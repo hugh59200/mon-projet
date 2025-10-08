@@ -47,7 +47,7 @@ export function useDropdownMenuHandler<T = DropdownItem>(
   const attach = async () => {
     detach()
     io.value = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting && isOpen.value) isOpen.value = false
+      if (entry!.isIntersecting && isOpen.value) isOpen.value = false
     })
     if (dropdownRef?.value)
       io.value.observe(dropdownRef.value)

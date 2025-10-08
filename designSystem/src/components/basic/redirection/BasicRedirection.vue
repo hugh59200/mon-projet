@@ -48,7 +48,7 @@
   onMounted(() => {
     if (!topAnchor.value) return
     observer = new IntersectionObserver(([entry]) => {
-      isPastTop.value = !entry.isIntersecting
+      isPastTop.value = entry!.isIntersecting
     })
     observer.observe(topAnchor.value)
   })

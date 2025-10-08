@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import WrapperToggleSwitch from './WrapperToggleSwitch.vue'
 import { type WrapperToggleSwitchProps } from './WrapperToggleSwitch.types'
 import type { ConcreteComponent } from 'vue'
