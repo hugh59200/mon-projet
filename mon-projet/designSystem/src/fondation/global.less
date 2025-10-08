@@ -1,0 +1,359 @@
+@font-family-primary: 'Mont';
+@font-family-secondary: 'sans-serif';
+
+@font-weight-light: 300;
+@font-weight-regular: 600;
+@font-weight-semibold: 700;
+@font-weight-bold: 800;
+
+@font-size-body-s: 10px;
+@font-size-body-m: 12px;
+@font-size-body-l: 14px;
+@font-size-body-xl: 16px;
+@font-size-h5: 18px;
+@font-size-h4: 20px;
+@font-size-h3: 28px;
+@font-size-h2: 35px;
+@font-size-h1: 48px;
+
+html body * {
+  scroll-behavior: smooth;
+  font-family: @font-family-primary, @font-family-secondary;
+}
+
+input {
+  width: 100%;
+  min-width: 0;
+  background: @white;
+  font-weight: @font-weight-regular;
+  border: 1px solid @neutral-200;
+  caret-color: @primary-600;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  outline: none;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &::placeholder {
+    color: @neutral-400;
+    font-size: @font-size-body-m;
+  }
+
+  &[readonly],
+  &[disabled] {
+    caret-color: transparent;
+    cursor: default !important;
+    background-color: @neutral-100;
+    color: @neutral-500;
+  }
+
+  &[disabled] {
+    opacity: 0.9;
+  }
+
+  &[readonly] {
+    background-color: @neutral-0;
+  }
+}
+
+.scrollbar {
+  /* ========== Chrome, Safari, Edge Chromium ========== */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+
+    &-thumb {
+      background-color: @neutral-200;
+      border-radius: 6px;
+    }
+  }
+}
+
+@supports (-moz-appearance: none) {
+  /* Styles spécifiques Firefox */
+  .scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: @neutral-100 transparent;
+  }
+}
+
+/* Style partagés aux éléments de grid */
+.gridElemWrapper:nth-child(odd),
+.listCardDesktopWrapper:nth-child(odd) {
+  background-color: @light-blue;
+}
+
+.gridElemWrapper:nth-child(even),
+.listCardDesktopWrapper:nth-child(even) {
+  background-color: @white;
+}
+
+.cardLayoutWrapper {
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(36, 1fr);
+  padding: 12px;
+  border-bottom: 1px solid @neutral-200;
+
+  &--selectionnable {
+    cursor: pointer;
+    &:hover {
+      background-color: @neutral-100;
+    }
+  }
+
+  &--no-pointer {
+    cursor: auto;
+  }
+
+  &--drawer {
+    background-color: #eeeeee;
+  }
+
+  &--factureList {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .drawer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  &--header {
+    border-radius: 8px 8px 0px 0px;
+    background: @indigo-900;
+
+    .elem {
+      display: flex;
+      justify-content: space-between;
+
+      span {
+        color: @white;
+        font-weight: 800;
+        font-size: 12px;
+      }
+
+      &--sort {
+        justify-content: flex-start;
+      }
+
+      svg {
+        fill: @white;
+        transform: scale(0.65);
+        overflow: visible;
+      }
+    }
+  }
+}
+
+.color-chip {
+  background-color: @neutral-400;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.color-recherche-demandes {
+  background-color: @red-600;
+}
+
+.color-recherche-dossiers {
+  background-color: @yellow-500;
+}
+
+.color-recherche-drf-demandes {
+  background-color: @pink-600;
+}
+
+.color-recherche-drf-dossiers {
+  background-color: @persian-600;
+}
+
+.color-recherche-virements {
+  background-color: @secondary-400;
+}
+
+.color-recherche-factures {
+  background-color: @blue-600;
+}
+
+.link {
+  color: @persian-600;
+  cursor: pointer;
+}
+
+.scrollable {
+  overflow: scroll;
+}
+
+.elem {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  color: @primary-950;
+  font-size: @font-size-body-m;
+
+  span {
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  svg {
+    transform: scale(0.7);
+    overflow: visible;
+  }
+
+  &--center {
+    justify-content: center !important;
+  }
+
+  &--bold {
+    span {
+      font-weight: 800;
+    }
+  }
+
+  &--column {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &--clickable {
+    color: @persian-600;
+    cursor: pointer;
+
+    svg {
+      fill: @persian-600;
+    }
+
+    :hover {
+      cursor: pointer;
+    }
+  }
+
+  &--disabled {
+    color: #cccccc;
+
+    svg {
+      fill: #cccccc;
+    }
+
+    :hover {
+      cursor: none;
+    }
+  }
+
+  span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  &--nowrap {
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  &--danger {
+    svg {
+      fill: @red-600;
+    }
+  }
+
+  &--column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--span-1 {
+    grid-column: span 1;
+  }
+
+  &--span-2 {
+    grid-column: span 2;
+  }
+
+  &--span-3 {
+    grid-column: span 3;
+  }
+
+  &--span-4 {
+    grid-column: span 4;
+  }
+
+  &--span-5 {
+    grid-column: span 5;
+  }
+
+  &--span-6 {
+    grid-column: span 6;
+  }
+
+  &--span-7 {
+    grid-column: span 7;
+  }
+
+  &--span-8 {
+    grid-column: span 8;
+  }
+
+  &--span-9 {
+    grid-column: span 9;
+  }
+
+  &--span-10 {
+    grid-column: span 10;
+  }
+
+  &--span-12 {
+    grid-column: span 12;
+  }
+
+  &--span-13 {
+    grid-column: span 13;
+  }
+
+  &--span-14 {
+    grid-column: span 14;
+  }
+
+  &--span-18 {
+    grid-column: span 18;
+  }
+
+  &--span-20 {
+    grid-column: span 20;
+  }
+
+  &--span-32 {
+    grid-column: span 32;
+  }
+
+  &--span-36 {
+    grid-column: span 36;
+  }
+}
+
+.emptyListPlaceholder {
+  display: table;
+  margin: 0 auto;
+  margin-top: 24px;
+  color: @neutral-500;
+}
+
+@focus-global: 0px 0px 1px 1px rgba(0, 167, 155, 0.4);
+
+.focusable:focus-visible {
+  outline: none;
+  box-shadow: @focus-global;
+}

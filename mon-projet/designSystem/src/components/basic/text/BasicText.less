@@ -1,0 +1,134 @@
+.h1 {
+  font-size: @font-size-h1;
+}
+.h2 {
+  font-size: @font-size-h2;
+}
+.h3 {
+  font-size: @font-size-h3;
+}
+.h4 {
+  font-size: @font-size-h4;
+}
+.h5 {
+  font-size: @font-size-h5;
+}
+.body-xl {
+  font-size: @font-size-body-xl;
+}
+.body-l {
+  font-size: @font-size-body-l;
+}
+.body-m {
+  font-size: @font-size-body-m;
+}
+.body-s {
+  font-size: @font-size-body-s;
+}
+
+.light {
+  font-weight: @font-weight-light;
+}
+.regular {
+  font-weight: @font-weight-regular;
+}
+.semibold {
+  font-weight: @font-weight-semibold;
+}
+.bold {
+  font-weight: @font-weight-bold;
+}
+strong {
+  font-weight: @font-weight-semibold;
+}
+.italic {
+  font-style: italic;
+}
+.normal {
+  font-style: normal;
+}
+
+.text {
+  &--wrap {
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &--pointer {
+    cursor: pointer;
+  }
+
+  &--wrapAll {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    word-break: break-all;
+  }
+
+  &--nbMaxLines-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+  }
+
+  &--nbMaxLines-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+  }
+
+  &-color--primary-600 {
+    color: @primary-600;
+  }
+  
+  &-color--primary-800 {
+    color: @primary-800;
+  }
+
+  &-color--secondary-900 {
+    color: @secondary-900;
+  }
+
+  &-color--secondary-800 {
+    color: @secondary-800;
+  }
+
+  &-color--secondary-1000 {
+    color: @secondary-1000;
+  }
+
+  &-color--secondary-600 {
+    color: @secondary-600;
+  }
+
+  &-color--neutral-500 {
+    color: @neutral-500;
+  }
+
+  &-color--white {
+    color: @white;
+  }
+
+  &-color--red {
+    color: @brick_red-600;
+  }
+
+  &-color--pink-400 {
+    color: @pink-400;
+  }
+
+  &-color--dark-jungle-green {
+    color: @dark-jungle-green;
+  }
+}

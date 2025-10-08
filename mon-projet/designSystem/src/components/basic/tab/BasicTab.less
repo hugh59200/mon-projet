@@ -1,0 +1,41 @@
+.tab {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: @spacing-20;
+  gap: @spacing-5;
+  border-top-left-radius: @spacing-10;
+  border-top-right-radius: @spacing-10;
+  user-select: none;
+  transition:
+    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s,
+    color 0.3s;
+  max-height: 0;
+
+  &--selected,
+  &--unselected:hover {
+    line-height: 1.1;
+    background: @white;
+    z-index: 2;
+  }
+
+  &--unselected {
+    color: @neutral-500;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  svg {
+    transform: scale(0.7);
+    flex: none;
+  }
+
+  &--success {
+    fill: @success-500;
+  }
+  &--danger {
+    fill: @danger-500;
+  }
+}

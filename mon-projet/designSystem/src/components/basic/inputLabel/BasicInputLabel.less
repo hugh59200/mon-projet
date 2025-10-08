@@ -1,0 +1,28 @@
+.input-label {
+  color: @secondary-1000;
+  display: flex;
+  gap: @spacing-5;
+
+  &--unwrap {
+    white-space: nowrap;
+  }
+
+  &__required {
+    position: relative;
+    color: @danger-600;
+    min-width: 4px;
+    span {
+      position: absolute;
+      top: -4px;
+    }
+  }
+
+  &__icon {
+    max-height: 12px;
+    fill: @secondary-1000;
+    cursor: pointer;
+    svg {
+      fill: @secondary-1000;
+    }
+  }
+}

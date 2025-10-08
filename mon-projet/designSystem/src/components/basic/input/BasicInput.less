@@ -1,0 +1,56 @@
+.input-container {
+  svg {
+    fill: @neutral-500;
+    transform: scale(0.9);
+    cursor: pointer;
+  }
+
+  &--disabled {
+    input {
+      background-color: @neutral-100;
+    }
+  }
+
+  &--large {
+    height: 48px;
+    border-radius: @border-radius-l;
+
+    input {
+      font-size: @font-size-body-l;
+    }
+  }
+
+  &--medium {
+    height: 40px;
+    border-radius: @border-radius-m;
+    input {
+      font-size: @font-size-body-m;
+    }
+  }
+
+  &--small {
+    height: 30px;
+    border-radius: @border-radius-s;
+    input {
+      font-size: @font-size-body-s;
+    }
+  }
+
+  &--success {
+    color: @success-600;
+    border-color: @success-600;
+
+    &:hover {
+      border-color: @success-600;
+    }
+  }
+
+  &--error {
+    color: @danger-600;
+    border-color: @danger-600;
+
+    &:hover {
+      border-color: @danger-600;
+    }
+  }
+}

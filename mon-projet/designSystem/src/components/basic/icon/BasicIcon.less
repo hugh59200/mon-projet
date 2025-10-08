@@ -1,0 +1,53 @@
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.icon {
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+
+  &--pointer {
+    cursor: pointer;
+  }
+
+  &--not-allowed {
+    cursor: not-allowed !important;
+  }
+
+  &--disabled {
+    fill: @neutral-300 !important;
+  }
+
+  &--color--primary-600 {
+    fill: @primary-600;
+  }
+
+  &--color--pink-400 {
+    fill: @pink-400;
+  }
+  &--color--secondary-800 {
+    fill: @secondary-800;
+  }
+  &--color--secondary-1000 {
+    fill: @secondary-1000;
+  }
+  &--color--grey-800 {
+    fill: @grey-800;
+  }
+}
+
+.icon.show {
+  opacity: 1;
+}
+
+.icon:focus {
+  outline: none;
+  box-shadow: @focus-global;
+}

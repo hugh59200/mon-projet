@@ -1,0 +1,88 @@
+.alert {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  border-radius: @spacing-5;
+
+  svg {
+    margin-top: -4px;
+  }
+
+  .icon--container {
+    height: 16px;
+    width: 16px;
+  }
+
+  &--small {
+    padding: @spacing-5;
+    svg {
+      margin-top: -6px;
+      transform: scale(0.5);
+    }
+    .icon--container {
+      margin-right: 6px;
+      margin-left: -4px;
+    }
+  }
+
+  &--medium {
+    padding: @spacing-10;
+
+    .icon--container {
+      margin-right: 10px;
+    }
+
+    svg {
+      transform: scale(0.7);
+    }
+  }
+
+  &--danger {
+    background-color: @danger-0;
+    color: @danger-600;
+
+    svg {
+      fill: @danger-600;
+    }
+  }
+
+  &--success {
+    background-color: @success-50;
+    color: @success-500;
+
+    svg {
+      fill: @success-500;
+    }
+  }
+
+  &--info {
+    background-color: @info-50;
+    color: @info-500;
+
+    svg {
+      fill: @info-500;
+    }
+  }
+
+  &--warning {
+    background-color: @warning-50;
+    color: @warning-500;
+
+    svg {
+      fill: @warning-500;
+    }
+  }
+
+  &--no-bg {
+    background-color: transparent;
+  }
+}
+
+@container (max-width: @breakpoint-mobile) {
+  .stepperButtons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+}

@@ -1,0 +1,138 @@
+import { Meta } from '@storybook/addon-docs'
+import tokens from '../tokens/tokens.json'
+
+<Meta title="Fondations/Couleurs de Statut" />
+
+# Fondations/Couleurs de Statut
+
+## Neutre
+
+Les couleurs neutres sont utilisées pour des statuts informatifs ou neutres.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '40px' }}>
+  {Object.entries(tokens.alerts.status_colors_token).map(([key, value]) => {
+    if (key.startsWith('status-neutral')) {
+      return (
+        <div
+          key={key}
+          style={{
+            backgroundColor: value,
+            width: '100px',
+            height: '100px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            borderRadius: '4px',
+            fontSize: '14px',
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}
+          onClick={() => navigator.clipboard.writeText(value).then(() => alert(`Copied: ${value}`))}
+        >
+          <p>{key}</p>
+        </div>
+      )
+    }
+    return null
+  })}
+</div>
+
+## Succès
+
+Les couleurs de succès sont utilisées pour indiquer des opérations réussies ou des statuts positifs.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '40px' }}>
+  {Object.entries(tokens.alerts.status_colors_token).map(([key, value]) => {
+    if (key.startsWith('status-success')) {
+      return (
+        <div
+          key={key}
+          style={{
+            backgroundColor: value,
+            width: '100px',
+            height: '100px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            borderRadius: '4px',
+            fontSize: '14px',
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}
+          onClick={() => navigator.clipboard.writeText(value).then(() => alert(`Copied: ${value}`))}
+        >
+          <p>{key}</p>
+        </div>
+      )
+    }
+    return null
+  })}
+</div>
+
+## Avertissement
+
+Les couleurs d'avertissement sont utilisées pour indiquer des mises en garde ou des situations nécessitant une attention particulière.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '40px' }}>
+  {Object.entries(tokens.alerts.status_colors_token).map(([key, value]) => {
+    if (key.startsWith('status-warning')) {
+      return (
+        <div
+          key={key}
+          style={{
+            backgroundColor: value,
+            width: '100px',
+            height: '100px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            borderRadius: '4px',
+            fontSize: '14px',
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}
+          onClick={() => navigator.clipboard.writeText(value).then(() => alert(`Copied: ${value}`))}
+        >
+          <p>{key}</p>
+        </div>
+      )
+    }
+    return null
+  })}
+</div>
+
+## Erreur
+
+Les couleurs d'erreur sont utilisées pour indiquer des erreurs ou des alertes critiques.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '40px' }}>
+  {Object.entries(tokens.alerts.status_colors_token).map(([key, value]) => {
+    if (key.startsWith('status-error')) {
+      return (
+        <div
+          key={key}
+          style={{
+            backgroundColor: value,
+            width: '100px',
+            height: '100px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            borderRadius: '4px',
+            fontSize: '14px',
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}
+          onClick={() => navigator.clipboard.writeText(value).then(() => alert(`Copied: ${value}`))}
+        >
+          <p>{key}</p>
+        </div>
+      )
+    }
+    return null
+  })}
+</div>

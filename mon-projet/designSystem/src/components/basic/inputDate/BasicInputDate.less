@@ -1,0 +1,18 @@
+.calendarDesktop {
+  display: none;
+  width: 100%;
+  width: 40px;
+  position: absolute;
+  z-index: 10;
+  bottom: 0;
+  right: 3px;
+}
+
+@media (min-width: @breakpoint-tablet) {
+  .calendarDesktop {
+    display: flex;
+    input {
+      opacity: 0;
+    }
+  }
+}

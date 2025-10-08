@@ -1,0 +1,198 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0px 0px 2px 2px rgba(0, 167, 155, 0.4);
+  }
+
+  .icon-container {
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &--large {
+    height: 48px;
+    padding: @padding-button-l;
+    border-radius: @border-radius-l;
+    gap: @spacing-10;
+  }
+
+  &--medium {
+    height: 40px;
+    padding: @padding-button-m;
+    border-radius: @border-radius-m;
+    gap: @spacing-10;
+    svg {
+      transform: scale(0.85);
+    }
+  }
+
+  &--small {
+    height: 35px;
+    padding: @padding-button-s;
+    border-radius: @border-radius-s;
+    gap: @spacing-5;
+
+    svg {
+      transform: scale(0.75);
+    }
+  }
+  &--auto {
+    width: auto;
+  }
+
+  &--full {
+    width: 100%;
+  }
+  &--primary {
+    &.btn--filled {
+      .addFilledColors(
+        @primary-filled-default-bg,
+        @primary-filled-default-text,
+        @primary-filled-hover-bg,
+        @primary-filled-hover-text,
+        @primary-filled-active-bg,
+        @primary-filled-active-text
+      );
+    }
+    &.btn--outlined {
+      .addOutlinedColors(
+        @primary-outlined-default-bg,
+        @primary-outlined-default-text,
+        @primary-outlined-hover-bg,
+        @primary-outlined-hover-text,
+        @primary-outlined-active-bg,
+        @primary-outlined-active-text
+      );
+    }
+    &.btn--ghost {
+      .addGhostedColors(
+        @primary-ghosted-default-bg,
+        @primary-ghosted-default-text,
+        @primary-ghosted-hover-bg,
+        @primary-ghosted-hover-text,
+        @primary-ghosted-active-bg,
+        @primary-ghosted-active-text
+      );
+    }
+  }
+
+  &--reverse {
+    &.btn--filled {
+      .addFilledColors(
+        @reverse-filled-default-bg,
+        @reverse-filled-default-text,
+        @reverse-filled-hover-bg,
+        @reverse-filled-hover-text,
+        @reverse-filled-active-bg,
+        @reverse-filled-active-text
+      );
+    }
+    &.btn--outlined {
+      .addOutlinedColors(
+        @reverse-outlined-default-bg,
+        @reverse-outlined-default-text,
+        @reverse-outlined-hover-bg,
+        @reverse-outlined-hover-text,
+        @reverse-outlined-active-bg,
+        @reverse-outlined-active-text
+      );
+    }
+    &.btn--ghost {
+      .addGhostedColors(
+        @reverse-ghosted-default-bg,
+        @reverse-ghosted-default-text,
+        @reverse-ghosted-hover-bg,
+        @reverse-ghosted-hover-text,
+        @reverse-ghosted-active-bg,
+        @reverse-ghosted-active-text
+      );
+    }
+  }
+
+  &--secondary {
+    &.btn--filled {
+      .addFilledColors(
+        @secondary-filled-default-bg,
+        @secondary-filled-default-text,
+        @secondary-filled-hover-bg,
+        @secondary-filled-hover-text,
+        @secondary-filled-active-bg,
+        @secondary-filled-active-text
+      );
+    }
+    &.btn--outlined {
+      .addOutlinedColors(
+        @secondary-outlined-default-bg,
+        @secondary-outlined-default-text,
+        @secondary-outlined-hover-bg,
+        @secondary-outlined-hover-text,
+        @secondary-outlined-active-bg,
+        @secondary-outlined-active-text
+      );
+    }
+    &.btn--ghost {
+      .addGhostedColors(
+        @secondary-ghosted-default-bg,
+        @secondary-ghosted-default-text,
+        @secondary-ghosted-hover-bg,
+        @secondary-ghosted-hover-text,
+        @secondary-ghosted-active-bg,
+        @secondary-ghosted-active-text
+      );
+    }
+  }
+
+  &--danger {
+    &.btn--filled {
+      .addFilledColors(
+        @danger-filled-default-bg,
+        @danger-filled-default-text,
+        @danger-filled-hover-bg,
+        @danger-filled-hover-text,
+        @danger-filled-active-bg,
+        @danger-filled-active-text
+      );
+    }
+    &.btn--outlined {
+      .addOutlinedColors(
+        @danger-outlined-default-bg,
+        @danger-outlined-default-text,
+        @danger-outlined-hover-bg,
+        @danger-outlined-hover-text,
+        @danger-outlined-active-bg,
+        @danger-outlined-active-text
+      );
+    }
+    &.btn--ghost {
+      .addGhostedColors(
+        @danger-ghosted-default-bg,
+        @danger-ghosted-default-text,
+        @danger-ghosted-hover-bg,
+        @danger-ghosted-hover-text,
+        @danger-ghosted-active-bg,
+        @danger-ghosted-active-text
+      );
+    }
+  }
+
+  &--icon-right {
+    flex-direction: row-reverse;
+  }
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.8s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}

@@ -1,0 +1,85 @@
+.standalone-link {
+  background: none;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+
+  &--with-icon {
+    display: flex;
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    color: @neutral-400;
+
+    svg {
+      fill: @neutral-300;
+    }
+  }
+
+  &--medium {
+    svg {
+      transform: scale(0.75);
+    }
+  }
+
+  &--small {
+    svg {
+      transform: scale(0.5);
+    }
+  }
+
+  &--primary {
+    &:not(.standalone-link--disabled) {
+      .addLinkColors(@primary-default-text, @primary-hover-text);
+    }
+  }
+
+  &--secondary {
+    &:not(.standalone-link--disabled) {
+      .addLinkColors(@secondary-default-text, @secondary-hover-text);
+    }
+  }
+
+  &--light {
+    &:not(.standalone-link--disabled) {
+      .addLinkColors(@light-default-text, @light-hover-text);
+    }
+  }
+
+  &--dark {
+    &:not(.standalone-link--disabled) {
+      .addLinkColors(@dark-default-text, @dark-hover-text);
+    }
+  }
+}
+
+.addLinkColors(@default-color, @hover-color) {
+  color: @default-color;
+
+  svg {
+    fill: @default-color;
+  }
+
+  &:hover {
+    color: @hover-color;
+    text-decoration: underline;
+
+    svg {
+      fill: @hover-color;
+    }
+  }
+}
+
+@primary-default-text: @primary-600;
+@primary-hover-text: @primary-800;
+
+@secondary-default-text: @secondary-800;
+@secondary-hover-text: @secondary-900;
+
+@light-default-text: @white;
+@light-hover-text: @secondary-300;
+
+@dark-default-text: @secondary-1000;
+@dark-hover-text: @secondary-1000;

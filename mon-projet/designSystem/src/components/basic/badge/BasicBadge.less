@@ -1,0 +1,85 @@
+.badge {
+  max-width: fit-content;
+  display: flex;
+  align-items: center;
+  border-radius: @border-radius-l;
+  border: 1px solid;
+
+  &--medium {
+    height: 30px;
+    padding: @padding-badge-m;
+    gap: @spacing-10;
+  }
+
+  &--small {
+    height: 20px;
+    padding: @padding-badge-s;
+    gap: @spacing-5;
+
+    svg {
+      transform: scale(0.65);
+    }
+  }
+
+  &--default {
+    background-color: @secondary-0;
+    color: @secondary-600;
+    border-color: @secondary-600;
+    svg {
+      fill: @secondary-0;
+    }
+  }
+
+  &--pending {
+    background-color: @warning-50;
+    color: @warning-500;
+    border-color: @warning-500;
+    svg {
+      fill: @warning-500;
+    }
+  }
+
+  &--error {
+    background-color: @danger-0;
+    color: @danger-500;
+    border-color: @danger-500;
+    svg {
+      fill: @danger-500;
+    }
+  }
+
+  &--success {
+    background-color: @success-50;
+    color: @success-500;
+    border-color: @success-500;
+    svg {
+      fill: @success-500;
+    }
+  }
+
+  &--info {
+    background-color: @info-50;
+    color: @info-500;
+    border-color: @info-500;
+    svg {
+      fill: @info-500;
+    }
+  }
+
+  &--canceled {
+    background-color: @neutral-100;
+    color: @neutral-500;
+    border-color: @neutral-500;
+    svg {
+      fill: @neutral-500;
+    }
+  }
+
+  .badge__close-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
