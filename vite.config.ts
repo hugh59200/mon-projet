@@ -30,11 +30,6 @@ generateGlobalComponents(__dirname)
 
 export default defineConfig({
   plugins: [
-    vue({
-      features: {
-        customElement: process.env.CIBLE === 'ADMIN',
-      },
-    }),
     VueDevTools(),
     svgLoader(),
     BasicSSL(),

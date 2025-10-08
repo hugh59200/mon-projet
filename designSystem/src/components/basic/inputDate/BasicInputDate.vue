@@ -95,7 +95,7 @@
       return value ?? ''
     }
 
-    const tokens = value.split('-')
+    const tokens = value!.split('-')
     return `${tokens[2]}/${tokens[1]}/${tokens[0]}`
   }
 
