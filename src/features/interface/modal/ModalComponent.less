@@ -1,0 +1,75 @@
+.modal {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 10000;
+  backdrop-filter: blur(1px) brightness(98%);
+  border-radius: @border-radius-l;
+  z-index: 900; // Le sablier est à 1000
+
+  /* Ne pas toucher HUGO STP */
+  &.sablier-devant {
+    z-index: 100;
+  }
+
+  svg {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  &__dialog {
+    border-top-left-radius: @border-radius-l;
+    border-top-right-radius: @border-radius-l;
+    max-width: 80%;
+    background-color: @white;
+    box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.05);
+  }
+
+  &__header {
+    border-top-left-radius: @border-radius-m;
+    border-top-right-radius: @border-radius-m;
+    padding: 32px 48px 32px 24px;
+    position: relative;
+    background-color: @secondary-900;
+
+    svg {
+      fill: @white;
+    }
+  }
+
+  &__content {
+    padding: 32px 24px;
+    position: relative;
+
+    svg {
+      fill: @neutral-500;
+    }
+  }
+
+  &__actions {
+    padding: 12px 24px 24px 24px;
+  }
+}
+
+@media screen and (max-height: 720px) {
+  .modal {
+    &__header {
+      padding: 16px 48px 16px 24px;
+    }
+
+    &__content {
+      padding: 18px 24px;
+    }
+
+    &__actions {
+      padding: 0px 24px 12px 24px;
+    }
+  }
+}

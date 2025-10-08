@@ -12,7 +12,7 @@ export function useWrapperFormLogic(modelValue: Ref<TabsModel>, tabs: Ref<TabPro
   function handleMovePrevious() {
     if (canMovePrevious.value) {
       const prevTab = tabs.value[currentIndex.value - 1]
-      modelValue.value = prevTab.tabKey
+      modelValue.value = prevTab?.tabKey
       emit('movePrevious')
     }
   }
@@ -20,7 +20,7 @@ export function useWrapperFormLogic(modelValue: Ref<TabsModel>, tabs: Ref<TabPro
   function handleMoveNext() {
     if (canMoveNext.value) {
       const nextTab = tabs.value[currentIndex.value + 1]
-      modelValue.value = nextTab.tabKey
+      modelValue.value = nextTab?.tabKey
       emit('moveNext')
     }
   }
