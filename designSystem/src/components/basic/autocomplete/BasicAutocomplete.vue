@@ -215,7 +215,7 @@
       else selectIndex.value = items.value.length - 1
       makeVisible(selectIndex.value)
     } else if (event.key === 'Enter') {
-      selectItem(items.value[selectIndex.value])
+      selectItem(items.value[selectIndex.value]!)
     }
   }
 

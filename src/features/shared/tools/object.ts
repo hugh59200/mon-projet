@@ -154,7 +154,53 @@ export function objectGetValueWithNestedKeyArray<TObject extends object, TResult
   return result
 }
 
+/**
+ * Applique la valeur en parcourant les clés imbriquées
+ * @param obj Un object
+ * @param keys Une chaine de clée séparée par des points : personne.adresse.cp ou salariés.0.nom
+ * @returns
+ */
+export function objectSetValueWithNestedKey<TObject extends object>(
+  obj: TObject,
+  keys: NestedKeyOf<TObject>,
+  value?: any,
+) {
+  return objectSetValueWithNestedKeyArray(obj, keys.split('.'), value)
+}
 
+/**
+ * Versiion de objectSetValueWithNestedKey utilisant un tableau de clée imbriquées
+ * @param obj Un object
+ * @param keys Un tableau de chaine ou de nombre représentant le chemin pour accéder à la valeur : ['personne', 'adresse', 'cp'] ou ['salariés', 0 'nom']
+ * @returns
+ */
+export function objectSetValueWithNestedKeyArray<TObject extends object>(
+  obj: TObject,
+  keyTokens: Array<string | number>,
+  value?: any,
+): TObject {
+  let context: any = obj
+  for (let i = 0; i < keyTokens.length; i++) {
+    const token = keyTokens[i]
+    if (i === keyTokens.length - 1) {
+      context[token!] = value
+    } else {
+      if (isNullOrUndefined(context[token!])) {
+        // Test si la clée suivante
+        // est un nombre ou une chaine
+        if (isNaN(keyTokens[i + 1] as any)) {
+          // C'est une chaine affecte un objet
+          context[token!] = {}
+        } else {
+          // C'est un nombre affecte un array
+          context[token!] = []
+        }
+      }
+      context = context[token!]
+    }
+  }
+  return obj
+}
 
 /**
  * Extraction d'une liste des propriétés d'un objet à plat (ex : ['personne.nom', 'personne.adresse.cp'])

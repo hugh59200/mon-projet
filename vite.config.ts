@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import BasicSSL from '@vitejs/plugin-basic-ssl'
 import path from 'path'
+import vue from '@vitejs/plugin-vue'
 import {  defineConfig, type BuildEnvironmentOptions } from 'vite'
 import svgLoader from 'vite-svg-loader'
 import VueDevTools from 'vite-plugin-vue-devtools'
@@ -29,6 +30,7 @@ generateGlobalComponents(__dirname)
 
 export default defineConfig({
   plugins: [
+    vue(),
     VueDevTools(),
     svgLoader(),
     BasicSSL(),
