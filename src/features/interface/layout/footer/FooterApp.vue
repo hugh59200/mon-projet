@@ -10,16 +10,11 @@
       Développement @akto 2025. Version : 1.0
     </BasicText>
     <BasicText
-      v-if="!showChip()"
       size="body-m"
       color="neutral-500"
     >
       -
     </BasicText>
-    <div
-      v-else
-      :class="`chip chip--${currentEnv}`"
-    ></div>
     <BasicText
       size="body-m"
       color="neutral-500"
@@ -37,7 +32,7 @@
         <template #header>VERSIONS STABLES DE L'OUTIL AKTO VERIF</template>
         <template #content>
           <vue-markdown
-            :source="AktoVersion"
+            :source="markdown"
             class="footer__content scrollbar"
           />
         </template>
@@ -51,15 +46,10 @@
   import VueMarkdown from 'vue-markdown-render'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useAfficheCGU } from '../../cgu'
-  import { markdown as AktoVersion } from './AktoVersion.md'
-  import type { Environnements } from '@/features/application/shared/Environnements.types'
+  import { markdown  } from './AktoVersion.md'
 
   const toggleModal = ref(false)
-  const currentEnv = import.meta.env.VITE_ENV as Environnements
 
-  const showChip = () => {
-    return currentEnv === 'blue' || currentEnv === 'green'
-  }
 
   const showCGU = () => {
     const dialog = useAfficheCGU()

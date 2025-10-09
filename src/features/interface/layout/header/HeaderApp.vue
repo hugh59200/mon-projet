@@ -1,7 +1,7 @@
 <template>
   <header>
     <div class="left-content">
-      <template v-if="appState.estUtilisateurAuthentifie">
+      <template v-if="true">
         <template v-if="headerText">
           <BasicText
             size="h3"
@@ -31,12 +31,7 @@
     </div>
 
     <div class="right-content">
-      <HeaderComboContexte />
-      <template v-if="appState.estUtilisateurAuthentifie">
-        <NotificationsComponent
-          v-if="!appState.estAuthentificationEnCours"
-          class="right-content__notification"
-        />
+      <template v-if="true">
         <div
           class="right-content__user-info"
           ref="menu"
@@ -75,46 +70,16 @@
             v-if="showMenu"
           >
             <div class="right-content__user-menu">
-              <template v-if="appState.estUtilisateurImpersonnalise">
-                <div class="name-interne">
-                  <BasicIcon
-                    name="profile"
-                    class="icon"
-                    active
-                  />
-                  <BasicText
-                    color="secondary-600"
-                    size="body-xl"
-                    weight="bold"
-                  >
-                    {{ fullNameInterne }}
-                  </BasicText>
-                </div>
-                <BasicText
-                  class="link"
-                  color="secondary-600"
-                  @click="changerUtilisateur"
-                  pointer
-                >
-                  Changer d’utilisateur externe
-                </BasicText>
-                <hr />
-              </template>
-              <template v-if="!appState.estAuthentificationEnCours">
+              <template v-if="false">
                 <BasicLink
                   @link-click="$router.push({ name: 'Profil' })"
                   @click="closeMenu"
                   type="dark"
                   label="Accéder à mon profil"
                 />
-                <BasicLink
-                  @link-click="demanderRattachement"
-                  type="dark"
-                  label="Me rattacher à une entreprise"
-                />
               </template>
               <BasicLink
-                @link-click="appState.deconnexionAsync"
+                @link-click="null"
                 type="dark"
                 label="Se déconnecter"
               />
@@ -130,13 +95,13 @@
           label="Créer son compte"
           variant="outlined"
           size="large"
-          @click="appState.inscriptionAsync"
+          @click="null"
           class="creation__button"
         />
         <BasicButton
           label="Se connecter"
           size="large"
-          @click="appState.connexionAsync"
+          @click="null"
         />
       </div>
     </div>
@@ -145,54 +110,26 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
-  import router from '@/router'
-  import { useRoute } from 'vue-router'
-  import { useAppStateStore } from '@/features/application'
-  import HeaderComboContexte from '@/features/interface/layout/comboContexte/ComboContexte.vue'
-  import NotificationsComponent from './composants/NotificationsComponent/NotificationsComponent.vue'
   import { useHandleClickOutside } from '@/features/interface/composables/useHandleClickOutside'
-  import { ROUTE_RESET_IMPERSO } from '@/features/auth/impersonnalisation'
-  import { Utilisateur } from '@/features/auth'
-  import { useDemandeRattachement } from '../../profil-utilisateur/sections/rattachements/demande'
 
   const menu = ref()
+
   const showMenu = ref(false)
-  const route = useRoute()
-  const appState = useAppStateStore()
 
   const headerText = computed<{ titre: string; sousTitre?: string } | undefined>(() => {
-    let result: string | [string, string] | undefined
-    if (typeof route.meta.label === 'function') result = route.meta.label(route)
-    else result = route.meta.label ?? ''
-
-    if (!result) return
-    else if (typeof result === 'string') return { titre: result }
-    else return { titre: result[0], sousTitre: result[1] }
+    return { titre: 'titre' }
   })
 
   const fullName = computed(() => {
-    return appState.utilisateur?.prenomNomAffichage
+    return 'mon nom'
   })
 
-  const fullNameInterne = computed(() => {
-    if (appState.utilisateur instanceof Utilisateur) return appState.utilisateur?.prenomNomInterne
-    else return ''
-  })
 
   const closeMenu = () => {
     showMenu.value = false
   }
 
-  const changerUtilisateur = () => {
-    router.push({ name: ROUTE_RESET_IMPERSO })
-    closeMenu()
-  }
 
-  const demanderRattachement = () => {
-    const demandeRattachement = useDemandeRattachement()
-    demandeRattachement.showDialog()
-    closeMenu()
-  }
 
   useHandleClickOutside(menu, () => {
     closeMenu()

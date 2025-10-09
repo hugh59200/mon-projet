@@ -1,17 +1,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAppStateStore } from '@/features/application'
-import { useFavorisStore } from '@/features/interface/favoris/favorisStore'
-import { useDialog } from '@/features/interface/dialog'
-import { typeContextCourantToContextAppType, TypesContextesAutorisesEnum } from '@/features/auth/context-app'
 import { getCurrentBreakpoint } from '@designSystem/fondation/breakpoints/getCurrentBreakpoint'
-import { useHandleClickOutside } from '../../composables'
+import { useHandleClickOutside } from '../../composables/useHandleClickOutside'
 
 export function useSidebarState(sidebarRef: any) {
   const router = useRouter()
-  const storeFavoris = useFavorisStore()
-  const dialog = useDialog()
-  const appState = useAppStateStore()
 
   const isSidebarReduced = ref(false)
   const isReducedManually = ref(false)
@@ -42,22 +35,8 @@ export function useSidebarState(sidebarRef: any) {
     }
   }
 
-  const deleteFavorite = async (key: string) => {
-    const result = await dialog.showDialog({
-      message: 'Confirmez-vous la suppression du favori ?',
-      type: 'YesNo',
-      title: 'Supprimer un favori',
-    })
-    if (result === 'Yes') {
-      storeFavoris.deleteFavori(key)
-    }
-  }
 
   const sidebarItems = computed(() => {
-    const context =
-      appState.contextCourant !== TypesContextesAutorisesEnum.Aucun
-        ? typeContextCourantToContextAppType(appState.contextCourant)
-        : null
 
     return router
       .getRoutes()
@@ -67,19 +46,13 @@ export function useSidebarState(sidebarRef: any) {
         // Gestion de la visibility
         let visibility = route.meta.visibility
         if (typeof visibility === 'function') {
-          visibility = visibility(route) // on passe la route pour que le resolver ait un contexte
+          visibility = visibility(route) 
         }
 
         return visibility !== 'hidden'
       })
-      .sort((a, b) => (a.meta.order ?? 0) - (b.meta.order ?? 0))
+      .sort((a, b) => (Number(a.meta.order) || 0) - (Number(b.meta.order) || 0))
       .map((route) => {
-        if (route.meta.requiresContext && context) {
-          return {
-            ...route,
-            params: { context },
-          }
-        }
         return route
       })
   })
@@ -95,15 +68,10 @@ export function useSidebarState(sidebarRef: any) {
     updateSidebarState()
   })
 
-  // watch(() => appState.contextCourant, {
-  //   immediate: true,
-  // })
 
   return {
     isSidebarReduced,
     toggleSidebar,
     sidebarItems,
-    deleteFavorite,
-    storeFavoris,
   }
 }
