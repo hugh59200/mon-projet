@@ -1,0 +1,44 @@
+<template>
+  <DialogComponent />
+  <SablierComponent />
+  <FavoriComponent />
+  <MachineEtats />
+  <CGU />
+  <vue3-snackbar
+    :duration="5000"
+    base-background-color="#fff"
+    background-opacity="0.05"
+    message-class="app-snackbar"
+    border="bottom"
+    bottom
+  />
+</template>
+
+<script setup lang="ts">
+  import { Vue3Snackbar } from 'vue3-snackbar'
+  import 'vue3-snackbar/styles'
+  import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
+  import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
+  import FavoriComponent from '@/features/interface/favoris/FavoriComponent.vue'
+  import MachineEtats from '@/features/interface/machine-etats/MachineEtats.vue'
+  import CGU from '@/features/interface/cgu/CGU.vue'
+
+  import { registerPopupAutoRattachement } from '@/features/interface/profil-utilisateur/sections/rattachements/demande'
+  import { registerPopupAutoCGU } from './features/interface/cgu'
+  import { registerAppSnackBarEventsManager } from './features/interface/shared/snack-bar'
+
+  registerPopupAutoRattachement()
+  registerPopupAutoCGU()
+  registerAppSnackBarEventsManager()
+</script>
+
+<style lang="less">
+  .vue3-snackbar-message.app-snackbar {
+    font-family: Mont, sans-serif;
+    _border-radius: 0;
+    border-bottom: none;
+    .vue3-snackbar-message-content {
+      width: 300px;
+    }
+  }
+</style>

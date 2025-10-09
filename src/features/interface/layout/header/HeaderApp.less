@@ -1,0 +1,138 @@
+header {
+  background-color: @secondary-800;
+  height: 80px;
+  color: @white;
+  padding: @spacing-10 @spacing-10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  word-wrap: break-word;
+  gap: @spacing-10;
+  z-index: 10;
+
+  .left-content {
+    min-width: 30px;
+    padding: @spacing-5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .logo {
+      margin-left: 24px;
+    }
+  }
+
+  .right-content {
+    display: flex;
+    align-items: center;
+    gap: @spacing-15;
+
+    &__buttons {
+      margin-right: 24px;
+      display: flex;
+      gap: 12px;
+    }
+
+    &__user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      padding: @spacing-10;
+      margin-right: @spacing-10;
+
+      &--mobile {
+        display: none;
+      }
+
+      .userName:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .menu {
+      position: absolute;
+      margin-top: 40px;
+      background-color: @white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    &__user-menu {
+      display: flex;
+      padding: 20px;
+      flex-direction: column;
+      justify-content: center;
+      white-space: nowrap;
+      gap: 12px;
+
+      .name-interne {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+        .text {
+          margin-top: 2px;
+        }
+        svg {
+          fill: @secondary-600;
+        }
+      }
+
+      .name {
+        color: @secondary-1000;
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .link:hover {
+        text-decoration: underline;
+      }
+
+      hr {
+        margin-top: 12px;
+        border-top: 1px solid #d0d5dd;
+      }
+
+      .action:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &__avatar {
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    &__notification {
+      background-color: transparent;
+      border: none;
+      color: @white;
+    }
+  }
+}
+
+@container (max-width: @breakpoint-mobile) {
+  .right-content {
+    &__user-info {
+      &--mobile {
+        display: flex !important;
+      }
+
+      &--desktop {
+        display: none;
+      }
+    }
+
+    &__buttons {
+      .creation__button {
+        display: none;
+      }
+    }
+  }
+}
