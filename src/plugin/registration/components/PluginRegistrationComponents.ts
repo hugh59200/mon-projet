@@ -26,7 +26,6 @@ declare module 'vue' {
     BasicLoader: (typeof import('@designSystem/components/basic/loader/BasicLoader.vue'))['default']
     BasicPagination: (typeof import('@designSystem/components/basic/pagination/BasicPagination.vue'))['default']
     BasicPopup: (typeof import('@designSystem/components/basic/popup/BasicPopup.vue'))['default']
-    BasicRadio: (typeof import('@designSystem/components/basic/radio/BasicRadio.vue'))['default']
     BasicSort: (typeof import('@designSystem/components/basic/sort/BasicSort.vue'))['default']
     BasicTab: (typeof import('@designSystem/components/basic/tab/BasicTab.vue'))['default']
     BasicTabs: (typeof import('@designSystem/components/basic/tabs/BasicTabs.vue'))['default']
@@ -71,7 +70,7 @@ export default {
 
       // Enregistre le composant uniquement s'il exporte `default`
       if (component && component.default) {
-        app.component(fileName, component.default)
+        app.component(fileName!, component.default)
       }
     }
   },
