@@ -79,17 +79,17 @@
       case ' ':
         event.preventDefault()
         handleSpace()
-        selectItem(computedItems.value[selectIndex.value].id)
+        selectItem(computedItems.value[selectIndex.value]!.id)
         break
       case 'ArrowDown':
         event.preventDefault()
         handleArrowDownKey()
-        selectItem(computedItems.value[selectIndex.value].id)
+        selectItem(computedItems.value[selectIndex.value]!.id)
         break
       case 'ArrowUp':
         event.preventDefault()
         handleArrowUpKey()
-        selectItem(computedItems.value[selectIndex.value].id)
+        selectItem(computedItems.value[selectIndex.value]!.id)
         break
       case 'Tab':
         handleTab()

@@ -1,0 +1,9 @@
+{
+  "actions": {
+    "Ok": "Ok",
+    "Yes": "Oui",
+    "No": "Non",
+    "Cancel": "Annuler",
+    "Retry": "Réessayer"
+  }
+}

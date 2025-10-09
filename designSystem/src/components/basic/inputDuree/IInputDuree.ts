@@ -21,8 +21,8 @@ export function inputDureeToString(value?: IInputDuree | null): string | null {
 export function stringToInputDuree(value?: string | null): IInputDuree {
   const captures = /^(\d{1,4})[h:](\d{2})$/i.exec(value ?? '')
   if (captures) {
-    const heures = parseInt(captures[1])
-    const minutes = parseInt(captures[2])
+    const heures = parseInt(captures[1]!)
+    const minutes = parseInt(captures[2]!)
 
     if (minutes < 60) {
       return {

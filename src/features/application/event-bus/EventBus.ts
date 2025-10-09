@@ -12,14 +12,14 @@ export type BusEventOnOption = { once?: boolean }
 export type BusEventErrorCallBack<B extends BusEvent> = (err: BusEventError<B>) => void
 export class BusEventError<B extends BusEvent> extends Error {
   readonly event: BusEvent<BusEventName<B>>
+  readonly #cause: Error
   constructor(event: BusEvent<BusEventName<B>>, error: Error) {
-    super("EventBus a interpecté une erreur au dispatch", {
-      cause: error
-    })
+    super("EventBus a interpecté une erreur au dispatch")
+    this.#cause = error
     this.event = event
   }
   get cause(): Error {
-    return super.cause as Error
+    return this.#cause
   }
 }
 

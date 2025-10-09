@@ -1,0 +1,41 @@
+.title {
+  text-align: center;
+
+  &--success {
+    color: @green-success-500;
+  }
+
+  &--warning {
+    color: @red-600;
+  }
+}
+
+:deep(.modal__dialog) {
+  max-width: 800px;
+  border-radius: 8px;
+  margin: 18px;
+}
+
+.content {
+  color: @secondary-950;
+  text-align: left;
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  margin-top: 24px;
+
+  > div {
+    min-height: 12px;
+  }
+
+  :deep(.basic-text) {
+    display: block;
+    white-space: break-spaces;
+    overflow-wrap: break-word;
+  }
+}
+
+.image {
+  height: 20vh;
+}

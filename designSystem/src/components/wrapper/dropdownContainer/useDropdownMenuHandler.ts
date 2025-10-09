@@ -1,7 +1,6 @@
 import { ref, computed, type Ref, nextTick, watch, onBeforeUnmount } from 'vue'
 import type { DropdownItem } from '@designSystem/components'
 import { useScrollIntoView } from '@/features/interface/composables/useScrollIntoView'
-import { noop } from '@/features/shared/tools'
 
 export type DropdownDirection = 'up' | 'down'
 
@@ -58,7 +57,7 @@ export function useDropdownMenuHandler<T = DropdownItem>(
       scrollRoot.value = (dropdownRef?.value ?? null)?.closest?.('.scroll-container') ?? null
       await nextTick()
       updateDropdownVisibilityAndDirection()
-      attach().then(noop)
+      attach()
     }
   })
 

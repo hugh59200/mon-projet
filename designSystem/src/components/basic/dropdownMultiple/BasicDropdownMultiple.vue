@@ -83,7 +83,7 @@
       case ' ':
         event.preventDefault()
         handleSpace()
-        selectItem(computedItems.value[selectIndex.value].id)
+        selectItem(computedItems.value[selectIndex.value]!.id)
         break
       case 'ArrowDown':
         event.preventDefault()
