@@ -1,8 +1,6 @@
 <template>
   <DialogComponent />
   <SablierComponent />
-  <FavoriComponent />
-  <MachineEtats />
   <CGU />
   <vue3-snackbar
     :duration="5000"
@@ -16,10 +14,8 @@
 
 <script setup lang="ts">
   import { Vue3Snackbar } from 'vue3-snackbar'
-  import 'vue3-snackbar/styles/vue3-snackbar.css'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
-  import FavoriComponent from '@/features/interface/favoris/FavoriComponent.vue'
   import CGU from '@/features/interface/cgu/CGU.vue'
   import { registerPopupAutoCGU } from './features/interface/cgu'
   import { registerAppSnackBarEventsManager } from './features/interface/shared/snack-bar'

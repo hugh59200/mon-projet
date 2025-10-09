@@ -1,6 +1,6 @@
 <template>
   <aside
-    v-if="appState.estUtilisateurAuthentifie"
+    v-if="true"
     ref="sidebar"
     :class="['sidebar', { reduced: isSidebarReduced }]"
   >
@@ -14,29 +14,20 @@
         :reduced="isSidebarReduced"
         :items="sidebarItems"
       />
-      <SidebarQuickAccess
-        :reduced="isSidebarReduced"
-        :favoris="storeFavoris.favoris ?? []"
-        @deleteFavorite="deleteFavorite"
-        @navigateToFavori="storeFavoris.navigateToFavori"
-      />
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useAppStateStore } from '@/features/application'
   import { useSidebarState } from './useSidebarState'
   import SidebarLogo from './SidebarLogo.vue'
   import SidebarItems from './SidebarItems.vue'
-  import SidebarQuickAccess from './SidebarQuickAccess.vue'
 
   const sidebar = ref<HTMLElement | null>(null)
 
-  const { isSidebarReduced, toggleSidebar, sidebarItems, deleteFavorite, storeFavoris } = useSidebarState(sidebar)
+  const { isSidebarReduced, toggleSidebar, sidebarItems } = useSidebarState(sidebar)
 
-  const appState = useAppStateStore()
 </script>
 
 <style lang="less">

@@ -18,15 +18,6 @@
 <style scoped lang="less">
   @import '/src/assets/Mont/Mont.less';
 
-  .envBox {
-    right: 10px;
-    bottom: 10px;
-    position: absolute;
-    padding: 12px;
-    border: solid 2px red;
-    border-radius: 8px;
-  }
-
   main {
     container-type: inline-size;
     display: flex;

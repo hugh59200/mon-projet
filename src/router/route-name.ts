@@ -1,4 +1,5 @@
 // Auto-generated from router/index.ts
 export type RouteName =
-  'contact' |
+  'NotFound' |
+  'access-denied' |
   'home'

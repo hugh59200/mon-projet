@@ -31,10 +31,7 @@
       >
         <template #header>VERSIONS STABLES DE L'OUTIL AKTO VERIF</template>
         <template #content>
-          <vue-markdown
-            :source="markdown"
-            class="footer__content scrollbar"
-          />
+          CGU contenu
         </template>
       </ModalComponent>
     </teleport>
@@ -43,10 +40,8 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import VueMarkdown from 'vue-markdown-render'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useAfficheCGU } from '../../cgu'
-  import { markdown  } from './AktoVersion.md'
 
   const toggleModal = ref(false)
 

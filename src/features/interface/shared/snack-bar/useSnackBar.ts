@@ -1,6 +1,5 @@
 import type { AppNotifEventArg, AppNotifEventType } from "@/features/application/app-events";
 import { useSnackbar } from "vue3-snackbar";
-import "vue3-snackbar/styles/snackbar.css";
 
 
 const TypesMessage: Record<AppNotifEventType, any> = {
