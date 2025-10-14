@@ -1,6 +1,6 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import type { Invocation, DialogResult, DialogType } from './types'
+import { computed, ref } from 'vue'
+import type { DialogResult, DialogType, Invocation } from './types'
 
 export type DialogStoreModel =
   | { visible: false; type: undefined }
@@ -66,4 +66,3 @@ export const useDialogStore = defineStore('dialog', () => {
     triggerUserAction,
   }
 })
-

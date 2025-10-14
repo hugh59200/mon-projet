@@ -1,13 +1,12 @@
-import { defineStore } from "pinia"
-import { computed, shallowRef, VueElement } from "vue"
+import { defineStore } from 'pinia'
+import { computed, shallowRef, VueElement } from 'vue'
 
 export type WebComponentNode = {
-  shadowRoot: ShadowRoot,
+  shadowRoot: ShadowRoot
   host: VueElement
 }
 
 export const useWebComponentNode = defineStore('web-component-node', () => {
-
   const componentNode = shallowRef<WebComponentNode | null>(null)
 
   function initialise(shadowRoot: ShadowRoot | null, host: VueElement | null) {
@@ -22,6 +21,6 @@ export const useWebComponentNode = defineStore('web-component-node', () => {
   return {
     initialise,
     shadowRoot,
-    host
+    host,
   }
 })

@@ -2,7 +2,7 @@
   <SideBar />
   <main>
     <HeaderApp />
-      <RouterView />
+    <RouterView />
     <FooterApp />
   </main>
   <AppRegisterGlobals />
@@ -11,8 +11,8 @@
 <script setup lang="ts">
   import HeaderApp from '@/features/interface/layout/header/HeaderApp.vue'
   import SideBar from '@/features/interface/layout/sideBar/SideBar.vue'
-  import FooterApp from './features/interface/layout/footer/FooterApp.vue'
   import AppRegisterGlobals from './AppRegisterGlobals.vue'
+  import FooterApp from './features/interface/layout/footer/FooterApp.vue'
 </script>
 
 <style scoped lang="less">

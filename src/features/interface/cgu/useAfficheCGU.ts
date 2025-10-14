@@ -1,8 +1,6 @@
-import { useAfficheCGUStore } from "./useAfficheCGUStore";
-
+import { useAfficheCGUStore } from './useAfficheCGUStore'
 
 export function useAfficheCGU() {
-
   const store = useAfficheCGUStore()
   const { showDialog, $reset } = store
 
@@ -12,6 +10,6 @@ export function useAfficheCGU() {
 
   return {
     showDialog,
-    dispose
+    dispose,
   }
 }

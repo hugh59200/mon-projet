@@ -5,7 +5,7 @@
       color="neutral-500"
       @click="toggleModal = !toggleModal"
       pointer
-      nb-max-lines="2"
+      nbMaxLines="2"
     >
       Développement @akto 2025. Version : 1.0
     </BasicText>
@@ -20,7 +20,7 @@
       color="neutral-500"
       @click="showCGU"
       pointer
-      nb-max-lines="2"
+      nbMaxLines="2"
     >
       Voir les conditions générales d'utilisation
     </BasicText>
@@ -30,21 +30,18 @@
         :overflow="false"
       >
         <template #header>VERSIONS STABLES DE L'OUTIL AKTO VERIF</template>
-        <template #content>
-          CGU contenu
-        </template>
+        <template #content>CGU contenu</template>
       </ModalComponent>
     </teleport>
   </footer>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { ref } from 'vue'
   import { useAfficheCGU } from '../../cgu'
 
   const toggleModal = ref(false)
-
 
   const showCGU = () => {
     const dialog = useAfficheCGU()

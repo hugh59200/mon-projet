@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "singleQuote": true,
+  "semi": false,
+  "endOfLine": "lf",
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "proseWrap": "preserve",
+  "vueIndentScriptAndStyle": true,
+  "singleAttributePerLine": true,
+  "overrides": [
+    {
+      "files": "*.vue",
+      "options": { "htmlWhitespaceSensitivity": "ignore" }
+    },
+    {
+      "files": ["*.less", "*.css", "*.scss"],
+      "options": { "singleQuote": false }
+    },
+    {
+      "files": "*.json",
+      "options": { "printWidth": 80 }
+    }
+  ],
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-tailwindcss"
+  ]
+}

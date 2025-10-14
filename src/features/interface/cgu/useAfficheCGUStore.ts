@@ -1,9 +1,8 @@
-import { ref } from "vue"
-import type { ShowCGUOptions } from "./types"
-import { defineStore } from "pinia"
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import type { ShowCGUOptions } from './types'
 
 export const useAfficheCGUStore = defineStore('cgu-affiche', () => {
-
   function $reset() {
     dialogVisible.value = false
     dialogClosable.value = false
@@ -18,7 +17,7 @@ export const useAfficheCGUStore = defineStore('cgu-affiche', () => {
   function showDialog(options: ShowCGUOptions) {
     $reset()
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       resolver = resolve
       dialogVisible.value = true
       dialogClosable.value = options.validationObligatoire !== true
@@ -38,6 +37,6 @@ export const useAfficheCGUStore = defineStore('cgu-affiche', () => {
     showDialog,
     queryClose,
     dialogClosable,
-    dialogVisible
+    dialogVisible,
   }
 })

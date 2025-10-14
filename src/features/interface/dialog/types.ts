@@ -18,4 +18,3 @@ export type ShowDialogOptions = {
 export interface IDialog {
   showDialog(options: ShowDialogOptions): Promise<DialogResult>
 }
-

@@ -1,6 +1,6 @@
-import { inject } from "vue";
-import { EventBus } from "@/features/application/event-bus/EventBus";
-import { EVENT_BUS, type AppBusEvents } from "./types";
+import { EventBus } from '@/features/application/event-bus/EventBus'
+import { inject } from 'vue'
+import { EVENT_BUS, type AppBusEvents } from './types'
 
 declare module 'vue' {
   interface ComponentCustomProperties {

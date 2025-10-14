@@ -1,3 +1,3 @@
-export * from "./CGU.vue"
-export { useAfficheCGU } from "./useAfficheCGU"
+export * from './CGU.vue'
 export { registerPopupAutoCGU } from './registerPopupAutoCGU'
+export { useAfficheCGU } from './useAfficheCGU'

@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import AccessDeniedView from '@/features/interface/shared/access-denied/AccessDeniedView.vue'
 import { registerPopupAutoGuard } from '@/features/application/popup-auto/registerPopupAutoGuard'
-import { registerNavigationEvents } from './registerNavigationEvents'
+import AccessDeniedView from '@/features/interface/shared/access-denied/AccessDeniedView.vue'
 import Home from '@/pages/Home.vue'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { registerNavigationEvents } from './registerNavigationEvents'
 
 export const routes: Array<RouteRecordRaw> = [
   {

@@ -1,7 +1,9 @@
 import type { IconName } from '@designSystem/fondation/icons/iconsList'
 import type { RouteLocationNormalizedLoadedGeneric, RouteRecordNormalized } from 'vue-router'
 
-export type RouteLabelResolver = (route: RouteLocationNormalizedLoadedGeneric) => string | [string, string]
+export type RouteLabelResolver = (
+  route: RouteLocationNormalizedLoadedGeneric,
+) => string | [string, string]
 
 export type Visibility = 'hidden' | 'visible' | 'disabled'
 

@@ -2,7 +2,10 @@ import { type Ref } from 'vue'
 import { useHandleEvent } from './useHandleEvent'
 import { useWebComponentNode } from './useWebComponentNode'
 
-function isClickInProtectedElements(target: Node, elements: Array<Ref<HTMLElement | null>>): boolean {
+function isClickInProtectedElements(
+  target: Node,
+  elements: Array<Ref<HTMLElement | null>>,
+): boolean {
   return elements?.some((ref) => ref.value && ref.value.contains(target))
 }
 

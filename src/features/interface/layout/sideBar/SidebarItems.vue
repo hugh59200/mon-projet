@@ -7,7 +7,7 @@
       <router-link
         :to="item"
         class="sidebar__items-item"
-        active-class="active"
+        activeClass="active"
         :class="{ disabled: getVisibility(item) === 'disabled' }"
         v-slot="{ isActive }"
       >
@@ -22,7 +22,7 @@
           v-if="!reduced"
           class="sidebar__items-item-label"
           wrap
-          nb-max-lines="2"
+          nbMaxLines="2"
           color="secondary-900"
         >
           {{ item.meta.label }}

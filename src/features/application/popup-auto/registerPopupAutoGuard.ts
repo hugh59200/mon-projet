@@ -1,4 +1,4 @@
-import type { Router } from "vue-router"
+import type { Router } from 'vue-router'
 import { getAllPopupAuto } from './PopupAuto'
 
 export function registerPopupAutoGuard(router: Router) {
@@ -12,4 +12,3 @@ export function registerPopupAutoGuard(router: Router) {
     }
   })
 }
-

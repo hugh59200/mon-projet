@@ -1,13 +1,15 @@
 import type { Environnements } from '@/features/application/shared/Environnements.types'
 import type { Directive } from 'vue'
 
-type EnvDirectiveValue = {
-  autorise: Environnements[]
-  refuse?: undefined
-} | {
-  autorise?: undefined
-  refuse: Environnements[]
-}
+type EnvDirectiveValue =
+  | {
+      autorise: Environnements[]
+      refuse?: undefined
+    }
+  | {
+      autorise?: undefined
+      refuse: Environnements[]
+    }
 
 export const vEnvironnement: Directive<HTMLElement, EnvDirectiveValue> = {
   mounted(element, binding) {

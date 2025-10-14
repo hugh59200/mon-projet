@@ -1,19 +1,18 @@
-import type { AppNotifEventArg, AppNotifEventType } from "@/features/application/app-events";
-import { useSnackbar } from "vue3-snackbar";
-
+import type { AppNotifEventArg, AppNotifEventType } from '@/features/application/app-events'
+import { useSnackbar } from 'vue3-snackbar'
 
 const TypesMessage: Record<AppNotifEventType, any> = {
-  info: "info",
-  warning: "warning",
-  danger: "error",
-  success: "success",
+  info: 'info',
+  warning: 'warning',
+  danger: 'error',
+  success: 'success',
 }
 
 const TypesColor: Record<AppNotifEventType, any> = {
-  info: "#14adff",
-  warning: "#ff6707",
-  danger: "#eb1515",
-  success: "#05a89c",
+  info: '#14adff',
+  warning: '#ff6707',
+  danger: '#eb1515',
+  success: '#05a89c',
 }
 
 export function useAppSnackBar() {
@@ -29,6 +28,6 @@ export function useAppSnackBar() {
   }
 
   return {
-    pop
+    pop,
   }
 }

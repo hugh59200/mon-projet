@@ -1,5 +1,5 @@
-import { useEventBus } from "@/features/application/app-events/AppEvents";
-import { watch, type Ref } from "vue";
+import { useEventBus } from '@/features/application/app-events/AppEvents'
+import { watch, type Ref } from 'vue'
 
 export function useHideOnNavigate(visible: Ref<boolean | undefined>, hideCallback?: () => void) {
   const eventBus = useEventBus()
@@ -26,4 +26,3 @@ export function useHideOnNavigate(visible: Ref<boolean | undefined>, hideCallbac
     }
   })
 }
-

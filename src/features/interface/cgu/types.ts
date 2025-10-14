@@ -1,3 +1,3 @@
 export type ShowCGUOptions = {
-  validationObligatoire?: boolean;
+  validationObligatoire?: boolean
 }

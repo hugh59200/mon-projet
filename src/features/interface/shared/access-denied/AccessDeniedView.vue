@@ -7,17 +7,18 @@
           src="@designSystem/fondation/img/modal-warning.svg?url"
         />
         <BasicText size="h3">Accès refusé</BasicText>
-        <BasicText size="h5">Vous n'avez pas les droits nécessaires pour accéder à cette page.</BasicText>
+        <BasicText size="h5">
+          Vous n'avez pas les droits nécessaires pour accéder à cette page.
+        </BasicText>
         <BasicText>
-          Veuillez contacter votre administrateur du référentiel d'entreprise pour obtenir les permissions
-          correspondantes.
+          Veuillez contacter votre administrateur du référentiel d'entreprise pour obtenir les
+          permissions correspondantes.
         </BasicText>
         <BasicLink
           label="Retour à la page d'accueil"
           @link-click="routeAccueil"
         />
       </div>
-
     </div>
   </div>
 </template>

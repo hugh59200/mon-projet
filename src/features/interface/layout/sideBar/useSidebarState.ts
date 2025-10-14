@@ -1,9 +1,9 @@
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { getCurrentBreakpoint } from '@designSystem/fondation/breakpoints/getCurrentBreakpoint'
+import { computed, onMounted, ref, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useHandleClickOutside } from '../../composables/useHandleClickOutside'
 
-export function useSidebarState(sidebarRef: any) {
+export function useSidebarState(sidebarRef: Ref<HTMLElement | null>) {
   const router = useRouter()
 
   const isSidebarReduced = ref(false)
@@ -35,9 +35,7 @@ export function useSidebarState(sidebarRef: any) {
     }
   }
 
-
   const sidebarItems = computed(() => {
-
     return router
       .getRoutes()
       .filter((route) => {
@@ -46,7 +44,7 @@ export function useSidebarState(sidebarRef: any) {
         // Gestion de la visibility
         let visibility = route.meta.visibility
         if (typeof visibility === 'function') {
-          visibility = visibility(route) 
+          visibility = visibility(route)
         }
 
         return visibility !== 'hidden'
@@ -67,7 +65,6 @@ export function useSidebarState(sidebarRef: any) {
     window.addEventListener('resize', handleResize)
     updateSidebarState()
   })
-
 
   return {
     isSidebarReduced,

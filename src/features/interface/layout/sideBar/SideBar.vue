@@ -20,14 +20,13 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useSidebarState } from './useSidebarState'
-  import SidebarLogo from './SidebarLogo.vue'
   import SidebarItems from './SidebarItems.vue'
+  import SidebarLogo from './SidebarLogo.vue'
+  import { useSidebarState } from './useSidebarState'
 
   const sidebar = ref<HTMLElement | null>(null)
 
   const { isSidebarReduced, toggleSidebar, sidebarItems } = useSidebarState(sidebar)
-
 </script>
 
 <style lang="less">

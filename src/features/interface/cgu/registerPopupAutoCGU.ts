@@ -1,10 +1,10 @@
-import { registerPopupAuto } from "@/features/application/popup-auto/PopupAuto"
-import { useVersionCGUStore } from "./useVersionCGUStore"
-import { useAfficheCGUStore } from "./useAfficheCGUStore"
+import { registerPopupAuto } from '@/features/application/popup-auto/PopupAuto'
+import { useAfficheCGUStore } from './useAfficheCGUStore'
+import { useVersionCGUStore } from './useVersionCGUStore'
 
 export function registerPopupAutoCGU() {
   registerPopupAuto({
-    key: "CGU",
+    key: 'CGU',
     canPopup: async () => {
       return true
     },
@@ -14,6 +14,6 @@ export function registerPopupAutoCGU() {
         const versionStore = useVersionCGUStore()
         return versionStore.setCguValidées()
       })
-    }
+    },
   })
 }

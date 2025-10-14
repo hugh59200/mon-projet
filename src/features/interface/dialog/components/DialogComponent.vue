@@ -5,7 +5,7 @@
     :closable="dialogModel.closable"
   >
     <template #content>
-      <div class="flex flex-column flex-gap-4">
+      <div class="flex-column flex-gap-4 flex">
         <img
           v-if="isCancelRetryOrError"
           class="image"
@@ -42,7 +42,7 @@
       </section>
     </template>
     <template #actions>
-      <div class="flex flex-gap-4">
+      <div class="flex-gap-4 flex">
         <BasicButton
           v-for="action in actions"
           :key="action"
@@ -59,11 +59,11 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import { storeToRefs } from 'pinia'
-  import type { DialogResult } from '../types'
   import { useDialogStore } from '@/features/interface/dialog/dialogStore'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { storeToRefs } from 'pinia'
+  import { computed } from 'vue'
+  import type { DialogResult } from '../types'
   import wording from './DialogComponent.json'
 
   const dialogModelVisible = defineModel<boolean>({
@@ -120,7 +120,9 @@
     }
   })
 
-  const isCancelRetryOrError = computed(() => ['Error', 'CancelRetry'].includes(dialogModel.value.type ?? 'Ok'))
+  const isCancelRetryOrError = computed(() =>
+    ['Error', 'CancelRetry'].includes(dialogModel.value.type ?? 'Ok'),
+  )
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 
 export const useSablierStore = defineStore('sablier', () => {
   const compteur = ref<number>(0)

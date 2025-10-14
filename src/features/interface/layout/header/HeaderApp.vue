@@ -48,7 +48,7 @@
               @click="showMenu = !showMenu"
               focusable
               pointer
-              nb-max-lines="2"
+              nbMaxLines="2"
             >
               {{ fullName }}
             </BasicText>
@@ -109,8 +109,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
   import { useHandleClickOutside } from '@/features/interface/composables/useHandleClickOutside'
+  import { computed, ref } from 'vue'
 
   const menu = ref()
 
@@ -124,12 +124,9 @@
     return 'mon nom'
   })
 
-
   const closeMenu = () => {
     showMenu.value = false
   }
-
-
 
   useHandleClickOutside(menu, () => {
     closeMenu()

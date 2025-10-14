@@ -8,7 +8,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 import { manualChunksOptimizer, assetFileNameOptimizer } from './vite/chunkOptimizer'
 import { generateGlobalComponents, generateRouteNamesUnion,generateIconsList } from './vite/generator'
 
-const outDir = (process.env.CIBLE ?? 'APP') === 'APP' ? 'dist' : 'dist-admin'
+const outDir = 'dist'  // Output directory for the build
 const config = {
   APP: {
     outDir,
@@ -43,6 +43,7 @@ export default defineConfig({
     },
   },
   css: {
+        transformer: 'postcss',
     preprocessorOptions: {
       less: {
         additionalData: `@import "@designSystem/index.less";`,
@@ -52,6 +53,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2500,
     ...config.APP,
+        cssMinify: false, 
   },
   server: {
     port: 5278,

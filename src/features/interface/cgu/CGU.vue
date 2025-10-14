@@ -36,13 +36,13 @@
       </div>
     </template>
     <template #actions>
-      <div class="flex justify-content-space-between">
+      <div class="justify-content-space-between flex">
         <BasicButton
           label="Télécharger les CGU"
           type="secondary"
           size="small"
           @click="pdfElem.download('cgu.pdf')"
-          icon-name="document-download"
+          iconName="document-download"
           iconRight
           class="fixed-footer__imprimer fixed-footer__imprimer--desktop"
           :disabled="!canDownload"
@@ -61,9 +61,9 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useDebounce } from '@/features/shared/tools'
   import { storeToRefs } from 'pinia'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import ModalComponent from '../modal/ModalComponent.vue'
   import { useAfficheCGUStore } from './useAfficheCGUStore'
 

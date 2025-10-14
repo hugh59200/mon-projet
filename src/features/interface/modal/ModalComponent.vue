@@ -49,8 +49,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue'
   import { useHandleClickOutside } from '@/features/interface/composables/useHandleClickOutside'
+  import { onMounted, onUnmounted, ref } from 'vue'
 
   interface ModalProps {
     closable?: boolean

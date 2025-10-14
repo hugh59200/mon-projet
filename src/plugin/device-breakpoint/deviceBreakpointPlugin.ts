@@ -1,11 +1,11 @@
-import { computed, ref, watch, type App } from 'vue'
 import { useDebounce } from '@/features/shared/tools'
+import { computed, ref, watch, type App } from 'vue'
 import {
-  type DeviceBreakpointOptions,
-  TABLET_MAX,
-  MOBILE_MAX,
   DEVICE_BREAKPOINT,
+  MOBILE_MAX,
+  TABLET_MAX,
   type Breakpoint,
+  type DeviceBreakpointOptions,
 } from './DeviceBreakpoint.types.ts'
 
 export default {
@@ -32,7 +32,10 @@ export default {
 
     const currentBreakpoint = computed<Breakpoint>(() => {
       if (currentWindowsWidth.value < options.mobileMax!) return 'mobile'
-      if (currentWindowsWidth.value >= options.mobileMax! && currentWindowsWidth.value < options.tabletMax!)
+      if (
+        currentWindowsWidth.value >= options.mobileMax! &&
+        currentWindowsWidth.value < options.tabletMax!
+      )
         return 'tablet'
       return 'desktop'
     })

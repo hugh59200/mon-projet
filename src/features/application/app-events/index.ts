@@ -1,2 +1,2 @@
-export * from "./AppEvents";
-export * from "./types";
+export * from './AppEvents'
+export * from './types'
