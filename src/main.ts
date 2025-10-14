@@ -6,6 +6,7 @@ import { createApp } from 'vue'
 import { SnackbarService } from 'vue3-snackbar'
 import App from './App.vue'
 import './assets/main.css'
+import { useAuthStore } from './auth/auth'
 import { focusableDirective } from './directives/index'
 import { createEventBus } from './plugin/event-bus/createEventBus'
 import router from './router'
@@ -19,4 +20,8 @@ app.use(createPinia())
 app.use(router)
 app.use(deviceBreakpointPlugin)
 app.directive('focusable', focusableDirective)
+
+const auth = useAuthStore()
+auth.restore()
+
 app.mount('#app')
