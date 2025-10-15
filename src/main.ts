@@ -1,27 +1,20 @@
-import type { AppBusEvents } from '@/features/application/app-events'
-import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
+import { useAuthStore } from '@/features/auth/useAuthStore'
 import { RegistrationDSComponents } from '@/plugin/registration'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { SnackbarService } from 'vue3-snackbar'
 import App from './App.vue'
-import './assets/main.css'
-import { useAuthStore } from './auth/auth'
-import { focusableDirective } from './directives/index'
-import { createEventBus } from './plugin/event-bus/createEventBus'
+import { focusableDirective } from './directives'
+
 import router from './router'
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createEventBus<AppBusEvents>())
-app.use(SnackbarService)
-app.use(RegistrationDSComponents)
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
-app.use(deviceBreakpointPlugin)
+app.use(RegistrationDSComponents)
 app.directive('focusable', focusableDirective)
-
 const auth = useAuthStore()
-auth.restore()
-
-app.mount('#app')
+auth.initAuth().then(() => {
+  app.mount('#app')
+})
