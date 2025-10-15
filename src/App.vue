@@ -1,11 +1,13 @@
 <template>
+  <HeaderApp />
   <main>
-    <HeaderApp />
     <RouterView />
   </main>
+  <FooterApp />
 </template>
 
 <script setup lang="ts">
+  import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/HeaderApp.vue'
 </script>
 
@@ -13,12 +15,9 @@
   @import '/src/assets/Mont/Mont.less';
 
   main {
-    container-type: inline-size;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    overflow-y: hidden;
-    position: sticky;
-    top: 0;
+    overflow: hidden;
   }
 </style>
