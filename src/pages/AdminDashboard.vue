@@ -10,7 +10,7 @@
       >
         Admin
       </RouterLink>
-      <button @click="auth.signOut">Déconnexion</button>
+      <BasicButton @click="auth.signOut">Déconnexion</BasicButton>
     </nav>
   </header>
 </template>

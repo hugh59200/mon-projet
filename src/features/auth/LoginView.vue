@@ -7,11 +7,7 @@
     >
       Connexion
     </BasicText>
-
-    <form
-      class="auth__form"
-      @submit.prevent="handleLogin"
-    >
+    <form class="auth__form">
       <BasicInput
         v-model="email"
         placeholder="Email"
@@ -19,7 +15,6 @@
         size="medium"
         autocomplete="off"
       />
-
       <BasicInput
         v-model="password"
         placeholder="Mot de passe"
@@ -27,7 +22,6 @@
         size="medium"
         autocomplete="off"
       />
-
       <BasicButton
         label="Se connecter"
         type="primary"
@@ -35,8 +29,8 @@
         width="full"
         size="medium"
         :disabled="loading"
+        @click="handleLogin"
       />
-
       <BasicText
         v-if="error"
         class="auth__error"

@@ -28,15 +28,23 @@ const router = createRouter({
   routes,
 })
 
-// 🔒 Middleware global
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+
+  // ✅ Initialise la session si pas déjà fait
   if (!auth.user) await auth.initAuth()
 
+  // 🔹 Empêche un utilisateur connecté d’aller sur /login ou /register
+  if (auth.isAuthenticated && ['/login', '/register'].includes(to.path)) {
+    return { name: 'home' }
+  }
+
+  // 🔹 Vérifie l’accès aux routes protégées
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login' }
   }
 
+  // 🔹 Vérifie les routes admin si besoin
   if (to.meta.requiresAdmin && !auth.isAdmin) {
     return { name: 'access-denied' }
   }

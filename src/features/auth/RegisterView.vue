@@ -8,10 +8,7 @@
       Inscription
     </BasicText>
 
-    <form
-      class="auth__form"
-      @submit.prevent="handleRegister"
-    >
+    <form class="auth__form">
       <BasicInput
         v-model="email"
         placeholder="Email"
@@ -35,6 +32,7 @@
         width="full"
         size="medium"
         :disabled="loading"
+        @click="handleRegister"
       />
 
       <BasicText
