@@ -1,37 +1,51 @@
 <template>
-  <div class="auth-container">
-    <h2>Créer un compte</h2>
-
-    <form @submit.prevent="register">
-      <input
-        v-model="email"
-        type="email"
-        placeholder="Email"
-        required
-      />
-      <input
-        v-model="password"
-        type="password"
-        placeholder="Mot de passe"
-        required
-      />
-
-      <button
-        type="submit"
-        :disabled="auth.loading"
-      >
-        {{ auth.loading ? 'Création...' : 'S’inscrire' }}
-      </button>
-    </form>
-
-    <p
-      v-if="auth.error"
-      class="error"
+  <div class="auth">
+    <BasicText
+      size="h5"
+      weight="bold"
+      class="auth__title"
     >
-      {{ auth.error }}
-    </p>
+      Inscription
+    </BasicText>
 
-    <router-link to="/login">Déjà un compte ? Se connecter</router-link>
+    <form
+      class="auth__form"
+      @submit.prevent="handleRegister"
+    >
+      <BasicInput
+        v-model="email"
+        placeholder="Email"
+        input-type="form"
+        size="medium"
+        autocomplete="off"
+      />
+
+      <BasicInput
+        v-model="password"
+        placeholder="Mot de passe"
+        input-type="form"
+        size="medium"
+        autocomplete="off"
+      />
+
+      <BasicButton
+        label="S’inscrire"
+        type="primary"
+        variant="filled"
+        width="full"
+        size="medium"
+        :disabled="loading"
+      />
+
+      <BasicText
+        v-if="error"
+        class="auth__error"
+        size="body-s"
+        color="red"
+      >
+        {{ error }}
+      </BasicText>
+    </form>
   </div>
 </template>
 
@@ -40,49 +54,46 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from './useAuthStore'
 
-  const router = useRouter()
   const auth = useAuthStore()
-
+  const router = useRouter()
   const email = ref('')
   const password = ref('')
+  const loading = ref(false)
+  const error = ref('')
 
-  async function register() {
-    const ok = await auth.signUp(email.value, password.value)
-    if (ok) router.push('/login')
+  async function handleRegister() {
+    loading.value = true
+    const success = await auth.signUp(email.value, password.value)
+    loading.value = false
+
+    if (success) router.push('/')
+    else error.value = auth.error ?? 'Inscription échouée'
   }
 </script>
 
-<style scoped>
-  .auth-container {
-    max-width: 400px;
-    margin: 6rem auto;
+<style scoped lang="less">
+  .auth {
+    max-width: 360px;
+    margin: 80px auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-  }
+    align-items: center;
+    text-align: center;
 
-  input {
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
+    &__title {
+      margin-bottom: 24px;
+    }
 
-  button {
-    background: #007bff;
-    border: none;
-    color: white;
-    padding: 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
 
-  .error {
-    color: red;
-    font-size: 0.9rem;
-  }
-
-  .success {
-    color: green;
-    font-size: 0.9rem;
+    &__error {
+      color: @danger-600;
+      margin-top: 10px;
+    }
   }
 </style>

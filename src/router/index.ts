@@ -11,9 +11,9 @@ const routes = [
     component: () => import('@/features/auth/RegisterView.vue'),
   },
   {
-    path: '/reset-password',
-    name: 'reset-password',
-    component: () => import('@/features/auth/ResetPasswordView.vue'),
+    path: '/access-denied',
+    name: 'access-denied',
+    component: () => import('@/features/auth/AccessDeniedView.vue'),
   },
   {
     path: '/admin',
@@ -28,22 +28,17 @@ const router = createRouter({
   routes,
 })
 
+// 🔒 Middleware global
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+  if (!auth.user) await auth.initAuth()
 
-  // attends l'initialisation de la session (utile au premier chargement)
-  if (!auth.user) {
-    await auth.initAuth()
-  }
-
-  // redirige vers /login si la route requiert l'authentification
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login' }
   }
 
-  // si déjà connecté et tente d'aller sur /login ou /register, redirige vers /
-  if (auth.isAuthenticated && ['login', 'register'].includes(to.name as string)) {
-    return { name: 'home' }
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return { name: 'access-denied' }
   }
 
   return true

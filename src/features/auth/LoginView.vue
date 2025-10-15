@@ -1,37 +1,51 @@
 <template>
-  <div class="auth-container">
-    <h2>Connexion</h2>
-
-    <form @submit.prevent="login">
-      <input
-        v-model="email"
-        type="email"
-        placeholder="Email"
-        required
-      />
-      <input
-        v-model="password"
-        type="password"
-        placeholder="Mot de passe"
-        required
-      />
-
-      <button
-        type="submit"
-        :disabled="auth.loading"
-      >
-        {{ auth.loading ? 'Connexion...' : 'Se connecter' }}
-      </button>
-    </form>
-
-    <p
-      v-if="auth.error"
-      class="error"
+  <div class="auth">
+    <BasicText
+      size="h5"
+      weight="bold"
+      class="auth__title"
     >
-      {{ auth.error }}
-    </p>
+      Connexion
+    </BasicText>
 
-    <router-link to="/register">Créer un compte</router-link>
+    <form
+      class="auth__form"
+      @submit.prevent="handleLogin"
+    >
+      <BasicInput
+        v-model="email"
+        placeholder="Email"
+        input-type="form"
+        size="medium"
+        autocomplete="off"
+      />
+
+      <BasicInput
+        v-model="password"
+        placeholder="Mot de passe"
+        input-type="form"
+        size="medium"
+        autocomplete="off"
+      />
+
+      <BasicButton
+        label="Se connecter"
+        type="primary"
+        variant="filled"
+        width="full"
+        size="medium"
+        :disabled="loading"
+      />
+
+      <BasicText
+        v-if="error"
+        class="auth__error"
+        size="body-s"
+        color="red"
+      >
+        {{ error }}
+      </BasicText>
+    </form>
   </div>
 </template>
 
@@ -40,41 +54,49 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from './useAuthStore'
 
-  const router = useRouter()
   const auth = useAuthStore()
+  const router = useRouter()
 
   const email = ref('')
   const password = ref('')
+  const loading = ref(false)
+  const error = ref('')
 
-  async function login() {
-    const ok = await auth.signIn(email.value, password.value)
-    if (ok) router.push('/')
+  async function handleLogin() {
+    loading.value = true
+    const success = await auth.signIn(email.value, password.value)
+    loading.value = false
+    if (success) {
+      router.push('/')
+    } else {
+      error.value = auth.error ?? 'Échec de la connexion'
+    }
   }
 </script>
 
-<style scoped>
-  .auth-container {
-    max-width: 400px;
-    margin: 5rem auto;
+<style scoped lang="less">
+  .auth {
+    max-width: 360px;
+    margin: 80px auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-  }
-  input {
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 0.6rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .error {
-    color: red;
-    font-size: 0.9rem;
+    align-items: center;
+    text-align: center;
+
+    &__title {
+      margin-bottom: 24px;
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    &__error {
+      color: @danger-600;
+      margin-top: 10px;
+    }
   }
 </style>
