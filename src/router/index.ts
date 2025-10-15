@@ -16,9 +16,15 @@ const routes = [
     component: () => import('@/features/auth/AccessDeniedView.vue'),
   },
   {
-    path: '/admin',
-    name: 'admin',
-    component: () => import('@/pages/AdminDashboard.vue'),
+    path: '/profil',
+    name: 'profil',
+    component: () => import('@/features/auth/ProfilView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/users',
+    name: 'admin-users',
+    component: () => import('@/features/admin/UsersAdminView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
 ]

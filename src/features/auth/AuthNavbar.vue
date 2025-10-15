@@ -18,7 +18,11 @@
         >
           {{ auth.user.email }}
         </BasicText>
-
+        <BasicButton
+          label="Mon profil"
+          type="secondary"
+          @click="$router.push('/profil')"
+        />
         <BasicButton
           label="Se déconnecter"
           type="secondary"

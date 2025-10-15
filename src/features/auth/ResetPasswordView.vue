@@ -1,36 +1,49 @@
 <template>
-  <div class="auth-container">
-    <h2>Mot de passe oublié</h2>
+  <div class="auth">
+    <BasicText
+      size="h5"
+      weight="bold"
+      class="auth__title"
+    >
+      Réinitialiser le mot de passe
+    </BasicText>
 
-    <form @submit.prevent="reset">
-      <input
+    <form
+      class="auth__form"
+      @submit.prevent="reset"
+    >
+      <BasicInput
         v-model="email"
-        type="email"
         placeholder="Votre email"
-        required
+        input-type="form"
+        size="medium"
+        autocomplete="off"
       />
-      <button
-        type="submit"
+
+      <BasicButton
+        label="Envoyer le lien"
+        type="primary"
+        variant="filled"
+        width="full"
+        size="medium"
         :disabled="loading"
+      />
+
+      <BasicText
+        v-if="message"
+        size="body-s"
+        color="primary-600"
       >
-        {{ loading ? 'Envoi...' : 'Envoyer un lien de réinitialisation' }}
-      </button>
+        {{ message }}
+      </BasicText>
+      <BasicText
+        v-if="error"
+        size="body-s"
+        color="red"
+      >
+        {{ error }}
+      </BasicText>
     </form>
-
-    <p
-      v-if="error"
-      class="error"
-    >
-      {{ error }}
-    </p>
-    <p
-      v-if="message"
-      class="success"
-    >
-      {{ message }}
-    </p>
-
-    <router-link :to="{ name: 'login' }">Retour à la connexion</router-link>
   </div>
 </template>
 
@@ -47,47 +60,13 @@
     loading.value = true
     error.value = null
     message.value = ''
-    const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
-      redirectTo: window.location.origin + '/login',
-    })
-    loading.value = false
 
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
+      redirectTo: `${window.location.origin}/login`,
+    })
+
+    loading.value = false
     if (err) error.value = err.message
-    else message.value = 'Lien de réinitialisation envoyé par email ✅'
+    else message.value = 'Lien envoyé par e-mail ✅'
   }
 </script>
-
-<style scoped>
-  .auth-container {
-    max-width: 400px;
-    margin: 6rem auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  input {
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  button {
-    background: #007bff;
-    border: none;
-    color: white;
-    padding: 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .error {
-    color: red;
-    font-size: 0.9rem;
-  }
-
-  .success {
-    color: green;
-    font-size: 0.9rem;
-  }
-</style>
