@@ -2,15 +2,17 @@
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
       <BasicText
-        size="body-l"
+        size="body-xl"
         weight="bold"
+        class="auth-navbar__logo"
+        @click="$router.push('/')"
       >
         mon site
       </BasicText>
     </div>
 
     <div class="auth-navbar__right">
-      <!-- Utilisateur connecté -->
+      <!-- ✅ Connecté -->
       <template v-if="auth.user">
         <BasicText
           size="body-m"
@@ -18,9 +20,30 @@
         >
           {{ auth.user.email }}
         </BasicText>
+
+        <!-- 🔹 Accueil -->
+        <BasicButton
+          label="Accueil"
+          type="secondary"
+          size="small"
+          @click="$router.push('/')"
+        />
+
+        <!-- 🔹 Administration (si admin) -->
+        <BasicButton
+          v-if="auth.isAdmin"
+          label="Administration"
+          type="primary"
+          variant="filled"
+          size="small"
+          @click="$router.push('/admin/users')"
+        />
+
+        <!-- 🔹 Profil + Déconnexion -->
         <BasicButton
           label="Mon profil"
           type="secondary"
+          size="small"
           @click="$router.push('/profil')"
         />
         <BasicButton
@@ -32,7 +55,7 @@
         />
       </template>
 
-      <!-- Non connecté -->
+      <!-- 🚪 Non connecté -->
       <template v-else>
         <BasicButton
           label="Connexion"
@@ -84,6 +107,10 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    &__logo {
+      cursor: pointer;
     }
 
     &__email {

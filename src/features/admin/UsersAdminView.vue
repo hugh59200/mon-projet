@@ -10,16 +10,36 @@
 
     <!-- 🔍 Barre de recherche -->
     <BasicInput
-      v-model="search"
+      v-model="store.search"
       placeholder="Rechercher par email ou nom..."
       input-type="form"
       size="medium"
       autocomplete="off"
       class="admin-users__search"
+      @input="handleSearch"
+    />
+    <!-- 📄 Pagination -->
+    <BasicPagination
+      v-if="store.totalPages > 1"
+      :nb-pages="store.totalPages"
+      :current-page="store.page"
+      :nb-pages-max="5"
+      :nb-results="store.totalResults"
+      @change="handlePageChange"
     />
 
-    <!-- 📋 Tableau des utilisateurs -->
-    <div class="admin-users__table">
+    <!-- 📊 Tableau des utilisateurs -->
+    <div
+      v-if="store.loading"
+      class="admin-users__loading"
+    >
+      Chargement des utilisateurs...
+    </div>
+
+    <div
+      v-else
+      class="admin-users__table"
+    >
       <div class="admin-users__header">
         <span>Email</span>
         <span>Nom</span>
@@ -29,7 +49,7 @@
       </div>
 
       <div
-        v-for="user in filteredUsers"
+        v-for="user in store.users"
         :key="user.id"
         class="admin-users__row"
       >
@@ -38,7 +58,8 @@
         <span>
           <select
             v-model="user.role"
-            @change="updateRole(user)"
+            @change="store.changeRole(user)"
+            class="admin-users__role"
           >
             <option value="user">user</option>
             <option value="admin">admin</option>
@@ -51,7 +72,7 @@
             variant="ghost"
             size="small"
             label="Supprimer"
-            @click="deleteUser(user)"
+            @click="store.deleteUser(user)"
           />
         </div>
       </div>
@@ -60,51 +81,21 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
-  import { supabase } from '@/services/supabaseClient'
-  import { computed, onMounted, ref } from 'vue'
+  import { BasicButton, BasicInput, BasicText } from '@designSystem/components'
+  import { onMounted } from 'vue'
+  import { useUsersAdminStore } from './useUsersAdminStore'
 
-  const users = ref<any[]>([])
-  const search = ref('')
-  const toast = useToastStore()
+  const store = useUsersAdminStore()
 
-  async function loadUsers() {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      toast.showToast('Erreur lors du chargement des utilisateurs', 'danger')
-    } else {
-      users.value = data
-    }
+  function handlePageChange(page: number) {
+    store.page = page
+    store.loadUsers()
   }
 
-  async function updateRole(user: any) {
-    const { error } = await supabase.from('profiles').update({ role: user.role }).eq('id', user.id)
-
-    if (error) toast.showToast('Erreur mise à jour rôle', 'danger')
-    else toast.showToast(`Rôle de ${user.email} mis à jour ✅`, 'success')
+  function handleSearch() {
+    store.page = 1
+    store.loadUsers()
   }
-
-  async function deleteUser(user: any) {
-    if (!confirm(`Supprimer ${user.email} ?`)) return
-    const { error } = await supabase.from('profiles').delete().eq('id', user.id)
-
-    if (error) toast.showToast('Erreur suppression utilisateur', 'danger')
-    else {
-      users.value = users.value.filter((u) => u.id !== user.id)
-      toast.showToast('Utilisateur supprimé ✅', 'success')
-    }
-  }
-
-  const filteredUsers = computed(() => {
-    const term = search.value.toLowerCase()
-    return users.value.filter(
-      (u) => u.email?.toLowerCase().includes(term) || u.full_name?.toLowerCase().includes(term),
-    )
-  })
 
   function formatDate(date: string) {
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -114,12 +105,12 @@
     })
   }
 
-  onMounted(loadUsers)
+  onMounted(store.loadUsers)
 </script>
 
 <style scoped lang="less">
   .admin-users {
-    max-width: 900px;
+    width: 900px;
     margin: 50px auto;
     display: flex;
     flex-direction: column;
@@ -166,9 +157,19 @@
       }
     }
 
+    &__role {
+      border-radius: 6px;
+      padding: 4px;
+    }
+
     &__actions {
       display: flex;
       justify-content: flex-end;
+    }
+
+    &__loading {
+      text-align: center;
+      color: @neutral-600;
     }
   }
 </style>
