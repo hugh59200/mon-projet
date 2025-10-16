@@ -8,7 +8,7 @@
       Gestion des commandes
     </BasicText>
 
-    <!-- 🔍 Barre de recherche -->
+    <!-- 🔍 Barre de recherche + filtres -->
     <div class="admin-orders__controls">
       <BasicInput
         v-model="search"
@@ -28,6 +28,28 @@
         <option value="amount_desc">Montant décroissant</option>
         <option value="amount_asc">Montant croissant</option>
       </select>
+
+      <select
+        v-model="statusFilter"
+        class="admin-orders__status-filter"
+      >
+        <option value="">Tous statuts</option>
+        <option
+          v-for="s in STATUSES"
+          :key="s"
+          :value="s"
+        >
+          {{ s }}
+        </option>
+      </select>
+
+      <BasicButton
+        label="Exporter CSV"
+        type="secondary"
+        variant="outlined"
+        size="small"
+        @click="exportCsv"
+      />
     </div>
 
     <!-- 📋 Liste -->
@@ -54,6 +76,7 @@
         <span>Email</span>
         <span>Total</span>
         <span>Date</span>
+        <span>Statut</span>
         <span>Détails</span>
       </div>
 
@@ -67,40 +90,28 @@
         <span>{{ order.total_amount.toFixed(2) }} €</span>
         <span>{{ formatDate(order.created_at) }}</span>
 
+        <!-- 🔁 Sélecteur de statut -->
+        <select
+          v-model="order.status"
+          class="admin-orders__status"
+          @change="updateStatus(order)"
+        >
+          <option
+            v-for="s in STATUSES"
+            :key="s"
+            :value="s"
+          >
+            {{ s }}
+          </option>
+        </select>
+
         <BasicButton
           label="Voir"
           size="small"
           type="secondary"
           variant="outlined"
-          @click="toggleDetails(order.id)"
+          @click="$router.push(`/admin/orders/${order.id}`)"
         />
-
-        <transition name="fade">
-          <div
-            v-if="expanded === order.id"
-            class="admin-orders__details"
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Produit</th>
-                  <th>Quantité</th>
-                  <th>Prix</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="item in order.items"
-                  :key="item.id"
-                >
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.quantity }}</td>
-                  <td>{{ item.price.toFixed(2) }} €</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </transition>
       </div>
     </div>
 
@@ -128,7 +139,10 @@
     total_amount: number
     created_at: string
     items: { id: string; name: string; quantity: number; price: number }[]
+    status: string
   }
+
+  const STATUSES = ['En attente', 'En préparation', 'Expédiée', 'Terminée', 'Annulée']
 
   const toast = useToastStore()
   const loading = ref(true)
@@ -137,6 +151,7 @@
   const sortKey = ref<'created_at_desc' | 'created_at_asc' | 'amount_desc' | 'amount_asc'>(
     'created_at_desc',
   )
+  const statusFilter = ref('')
   const page = ref(1)
   const perPage = 8
   const total = ref(0)
@@ -146,6 +161,9 @@
     loading.value = true
 
     let query = supabase.from('orders').select('*', { count: 'exact' })
+
+    // Filtre par statut
+    if (statusFilter.value) query = query.eq('status', statusFilter.value)
 
     // Pagination
     const from = (page.value - 1) * perPage
@@ -204,6 +222,48 @@
       (o) => o.full_name.toLowerCase().includes(term) || o.email.toLowerCase().includes(term),
     )
   })
+
+  async function updateStatus(order: Order) {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: order.status })
+      .eq('id', order.id)
+
+    if (error) {
+      toast.showToast('Erreur de mise à jour du statut', 'danger')
+    } else {
+      toast.showToast(`Statut mis à jour : ${order.status}`, 'success')
+    }
+  }
+
+  /** 🧾 Export CSV */
+  function exportCsv() {
+    if (orders.value.length === 0) {
+      toast.showToast('Aucune commande à exporter', 'warning')
+      return
+    }
+
+    const headers = ['Nom', 'Email', 'Montant total (€)', 'Statut', 'Date', 'Produits']
+
+    const rows = orders.value.map((o) => [
+      o.full_name,
+      o.email,
+      o.total_amount.toFixed(2),
+      o.status,
+      formatDate(o.created_at),
+      o.items.map((i) => `${i.name} x${i.quantity}`).join(' | '),
+    ])
+
+    const csvContent = [headers, ...rows].map((r) => r.map((x) => `"${x}"`).join(';')).join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `commandes_${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 </script>
 
 <style scoped lang="less">
@@ -222,14 +282,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     &__search {
       flex: 1;
+      min-width: 200px;
     }
 
-    &__sort {
+    &__sort,
+    &__status-filter,
+    &__status {
       padding: 6px;
       border-radius: 6px;
       border: 1px solid @neutral-300;
@@ -245,7 +309,7 @@
     &__header,
     &__row {
       display: grid;
-      grid-template-columns: 1.2fr 1.4fr 0.8fr 1.2fr 0.8fr;
+      grid-template-columns: 1.2fr 1.4fr 0.8fr 1.2fr 1fr 0.8fr;
       align-items: center;
       padding: 10px 12px;
     }

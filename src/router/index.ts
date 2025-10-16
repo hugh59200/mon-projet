@@ -51,7 +51,30 @@ const routes = [
     component: () => import('@/features/admin/OrdersAdminView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
-
+  {
+    path: '/admin/orders/:id',
+    name: 'admin-order-detail',
+    component: () => import('@/features/admin/OrderDetailView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/profil/commandes',
+    name: 'user-orders',
+    component: () => import('@/features/user/UserOrdersView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/profil/commandes/:id',
+    name: 'user-order-detail',
+    component: () => import('@/features/user/UserOrderDetailView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/confirmation/:id',
+    name: 'confirmation',
+    component: () => import('@/features/shop/ConfirmationView.vue'),
+    meta: { requiresAuth: true },
+  },
   {
     path: '/admin/users',
     name: 'admin-users',

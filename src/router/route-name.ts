@@ -1,12 +1,17 @@
 // Auto-generated from router/index.ts
 export type RouteName =
   'access-denied' |
+  'admin-order-detail' |
+  'admin-orders' |
   'admin-users' |
   'cart' |
   'catalogue' |
   'checkout' |
+  'confirmation' |
   'home' |
   'login' |
   'product-detail' |
   'profil' |
-  'register'
+  'register' |
+  'user-order-detail' |
+  'user-orders'

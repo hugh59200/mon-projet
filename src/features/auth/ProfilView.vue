@@ -59,6 +59,12 @@
           variant="outlined"
           @click="showPasswordForm = !showPasswordForm"
         />
+        <BasicButton
+          label="Mes commandes"
+          type="secondary"
+          variant="outlined"
+          @click="$router.push('/profil/commandes')"
+        />
       </div>
 
       <!-- 🔐 Formulaire de mot de passe -->
