@@ -1,6 +1,6 @@
 <template>
   <div class="catalogue">
-    <!-- 🔍 HEADER + BARRE DE RECHERCHE -->
+    <!-- HEADER -->
     <div class="catalogue__header">
       <BasicText
         size="h3"
@@ -9,19 +9,19 @@
         Catalogue de peptides
       </BasicText>
 
-      <div class="catalogue__search">
-        <BasicInput
-          v-model="search"
-          placeholder="Rechercher un peptide..."
-          input-type="form"
-          size="medium"
-          icon-left="search"
-        />
-      </div>
+      <BasicInput
+        v-model="search"
+        placeholder="Rechercher un peptide..."
+        input-type="form"
+        size="medium"
+        icon-left="search"
+        class="catalogue__search"
+      />
     </div>
 
+    <!-- LAYOUT -->
     <div class="catalogue__layout">
-      <!-- 🎚️ FILTRES LATERAUX -->
+      <!-- FILTRES -->
       <aside class="catalogue__filters">
         <BasicText
           size="h5"
@@ -29,114 +29,90 @@
         >
           Filtres
         </BasicText>
-
-        <div class="catalogue__filter-group">
-          <BasicText
-            size="body-s"
-            weight="bold"
-          >
-            Catégorie
-          </BasicText>
-          <select v-model="filters.category">
-            <option value="">Toutes</option>
-            <option value="performance">Performance</option>
-            <option value="récupération">Récupération</option>
-            <option value="recherche">Recherche</option>
-          </select>
-        </div>
-
-        <div class="catalogue__filter-group">
-          <BasicText
-            size="body-s"
-            weight="bold"
-          >
-            Disponibilité
-          </BasicText>
-          <select v-model="filters.stock">
-            <option value="">Toutes</option>
-            <option value="in">En stock</option>
-            <option value="out">Rupture</option>
-          </select>
-        </div>
-
-        <div class="catalogue__filter-group">
-          <BasicText
-            size="body-s"
-            weight="bold"
-          >
-            Trier par
-          </BasicText>
-          <select v-model="sort">
-            <option value="asc">Prix croissant</option>
-            <option value="desc">Prix décroissant</option>
-          </select>
-        </div>
+        <select v-model="filters.category">
+          <option value="">Toutes les catégories</option>
+          <option value="Performance">Performance</option>
+          <option value="Récupération">Récupération</option>
+          <option value="Recherche">Recherche</option>
+        </select>
+        <select v-model="filters.stock">
+          <option value="">Toutes</option>
+          <option value="in">En stock</option>
+          <option value="out">Rupture</option>
+        </select>
       </aside>
 
-      <!-- 💊 GRILLE PRODUITS -->
+      <!-- PRODUITS -->
       <section class="catalogue__products">
         <div
-          v-if="filteredProducts.length === 0"
+          v-if="loading"
+          class="catalogue__loading"
+        >
+          <BasicText>Chargement des produits...</BasicText>
+        </div>
+
+        <div
+          v-else-if="filteredProducts.length === 0"
           class="catalogue__empty"
         >
-          <BasicText>Aucun produit ne correspond à la recherche.</BasicText>
+          <BasicText>Aucun produit trouvé.</BasicText>
         </div>
 
-        <div class="catalogue__grid">
+        <div
+          v-else
+          class="catalogue__grid"
+        >
           <div
-            v-for="product in filteredProducts"
-            :key="product.id"
+            v-for="p in filteredProducts"
+            :key="p.id"
             class="catalogue__card"
           >
-            <div class="catalogue__card-image">
-              <img
-                :src="product.image"
-                :alt="product.name"
-                loading="lazy"
-              />
-            </div>
+            <img
+              :src="p.image"
+              :alt="p.name"
+            />
+            <BasicText weight="bold">{{ p.name }}</BasicText>
+            <BasicText
+              size="body-s"
+              color="neutral-500"
+            >
+              {{ p.category }}
+            </BasicText>
+            <BasicText size="body-s">Pureté : {{ p.purity }}%</BasicText>
+            <BasicText
+              size="body-l"
+              weight="bold"
+              class="catalogue__price"
+            >
+              {{ p.price.toFixed(2) }} €
+            </BasicText>
 
-            <div class="catalogue__card-content">
-              <BasicText weight="bold">{{ product.name }}</BasicText>
-              <BasicText
-                size="body-s"
-                color="neutral-500"
-              >
-                {{ product.category }}
-              </BasicText>
-
-              <BasicText
-                size="body-s"
-                color="neutral-500"
-              >
-                Pureté : {{ product.purity }}%
-              </BasicText>
-
-              <BasicText
-                size="body-l"
-                weight="bold"
-                class="catalogue__price"
-              >
-                {{ product.price.toFixed(2) }} €
-              </BasicText>
-
-              <BasicButton
-                :label="product.stock ? 'Ajouter au panier' : 'Rupture'"
-                :type="product.stock ? 'primary' : 'secondary'"
-                :variant="product.stock ? 'filled' : 'outlined'"
-                size="small"
-                :disabled="!product.stock"
-              />
-            </div>
+            <BasicButton
+              :label="p.stock ? 'Ajouter au panier' : 'Rupture'"
+              :disabled="!p.stock"
+              :type="p.stock ? 'primary' : 'secondary'"
+              size="small"
+            />
           </div>
         </div>
+
+        <!-- PAGINATION -->
+        <BasicPagination
+          v-if="nbPages > 1"
+          :nb-pages="nbPages"
+          :current-page="page"
+          :nb-pages-max="5"
+          :nb-results="total"
+          @change="page = $event"
+        />
       </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { supabase } from '@/services/supabaseClient'
+  import { computed, ref, watchEffect } from 'vue'
 
   type Product = {
     id: string
@@ -148,79 +124,45 @@
     image: string
   }
 
+  const products = ref<Product[]>([])
+  const loading = ref(true)
+  const page = ref(1)
+  const perPage = 6
+  const total = ref(0)
   const search = ref('')
-  const filters = ref({
-    category: '',
-    stock: '',
-  })
-  const sort = ref<'asc' | 'desc'>('asc')
+  const filters = ref({ category: '', stock: '' })
 
-  const products = ref<Product[]>([
-    {
-      id: '1',
-      name: 'GHK-Cu Peptide',
-      category: 'Performance',
-      price: 39.9,
-      purity: 99,
-      stock: true,
-      image: '/images/products/ghkcu.jpg',
-    },
-    {
-      id: '2',
-      name: 'BPC-157 Peptide',
-      category: 'Récupération',
-      price: 34.9,
-      purity: 99,
-      stock: true,
-      image: '/images/products/bpc157.jpg',
-    },
-    {
-      id: '3',
-      name: 'CJC-1295 DAC',
-      category: 'Performance',
-      price: 44.9,
-      purity: 98,
-      stock: false,
-      image: '/images/products/cjc1295.jpg',
-    },
-    {
-      id: '4',
-      name: 'Thymosin Beta-4',
-      category: 'Récupération',
-      price: 32.9,
-      purity: 99,
-      stock: true,
-      image: '/images/products/tb4.jpg',
-    },
-    {
-      id: '5',
-      name: 'Epitalon',
-      category: 'Recherche',
-      price: 36.5,
-      purity: 99,
-      stock: true,
-      image: '/images/products/epitalon.jpg',
-    },
-  ])
+  // Chargement Supabase
+  async function loadProducts() {
+    loading.value = true
+    let query = supabase.from('products').select('*', { count: 'exact' })
 
-  const filteredProducts = computed(() => {
-    let list = products.value
+    // Filtres
+    if (filters.value.category) query = query.eq('category', filters.value.category)
+    if (filters.value.stock) query = query.eq('stock', filters.value.stock === 'in')
 
-    // 🔍 Filtre recherche
-    if (search.value)
-      list = list.filter((p) => p.name.toLowerCase().includes(search.value.toLowerCase()))
+    // Recherche
+    if (search.value) query = query.ilike('name', `%${search.value}%`)
 
-    // 🎚️ Filtres
-    if (filters.value.category)
-      list = list.filter((p) => p.category.toLowerCase() === filters.value.category.toLowerCase())
-    if (filters.value.stock)
-      list = list.filter((p) => (filters.value.stock === 'in' ? p.stock : !p.stock))
+    // Pagination
+    const from = (page.value - 1) * perPage
+    const to = from + perPage - 1
 
-    // ↕️ Tri prix
-    list = list.sort((a, b) => (sort.value === 'asc' ? a.price - b.price : b.price - a.price))
+    const { data, count, error } = await query.range(from, to).order('price', { ascending: true })
 
-    return list
-  })
+    if (error) console.error(error)
+    else {
+      products.value = data || []
+      total.value = count || 0
+    }
+    loading.value = false
+  }
+
+  watchEffect(loadProducts)
+
+  const nbPages = computed(() => Math.ceil(total.value / perPage))
+
+  const filteredProducts = computed(() => products.value)
 </script>
 
 <style scoped lang="less">
@@ -229,18 +171,6 @@
     flex-direction: column;
     gap: 24px;
     padding: 40px 60px;
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    &__search {
-      width: 280px;
-    }
 
     &__layout {
       display: flex;
@@ -251,32 +181,15 @@
       flex: 0 0 220px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 16px;
       background: @neutral-50;
-      padding: 20px;
-      border-radius: 8px;
       border: 1px solid @neutral-200;
-    }
-
-    &__filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      select {
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid @neutral-300;
-        background: white;
-        cursor: pointer;
-      }
+      border-radius: 8px;
+      padding: 20px;
     }
 
     &__products {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
 
     &__grid {
@@ -287,43 +200,31 @@
 
     &__card {
       background: white;
-      border: 1px solid @neutral-200;
       border-radius: 12px;
+      border: 1px solid @neutral-200;
       padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+      text-align: center;
       transition: all 0.2s;
 
-      &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transform: translateY(-4px);
+      img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
       }
 
-      &-image {
-        width: 100%;
-        height: 140px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 8px;
-        overflow: hidden;
-        background: @neutral-100;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       }
     }
 
     &__price {
       color: @primary-700;
-      margin-top: 4px;
     }
 
+    &__loading,
     &__empty {
       text-align: center;
       padding: 40px;
@@ -332,13 +233,6 @@
     @media (max-width: 900px) {
       &__layout {
         flex-direction: column;
-      }
-
-      &__filters {
-        flex: none;
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
       }
     }
   }

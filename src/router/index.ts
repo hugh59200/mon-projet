@@ -22,6 +22,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/catalogue',
+    name: 'catalogue',
+    component: () => import('@/pages/Catalogue.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/admin/users',
     name: 'admin-users',
     component: () => import('@/features/admin/UsersAdminView.vue'),

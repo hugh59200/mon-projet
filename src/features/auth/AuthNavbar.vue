@@ -2,7 +2,7 @@
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
       <BasicText
-        size="body-xl"
+        size="body-l"
         weight="bold"
         class="auth-navbar__logo"
         @click="$router.push('/')"
@@ -29,6 +29,14 @@
           @click="$router.push('/')"
         />
 
+        <!-- 🔹 Catalogue -->
+        <BasicButton
+          label="Catalogue"
+          type="secondary"
+          size="small"
+          @click="$router.push('/catalogue')"
+        />
+
         <!-- 🔹 Administration (si admin) -->
         <BasicButton
           v-if="auth.isAdmin"
@@ -39,7 +47,6 @@
           @click="$router.push('/admin/users')"
         />
 
-        <!-- 🔹 Profil + Déconnexion -->
         <BasicButton
           label="Mon profil"
           type="secondary"
