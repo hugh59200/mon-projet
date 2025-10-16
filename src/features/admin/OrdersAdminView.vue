@@ -155,7 +155,6 @@
   const page = ref(1)
   const perPage = 8
   const total = ref(0)
-  const expanded = ref<string | null>(null)
 
   async function loadOrders() {
     loading.value = true
@@ -199,10 +198,6 @@
   }
 
   watchEffect(loadOrders)
-
-  function toggleDetails(id: string) {
-    expanded.value = expanded.value === id ? null : id
-  }
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {

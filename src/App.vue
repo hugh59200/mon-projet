@@ -9,11 +9,8 @@
 
 <script setup lang="ts">
   import AuthNavbar from '@/features/auth/AuthNavbar.vue'
-  import { useAuthStore } from '@/features/auth/useAuthStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
-
-  const auth = useAuthStore()
 </script>
 
 <style scoped lang="less">

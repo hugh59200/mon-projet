@@ -98,7 +98,7 @@
       >
         <div class="confirmation__sending">
           <span class="confirmation__spinner" />
-          <BasicText color="neutral-700">Envoi de l’email de confirmation...</BasicText>
+          <BasicText color="neutral-500">Envoi de l’email de confirmation...</BasicText>
         </div>
       </div>
     </transition>
