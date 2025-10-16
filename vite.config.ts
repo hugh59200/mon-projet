@@ -1,18 +1,62 @@
-import { fileURLToPath, URL } from 'node:url'
 import BasicSSL from '@vitejs/plugin-basic-ssl'
-import path from 'path'
 import vue from '@vitejs/plugin-vue'
-import {  defineConfig, type BuildEnvironmentOptions } from 'vite'
-import svgLoader from 'vite-svg-loader'
+import { fileURLToPath, URL } from 'node:url'
+import path from 'path'
 import VueDevTools from 'vite-plugin-vue-devtools'
-import { manualChunksOptimizer, assetFileNameOptimizer } from './vite/chunkOptimizer'
-import { generateGlobalComponents, generateRouteNamesUnion,generateIconsList } from './vite/generator'
+import svgLoader from 'vite-svg-loader'
 
-const outDir = 'dist'  // Output directory for the build
-const config = {
-  APP: {
+import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer'
+
+import { defineConfig } from 'vite'
+import {
+  generateGlobalComponents,
+  generateIconsList,
+  generateRouteNamesUnion,
+} from './vite/generator'
+
+// === Config globale ===
+const outDir = 'dist'
+
+// 🧩 Pré-build automatiques
+generateIconsList(__dirname)
+generateRouteNamesUnion(__dirname)
+generateGlobalComponents(__dirname)
+
+export default defineConfig({
+  // === Plugins ===
+  plugins: [
+    vue(),
+    svgLoader(),
+    VueDevTools(),
+    BasicSSL(), // SSL local
+  ],
+
+  // === Résolution des alias ===
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@designSystem': path.resolve(__dirname, 'designSystem/src'),
+      '@designSystem/components': path.resolve(__dirname, 'designSystem/src/components/index.ts'),
+    },
+  },
+
+  // === Configuration CSS (LESS global) ===
+  css: {
+    transformer: 'postcss',
+    preprocessorOptions: {
+      less: {
+        additionalData: `@import "@designSystem/index.less";`,
+      },
+    },
+  },
+
+  // === Build optimisé (Cloudflare-ready) ===
+  build: {
     outDir,
     sourcemap: true,
+    cssMinify: false,
+    chunkSizeWarningLimit: 2500,
+
     rollupOptions: {
       output: {
         manualChunks: manualChunksOptimizer,
@@ -21,43 +65,22 @@ const config = {
         entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
-  } as BuildEnvironmentOptions,
-}
 
-generateIconsList(__dirname)
-generateRouteNamesUnion(__dirname)
-generateGlobalComponents(__dirname)
+    // ✅ cible moderne (Cloudflare Pages supporte ESNext)
+    target: 'esnext',
+  },
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    VueDevTools(),
-    svgLoader(),
-    BasicSSL(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@designSystem': path.resolve(__dirname, 'designSystem/src'),
-      '@designSystem/components': path.resolve(__dirname, 'designSystem/src/components/index.ts'),
-    },
-  },
-  css: {
-        transformer: 'postcss',
-    preprocessorOptions: {
-      less: {
-        additionalData: `@import "@designSystem/index.less";`,
-      },
-    },
-  },
-  build: {
-    chunkSizeWarningLimit: 2500,
-    ...config.APP,
-        cssMinify: false, 
-  },
+  // === Serveur local ===
   server: {
     port: 5278,
     strictPort: true,
     host: 'localhost',
+  },
+
+  // === Optimisation dépendances ===
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
 })
