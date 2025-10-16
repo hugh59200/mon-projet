@@ -48,6 +48,22 @@
         />
 
         <BasicButton
+          label="Panier"
+          type="secondary"
+          size="small"
+          @click="$router.push('/panier')"
+        />
+        <BasicBadge
+          v-if="cart.totalItems > 0"
+          :label="cart.totalItems.toString()"
+        />
+        <BasicButton
+          label="Paiement"
+          type="secondary"
+          size="small"
+          @click="$router.push('/paiement')"
+        />
+        <BasicButton
           label="Mon profil"
           type="secondary"
           size="small"
@@ -85,10 +101,12 @@
 
 <script setup lang="ts">
   import { useRouter } from 'vue-router'
+  import { useCartStore } from '../cart/useCartStore'
   import { useAuthStore } from './useAuthStore'
 
   const router = useRouter()
   const auth = useAuthStore()
+  const cart = useCartStore()
 
   async function handleLogout() {
     await auth.signOut()

@@ -1,6 +1,6 @@
 <template>
   <div class="catalogue">
-    <!-- HEADER -->
+    <!-- 🧬 HEADER -->
     <div class="catalogue__header">
       <BasicText
         size="h3"
@@ -19,9 +19,9 @@
       />
     </div>
 
-    <!-- LAYOUT -->
+    <!-- ⚙️ LAYOUT PRINCIPAL -->
     <div class="catalogue__layout">
-      <!-- FILTRES -->
+      <!-- 🎚️ FILTRES LATERAUX -->
       <aside class="catalogue__filters">
         <BasicText
           size="h5"
@@ -29,20 +29,38 @@
         >
           Filtres
         </BasicText>
-        <select v-model="filters.category">
-          <option value="">Toutes les catégories</option>
-          <option value="Performance">Performance</option>
-          <option value="Récupération">Récupération</option>
-          <option value="Recherche">Recherche</option>
-        </select>
-        <select v-model="filters.stock">
-          <option value="">Toutes</option>
-          <option value="in">En stock</option>
-          <option value="out">Rupture</option>
-        </select>
+
+        <div class="catalogue__filter-group">
+          <BasicText
+            size="body-s"
+            weight="bold"
+          >
+            Catégorie
+          </BasicText>
+          <select v-model="filters.category">
+            <option value="">Toutes les catégories</option>
+            <option value="Performance">Performance</option>
+            <option value="Récupération">Récupération</option>
+            <option value="Recherche">Recherche</option>
+          </select>
+        </div>
+
+        <div class="catalogue__filter-group">
+          <BasicText
+            size="body-s"
+            weight="bold"
+          >
+            Disponibilité
+          </BasicText>
+          <select v-model="filters.stock">
+            <option value="">Toutes</option>
+            <option value="in">En stock</option>
+            <option value="out">Rupture</option>
+          </select>
+        </div>
       </aside>
 
-      <!-- PRODUITS -->
+      <!-- 💊 PRODUITS -->
       <section class="catalogue__products">
         <div
           v-if="loading"
@@ -66,19 +84,24 @@
             v-for="p in filteredProducts"
             :key="p.id"
             class="catalogue__card"
+            @click="$router.push(`/catalogue/${p.id}`)"
           >
             <img
               :src="p.image"
               :alt="p.name"
+              loading="lazy"
             />
             <BasicText weight="bold">{{ p.name }}</BasicText>
+
             <BasicText
               size="body-s"
               color="neutral-500"
             >
               {{ p.category }}
             </BasicText>
+
             <BasicText size="body-s">Pureté : {{ p.purity }}%</BasicText>
+
             <BasicText
               size="body-l"
               weight="bold"
@@ -92,11 +115,12 @@
               :disabled="!p.stock"
               :type="p.stock ? 'primary' : 'secondary'"
               size="small"
+              @click.stop="addProduct(p)"
             />
           </div>
         </div>
 
-        <!-- PAGINATION -->
+        <!-- 📄 PAGINATION -->
         <BasicPagination
           v-if="nbPages > 1"
           :nb-pages="nbPages"
@@ -111,8 +135,21 @@
 </template>
 
 <script setup lang="ts">
+  import { useCartStore } from '@/features/cart/useCartStore'
   import { supabase } from '@/services/supabaseClient'
   import { computed, ref, watchEffect } from 'vue'
+
+  const cart = useCartStore()
+
+  function addProduct(p: any) {
+    cart.addToCart({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image: p.image,
+      stock: p.stock,
+    })
+  }
 
   type Product = {
     id: string
@@ -132,36 +169,38 @@
   const search = ref('')
   const filters = ref({ category: '', stock: '' })
 
-  // Chargement Supabase
+  // ⚡ Chargement dynamique depuis Supabase
   async function loadProducts() {
     loading.value = true
     let query = supabase.from('products').select('*', { count: 'exact' })
 
-    // Filtres
+    // 🎚️ Filtres
     if (filters.value.category) query = query.eq('category', filters.value.category)
     if (filters.value.stock) query = query.eq('stock', filters.value.stock === 'in')
 
-    // Recherche
+    // 🔍 Recherche
     if (search.value) query = query.ilike('name', `%${search.value}%`)
 
-    // Pagination
+    // 📄 Pagination
     const from = (page.value - 1) * perPage
     const to = from + perPage - 1
 
-    const { data, count, error } = await query.range(from, to).order('price', { ascending: true })
+    const { data, count, error } = await query.order('price', { ascending: true }).range(from, to)
 
-    if (error) console.error(error)
-    else {
+    if (error) {
+      console.error('Erreur Supabase :', error)
+    } else {
       products.value = data || []
       total.value = count || 0
     }
+
     loading.value = false
   }
 
+  // ⚙️ Recharger à chaque changement de filtre, page ou recherche
   watchEffect(loadProducts)
 
   const nbPages = computed(() => Math.ceil(total.value / perPage))
-
   const filteredProducts = computed(() => products.value)
 </script>
 
@@ -171,6 +210,18 @@
     flex-direction: column;
     gap: 24px;
     padding: 40px 60px;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    &__search {
+      width: 280px;
+    }
 
     &__layout {
       display: flex;
@@ -186,6 +237,20 @@
       border: 1px solid @neutral-200;
       border-radius: 8px;
       padding: 20px;
+    }
+
+    &__filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid @neutral-300;
+        background: white;
+        cursor: pointer;
+      }
     }
 
     &__products {
@@ -204,7 +269,8 @@
       border: 1px solid @neutral-200;
       padding: 16px;
       text-align: center;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      cursor: pointer;
 
       img {
         width: 100%;

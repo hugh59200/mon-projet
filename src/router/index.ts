@@ -28,6 +28,31 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/catalogue/:id',
+    name: 'product-detail',
+    component: () => import('@/pages/ProductView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/panier',
+    name: 'cart',
+    component: () => import('@/pages/PanierView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/paiement',
+    name: 'checkout',
+    component: () => import('@/pages/CheckoutView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/orders',
+    name: 'admin-orders',
+    component: () => import('@/features/admin/OrdersAdminView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
+  {
     path: '/admin/users',
     name: 'admin-users',
     component: () => import('@/features/admin/UsersAdminView.vue'),

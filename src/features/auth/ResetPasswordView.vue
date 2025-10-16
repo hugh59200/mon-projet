@@ -8,10 +8,7 @@
       Réinitialiser le mot de passe
     </BasicText>
 
-    <form
-      class="auth__form"
-      @submit.prevent="reset"
-    >
+    <form class="auth__form">
       <BasicInput
         v-model="email"
         placeholder="Votre email"
@@ -27,6 +24,7 @@
         width="full"
         size="medium"
         :disabled="loading"
+        @click="reset"
       />
 
       <BasicText

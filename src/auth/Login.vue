@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <h1>Connexion</h1>
-    <form @submit.prevent="handleLogin">
+    <form>
       <input
         v-model="username"
         placeholder="Nom d'utilisateur"
@@ -11,7 +11,12 @@
         placeholder="Mot de passe"
         type="password"
       />
-      <button type="submit">Se connecter</button>
+      <button
+        type="submit"
+        @click="handleLogin"
+      >
+        Se connecter
+      </button>
     </form>
     <p
       v-if="error"

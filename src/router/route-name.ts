@@ -2,7 +2,11 @@
 export type RouteName =
   'access-denied' |
   'admin-users' |
+  'cart' |
+  'catalogue' |
+  'checkout' |
   'home' |
   'login' |
+  'product-detail' |
   'profil' |
   'register'
