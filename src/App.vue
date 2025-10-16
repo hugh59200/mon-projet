@@ -4,8 +4,6 @@
     <RouterView />
   </main>
   <FooterApp />
-
-  <!-- ✅ Conteneur global pour TOUS les toasts -->
   <ToastContainer />
 </template>
 
