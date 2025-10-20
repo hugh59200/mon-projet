@@ -1,0 +1,156 @@
+.left-sidebar {
+  height: 100vh;
+  width: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: @spacing-10;
+  padding: 24px 0;
+  background-color: @white;
+  transition: width 0.3s ease;
+  box-shadow: 0px 0px 40px rgba(29, 72, 81, 0.2);
+  user-select: none;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  svg {
+    flex: none;
+  }
+
+  &__top {
+    width: 90%;
+
+    &--icon {
+      height: 24px;
+      display: block;
+      text-align: right;
+      margin-bottom: @spacing-15;
+    }
+
+    &--logo {
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  &__items {
+    margin: @spacing-20 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: @spacing-15;
+    transition: width 0.3s ease;
+  }
+
+  &__item {
+    height: 50px;
+    padding: 0px 16px;
+    text-decoration: none;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 12px;
+    border-radius: @border-radius-xl;
+    transition: background-color 0.3s ease;
+
+    &--icon {
+      flex: none;
+      height: 24px;
+      width: 24px;
+    }
+
+    &:hover {
+      background-color: @secondary-0;
+      svg {
+        fill: @secondary-800;
+      }
+    }
+
+    &__link {
+      width: 140px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      svg {
+        transform: scale(0.8);
+      }
+    }
+
+    &.active {
+      background: @secondary-800;
+      span {
+        color: @white;
+      }
+      svg {
+        fill: @white;
+      }
+    }
+  }
+
+  &__chip {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  &--reduced {
+    width: 90px;
+
+    .left-sidebar {
+      &__top--icon {
+        text-align: center;
+      }
+
+      &__item {
+        position: relative;
+
+        .left-sidebar__chip--delete {
+          opacity: 0;
+          visibility: hidden;
+          transition:
+            opacity 0.2s ease,
+            visibility 0.2s ease;
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          transform: scale(0.5);
+          width: 24px;
+          height: 24px;
+          background-color: @neutral-200;
+          border-radius: 50%;
+        }
+
+        &:hover {
+          .left-sidebar__chip--delete {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+      }
+    }
+
+    img {
+      width: 120%;
+    }
+  }
+
+  &--mobile {
+    height: calc(100vh - 80px);
+    top: 80px;
+    position: fixed;
+    padding: 0 16px;
+    pointer-events: none;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+}

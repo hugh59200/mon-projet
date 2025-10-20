@@ -1,22 +1,19 @@
 <template>
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
-      <div class="auth-navbar__left--icon">
-        <BasicIcon
-          :name="sidebar.isOpen ? 'menu-grid' : 'menu-grid-reduced'"
-          active
-          pointer
-          @click="sidebar.toggle()"
-        />
-      </div>
-      <div class="auth-navbar__left--logo">
-        <BasicText
-          size="body-l"
-          weight="bold"
-        >
-          Fast Peptides
-        </BasicText>
-      </div>
+      <BasicIcon
+        :name="isReduced ? 'menu-grid-reduced' : 'menu-grid'"
+        active
+        pointer
+        @click="toggle"
+      />
+      <BasicText
+        size="body-l"
+        weight="bold"
+        class="auth-navbar__logo"
+      >
+        Fast Peptides
+      </BasicText>
     </div>
 
     <div class="auth-navbar__right">
@@ -90,6 +87,7 @@
 
 <script setup lang="ts">
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
+  import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
   import { useCartStore } from '../cart/useCartStore'
   import { useAuthStore } from './useAuthStore'
@@ -98,6 +96,8 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const sidebar = useSidebarStore()
+  const { isReduced } = storeToRefs(sidebar) // ✅ réactif
+  const { toggle } = sidebar
 
   async function handleLogout() {
     await auth.signOut()
@@ -112,43 +112,28 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0px 24px;
+    padding: 0 24px;
     background-color: @secondary-800;
     color: white;
-    z-index: 1000;
 
     &__left {
       display: flex;
       align-items: center;
+      gap: 16px;
 
-      &--icon {
-        margin-right: 16px;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-
-        svg {
-          fill: white;
-        }
+      svg {
+        fill: @white;
       }
+    }
 
-      &--logo {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-      }
+    &__logo {
+      cursor: pointer;
     }
 
     &__right {
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-
-    &__email {
-      margin-right: 12px;
-      color: @neutral-100;
     }
   }
 </style>

@@ -1,18 +1,15 @@
 <template>
   <div class="app-layout">
     <AuthNavbar />
-
     <div
       class="app-body"
-      :class="{ 'sidebar-open': sidebar.isOpen }"
+      :class="{ 'sidebar-reduced': sidebar.isReduced }"
     >
       <SidebarApp />
-
       <main class="app-main">
         <RouterView />
       </main>
     </div>
-
     <FooterApp />
     <ToastContainer />
   </div>
@@ -43,11 +40,11 @@
     display: flex;
     flex: 1;
     transition: margin-left 0.3s ease;
-    margin-left: 60px; // largeur minimale (sidebar fermée)
+    margin-left: 240px; // largeur étendue
   }
 
-  .app-body.sidebar-open {
-    margin-left: 220px; // largeur ouverte
+  .app-body.sidebar-reduced {
+    margin-left: 80px; // largeur réduite
   }
 
   .app-main {

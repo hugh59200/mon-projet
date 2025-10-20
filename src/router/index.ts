@@ -1,9 +1,19 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import Home from '@/pages/Home.vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import './RouteMeta'
 
-const routes = [
-  { path: '/', name: 'home', component: Home },
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'home',
+    component: Home,
+    meta: {
+      label: 'Accueil',
+      icon: 'home',
+      order: 1,
+    },
+  },
   { path: '/login', name: 'login', component: () => import('@/features/auth/LoginView.vue') },
   {
     path: '/register',
@@ -25,7 +35,12 @@ const routes = [
     path: '/catalogue',
     name: 'catalogue',
     component: () => import('@/pages/Catalogue.vue'),
-    meta: { requiresAuth: true },
+    meta: {
+      requiresAuth: true,
+      label: 'Catalogue',
+      icon: 'folder-open',
+      order: 2,
+    },
   },
   {
     path: '/catalogue/:id',

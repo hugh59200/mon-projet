@@ -1,88 +1,112 @@
 <template>
   <aside
     class="sidebar"
-    :class="{ open: sidebar.isOpen }"
+    :class="{ reduced: isReduced }"
   >
-    <nav class="sidebar__links">
-      <button
-        class="sidebar__link"
-        :class="{ active: $route.path === '/' }"
-        @click="$router.push('/')"
+    <nav class="sidebar__items">
+      <RouterLink
+        v-for="item in sidebarItems"
+        :key="item.path"
+        :to="item.path"
+        class="sidebar__item"
+        active-class="active"
+        v-slot="{ isActive }"
       >
-        <i class="pi pi-home"></i>
-        Accueil
-      </button>
+        <div class="sidebar__icon">
+          <BasicIcon
+            :name="item.icon"
+            :active="isActive"
+          />
+        </div>
 
-      <button
-        class="sidebar__link"
-        :class="{ active: $route.path.includes('/catalogue') }"
-        @click="$router.push('/catalogue')"
-      >
-        <i class="pi pi-list"></i>
-        Catalogue
-      </button>
+        <transition name="fade-slide">
+          <div
+            v-if="!isReduced"
+            class="sidebar__label"
+          >
+            <BasicText
+              wrap
+              nb-max-lines="2"
+              color="white"
+            >
+              {{ item.label }}
+            </BasicText>
+          </div>
+        </transition>
+      </RouterLink>
     </nav>
   </aside>
 </template>
 
 <script setup lang="ts">
+  import { storeToRefs } from 'pinia'
   import { useSidebarStore } from './useSidebarStore'
+
   const sidebar = useSidebarStore()
+  const { sidebarItems, isReduced } = storeToRefs(sidebar)
 </script>
 
 <style scoped lang="less">
   .sidebar {
     position: fixed;
-    top: 60px;
     left: 0;
-    width: 60px; // largeur réduite par défaut
+    top: 60px;
     height: calc(100vh - 60px);
+    width: 240px;
     background: @secondary-800;
-    color: white;
+    color: @neutral-100;
     display: flex;
     flex-direction: column;
-    padding: 24px 12px;
-    overflow: hidden;
+    align-items: stretch;
+    padding: 20px 0;
+    transition: width 0.3s ease;
     z-index: 800;
-    transition: all 0.3s ease;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
     border-right: 1px solid fade(white, 10%);
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 
-    &.open {
-      width: 220px;
-      padding: 24px 18px;
+    /* Mode réduit */
+    &.reduced {
+      width: 80px;
+
+      .sidebar__label {
+        display: none;
+      }
     }
 
-    &__links {
+    &__items {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 10px;
+      align-items: stretch;
+      gap: 6px;
+      padding: 0 12px; // ✅ espace intérieur pour éviter le débordement
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    &__link {
+    &__item {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 10px 14px;
       border-radius: 8px;
+      color: fade(@neutral-100, 80%);
+      text-decoration: none;
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        transform 0.2s ease;
+      min-height: 42px;
       background: transparent;
-      border: none;
-      color: fade(white, 80%);
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.25s ease;
-      text-align: left;
-      white-space: nowrap;
+      box-sizing: border-box;
 
-      i {
-        font-size: 16px;
-        width: 20px;
-        text-align: center;
+      svg {
+        fill: @neutral-100;
+        transition: fill 0.3s ease;
       }
 
       &:hover {
-        background: fade(white, 10%);
+        background: fade(@neutral-100, 10%);
         color: white;
       }
 
@@ -90,44 +114,47 @@
         background: @primary-600;
         color: white;
         font-weight: bold;
+        box-shadow: 0 0 0 1px fade(white, 8%);
       }
+    }
+
+    /* Icône à gauche */
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      min-width: 26px;
+      height: 26px;
+
+      svg {
+        fill: @neutral-100;
+        transition: fill 0.3s ease;
+      }
+    }
+
+    /* Label du lien */
+    &__label {
+      margin-left: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
-  /* 📱 Responsive : devient nav du bas */
-  @media (max-width: 900px) {
-    .sidebar {
-      position: fixed;
-      bottom: 0;
-      top: auto;
-      width: 100%;
-      height: 60px;
-      flex-direction: row;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0 10px;
-      border-right: none;
-      border-top: 1px solid fade(white, 15%);
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+  /* ✨ Animation fluide du label */
+  .fade-slide-enter-active,
+  .fade-slide-leave-active {
+    transition: all 0.25s ease;
+  }
 
-      &.open {
-        width: 100%;
-      }
+  .fade-slide-enter-from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
 
-      &__links {
-        flex-direction: row;
-        gap: 0;
-        width: 100%;
-        justify-content: space-evenly;
-      }
-
-      &__link {
-        flex-direction: column;
-        gap: 4px;
-        font-size: 12px;
-        background: none;
-        padding: 6px 0;
-      }
-    }
+  .fade-slide-leave-to {
+    opacity: 0;
+    transform: translateX(-6px);
   }
 </style>
