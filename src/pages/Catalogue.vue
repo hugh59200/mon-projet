@@ -42,6 +42,8 @@
             <option value="Performance">Performance</option>
             <option value="Récupération">Récupération</option>
             <option value="Recherche">Recherche</option>
+            <option value="Bien-être">Bien-être</option>
+            <option value="Métabolisme">Métabolisme</option>
           </select>
         </div>
 
@@ -62,6 +64,18 @@
 
       <!-- 💊 PRODUITS -->
       <section class="catalogue__products">
+        <!-- 🔝 Pagination en haut -->
+        <BasicPagination
+          v-if="nbPages > 1"
+          :nb-pages="nbPages"
+          :current-page="page"
+          :nb-pages-max="5"
+          :nb-results="total"
+          class="catalogue__pagination-top"
+          @change="page = $event"
+        />
+
+        <!-- ⚙️ États -->
         <div
           v-if="loading"
           class="catalogue__loading"
@@ -76,65 +90,28 @@
           <BasicText>Aucun produit trouvé.</BasicText>
         </div>
 
-        <div
-          v-else
+        <!-- 💊 Liste des produits avec animation -->
+        <TransitionGroup
+          name="fade-up"
+          tag="div"
           class="catalogue__grid"
+          v-else
         >
-          <div
+          <ProductCart
             v-for="p in filteredProducts"
             :key="p.id"
-            class="catalogue__card"
-            @click="$router.push(`/catalogue/${p.id}`)"
-          >
-            <img
-              :src="p.image"
-              :alt="p.name"
-              loading="lazy"
-            />
-            <BasicText weight="bold">{{ p.name }}</BasicText>
-
-            <BasicText
-              size="body-s"
-              color="neutral-500"
-            >
-              {{ p.category }}
-            </BasicText>
-
-            <BasicText size="body-s">Pureté : {{ p.purity }}%</BasicText>
-
-            <BasicText
-              size="body-l"
-              weight="bold"
-              class="catalogue__price"
-            >
-              {{ p.price.toFixed(2) }} €
-            </BasicText>
-
-            <BasicButton
-              :label="p.stock ? 'Ajouter au panier' : 'Rupture'"
-              :disabled="!p.stock"
-              :type="p.stock ? 'primary' : 'secondary'"
-              size="small"
-              @click.stop="addProduct(p)"
-            />
-          </div>
-        </div>
-
-        <!-- 📄 PAGINATION -->
-        <BasicPagination
-          v-if="nbPages > 1"
-          :nb-pages="nbPages"
-          :current-page="page"
-          :nb-pages-max="5"
-          :nb-results="total"
-          @change="page = $event"
-        />
+            :product="p"
+            @add="addProduct"
+            @view="(id: any) => $router.push(`/catalogue/${id}`)"
+          />
+        </TransitionGroup>
       </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import ProductCart from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { supabase } from '@/services/supabaseClient'
   import { computed, ref, watchEffect } from 'vue'
@@ -263,31 +240,10 @@
       gap: 24px;
     }
 
-    &__card {
-      background: white;
-      border-radius: 12px;
-      border: 1px solid @neutral-200;
-      padding: 16px;
-      text-align: center;
-      transition: all 0.2s ease;
-      cursor: pointer;
-
-      img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-bottom: 10px;
-      }
-
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      }
-    }
-
-    &__price {
-      color: @primary-700;
+    &__pagination-top {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
     }
 
     &__loading,
@@ -301,5 +257,16 @@
         flex-direction: column;
       }
     }
+  }
+
+  /* ✨ Animation d’apparition fluide */
+  .fade-up-enter-active,
+  .fade-up-leave-active {
+    transition: all 0.4s ease;
+  }
+  .fade-up-enter-from,
+  .fade-up-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
   }
 </style>
