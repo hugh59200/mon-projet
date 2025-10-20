@@ -236,8 +236,10 @@
 
     &__grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      column-gap: 28px;
+      row-gap: 50px;
+      align-items: start;
     }
 
     &__pagination-top {

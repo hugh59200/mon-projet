@@ -1,14 +1,22 @@
 <template>
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
-      <BasicText
-        size="body-l"
-        weight="bold"
-        class="auth-navbar__logo"
-        @click="$router.push('/')"
-      >
-        mon site
-      </BasicText>
+      <div class="auth-navbar__top--icon">
+        <BasicIcon
+          :name="sidebar.isOpen ? 'menu-grid' : 'menu-grid-reduced'"
+          active
+          pointer
+          @click="sidebar.toggle()"
+        />
+      </div>
+      <div class="auth-navbar__top--logo">
+        <BasicText
+          size="body-l"
+          weight="bold"
+        >
+          Fast Peptides
+        </BasicText>
+      </div>
     </div>
 
     <div class="auth-navbar__right">
@@ -20,22 +28,6 @@
         >
           {{ auth.user.email }}
         </BasicText>
-
-        <!-- 🔹 Accueil -->
-        <BasicButton
-          label="Accueil"
-          type="secondary"
-          size="small"
-          @click="$router.push('/')"
-        />
-
-        <!-- 🔹 Catalogue -->
-        <BasicButton
-          label="Catalogue"
-          type="secondary"
-          size="small"
-          @click="$router.push('/catalogue')"
-        />
 
         <!-- 🔹 Administration (si admin) -->
         <BasicButton
@@ -100,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore' // ✅
   import { useRouter } from 'vue-router'
   import { useCartStore } from '../cart/useCartStore'
   import { useAuthStore } from './useAuthStore'
@@ -107,6 +100,7 @@
   const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()
+  const sidebar = useSidebarStore() // ✅
 
   async function handleLogout() {
     await auth.signOut()
@@ -116,12 +110,33 @@
 
 <style scoped lang="less">
   .auth-navbar {
+    height: 60px;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
+    padding: 0px 24px;
     background-color: @secondary-800;
     color: white;
+
+    &__top {
+      &--icon {
+        margin-right: 16px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+
+        svg {
+          fill: white;
+        }
+      }
+
+      &--logo {
+        display: flex;
+        align-items: center;
+      }
+    }
 
     &__left {
       display: flex;
