@@ -1,7 +1,7 @@
 <template>
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
-      <div class="auth-navbar__top--icon">
+      <div class="auth-navbar__left--icon">
         <BasicIcon
           :name="sidebar.isOpen ? 'menu-grid' : 'menu-grid-reduced'"
           active
@@ -9,7 +9,7 @@
           @click="sidebar.toggle()"
         />
       </div>
-      <div class="auth-navbar__top--logo">
+      <div class="auth-navbar__left--logo">
         <BasicText
           size="body-l"
           weight="bold"
@@ -20,7 +20,6 @@
     </div>
 
     <div class="auth-navbar__right">
-      <!-- ✅ Connecté -->
       <template v-if="auth.user">
         <BasicText
           size="body-m"
@@ -29,7 +28,6 @@
           {{ auth.user.email }}
         </BasicText>
 
-        <!-- 🔹 Administration (si admin) -->
         <BasicButton
           v-if="auth.isAdmin"
           label="Administration"
@@ -70,7 +68,6 @@
         />
       </template>
 
-      <!-- 🚪 Non connecté -->
       <template v-else>
         <BasicButton
           label="Connexion"
@@ -92,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore' // ✅
+  import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import { useRouter } from 'vue-router'
   import { useCartStore } from '../cart/useCartStore'
   import { useAuthStore } from './useAuthStore'
@@ -100,7 +97,7 @@
   const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()
-  const sidebar = useSidebarStore() // ✅
+  const sidebar = useSidebarStore()
 
   async function handleLogout() {
     await auth.signOut()
@@ -118,8 +115,12 @@
     padding: 0px 24px;
     background-color: @secondary-800;
     color: white;
+    z-index: 1000;
 
-    &__top {
+    &__left {
+      display: flex;
+      align-items: center;
+
       &--icon {
         margin-right: 16px;
         width: 24px;
@@ -135,22 +136,14 @@
       &--logo {
         display: flex;
         align-items: center;
+        cursor: pointer;
       }
-    }
-
-    &__left {
-      display: flex;
-      align-items: center;
     }
 
     &__right {
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-
-    &__logo {
-      cursor: pointer;
     }
 
     &__email {
