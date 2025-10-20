@@ -1,81 +1,60 @@
 <template>
   <div class="catalogue">
-    <!-- 🧬 HEADER -->
+    <!-- 🔹 Header catalogue -->
     <div class="catalogue__header">
       <BasicText
-        size="h3"
+        size="h2"
         weight="bold"
       >
         Catalogue de peptides
       </BasicText>
 
-      <BasicInput
-        v-model="search"
-        placeholder="Rechercher un peptide..."
-        input-type="form"
-        size="medium"
-        icon-left="search"
-        class="catalogue__search"
-      />
+      <div class="catalogue__search">
+        <BasicInput
+          v-model="searchTerm"
+          placeholder="Rechercher un peptide..."
+          icon-left="search"
+        />
+      </div>
     </div>
 
-    <!-- ⚙️ LAYOUT PRINCIPAL -->
-    <div class="catalogue__layout">
-      <!-- 🎚️ FILTRES LATERAUX -->
+    <!-- 🔹 Corps : filtres + liste -->
+    <div class="catalogue__body">
+      <!-- 🧭 Filtres -->
       <aside class="catalogue__filters">
         <BasicText
-          size="h5"
+          size="body-l"
           weight="bold"
         >
           Filtres
         </BasicText>
 
-        <div class="catalogue__filter-group">
-          <BasicText
-            size="body-s"
-            weight="bold"
-          >
-            Catégorie
-          </BasicText>
-          <select v-model="filters.category">
+        <div class="catalogue__filter">
+          <BasicText size="body-s">Catégorie</BasicText>
+          <select v-model="selectedCategory">
             <option value="">Toutes les catégories</option>
-            <option value="Performance">Performance</option>
-            <option value="Récupération">Récupération</option>
-            <option value="Recherche">Recherche</option>
-            <option value="Bien-être">Bien-être</option>
-            <option value="Métabolisme">Métabolisme</option>
+            <option
+              v-for="cat in categories"
+              :key="cat"
+              :value="cat"
+            >
+              {{ cat }}
+            </option>
           </select>
         </div>
 
-        <div class="catalogue__filter-group">
-          <BasicText
-            size="body-s"
-            weight="bold"
-          >
-            Disponibilité
-          </BasicText>
-          <select v-model="filters.stock">
+        <div class="catalogue__filter">
+          <BasicText size="body-s">Disponibilité</BasicText>
+          <select v-model="stockFilter">
             <option value="">Toutes</option>
-            <option value="in">En stock</option>
-            <option value="out">Rupture</option>
+            <option value="available">En stock</option>
+            <option value="unavailable">Rupture</option>
           </select>
         </div>
       </aside>
 
-      <!-- 💊 PRODUITS -->
-      <section class="catalogue__products">
-        <!-- 🔝 Pagination en haut -->
-        <BasicPagination
-          v-if="nbPages > 1"
-          :nb-pages="nbPages"
-          :current-page="page"
-          :nb-pages-max="5"
-          :nb-results="total"
-          class="catalogue__pagination-top"
-          @change="page = $event"
-        />
-
-        <!-- ⚙️ États -->
+      <!-- 🛒 Liste scrollable -->
+      <section class="catalogue__list">
         <div
           v-if="loading"
           class="catalogue__loading"
@@ -90,45 +69,30 @@
           <BasicText>Aucun produit trouvé.</BasicText>
         </div>
 
-        <!-- 💊 Liste des produits avec animation -->
-        <TransitionGroup
-          name="fade-up"
-          tag="div"
-          class="catalogue__grid"
+        <div
           v-else
+          class="catalogue__grid"
         >
-          <ProductCart
-            v-for="p in filteredProducts"
-            :key="p.id"
-            :product="p"
-            @add="addProduct"
-            @view="(id: any) => $router.push(`/catalogue/${id}`)"
+          <ProductCard
+            v-for="product in filteredProducts"
+            :key="product.id"
+            :product="product"
+            @view="viewProduct"
+            @add="addToCart"
           />
-        </TransitionGroup>
+        </div>
       </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import ProductCart from '@/features/cart/ProductCart.vue'
-  import { useCartStore } from '@/features/cart/useCartStore'
+  import ProductCard from '@/features/cart/ProductCart.vue'
   import { supabase } from '@/services/supabaseClient'
-  import { computed, ref, watchEffect } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
 
-  const cart = useCartStore()
-
-  function addProduct(p: any) {
-    cart.addToCart({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      image: p.image,
-      stock: p.stock,
-    })
-  }
-
-  type Product = {
+  interface Product {
     id: string
     name: string
     category: string
@@ -138,114 +102,100 @@
     image: string
   }
 
+  const router = useRouter()
   const products = ref<Product[]>([])
+  const categories = ref<string[]>([])
   const loading = ref(true)
-  const page = ref(1)
-  const perPage = 6
-  const total = ref(0)
-  const search = ref('')
-  const filters = ref({ category: '', stock: '' })
+  const searchTerm = ref('')
+  const selectedCategory = ref('')
+  const stockFilter = ref('')
 
-  // ⚡ Chargement dynamique depuis Supabase
-  async function loadProducts() {
-    loading.value = true
-    let query = supabase.from('products').select('*', { count: 'exact' })
-
-    // 🎚️ Filtres
-    if (filters.value.category) query = query.eq('category', filters.value.category)
-    if (filters.value.stock) query = query.eq('stock', filters.value.stock === 'in')
-
-    // 🔍 Recherche
-    if (search.value) query = query.ilike('name', `%${search.value}%`)
-
-    // 📄 Pagination
-    const from = (page.value - 1) * perPage
-    const to = from + perPage - 1
-
-    const { data, count, error } = await query.order('price', { ascending: true }).range(from, to)
-
-    if (error) {
-      console.error('Erreur Supabase :', error)
-    } else {
-      products.value = data || []
-      total.value = count || 0
+  onMounted(async () => {
+    const { data, error } = await supabase.from('products').select('*')
+    if (!error && data) {
+      products.value = data
+      categories.value = [...new Set(data.map((p: Product) => p.category))]
     }
-
     loading.value = false
+  })
+
+  const filteredProducts = computed(() => {
+    return products.value.filter((p) => {
+      const matchSearch = p.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+      const matchCategory = !selectedCategory.value || p.category === selectedCategory.value
+      const matchStock =
+        !stockFilter.value || (stockFilter.value === 'available' ? p.stock : !p.stock)
+
+      return matchSearch && matchCategory && matchStock
+    })
+  })
+
+  function viewProduct(id: string) {
+    router.push(`/catalogue/${id}`)
   }
 
-  // ⚙️ Recharger à chaque changement de filtre, page ou recherche
-  watchEffect(loadProducts)
-
-  const nbPages = computed(() => Math.ceil(total.value / perPage))
-  const filteredProducts = computed(() => products.value)
+  function addToCart(product: Product) {
+    console.log('🛒 Ajouter au panier :', product.name)
+  }
 </script>
 
 <style scoped lang="less">
   .catalogue {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 40px 60px;
+    height: calc(100vh - 60px); // occupe tout sous le header
+    overflow: hidden;
 
     &__header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
+      padding: 16px 32px;
+      background: white;
+      border-bottom: 1px solid @neutral-200;
+      flex-shrink: 0; // ne bouge pas
     }
 
-    &__search {
-      width: 280px;
-    }
-
-    &__layout {
+    &__body {
       display: flex;
-      gap: 32px;
+      flex: 1;
+      overflow: hidden; // empêche le scroll global
     }
 
     &__filters {
-      flex: 0 0 220px;
+      width: 260px;
+      background: fade(@secondary-800, 8%);
+      border-right: 1px solid fade(@neutral-100, 20%);
+      padding: 20px;
+      flex-shrink: 0;
+      overflow-y: auto; // si trop de filtres
       display: flex;
       flex-direction: column;
       gap: 16px;
-      background: @neutral-50;
-      border: 1px solid @neutral-200;
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    &__filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
 
       select {
-        padding: 8px;
+        width: 100%;
+        padding: 6px 8px;
         border-radius: 6px;
         border: 1px solid @neutral-300;
         background: white;
-        cursor: pointer;
       }
     }
 
-    &__products {
+    /* ✅ Zone scrollable */
+    &__list {
       flex: 1;
+      overflow-y: auto; // seul ce bloc scrolle
+      padding: 24px 32px;
+      background: @neutral-50;
+      display: flex;
+      flex-direction: column;
     }
 
     &__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      column-gap: 28px;
-      row-gap: 50px;
-      align-items: start;
-    }
-
-    &__pagination-top {
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: center;
+      gap: 24px;
     }
 
     &__loading,
@@ -255,20 +205,19 @@
     }
 
     @media (max-width: 900px) {
-      &__layout {
+      &__body {
         flex-direction: column;
       }
+      &__filters {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid @neutral-200;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      &__list {
+        padding: 16px;
+      }
     }
-  }
-
-  /* ✨ Animation d’apparition fluide */
-  .fade-up-enter-active,
-  .fade-up-leave-active {
-    transition: all 0.4s ease;
-  }
-  .fade-up-enter-from,
-  .fade-up-leave-to {
-    opacity: 0;
-    transform: translateY(10px);
   }
 </style>
