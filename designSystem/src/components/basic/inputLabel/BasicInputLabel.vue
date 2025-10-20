@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="input-label"
-    :class="{ 'input-label--unwrap': !wrapLabel }"
-  >
+  <div class="input-label">
     <BasicText
       v-if="required"
       class="input-label__required"
@@ -31,9 +28,7 @@
 <script setup lang="ts">
   import { type InputLabelProps } from '@designSystem/components'
 
-  withDefaults(defineProps<InputLabelProps>(), {
-    wrapLabel: true,
-  })
+  defineProps<InputLabelProps>()
 </script>
 
 <style lang="less">

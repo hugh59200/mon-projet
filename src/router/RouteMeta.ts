@@ -1,5 +1,8 @@
-import type { IconName } from '@designSystem/fondation/icons/iconsList'
-import type { RouteLocationNormalizedLoadedGeneric, RouteRecordNormalized } from 'vue-router'
+import type {
+  RouteLocationNormalizedLoaded,
+  RouteLocationNormalizedLoadedGeneric,
+  RouteRecordNormalized,
+} from 'vue-router'
 
 export type RouteLabelResolver = (
   route: RouteLocationNormalizedLoadedGeneric,
@@ -11,9 +14,14 @@ export type VisibilityResolver = (route: RouteRecordNormalized) => Visibility
 
 declare module 'vue-router' {
   interface RouteMeta {
-    label?: string | RouteLabelResolver
-    icon?: IconName
+    requiresAuth?: boolean
+    requiresAdmin?: boolean
+    label?: string
+    icon?: string
     order?: number
-    visibility?: Visibility | VisibilityResolver
+    title?: string
+    description?: string
+    getTitle?: (route: RouteLocationNormalizedLoaded) => string
+    getDescription?: (route: RouteLocationNormalizedLoaded) => string
   }
 }

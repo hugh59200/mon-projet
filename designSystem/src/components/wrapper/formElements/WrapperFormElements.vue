@@ -5,7 +5,6 @@
       :required
       :help
       :hint
-      :wrapLabel
     >
       <template #label>
         <slot name="label"></slot>
@@ -14,9 +13,7 @@
         <slot name="hint"></slot>
       </template>
     </WrapperLabelHint>
-
     <slot></slot>
-
     <BasicAlert
       v-if="alertLabel"
       class="wrapper__alert--container"
@@ -31,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { WrapperFormElementProps } from '@designSystem/components'
   import { useDialog } from '@/features/interface/dialog'
+  import type { WrapperFormElementProps } from '@designSystem/components'
 
   withDefaults(defineProps<WrapperFormElementProps>(), {
     label: '',
@@ -41,7 +38,6 @@
     hint: '',
     alertMessage: '',
     alertType: 'danger',
-    wrapLabel: true,
   })
 
   const showAlert = (message: string) => {

@@ -120,7 +120,25 @@
 
     if (!error && data) {
       product.value = data
+
+      // 🧠 Met à jour dynamiquement le titre et la description
+      document.title = `${data.name} – Fast Peptides`
+
+      const descriptionTag = document.querySelector('meta[name="description"]')
+      const metaDescription =
+        data.description ||
+        `Achetez le peptide ${data.name} (${data.purity}% pureté) sur Fast Peptides.`
+
+      if (descriptionTag) {
+        descriptionTag.setAttribute('content', metaDescription)
+      } else {
+        const meta = document.createElement('meta')
+        meta.name = 'description'
+        meta.content = metaDescription
+        document.head.appendChild(meta)
+      }
     }
+
     loading.value = false
   })
 </script>
@@ -131,6 +149,7 @@
     flex-direction: column;
     padding: 40px 60px;
     gap: 20px;
+    user-select: none;
 
     &__back {
       align-self: flex-start;

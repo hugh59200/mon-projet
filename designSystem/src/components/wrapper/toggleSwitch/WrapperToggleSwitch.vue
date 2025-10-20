@@ -6,7 +6,6 @@
     :help
     :alertLabel
     :alertType
-    :wrapLabel
   >
     <BasicToggleSwitch
       v-model="modelValue"

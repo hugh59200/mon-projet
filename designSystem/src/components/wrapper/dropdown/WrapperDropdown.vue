@@ -6,7 +6,6 @@
     :alertLabel
     :alertType
     :help
-    :wrapLabel
   >
     <BasicDropdown
       v-model="modelValue"
@@ -24,8 +23,12 @@
   </WrapperFormElements>
 </template>
 
-<script setup lang="ts" generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId">
-  import type { WrapperDropdownProps, DropdownId, DropdownItem } from '@designSystem/components'
+<script
+  setup
+  lang="ts"
+  generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId"
+>
+  import type { DropdownId, DropdownItem, WrapperDropdownProps } from '@designSystem/components'
 
   withDefaults(defineProps<WrapperDropdownProps<TDropdownItem>>(), {
     deletable: true,

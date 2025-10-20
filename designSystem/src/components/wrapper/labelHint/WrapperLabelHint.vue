@@ -9,7 +9,6 @@
       :required
       :help
       class="wrapper__label"
-      :wrap-label
     >
       <slot name="label"></slot>
     </BasicInputLabel>
@@ -26,14 +25,13 @@
 </template>
 
 <script setup lang="ts">
-  import { BasicInputLabel, BasicHint } from '@designSystem/components'
+  import { BasicHint, BasicInputLabel } from '@designSystem/components'
 
   export interface WrapperLabelHintProps {
     label?: string
     required?: boolean
     help?: string
     hint?: string
-    wrapLabel?: boolean
   }
 
   withDefaults(defineProps<WrapperLabelHintProps>(), {
@@ -41,7 +39,6 @@
     required: false,
     help: '',
     hint: '',
-    wrapLabel: true,
   })
 </script>
 
