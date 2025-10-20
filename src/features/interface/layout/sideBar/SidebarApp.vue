@@ -48,10 +48,11 @@
 
 <style scoped lang="less">
   .sidebar {
-    position: fixed;
+    position: fixed; /* ✅ collée à gauche */
     left: 0;
-    top: 60px;
+    top: 60px; /* sous le header */
     height: calc(100vh - 60px);
+    z-index: 900; /* juste en dessous du header */
     width: 240px;
     background: @secondary-800;
     color: @neutral-100;

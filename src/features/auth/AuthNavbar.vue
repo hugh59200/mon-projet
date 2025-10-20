@@ -107,6 +107,11 @@
 
 <style scoped lang="less">
   .auth-navbar {
+    position: fixed; /* ✅ reste collé en haut */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* passe au-dessus de la sidebar */
     height: 60px;
     width: 100%;
     display: flex;
