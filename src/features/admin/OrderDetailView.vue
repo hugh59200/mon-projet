@@ -46,6 +46,31 @@
           </p>
         </div>
       </div>
+
+      <!-- 🔄 Changer le statut -->
+      <div class="order-status-update">
+        <label><b>Modifier le statut :</b></label>
+        <select
+          v-model="selectedStatus"
+          class="order-status-update__select"
+        >
+          <option
+            v-for="s in STATUSES"
+            :key="s.value"
+            :value="s.value"
+          >
+            {{ s.label }}
+          </option>
+        </select>
+        <BasicButton
+          :disabled="loadingStatus"
+          label="Mettre à jour le statut"
+          type="secondary"
+          variant="outlined"
+          size="small"
+          @click="handleUpdateStatus"
+        />
+      </div>
     </div>
 
     <!-- 📦 Produits -->
@@ -59,7 +84,6 @@
       >
         Produits commandés
       </BasicText>
-
       <table class="order-detail__table">
         <thead>
           <tr>
@@ -91,7 +115,6 @@
       >
         Ajouter un suivi de livraison
       </BasicText>
-
       <div class="order-shipment__form">
         <BasicInput
           v-model="carrier"
@@ -137,8 +160,10 @@
   const order = ref<any>(null)
   const loading = ref(true)
   const loadingShipment = ref(false)
+  const loadingStatus = ref(false)
   const carrier = ref('')
   const trackingNumber = ref('')
+  const selectedStatus = ref('')
 
   const STATUSES = [
     { value: 'pending', label: 'En attente', color: 'warning' },
@@ -155,7 +180,6 @@
     return (STATUSES.find((s) => s.value === value)?.color || 'neutral') as BadgeType
   }
 
-  // 🔹 Charger la commande
   async function loadOrder() {
     loading.value = true
     const id = route.params.id
@@ -164,12 +188,12 @@
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
       console.error(error)
     } else {
-      // S’assure que items est bien un tableau
       try {
         order.value = data
         if (typeof order.value.items === 'string') {
           order.value.items = JSON.parse(order.value.items)
         }
+        selectedStatus.value = order.value.status
       } catch {
         order.value.items = []
       }
@@ -189,6 +213,51 @@
     })
   }
 
+  // 🚀 Changer le statut manuellement
+  async function handleUpdateStatus() {
+    try {
+      loadingStatus.value = true
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: selectedStatus.value })
+        .eq('id', order.value.id)
+
+      if (error) throw error
+
+      // Envoi de l’email via Edge Function
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            order_id: order.value.id,
+            status: selectedStatus.value,
+            email: order.value.email,
+            full_name: order.value.full_name,
+          }),
+        },
+      )
+
+      const data = await res.json()
+
+      if (data.success) {
+        toast.showToast('Statut mis à jour et email envoyé ✅', 'success')
+        await loadOrder()
+      } else {
+        toast.showToast('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.showToast('Erreur lors du changement de statut ⚠️', 'danger')
+    } finally {
+      loadingStatus.value = false
+    }
+  }
+
   // 🚚 Ajout du suivi expédition
   async function handleAddTracking() {
     if (!carrier.value || !trackingNumber.value) {
@@ -198,8 +267,6 @@
 
     try {
       loadingShipment.value = true
-
-      // 🧾 Met à jour la commande
       const { error: updateError } = await supabase
         .from('orders')
         .update({
@@ -212,7 +279,6 @@
 
       if (updateError) throw updateError
 
-      // 🚀 Envoi mail via Edge Function
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
         {
@@ -305,6 +371,19 @@
     &__loading {
       text-align: center;
       padding: 40px;
+    }
+  }
+
+  .order-status-update {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &__select {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid @neutral-300;
     }
   }
 
