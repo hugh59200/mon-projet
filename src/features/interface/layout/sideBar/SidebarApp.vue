@@ -1,7 +1,7 @@
 <template>
   <aside
     class="sidebar"
-    :class="{ reduced: isReduced }"
+    :class="[{ reduced: isReduced }, { 'sidebar--open': isMobileOpen }]"
   >
     <nav class="sidebar__items">
       <RouterLink
@@ -11,6 +11,7 @@
         class="sidebar__item"
         active-class="active"
         v-slot="{ isActive }"
+        @click="isMobileOpen = false"
       >
         <div class="sidebar__icon">
           <BasicIcon
@@ -40,20 +41,24 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
+  import { ref, watch } from 'vue'
   import { useSidebarStore } from './useSidebarStore'
 
   const sidebar = useSidebarStore()
   const { sidebarItems, isReduced } = storeToRefs(sidebar)
+
+  // ✅ Nouveau : ouverture mobile
+  const isMobileOpen = ref(false)
+  watch(isReduced, () => {
+    if (window.innerWidth < 900) isMobileOpen.value = false
+  })
 </script>
 
 <style scoped lang="less">
   .sidebar {
-    position: fixed; /* ✅ collée à gauche */
-    left: 0;
-    top: 60px; /* sous le header */
-    height: calc(100vh - 60px);
-    z-index: 900; /* juste en dessous du header */
-    width: 240px;
+    position: relative; /* ✅ elle reste dans la grille */
+    height: 100%;
+    width: 100%;
     background: @secondary-800;
     color: @neutral-100;
     display: flex;
@@ -61,9 +66,7 @@
     align-items: stretch;
     padding: 20px 0;
     transition: width 0.3s ease;
-    z-index: 800;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
-    border-right: 1px solid fade(white, 10%);
+    box-shadow: inset -1px 0 0 fade(white, 10%);
     box-sizing: border-box;
 
     /* Mode réduit */
@@ -100,8 +103,7 @@
       min-height: 42px;
       background: transparent;
       box-sizing: border-box;
-
-      svg {
+      AppLayout svg {
         fill: @neutral-100;
         transition: fill 0.3s ease;
       }

@@ -2,22 +2,15 @@
   <footer>
     <BasicText
       size="body-m"
-      color="neutral-500"
       @click="toggleModal = !toggleModal"
       pointer
       nbMaxLines="2"
     >
       Développement @akto 2025. Version : 1.0
     </BasicText>
+    <BasicText size="body-m">-</BasicText>
     <BasicText
       size="body-m"
-      color="neutral-500"
-    >
-      -
-    </BasicText>
-    <BasicText
-      size="body-m"
-      color="neutral-500"
       @click="showCGU"
       pointer
       nbMaxLines="2"
