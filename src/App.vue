@@ -26,13 +26,11 @@
   import { supabase } from './services/supabaseClient'
 
   const sidebar = useSidebarStore()
+  const cart = useCartStore()
 
+  // Vider le panier si déconnexion
   supabase.auth.onAuthStateChange((_event, session) => {
-    const cart = useCartStore()
-    if (!session) {
-      // Optionnel : vider le panier local à la déconnexion
-      cart.items = []
-    }
+    if (!session) cart.items = []
   })
 </script>
 

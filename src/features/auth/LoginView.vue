@@ -60,11 +60,8 @@
     loading.value = true
     const success = await auth.signIn(email.value, password.value)
     loading.value = false
-    if (success) {
-      router.push('/')
-    } else {
-      error.value = auth.error ?? 'Échec de la connexion'
-    }
+    if (success) router.push('/')
+    else error.value = auth.error ?? 'Échec de la connexion'
   }
 </script>
 

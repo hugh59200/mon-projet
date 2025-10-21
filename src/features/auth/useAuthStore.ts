@@ -1,26 +1,29 @@
+// /src/features/auth/useAuthStore.ts
+import router from '@/router'
 import { supabase } from '@/services/supabaseClient'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useToastStore } from '../interface/toast/useToastStore'
 
+interface Profile {
+  id: string
+  email: string
+  full_name?: string
+  role?: 'admin' | 'user'
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  // --- ÉTATS GLOBAUX
   const user = ref<any | null>(null)
-  const profile = ref<any | null>(null)
+  const profile = ref<Profile | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
-
-  // --- AUTRES
-  const router = useRouter()
-  const toastStore = useToastStore()
+  const toast = useToastStore()
   let refreshInterval: number | null = null
 
-  // --- COMPUTED
   const isAuthenticated = computed(() => !!user.value)
-  const isAdmin = computed(() => profile.value?.role === 'admin')
+  const isAdmin = computed(() => (profile.value?.role || '') === 'admin')
 
-  // --- PROFIL
+  // --- PROFIL UTILISATEUR
   async function fetchProfile() {
     if (!user.value) return
     const { data, error: err } = await supabase
@@ -28,105 +31,86 @@ export const useAuthStore = defineStore('auth', () => {
       .select('*')
       .eq('id', user.value.id)
       .single()
-
     if (err) {
-      console.error('Erreur profil:', err)
-      toastStore.showToast('Erreur lors du chargement du profil.', 'danger')
+      toast.showToast('Erreur lors du chargement du profil.', 'danger')
+      console.error(err)
     } else {
-      profile.value = data
+      profile.value = data || { role: 'user' }
     }
   }
 
-  // --- INSCRIPTION
-  async function signUp(email: string, password: string) {
-    loading.value = true
-    error.value = null
-
-    const { data, error: err } = await supabase.auth.signUp({ email, password })
-    loading.value = false
-
-    if (err) {
-      error.value = err.message
-      toastStore.showToast(err.message, 'danger')
-      return false
-    }
-
-    toastStore.showToast(
-      'Compte créé ! Vérifiez vos e-mails pour confirmer votre adresse.',
-      'success',
-    )
-    user.value = data.user
-    await fetchProfile()
-    startAutoRefresh()
+  // --- SESSION
+  async function refreshSession() {
+    const { data, error: err } = await supabase.auth.getSession()
+    if (err || !data.session?.user) return false
+    user.value = data.session.user
     return true
   }
 
-  // --- CONNEXION
-  async function signIn(email: string, password: string) {
+  async function signIn(email: string, password: string): Promise<boolean> {
     loading.value = true
-    error.value = null
-
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
     loading.value = false
 
     if (err) {
+      toast.showToast(err.message, 'danger')
       error.value = err.message
-      toastStore.showToast(err.message, 'danger')
       return false
     }
 
-    toastStore.showToast('Connexion réussie 🎉', 'success')
+    user.value = data.user
+    await fetchProfile()
+    startAutoRefresh()
+    toast.showToast('Connexion réussie 🎉', 'success')
+    return true
+  }
+
+  async function signUp(email: string, password: string): Promise<boolean> {
+    loading.value = true
+    const { data, error: err } = await supabase.auth.signUp({ email, password })
+    loading.value = false
+
+    if (err) {
+      toast.showToast(err.message, 'danger')
+      error.value = err.message
+      return false
+    }
+
+    toast.showToast('Compte créé ! Vérifiez vos e-mails 📧', 'success')
     user.value = data.user
     await fetchProfile()
     startAutoRefresh()
     return true
   }
 
-  // --- DÉCONNEXION
-  async function signOut(message?: string) {
+  async function signOut(redirect = true, message?: string) {
     await supabase.auth.signOut()
     user.value = null
     profile.value = null
     stopAutoRefresh()
-
-    toastStore.showToast(message ?? 'Vous avez été déconnecté.', message ? 'warning' : 'info')
-    router.push({ name: 'login' })
+    toast.showToast(message ?? 'Déconnexion effectuée.', message ? 'warning' : 'info')
+    if (redirect) router.push('/login')
   }
 
-  // --- INITIALISATION (chargée au démarrage)
+  // --- INIT
   async function initAuth() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    user.value = session?.user ?? null
-
-    if (user.value) {
+    if (await refreshSession()) {
       await fetchProfile()
       startAutoRefresh()
     }
-
-    // 🔁 écoute connexion / déconnexion
-    supabase.auth.onAuthStateChange((_event, session) => {
-      user.value = session?.user ?? null
-      if (user.value) fetchProfile()
-      else profile.value = null
-    })
   }
 
-  // --- REFRESH AUTOMATIQUE DE SESSION
+  // --- AUTO REFRESH SESSION
   function startAutoRefresh() {
     stopAutoRefresh()
     refreshInterval = window.setInterval(
       async () => {
-        const { data, error: err } = await supabase.auth.getSession()
-        if (err || !data?.session?.user) {
-          await signOut('Votre session a expiré, veuillez vous reconnecter.')
-        } else {
-          user.value = data.session.user
+        if (!(await refreshSession())) {
+          await signOut(true, 'Session expirée, veuillez vous reconnecter.')
         }
       },
-      50 * 60 * 1000,
-    ) // 50 minutes
+      60 * 60 * 1000,
+    ) // toutes les 60 min
   }
 
   function stopAutoRefresh() {
@@ -136,7 +120,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // --- EXPORTS
+  // --- LISTENER GLOBAL SUPABASE
+  supabase.auth.onAuthStateChange((_event, session) => {
+    user.value = session?.user ?? null
+    if (session?.user) fetchProfile()
+    else profile.value = null
+  })
+
   return {
     user,
     profile,

@@ -27,12 +27,17 @@
 
         <BasicButton
           v-if="auth.isAdmin"
-          label="Administration"
+          label="Admin"
           type="primary"
-          variant="filled"
           size="small"
           @click="$router.push('/admin')"
-        />
+        >
+          <!-- <BasicBadge
+            v-if="auth.isAdmin"
+            label="Admin"
+            type="info"
+          /> -->
+        </BasicButton>
         <BasicButton
           label="Panier"
           type="secondary"
