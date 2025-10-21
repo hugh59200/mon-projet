@@ -25,25 +25,19 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         name: 'login',
         component: () => import('@/features/auth/LoginView.vue'),
-        meta: {
-          title: 'Connexion – Fast Peptides',
-        },
+        meta: { title: 'Connexion – Fast Peptides' },
       },
       {
         path: 'register',
         name: 'register',
         component: () => import('@/features/auth/RegisterView.vue'),
-        meta: {
-          title: 'Inscription – Fast Peptides',
-        },
+        meta: { title: 'Inscription – Fast Peptides' },
       },
       {
         path: 'reset-password',
         name: 'reset-password',
         component: () => import('@/features/auth/ResetPasswordView.vue'),
-        meta: {
-          title: 'Mot de passe oublié – Fast Peptides',
-        },
+        meta: { title: 'Mot de passe oublié – Fast Peptides' },
       },
     ],
   },
@@ -65,23 +59,18 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Votre mot de passe a été modifié avec succès.',
     },
   },
-  // ✅ Callback OAuth (Google/GitHub)
   {
     path: '/auth/callback',
     name: 'auth-callback',
     component: () => import('@/features/auth/AuthCallbackView.vue'),
-    meta: {
-      title: 'Connexion en cours – Fast Peptides',
-    },
+    meta: { title: 'Connexion en cours – Fast Peptides' },
   },
-
   {
     path: '/access-denied',
     name: 'access-denied',
     component: () => import('@/features/auth/AccessDeniedView.vue'),
     meta: { title: 'Accès refusé – Fast Peptides' },
   },
-
   {
     path: '/profil',
     name: 'profil',
@@ -93,8 +82,6 @@ const routes: Array<RouteRecordRaw> = [
         'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
     },
   },
-
-  // ... 🔽 (tes autres routes inchangées)
   {
     path: '/catalogue',
     name: 'catalogue',
@@ -214,23 +201,24 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  // Assure-toi que la session est chargée avant toute navigation
+  // ✅ Attends que la session soit prête
   if (!auth.user) await auth.initAuth()
 
-  // 🔒 Bloque les pages auth si déjà connecté
-  if (auth.isAuthenticated && ['/auth/login', '/register', '/reset-password'].includes(to.path)) {
+  // ✅ Corrigé : bloque correctement les pages d’auth si connecté
+  const authPages = ['/auth/login', '/auth/register', '/auth/reset-password']
+  if (auth.isAuthenticated && authPages.includes(to.path)) {
     return { name: 'home' }
   }
 
-  // 🔐 Protège les routes privées
+  // 🔐 Routes nécessitant une connexion
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return {
-      name: 'login',
-      query: { redirect: to.fullPath }, // ⬅️ on garde la route demandée
+      path: '/auth/login',
+      query: { redirect: to.fullPath },
     }
   }
 
-  // 🛡️ Vérifie les accès admin
+  // 🛡️ Admin uniquement
   if (to.meta.requiresAdmin && !auth.isAdmin) {
     return { name: 'access-denied' }
   }
