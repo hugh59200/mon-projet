@@ -119,7 +119,7 @@
     }
 
     message.value = 'Mot de passe mis à jour ✅'
-    setTimeout(() => router.push('/login'), 1500)
+    setTimeout(() => router.push('/update-password/success'), 1000)
   }
 </script>
 

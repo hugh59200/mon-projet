@@ -1,11 +1,12 @@
 <template>
-  <section class="auth-page">
+  <AuthLayout>
     <AuthForm mode="login" />
-  </section>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
   import AuthForm from './AuthForm.vue'
+  import AuthLayout from './layouts/AuthLayout.vue'
 </script>
 
 <style scoped lang="less">

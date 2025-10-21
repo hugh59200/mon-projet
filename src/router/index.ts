@@ -57,6 +57,15 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Choisissez un nouveau mot de passe pour accéder à votre compte Fast Peptides.',
     },
   },
+  {
+    path: '/update-password/success',
+    name: 'update-password-success',
+    component: () => import('@/features/auth/UpdatePasswordSuccessView.vue'),
+    meta: {
+      title: 'Mot de passe mis à jour – Fast Peptides',
+      description: 'Votre mot de passe a été modifié avec succès.',
+    },
+  },
   // ✅ Callback OAuth (Google/GitHub)
   {
     path: '/auth/callback',

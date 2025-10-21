@@ -16,5 +16,7 @@ export type RouteName =
   'profil' |
   'register' |
   'reset-password' |
+  'update-password' |
+  'update-password-success' |
   'user-order-detail' |
   'user-orders'

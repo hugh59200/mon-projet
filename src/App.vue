@@ -65,11 +65,10 @@
   /* 📜 Contenu scrollable */
   .app-main {
     flex: 1;
-    padding: 24px 40px;
     background: white;
     transition: all 0.3s ease;
     height: calc(100vh - 60px); // ⚡ occupe l’espace sous le header
-    overflow-y: auto; // ✅ seul le contenu scrolle
+    overflow: hidden;
   }
 
   /* 🧍 Responsif mobile */
