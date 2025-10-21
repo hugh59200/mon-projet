@@ -1,7 +1,6 @@
 <template>
   <div class="app-layout">
-    <AuthNavbar />
-
+    <Header />
     <div
       class="app-body"
       :class="{ 'sidebar-reduced': sidebar.isReduced }"
@@ -12,15 +11,14 @@
         <RouterView />
       </main>
     </div>
-
     <FooterApp />
     <ToastContainer />
   </div>
 </template>
 
 <script setup lang="ts">
-  import AuthNavbar from '@/features/auth/AuthNavbar.vue'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
+  import Header from '@/features/interface/layout/header/Header.vue'
   import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'

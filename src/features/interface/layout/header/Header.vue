@@ -86,11 +86,11 @@
 </template>
 
 <script setup lang="ts">
+  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useCartStore } from '@/features/cart/useCartStore'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
-  import { useCartStore } from '../cart/useCartStore'
-  import { useAuthStore } from './useAuthStore'
 
   const router = useRouter()
   const auth = useAuthStore()
