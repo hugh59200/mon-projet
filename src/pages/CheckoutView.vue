@@ -153,20 +153,23 @@
 
     loading.value = true
 
+    const payload = {
+      email: auth.user.email,
+      full_name: fullName.value,
+      address: address.value,
+      zip: zip.value,
+      city: city.value,
+      country: country.value,
+      payment_method: 'card',
+      total_amount: cart.totalPrice,
+      items: cart.items,
+    }
+
     try {
-      const order = await createFullOrder({
-        email: auth.user.email,
-        full_name: fullName.value,
-        address: address.value,
-        zip: zip.value,
-        city: city.value,
-        country: country.value,
-        payment_method: 'card',
-        total_amount: cart.totalPrice,
-        items: cart.items,
-      })
+      const order = await createFullOrder(payload)
 
       toast.showToast('Commande validée ✅', 'success')
+      toast.showToast('Email de confirmation envoyé 📧', 'success')
       cart.clearCart()
       router.push(`/confirmation/${order.id}`)
     } catch (err: any) {

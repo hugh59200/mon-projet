@@ -31,9 +31,8 @@
           type="primary"
           variant="filled"
           size="small"
-          @click="$router.push('/admin/users')"
+          @click="$router.push('/admin')"
         />
-
         <BasicButton
           label="Panier"
           type="secondary"

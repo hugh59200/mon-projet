@@ -36,10 +36,10 @@
         <option value="">Tous statuts</option>
         <option
           v-for="s in STATUSES"
-          :key="s"
-          :value="s"
+          :key="s.value"
+          :value="s.value"
         >
-          {{ s }}
+          {{ s.label }}
         </option>
       </select>
 
@@ -90,20 +90,27 @@
         <span>{{ order.total_amount.toFixed(2) }} €</span>
         <span>{{ formatDate(order.created_at) }}</span>
 
-        <!-- 🔁 Sélecteur de statut -->
-        <select
-          v-model="order.status"
-          class="admin-orders__status"
-          @change="updateStatus(order)"
-        >
-          <option
-            v-for="s in STATUSES"
-            :key="s"
-            :value="s"
+        <!-- 🟢 Statut + badge -->
+        <div class="admin-orders__status-cell">
+          <BasicBadge
+            :label="getStatusMeta(order.status).label"
+            :type="getStatusMeta(order.status).color as BadgeType"
+            size="small"
+          />
+          <select
+            v-model="order.status"
+            class="admin-orders__status"
+            @change="updateStatus(order)"
           >
-            {{ s }}
-          </option>
-        </select>
+            <option
+              v-for="s in STATUSES"
+              :key="s.value"
+              :value="s.value"
+            >
+              {{ s.label }}
+            </option>
+          </select>
+        </div>
 
         <BasicButton
           label="Voir"
@@ -130,6 +137,7 @@
 <script setup lang="ts">
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
+  import type { BadgeType } from '@designSystem/index'
   import { computed, ref, watchEffect } from 'vue'
 
   type Order = {
@@ -142,7 +150,18 @@
     status: string
   }
 
-  const STATUSES = ['En attente', 'En préparation', 'Expédiée', 'Terminée', 'Annulée']
+  // 🧾 Statuts avec libellé + couleur
+  const STATUSES = [
+    { value: 'pending', label: 'En attente', color: 'warning' },
+    { value: 'confirmed', label: 'Confirmée', color: 'success' },
+    { value: 'shipped', label: 'Expédiée', color: 'info' },
+    { value: 'completed', label: 'Terminée', color: 'neutral' },
+    { value: 'canceled', label: 'Annulée', color: 'danger' },
+  ]
+
+  function getStatusMeta(value: string) {
+    return STATUSES.find((s) => s.value === value) || { label: value, color: 'neutral' }
+  }
 
   const toast = useToastStore()
   const loading = ref(true)
@@ -158,18 +177,11 @@
 
   async function loadOrders() {
     loading.value = true
-
     let query = supabase.from('orders').select('*', { count: 'exact' })
-
-    // Filtre par statut
     if (statusFilter.value) query = query.eq('status', statusFilter.value)
-
-    // Pagination
     const from = (page.value - 1) * perPage
     const to = from + perPage - 1
     query = query.range(from, to)
-
-    // Tri
     switch (sortKey.value) {
       case 'created_at_asc':
         query = query.order('created_at', { ascending: true })
@@ -185,7 +197,6 @@
     }
 
     const { data, count, error } = await query
-
     if (error) {
       toast.showToast('Erreur lors du chargement des commandes', 'danger')
       console.error(error)
@@ -193,7 +204,6 @@
       orders.value = (data ?? []) as Order[]
       total.value = count ?? 0
     }
-
     loading.value = false
   }
 
@@ -226,8 +236,38 @@
 
     if (error) {
       toast.showToast('Erreur de mise à jour du statut', 'danger')
-    } else {
-      toast.showToast(`Statut mis à jour : ${order.status}`, 'success')
+      return
+    }
+
+    // 📤 Envoi du mail via Edge Function
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            order_id: order.id,
+            status: order.status,
+            email: order.email,
+            full_name: order.full_name,
+          }),
+        },
+      )
+
+      const result = await res.json()
+
+      if (result.success) {
+        toast.showToast(`Statut mis à jour et email envoyé 📧`, 'success')
+      } else {
+        toast.showToast('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
+      }
+    } catch (err) {
+      console.error('Erreur envoi email :', err)
+      toast.showToast('Statut mis à jour, mais erreur envoi mail ⚠️', 'warning')
     }
   }
 
@@ -239,18 +279,16 @@
     }
 
     const headers = ['Nom', 'Email', 'Montant total (€)', 'Statut', 'Date', 'Produits']
-
     const rows = orders.value.map((o) => [
       o.full_name,
       o.email,
       o.total_amount.toFixed(2),
-      o.status,
+      getStatusMeta(o.status).label,
       formatDate(o.created_at),
       o.items.map((i) => `${i.name} x${i.quantity}`).join(' | '),
     ])
 
     const csvContent = [headers, ...rows].map((r) => r.map((x) => `"${x}"`).join(';')).join('\n')
-
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -304,7 +342,7 @@
     &__header,
     &__row {
       display: grid;
-      grid-template-columns: 1.2fr 1.4fr 0.8fr 1.2fr 1fr 0.8fr;
+      grid-template-columns: 1.2fr 1.4fr 0.8fr 1.2fr 1.4fr 0.8fr;
       align-items: center;
       padding: 10px 12px;
     }
@@ -326,28 +364,10 @@
       }
     }
 
-    &__details {
-      grid-column: 1 / -1;
-      background: @neutral-50;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-top: 6px;
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-
-        th,
-        td {
-          padding: 6px 8px;
-          text-align: left;
-          border-bottom: 1px solid @neutral-200;
-        }
-
-        th {
-          font-weight: bold;
-        }
-      }
+    &__status-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     &__loading,
@@ -355,16 +375,5 @@
       text-align: center;
       padding: 40px;
     }
-  }
-
-  /* Animation ouverture détails */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: all 0.3s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-    transform: translateY(-8px);
   }
 </style>

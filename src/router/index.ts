@@ -119,6 +119,12 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/admin',
+    name: 'admin-dashboard',
+    component: () => import('@/features/admin/AdminDashboard.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, title: 'Administration – Fast Peptides' },
+  },
+  {
     path: '/profil/commandes',
     name: 'user-orders',
     component: () => import('@/features/user/UserOrdersView.vue'),

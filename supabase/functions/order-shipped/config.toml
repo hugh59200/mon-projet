@@ -1,0 +1,2 @@
+[functions.order-shipped]
+verify_jwt = false

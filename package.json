@@ -20,6 +20,7 @@
     "less-loader": "^12.3.0",
     "pinia": "^3.0.3",
     "plugin-basic-ssl": "^0.0.1-security",
+    "supabase": "^2.53.6",
     "vite-svg-loader": "^5.1.0",
     "vue-router": "^4.5.1",
     "vue3-snackbar": "^2.5.2",

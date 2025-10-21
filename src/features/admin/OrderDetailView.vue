@@ -16,7 +16,6 @@
       </BasicText>
     </div>
 
-    <!-- 🕐 Chargement -->
     <div
       v-if="loading"
       class="order-detail__loading"
@@ -24,7 +23,6 @@
       <BasicText>Chargement de la commande...</BasicText>
     </div>
 
-    <!-- 🚫 Non trouvée -->
     <div
       v-else-if="!order"
       class="order-detail__empty"
@@ -32,12 +30,11 @@
       <BasicText>Commande introuvable.</BasicText>
     </div>
 
-    <!-- 🧾 Contenu -->
     <div
       v-else
       class="order-detail__content"
     >
-      <!-- 🧍 Informations client -->
+      <!-- Client -->
       <section class="order-detail__section">
         <BasicText
           size="h5"
@@ -52,7 +49,7 @@
         <BasicText>{{ order.country }}</BasicText>
       </section>
 
-      <!-- 💳 Paiement -->
+      <!-- Paiement -->
       <section class="order-detail__section">
         <BasicText
           size="h5"
@@ -65,7 +62,7 @@
         <BasicText>Date : {{ formatDate(order.created_at) }}</BasicText>
       </section>
 
-      <!-- 📦 Statut -->
+      <!-- Statut -->
       <section class="order-detail__section">
         <BasicText
           size="h5"
@@ -73,33 +70,40 @@
         >
           Statut de la commande
         </BasicText>
-        <select
-          v-model="order.status"
-          class="order-detail__status"
-          @change="updateStatus"
-        >
-          <option
-            v-for="s in STATUSES"
-            :key="s"
-            :value="s"
+        <div class="order-detail__status-cell">
+          <BasicBadge
+            :label="getStatusMeta(order.status).label"
+            :type="getStatusMeta(order.status).color as BadgeType"
+            size="small"
+          />
+          <select
+            v-model="order.status"
+            class="order-detail__status"
+            @change="updateStatus"
           >
-            {{ s }}
-          </option>
-        </select>
+            <option
+              v-for="s in STATUSES"
+              :key="s.value"
+              :value="s.value"
+            >
+              {{ s.label }}
+            </option>
+          </select>
+        </div>
       </section>
 
-      <!-- 📝 Notes internes -->
+      <!-- Notes -->
       <section class="order-detail__section">
         <BasicText
           size="h5"
           weight="bold"
         >
-          Notes internes (non visibles client)
+          Notes internes
         </BasicText>
         <textarea
           v-model="notes"
           class="order-detail__textarea"
-          placeholder="Ajouter des remarques internes (ex : suivi logistique, infos client, etc.)"
+          placeholder="Ajouter des remarques internes..."
         />
         <div class="order-detail__actions">
           <BasicButton
@@ -120,7 +124,7 @@
         </div>
       </section>
 
-      <!-- 💊 Produits -->
+      <!-- Produits -->
       <section class="order-detail__section">
         <BasicText
           size="h5"
@@ -157,10 +161,21 @@
 <script setup lang="ts">
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
+  import type { BadgeType } from '@designSystem/index'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
-  const STATUSES = ['En attente', 'En préparation', 'Expédiée', 'Terminée', 'Annulée']
+  const STATUSES = [
+    { value: 'pending', label: 'En attente', color: 'warning' },
+    { value: 'confirmed', label: 'Confirmée', color: 'success' },
+    { value: 'shipped', label: 'Expédiée', color: 'info' },
+    { value: 'completed', label: 'Terminée', color: 'neutral' },
+    { value: 'canceled', label: 'Annulée', color: 'danger' },
+  ]
+
+  function getStatusMeta(value: string) {
+    return STATUSES.find((s) => s.value === value) || { label: value, color: 'neutral' }
+  }
 
   type Order = {
     id: string
@@ -193,10 +208,9 @@
       .select('*')
       .eq('id', route.params.id)
       .single()
-
     if (error) {
-      console.error(error)
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
+      console.error(error)
     } else {
       order.value = data as Order
       notes.value = order.value.internal_notes || ''
@@ -206,25 +220,22 @@
 
   async function updateStatus() {
     if (!order.value) return
-
     const { error } = await supabase
       .from('orders')
       .update({ status: order.value.status })
       .eq('id', order.value.id)
-
     if (error) toast.showToast('Erreur de mise à jour du statut', 'danger')
-    else toast.showToast(`Statut mis à jour : ${order.value.status}`, 'success')
+    else
+      toast.showToast(`Statut mis à jour : ${getStatusMeta(order.value.status).label}`, 'success')
   }
 
   async function saveNotes() {
     if (!order.value) return
     savingNotes.value = true
-
     const { error } = await supabase
       .from('orders')
       .update({ internal_notes: notes.value })
       .eq('id', order.value.id)
-
     savingNotes.value = false
     if (error) {
       toast.showToast('Erreur lors de la sauvegarde des notes', 'danger')
@@ -281,6 +292,12 @@
       gap: 6px;
     }
 
+    &__status-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     &__status {
       width: 200px;
       padding: 8px;
@@ -297,6 +314,7 @@
       border: 1px solid @neutral-300;
       resize: vertical;
       font-family: inherit;
+      font-size: 14px;
     }
 
     &__actions {
@@ -320,6 +338,7 @@
 
       th {
         background: @neutral-50;
+        font-weight: bold;
       }
     }
 
@@ -327,6 +346,7 @@
     &__empty {
       text-align: center;
       padding: 40px;
+      color: @neutral-600;
     }
   }
 </style>

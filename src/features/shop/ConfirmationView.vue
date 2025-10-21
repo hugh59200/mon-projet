@@ -1,6 +1,5 @@
 <template>
   <div class="confirmation">
-    <!-- ✅ Icône et titre -->
     <BasicIcon
       name="tick-circle"
       class="confirmation__icon"
@@ -28,7 +27,7 @@
       {{ order?.id }}
     </BasicText>
 
-    <!-- 🕓 États de chargement et d’erreur -->
+    <!-- Chargement -->
     <div
       v-if="loading"
       class="confirmation__loading"
@@ -36,6 +35,7 @@
       <BasicText>Chargement des détails...</BasicText>
     </div>
 
+    <!-- Erreur -->
     <div
       v-else-if="!order"
       class="confirmation__error"
@@ -43,7 +43,7 @@
       <BasicText color="red">Commande introuvable ❌</BasicText>
     </div>
 
-    <!-- 🧾 Résumé commande -->
+    <!-- Contenu principal -->
     <div
       v-else
       class="confirmation__details"
@@ -90,20 +90,7 @@
       </div>
     </div>
 
-    <!-- 📧 Spinner visible uniquement pendant l’envoi -->
-    <transition name="fade">
-      <div
-        v-if="emailStatus === 'sending'"
-        class="confirmation__banner confirmation__banner--sending"
-      >
-        <div class="confirmation__sending">
-          <span class="confirmation__spinner" />
-          <BasicText color="neutral-500">Envoi de l’email de confirmation...</BasicText>
-        </div>
-      </div>
-    </transition>
-
-    <!-- 🔘 Actions -->
+    <!-- Actions -->
     <div class="confirmation__actions">
       <BasicButton
         label="Voir mes commandes"
@@ -145,9 +132,8 @@
   const toast = useToastStore()
   const order = ref<Order | null>(null)
   const loading = ref(true)
-  const emailStatus = ref<'idle' | 'sending' | 'success' | 'error'>('idle')
 
-  // 📦 Charge la commande
+  // 🔹 Charge la commande
   async function loadOrder() {
     const { data, error } = await supabase
       .from('orders')
@@ -159,62 +145,11 @@
       console.error(error)
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
     } else {
-      // ✅ Si "items" est une chaîne JSON, on la parse proprement
       const parsedItems = typeof data.items === 'string' ? JSON.parse(data.items) : data.items
-
-      order.value = {
-        ...data,
-        items: parsedItems,
-      }
-
-      sendConfirmationEmail()
+      order.value = { ...data, items: parsedItems }
     }
 
     loading.value = false
-  }
-
-  // 📧 Envoie l’email via Edge Function
-  async function sendConfirmationEmail() {
-    if (!order.value) return
-
-    emailStatus.value = 'sending'
-
-    const payload = {
-      order_id: order.value.id,
-      email: order.value.email,
-      full_name: order.value.full_name,
-      total_amount: order.value.total_amount,
-      items: order.value.items,
-      created_at: order.value.created_at,
-    }
-
-    try {
-      const res = await fetch(
-        'https://dwomsbawthlktapmtmqu.supabase.co/functions/v1/order-confirmation',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await res.json()
-
-      if (res.ok && data?.success) {
-        emailStatus.value = 'success'
-        toast.showToast('Email de confirmation envoyé ✅', 'success')
-      } else {
-        console.warn('⚠️ Réponse Edge Function:', data)
-        emailStatus.value = 'error'
-        toast.showToast('Erreur lors de l’envoi de l’email ⚠️', 'danger')
-      }
-    } catch (err) {
-      console.error('Erreur réseau ou Edge Function:', err)
-      emailStatus.value = 'error'
-      toast.showToast('Erreur réseau lors de l’envoi de l’email', 'danger')
-    }
   }
 
   function formatDate(date: string) {
