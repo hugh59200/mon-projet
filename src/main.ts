@@ -12,25 +12,21 @@ import router from './router'
 const app = createApp(App)
 const pinia = createPinia()
 
-// --- 🧠 Pinia d'abord ---
 app.use(pinia)
 app.use(router)
 app.use(RegistrationDSComponents)
 app.use(deviceBreakpointPlugin)
 app.directive('focusable', focusableDirective)
 
-// --- 🕓 Active le sablier global ---
+// sablier global (inchangé)
 const sablierFetch = configSablier(window.fetch)
 window.fetch = sablierFetch
-
-// --- 🧩 Intégration propre avec Supabase v2 ---
 ;(supabase as any).global = {
   ...(supabase as any).global,
   fetch: sablierFetch,
 }
 
-// --- 🧭 Auth + montage ---
 const auth = useAuthStore()
-auth.initAuth().then(() => {
-  app.mount('#app')
-})
+auth.initAuth() // 🔄 on l'appelle mais on ne bloque pas ici
+
+app.mount('#app') // ✅ montage immédiat
