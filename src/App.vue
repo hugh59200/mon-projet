@@ -13,6 +13,7 @@
     </div>
     <FooterApp />
     <ToastContainer />
+    <SablierComponent />
   </div>
 </template>
 
@@ -21,6 +22,7 @@
   import Header from '@/features/interface/layout/header/Header.vue'
   import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
+  import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
   import { useCartStore } from './features/cart/useCartStore'
   import { supabase } from './services/supabaseClient'
