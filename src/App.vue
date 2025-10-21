@@ -22,8 +22,18 @@
   import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
+  import { useCartStore } from './features/cart/useCartStore'
+  import { supabase } from './services/supabaseClient'
 
   const sidebar = useSidebarStore()
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    const cart = useCartStore()
+    if (!session) {
+      // Optionnel : vider le panier local à la déconnexion
+      cart.items = []
+    }
+  })
 </script>
 
 <style scoped lang="less">

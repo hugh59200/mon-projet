@@ -25,7 +25,7 @@
         <div class="checkout__item-left">
           <img
             :src="item.image"
-            alt="item.name"
+            :alt="item.name"
             class="checkout__item-img"
           />
           <div>
@@ -38,7 +38,6 @@
             </BasicText>
           </div>
         </div>
-
         <BasicText weight="bold">{{ (item.quantity * item.price).toFixed(2) }} €</BasicText>
       </div>
 
@@ -122,7 +121,7 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
-  import { createOrder } from '@/services/orderService'
+  import { createFullOrder } from '@/services/orderService'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -134,7 +133,7 @@
   const loading = ref(false)
 
   // 📦 Champs adresse
-  const fullName = ref(auth.user?.email ?? '')
+  const fullName = ref(auth.profile?.full_name || '')
   const address = ref('')
   const zip = ref('')
   const city = ref('')
@@ -155,8 +154,7 @@
     loading.value = true
 
     try {
-      const { id } = await createOrder({
-        user_id: auth.user.id,
+      const order = await createFullOrder({
         email: auth.user.email,
         full_name: fullName.value,
         address: address.value,
@@ -169,11 +167,11 @@
       })
 
       toast.showToast('Commande validée ✅', 'success')
-      cart.items = []
-      router.push(`/confirmation/${id}`)
+      cart.clearCart()
+      router.push(`/confirmation/${order.id}`)
     } catch (err: any) {
       console.error(err)
-      toast.showToast('Erreur lors de la création de la commande.', 'danger')
+      toast.showToast('Erreur lors de la création de la commande ❌', 'danger')
     } finally {
       loading.value = false
     }

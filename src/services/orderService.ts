@@ -9,7 +9,6 @@ export interface OrderItem {
 }
 
 export interface CreateOrderPayload {
-  user_id: string
   email: string
   full_name: string
   address: string
@@ -21,34 +20,43 @@ export interface CreateOrderPayload {
   items: OrderItem[]
 }
 
-export async function createOrder(payload: CreateOrderPayload) {
-  // 1️⃣ Insertion de la commande dans la table Supabase
-  const { data, error } = await supabase
-    .from('orders')
-    .insert([
-      {
-        user_id: payload.user_id,
-        email: payload.email,
-        full_name: payload.full_name,
-        address: payload.address,
-        zip: payload.zip,
-        city: payload.city,
-        country: payload.country,
-        payment_method: payload.payment_method,
-        total_amount: payload.total_amount,
-        items: payload.items,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single()
+/**
+ * 🧾 Crée une commande complète via la fonction RPC Supabase
+ */
+export async function createFullOrder(payload: CreateOrderPayload) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
 
-  if (error) {
-    console.error('❌ Erreur lors de la création de la commande :', error)
-    throw error
+  if (userError || !user) {
+    throw new Error('Utilisateur non connecté')
   }
 
-  console.log('✅ Commande insérée :', data)
+  const { data, error } = await supabase.rpc('create_full_order', {
+    _user_id: user.id,
+    _email: payload.email,
+    _full_name: payload.full_name,
+    _address: payload.address,
+    _zip: payload.zip,
+    _city: payload.city,
+    _country: payload.country,
+    _payment_method: payload.payment_method,
+    _total_amount: payload.total_amount,
+    _items: payload.items,
+  })
 
-  return data
+  if (error) {
+    console.error('❌ Erreur RPC create_full_order :', error)
+    throw new Error(error.message)
+  }
+
+  console.log('✅ Commande complète créée :', data)
+
+  return {
+    id: data,
+    total: payload.total_amount,
+    date: new Date().toISOString(),
+    status: 'En attente',
+  }
 }

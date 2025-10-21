@@ -88,6 +88,8 @@
 
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
+  import { useCartStore } from '@/features/cart/useCartStore'
+  import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -101,6 +103,9 @@
     stock: boolean
     image: string
   }
+
+  const cart = useCartStore()
+  const toast = useToastStore()
 
   const router = useRouter()
   const products = ref<Product[]>([])
@@ -135,7 +140,8 @@
   }
 
   function addToCart(product: Product) {
-    console.log('🛒 Ajouter au panier :', product.name)
+    cart.addToCart(product)
+    toast.showToast(`✅ ${product.name} ajouté au panier`, 'success')
   }
 </script>
 
