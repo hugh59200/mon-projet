@@ -72,6 +72,8 @@
             <th>Client</th>
             <th>Commandes</th>
             <th>Total dépensé (€)</th>
+            <th>Dernière commande</th>
+            <th>Contact</th>
           </tr>
         </thead>
         <tbody>
@@ -90,6 +92,17 @@
             </td>
             <td>{{ client.orders }}</td>
             <td>{{ client.total.toFixed(2) }}</td>
+            <td>{{ formatDate(client.last_order) }}</td>
+            <td>
+              <a
+                v-if="client.email"
+                class="contact-link"
+                :href="`mailto:${client.email}`"
+                title="Contacter le client"
+              >
+                📧 Envoyer un mail
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -147,9 +160,11 @@
   interface TopClient {
     id: string
     name: string
+    email: string | null
     orders: number
     total: number
     avatar_url?: string | null
+    last_order: string | null
   }
 
   /* -------------------------------------------------------------------------- */
@@ -291,6 +306,7 @@
     const { data, error } = await supabase.from('orders').select(`
       user_id,
       total_amount,
+      created_at,
       profiles!inner (
         full_name,
         email,
@@ -305,27 +321,49 @@
 
     const clients: Record<
       string,
-      { name: string; orders: number; total: number; avatar_url?: string }
+      {
+        name: string
+        email: string | null
+        orders: number
+        total: number
+        avatar_url?: string
+        last_order: string | null
+      }
     > = {}
 
     data.forEach((order: any) => {
       const id = order.user_id
       const profile = order.profiles
       const name = profile?.full_name || profile?.email || 'Client inconnu'
+      const email = profile?.email || null
       const avatar = profile?.avatar_url || null
 
       if (!clients[id]) {
-        clients[id] = { name, orders: 0, total: 0, avatar_url: avatar }
+        clients[id] = { name, email, orders: 0, total: 0, avatar_url: avatar, last_order: null }
       }
 
       clients[id].orders += 1
       clients[id].total += order.total_amount || 0
+
+      const orderDate = new Date(order.created_at)
+      if (!clients[id].last_order || orderDate > new Date(clients[id].last_order)) {
+        clients[id].last_order = order.created_at
+      }
     })
 
     topClients.value = Object.entries(clients)
       .map(([id, c]) => ({ id, ...c }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 5)
+  }
+
+  function formatDate(date: string | null) {
+    if (!date) return '-'
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
   }
 
   /* -------------------------------------------------------------------------- */
@@ -432,6 +470,15 @@
         height: 28px;
         border-radius: 50%;
         object-fit: cover;
+      }
+    }
+
+    .contact-link {
+      color: #00796b;
+      font-weight: 500;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
       }
     }
   }
