@@ -17,6 +17,8 @@ const routes: Array<RouteRecordRaw> = [
         'Découvrez Fast Peptides, la référence européenne pour les peptides de recherche certifiés et livrés rapidement.',
     },
   },
+
+  // 🔑 Auth pages (utilisent AuthForm.vue)
   {
     path: '/login',
     name: 'login',
@@ -38,11 +40,40 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () => import('@/features/auth/ResetPasswordView.vue'),
+    meta: {
+      title: 'Mot de passe oublié – Fast Peptides',
+      description: 'Recevez un lien pour réinitialiser votre mot de passe.',
+    },
+  },
+  {
+    path: '/update-password',
+    name: 'update-password',
+    component: () => import('@/features/auth/UpdatePasswordView.vue'),
+    meta: {
+      title: 'Nouveau mot de passe – Fast Peptides',
+      description: 'Choisissez un nouveau mot de passe pour accéder à votre compte Fast Peptides.',
+    },
+  },
+  // ✅ Callback OAuth (Google/GitHub)
+  {
+    path: '/auth/callback',
+    name: 'auth-callback',
+    component: () => import('@/features/auth/AuthCallbackView.vue'),
+    meta: {
+      title: 'Connexion en cours – Fast Peptides',
+    },
+  },
+
+  {
     path: '/access-denied',
     name: 'access-denied',
     component: () => import('@/features/auth/AccessDeniedView.vue'),
     meta: { title: 'Accès refusé – Fast Peptides' },
   },
+
   {
     path: '/profil',
     name: 'profil',
@@ -54,6 +85,8 @@ const routes: Array<RouteRecordRaw> = [
         'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
     },
   },
+
+  // ... 🔽 (tes autres routes inchangées)
   {
     path: '/catalogue',
     name: 'catalogue',
@@ -169,23 +202,32 @@ const router = createRouter({
   routes,
 })
 
+// 🧠 Middleware de navigation
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
+  // Assure-toi que la session est chargée avant toute navigation
   if (!auth.user) await auth.initAuth()
 
-  if (auth.isAuthenticated && ['/login', '/register'].includes(to.path)) {
+  // 🔒 Bloque les pages auth si déjà connecté
+  if (auth.isAuthenticated && ['/login', '/register', '/reset-password'].includes(to.path)) {
     return { name: 'home' }
   }
 
+  // 🔐 Protège les routes privées
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'login' }
+    return {
+      name: 'login',
+      query: { redirect: to.fullPath }, // ⬅️ on garde la route demandée
+    }
   }
 
+  // 🛡️ Vérifie les accès admin
   if (to.meta.requiresAdmin && !auth.isAdmin) {
     return { name: 'access-denied' }
   }
 
+  // 🧭 Met à jour le titre et description SEO
   const title =
     typeof to.meta.getTitle === 'function' ? to.meta.getTitle(to) : to.meta.title || 'Fast Peptides'
 

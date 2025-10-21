@@ -5,6 +5,7 @@ export type RouteName =
   'admin-order-detail' |
   'admin-orders' |
   'admin-users' |
+  'auth-callback' |
   'cart' |
   'catalogue' |
   'checkout' |
@@ -14,5 +15,6 @@ export type RouteName =
   'product-detail' |
   'profil' |
   'register' |
+  'reset-password' |
   'user-order-detail' |
   'user-orders'

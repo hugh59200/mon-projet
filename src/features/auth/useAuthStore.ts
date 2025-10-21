@@ -20,10 +20,13 @@ export const useAuthStore = defineStore('auth', () => {
   const toast = useToastStore()
   let refreshInterval: number | null = null
 
+  // --- COMPUTED ---
   const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => (profile.value?.role || '') === 'admin')
 
-  // --- PROFIL UTILISATEUR
+  // ======================================================
+  // 🧩 PROFIL UTILISATEUR
+  // ======================================================
   async function fetchProfile() {
     if (!user.value) return
     const { data, error: err } = await supabase
@@ -31,15 +34,18 @@ export const useAuthStore = defineStore('auth', () => {
       .select('*')
       .eq('id', user.value.id)
       .single()
+
     if (err) {
+      console.error('Erreur profil:', err)
       toast.showToast('Erreur lors du chargement du profil.', 'danger')
-      console.error(err)
     } else {
       profile.value = data || { role: 'user' }
     }
   }
 
-  // --- SESSION
+  // ======================================================
+  // 🔁 SESSION
+  // ======================================================
   async function refreshSession() {
     const { data, error: err } = await supabase.auth.getSession()
     if (err || !data.session?.user) return false
@@ -47,6 +53,9 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
+  // ======================================================
+  // 🔐 LOGIN (Email + MDP)
+  // ======================================================
   async function signIn(email: string, password: string): Promise<boolean> {
     loading.value = true
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
@@ -65,6 +74,9 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
+  // ======================================================
+  // 🧾 INSCRIPTION
+  // ======================================================
   async function signUp(email: string, password: string): Promise<boolean> {
     loading.value = true
     const { data, error: err } = await supabase.auth.signUp({ email, password })
@@ -83,6 +95,58 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
+  // ======================================================
+  // 🌍 OAUTH (Google, GitHub)
+  // ======================================================
+  async function signInWithProvider(provider: 'google' | 'github', redirect?: string) {
+    try {
+      loading.value = true
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback${
+            redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''
+          }`,
+        },
+      })
+      if (err) {
+        toast.showToast(err.message, 'danger')
+        error.value = err.message
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ======================================================
+  // ✉️ MAGIC LINK (connexion sans mot de passe)
+  // ======================================================
+  async function signInWithMagicLink(email: string): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    loading.value = false
+
+    if (err) {
+      error.value = err.message
+      toast.showToast(err.message, 'danger')
+      return false
+    }
+
+    toast.showToast('Lien magique envoyé à votre e-mail 📩', 'success')
+    return true
+  }
+
+  // ======================================================
+  // 🚪 LOGOUT
+  // ======================================================
   async function signOut(redirect = true, message?: string) {
     await supabase.auth.signOut()
     user.value = null
@@ -92,7 +156,9 @@ export const useAuthStore = defineStore('auth', () => {
     if (redirect) router.push('/login')
   }
 
-  // --- INIT
+  // ======================================================
+  // 🚀 INIT AUTH
+  // ======================================================
   async function initAuth() {
     if (await refreshSession()) {
       await fetchProfile()
@@ -100,7 +166,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // --- AUTO REFRESH SESSION
+  // ======================================================
+  // 🕒 AUTO REFRESH SESSION
+  // ======================================================
   function startAutoRefresh() {
     stopAutoRefresh()
     refreshInterval = window.setInterval(
@@ -110,7 +178,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
       },
       60 * 60 * 1000,
-    ) // toutes les 60 min
+    )
   }
 
   function stopAutoRefresh() {
@@ -120,13 +188,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // --- LISTENER GLOBAL SUPABASE
-  supabase.auth.onAuthStateChange((_event, session) => {
+  // ======================================================
+  // 🔊 LISTENER GLOBAL SUPABASE
+  // ======================================================
+  supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = session?.user ?? null
-    if (session?.user) fetchProfile()
-    else profile.value = null
+
+    if (session?.user) {
+      await fetchProfile()
+      startAutoRefresh()
+    } else {
+      profile.value = null
+      stopAutoRefresh()
+    }
+
+    // 🚦 Redirection automatique après OAuth / Magic Link
+    if (event === 'SIGNED_IN' && router.currentRoute.value.name === 'auth-callback') {
+      const redirect = router.currentRoute.value.query.redirect as string
+      router.push(redirect || '/')
+    }
+
+    if (event === 'SIGNED_OUT') {
+      router.push('/login')
+    }
   })
 
+  // ======================================================
+  // EXPORTS
+  // ======================================================
   return {
     user,
     profile,
@@ -137,6 +226,8 @@ export const useAuthStore = defineStore('auth', () => {
     signUp,
     signIn,
     signOut,
+    signInWithProvider,
+    signInWithMagicLink,
     initAuth,
   }
 })
