@@ -33,7 +33,7 @@
       const redirect = router.currentRoute.value.query.redirect as string
       router.push(redirect || '/')
     } else {
-      router.push('/login')
+      router.push('/auth/login')
     }
   })
 </script>

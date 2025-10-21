@@ -153,7 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
     profile.value = null
     stopAutoRefresh()
     toast.showToast(message ?? 'Déconnexion effectuée.', message ? 'warning' : 'info')
-    if (redirect) router.push('/login')
+    if (redirect) router.push('/auth/login')
   }
 
   // ======================================================
@@ -209,7 +209,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     if (event === 'SIGNED_OUT') {
-      router.push('/login')
+      router.push('/auth/login')
     }
   })
 

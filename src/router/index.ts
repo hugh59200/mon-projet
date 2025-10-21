@@ -17,36 +17,35 @@ const routes: Array<RouteRecordRaw> = [
         'Découvrez Fast Peptides, la référence européenne pour les peptides de recherche certifiés et livrés rapidement.',
     },
   },
-
-  // 🔑 Auth pages (utilisent AuthForm.vue)
   {
-    path: '/login',
-    name: 'login',
-    component: () => import('@/features/auth/LoginView.vue'),
-    meta: {
-      title: 'Connexion – Fast Peptides',
-      description:
-        'Connectez-vous à votre compte Fast Peptides pour accéder à vos commandes et produits.',
-    },
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('@/features/auth/RegisterView.vue'),
-    meta: {
-      title: 'Inscription – Fast Peptides',
-      description:
-        'Créez un compte Fast Peptides et bénéficiez de produits certifiés et d’un suivi personnalisé.',
-    },
-  },
-  {
-    path: '/reset-password',
-    name: 'reset-password',
-    component: () => import('@/features/auth/ResetPasswordView.vue'),
-    meta: {
-      title: 'Mot de passe oublié – Fast Peptides',
-      description: 'Recevez un lien pour réinitialiser votre mot de passe.',
-    },
+    path: '/auth',
+    component: () => import('@/features/auth/AuthWrapper.vue'),
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('@/features/auth/LoginView.vue'),
+        meta: {
+          title: 'Connexion – Fast Peptides',
+        },
+      },
+      {
+        path: 'register',
+        name: 'register',
+        component: () => import('@/features/auth/RegisterView.vue'),
+        meta: {
+          title: 'Inscription – Fast Peptides',
+        },
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: () => import('@/features/auth/ResetPasswordView.vue'),
+        meta: {
+          title: 'Mot de passe oublié – Fast Peptides',
+        },
+      },
+    ],
   },
   {
     path: '/update-password',
@@ -219,7 +218,7 @@ router.beforeEach(async (to) => {
   if (!auth.user) await auth.initAuth()
 
   // 🔒 Bloque les pages auth si déjà connecté
-  if (auth.isAuthenticated && ['/login', '/register', '/reset-password'].includes(to.path)) {
+  if (auth.isAuthenticated && ['/auth/login', '/register', '/reset-password'].includes(to.path)) {
     return { name: 'home' }
   }
 

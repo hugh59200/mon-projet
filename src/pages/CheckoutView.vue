@@ -142,7 +142,7 @@
   async function submitOrder() {
     if (!auth.user) {
       toast.showToast('Veuillez vous connecter pour finaliser la commande.', 'danger')
-      router.push('/login')
+      router.push('/auth/login')
       return
     }
 

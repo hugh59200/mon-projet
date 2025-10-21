@@ -115,21 +115,21 @@
     <div class="auth__links">
       <RouterLink
         v-if="mode === 'login'"
-        to="/register"
+        to="/auth/register"
       >
         Pas encore de compte ?
         <b>S’inscrire</b>
       </RouterLink>
       <RouterLink
         v-if="mode === 'register'"
-        to="/login"
+        to="/auth/login"
       >
         Déjà inscrit ?
         <b>Se connecter</b>
       </RouterLink>
       <RouterLink
         v-if="mode === 'login'"
-        to="/reset-password"
+        to="/auth/reset-password"
       >
         Mot de passe oublié ?
       </RouterLink>
@@ -222,7 +222,7 @@
 
       if (props.mode === 'reset') {
         const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
-          redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/auth/login`, // ✅ corrigé
         })
         if (err) error.value = err.message
         else message.value = 'Lien de réinitialisation envoyé ✅'

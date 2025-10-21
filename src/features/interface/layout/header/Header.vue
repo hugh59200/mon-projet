@@ -11,6 +11,7 @@
         size="body-l"
         weight="bold"
         class="auth-navbar__logo"
+        @click="router.push('/')"
       >
         Fast Peptides
       </BasicText>
@@ -30,19 +31,13 @@
           label="Admin"
           type="primary"
           size="small"
-          @click="$router.push('/admin')"
-        >
-          <!-- <BasicBadge
-            v-if="auth.isAdmin"
-            label="Admin"
-            type="info"
-          /> -->
-        </BasicButton>
+          @click="router.push('/admin')"
+        />
         <BasicButton
           label="Panier"
           type="secondary"
           size="small"
-          @click="$router.push('/panier')"
+          @click="router.push('/panier')"
         />
         <BasicBadge
           v-if="cart.totalItems > 0"
@@ -52,13 +47,13 @@
           label="Paiement"
           type="secondary"
           size="small"
-          @click="$router.push('/paiement')"
+          @click="router.push('/paiement')"
         />
         <BasicButton
           label="Mon profil"
           type="secondary"
           size="small"
-          @click="$router.push('/profil')"
+          @click="router.push('/profil')"
         />
         <BasicButton
           label="Se déconnecter"
@@ -75,14 +70,14 @@
           type="primary"
           variant="filled"
           size="small"
-          @click="router.push('/login')"
+          @click="router.push('/auth/login')"
         />
         <BasicButton
           label="Inscription"
           type="reverse"
           variant="outlined"
           size="small"
-          @click="router.push('/register')"
+          @click="router.push('/auth/register')"
         />
       </template>
     </div>
@@ -100,22 +95,22 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const sidebar = useSidebarStore()
-  const { isReduced } = storeToRefs(sidebar) // ✅ réactif
+  const { isReduced } = storeToRefs(sidebar)
   const { toggle } = sidebar
 
   async function handleLogout() {
     await auth.signOut()
-    router.push('/login')
+    router.push('/auth/login') // ✅ corrigé
   }
 </script>
 
 <style scoped lang="less">
   .auth-navbar {
-    position: fixed; /* ✅ reste collé en haut */
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000; /* passe au-dessus de la sidebar */
+    z-index: 1000;
     height: 60px;
     width: 100%;
     display: flex;
@@ -137,6 +132,11 @@
 
     &__logo {
       cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s ease;
+      &:hover {
+        opacity: 0.85;
+      }
     }
 
     &__right {

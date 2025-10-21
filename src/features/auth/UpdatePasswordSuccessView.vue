@@ -27,7 +27,7 @@
         variant="filled"
         size="medium"
         width="full"
-        @click="router.push('/login')"
+        @click="router.push('/auth/login')"
       />
     </div>
   </section>
