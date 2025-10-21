@@ -1,3 +1,4 @@
+import type { IconName } from '@designSystem/fondation/icons/iconsList'
 import type {
   RouteLocationNormalizedLoaded,
   RouteLocationNormalizedLoadedGeneric,
@@ -17,7 +18,7 @@ declare module 'vue-router' {
     requiresAuth?: boolean
     requiresAdmin?: boolean
     label?: string
-    icon?: string
+    icon?: IconName
     order?: number
     title?: string
     description?: string
