@@ -19,14 +19,14 @@ function corsHeaders() {
   }
 }
 
-serve(async (req) => {
+serve(async (req: { method: string; json: () => OrderPayload | PromiseLike<OrderPayload> }) => {
   // 🔸 Réponse aux preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders() })
   }
 
   try {
-    // 🔑 Variables d’environnement
+    // 🔑 Variables d’environnement Supabase
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -44,7 +44,7 @@ serve(async (req) => {
 
     if (!email || !order_id || !items?.length) {
       return new Response(JSON.stringify({ success: false, error: 'Requête incomplète.' }), {
-        status: 400,
+        status: 200, // ✅ On renvoie toujours 200 pour éviter les erreurs front
         headers: corsHeaders(),
       })
     }
@@ -52,26 +52,49 @@ serve(async (req) => {
     // 💬 Choix de l’expéditeur selon l’environnement
     const fromEmail = env === 'production' ? 'contact@peptidestore.com' : 'onboarding@resend.dev'
 
-    // 🧾 Contenu de l’email HTML
-    const itemsHtml = items
-      .map((i) => `<li>${i.name} — ${i.quantity} × ${i.price.toFixed(2)} €</li>`)
-      .join('')
-
+    // 🧾 Contenu HTML pro et responsive
     const html = `
-      <h2>Merci pour votre commande, ${full_name || 'cher client'} !</h2>
-      <p>Votre commande <b>#${order_id}</b> a bien été enregistrée.</p>
-      <ul>${itemsHtml}</ul>
-      <p><b>Total :</b> ${total_amount.toFixed(2)} €</p>
-      <p>Date : ${new Date(created_at).toLocaleString('fr-FR')}</p>
-      <p>Nous vous tiendrons informé de l’expédition sous peu 🚚</p>
-      <hr/>
-      <small>Merci de votre confiance,<br/>L’équipe PeptideStore</small>
+      <div style="font-family:Arial, sans-serif; max-width:600px; margin:auto; color:#111;">
+        <h2 style="color:#008080;">Merci pour votre commande, ${full_name || 'cher client'} 🎉</h2>
+        <p>Votre commande <strong>#${order_id}</strong> a bien été enregistrée.</p>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+          <thead>
+            <tr style="background:#f6f6f6;">
+              <th style="text-align:left; padding:8px;">Produit</th>
+              <th style="text-align:right; padding:8px;">Qté</th>
+              <th style="text-align:right; padding:8px;">Prix</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items
+              .map(
+                (i) => `
+                <tr>
+                  <td style="padding:8px;">${i.name}</td>
+                  <td style="text-align:right; padding:8px;">${i.quantity}</td>
+                  <td style="text-align:right; padding:8px;">${(i.price * i.quantity).toFixed(2)} €</td>
+                </tr>`,
+              )
+              .join('')}
+          </tbody>
+        </table>
+
+        <p style="margin-top:15px;">
+          <strong>Total :</strong> ${total_amount.toFixed(2)} €<br/>
+          <strong>Date :</strong> ${new Date(created_at).toLocaleString('fr-FR')}
+        </p>
+
+        <p>Nous vous tiendrons informé de l’expédition sous peu 🚚</p>
+        <hr/>
+        <small>Merci de votre confiance,<br/>L’équipe PeptideStore 🧬</small>
+      </div>
     `
 
     console.info(`📤 Envoi email via Resend → ${email} (${env})`)
 
-    // 📧 Appel à Resend API
-    const res = await fetch('https://api.resend.com/emails', {
+    // 📧 Envoi via Resend API
+    const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
@@ -85,15 +108,25 @@ serve(async (req) => {
       }),
     })
 
-    const data = await res.json()
-    console.info('📨 Réponse Resend:', data)
+    const resendData = await resendRes.json()
+    console.info('📨 Réponse Resend:', resendData)
 
-    if (!res.ok) {
-      console.error('❌ Erreur Resend:', data)
-      return new Response(JSON.stringify({ success: false, error: data }), {
-        status: 400,
-        headers: corsHeaders(),
-      })
+    // ⚠️ Si Resend retourne une erreur, on la log mais on ne fait pas planter le front
+    if (!resendRes.ok) {
+      console.error('❌ Erreur Resend:', resendData)
+      await supabase.from('logs').insert([
+        {
+          type: 'email_error',
+          order_id,
+          email,
+          message: JSON.stringify(resendData),
+          created_at: new Date().toISOString(),
+        },
+      ])
+      return new Response(
+        JSON.stringify({ success: false, message: 'Erreur Resend, mais commande confirmée' }),
+        { status: 200, headers: corsHeaders() },
+      )
     }
 
     // ✅ Met à jour le statut de la commande
@@ -106,7 +139,7 @@ serve(async (req) => {
       console.error('⚠️ Erreur lors de la mise à jour du statut :', updateError)
     }
 
-    // 📘 Log optionnel dans une table dédiée
+    // 📘 Log email envoyé
     await supabase.from('logs').insert([
       {
         type: 'email_sent',
@@ -122,9 +155,10 @@ serve(async (req) => {
     })
   } catch (err) {
     console.error('❌ Erreur Edge Function:', err)
-    return new Response(JSON.stringify({ success: false, error: err.message }), {
-      status: 500,
-      headers: corsHeaders(),
-    })
+    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
+    return new Response(
+      JSON.stringify({ success: false, error: errorMessage }),
+      { status: 200, headers: corsHeaders() }, // ✅ Toujours 200 pour éviter le toast rouge
+    )
   }
 })

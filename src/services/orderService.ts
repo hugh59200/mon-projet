@@ -33,6 +33,7 @@ export async function createFullOrder(payload: CreateOrderPayload) {
     throw new Error('Utilisateur non connecté')
   }
 
+  // 🚀 Appel RPC
   const { data, error } = await supabase.rpc('create_full_order', {
     _user_id: user.id,
     _email: payload.email,
@@ -43,7 +44,7 @@ export async function createFullOrder(payload: CreateOrderPayload) {
     _country: payload.country,
     _payment_method: payload.payment_method,
     _total_amount: payload.total_amount,
-    _items: payload.items,
+    _items: JSON.stringify(payload.items), // ✅ clé du problème résolue
   })
 
   if (error) {

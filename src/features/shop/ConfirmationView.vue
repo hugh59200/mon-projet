@@ -159,7 +159,14 @@
       console.error(error)
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
     } else {
-      order.value = data as Order
+      // ✅ Si "items" est une chaîne JSON, on la parse proprement
+      const parsedItems = typeof data.items === 'string' ? JSON.parse(data.items) : data.items
+
+      order.value = {
+        ...data,
+        items: parsedItems,
+      }
+
       sendConfirmationEmail()
     }
 
@@ -186,17 +193,20 @@
         'https://dwomsbawthlktapmtmqu.supabase.co/functions/v1/order-confirmation',
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
           body: JSON.stringify(payload),
         },
       )
-
       const data = await res.json()
 
-      if (res.ok && data.success) {
+      if (res.ok && data?.success) {
         emailStatus.value = 'success'
         toast.showToast('Email de confirmation envoyé ✅', 'success')
       } else {
+        console.warn('⚠️ Réponse Edge Function:', data)
         emailStatus.value = 'error'
         toast.showToast('Erreur lors de l’envoi de l’email ⚠️', 'danger')
       }
@@ -204,9 +214,6 @@
       console.error('Erreur réseau ou Edge Function:', err)
       emailStatus.value = 'error'
       toast.showToast('Erreur réseau lors de l’envoi de l’email', 'danger')
-    } finally {
-      // ⏱️ Masque le spinner après un petit délai
-      setTimeout(() => (emailStatus.value = 'idle'), 2000)
     }
   }
 

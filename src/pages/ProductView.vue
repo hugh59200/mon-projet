@@ -67,6 +67,7 @@
           {{ product.description || 'Aucune description disponible pour ce produit.' }}
         </BasicText>
 
+        <!-- 🛒 Bouton ajout panier -->
         <div class="product__actions">
           <BasicButton
             :label="product.stock ? 'Ajouter au panier' : 'Rupture de stock'"
@@ -74,6 +75,7 @@
             :type="product.stock ? 'primary' : 'secondary'"
             variant="filled"
             size="medium"
+            @click="addToCart(product)"
           />
         </div>
       </div>
@@ -95,6 +97,8 @@
 </template>
 
 <script setup lang="ts">
+  import { useCartStore } from '@/features/cart/useCartStore'
+  import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
@@ -111,6 +115,9 @@
   }
 
   const route = useRoute()
+  const cart = useCartStore()
+  const toast = useToastStore()
+
   const product = ref<Product | null>(null)
   const loading = ref(true)
 
@@ -141,6 +148,12 @@
 
     loading.value = false
   })
+
+  // 🛒 Fonction d'ajout au panier
+  function addToCart(p: Product) {
+    cart.addToCart(p)
+    toast.showToast(`✅ ${p.name} ajouté au panier`, 'success')
+  }
 </script>
 
 <style scoped lang="less">
@@ -199,6 +212,7 @@
 
     @media (max-width: 900px) {
       padding: 20px;
+
       &__content {
         flex-direction: column;
         align-items: center;
