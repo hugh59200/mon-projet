@@ -1,159 +1,126 @@
 <template>
   <div class="order-detail">
-    <div class="order-detail__header">
-      <BasicButton
-        label="← Retour"
-        type="secondary"
-        variant="outlined"
-        size="small"
-        @click="$router.push('/admin/orders')"
-      />
+    <BasicText
+      size="h4"
+      weight="bold"
+      class="order-detail__title"
+    >
+      Détails de la commande
+    </BasicText>
+
+    <!-- 🧾 Informations principales -->
+    <div
+      v-if="order"
+      class="order-detail__info"
+    >
+      <div class="order-detail__grid">
+        <div>
+          <p>
+            <b>Nom :</b>
+            {{ order.full_name }}
+          </p>
+          <p>
+            <b>Email :</b>
+            {{ order.email }}
+          </p>
+          <p>
+            <b>Date :</b>
+            {{ formatDate(order.created_at) }}
+          </p>
+        </div>
+        <div>
+          <p>
+            <b>Montant total :</b>
+            {{ order.total_amount.toFixed(2) }} €
+          </p>
+          <p>
+            <b>Statut :</b>
+            <BasicBadge
+              :label="getStatusLabel(order.status)"
+              :type="getStatusColor(order.status)"
+            />
+          </p>
+          <p>
+            <b>ID commande :</b>
+            {{ order.id }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📦 Produits -->
+    <div
+      v-if="order?.items?.length"
+      class="order-detail__products"
+    >
       <BasicText
-        size="h4"
+        size="h5"
         weight="bold"
       >
-        Détail de la commande
+        Produits commandés
       </BasicText>
+
+      <table class="order-detail__table">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix unitaire (€)</th>
+            <th>Total (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in order.items"
+            :key="item.id"
+          >
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price.toFixed(2) }}</td>
+            <td>{{ (item.price * item.quantity).toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 🚚 Bloc expédition -->
+    <div class="order-shipment">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        Ajouter un suivi de livraison
+      </BasicText>
+
+      <div class="order-shipment__form">
+        <BasicInput
+          v-model="carrier"
+          placeholder="Transporteur (ex: Colissimo, UPS, DHL...)"
+          input-type="form"
+          size="medium"
+        />
+        <BasicInput
+          v-model="trackingNumber"
+          placeholder="Numéro ou lien de suivi"
+          input-type="form"
+          size="medium"
+        />
+        <BasicButton
+          :disabled="loadingShipment"
+          label="Enregistrer et envoyer le mail"
+          type="primary"
+          variant="filled"
+          size="medium"
+          @click="handleAddTracking"
+        />
+      </div>
     </div>
 
     <div
       v-if="loading"
       class="order-detail__loading"
     >
-      <BasicText>Chargement de la commande...</BasicText>
-    </div>
-
-    <div
-      v-else-if="!order"
-      class="order-detail__empty"
-    >
-      <BasicText>Commande introuvable.</BasicText>
-    </div>
-
-    <div
-      v-else
-      class="order-detail__content"
-    >
-      <!-- Client -->
-      <section class="order-detail__section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Informations client
-        </BasicText>
-        <BasicText>{{ order.full_name }}</BasicText>
-        <BasicText>{{ order.email }}</BasicText>
-        <BasicText>{{ order.address }}</BasicText>
-        <BasicText>{{ order.zip }} {{ order.city }}</BasicText>
-        <BasicText>{{ order.country }}</BasicText>
-      </section>
-
-      <!-- Paiement -->
-      <section class="order-detail__section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Paiement
-        </BasicText>
-        <BasicText>Méthode : {{ order.payment_method }}</BasicText>
-        <BasicText>Total : {{ order.total_amount.toFixed(2) }} €</BasicText>
-        <BasicText>Date : {{ formatDate(order.created_at) }}</BasicText>
-      </section>
-
-      <!-- Statut -->
-      <section class="order-detail__section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Statut de la commande
-        </BasicText>
-        <div class="order-detail__status-cell">
-          <BasicBadge
-            :label="getStatusMeta(order.status).label"
-            :type="getStatusMeta(order.status).color as BadgeType"
-            size="small"
-          />
-          <select
-            v-model="order.status"
-            class="order-detail__status"
-            @change="updateStatus"
-          >
-            <option
-              v-for="s in STATUSES"
-              :key="s.value"
-              :value="s.value"
-            >
-              {{ s.label }}
-            </option>
-          </select>
-        </div>
-      </section>
-
-      <!-- Notes -->
-      <section class="order-detail__section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Notes internes
-        </BasicText>
-        <textarea
-          v-model="notes"
-          class="order-detail__textarea"
-          placeholder="Ajouter des remarques internes..."
-        />
-        <div class="order-detail__actions">
-          <BasicButton
-            label="Enregistrer les notes"
-            type="primary"
-            variant="filled"
-            size="small"
-            :disabled="savingNotes"
-            @click="saveNotes"
-          />
-          <BasicText
-            v-if="savedAt"
-            size="body-s"
-            color="neutral-500"
-          >
-            Dernière sauvegarde : {{ savedAt }}
-          </BasicText>
-        </div>
-      </section>
-
-      <!-- Produits -->
-      <section class="order-detail__section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Produits
-        </BasicText>
-        <table class="order-detail__table">
-          <thead>
-            <tr>
-              <th>Produit</th>
-              <th>Quantité</th>
-              <th>Prix unitaire</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="item in order.items"
-              :key="item.id"
-            >
-              <td>{{ item.name }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>{{ item.price.toFixed(2) }} €</td>
-              <td>{{ (item.price * item.quantity).toFixed(2) }} €</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <BasicText>Chargement des informations...</BasicText>
     </div>
   </div>
 </template>
@@ -165,6 +132,14 @@
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
+  const route = useRoute()
+  const toast = useToastStore()
+  const order = ref<any>(null)
+  const loading = ref(true)
+  const loadingShipment = ref(false)
+  const carrier = ref('')
+  const trackingNumber = ref('')
+
   const STATUSES = [
     { value: 'pending', label: 'En attente', color: 'warning' },
     { value: 'confirmed', label: 'Confirmée', color: 'success' },
@@ -173,80 +148,36 @@
     { value: 'canceled', label: 'Annulée', color: 'danger' },
   ]
 
-  function getStatusMeta(value: string) {
-    return STATUSES.find((s) => s.value === value) || { label: value, color: 'neutral' }
+  function getStatusLabel(value: string) {
+    return STATUSES.find((s) => s.value === value)?.label || value
+  }
+  function getStatusColor(value: string): BadgeType {
+    return (STATUSES.find((s) => s.value === value)?.color || 'neutral') as BadgeType
   }
 
-  type Order = {
-    id: string
-    full_name: string
-    email: string
-    address: string
-    city: string
-    zip: string
-    country: string
-    payment_method: string
-    total_amount: number
-    status: string
-    created_at: string
-    internal_notes?: string
-    items: { id: string; name: string; quantity: number; price: number }[]
-  }
-
-  const route = useRoute()
-  const toast = useToastStore()
-  const loading = ref(true)
-  const savingNotes = ref(false)
-  const savedAt = ref<string | null>(null)
-  const order = ref<Order | null>(null)
-  const notes = ref('')
-
+  // 🔹 Charger la commande
   async function loadOrder() {
     loading.value = true
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', route.params.id)
-      .single()
+    const id = route.params.id
+    const { data, error } = await supabase.from('orders').select('*').eq('id', id).single()
     if (error) {
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
       console.error(error)
     } else {
-      order.value = data as Order
-      notes.value = order.value.internal_notes || ''
+      // S’assure que items est bien un tableau
+      try {
+        order.value = data
+        if (typeof order.value.items === 'string') {
+          order.value.items = JSON.parse(order.value.items)
+        }
+      } catch {
+        order.value.items = []
+      }
     }
     loading.value = false
   }
 
-  async function updateStatus() {
-    if (!order.value) return
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: order.value.status })
-      .eq('id', order.value.id)
-    if (error) toast.showToast('Erreur de mise à jour du statut', 'danger')
-    else
-      toast.showToast(`Statut mis à jour : ${getStatusMeta(order.value.status).label}`, 'success')
-  }
-
-  async function saveNotes() {
-    if (!order.value) return
-    savingNotes.value = true
-    const { error } = await supabase
-      .from('orders')
-      .update({ internal_notes: notes.value })
-      .eq('id', order.value.id)
-    savingNotes.value = false
-    if (error) {
-      toast.showToast('Erreur lors de la sauvegarde des notes', 'danger')
-    } else {
-      toast.showToast('Notes enregistrées ✅', 'success')
-      savedAt.value = new Date().toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    }
-  }
+  onMounted(loadOrder)
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
@@ -258,76 +189,105 @@
     })
   }
 
-  onMounted(loadOrder)
+  // 🚚 Ajout du suivi expédition
+  async function handleAddTracking() {
+    if (!carrier.value || !trackingNumber.value) {
+      toast.showToast('Veuillez renseigner le transporteur et le numéro de suivi', 'warning')
+      return
+    }
+
+    try {
+      loadingShipment.value = true
+
+      // 🧾 Met à jour la commande
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          carrier: carrier.value,
+          tracking_number: trackingNumber.value,
+          shipped_at: new Date().toISOString(),
+          status: 'shipped',
+        })
+        .eq('id', order.value.id)
+
+      if (updateError) throw updateError
+
+      // 🚀 Envoi mail via Edge Function
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            order_id: order.value.id,
+            status: 'shipped',
+            email: order.value.email,
+            full_name: order.value.full_name,
+            carrier: carrier.value,
+            tracking_number: trackingNumber.value,
+          }),
+        },
+      )
+
+      const data = await res.json()
+
+      if (data.success) {
+        toast.showToast('Numéro de suivi ajouté et mail envoyé ✅', 'success')
+        await loadOrder()
+        carrier.value = ''
+        trackingNumber.value = ''
+      } else {
+        toast.showToast('Suivi ajouté, mais mail non envoyé ⚠️', 'warning')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.showToast('Erreur lors de l’ajout du suivi ⚠️', 'danger')
+    } finally {
+      loadingShipment.value = false
+    }
+  }
 </script>
 
 <style scoped lang="less">
   .order-detail {
     max-width: 900px;
-    margin: 50px auto;
+    margin: 40px auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 0 20px;
+    gap: 32px;
 
-    &__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    &__title {
+      text-align: center;
     }
 
-    &__content {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    &__section {
+    &__info {
       background: white;
-      border-radius: 12px;
       border: 1px solid @neutral-200;
+      border-radius: 10px;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
     }
 
-    &__status-cell {
+    &__grid {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
     }
 
-    &__status {
-      width: 200px;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid @neutral-300;
+    &__products {
       background: white;
-    }
-
-    &__textarea {
-      width: 100%;
-      min-height: 100px;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid @neutral-300;
-      resize: vertical;
-      font-family: inherit;
-      font-size: 14px;
-    }
-
-    &__actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-top: 8px;
+      border: 1px solid @neutral-200;
+      border-radius: 10px;
+      padding: 20px;
     }
 
     &__table {
       width: 100%;
+      margin-top: 10px;
       border-collapse: collapse;
-      margin-top: 8px;
 
       th,
       td {
@@ -342,11 +302,29 @@
       }
     }
 
-    &__loading,
-    &__empty {
+    &__loading {
       text-align: center;
       padding: 40px;
-      color: @neutral-600;
+    }
+  }
+
+  .order-shipment {
+    background: @neutral-50;
+    border: 1px solid @neutral-200;
+    border-radius: 10px;
+    padding: 20px;
+
+    &__form {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+
+      input {
+        flex: 1;
+        min-width: 200px;
+      }
     }
   }
 </style>
