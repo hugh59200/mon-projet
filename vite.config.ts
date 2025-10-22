@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue'
+import fs from 'fs'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'path'
 import { defineConfig, type BuildEnvironmentOptions } from 'vite'
@@ -60,7 +61,10 @@ export default defineConfig({
   },
   server: {
     port: 5278,
-    strictPort: true,
     host: 'localhost',
+    https: {
+      key: fs.readFileSync('./localhost-key.pem'),
+      cert: fs.readFileSync('./localhost.pem'),
+    },
   },
 })
