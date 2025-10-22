@@ -210,18 +210,16 @@ export const useAuthStore = defineStore('auth', () => {
   // ======================================================
   // 🔊 LISTENER GLOBAL SUPABASE
   // ======================================================
-  // ======================================================
-  // 🔊 LISTENER GLOBAL SUPABASE
-  // ======================================================
   supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = session?.user ?? null
 
     if (session?.user) {
-      await fetchProfile()
+      try {
+        fetchProfile()
+      } catch (err) {
+        console.warn('Erreur fetchProfile (non bloquant) :', err)
+      }
       startAutoRefresh()
-    } else {
-      profile.value = null
-      stopAutoRefresh()
     }
 
     // 🚦 Redirection automatique après OAuth / Magic Link

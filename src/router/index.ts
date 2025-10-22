@@ -218,9 +218,7 @@ router.beforeEach(async (to) => {
     }
   }
 
-  // 🧺 Vérifie le panier pour la page paiement
   if (to.meta.requiresCart && cart.items.length === 0) {
-    console.warn('⛔ Panier vide — redirection vers /panier')
     return '/panier'
   }
 

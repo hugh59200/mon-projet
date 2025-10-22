@@ -122,7 +122,7 @@
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { createFullOrder } from '@/services/orderService'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   const auth = useAuthStore()
@@ -179,13 +179,6 @@
       loading.value = false
     }
   }
-
-  onMounted(() => {
-    if (cart.items.length === 0) {
-      toast.showToast('Votre panier est vide 🛒', 'warning')
-      router.replace('/panier')
-    }
-  })
 </script>
 
 <style scoped lang="less">
