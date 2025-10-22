@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useCartStore } from '@/features/cart/useCartStore'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
@@ -121,6 +122,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'checkout',
     component: () => import('@/pages/CheckoutView.vue'),
     meta: {
+      requiresCart: true,
       requiresAuth: true,
       title: 'Paiement – Fast Peptides',
       description: 'Validez et payez votre commande de peptides en toute sécurité.',
@@ -200,17 +202,15 @@ const router = createRouter({
 // 🧠 Middleware de navigation
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+  const cart = useCartStore()
 
-  // ✅ Attends que la session soit prête
   if (!auth.user) await auth.initAuth()
 
-  // ✅ Corrigé : bloque correctement les pages d’auth si connecté
   const authPages = ['/auth/login', '/auth/register', '/auth/reset-password']
   if (auth.isAuthenticated && authPages.includes(to.path)) {
     return { name: 'home' }
   }
 
-  // 🔐 Routes nécessitant une connexion
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return {
       path: '/auth/login',
@@ -218,15 +218,19 @@ router.beforeEach(async (to) => {
     }
   }
 
-  // 🛡️ Admin uniquement
+  // 🧺 Vérifie le panier pour la page paiement
+  if (to.meta.requiresCart && cart.items.length === 0) {
+    console.warn('⛔ Panier vide — redirection vers /panier')
+    return '/panier'
+  }
+
   if (to.meta.requiresAdmin && !auth.isAdmin) {
     return { name: 'access-denied' }
   }
 
-  // 🧭 Met à jour le titre et description SEO
+  // 🧭 SEO dynamique
   const title =
     typeof to.meta.getTitle === 'function' ? to.meta.getTitle(to) : to.meta.title || 'Fast Peptides'
-
   document.title = title
 
   const descriptionTag = document.querySelector('meta[name="description"]')
@@ -235,16 +239,13 @@ router.beforeEach(async (to) => {
       ? to.meta.getDescription(to)
       : to.meta.description || 'Peptides de recherche certifiés, livrés rapidement en Europe.'
 
-  if (descriptionTag) {
-    descriptionTag.setAttribute('content', description)
-  } else {
+  if (descriptionTag) descriptionTag.setAttribute('content', description)
+  else {
     const meta = document.createElement('meta')
     meta.name = 'description'
     meta.content = description
     document.head.appendChild(meta)
   }
-
-  return true
 })
 
 export default router

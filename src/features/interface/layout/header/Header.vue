@@ -47,7 +47,8 @@
           label="Paiement"
           type="secondary"
           size="small"
-          @click="router.push('/paiement')"
+          :disabled="cart.totalItems === 0"
+          @click="cart.totalItems > 0 && router.push('/paiement')"
         />
         <BasicButton
           label="Mon profil"
@@ -99,7 +100,9 @@
   const { toggle } = sidebar
 
   async function handleLogout() {
+    console.log('➡️ Tentative de déconnexion...')
     await auth.signOut()
+    console.log('✅ signOut() terminé')
   }
 </script>
 

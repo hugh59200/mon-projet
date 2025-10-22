@@ -16,6 +16,7 @@ export type VisibilityResolver = (route: RouteRecordNormalized) => Visibility
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean
+    requiresCart?: boolean
     requiresAdmin?: boolean
     label?: string
     icon?: IconName

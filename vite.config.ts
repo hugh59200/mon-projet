@@ -33,12 +33,7 @@ generateRouteNamesUnion(__dirname)
 generateGlobalComponents(__dirname)
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    VueDevTools(),
-    svgLoader(),
-    // BasicSSL(),
-  ],
+  plugins: [vue(), VueDevTools(), svgLoader()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -63,8 +58,8 @@ export default defineConfig({
     port: 5278,
     host: 'localhost',
     https: {
-      key: fs.readFileSync('./localhost-key.pem'),
-      cert: fs.readFileSync('./localhost.pem'),
+      key: fs.readFileSync('./localhost+2-key.pem'),
+      cert: fs.readFileSync('./localhost+2.pem'),
     },
   },
 })

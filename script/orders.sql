@@ -122,7 +122,8 @@ END $$;
 -- =============================
 -- ⚙️ FONCTION : create_full_order()
 -- =============================
-CREATE OR REPLACE FUNCTION create_full_order(
+-- ✅ Met à jour la fonction existante pour accepter un _status optionnel
+create or replace function create_full_order(
   _user_id uuid,
   _email text,
   _full_name text,
@@ -132,15 +133,16 @@ CREATE OR REPLACE FUNCTION create_full_order(
   _country text,
   _payment_method text,
   _total_amount numeric,
-  _items jsonb
+  _items jsonb,
+  _status text default 'pending'
 )
-RETURNS uuid
-LANGUAGE plpgsql
-AS $$
-DECLARE
+returns uuid
+language plpgsql
+as $$
+declare
   new_order_id uuid;
-BEGIN
-  INSERT INTO orders (
+begin
+  insert into orders (
     user_id,
     email,
     full_name,
@@ -154,7 +156,7 @@ BEGIN
     status,
     created_at
   )
-  VALUES (
+  values (
     _user_id,
     _email,
     _full_name,
@@ -165,16 +167,15 @@ BEGIN
     _payment_method,
     _total_amount,
     _items,
-    'pending',
+    _status,       -- 🧩 ici on prend le paramètre dynamique
     now()
   )
-  RETURNING id INTO new_order_id;
+  returning id into new_order_id;
 
-  RETURN new_order_id;
-END;
+  return new_order_id;
+end;
 $$;
 
--- =============================
--- 🔄 RELOAD SCHEMA CACHE
--- =============================
-NOTIFY pgrst, 'reload schema';
+-- 🔄 Recharge le schéma PostgREST
+notify pgrst, 'reload schema';
+

@@ -1,39 +1,92 @@
 <template>
-  <div class="callback">
-    <BasicText
-      size="body-l"
-      weight="regular"
+  <transition name="fade">
+    <div
+      v-if="visible"
+      class="callback"
     >
-      Connexion en cours...
-    </BasicText>
-    <div class="callback__loader">
-      <div
-        class="dot"
-        v-for="i in 3"
-        :key="i"
-      />
+      <div class="callback__card">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          {{ messageTitle }}
+        </BasicText>
+        <BasicText
+          color="neutral-500"
+          size="body-s"
+        >
+          {{ messageSubtitle }}
+        </BasicText>
+
+        <div
+          class="callback__loader"
+          v-if="loading"
+        >
+          <BasicLoader
+            size="large"
+            color="primary"
+          />
+        </div>
+
+        <BasicButton
+          v-else
+          label="Retour à la connexion"
+          type="primary"
+          @click="router.push('/auth/login')"
+        />
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { supabase } from '@/services/supabaseClient'
+  import { onMounted, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { useAuthStore } from './useAuthStore'
 
-  const auth = useAuthStore()
   const router = useRouter()
+  const route = useRoute()
+  const auth = useAuthStore()
+
+  const loading = ref(true)
+  const visible = ref(true)
+  const messageTitle = ref('Connexion sécurisée en cours 🔐')
+  const messageSubtitle = ref('Fast Peptides vérifie votre compte, un instant…')
 
   onMounted(async () => {
-    // Attendre que la session Supabase soit synchronisée
-    await auth.initAuth()
+    try {
+      const { data, error } = await supabase.auth.getSession()
+      if (error) throw error
 
-    // Si l’utilisateur est connecté → redirige
-    if (auth.isAuthenticated) {
-      const redirect = router.currentRoute.value.query.redirect as string
-      router.push(redirect || '/')
-    } else {
-      router.push('/auth/login')
+      if (data.session) {
+        auth.user = data.session.user
+        await auth.initAuth()
+
+        // 🧭 Récupère redirection depuis sessionStorage ou query
+        const savedRedirect = sessionStorage.getItem('redirectAfterOAuth')
+        sessionStorage.removeItem('redirectAfterOAuth') // nettoyage
+
+        const redirect =
+          savedRedirect || (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/profil')
+
+        // ⏳ petite pause + fade out avant redirection
+        messageTitle.value = 'Connexion réussie ✅'
+        messageSubtitle.value = 'Redirection vers votre espace...'
+        await new Promise((resolve) => setTimeout(resolve, 400))
+        visible.value = false
+        await new Promise((resolve) => setTimeout(resolve, 400))
+        router.replace(redirect)
+      } else {
+        throw new Error('Aucune session trouvée.')
+      }
+    } catch (err) {
+      console.error('Erreur callback:', err)
+      messageTitle.value = 'Échec de la connexion ❌'
+      messageSubtitle.value =
+        'Une erreur est survenue pendant la validation de votre compte. Veuillez réessayer.'
+    } finally {
+      loading.value = false
     }
   })
 </script>
@@ -41,42 +94,53 @@
 <style scoped lang="less">
   .callback {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    height: calc(100vh - 120px);
-    gap: 20px;
-    color: @primary-700;
+    align-items: center;
+    min-height: 70vh;
+    text-align: center;
 
-    &__loader {
+    &__card {
+      background: @neutral-50;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+      max-width: 340px;
       display: flex;
-      gap: 6px;
-
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: @primary-700;
-        animation: bounce 1.2s infinite ease-in-out both;
-      }
-
-      .dot:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-      .dot:nth-child(2) {
-        animation-delay: -0.16s;
-      }
+      flex-direction: column;
+      align-items: center;
+      gap: 16px; // 👈 espacement doux entre éléments
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
     }
 
-    @keyframes bounce {
-      0%,
-      80%,
-      100% {
-        transform: scale(0);
-      }
-      40% {
-        transform: scale(1);
-      }
+    &__loader {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  /* Animation fade transition */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.4s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  /* Animation apparition carte */
+  @keyframes fadeIn {
+    from {
+      transform: translateY(12px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
     }
   }
 </style>

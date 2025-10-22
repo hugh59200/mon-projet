@@ -101,14 +101,18 @@ export const useAuthStore = defineStore('auth', () => {
   async function signInWithProvider(provider: 'google' | 'github', redirect?: string) {
     try {
       loading.value = true
+
+      // 💾 Sauvegarde la redirection (pour la restaurer après callback)
+      if (redirect) sessionStorage.setItem('redirectAfterOAuth', redirect)
+      else sessionStorage.removeItem('redirectAfterOAuth')
+
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback${
-            redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''
-          }`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
+
       if (err) {
         toast.showToast(err.message, 'danger')
         error.value = err.message
@@ -117,7 +121,6 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = false
     }
   }
-
   // ======================================================
   // ✉️ MAGIC LINK (connexion sans mot de passe)
   // ======================================================
@@ -162,10 +165,24 @@ export const useAuthStore = defineStore('auth', () => {
   // 🚀 INIT AUTH
   // ======================================================
   async function initAuth() {
-    if (await refreshSession()) {
+    loading.value = true
+
+    const { data, error } = await supabase.auth.getSession()
+    if (error) {
+      console.warn('Erreur récupération session Supabase', error)
+    }
+
+    const session = data.session
+    if (session?.user) {
+      user.value = session.user
       await fetchProfile()
       startAutoRefresh()
+    } else {
+      user.value = null
+      profile.value = null
     }
+
+    loading.value = false
   }
 
   // ======================================================
@@ -190,6 +207,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // ======================================================
+  // 🔊 LISTENER GLOBAL SUPABASE
+  // ======================================================
   // ======================================================
   // 🔊 LISTENER GLOBAL SUPABASE
   // ======================================================

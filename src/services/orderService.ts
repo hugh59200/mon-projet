@@ -1,4 +1,4 @@
-// src/services/orderService.ts
+// /src/services/orderService.ts
 import { supabase } from '@/services/supabaseClient'
 
 export interface OrderItem {
@@ -28,7 +28,10 @@ export async function createFullOrder(payload: CreateOrderPayload) {
 
   if (userError || !user) throw new Error('Utilisateur non connecté')
 
-  // 📦 1️⃣ Crée la commande dans Supabase
+  // 💳 Simulation de paiement réussi (aucune intégration Stripe)
+  console.info('💳 Simulation de paiement : réussite (mode test).')
+
+  // 📦 1️⃣ Crée la commande dans Supabase via RPC
   const { data, error } = await supabase.rpc('create_full_order', {
     _user_id: user.id,
     _email: payload.email,
@@ -40,6 +43,7 @@ export async function createFullOrder(payload: CreateOrderPayload) {
     _payment_method: payload.payment_method,
     _total_amount: payload.total_amount,
     _items: JSON.stringify(payload.items),
+    _status: 'paid_test', // 🧩 statut ajouté pour signaler une commande simulée
   })
 
   if (error) {
@@ -48,10 +52,9 @@ export async function createFullOrder(payload: CreateOrderPayload) {
   }
 
   const orderId = data
+  console.log('✅ Commande complète créée (simulation) :', orderId)
 
-  console.log('✅ Commande complète créée :', orderId)
-
-  // 📧 2️⃣ Envoi de l’email de confirmation via Edge Function
+  // 📧 2️⃣ Envoi de l’email de confirmation via Edge Function (inchangé)
   try {
     const emailRes = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-confirmation`,
@@ -59,7 +62,7 @@ export async function createFullOrder(payload: CreateOrderPayload) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`, // ✅ clé publique
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           order_id: orderId,
@@ -78,11 +81,11 @@ export async function createFullOrder(payload: CreateOrderPayload) {
     console.warn('⚠️ Erreur lors de l’envoi du mail (non bloquant)', emailErr)
   }
 
-  // ✅ 3️⃣ Retour au front
+  // ✅ 3️⃣ Retourne la commande simulée
   return {
     id: orderId,
     total: payload.total_amount,
     date: new Date().toISOString(),
-    status: 'En attente',
+    status: 'paid_test',
   }
 }

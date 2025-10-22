@@ -1,129 +1,148 @@
 <template>
-  <div
+  <transition
     v-if="loading"
-    class="loading"
+    name="fade"
   >
-    Chargement...
-  </div>
-
-  <div
-    v-else
-    class="admin-dashboard"
-  >
-    <BasicText
-      size="h4"
-      weight="bold"
+    <div
+      key="loading"
+      class="loading"
     >
-      Tableau de bord administrateur
-    </BasicText>
-
-    <!-- 📊 Statistiques globales -->
-    <div class="admin-dashboard__stats">
-      <div
-        class="stat-card"
-        v-for="stat in statCards"
-        :key="stat.label"
+      <BasicLoader
+        size="large"
+        color="primary"
+      />
+      <BasicText
+        size="body-s"
+        color="neutral-500"
       >
-        <p class="label">{{ stat.label }}</p>
-        <p class="value">{{ stat.value }}</p>
+        Chargement des données...
+      </BasicText>
+    </div>
+  </transition>
+
+  <transition
+    v-else
+    name="fade"
+  >
+    <div
+      key="dashboard"
+      class="admin-dashboard"
+    >
+      <BasicText
+        size="h4"
+        weight="bold"
+      >
+        Tableau de bord administrateur
+      </BasicText>
+
+      <!-- 📊 Statistiques globales -->
+      <div class="admin-dashboard__stats">
+        <div
+          class="stat-card"
+          v-for="stat in statCards"
+          :key="stat.label"
+        >
+          <p class="label">{{ stat.label }}</p>
+          <p class="value">{{ stat.value }}</p>
+        </div>
+      </div>
+
+      <!-- 📈 Graphique revenus -->
+      <div class="chart-section">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          Revenus des 7 derniers jours
+        </BasicText>
+        <Bar
+          :data="chartDataRevenue"
+          :options="chartOptions"
+        />
+      </div>
+
+      <!-- 📊 Graphique commandes -->
+      <div class="chart-section">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          Commandes des 7 derniers jours
+        </BasicText>
+        <Bar
+          :data="chartDataOrders"
+          :options="chartOptionsOrders"
+        />
+      </div>
+
+      <!-- 🏆 Top clients -->
+      <div class="chart-section top-clients">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          🏆 Top 5 clients
+        </BasicText>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Commandes</th>
+              <th>Total dépensé (€)</th>
+              <th>Dernière commande</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="client in topClients"
+              :key="client.id"
+            >
+              <td class="client-cell">
+                <img
+                  v-if="client.avatar_url"
+                  :src="client.avatar_url"
+                  alt="avatar"
+                  class="avatar"
+                />
+                <span>{{ client.name }}</span>
+              </td>
+              <td>{{ client.orders }}</td>
+              <td>{{ client.total.toFixed(2) }}</td>
+              <td>{{ formatDate(client.last_order) }}</td>
+              <td>
+                <a
+                  v-if="client.email"
+                  class="contact-link"
+                  :href="`mailto:${client.email}`"
+                  title="Contacter le client"
+                >
+                  📧 Envoyer un mail
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 🧭 Navigation -->
+      <div class="admin-dashboard__cards">
+        <BasicButton
+          label="👤 Gérer les utilisateurs"
+          type="primary"
+          size="large"
+          @click="$router.push('/admin/users')"
+        />
+        <BasicButton
+          label="📦 Gérer les commandes"
+          type="secondary"
+          size="large"
+          @click="$router.push('/admin/orders')"
+        />
       </div>
     </div>
-
-    <!-- 📈 Graphique revenus -->
-    <div class="chart-section">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        Revenus des 7 derniers jours
-      </BasicText>
-      <Bar
-        :data="chartDataRevenue"
-        :options="chartOptions"
-      />
-    </div>
-
-    <!-- 📊 Graphique commandes -->
-    <div class="chart-section">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        Commandes des 7 derniers jours
-      </BasicText>
-      <Bar
-        :data="chartDataOrders"
-        :options="chartOptionsOrders"
-      />
-    </div>
-
-    <!-- 🏆 Top clients -->
-    <div class="chart-section top-clients">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        🏆 Top 5 clients
-      </BasicText>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Commandes</th>
-            <th>Total dépensé (€)</th>
-            <th>Dernière commande</th>
-            <th>Contact</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="client in topClients"
-            :key="client.id"
-          >
-            <td class="client-cell">
-              <img
-                v-if="client.avatar_url"
-                :src="client.avatar_url"
-                alt="avatar"
-                class="avatar"
-              />
-              <span>{{ client.name }}</span>
-            </td>
-            <td>{{ client.orders }}</td>
-            <td>{{ client.total.toFixed(2) }}</td>
-            <td>{{ formatDate(client.last_order) }}</td>
-            <td>
-              <a
-                v-if="client.email"
-                class="contact-link"
-                :href="`mailto:${client.email}`"
-                title="Contacter le client"
-              >
-                📧 Envoyer un mail
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 🧭 Navigation -->
-    <div class="admin-dashboard__cards">
-      <BasicButton
-        label="👤 Gérer les utilisateurs"
-        type="primary"
-        size="large"
-        @click="$router.push('/admin/users')"
-      />
-      <BasicButton
-        label="📦 Gérer les commandes"
-        type="secondary"
-        size="large"
-        @click="$router.push('/admin/orders')"
-      />
-    </div>
-  </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
@@ -380,12 +399,13 @@
 
 <style scoped lang="less">
   .loading {
-    text-align: center;
-    margin-top: 50px;
-    font-weight: bold;
-    color: #00796b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 12px;
   }
-
   .admin-dashboard {
     max-width: 900px;
     margin: 50px auto;
