@@ -148,7 +148,9 @@ export const useAuthStore = defineStore('auth', () => {
   // 🚪 LOGOUT
   // ======================================================
   async function signOut(redirect = true, message?: string) {
+    console.log('disconnecting')
     await supabase.auth.signOut()
+    console.log('disconnectinggggg')
     user.value = null
     profile.value = null
     stopAutoRefresh()

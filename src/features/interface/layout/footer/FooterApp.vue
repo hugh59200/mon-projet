@@ -6,7 +6,7 @@
       pointer
       nbMaxLines="2"
     >
-      Développement @akto 2025. Version : 1.0
+      Développement @Fast-Petides 2025. Version : 1.0
     </BasicText>
     <BasicText size="body-m">-</BasicText>
     <BasicText

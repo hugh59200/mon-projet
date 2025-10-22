@@ -100,7 +100,6 @@
 
   async function handleLogout() {
     await auth.signOut()
-    router.push('/auth/login') // ✅ corrigé
   }
 </script>
 

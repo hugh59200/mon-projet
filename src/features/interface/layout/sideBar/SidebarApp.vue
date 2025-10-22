@@ -47,7 +47,6 @@
   const sidebar = useSidebarStore()
   const { sidebarItems, isReduced } = storeToRefs(sidebar)
 
-  // ✅ Nouveau : ouverture mobile
   const isMobileOpen = ref(false)
   watch(isReduced, () => {
     if (window.innerWidth < 900) isMobileOpen.value = false
@@ -56,7 +55,7 @@
 
 <style scoped lang="less">
   .sidebar {
-    position: relative; /* ✅ elle reste dans la grille */
+    position: relative;
     height: 100%;
     width: 100%;
     background: @secondary-800;
@@ -65,7 +64,9 @@
     flex-direction: column;
     align-items: stretch;
     padding: 20px 0;
-    transition: width 0.3s ease;
+    transition:
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.3s ease;
     box-shadow: inset -1px 0 0 fade(white, 10%);
     box-sizing: border-box;
 
@@ -83,7 +84,7 @@
       flex-direction: column;
       align-items: stretch;
       gap: 6px;
-      padding: 0 12px; // ✅ espace intérieur pour éviter le débordement
+      padding: 0 12px;
       width: 100%;
       box-sizing: border-box;
     }
@@ -103,10 +104,6 @@
       min-height: 42px;
       background: transparent;
       box-sizing: border-box;
-      AppLayout svg {
-        fill: @neutral-100;
-        transition: fill 0.3s ease;
-      }
 
       &:hover {
         background: fade(@neutral-100, 10%);
@@ -121,7 +118,6 @@
       }
     }
 
-    /* Icône à gauche */
     &__icon {
       display: flex;
       align-items: center;
@@ -136,7 +132,6 @@
       }
     }
 
-    /* Label du lien */
     &__label {
       margin-left: 10px;
       white-space: nowrap;
@@ -155,7 +150,6 @@
     opacity: 0;
     transform: translateX(-6px);
   }
-
   .fade-slide-leave-to {
     opacity: 0;
     transform: translateX(-6px);

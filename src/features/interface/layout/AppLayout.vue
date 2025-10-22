@@ -6,10 +6,20 @@
     <HeaderApp class="header" />
     <SidebarApp class="sidebar" />
     <main class="content">
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <transition
+          name="fade-slide"
+          mode="out-in"
+          appear
+        >
+          <component
+            :is="Component"
+            :key="$route.fullPath"
+          />
+        </transition>
+      </RouterView>
     </main>
     <FooterApp class="footer" />
-
     <ToastContainer />
     <SablierComponent />
   </div>
@@ -28,7 +38,7 @@
   const cart = useCartStore()
   const sidebar = useSidebarStore()
 
-  // 🔁 Vider le panier si l’utilisateur se déconnecte
+  // 🔁 Vide le panier à la déconnexion
   supabase.auth.onAuthStateChange((_event, session) => {
     if (!session) cart.items = []
   })
@@ -41,16 +51,17 @@
   .app-grid {
     display: grid;
     grid-template-columns: 240px 1fr;
-    grid-template-rows: 60px auto auto; // ✅ l’auto au centre permet d’adapter la hauteur du contenu
+    grid-template-rows: 60px 1fr auto;
     grid-template-areas:
       'header header'
       'sidebar content'
       'sidebar footer';
-    min-height: 100vh; // ✅ remplace height par min-height
+
+    height: 100vh;
     width: 100vw;
-    overflow: hidden;
     background-color: @neutral-0;
-    gap: 0;
+    overflow: hidden;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1); // 🧠 fluide
   }
 
   /* --- HEADER --- */
@@ -76,35 +87,38 @@
   .content {
     grid-area: content;
     background-color: @neutral-0;
-    padding: 40px 60px 80px; // ✅ ajout du padding bas
+    padding: 40px 60px 80px;
     overflow-y: auto;
     height: 100%;
+    min-height: 0;
+    scroll-behavior: smooth;
   }
+
   /* --- FOOTER --- */
   .footer {
     position: fixed;
     bottom: 0;
-    left: 240px; // largeur sidebar
+    left: 240px;
     right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: @secondary-700;
-    color: white;
-    text-align: center;
-    z-index: 950; // sous le header
-    padding: 0 16px;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 950;
+    height: 30px;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
-  /* 🧩 Si sidebar réduite */
   .app-grid.sidebar-reduced .footer {
     left: 80px;
-    transition: left 0.3s ease;
   }
-  /* --- SIDEBAR RÉDUITE --- */
-  .app-grid.sidebar-reduced {
-    grid-template-columns: 80px 1fr;
-    transition: grid-template-columns 0.3s ease;
+
+  /* ✨ TRANSITION entre pages */
+  .fade-slide-enter-active,
+  .fade-slide-leave-active {
+    transition: all 0.1s cubic-bezier(0.25, 1, 0.5, 1); // 200ms
+  }
+  .fade-slide-enter-from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .fade-slide-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
   }
 </style>

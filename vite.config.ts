@@ -1,14 +1,17 @@
-import { fileURLToPath, URL } from 'node:url'
-import BasicSSL from '@vitejs/plugin-basic-ssl'
-import path from 'path'
 import vue from '@vitejs/plugin-vue'
-import {  defineConfig, type BuildEnvironmentOptions } from 'vite'
-import svgLoader from 'vite-svg-loader'
+import { fileURLToPath, URL } from 'node:url'
+import path from 'path'
+import { defineConfig, type BuildEnvironmentOptions } from 'vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
-import { manualChunksOptimizer, assetFileNameOptimizer } from './vite/chunkOptimizer'
-import { generateGlobalComponents, generateRouteNamesUnion,generateIconsList } from './vite/generator'
+import svgLoader from 'vite-svg-loader'
+import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer'
+import {
+  generateGlobalComponents,
+  generateIconsList,
+  generateRouteNamesUnion,
+} from './vite/generator'
 
-const outDir = 'dist'  // Output directory for the build
+const outDir = 'dist' // Output directory for the build
 const config = {
   APP: {
     outDir,
@@ -33,7 +36,7 @@ export default defineConfig({
     vue(),
     VueDevTools(),
     svgLoader(),
-    BasicSSL(),
+    // BasicSSL(),
   ],
   resolve: {
     alias: {
@@ -43,7 +46,7 @@ export default defineConfig({
     },
   },
   css: {
-        transformer: 'postcss',
+    transformer: 'postcss',
     preprocessorOptions: {
       less: {
         additionalData: `@import "@designSystem/index.less";`,
@@ -53,7 +56,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2500,
     ...config.APP,
-        cssMinify: false, 
+    cssMinify: false,
   },
   server: {
     port: 5278,
