@@ -9,9 +9,11 @@ export type RouteName =
   'cart' |
   'catalogue' |
   'checkout' |
-  'confirmation' |
   'home' |
   'login' |
+  'payment-cancel' |
+  'payment-result' |
+  'payment-success' |
   'product-detail' |
   'profil' |
   'register' |

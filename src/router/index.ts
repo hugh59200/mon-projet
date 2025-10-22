@@ -129,6 +129,24 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/paiement/success',
+    name: 'payment-success',
+    component: () => import('@/pages/PaymentSuccessView.vue'),
+    meta: {
+      title: 'Paiement réussi – Fast Peptides',
+      description: 'Votre paiement a été traité avec succès. Merci pour votre commande !',
+    },
+  },
+  {
+    path: '/paiement/cancel',
+    name: 'payment-cancel',
+    component: () => import('@/pages/PaymentCancelView.vue'),
+    meta: {
+      title: 'Paiement annulé – Fast Peptides',
+      description: 'Votre paiement a été annulé. Vous pouvez réessayer ou modifier votre panier.',
+    },
+  },
+  {
     path: '/admin/orders',
     name: 'admin-orders',
     component: () => import('@/features/admin/OrdersAdminView.vue'),
@@ -174,12 +192,11 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/confirmation/:id',
-    name: 'confirmation',
-    component: () => import('@/features/shop/ConfirmationView.vue'),
+    path: '/confirmation',
+    name: 'payment-result',
+    component: () => import('@/pages/PaymentResultView.vue'),
     meta: {
-      requiresAuth: true,
-      getTitle: (route) => `Confirmation #${route.params.id as string} – Fast Peptides`,
+      title: 'Résultat du paiement – Fast Peptides',
     },
   },
   {

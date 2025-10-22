@@ -1,29 +1,40 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import Stripe from 'https://esm.sh/stripe@13.5.0?target=deno'
 
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
+  apiVersion: '2025-09-30.clover',
+})
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Apikey, x-client-info',
+  'Content-Type': 'application/json',
 }
 
 serve(async (req) => {
-  // ✅ Gérer le prévol CORS proprement
+  // ✅ CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { status: 200, headers: corsHeaders })
   }
 
   try {
-    console.log('➡️ Requête reçue sur create-stripe-session')
+    const body = await req.json().catch(() => null)
+    console.log('🧾 Corps reçu :', body)
 
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
-    if (!stripeKey) throw new Error('STRIPE_SECRET_KEY manquant')
+    if (!body) {
+      console.error('❌ Aucun body JSON reçu !')
+      return new Response(JSON.stringify({ error: 'Request body manquant ou invalide.' }), {
+        status: 400,
+        headers: corsHeaders,
+      })
+    }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: '2024-09-30.acacia' })
-    const { amount, currency = 'eur', email } = await req.json()
+    const { amount, email, orderId } = body
 
-    if (!amount || amount <= 0) {
-      return new Response(JSON.stringify({ error: 'Montant invalide' }), {
+    if (!amount || !email) {
+      console.error('❌ amount et email manquants :', body)
+      return new Response(JSON.stringify({ error: 'amount et email sont requis' }), {
         status: 400,
         headers: corsHeaders,
       })
@@ -32,30 +43,39 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
+      customer_email: email,
       line_items: [
         {
           price_data: {
-            currency,
+            currency: 'eur',
             product_data: { name: 'Commande Fast Peptides' },
             unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
       ],
-      success_url: 'http://localhost:5173/confirmation?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'http://localhost:5173/checkout?canceled=true',
-      customer_email: email || undefined,
+      success_url: 'https://localhost:5278/paiement/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://localhost:5278/paiement/cancel',
+      metadata: { order_id: orderId || 'unknown' },
     })
 
+    console.log('✅ Session Stripe créée :', session.id)
+
     return new Response(
-      JSON.stringify({ success: true, sessionId: session.id, url: session.url }),
+      JSON.stringify({
+        url: session.url,
+        sessionId: session.id,
+        payment_intent_id: session.payment_intent,
+      }),
       { status: 200, headers: corsHeaders },
     )
   } catch (err) {
-    console.error('❌ Erreur Stripe:', err)
-    return new Response(JSON.stringify({ success: false, error: String(err) }), {
-      status: 500,
-      headers: corsHeaders,
-    })
+    console.error('💥 Erreur création session Stripe :', err)
+    return new Response(
+      JSON.stringify({
+        error: err?.message || 'Erreur interne du serveur',
+      }),
+      { status: 500, headers: corsHeaders },
+    )
   }
 })

@@ -1,8 +1,14 @@
-// src/services/paymentService.ts
+// ✅ src/services/paymentService.ts
 import { supabase } from '@/services/supabaseClient'
 
+/**
+ * Types de prestataires de paiement supportés
+ */
 export type PaymentProvider = 'simulation' | 'stripe' | 'crypto'
 
+/**
+ * Structure normalisée d’un paiement
+ */
 export interface PaymentIntent {
   id: string
   amount: number
@@ -13,9 +19,13 @@ export interface PaymentIntent {
   created_at: string
 }
 
+/**
+ * 💳 Fonction principale — lance le paiement selon le provider choisi
+ */
 export async function processPayment(
   amount: number,
   provider: PaymentProvider = 'simulation',
+  email?: string,
 ): Promise<PaymentIntent> {
   console.log(`💳 Paiement via ${provider} pour ${amount} €`)
 
@@ -23,7 +33,7 @@ export async function processPayment(
     case 'simulation':
       return simulatePayment(amount)
     case 'stripe':
-      return createStripeCheckout(amount)
+      return createStripeCheckout(amount, email)
     case 'crypto':
       return createCryptoInvoice(amount)
     default:
@@ -31,11 +41,15 @@ export async function processPayment(
   }
 }
 
-/** 1️⃣ Simulation locale */
+/* -------------------------------------------------------------------------- */
+/* 🧩 1️⃣ Paiement simulé (pour tests)                                         */
+/* -------------------------------------------------------------------------- */
 async function simulatePayment(amount: number): Promise<PaymentIntent> {
+  // Petit délai pour simuler un vrai appel API
   await new Promise((r) => setTimeout(r, 1000))
+
   return {
-    id: `sim-${Math.random().toString(36).substring(2, 10)}`,
+    id: `sim_${Math.random().toString(36).substring(2, 10)}`,
     amount,
     currency: 'EUR',
     status: 'succeeded',
@@ -44,34 +58,52 @@ async function simulatePayment(amount: number): Promise<PaymentIntent> {
   }
 }
 
-/** 2️⃣ Stripe Checkout (via Supabase Edge Function) */
-async function createStripeCheckout(amount: number): Promise<PaymentIntent> {
-  const { data, error } = await supabase.functions.invoke('create-stripe-session', {
-    body: { amount },
-  })
+/* -------------------------------------------------------------------------- */
+/* 💳 2️⃣ Stripe Checkout (via Supabase Edge Function)                        */
+/* -------------------------------------------------------------------------- */
+async function createStripeCheckout(amount: number, email?: string): Promise<PaymentIntent> {
+  try {
+    const { data, error } = await supabase.functions.invoke('create-stripe-session', {
+      body: { amount, currency: 'eur', email },
+    })
 
-  console.log('Stripe session response:', { data, error }) // 👈 ajoute ça
+    console.log('📡 Réponse Stripe:', { data, error })
 
-  if (error || !data) throw new Error(error?.message || 'Erreur Stripe')
+    if (error || !data) {
+      throw new Error(error?.message || 'Erreur de création de session Stripe')
+    }
 
-  return {
-    id: data.sessionId,
-    amount,
-    currency: 'EUR',
-    status: 'pending',
-    provider: 'stripe',
-    checkout_url: data.url,
-    created_at: new Date().toISOString(),
+    // 🚀 Redirection directe vers Stripe Checkout
+    if (data.url) {
+      window.location.href = data.url
+    }
+
+    return {
+      id: data.sessionId,
+      amount,
+      currency: 'EUR',
+      status: 'pending',
+      provider: 'stripe',
+      checkout_url: data.url,
+      created_at: new Date().toISOString(),
+    }
+  } catch (err) {
+    console.error('❌ Erreur Stripe:', err)
+    throw err
   }
 }
 
-/** 3️⃣ Coinbase Commerce ou BTCPay */
+/* -------------------------------------------------------------------------- */
+/* 🪙 3️⃣ Paiement crypto (Coinbase / BTCPay)                                 */
+/* -------------------------------------------------------------------------- */
 async function createCryptoInvoice(amount: number): Promise<PaymentIntent> {
   const { data, error } = await supabase.functions.invoke('create-crypto-invoice', {
     body: { amount },
   })
 
-  if (error || !data) throw new Error(error?.message || 'Erreur création facture crypto')
+  if (error || !data) {
+    throw new Error(error?.message || 'Erreur création facture crypto')
+  }
 
   return {
     id: data.invoiceId,

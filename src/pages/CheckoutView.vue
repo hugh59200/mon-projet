@@ -156,18 +156,16 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
-  import { createFullOrder } from '@/services/orderService'
-  import { processPayment, type PaymentProvider } from '@/services/paymentService'
+  import { type PaymentProvider } from '@/services/paymentService'
+  import { supabase } from '@/services/supabaseClient'
   import { Bitcoin, CreditCard, TestTube } from 'lucide-vue-next'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
-  // --- Stores
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
   const router = useRouter()
-
   const loading = ref(false)
 
   // --- Champs adresse
@@ -177,8 +175,7 @@
   const city = ref('')
   const country = ref('France')
 
-  // --- Modes de paiement
-
+  // --- Méthodes de paiement
   const paymentMethods = [
     {
       label: 'Carte bancaire (Stripe)',
@@ -218,22 +215,7 @@
     loading.value = true
 
     try {
-      // 💳 1️⃣ Paiement selon le mode choisi
-      const payment = await processPayment(cart.totalPrice, selectedPayment.value)
-
-      // 🚀 Si Stripe → redirection externe immédiate
-      if (payment.provider === 'stripe' && payment.checkout_url) {
-        window.location.href = payment.checkout_url
-        return // ✅ Stop ici (ne pas tester succeeded)
-      }
-
-      // 💰 Si simulation → vérifie le statut
-      if (payment.provider === 'simulation' && payment.status !== 'succeeded') {
-        toast.showToast('Paiement simulé échoué ❌', 'danger')
-        return
-      }
-
-      // 📦 2️⃣ Création commande (cas test / crypto)
+      // 1️⃣ Crée une commande "pending"
       const payload = {
         email: auth.user.email,
         full_name: fullName.value,
@@ -244,16 +226,48 @@
         payment_method: selectedPayment.value,
         total_amount: cart.totalPrice,
         items: cart.items,
+        status: 'pending',
       }
 
-      const order = await createFullOrder(payload)
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({ user_id: auth.user.id, ...payload })
+        .select()
+        .single()
 
-      // 🎉 3️⃣ Confirmation
-      toast.showToast('Commande validée ✅', 'success')
-      cart.clearCart()
-      router.push(`/confirmation/${order.id}`)
+      if (orderError || !order) throw orderError
+
+      // 2️⃣ Paiement Stripe
+      if (selectedPayment.value === 'stripe') {
+        const { data, error } = await supabase.functions.invoke('create-stripe-session', {
+          body: {
+            amount: cart.totalPrice,
+            email: auth.user.email,
+            orderId: order.id,
+          },
+        })
+
+        console.log('📦 Payload envoyé :', {
+          amount: cart.totalPrice,
+          email: auth.user.email,
+          orderId: order.id,
+        })
+
+        if (error) {
+          console.error('❌ Erreur Supabase invoke :', error)
+        }
+
+        if (!data?.url) {
+          throw new Error('Erreur lors de la création de la session Stripe.')
+        }
+
+        console.log('✅ Session Stripe créée côté front :', data)
+        window.location.href = data.url
+      }
+      // 3️⃣ Simulation / crypto → autre logique plus tard
+      toast.showToast('Paiement non-Stripe simulé.', 'success')
     } catch (err: any) {
-      console.error(err)
+      console.error('❌ Erreur commande/paiement:', err)
       toast.showToast('Erreur lors du paiement ou de la commande ❌', 'danger')
     } finally {
       loading.value = false

@@ -12,19 +12,25 @@ CREATE TABLE IF NOT EXISTS public.orders (
   country text NOT NULL,
   payment_method text NOT NULL,
   total_amount numeric(10,2) NOT NULL,
-  items jsonb, -- ✅ Ajout pour stocker les produits au format JSON
-  status text DEFAULT 'En attente',
+  items jsonb, -- ✅ Stocke les produits au format JSON
+  status text DEFAULT 'pending', -- ✅ Uniformisé pour correspondre au webhook
   internal_notes text DEFAULT '',
-  carrier text, -- 🚚 Transporteur
-  tracking_number text, -- 🔢 Numéro de suivi
-  shipped_at timestamptz, -- 🕓 Date d’expédition
-  created_at timestamptz DEFAULT now()
+  carrier text,
+  tracking_number text,
+  shipped_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+
+  -- 💳 Stripe : lien avec le paiement
+  payment_intent_id text UNIQUE, -- ✅ lien avec Stripe PaymentIntent
+  stripe_session_id text UNIQUE  -- ✅ pour garder la trace du Checkout Session
 );
 
 -- ✅ Indexes
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders (user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON public.orders (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders (status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_intent_id ON public.orders (payment_intent_id);
 
 -- ✅ RLS
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
@@ -122,8 +128,7 @@ END $$;
 -- =============================
 -- ⚙️ FONCTION : create_full_order()
 -- =============================
--- ✅ Met à jour la fonction existante pour accepter un _status optionnel
-create or replace function create_full_order(
+CREATE OR REPLACE FUNCTION create_full_order(
   _user_id uuid,
   _email text,
   _full_name text,
@@ -134,15 +139,17 @@ create or replace function create_full_order(
   _payment_method text,
   _total_amount numeric,
   _items jsonb,
-  _status text default 'pending'
+  _status text DEFAULT 'pending',
+  _payment_intent_id text DEFAULT NULL,
+  _stripe_session_id text DEFAULT NULL
 )
-returns uuid
-language plpgsql
-as $$
-declare
+RETURNS uuid
+LANGUAGE plpgsql
+AS $$
+DECLARE
   new_order_id uuid;
-begin
-  insert into orders (
+BEGIN
+  INSERT INTO orders (
     user_id,
     email,
     full_name,
@@ -154,9 +161,12 @@ begin
     total_amount,
     items,
     status,
-    created_at
+    payment_intent_id,
+    stripe_session_id,
+    created_at,
+    updated_at
   )
-  values (
+  VALUES (
     _user_id,
     _email,
     _full_name,
@@ -167,15 +177,18 @@ begin
     _payment_method,
     _total_amount,
     _items,
-    _status,       -- 🧩 ici on prend le paramètre dynamique
-    now()
+    _status,
+    _payment_intent_id,
+    _stripe_session_id,
+    NOW(),
+    NOW()
   )
-  returning id into new_order_id;
+  RETURNING id INTO new_order_id;
 
-  return new_order_id;
-end;
+  RETURN new_order_id;
+END;
 $$;
 
--- 🔄 Recharge le schéma PostgREST
-notify pgrst, 'reload schema';
+-- 🔄 Recharge le schéma PostgREST pour l’API
+NOTIFY pgrst, 'reload schema';
 
