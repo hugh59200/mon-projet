@@ -5,35 +5,30 @@
   >
     <HeaderApp class="header" />
     <SidebarApp class="sidebar" />
-
     <main class="content">
-      <!-- ✅ Encapsuler RouterView dans un Suspense -->
-      <Suspense>
-        <template #default>
-          <RouterView v-slot="{ Component }">
-            <transition
-              name="fade-slide"
-              mode="out-in"
-              appear
-            >
-              <component
-                :is="Component"
-                :key="$route.fullPath"
-              />
-            </transition>
-          </RouterView>
-        </template>
-
-        <!-- 🕐 Fallback pendant le chargement -->
-        <template #fallback>
-          <div class="suspense-loading">Chargement du contenu...</div>
-        </template>
-      </Suspense>
+      <RouterView v-slot="{ Component }">
+        <transition
+          name="fade-slide"
+          mode="out-in"
+          appear
+        >
+          <component
+            :is="Component"
+            :key="$route.fullPath"
+            @vue:beforeMount="sablier.debutSablier"
+            @vue:mounted="sablier.finSablier"
+          />
+        </transition>
+      </RouterView>
+      <transition
+        name="fade"
+        appear
+      >
+        <SablierComponent v-if="sablier.estSablierVisible" />
+      </transition>
     </main>
-
     <FooterApp class="footer" />
     <ToastContainer />
-    <SablierComponent />
   </div>
 </template>
 
@@ -44,13 +39,14 @@
   import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
+  import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/services/supabaseClient'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
 
   const cart = useCartStore()
   const sidebar = useSidebarStore()
+  const sablier = useSablierStore()
 
-  // 🔁 Vide le panier à la déconnexion
   supabase.auth.onAuthStateChange((_event, session) => {
     if (!session) cart.items = []
   })
@@ -68,12 +64,11 @@
       'header header'
       'sidebar content'
       'sidebar footer';
-
     height: 100vh;
     width: 100vw;
     background-color: @neutral-0;
     overflow: hidden;
-    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1); // 🧠 fluide
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* --- HEADER --- */
@@ -104,6 +99,7 @@
     height: 100%;
     min-height: 0;
     scroll-behavior: smooth;
+    position: relative;
   }
 
   /* --- FOOTER --- */
@@ -116,14 +112,6 @@
     height: 30px;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
-  .suspense-loading {
-    text-align: center;
-    margin-top: 60px;
-    color: @neutral-600;
-    font-style: italic;
-  }
-
   .app-grid.sidebar-reduced .footer {
     left: 80px;
   }
@@ -131,7 +119,7 @@
   /* ✨ TRANSITION entre pages */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
-    transition: all 0.1s cubic-bezier(0.25, 1, 0.5, 1); // 200ms
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .fade-slide-enter-from {
     opacity: 0;
@@ -140,5 +128,15 @@
   .fade-slide-leave-to {
     opacity: 0;
     transform: translateY(-8px);
+  }
+
+  /* Effet doux sur le sablier */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

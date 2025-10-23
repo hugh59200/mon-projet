@@ -102,20 +102,14 @@
         </div>
       </transition>
     </div>
-
-    <div
-      v-else
-      class="profil__loading"
-    >
-      <BasicText>Chargement du profil...</BasicText>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useAuthStore } from './useAuthStore'
 
   const auth = useAuthStore()
@@ -132,13 +126,12 @@
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
 
+  /* --------------------------------------------- */
+  /* 🔄 Fonctions principales                      */
+  /* --------------------------------------------- */
   async function loadProfile(retry = 0) {
-    if (!auth.user) {
-      console.warn('⚠️ Aucun utilisateur connecté')
-      return
-    }
+    if (!auth.user) return
 
-    console.log('Chargement du profil pour:', auth.user.id)
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -146,33 +139,31 @@
       .maybeSingle()
 
     if (error) {
-      console.error('Erreur profil:', error)
       toast.showToast('Erreur lors du chargement du profil', 'danger')
+      console.error(error)
       return
     }
 
     if (!data && retry < 3) {
-      console.warn('Profil non trouvé, nouvel essai dans 1s...')
       setTimeout(() => loadProfile(retry + 1), 1000)
       return
     }
 
     if (data) {
-      console.log('✅ Profil chargé:', data)
       profile.value = data
       editableName.value = data.full_name ?? ''
       if (data.avatar_url) avatarPreview.value = getPublicUrl(data.avatar_url)
     }
   }
 
-  const { data } = await supabase.auth.getSession()
-  console.log(data.session?.user)
-
   function getPublicUrl(path: string) {
     const { data } = supabase.storage.from('avatars').getPublicUrl(path)
     return data.publicUrl
   }
 
+  /* --------------------------------------------- */
+  /* 🖼️ Upload avatar                              */
+  /* --------------------------------------------- */
   async function uploadAvatar(e: Event) {
     const target = e.target as HTMLInputElement
     if (!target.files?.length || !auth.user) return
@@ -203,19 +194,27 @@
     }
   }
 
+  /* --------------------------------------------- */
+  /* ✏️ Mise à jour du profil                      */
+  /* --------------------------------------------- */
   async function updateProfile() {
     if (!profile.value) return
     loading.value = true
+
     const { error } = await supabase
       .from('profiles')
       .update({ full_name: editableName.value })
       .eq('id', profile.value.id)
+
     loading.value = false
 
     if (error) toast.showToast('Erreur lors de la mise à jour', 'danger')
     else toast.showToast('Profil mis à jour ✅', 'success')
   }
 
+  /* --------------------------------------------- */
+  /* 🔐 Mise à jour du mot de passe                */
+  /* --------------------------------------------- */
   async function updatePassword() {
     if (newPassword.value !== confirmPassword.value) {
       toast.showToast('Les mots de passe ne correspondent pas ❌', 'danger')
@@ -223,11 +222,9 @@
     }
 
     passwordLoading.value = true
-
     const { error } = await supabase.auth.updateUser({
       password: newPassword.value,
     })
-
     passwordLoading.value = false
 
     if (error) toast.showToast(error.message, 'danger')
@@ -238,13 +235,12 @@
     }
   }
 
-  onMounted(async () => {
+  /* --------------------------------------------- */
+  /* 🧠 Initialisation automatique avec sablier     */
+  /* --------------------------------------------- */
+  useAutoSablier(async () => {
     await auth.initAuth()
-    if (auth.user) {
-      await loadProfile()
-    } else {
-      console.warn('Utilisateur non trouvé après initAuth()')
-    }
+    if (auth.user) await loadProfile()
   })
 </script>
 

@@ -1,37 +1,57 @@
-// /src/features/interface/sablier/useSablierStore.ts
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 export const useSablierStore = defineStore('sablier', () => {
   const compteur = ref(0)
-  const estSablierVisible = ref(false)
+  const estVisible = ref(false)
   let timeoutId: number | null = null
+  let graceDelayId: number | null = null
 
-  /** 🔥 Montre le sablier */
+  /** 🔥 Lance le sablier (avec délai d'affichage UX-friendly) */
   function debutSablier() {
     compteur.value++
-    // Affiche immédiatement si première requête
+
+    // 🧠 Si c’est la première requête, on attend un peu avant d’afficher
     if (compteur.value === 1) {
-      if (timeoutId) clearTimeout(timeoutId)
-      estSablierVisible.value = true
+      graceDelayId = window.setTimeout(() => {
+        estVisible.value = true
+      }, 200) // délai d’affichage minimal
     }
   }
 
-  /** 💨 Cache le sablier (après la dernière requête) */
+  /** 💨 Termine le sablier */
   function finSablier() {
     if (compteur.value > 0) compteur.value--
-    // On ne masque que si plus aucune requête active
+
+    // 👇 Quand toutes les requêtes sont finies
     if (compteur.value === 0) {
-      // Laisse un léger délai pour éviter le clignotement
+      // ⛔ Annule l’affichage s’il n’a pas encore commencé
+      if (graceDelayId) {
+        clearTimeout(graceDelayId)
+        graceDelayId = null
+      }
+
+      // ✨ Laisse un léger délai pour fluidifier la disparition
       timeoutId = window.setTimeout(() => {
-        estSablierVisible.value = false
+        estVisible.value = false
       }, 200)
     }
   }
 
+  /** 🧩 Utilitaire pour envelopper une promesse */
+  async function avecSablier<T>(promesse: Promise<T>): Promise<T> {
+    debutSablier()
+    try {
+      return await promesse
+    } finally {
+      finSablier()
+    }
+  }
+
   return {
-    estSablierVisible: computed(() => estSablierVisible.value),
+    estSablierVisible: computed(() => estVisible.value),
     debutSablier,
     finSablier,
+    avecSablier,
   }
 })

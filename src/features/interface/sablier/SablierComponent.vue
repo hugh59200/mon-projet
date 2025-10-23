@@ -3,10 +3,7 @@
     appear
     name="fade"
   >
-    <div
-      class="backdraw"
-      v-if="store.estSablierVisible"
-    >
+    <div class="backdraw">
       <div class="spinner">
         <BasicText
           size="body-xl"
@@ -21,13 +18,7 @@
     </div>
   </transition>
 </template>
-
-<script setup lang="ts">
-  import { useSablierStore } from './useSablierStore'
-
-  const store = useSablierStore()
-</script>
-
+<script setup lang="ts"></script>
 <style lang="less" scoped>
   .backdraw.fade-enter-active {
     transition-delay: 20ms;
