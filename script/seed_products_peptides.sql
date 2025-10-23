@@ -2,6 +2,9 @@
 -- 🧬  SEED DES PRODUITS PEPTIDES (basé sur src/assets/products)
 -- =====================================================
 
+-- 🛡️ Désactivation du RLS pour garantir l’accès public au catalogue
+alter table public.products disable row level security;
+
 -- 1️⃣ Nettoyage : suppression des produits obsolètes
 DELETE FROM public.products
 WHERE name NOT IN (
