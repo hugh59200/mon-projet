@@ -55,22 +55,17 @@
 
       <!-- 🛒 Liste scrollable -->
       <section class="catalogue__list">
+        <!-- 🚫 Aucun produit trouvé -->
         <div
-          v-if="loading"
-          class="catalogue__loading"
-        >
-          <BasicText>Chargement des produits...</BasicText>
-        </div>
-
-        <div
-          v-else-if="filteredProducts.length === 0"
+          v-if="hasLoaded && filteredProducts.length === 0"
           class="catalogue__empty"
         >
           <BasicText>Aucun produit trouvé.</BasicText>
         </div>
 
+        <!-- ✅ Liste -->
         <div
-          v-else
+          v-else-if="filteredProducts.length > 0"
           class="catalogue__grid"
         >
           <ProductCard
@@ -89,9 +84,10 @@
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
+  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   interface Product {
@@ -106,23 +102,34 @@
 
   const cart = useCartStore()
   const toast = useToastStore()
-
   const router = useRouter()
+
   const products = ref<Product[]>([])
   const categories = ref<string[]>([])
-  const loading = ref(true)
   const searchTerm = ref('')
   const selectedCategory = ref('')
   const stockFilter = ref('')
+  const hasLoaded = ref(false) // ✅ fin du chargement logique
 
-  onMounted(async () => {
-    const { data, error } = await supabase.from('products').select('*')
-    if (!error && data) {
-      products.value = data
-      categories.value = [...new Set(data.map((p: Product) => p.category))]
+  async function loadProducts() {
+    try {
+      const { data, error } = await supabase.from('products').select('*')
+      if (error) throw error
+      if (data) {
+        products.value = data
+        categories.value = [...new Set(data.map((p: Product) => p.category))]
+      }
+    } catch (err) {
+      console.error('Erreur chargement catalogue:', err)
+      toast.showToast('Erreur lors du chargement du catalogue', 'danger')
+      products.value = []
+    } finally {
+      hasLoaded.value = true
     }
-    loading.value = false
-  })
+  }
+
+  // 🚀 sablier global automatique
+  useAutoSablier(loadProducts)
 
   const filteredProducts = computed(() => {
     return products.value.filter((p) => {
@@ -130,7 +137,6 @@
       const matchCategory = !selectedCategory.value || p.category === selectedCategory.value
       const matchStock =
         !stockFilter.value || (stockFilter.value === 'available' ? p.stock : !p.stock)
-
       return matchSearch && matchCategory && matchStock
     })
   })
@@ -149,7 +155,7 @@
   .catalogue {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 60px); // occupe tout sous le header
+    height: calc(100vh - 60px);
     overflow: hidden;
 
     &__header {
@@ -159,13 +165,13 @@
       padding: 16px 32px;
       background: white;
       border-bottom: 1px solid @neutral-200;
-      flex-shrink: 0; // ne bouge pas
+      flex-shrink: 0;
     }
 
     &__body {
       display: flex;
       flex: 1;
-      overflow: hidden; // empêche le scroll global
+      overflow: hidden;
     }
 
     &__filters {
@@ -174,7 +180,7 @@
       border-right: 1px solid fade(@neutral-100, 20%);
       padding: 20px;
       flex-shrink: 0;
-      overflow-y: auto; // si trop de filtres
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -188,10 +194,9 @@
       }
     }
 
-    /* ✅ Zone scrollable */
     &__list {
       flex: 1;
-      overflow-y: auto; // seul ce bloc scrolle
+      overflow-y: auto;
       padding: 24px 32px;
       background: @neutral-50;
       display: flex;
@@ -204,7 +209,6 @@
       gap: 24px;
     }
 
-    &__loading,
     &__empty {
       text-align: center;
       padding: 40px;

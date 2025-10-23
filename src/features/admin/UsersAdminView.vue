@@ -18,6 +18,7 @@
       class="admin-users__search"
       @input="handleSearch"
     />
+
     <!-- 📄 Pagination -->
     <BasicPagination
       v-if="store.totalPages > 1"
@@ -33,7 +34,16 @@
       v-if="store.loading"
       class="admin-users__loading"
     >
-      Chargement des utilisateurs...
+      <BasicLoader
+        size="medium"
+        color="primary"
+      />
+      <BasicText
+        size="body-l"
+        color="neutral-500"
+      >
+        Chargement des utilisateurs...
+      </BasicText>
     </div>
 
     <div
@@ -81,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-  import { BasicButton, BasicInput, BasicText } from '@designSystem/components'
+  import { BasicButton, BasicInput, BasicLoader, BasicText } from '@designSystem/components'
   import { onMounted } from 'vue'
   import { useUsersAdminStore } from './useUsersAdminStore'
 
@@ -168,7 +178,12 @@
     }
 
     &__loading {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 60px 0;
       color: @neutral-600;
     }
   }

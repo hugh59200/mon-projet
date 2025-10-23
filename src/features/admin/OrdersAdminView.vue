@@ -54,14 +54,7 @@
 
     <!-- 📋 Liste -->
     <div
-      v-if="loading"
-      class="admin-orders__loading"
-    >
-      <BasicText>Chargement des commandes...</BasicText>
-    </div>
-
-    <div
-      v-else-if="filteredOrders.length === 0"
+      v-if="filteredOrders.length === 0"
       class="admin-orders__empty"
     >
       <BasicText>Aucune commande trouvée.</BasicText>
@@ -135,10 +128,11 @@
 </template>
 
 <script setup lang="ts">
+  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import type { BadgeType } from '@designSystem/index'
-  import { computed, ref, watchEffect } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   type Order = {
     id: string
@@ -150,7 +144,9 @@
     status: string
   }
 
-  // 🧾 Statuts avec libellé + couleur
+  /* -------------------------------------------------------------------------- */
+  /*                                  CONSTANTS                                 */
+  /* -------------------------------------------------------------------------- */
   const STATUSES = [
     { value: 'pending', label: 'En attente', color: 'warning' },
     { value: 'confirmed', label: 'Confirmée', color: 'success' },
@@ -163,8 +159,10 @@
     return STATUSES.find((s) => s.value === value) || { label: value, color: 'neutral' }
   }
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   STATE                                   */
+  /* -------------------------------------------------------------------------- */
   const toast = useToastStore()
-  const loading = ref(true)
   const orders = ref<Order[]>([])
   const search = ref('')
   const sortKey = ref<'created_at_desc' | 'created_at_asc' | 'amount_desc' | 'amount_asc'>(
@@ -175,13 +173,18 @@
   const perPage = 8
   const total = ref(0)
 
+  /* -------------------------------------------------------------------------- */
+  /*                                LOAD ORDERS                                */
+  /* -------------------------------------------------------------------------- */
   async function loadOrders() {
-    loading.value = true
     let query = supabase.from('orders').select('*', { count: 'exact' })
+
     if (statusFilter.value) query = query.eq('status', statusFilter.value)
+
     const from = (page.value - 1) * perPage
     const to = from + perPage - 1
     query = query.range(from, to)
+
     switch (sortKey.value) {
       case 'created_at_asc':
         query = query.order('created_at', { ascending: true })
@@ -197,6 +200,7 @@
     }
 
     const { data, count, error } = await query
+
     if (error) {
       toast.showToast('Erreur lors du chargement des commandes', 'danger')
       console.error(error)
@@ -204,11 +208,26 @@
       orders.value = (data ?? []) as Order[]
       total.value = count ?? 0
     }
-    loading.value = false
   }
 
-  watchEffect(loadOrders)
+  /* -------------------------------------------------------------------------- */
+  /*                                WATCHERS                                   */
+  /* -------------------------------------------------------------------------- */
+  // 🧠 Recharge dès qu’un filtre ou tri change
+  watch([page, sortKey, statusFilter], async () => {
+    await loadOrders()
+  })
 
+  /* -------------------------------------------------------------------------- */
+  /*                            🧠 Chargement initial                           */
+  /* -------------------------------------------------------------------------- */
+  useAutoSablier(async () => {
+    await loadOrders()
+  })
+
+  /* -------------------------------------------------------------------------- */
+  /*                                UTILITAIRES                                */
+  /* -------------------------------------------------------------------------- */
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
       day: '2-digit',
@@ -228,6 +247,9 @@
     )
   })
 
+  /* -------------------------------------------------------------------------- */
+  /*                              UPDATE STATUS                                 */
+  /* -------------------------------------------------------------------------- */
   async function updateStatus(order: Order) {
     const { error } = await supabase
       .from('orders')
@@ -239,7 +261,6 @@
       return
     }
 
-    // 📤 Envoi du mail via Edge Function
     try {
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
@@ -259,7 +280,6 @@
       )
 
       const result = await res.json()
-
       if (result.success) {
         toast.showToast(`Statut mis à jour et email envoyé 📧`, 'success')
       } else {
@@ -271,7 +291,9 @@
     }
   }
 
-  /** 🧾 Export CSV */
+  /* -------------------------------------------------------------------------- */
+  /*                                 EXPORT CSV                                 */
+  /* -------------------------------------------------------------------------- */
   function exportCsv() {
     if (orders.value.length === 0) {
       toast.showToast('Aucune commande à exporter', 'warning')
@@ -370,7 +392,6 @@
       gap: 8px;
     }
 
-    &__loading,
     &__empty {
       text-align: center;
       padding: 40px;

@@ -11,6 +11,7 @@
         >
           {{ messageTitle }}
         </BasicText>
+
         <BasicText
           color="neutral-500"
           size="body-s"
@@ -18,22 +19,23 @@
           {{ messageSubtitle }}
         </BasicText>
 
-        <div
-          class="callback__loader"
-          v-if="loading"
-        >
-          <BasicLoader
-            size="large"
-            color="primary"
+        <transition name="fade">
+          <div
+            v-if="loading"
+            class="callback__loader"
+          >
+            <BasicLoader
+              size="large"
+              color="primary"
+            />
+          </div>
+          <BasicButton
+            v-else
+            label="Retour à la connexion"
+            type="primary"
+            @click="router.push('/auth/login')"
           />
-        </div>
-
-        <BasicButton
-          v-else
-          label="Retour à la connexion"
-          type="primary"
-          @click="router.push('/auth/login')"
-        />
+        </transition>
       </div>
     </div>
   </transition>
@@ -54,6 +56,9 @@
   const messageTitle = ref('Connexion sécurisée en cours 🔐')
   const messageSubtitle = ref('Fast Peptides vérifie votre compte, un instant…')
 
+  // petite fonction utilitaire pour un délai fluide
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
   onMounted(async () => {
     try {
       const { data, error } = await supabase.auth.getSession()
@@ -63,19 +68,19 @@
         auth.user = data.session.user
         await auth.initAuth()
 
-        // 🧭 Récupère redirection depuis sessionStorage ou query
         const savedRedirect = sessionStorage.getItem('redirectAfterOAuth')
-        sessionStorage.removeItem('redirectAfterOAuth') // nettoyage
+        sessionStorage.removeItem('redirectAfterOAuth')
 
         const redirect =
           savedRedirect || (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/profil')
 
-        // ⏳ petite pause + fade out avant redirection
         messageTitle.value = 'Connexion réussie ✅'
         messageSubtitle.value = 'Redirection vers votre espace...'
-        await new Promise((resolve) => setTimeout(resolve, 400))
+
+        await wait(400)
         visible.value = false
-        await new Promise((resolve) => setTimeout(resolve, 400))
+        await wait(400)
+
         router.replace(redirect)
       } else {
         throw new Error('Aucune session trouvée.')
@@ -108,7 +113,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px; // 👈 espacement doux entre éléments
+      gap: 16px;
       opacity: 0;
       animation: fadeIn 0.5s ease forwards;
     }
@@ -121,18 +126,16 @@
     }
   }
 
-  /* Animation fade transition */
+  /* --- Transitions --- */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.4s ease;
   }
-
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
   }
 
-  /* Animation apparition carte */
   @keyframes fadeIn {
     from {
       transform: translateY(12px);

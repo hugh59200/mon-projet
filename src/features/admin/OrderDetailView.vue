@@ -138,27 +138,20 @@
         />
       </div>
     </div>
-
-    <div
-      v-if="loading"
-      class="order-detail__loading"
-    >
-      <BasicText>Chargement des informations...</BasicText>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import type { BadgeType } from '@designSystem/index'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()
   const toast = useToastStore()
   const order = ref<any>(null)
-  const loading = ref(true)
   const loadingShipment = ref(false)
   const loadingStatus = ref(false)
   const carrier = ref('')
@@ -180,10 +173,13 @@
     return (STATUSES.find((s) => s.value === value)?.color || 'neutral') as BadgeType
   }
 
+  /* -------------------------------------------------------------------------- */
+  /*                            🔄 Chargement de commande                       */
+  /* -------------------------------------------------------------------------- */
   async function loadOrder() {
-    loading.value = true
     const id = route.params.id
     const { data, error } = await supabase.from('orders').select('*').eq('id', id).single()
+
     if (error) {
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
       console.error(error)
@@ -198,11 +194,11 @@
         order.value.items = []
       }
     }
-    loading.value = false
   }
 
-  onMounted(loadOrder)
-
+  /* -------------------------------------------------------------------------- */
+  /*                            ⚙️ Actions                                     */
+  /* -------------------------------------------------------------------------- */
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
       day: '2-digit',
@@ -315,6 +311,13 @@
       loadingShipment.value = false
     }
   }
+
+  /* -------------------------------------------------------------------------- */
+  /*                     🧠 Chargement automatique avec sablier                 */
+  /* -------------------------------------------------------------------------- */
+  useAutoSablier(async () => {
+    await loadOrder()
+  })
 </script>
 
 <style scoped lang="less">

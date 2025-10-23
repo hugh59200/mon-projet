@@ -192,14 +192,6 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/confirmation',
-    name: 'payment-result',
-    component: () => import('@/pages/PaymentResultView.vue'),
-    meta: {
-      title: 'Résultat du paiement – Fast Peptides',
-    },
-  },
-  {
     path: '/admin/users',
     name: 'admin-users',
     component: () => import('@/features/admin/UsersAdminView.vue'),

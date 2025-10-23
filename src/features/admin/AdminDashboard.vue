@@ -1,151 +1,123 @@
 <template>
-  <transition
-    v-if="loading"
-    name="fade"
-  >
-    <div
-      key="loading"
-      class="loading"
+  <div class="admin-dashboard">
+    <BasicText
+      size="h4"
+      weight="bold"
     >
-      <BasicLoader
-        size="large"
-        color="primary"
-      />
-      <BasicText
-        size="body-s"
-        color="neutral-500"
-      >
-        Chargement des données...
-      </BasicText>
-    </div>
-  </transition>
+      Tableau de bord administrateur
+    </BasicText>
 
-  <transition
-    v-else
-    name="fade"
-  >
-    <div
-      key="dashboard"
-      class="admin-dashboard"
-    >
+    <!-- 📊 Statistiques globales -->
+    <div class="admin-dashboard__stats">
+      <div
+        class="stat-card"
+        v-for="stat in statCards"
+        :key="stat.label"
+      >
+        <p class="label">{{ stat.label }}</p>
+        <p class="value">{{ stat.value }}</p>
+      </div>
+    </div>
+
+    <!-- 📈 Graphique revenus -->
+    <div class="chart-section">
       <BasicText
-        size="h4"
+        size="h5"
         weight="bold"
       >
-        Tableau de bord administrateur
+        Revenus des 7 derniers jours
+      </BasicText>
+      <Bar
+        :data="chartDataRevenue"
+        :options="chartOptions"
+      />
+    </div>
+
+    <!-- 📊 Graphique commandes -->
+    <div class="chart-section">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        Commandes des 7 derniers jours
+      </BasicText>
+      <Bar
+        :data="chartDataOrders"
+        :options="chartOptionsOrders"
+      />
+    </div>
+
+    <!-- 🏆 Top clients -->
+    <div class="chart-section top-clients">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        🏆 Top 5 clients
       </BasicText>
 
-      <!-- 📊 Statistiques globales -->
-      <div class="admin-dashboard__stats">
-        <div
-          class="stat-card"
-          v-for="stat in statCards"
-          :key="stat.label"
-        >
-          <p class="label">{{ stat.label }}</p>
-          <p class="value">{{ stat.value }}</p>
-        </div>
-      </div>
-
-      <!-- 📈 Graphique revenus -->
-      <div class="chart-section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Revenus des 7 derniers jours
-        </BasicText>
-        <Bar
-          :data="chartDataRevenue"
-          :options="chartOptions"
-        />
-      </div>
-
-      <!-- 📊 Graphique commandes -->
-      <div class="chart-section">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Commandes des 7 derniers jours
-        </BasicText>
-        <Bar
-          :data="chartDataOrders"
-          :options="chartOptionsOrders"
-        />
-      </div>
-
-      <!-- 🏆 Top clients -->
-      <div class="chart-section top-clients">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          🏆 Top 5 clients
-        </BasicText>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Commandes</th>
-              <th>Total dépensé (€)</th>
-              <th>Dernière commande</th>
-              <th>Contact</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="client in topClients"
-              :key="client.id"
-            >
-              <td class="client-cell">
-                <img
-                  v-if="client.avatar_url"
-                  :src="client.avatar_url"
-                  alt="avatar"
-                  class="avatar"
-                />
-                <span>{{ client.name }}</span>
-              </td>
-              <td>{{ client.orders }}</td>
-              <td>{{ client.total.toFixed(2) }}</td>
-              <td>{{ formatDate(client.last_order) }}</td>
-              <td>
-                <a
-                  v-if="client.email"
-                  class="contact-link"
-                  :href="`mailto:${client.email}`"
-                  title="Contacter le client"
-                >
-                  📧 Envoyer un mail
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 🧭 Navigation -->
-      <div class="admin-dashboard__cards">
-        <BasicButton
-          label="👤 Gérer les utilisateurs"
-          type="primary"
-          size="large"
-          @click="$router.push('/admin/users')"
-        />
-        <BasicButton
-          label="📦 Gérer les commandes"
-          type="secondary"
-          size="large"
-          @click="$router.push('/admin/orders')"
-        />
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Commandes</th>
+            <th>Total dépensé (€)</th>
+            <th>Dernière commande</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="client in topClients"
+            :key="client.id"
+          >
+            <td class="client-cell">
+              <img
+                v-if="client.avatar_url"
+                :src="client.avatar_url"
+                alt="avatar"
+                class="avatar"
+              />
+              <span>{{ client.name }}</span>
+            </td>
+            <td>{{ client.orders }}</td>
+            <td>{{ client.total.toFixed(2) }}</td>
+            <td>{{ formatDate(client.last_order) }}</td>
+            <td>
+              <a
+                v-if="client.email"
+                class="contact-link"
+                :href="`mailto:${client.email}`"
+                title="Contacter le client"
+              >
+                📧 Envoyer un mail
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </transition>
+
+    <!-- 🧭 Navigation -->
+    <div class="admin-dashboard__cards">
+      <BasicButton
+        label="👤 Gérer les utilisateurs"
+        type="primary"
+        size="large"
+        @click="$router.push('/admin/users')"
+      />
+      <BasicButton
+        label="📦 Gérer les commandes"
+        type="secondary"
+        size="large"
+        @click="$router.push('/admin/orders')"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { supabase } from '@/services/supabaseClient'
   import {
     BarElement,
@@ -156,14 +128,11 @@
     Title,
     Tooltip,
   } from 'chart.js'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { Bar } from 'vue-chartjs'
 
   ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   TYPES                                   */
-  /* -------------------------------------------------------------------------- */
   interface ChartDataset {
     label: string
     backgroundColor: string
@@ -189,26 +158,23 @@
   /* -------------------------------------------------------------------------- */
   /*                                   STATE                                   */
   /* -------------------------------------------------------------------------- */
-  const loading = ref(true)
   const stats = ref({
     total_orders: 0,
     total_revenue: 0,
     shipped_orders: 0,
     pending_orders: 0,
   })
+
   const chartDataRevenue = ref<ChartData>({
     labels: [],
     datasets: [{ label: 'Revenus (€)', backgroundColor: '#00796b', data: [], borderRadius: 6 }],
   })
+
   const chartDataOrders = ref<ChartData>({
     labels: [],
     datasets: [{ label: 'Commandes', backgroundColor: '#ffa726', data: [], borderRadius: 6 }],
   })
-  const topClients = ref<TopClient[]>([])
 
-  /* -------------------------------------------------------------------------- */
-  /*                                  OPTIONS                                  */
-  /* -------------------------------------------------------------------------- */
   const chartOptions = {
     responsive: true,
     plugins: { legend: { display: false } },
@@ -217,6 +183,7 @@
       y: { beginAtZero: true, ticks: { color: '#555', callback: (v: any) => `${v} €` } },
     },
   }
+
   const chartOptionsOrders = {
     responsive: true,
     plugins: { legend: { display: false } },
@@ -225,6 +192,8 @@
       y: { beginAtZero: true, ticks: { color: '#555', callback: (v: any) => `${v} commandes` } },
     },
   }
+
+  const topClients = ref<TopClient[]>([])
 
   /* -------------------------------------------------------------------------- */
   /*                              COMPUTED STATS                               */
@@ -323,15 +292,15 @@
 
   async function loadTopClients() {
     const { data, error } = await supabase.from('orders').select(`
-      user_id,
-      total_amount,
-      created_at,
-      profiles!inner (
-        full_name,
-        email,
-        avatar_url
-      )
-    `)
+    user_id,
+    total_amount,
+    created_at,
+    profiles!inner (
+      full_name,
+      email,
+      avatar_url
+    )
+  `)
 
     if (error) {
       console.error('Erreur Supabase :', error)
@@ -386,26 +355,14 @@
   }
 
   /* -------------------------------------------------------------------------- */
-  /*                                 LIFECYCLE                                 */
+  /*                            🧠 Initialisation auto                           */
   /* -------------------------------------------------------------------------- */
-  onMounted(async () => {
-    loading.value = true
-    await loadStats()
-    await loadWeeklyData()
-    await loadTopClients()
-    loading.value = false
+  useAutoSablier(async () => {
+    await Promise.all([loadStats(), loadWeeklyData(), loadTopClients()])
   })
 </script>
 
 <style scoped lang="less">
-  .loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    gap: 12px;
-  }
   .admin-dashboard {
     max-width: 900px;
     margin: 50px auto;

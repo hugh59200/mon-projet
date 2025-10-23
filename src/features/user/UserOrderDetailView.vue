@@ -8,7 +8,6 @@
         size="small"
         @click="$router.push('/profil/commandes')"
       />
-
       <BasicText
         size="h4"
         weight="bold"
@@ -17,25 +16,9 @@
       </BasicText>
     </div>
 
-    <!-- 🕐 Chargement -->
+    <!-- ✅ Contenu principal -->
     <div
-      v-if="loading"
-      class="user-order-detail__loading"
-    >
-      <BasicText>Chargement de la commande...</BasicText>
-    </div>
-
-    <!-- 🚫 Introuvable -->
-    <div
-      v-else-if="!order"
-      class="user-order-detail__empty"
-    >
-      <BasicText>Commande introuvable.</BasicText>
-    </div>
-
-    <!-- ✅ Contenu -->
-    <div
-      v-else
+      v-if="order"
       class="user-order-detail__content"
     >
       <section class="user-order-detail__section">
@@ -107,6 +90,14 @@
         </table>
       </section>
     </div>
+
+    <!-- 🚫 Erreur affichée uniquement après chargement -->
+    <div
+      v-else-if="hasLoaded"
+      class="user-order-detail__empty"
+    >
+      <BasicText>Commande introuvable.</BasicText>
+    </div>
   </div>
 </template>
 
@@ -114,8 +105,9 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useAutoSablier } from '../interface/sablier/useAutoSablier'
 
   type Order = {
     id: string
@@ -134,27 +126,39 @@
   const route = useRoute()
   const auth = useAuthStore()
   const toast = useToastStore()
-
-  const loading = ref(true)
   const order = ref<Order | null>(null)
+  const hasLoaded = ref(false) // ✅ indique la fin du chargement logique
 
   async function loadOrder() {
-    loading.value = true
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', route.params.id)
-      .eq('email', auth.user?.email)
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', route.params.id)
+        .eq('email', auth.user?.email)
+        .single()
 
-    if (error) {
-      console.error(error)
-      toast.showToast('Erreur lors du chargement de la commande', 'danger')
-    } else {
+      if (error) {
+        // Cas spécifique : commande inexistante
+        if (error.code === 'PGRST116') {
+          order.value = null
+          return
+        }
+        throw error
+      }
+
       order.value = data as Order
+    } catch (err) {
+      console.error('Erreur lors du chargement de la commande:', err)
+      toast.showToast('Erreur lors du chargement de la commande', 'danger')
+      order.value = null
+    } finally {
+      hasLoaded.value = true // ✅ fin du chargement logique
     }
-    loading.value = false
   }
+
+  // 🕐 sablier global auto
+  useAutoSablier(loadOrder)
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
@@ -182,8 +186,6 @@
         return 'neutral'
     }
   }
-
-  onMounted(loadOrder)
 </script>
 
 <style scoped lang="less">
@@ -192,8 +194,8 @@
     margin: 50px auto;
     display: flex;
     flex-direction: column;
-    gap: 32px; // ✅ espace vertical entre header et sections
-    padding: 0 20px 100px; // espace bas pour le scroll
+    gap: 32px;
+    padding: 0 20px 100px;
     overflow-y: auto;
     min-height: calc(100vh - 120px);
 
@@ -209,7 +211,7 @@
     &__content {
       display: flex;
       flex-direction: column;
-      gap: 24px; // ✅ espace entre chaque bloc de section
+      gap: 24px;
     }
 
     &__section {
@@ -245,10 +247,10 @@
       }
     }
 
-    &__loading,
     &__empty {
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
+      color: @neutral-500;
     }
 
     @media (max-width: 768px) {

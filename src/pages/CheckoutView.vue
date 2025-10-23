@@ -145,8 +145,7 @@
       width="full"
       size="large"
       class="checkout__submit"
-      :disabled="loading || cart.items.length === 0"
-      :loading="loading"
+      :disabled="cart.items.length === 0"
       @click="submitOrder"
     />
   </div>
@@ -155,6 +154,7 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/cart/useCartStore'
+  import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { type PaymentProvider } from '@/services/paymentService'
   import { supabase } from '@/services/supabaseClient'
@@ -166,7 +166,7 @@
   const cart = useCartStore()
   const toast = useToastStore()
   const router = useRouter()
-  const loading = ref(false)
+  const { withSablier } = useManualSablier()
 
   // --- Champs adresse
   const fullName = ref(auth.profile?.full_name || '')
@@ -199,79 +199,66 @@
 
   const selectedPayment = ref<PaymentProvider>('simulation')
 
-  // --- Validation finale
   async function submitOrder() {
-    if (!auth.user) {
-      toast.showToast('Veuillez vous connecter pour finaliser la commande.', 'danger')
-      router.push('/auth/login')
-      return
-    }
-
-    if (cart.items.length === 0) {
-      toast.showToast('Votre panier est vide.', 'warning')
-      return
-    }
-
-    loading.value = true
-
-    try {
-      // 1️⃣ Crée une commande "pending"
-      const payload = {
-        email: auth.user.email,
-        full_name: fullName.value,
-        address: address.value,
-        zip: zip.value,
-        city: city.value,
-        country: country.value,
-        payment_method: selectedPayment.value,
-        total_amount: cart.totalPrice,
-        items: cart.items,
-        status: 'pending',
+    await withSablier(async () => {
+      if (!auth.user) {
+        toast.showToast('Veuillez vous connecter pour finaliser la commande.', 'danger')
+        router.push('/auth/login')
+        return
       }
 
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({ user_id: auth.user.id, ...payload })
-        .select()
-        .single()
+      if (cart.items.length === 0) {
+        toast.showToast('Votre panier est vide.', 'warning')
+        return
+      }
 
-      if (orderError || !order) throw orderError
-
-      // 2️⃣ Paiement Stripe
-      if (selectedPayment.value === 'stripe') {
-        const { data, error } = await supabase.functions.invoke('create-stripe-session', {
-          body: {
-            amount: cart.totalPrice,
-            email: auth.user.email,
-            orderId: order.id,
-          },
-        })
-
-        console.log('📦 Payload envoyé :', {
-          amount: cart.totalPrice,
+      try {
+        // 1️⃣ Crée une commande "pending"
+        const payload = {
           email: auth.user.email,
-          orderId: order.id,
-        })
-
-        if (error) {
-          console.error('❌ Erreur Supabase invoke :', error)
+          full_name: fullName.value,
+          address: address.value,
+          zip: zip.value,
+          city: city.value,
+          country: country.value,
+          payment_method: selectedPayment.value,
+          total_amount: cart.totalPrice,
+          items: cart.items,
+          status: 'pending',
         }
 
-        if (!data?.url) {
-          throw new Error('Erreur lors de la création de la session Stripe.')
-        }
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert({ user_id: auth.user.id, ...payload })
+          .select()
+          .single()
 
-        console.log('✅ Session Stripe créée côté front :', data)
-        window.location.href = data.url
+        if (orderError || !order) throw orderError
+
+        // 2️⃣ Paiement Stripe
+        if (selectedPayment.value === 'stripe') {
+          const { data, error } = await supabase.functions.invoke('create-stripe-session', {
+            body: {
+              amount: cart.totalPrice,
+              email: auth.user.email,
+              orderId: order.id,
+            },
+          })
+
+          if (error || !data?.url)
+            throw new Error('Erreur lors de la création de la session Stripe.')
+          window.location.href = data.url
+        } else {
+          // 3️⃣ Simulation ou crypto
+          toast.showToast('Paiement non-Stripe simulé.', 'success')
+          cart.clearCart()
+          router.push('/profil/commandes')
+        }
+      } catch (err: any) {
+        console.error('❌ Erreur commande/paiement:', err)
+        toast.showToast('Erreur lors du paiement ou de la commande ❌', 'danger')
       }
-      // 3️⃣ Simulation / crypto → autre logique plus tard
-      toast.showToast('Paiement non-Stripe simulé.', 'success')
-    } catch (err: any) {
-      console.error('❌ Erreur commande/paiement:', err)
-      toast.showToast('Erreur lors du paiement ou de la commande ❌', 'danger')
-    } finally {
-      loading.value = false
-    }
+    })
   }
 </script>
 
@@ -282,7 +269,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 0 20px 100px; // ✅ espace en bas pour éviter chevauchement par le footer
+    padding: 0 20px 100px;
     box-sizing: border-box;
 
     &__title {
@@ -378,9 +365,6 @@
       }
     }
 
-    /* ✅ Bouton toujours visible */
-
-    /* Mobile friendly */
     @media (max-width: 700px) {
       &__row {
         flex-direction: column;

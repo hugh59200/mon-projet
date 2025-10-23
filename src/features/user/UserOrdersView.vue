@@ -8,17 +8,9 @@
       Mes commandes
     </BasicText>
 
-    <!-- 📦 Chargement -->
+    <!-- 🚫 Aucun résultat (uniquement après chargement complet) -->
     <div
-      v-if="loading"
-      class="user-orders__loading"
-    >
-      <BasicText>Chargement de vos commandes...</BasicText>
-    </div>
-
-    <!-- 🚫 Aucun résultat -->
-    <div
-      v-else-if="orders.length === 0"
+      v-if="hasLoaded && orders.length === 0"
       class="user-orders__empty"
     >
       <BasicText>Vous n’avez encore passé aucune commande.</BasicText>
@@ -31,9 +23,9 @@
       />
     </div>
 
-    <!-- ✅ Liste -->
+    <!-- ✅ Liste des commandes -->
     <div
-      v-else
+      v-else-if="orders.length > 0"
       class="user-orders__list"
     >
       <div
@@ -53,6 +45,7 @@
           <BasicText>Total : {{ order.total_amount.toFixed(2) }} €</BasicText>
           <BasicText>Méthode : {{ order.payment_method }}</BasicText>
         </div>
+
         <BasicButton
           label="Voir les détails"
           type="secondary"
@@ -69,7 +62,8 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
+  import { useAutoSablier } from '../interface/sablier/useAutoSablier'
 
   type Order = {
     id: string
@@ -83,26 +77,36 @@
   const auth = useAuthStore()
   const toast = useToastStore()
   const orders = ref<Order[]>([])
-  const loading = ref(true)
+  const hasLoaded = ref(false) // ✅ indique la fin du chargement logique
 
   async function loadUserOrders() {
-    if (!auth.user) return
+    try {
+      if (!auth.user) {
+        orders.value = []
+        hasLoaded.value = true
+        return
+      }
 
-    loading.value = true
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('email', auth.user.email)
-      .order('created_at', { ascending: false })
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('email', auth.user.email)
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error(error)
-      toast.showToast('Erreur lors du chargement de vos commandes', 'danger')
-    } else {
+      if (error) throw error
+
       orders.value = (data ?? []) as Order[]
+    } catch (err) {
+      console.error('Erreur lors du chargement des commandes:', err)
+      toast.showToast('Erreur lors du chargement de vos commandes', 'danger')
+      orders.value = []
+    } finally {
+      hasLoaded.value = true // ✅ fin du chargement logique
     }
-    loading.value = false
   }
+
+  // 🕐 sablier global automatique
+  useAutoSablier(loadUserOrders)
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
@@ -130,8 +134,6 @@
         return 'neutral'
     }
   }
-
-  onMounted(loadUserOrders)
 </script>
 
 <style scoped lang="less">
@@ -147,7 +149,6 @@
       text-align: center;
     }
 
-    &__loading,
     &__empty {
       text-align: center;
       padding: 40px;
@@ -167,6 +168,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: 0 2px 6px fade(@neutral-400, 8%);
     }
 
     &__header {
@@ -182,31 +184,8 @@
       color: @neutral-700;
     }
 
-    &__details {
-      margin-top: 10px;
-
-      summary {
-        cursor: pointer;
-        font-weight: bold;
-        color: @primary-700;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 6px;
-
-        th,
-        td {
-          padding: 6px 8px;
-          text-align: left;
-          border-bottom: 1px solid @neutral-200;
-        }
-
-        th {
-          background: @neutral-50;
-        }
-      }
+    @media (max-width: 768px) {
+      padding: 0 10px;
     }
   }
 </style>
