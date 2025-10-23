@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
     meta: {
       label: 'Accueil',
-      icon: 'home',
+      icon: 'Home',
       order: 1,
       title: 'Accueil – Fast Peptides',
       description:
@@ -90,7 +90,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       label: 'Catalogue',
-      icon: 'folder-open',
+      icon: 'Boxes',
       order: 2,
       title: 'Catalogue – Fast Peptides',
       description: 'Explorez notre catalogue complet de peptides de recherche de haute qualité.',

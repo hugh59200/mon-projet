@@ -14,7 +14,7 @@ declare module 'vue' {
     BasicDropdownItem: (typeof import('@designSystem/components/basic/dropdownItem/BasicDropdownItem.vue'))['default']
     BasicDropdownMultiple: (typeof import('@designSystem/components/basic/dropdownMultiple/BasicDropdownMultiple.vue'))['default']
     BasicHint: (typeof import('@designSystem/components/basic/hint/BasicHint.vue'))['default']
-    BasicIcon: (typeof import('@designSystem/components/basic/icon/BasicIcon.vue'))['default']
+    BasicIconNext: (typeof import('@designSystem/components/basic/icon/BasicIconNext.vue'))['default']
     BasicIconTitleCard: (typeof import('@designSystem/components/basic/iconTitle/BasicIconTitleCard.vue'))['default']
     BasicInput: (typeof import('@designSystem/components/basic/input/BasicInput.vue'))['default']
     BasicInputDate: (typeof import('@designSystem/components/basic/inputDate/BasicInputDate.vue'))['default']

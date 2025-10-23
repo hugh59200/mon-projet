@@ -14,7 +14,7 @@
         @click="isMobileOpen = false"
       >
         <div class="sidebar__icon">
-          <BasicIcon
+          <BasicIconNext
             :name="item.icon"
             :active="isActive"
           />

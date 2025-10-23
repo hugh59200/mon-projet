@@ -19,6 +19,7 @@ declare module 'vue' {
     BasicDropdownMultiple: typeof import('./../designSystem/src/components/basic/dropdownMultiple/BasicDropdownMultiple.vue')['default']
     BasicHint: typeof import('./../designSystem/src/components/basic/hint/BasicHint.vue')['default']
     BasicIcon: typeof import('./../designSystem/src/components/basic/icon/BasicIcon.vue')['default']
+    BasicIconNext: typeof import('./../designSystem/src/components/basic/icon/BasicIconNext.vue')['default']
     BasicIconTitleCard: typeof import('./../designSystem/src/components/basic/iconTitle/BasicIconTitleCard.vue')['default']
     BasicInput: typeof import('./../designSystem/src/components/basic/input/BasicInput.vue')['default']
     BasicInputDate: typeof import('./../designSystem/src/components/basic/inputDate/BasicInputDate.vue')['default']

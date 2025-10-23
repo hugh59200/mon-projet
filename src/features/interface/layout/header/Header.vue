@@ -1,12 +1,23 @@
 <template>
   <nav class="auth-navbar">
     <div class="auth-navbar__left">
-      <BasicIcon
-        :name="isReduced ? 'menu-grid-reduced' : 'menu-grid'"
-        active
+      <BasicIconNext
+        :name="isReduced ? 'LayoutGrid' : 'Menu'"
         pointer
         @click="toggle"
       />
+
+      <div
+        class="logo-icon"
+        @click="router.push('/')"
+      >
+        <img
+          src="@/assets/logo-app.png"
+          alt="Logo Fast Peptides"
+          class="logo-img"
+        />
+      </div>
+
       <BasicText
         size="body-l"
         weight="bold"
@@ -115,7 +126,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 24px;
-    background-color: @secondary-800;
+    // background-color: @secondary-800;
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -142,6 +153,26 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+  }
+
+  .logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 0.25s ease;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
     }
   }
 </style>

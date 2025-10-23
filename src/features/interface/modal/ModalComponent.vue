@@ -20,18 +20,18 @@
           <slot name="header"></slot>
         </BasicText>
 
-        <BasicIcon
+        <BasicIconNext
           v-if="closable"
-          name="close-square"
+          name="X"
           @click="closeModal"
           pointer
         />
       </div>
 
       <div class="modal__content">
-        <BasicIcon
+        <BasicIconNext
           v-if="closable && !$slots.header"
-          name="close-square"
+          name="X"
           @click="closeModal"
           pointer
         />

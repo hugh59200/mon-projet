@@ -59,9 +59,9 @@
           :key="cat.label"
           class="home__card"
         >
-          <BasicIcon
-            name="adherent"
-            size="40"
+          <BasicIconNext
+            :name="cat.icon"
+            :size="40"
           />
           <BasicText weight="bold">{{ cat.label }}</BasicText>
           <BasicText
@@ -90,9 +90,9 @@
           :key="q.text"
           class="home__quality-item"
         >
-          <BasicIcon
-            name="prestataire"
-            size="28"
+          <BasicIconNext
+            :name="q.icon"
+            :size="28"
             color="primary-600"
           />
           <BasicText>{{ q.text }}</BasicText>
@@ -120,37 +120,48 @@
 </template>
 
 <script setup lang="ts">
+  import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
 
-  const categories = ref([
+  interface Category {
+    icon: IconNameNext
+    label: string
+    desc: string
+  }
+
+  interface QualityItem {
+    icon: IconNameNext
+    text: string
+  }
+
+  const categories = ref<Category[]>([
     {
-      icon: 'flask',
+      icon: 'FlaskRound',
       label: 'Peptides de performance',
       desc: 'GHK-Cu, BPC-157, CJC-1295 et plus',
     },
     {
-      icon: 'dna',
+      icon: 'Dna',
       label: 'Peptides de récupération',
       desc: 'Optimisez votre récupération musculaire et articulaire',
     },
     {
-      icon: 'microscope',
+      icon: 'Microscope',
       label: 'Peptides de recherche cellulaire',
       desc: 'Destinés à la recherche scientifique uniquement',
     },
   ])
 
-  const quality = ref([
-    { icon: 'check-circle', text: 'Pureté testée ≥ 99% (HPLC & MS)' },
-    { icon: 'shield', text: 'Stock européen – expédition sous 24h' },
-    { icon: 'truck', text: 'Livraison rapide dans toute l’UE' },
-    { icon: 'leaf', text: 'Sans excipient ni conservateur inutile' },
+  const quality = ref<QualityItem[]>([
+    { icon: 'CheckCircle', text: 'Pureté testée ≥ 99% (HPLC & MS)' },
+    { icon: 'ShieldCheck', text: 'Stock européen – expédition sous 24h' },
+    { icon: 'Truck', text: 'Livraison rapide dans toute l’UE' },
+    { icon: 'Leaf', text: 'Sans excipient ni conservateur inutile' },
   ])
 </script>
 
 <style scoped lang="less">
   .home {
-    background-color: red;
     display: flex;
     flex-direction: column;
     gap: 80px;
@@ -214,13 +225,41 @@
       background: white;
       border: 1px solid @neutral-200;
       border-radius: 12px;
-      padding: 24px;
+      padding: 32px 20px;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      box-sizing: border-box;
 
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        border-color: @primary-200;
+      }
+
+      .basic-icon-next {
+        color: @primary-600;
+        margin-bottom: 6px;
+
+        svg {
+          width: 40px;
+          height: 40px;
+          stroke-width: 1.75;
+        }
+      }
+
+      .basic-text {
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      // Sous-texte
+      .basic-text[color='neutral-500'] {
+        font-size: 0.9rem;
       }
     }
 
@@ -234,30 +273,41 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 24px;
-        margin-top: 20px;
+        gap: 20px;
+        margin-top: 24px;
       }
 
       &-item {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         background: white;
-        padding: 12px 16px;
+        padding: 12px 18px;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      }
-    }
+        border: 1px solid @neutral-200;
+        transition: all 0.25s ease;
 
-    &__cta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 16px;
-      background: @primary-50;
-      padding: 40px;
-      border-radius: 12px;
+        &:hover {
+          border-color: @primary-300;
+          background: @primary-200;
+        }
+
+        .basic-icon-next {
+          color: @primary-600;
+          flex-shrink: 0;
+
+          svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 1.8;
+          }
+        }
+
+        .basic-text {
+          font-size: 0.95rem;
+        }
+      }
     }
   }
 </style>

@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import router from '@/router'
-import type { IconName } from '@designSystem/fondation/icons/iconsList'
+import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -39,7 +39,7 @@ export const useSidebarStore = defineStore('sidebar', () => {
         name: route.name!,
         path: route.path,
         label: route.meta.label as string,
-        icon: route.meta.icon as IconName,
+        icon: route.meta.icon as IconNameNext,
       }))
   })
 

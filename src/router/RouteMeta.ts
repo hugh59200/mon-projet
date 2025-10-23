@@ -1,4 +1,4 @@
-import type { IconName } from '@designSystem/fondation/icons/iconsList'
+import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 import type {
   RouteLocationNormalizedLoaded,
   RouteLocationNormalizedLoadedGeneric,
@@ -19,7 +19,7 @@ declare module 'vue-router' {
     requiresCart?: boolean
     requiresAdmin?: boolean
     label?: string
-    icon?: IconName
+    icon?: IconNameNext
     order?: number
     title?: string
     description?: string
