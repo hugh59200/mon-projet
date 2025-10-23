@@ -282,13 +282,16 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 0 20px;
+    padding: 0 20px 100px; // ✅ espace en bas pour éviter chevauchement par le footer
+    box-sizing: border-box;
 
     &__title {
       text-align: center;
     }
 
-    &__cart {
+    &__cart,
+    &__infos,
+    &__payment {
       background: white;
       border: 1px solid @neutral-200;
       border-radius: 12px;
@@ -325,17 +328,6 @@
       justify-content: space-between;
       align-items: center;
       padding-top: 8px;
-    }
-
-    &__infos,
-    &__payment {
-      background: white;
-      border: 1px solid @neutral-200;
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
     }
 
     &__methods {
@@ -386,13 +378,17 @@
       }
     }
 
-    &__submit {
-      margin-top: 8px;
-    }
+    /* ✅ Bouton toujours visible */
 
+    /* Mobile friendly */
     @media (max-width: 700px) {
       &__row {
         flex-direction: column;
+      }
+
+      &__submit {
+        padding: 12px 0;
+        box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.05);
       }
     }
   }
