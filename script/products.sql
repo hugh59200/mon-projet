@@ -1,9 +1,48 @@
 -- =====================================================
--- 🧬  SEED DES PRODUITS PEPTIDES (basé sur src/assets/products)
+-- 🧱 TABLE PRODUCTS (si non existante)
 -- =====================================================
+CREATE TABLE IF NOT EXISTS public.products (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  category text NOT NULL,
+  price numeric(10,2) NOT NULL,
+  purity numeric(5,2),
+  stock boolean DEFAULT true,
+  image text,
+  description text,
+  created_at timestamp with time zone DEFAULT now()
+);
 
--- 🛡️ Désactivation du RLS pour garantir l’accès public au catalogue
-alter table public.products disable row level security;
+-- =====================================================
+-- 🔐 RLS (sécurité par défaut)
+-- =====================================================
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- Nettoyage des policies existantes
+DROP POLICY IF EXISTS "Public can read products" ON public.products;
+DROP POLICY IF EXISTS "Admins can manage products" ON public.products;
+
+-- ✅ Lecture publique (nécessaire pour afficher le catalogue)
+CREATE POLICY "Public can read products"
+ON public.products
+FOR SELECT
+USING (true);
+
+-- ✅ Modification réservée aux admins
+CREATE POLICY "Admins can manage products"
+ON public.products
+FOR ALL
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.profiles p
+    WHERE p.id = auth.uid() AND p.role = 'admin'
+  )
+);
+
+-- =====================================================
+-- 🧬 SEED DES PRODUITS PEPTIDES
+-- =====================================================
 
 -- 1️⃣ Nettoyage : suppression des produits obsolètes
 DELETE FROM public.products
@@ -52,5 +91,5 @@ DO UPDATE SET
   created_at  = NOW();
 
 -- =====================================================
--- ✅ Fin du seed produits (cohérent avec assets/)
+-- ✅ Fin du seed produits (sécurisé avec RLS)
 -- =====================================================

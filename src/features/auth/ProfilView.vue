@@ -132,22 +132,41 @@
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
 
-  async function loadProfile() {
-    if (!auth.user) return
+  async function loadProfile(retry = 0) {
+    if (!auth.user) {
+      console.warn('⚠️ Aucun utilisateur connecté')
+      return
+    }
+
+    console.log('Chargement du profil pour:', auth.user.id)
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', auth.user.id)
-      .single()
+      .maybeSingle()
 
     if (error) {
+      console.error('Erreur profil:', error)
       toast.showToast('Erreur lors du chargement du profil', 'danger')
-    } else {
+      return
+    }
+
+    if (!data && retry < 3) {
+      console.warn('Profil non trouvé, nouvel essai dans 1s...')
+      setTimeout(() => loadProfile(retry + 1), 1000)
+      return
+    }
+
+    if (data) {
+      console.log('✅ Profil chargé:', data)
       profile.value = data
       editableName.value = data.full_name ?? ''
       if (data.avatar_url) avatarPreview.value = getPublicUrl(data.avatar_url)
     }
   }
+
+  const { data } = await supabase.auth.getSession()
+  console.log(data.session?.user)
 
   function getPublicUrl(path: string) {
     const { data } = supabase.storage.from('avatars').getPublicUrl(path)
@@ -219,7 +238,14 @@
     }
   }
 
-  onMounted(loadProfile)
+  onMounted(async () => {
+    await auth.initAuth()
+    if (auth.user) {
+      await loadProfile()
+    } else {
+      console.warn('Utilisateur non trouvé après initAuth()')
+    }
+  })
 </script>
 
 <style scoped lang="less">

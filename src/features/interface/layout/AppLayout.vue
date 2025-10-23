@@ -5,20 +5,32 @@
   >
     <HeaderApp class="header" />
     <SidebarApp class="sidebar" />
+
     <main class="content">
-      <RouterView v-slot="{ Component }">
-        <transition
-          name="fade-slide"
-          mode="out-in"
-          appear
-        >
-          <component
-            :is="Component"
-            :key="$route.fullPath"
-          />
-        </transition>
-      </RouterView>
+      <!-- ✅ Encapsuler RouterView dans un Suspense -->
+      <Suspense>
+        <template #default>
+          <RouterView v-slot="{ Component }">
+            <transition
+              name="fade-slide"
+              mode="out-in"
+              appear
+            >
+              <component
+                :is="Component"
+                :key="$route.fullPath"
+              />
+            </transition>
+          </RouterView>
+        </template>
+
+        <!-- 🕐 Fallback pendant le chargement -->
+        <template #fallback>
+          <div class="suspense-loading">Chargement du contenu...</div>
+        </template>
+      </Suspense>
     </main>
+
     <FooterApp class="footer" />
     <ToastContainer />
     <SablierComponent />
@@ -104,6 +116,14 @@
     height: 30px;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  .suspense-loading {
+    text-align: center;
+    margin-top: 60px;
+    color: @neutral-600;
+    font-style: italic;
+  }
+
   .app-grid.sidebar-reduced .footer {
     left: 80px;
   }

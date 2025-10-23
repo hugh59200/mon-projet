@@ -1,10 +1,9 @@
 -- =============================================================
--- 🧱 SETUP TABLE + TRIGGER handle_new_user()
+-- 🧱 TABLE PROFILES + TRIGGER handle_new_user()
 -- =============================================================
 
--- 1️⃣ Table profils
 create table if not exists public.profiles (
-  id uuid references auth.users on delete cascade primary key,
+  id uuid primary key references auth.users on delete cascade,
   email text unique,
   full_name text,
   role text default 'user',
@@ -12,7 +11,7 @@ create table if not exists public.profiles (
   created_at timestamp with time zone default now()
 );
 
--- 2️⃣ Fonction déclenchée à chaque nouvel utilisateur
+-- Fonction déclenchée à chaque nouvel utilisateur
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
@@ -29,57 +28,64 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- 3️⃣ Trigger lié à auth.users
+-- Trigger lié à auth.users
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute procedure public.handle_new_user();
 
 -- =============================================================
--- 🔐 RLS POLICIES
+-- 🔐 RLS (Row Level Security)
 -- =============================================================
-
 alter table public.profiles enable row level security;
 
--- 👁️ Lecture de son propre profil
+-- Supprime toutes les anciennes policies
 drop policy if exists "Users can view their own profile" on public.profiles;
+drop policy if exists "Users can update their own profile" on public.profiles;
+drop policy if exists "Admins can manage all profiles" on public.profiles;
+
+-- 👁️ Lecture de son propre profil
 create policy "Users can view their own profile"
 on public.profiles
 for select
 using (auth.uid() = id);
 
 -- ✏️ Mise à jour de son propre profil
-drop policy if exists "Users can update their own profile" on public.profiles;
 create policy "Users can update their own profile"
 on public.profiles
 for update
 using (auth.uid() = id);
 
 -- 🛠️ Gestion complète pour les admins
-drop policy if exists "Admins can manage all profiles" on public.profiles;
 create policy "Admins can manage all profiles"
 on public.profiles
 for all
+to authenticated
 using (
-  coalesce(auth.jwt() ->> 'role', '') = 'admin'
+  exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid() and p.role = 'admin'
+  )
 );
 
 -- =============================================================
--- 🪄 JWT CUSTOM CLAIMS (pour éviter toute récursion)
+-- 🪄 JWT CUSTOM CLAIMS (fonction mise à jour)
 -- =============================================================
 
-create or replace function public.jwt_custom_claims()
-returns jsonb
+-- ⚠️ jwt_claims_builder est déprécié → on utilise une fonction custom
+create or replace function public.jwt_custom_claims() 
+returns jsonb 
 language sql stable as $$
   select jsonb_build_object('role', role)
   from public.profiles
   where id = auth.uid();
 $$;
 
-alter role authenticator set jwt_claims_builder = 'public.jwt_custom_claims';
+-- Supabase appelle automatiquement jwt_custom_claims() si elle existe
+-- donc pas besoin d’utiliser alter role authenticator ...
 
 -- =============================================================
--- ✅ SEED OPTIONNEL D'UTILISATEURS FACTICES
+-- 🧪 SEED D'UTILISATEURS FACTICES (optionnel)
 -- =============================================================
 do $$
 declare
