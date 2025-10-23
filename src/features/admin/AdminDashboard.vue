@@ -117,7 +117,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { supabase } from '@/services/supabaseClient'
   import {
     BarElement,
@@ -128,7 +127,7 @@
     Title,
     Tooltip,
   } from 'chart.js'
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { Bar } from 'vue-chartjs'
 
   ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
@@ -354,10 +353,7 @@
     })
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                            🧠 Initialisation auto                           */
-  /* -------------------------------------------------------------------------- */
-  useAutoSablier(async () => {
+  onMounted(async () => {
     await Promise.all([loadStats(), loadWeeklyData(), loadTopClients()])
   })
 </script>

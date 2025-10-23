@@ -150,6 +150,7 @@
 
 <style scoped lang="less">
   .home {
+    background-color: red;
     display: flex;
     flex-direction: column;
     gap: 80px;

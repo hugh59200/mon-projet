@@ -63,7 +63,6 @@
           </option>
         </select>
         <BasicButton
-          :disabled="loadingStatus"
           label="Mettre à jour le statut"
           type="secondary"
           variant="outlined"
@@ -129,7 +128,6 @@
           size="medium"
         />
         <BasicButton
-          :disabled="loadingShipment"
           label="Enregistrer et envoyer le mail"
           type="primary"
           variant="filled"
@@ -142,7 +140,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import type { BadgeType } from '@designSystem/index'
@@ -152,8 +149,6 @@
   const route = useRoute()
   const toast = useToastStore()
   const order = ref<any>(null)
-  const loadingShipment = ref(false)
-  const loadingStatus = ref(false)
   const carrier = ref('')
   const trackingNumber = ref('')
   const selectedStatus = ref('')
@@ -173,9 +168,6 @@
     return (STATUSES.find((s) => s.value === value)?.color || 'neutral') as BadgeType
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                            🔄 Chargement de commande                       */
-  /* -------------------------------------------------------------------------- */
   async function loadOrder() {
     const id = route.params.id
     const { data, error } = await supabase.from('orders').select('*').eq('id', id).single()
@@ -183,22 +175,20 @@
     if (error) {
       toast.showToast('Erreur lors du chargement de la commande', 'danger')
       console.error(error)
-    } else {
-      try {
-        order.value = data
-        if (typeof order.value.items === 'string') {
-          order.value.items = JSON.parse(order.value.items)
-        }
-        selectedStatus.value = order.value.status
-      } catch {
-        order.value.items = []
+      return
+    }
+
+    try {
+      order.value = data
+      if (typeof order.value.items === 'string') {
+        order.value.items = JSON.parse(order.value.items)
       }
+      selectedStatus.value = order.value.status
+    } catch {
+      order.value.items = []
     }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                            ⚙️ Actions                                     */
-  /* -------------------------------------------------------------------------- */
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
       day: '2-digit',
@@ -209,10 +199,9 @@
     })
   }
 
-  // 🚀 Changer le statut manuellement
+  // 🚀 Changer le statut
   async function handleUpdateStatus() {
     try {
-      loadingStatus.value = true
       const { error } = await supabase
         .from('orders')
         .update({ status: selectedStatus.value })
@@ -220,7 +209,6 @@
 
       if (error) throw error
 
-      // Envoi de l’email via Edge Function
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`,
         {
@@ -249,8 +237,6 @@
     } catch (err) {
       console.error(err)
       toast.showToast('Erreur lors du changement de statut ⚠️', 'danger')
-    } finally {
-      loadingStatus.value = false
     }
   }
 
@@ -262,7 +248,6 @@
     }
 
     try {
-      loadingShipment.value = true
       const { error: updateError } = await supabase
         .from('orders')
         .update({
@@ -307,17 +292,10 @@
     } catch (err) {
       console.error(err)
       toast.showToast('Erreur lors de l’ajout du suivi ⚠️', 'danger')
-    } finally {
-      loadingShipment.value = false
     }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                     🧠 Chargement automatique avec sablier                 */
-  /* -------------------------------------------------------------------------- */
-  useAutoSablier(async () => {
-    await loadOrder()
-  })
+  loadOrder()
 </script>
 
 <style scoped lang="less">

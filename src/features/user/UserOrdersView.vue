@@ -62,8 +62,7 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { ref } from 'vue'
-  import { useAutoSablier } from '../interface/sablier/useAutoSablier'
+  import { onMounted, ref } from 'vue'
 
   type Order = {
     id: string
@@ -106,7 +105,9 @@
   }
 
   // 🕐 sablier global automatique
-  useAutoSablier(loadUserOrders)
+  onMounted(async () => {
+    await loadUserOrders()
+  })
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {

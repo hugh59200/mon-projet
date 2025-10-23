@@ -106,10 +106,9 @@
 </template>
 
 <script setup lang="ts">
-  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useAuthStore } from './useAuthStore'
 
   const auth = useAuthStore()
@@ -235,10 +234,7 @@
     }
   }
 
-  /* --------------------------------------------- */
-  /* 🧠 Initialisation automatique avec sablier     */
-  /* --------------------------------------------- */
-  useAutoSablier(async () => {
+  onMounted(async () => {
     await auth.initAuth()
     if (auth.user) await loadProfile()
   })

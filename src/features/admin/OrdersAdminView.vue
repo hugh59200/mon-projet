@@ -8,7 +8,6 @@
       Gestion des commandes
     </BasicText>
 
-    <!-- 🔍 Barre de recherche + filtres -->
     <div class="admin-orders__controls">
       <BasicInput
         v-model="search"
@@ -52,7 +51,6 @@
       />
     </div>
 
-    <!-- 📋 Liste -->
     <div
       v-if="filteredOrders.length === 0"
       class="admin-orders__empty"
@@ -83,7 +81,6 @@
         <span>{{ order.total_amount.toFixed(2) }} €</span>
         <span>{{ formatDate(order.created_at) }}</span>
 
-        <!-- 🟢 Statut + badge -->
         <div class="admin-orders__status-cell">
           <BasicBadge
             :label="getStatusMeta(order.status).label"
@@ -115,7 +112,6 @@
       </div>
     </div>
 
-    <!-- PAGINATION -->
     <BasicPagination
       v-if="nbPages > 1"
       :nb-pages="nbPages"
@@ -128,11 +124,10 @@
 </template>
 
 <script setup lang="ts">
-  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
   import type { BadgeType } from '@designSystem/index'
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   type Order = {
     id: string
@@ -144,9 +139,6 @@
     status: string
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                  CONSTANTS                                 */
-  /* -------------------------------------------------------------------------- */
   const STATUSES = [
     { value: 'pending', label: 'En attente', color: 'warning' },
     { value: 'confirmed', label: 'Confirmée', color: 'success' },
@@ -159,9 +151,6 @@
     return STATUSES.find((s) => s.value === value) || { label: value, color: 'neutral' }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   STATE                                   */
-  /* -------------------------------------------------------------------------- */
   const toast = useToastStore()
   const orders = ref<Order[]>([])
   const search = ref('')
@@ -173,9 +162,6 @@
   const perPage = 8
   const total = ref(0)
 
-  /* -------------------------------------------------------------------------- */
-  /*                                LOAD ORDERS                                */
-  /* -------------------------------------------------------------------------- */
   async function loadOrders() {
     let query = supabase.from('orders').select('*', { count: 'exact' })
 
@@ -210,24 +196,14 @@
     }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                WATCHERS                                   */
-  /* -------------------------------------------------------------------------- */
-  // 🧠 Recharge dès qu’un filtre ou tri change
   watch([page, sortKey, statusFilter], async () => {
     await loadOrders()
   })
 
-  /* -------------------------------------------------------------------------- */
-  /*                            🧠 Chargement initial                           */
-  /* -------------------------------------------------------------------------- */
-  useAutoSablier(async () => {
+  onMounted(async () => {
     await loadOrders()
   })
 
-  /* -------------------------------------------------------------------------- */
-  /*                                UTILITAIRES                                */
-  /* -------------------------------------------------------------------------- */
   function formatDate(date: string) {
     return new Date(date).toLocaleString('fr-FR', {
       day: '2-digit',
@@ -247,9 +223,6 @@
     )
   })
 
-  /* -------------------------------------------------------------------------- */
-  /*                              UPDATE STATUS                                 */
-  /* -------------------------------------------------------------------------- */
   async function updateStatus(order: Order) {
     const { error } = await supabase
       .from('orders')
@@ -291,9 +264,6 @@
     }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 EXPORT CSV                                 */
-  /* -------------------------------------------------------------------------- */
   function exportCsv() {
     if (orders.value.length === 0) {
       toast.showToast('Aucune commande à exporter', 'warning')

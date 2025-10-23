@@ -84,10 +84,9 @@
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
-  import { useAutoSablier } from '@/features/interface/sablier/useAutoSablier'
   import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   interface Product {
@@ -128,8 +127,9 @@
     }
   }
 
-  // 🚀 sablier global automatique
-  useAutoSablier(loadProducts)
+  onMounted(async () => {
+    await loadProducts()
+  })
 
   const filteredProducts = computed(() => {
     return products.value.filter((p) => {
