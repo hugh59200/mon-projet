@@ -1,5 +1,5 @@
-import { useToastStore } from '@/features/interface/toast/useToastStore'
 import { deleteUserById, updateUserRole, type UserProfile } from '@/services/userService'
+import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

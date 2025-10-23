@@ -32,6 +32,10 @@ export const useSablierStore = defineStore('sablier', () => {
       }
 
       // ✨ Laisse un léger délai pour fluidifier la disparition
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
       timeoutId = window.setTimeout(() => {
         estVisible.value = false
       }, 200)

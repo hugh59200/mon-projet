@@ -1,9 +1,5 @@
 <template>
   <div
-    v-focusable="{
-      focusable: selectionnable,
-      onEnter: handleClick,
-    }"
     :class="['basic-card', { 'basic-card--clickable': isSelectionnable }]"
     @click="isSelectionnable ? handleClick() : undefined"
   >

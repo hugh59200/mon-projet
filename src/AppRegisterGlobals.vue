@@ -18,10 +18,8 @@
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { Vue3Snackbar } from 'vue3-snackbar'
   import { registerPopupAutoCGU } from './features/interface/cgu'
-  import { registerAppSnackBarEventsManager } from './features/interface/shared/snack-bar'
 
   registerPopupAutoCGU()
-  registerAppSnackBarEventsManager()
 </script>
 
 <style lang="less">

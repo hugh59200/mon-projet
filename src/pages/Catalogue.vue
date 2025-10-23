@@ -84,8 +84,8 @@
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 

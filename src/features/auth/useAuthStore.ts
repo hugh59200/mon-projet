@@ -3,7 +3,7 @@ import router from '@/router'
 import { supabase } from '@/services/supabaseClient'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useToastStore } from '../interface/toast/useToastStore'
+import { useToastStore } from '../../../designSystem/src/components/basic/toast/useToastStore'
 
 interface Profile {
   id: string

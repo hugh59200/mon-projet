@@ -140,8 +140,8 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { BadgeType } from '@designSystem/index'
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'

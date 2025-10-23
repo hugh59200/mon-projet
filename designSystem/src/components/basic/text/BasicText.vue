@@ -1,7 +1,6 @@
 <template>
   <component
     :is="['h1', 'h2', 'h3', 'h4', 'h5'].includes(size) ? size : 'span'"
-    v-focusable="{ focusable, onEnter: () => $emit('click') }"
     :class="[
       'text',
       size,

@@ -20,7 +20,6 @@
         },
       ]"
       @click="goToPage(page)"
-      v-focusable="{ focusable: page.type !== 'ellipse', onEnter: () => goToPage(page) }"
     >
       <BasicText :size="page.num > 3 ? 'body-s' : 'body-m'">
         {{ page.type === 'ellipse' ? '...' : page.num }}
@@ -77,7 +76,10 @@
     }))
     if (props.nbPages <= props.nbPagesMax) return result
 
-    const start = Math.min(Math.max(props.currentPage - props.nbPagesMax / 2, 0), props.nbPages - props.nbPagesMax)
+    const start = Math.min(
+      Math.max(props.currentPage - props.nbPagesMax / 2, 0),
+      props.nbPages - props.nbPagesMax,
+    )
     result = [...result.splice(start, props.nbPagesMax)]
     if (props.currentPage > props.nbPagesMax / 2) {
       result[0] = { type: 'num', num: 1 }

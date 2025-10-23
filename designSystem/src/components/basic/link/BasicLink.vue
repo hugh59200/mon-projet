@@ -1,9 +1,5 @@
 <template>
   <span
-    v-focusable="{
-      focusable: true,
-      onEnter: () => $emit('link-click'),
-    }"
     :class="[
       'standalone-link',
       `standalone-link--${type}`,

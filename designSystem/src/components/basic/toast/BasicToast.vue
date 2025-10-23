@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore, type ToastType } from '@/features/interface/toast/useToastStore'
+  import { useToastStore, type ToastType } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
 
   const props = defineProps<{

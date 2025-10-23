@@ -106,8 +106,8 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
   import { supabase } from '@/services/supabaseClient'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import { useAuthStore } from './useAuthStore'
 

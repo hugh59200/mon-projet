@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import BasicToast from './BasicToast.vue'
 
   const toastStore = useToastStore()
