@@ -1,6 +1,7 @@
 // Auto-generated from router/index.ts
 export type RouteName =
   'access-denied' |
+  'admin-chat' |
   'admin-dashboard' |
   'admin-order-detail' |
   'admin-orders' |

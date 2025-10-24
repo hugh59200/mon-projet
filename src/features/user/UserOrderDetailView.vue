@@ -130,10 +130,27 @@
 
   async function loadOrder() {
     try {
+      const orderId = route.params.id
+      if (typeof orderId !== 'string') {
+        throw new Error('Invalid order ID')
+      }
+
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
-        .eq('id', route.params.id)
+        .select(`
+          id,
+          full_name,
+          address,
+          zip,
+          city,
+          country,
+          payment_method,
+          total_amount,
+          status,
+          created_at,
+          items
+        `)
+        .eq('id', orderId)
         .eq('email', auth.user?.email)
         .single()
 

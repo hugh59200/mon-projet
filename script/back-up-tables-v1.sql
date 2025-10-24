@@ -147,12 +147,6 @@ CREATE TABLE IF NOT EXISTS public.orders (
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-  EXECUTE 'DROP POLICY IF EXISTS "User can view own orders" ON public.orders';
-  EXECUTE 'DROP POLICY IF EXISTS "Admin full access orders" ON public.orders';
-END $$;
-
 CREATE POLICY "User can view own orders"
   ON public.orders
   FOR SELECT
@@ -182,4 +176,88 @@ UPDATE public.profiles
 SET cgu_accepted = false,
     cgu_accepted_at = NULL;
 
+-- ============================================================
+-- 💬 TABLE : MESSAGES (Chat utilisateur ↔️ Admin)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.messages (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid REFERENCES public.profiles (id) ON DELETE CASCADE,
+  sender_role text DEFAULT 'user' CHECK (sender_role IN ('user', 'admin')),
+  content text NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  is_read boolean DEFAULT false
+);
+
+
+CREATE INDEX IF NOT EXISTS idx_messages_user_id ON public.messages (user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages (created_at);
+
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  EXECUTE 'DROP POLICY IF EXISTS "Users can read own messages" ON public.messages';
+  EXECUTE 'DROP POLICY IF EXISTS "Users can send messages" ON public.messages';
+  EXECUTE 'DROP POLICY IF EXISTS "Admin full access messages" ON public.messages';
+END $$;
+
+CREATE POLICY "Users can read own messages"
+  ON public.messages
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can send messages"
+  ON public.messages
+  FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Admin full access messages"
+  ON public.messages
+  FOR ALL
+  TO authenticated
+  USING (auth.jwt() ->> 'role' = 'admin');
+
+CREATE OR REPLACE FUNCTION public.delete_user_messages()
+RETURNS trigger AS $$
+BEGIN
+  DELETE FROM public.messages WHERE user_id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_profile_deleted ON public.profiles;
+
+CREATE TRIGGER on_profile_deleted
+AFTER DELETE ON public.profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.delete_user_messages();
+
+INSERT INTO public.messages (user_id, sender_role, content, created_at) VALUES
+('04fd0dc1-601e-4e3d-91ca-f7c7f7062dd9', 'user', 'Bonjour, je voulais savoir si IGF-1 LR3 est toujours en stock ?', now() - interval '1 day'),
+('53b4ae6b-8339-4a20-8947-84b77f5ae5a4', 'admin', 'Oui, il revient en stock demain matin 🚚', now() - interval '22 hours'),
+('04fd0dc1-601e-4e3d-91ca-f7c7f7062dd9', 'user', 'Parfait, merci beaucoup !', now() - interval '21 hours');
+
+ALTER TABLE public.messages
+DROP CONSTRAINT IF EXISTS messages_user_id_fkey;
+
+ALTER TABLE public.messages
+ADD CONSTRAINT messages_user_id_fkey
+FOREIGN KEY (user_id)
+REFERENCES public.profiles (id)
+ON DELETE CASCADE;
+
+ALTER TABLE public.messages
+ADD COLUMN IF NOT EXISTS is_read boolean DEFAULT false;
+
+-- ✅ Ajoute le champ read_at pour tracer quand un message est lu
+ALTER TABLE public.messages
+ADD COLUMN IF NOT EXISTS read_at timestamptz;
+
+
+DO $$
+BEGIN
+  EXECUTE 'DROP POLICY IF EXISTS "User can view own orders" ON public.orders';
+  EXECUTE 'DROP POLICY IF EXISTS "Admin full access orders" ON public.orders';
+END $$;
 

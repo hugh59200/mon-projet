@@ -1,18 +1,18 @@
 import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
+import type { Database } from '@/types/supabase'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // 🔗 Client Supabase de base
-const baseClient = createClient(supabaseUrl, supabaseKey, {
+const baseClient = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
   },
 })
-
 /**
  * 🧠 Proxy Supabase sélectif et “chain-safe”
  * - Gère le sablier UNIQUEMENT sur les appels finaux (pas sur le chainage)

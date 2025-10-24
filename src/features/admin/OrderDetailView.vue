@@ -170,6 +170,8 @@
 
   async function loadOrder() {
     const id = route.params.id
+    if (!id || Array.isArray(id)) return
+
     const { data, error } = await supabase.from('orders').select('*').eq('id', id).single()
 
     if (error) {

@@ -70,7 +70,15 @@
     payment_method: string
     status: string
     created_at: string
-    items: { id: string; name: string; quantity: number; price: number }[]
+    items: unknown
+    address: string | null
+    carrier: string | null
+    city: string | null
+    country: string | null
+    email: string
+    full_name: string
+    internal_notes: string | null
+    zip: string | null
   }
 
   const auth = useAuthStore()

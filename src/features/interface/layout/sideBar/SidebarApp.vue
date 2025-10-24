@@ -18,6 +18,11 @@
             :name="item.icon"
             :active="isActive"
           />
+
+          <!-- 🔔 Badge pour les nouveaux messages -->
+          <template v-if="item.path === '/admin/chat' && chatNotif.unreadCount > 0">
+            <span class="notif-badge">{{ chatNotif.unreadCount }}</span>
+          </template>
         </div>
 
         <transition name="fade-slide">
@@ -40,8 +45,9 @@
 </template>
 
 <script setup lang="ts">
+  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
   import { storeToRefs } from 'pinia'
-  import { ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useSidebarStore } from './useSidebarStore'
 
   const sidebar = useSidebarStore()
@@ -50,6 +56,14 @@
   const isMobileOpen = ref(false)
   watch(isReduced, () => {
     if (window.innerWidth < 900) isMobileOpen.value = false
+  })
+
+  // 🔔 Store des notifications
+  const chatNotif = useChatNotifStore()
+
+  onMounted(async () => {
+    await chatNotif.fetchUnreadCount()
+    chatNotif.listenRealtime()
   })
 </script>
 
@@ -70,15 +84,6 @@
     box-shadow: inset -1px 0 0 fade(white, 10%);
     box-sizing: border-box;
 
-    /* Mode réduit */
-    &.reduced {
-      width: 80px;
-
-      .sidebar__label {
-        display: none;
-      }
-    }
-
     &__items {
       display: flex;
       flex-direction: column;
@@ -86,10 +91,10 @@
       gap: 6px;
       padding: 0 12px;
       width: 100%;
-      box-sizing: border-box;
     }
 
     &__item {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -99,11 +104,8 @@
       text-decoration: none;
       transition:
         background-color 0.25s ease,
-        color 0.25s ease,
-        transform 0.2s ease;
+        color 0.25s ease;
       min-height: 42px;
-      background: transparent;
-      box-sizing: border-box;
 
       &:hover {
         background: fade(@neutral-100, 10%);
@@ -125,33 +127,25 @@
       width: 26px;
       min-width: 26px;
       height: 26px;
-
-      svg {
-        fill: @neutral-100;
-        transition: fill 0.3s ease;
-      }
-    }
-
-    &__label {
-      margin-left: 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      position: relative;
     }
   }
 
-  /* ✨ Animation fluide du label */
-  .fade-slide-enter-active,
-  .fade-slide-leave-active {
-    transition: all 0.25s ease;
-  }
-
-  .fade-slide-enter-from {
-    opacity: 0;
-    transform: translateX(-6px);
-  }
-  .fade-slide-leave-to {
-    opacity: 0;
-    transform: translateX(-6px);
+  /* 🔔 Petit badge de notif */
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #f44336;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 9999px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px @secondary-800;
   }
 </style>

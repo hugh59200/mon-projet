@@ -36,7 +36,14 @@ export const useAuthStore = defineStore('auth', () => {
       console.warn('Erreur profil (non bloquante):', err)
       return
     }
-    if (data) profile.value = data
+    if (data && data.id && data.email) {
+      profile.value = {
+        id: data.id,
+        email: data.email,
+        full_name: data.full_name || undefined,
+        role: (data.role as 'admin' | 'user') || undefined
+      }
+    }
   }
 
   // ======================================================

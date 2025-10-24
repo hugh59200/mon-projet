@@ -172,6 +172,16 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true, requiresAdmin: true, title: 'Administration – Fast Peptides' },
   },
   {
+    path: '/admin/chat',
+    name: 'admin-chat',
+    component: () => import('@/features/support/ChatAdminView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Chat (Admin) – Fast Peptides',
+    },
+  },
+  {
     path: '/profil/commandes',
     name: 'user-orders',
     component: () => import('@/features/user/UserOrdersView.vue'),

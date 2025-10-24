@@ -20,7 +20,14 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
       const { data, count, error } = await fetchUsersWithCount(search.value, limit, offset)
       if (error) throw error
 
-      users.value = data
+      users.value = data?.map(user => ({
+        id: user.id,
+        email: user.email ?? '',
+        full_name: user.full_name,
+        role: user.role as 'admin' | 'user',
+        created_at: user.created_at ?? '',
+        avatar_url: user.avatar_url
+      })) ?? []
       totalResults.value = count ?? 0
       totalPages.value = Math.ceil(totalResults.value / limit)
     } catch (err) {

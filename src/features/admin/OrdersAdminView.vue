@@ -191,7 +191,15 @@
       toast.showToast('Erreur lors du chargement des commandes', 'danger')
       console.error(error)
     } else {
-      orders.value = (data ?? []) as Order[]
+      orders.value = (data ?? []).map(order => ({
+        ...order,
+        items: (order.items as any[] ?? []).map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      })) as Order[]
       total.value = count ?? 0
     }
   }

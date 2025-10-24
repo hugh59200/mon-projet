@@ -94,9 +94,9 @@
     name: string
     category: string
     price: number
-    purity: number
-    stock: boolean
-    image: string
+    purity: number | null
+    stock: boolean | null
+    image: string | null
   }
 
   const cart = useCartStore()
@@ -146,7 +146,7 @@
   }
 
   function addToCart(product: Product) {
-    cart.addToCart(product)
+    cart.addToCart({ ...product, stock: product.stock ?? false, image: product.image ?? '' })
     toast.showToast(`✅ ${product.name} ajouté au panier`, 'success')
   }
 </script>

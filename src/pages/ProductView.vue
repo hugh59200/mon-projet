@@ -24,7 +24,7 @@
     >
       <div class="product__image">
         <img
-          :src="product.image"
+          :src="product.image || '/default-product-image.jpg'"
           :alt="product.name"
         />
       </div>
@@ -108,10 +108,10 @@
     name: string
     category: string
     price: number
-    purity: number
+    purity: number | null
     stock: boolean
-    image: string
-    description?: string
+    image: string | null
+    description?: string | null
   }
 
   const route = useRoute()
@@ -123,10 +123,11 @@
 
   onMounted(async () => {
     const { id } = route.params
+    if (typeof id !== 'string') return
     const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
 
     if (!error && data) {
-      product.value = data
+      product.value = { ...data, stock: !!data.stock }
 
       // 🧠 Met à jour dynamiquement le titre et la description
       document.title = `${data.name} – Fast Peptides`
@@ -151,7 +152,10 @@
 
   // 🛒 Fonction d'ajout au panier
   function addToCart(p: Product) {
-    cart.addToCart(p)
+    cart.addToCart({
+      ...p,
+      image: p.image || '/default-product-image.jpg',
+    })
     toast.showToast(`✅ ${p.name} ajouté au panier`, 'success')
   }
 </script>

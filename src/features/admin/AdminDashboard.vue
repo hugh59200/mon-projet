@@ -97,7 +97,23 @@
         </tbody>
       </table>
     </div>
-
+    <div class="chart-section chat-preview">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        💬 Derniers messages
+      </BasicText>
+      <ChatAdminView :is-preview="true" />
+      <div class="chat-link">
+        <BasicButton
+          label="Ouvrir le chat complet"
+          type="secondary"
+          size="medium"
+          @click="$router.push('/admin/chat')"
+        />
+      </div>
+    </div>
     <!-- 🧭 Navigation -->
     <div class="admin-dashboard__cards">
       <BasicButton
@@ -129,6 +145,7 @@
   } from 'chart.js'
   import { computed, onMounted, ref } from 'vue'
   import { Bar } from 'vue-chartjs'
+  import ChatAdminView from '../support/ChatAdminView.vue'
 
   ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
@@ -256,10 +273,10 @@
     })
 
     data?.forEach((order) => {
-      const dateKey = new Date(order.created_at).toISOString().split('T')[0]
+      const dateKey = order.created_at ? new Date(order.created_at).toISOString().split('T')[0] : ''
       const day = days.find((d) => d.key === dateKey)
       if (day) {
-        day.total += order.total_amount
+        day.total += order.total_amount ?? 0
         day.count += 1
       }
     })
@@ -367,6 +384,9 @@
     align-items: center;
     gap: 40px;
     text-align: center;
+    overflow: visible;
+    min-height: 100vh; /* forcer la hauteur minimale */
+    padding-bottom: 100px; /* espace pour les boutons */
 
     &__stats {
       display: grid;
@@ -453,6 +473,20 @@
       &:hover {
         text-decoration: underline;
       }
+    }
+  }
+
+  .chat-preview {
+    overflow: auto !important; /* rendre le chat scrollable */
+    max-height: 400px;
+    border: 1px solid @neutral-200;
+    border-radius: 10px;
+    background: #fafafa;
+
+    .chat-link {
+      text-align: center;
+      margin-top: 10px;
+      overflow: visible !important;
     }
   }
 </style>
