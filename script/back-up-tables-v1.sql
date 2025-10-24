@@ -1,5 +1,6 @@
 -- ============================================================
--- 💾 FULL SUPABASE BACKUP / RESTORE SCRIPT (FINAL - NO RECURSION)
+-- 💾 FULL BACKUP / RESTORE SCRIPT - SUPABASE
+-- Includes: profiles, products, orders (+ data + RLS + functions)
 -- ============================================================
 
 -- =============================
@@ -22,43 +23,27 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at timestamptz DEFAULT now()
 );
 
--- =============================
--- 🔐 RLS & POLICIES (SAFE, NO RECURSION)
--- =============================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Supprime les anciennes policies
-DO $$
-BEGIN
-  EXECUTE 'DROP POLICY IF EXISTS "Read own profile" ON public.profiles';
-  EXECUTE 'DROP POLICY IF EXISTS "Update own profile" ON public.profiles';
-  EXECUTE 'DROP POLICY IF EXISTS "Admin full access" ON public.profiles';
-END $$;
-
--- 👁️ Lecture : utilisateur → son propre profil
-CREATE POLICY "Read own profile"
+CREATE POLICY "Users can view their own profile"
   ON public.profiles
-  FOR SELECT
-  USING (auth.uid() = id);
+  FOR SELECT USING (auth.uid() = id);
 
--- ✏️ Mise à jour : utilisateur → son propre profil
-CREATE POLICY "Update own profile"
+CREATE POLICY "Users can update their own profile"
   ON public.profiles
-  FOR UPDATE
-  USING (auth.uid() = id);
+  FOR UPDATE USING (auth.uid() = id);
 
--- 🧑‍💼 Admins : accès complet (utilise un SELECT isolé pour éviter toute récursion)
-CREATE POLICY "Admin full access"
+CREATE POLICY "Admins can manage all profiles"
   ON public.profiles
   FOR ALL
   TO authenticated
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    EXISTS (
+      SELECT 1 FROM public.profiles p
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
   );
 
--- =============================
--- ⚙️ TRIGGER : handle_new_user()
--- =============================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
@@ -78,19 +63,15 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
-FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- =============================
--- ⚙️ JWT Custom Claims (NO recursion)
--- =============================
 CREATE OR REPLACE FUNCTION public.jwt_custom_claims()
 RETURNS jsonb LANGUAGE sql STABLE AS $$
-  SELECT jsonb_build_object('role', (SELECT role FROM public.profiles WHERE id = auth.uid()));
+  SELECT jsonb_build_object('role', role)
+  FROM public.profiles
+  WHERE id = auth.uid();
 $$;
 
--- =============================
--- 👥 SEED : Profiles
--- =============================
 INSERT INTO public.profiles (id, email, role, created_at, full_name, avatar_url) VALUES
 ('04fd0dc1-601e-4e3d-91ca-f7c7f7062dd9', 'lucas.martin@example.com', 'user', '2025-10-23 11:06:16.614868+00', 'Lucas Martin', NULL),
 ('53b4ae6b-8339-4a20-8947-84b77f5ae5a4', 'maxime.riviere@example.com', 'admin', '2025-10-23 11:06:16.614868+00', 'Maxime Rivière', NULL),
@@ -114,30 +95,36 @@ CREATE TABLE IF NOT EXISTS public.products (
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
--- Supprime anciennes policies
-DO $$
-BEGIN
-  EXECUTE 'DROP POLICY IF EXISTS "Public can read products" ON public.products';
-  EXECUTE 'DROP POLICY IF EXISTS "Admins can manage products" ON public.products';
-END $$;
-
 CREATE POLICY "Public can read products"
   ON public.products FOR SELECT USING (true);
 
 CREATE POLICY "Admins can manage products"
   ON public.products
   FOR ALL TO authenticated
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
 
--- 🌱 SEED : Products
 INSERT INTO public.products (id, name, category, price, purity, stock, image, created_at, description) VALUES
 ('055325fa-d4cf-4fff-99c9-6b2313efd21e', 'IGF-1 LR3', 'Performance', 59.90, 98.00, false, '/src/assets/products/igf-1-lr3/peptide-igf-1-lr3.png', '2025-10-23 11:03:43.922507', 'Facteur de croissance insulinomimétique, variante LR3.'),
 ('33139fef-a328-4f89-9586-29d7ee594cd7', 'Semax', 'Bien-être', 27.90, 99.00, true, '/src/assets/products/semax/peptide-semax.png', '2025-10-23 11:03:43.922507', 'Peptide neuroprotecteur / stimulant cognitif.'),
 ('36aa8192-5ff4-475f-8e8b-2ae9acd99750', 'Retatrutide', 'Métabolisme', 54.90, 99.00, true, '/src/assets/products/retatrutide/peptide-retatrutide.png', '2025-10-23 11:03:43.922507', 'Agoniste multiple étudié pour la perte de poids.'),
-('4c9db888-2682-4fb0-9c78-9a14529c9916', 'Selank', 'Bien-être', 27.90, 99.00, true, '/src/assets/products/selank/peptide-selank.png', '2025-10-23 11:03:43.922507', 'Peptide anxiolytique et nootropique.');
+('480b7044-e72d-4616-b114-14b6ea7b7aad', 'TB-500', 'Récupération', 32.90, 99.00, true, '/src/assets/products/tb-500/peptide-tb-500.png', '2025-10-23 11:03:43.922507', 'Fragment synthétique du TB4 ; régénération tissulaire.'),
+('4c9db888-2682-4fb0-9c78-9a14529c9916', 'Selank', 'Bien-être', 27.90, 99.00, true, '/src/assets/products/selank/peptide-selank.png', '2025-10-23 11:03:43.922507', 'Peptide anxiolytique et nootropique.'),
+('4f5337fd-5b34-4e38-88b8-09d80f732c81', 'CJC-1295', 'Performance', 44.90, 98.00, false, '/src/assets/products/cjc-1295/peptide-cjc-1295.png', '2025-10-23 11:03:43.922507', 'Stimule la sécrétion naturelle de l’hormone de croissance (GH).'),
+('4fa90261-496c-44e0-8dc8-dd81bd443d4a', 'Tesamorelin', 'Performance', 49.90, 98.00, false, '/src/assets/products/tesamorelin/peptide-tesamorelin.png', '2025-10-23 11:03:43.922507', 'GHRH analogue ; stimule la libération d’hormone de croissance.'),
+('7979d686-c341-4606-944b-16f35097385c', 'Semaglutide', 'Métabolisme', 52.90, 99.00, true, '/src/assets/products/semaglutide/peptide-semaglutide.png', '2025-10-23 11:03:43.922507', 'Analogue du GLP-1 étudié pour le contrôle glycémique.'),
+('8e30a5b8-cc7f-4e65-ba95-acd9bbcd4b8c', 'BPC-157', 'Récupération', 34.90, 99.00, true, '/src/assets/products/bpc-157/peptide-bpc-157.png', '2025-10-23 11:03:43.922507', 'Peptide pro-régénératif pour tendons et tissus.'),
+('a5a75105-0731-4adc-8ea2-bc23caf68dca', 'MOTS-c', 'Recherche', 49.90, 99.00, true, '/src/assets/products/mots-c/peptide-mots-c.png', '2025-10-23 11:03:43.922507', 'Peptide mitochondrial étudié pour le métabolisme énergétique.'),
+('c0e8f904-5cdc-4020-a41a-019e99c5b0a6', 'Melanothan-2', 'Recherche', 39.90, 99.00, true, '/src/assets/products/melanothan-2/peptide-melanothan-2.png', '2025-10-23 11:03:43.922507', 'Analogue de l’α-MSH ; stimule le bronzage et la libido.'),
+('cb8034c6-f2e7-46b3-8169-7cb9731634ab', 'DSIP', 'Bien-être', 29.90, 99.00, true, '/src/assets/products/dsip/peptide-dsip.png', '2025-10-23 11:03:43.922507', 'Delta Sleep-Inducing Peptide, étudié pour le sommeil.'),
+('d2c28d0b-8b14-4c12-b86b-44e075c0ba7b', 'PT-141', 'Bien-être', 42.90, 99.00, true, '/src/assets/products/pt-141/peptide-pt-141.png', '2025-10-23 11:03:43.922507', 'Bremelanotide ; applications libido / dysfonction sexuelle.');
 
 -- ============================================================
--- 🧾 TABLE : ORDERS
+-- 🧾 TABLE : ORDERS (FIXED + COMPLETE)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -164,28 +151,9 @@ CREATE TABLE IF NOT EXISTS public.orders (
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-  EXECUTE 'DROP POLICY IF EXISTS "User can view own orders" ON public.orders';
-  EXECUTE 'DROP POLICY IF EXISTS "Admin full access orders" ON public.orders';
-END $$;
-
-CREATE POLICY "User can view own orders"
-  ON public.orders
-  FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Admin full access orders"
-  ON public.orders
-  FOR ALL
-  TO authenticated
-  USING (auth.jwt() ->> 'role' = 'admin');
-
--- 🌱 SEED : Orders
-INSERT INTO public.orders (id, user_id, full_name, email, address, zip, city, country, payment_method, total_amount, items, status, created_at)
-VALUES
-('0d47fea6-fc86-4738-880b-7ae3e2c6c06e', 'a0dde032-184c-4770-8b9f-51d7a52f36b4', 'Hugo Bogrand', 'h.bogrand@gmail.com', '', '', '', 'France', 'stripe', 54.90, '[{"id":"36aa8192-5ff4-475f-8e8b-2ae9acd99750","name":"Retatrutide"}]', 'pending', '2025-10-23 12:48:27.273917+00');
+INSERT INTO public.orders (id, user_id, full_name, email, address, zip, city, country, payment_method, total_amount, items, status, internal_notes, carrier, tracking_number, shipped_at, created_at, payment_intent_id, stripe_session_id, updated_at) VALUES
+('0d47fea6-fc86-4738-880b-7ae3e2c6c06e', 'a0dde032-184c-4770-8b9f-51d7a52f36b4', 'Hugo Bogrand', 'h.bogrand@gmail.com', '', '', '', 'France', 'stripe', 54.90, '[{"id":"36aa8192-5ff4-475f-8e8b-2ae9acd99750","name":"Retatrutide"}]', 'pending', '', NULL, NULL, NULL, '2025-10-23 12:48:27.273917+00', NULL, NULL, '2025-10-23 12:48:27.273917+00');
 
 -- ============================================================
--- ✅ END OF SCRIPT
+-- ✅ END OF FULL BACKUP
 -- ============================================================
