@@ -70,8 +70,7 @@
     height: 100vh;
     width: 100vw;
     background-color: @neutral-0;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 

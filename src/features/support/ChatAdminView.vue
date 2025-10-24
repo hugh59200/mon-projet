@@ -89,7 +89,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
   import ChatMessage from '@/features/support/ChatMessage.vue'
   import { supabase } from '@/services/supabaseClient'
   import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
@@ -109,7 +108,6 @@
   const messageContainer = ref<HTMLDivElement>()
   const endOfChat = ref<HTMLDivElement>()
 
-  const adminId = useAuthStore().user?.id
   const chatNotif = useChatNotifStore()
   const typing = useTypingStore()
   const route = useRoute()
@@ -310,6 +308,7 @@
       min-height: 500px;
     }
 
+    /* === SIDEBAR (liste des conversations) === */
     &__sidebar {
       background: @neutral-50;
       border-right: 1px solid @neutral-200;
@@ -340,22 +339,27 @@
       }
     }
 
+    /* === ZONE DE MESSAGES === */
     &__messages {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0;
       position: relative;
       background: white;
+      border-left: 1px solid @neutral-200;
+
+      height: 600px;
+      overflow: hidden;
 
       .messages-list {
         flex: 1;
         overflow-y: auto;
         padding: 16px;
-        min-height: 300px;
-        max-height: calc(100vh - 280px); /* s’adapte dynamiquement à la fenêtre */
+        padding-bottom: 70px; /* espace sous les messages */
+        scroll-behavior: smooth;
       }
 
+      /* === Barre d’envoi === */
       .send-box {
         display: flex;
         align-items: center;
@@ -363,10 +367,7 @@
         border-top: 1px solid @neutral-200;
         padding: 12px;
         background: white;
-        position: sticky;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        box-shadow: 0 -2px 6px fade(@neutral-800, 5%); /* ✅ ombre subtile */
 
         input {
           flex: 1;
@@ -376,6 +377,7 @@
           font-size: 14px;
           border-radius: 8px;
           background: @neutral-50;
+          transition: all 0.2s ease;
           &:focus {
             border-color: @primary-500;
             background: white;
@@ -388,6 +390,7 @@
       }
     }
 
+    /* === Placeholder quand aucune conversation n’est sélectionnée === */
     &__placeholder {
       display: flex;
       align-items: center;
@@ -436,5 +439,20 @@
       transform: scale(1);
       opacity: 1;
     }
+  }
+
+  /* === SCROLL PERSONNALISÉ (Chrome / Edge / Safari) === */
+  .messages-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  .messages-list::-webkit-scrollbar-thumb {
+    background: fade(@neutral-600, 40%);
+    border-radius: 8px;
+  }
+  .messages-list::-webkit-scrollbar-thumb:hover {
+    background: fade(@neutral-600, 60%);
+  }
+  .messages-list::-webkit-scrollbar-track {
+    background: fade(@neutral-100, 60%);
   }
 </style>

@@ -29,7 +29,7 @@
             v-for="msg in messages"
             :key="msg.id"
             :message="msg"
-            :isMine="msg.user_id === user?.id"
+            :isMine="msg.sender_role === 'user'"
           />
 
           <!-- 💭 Bulle typing animée -->
@@ -66,10 +66,9 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
   import { supabase } from '@/services/supabaseClient'
   import { storeToRefs } from 'pinia'
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { nextTick, onMounted, onUnmounted, ref } from 'vue'
   import ChatMessage from './ChatMessage.vue'
   import { useChatStore } from './stores/useChatStore'
   import { useTypingStore } from './stores/useTypingStore'
@@ -80,7 +79,6 @@
   const chat = useChatStore()
   const typing = useTypingStore()
   const { messages } = storeToRefs(chat) // ✅ Rend messages réactif
-  const user = useAuthStore().user
 
   const newMessage = ref('')
   const isOpen = ref(false)
@@ -154,10 +152,6 @@
   onUnmounted(() => {
     supabase.removeChannel(channel)
     supabase.removeChannel(typingChannel)
-  })
-
-  watch(messages, () => {
-    nextTick(() => endOfChat.value?.scrollIntoView({ behavior: 'smooth' }))
   })
 </script>
 

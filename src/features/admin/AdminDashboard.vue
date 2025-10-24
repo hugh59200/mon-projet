@@ -1,25 +1,9 @@
 <template>
   <div class="admin-dashboard">
     <!-- 💬 Chat en aperçu -->
-    <section class="dashboard-card chat-preview">
-      <header class="card-header">
-        <BasicText
-          size="h4"
-          weight="bold"
-        >
-          💬 Messages clients
-        </BasicText>
-        <BasicButton
-          label="Ouvrir le chat complet"
-          type="secondary"
-          size="small"
-          @click="$router.push('/admin/chat')"
-        />
-      </header>
-
-      <ChatAdminView :is-preview="true" />
+    <section class="dashboard-card">
+      <ChatAdminView />
     </section>
-
     <!-- 📊 Statistiques globales -->
     <section class="dashboard-card">
       <BasicText
@@ -445,20 +429,6 @@
         font-weight: bold;
         font-size: 20px;
         margin-top: 4px;
-      }
-    }
-
-    /* --- CHAT PREVIEW --- */
-    .chat-preview {
-      .card-header {
-        margin-bottom: 16px;
-      }
-
-      .ChatAdminView {
-        border-radius: 8px;
-        overflow: hidden;
-        max-height: 420px;
-        border: 1px solid @neutral-200;
       }
     }
 
