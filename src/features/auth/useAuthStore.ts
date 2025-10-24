@@ -1,9 +1,7 @@
-// /src/features/auth/useAuthStore.ts
 import router from '@/router'
 import { supabase } from '@/services/supabaseClient'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useToastStore } from '../../../designSystem/src/components/basic/toast/useToastStore'
 
 interface Profile {
   id: string
@@ -17,7 +15,6 @@ export const useAuthStore = defineStore('auth', () => {
   const profile = ref<Profile | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const toast = useToastStore()
   let refreshInterval: number | null = null
 
   // --- COMPUTED ---
@@ -33,14 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
       .from('profiles')
       .select('*')
       .eq('id', user.value.id)
-      .single()
+      .maybeSingle()
 
     if (err) {
-      console.error('Erreur profil:', err)
-      toast.showToast('Erreur lors du chargement du profil.', 'danger')
-    } else {
-      profile.value = data || { role: 'user' }
+      console.warn('Erreur profil (non bloquante):', err)
+      return
     }
+    if (data) profile.value = data
   }
 
   // ======================================================
@@ -58,19 +54,28 @@ export const useAuthStore = defineStore('auth', () => {
   // ======================================================
   async function signIn(email: string, password: string): Promise<boolean> {
     loading.value = true
+    error.value = null
+
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
     loading.value = false
 
     if (err) {
-      toast.showToast(err.message, 'danger')
       error.value = err.message
       return false
     }
 
+    // 🔍 Vérifie si le mail est confirmé
+    const isConfirmed = !!data.user?.email_confirmed_at
+    if (!isConfirmed) {
+      error.value = 'Veuillez confirmer votre e-mail avant de vous connecter 📧'
+      await supabase.auth.signOut()
+      return false
+    }
+
+    // ✅ Connexion normale
     user.value = data.user
     await fetchProfile()
     startAutoRefresh()
-    toast.showToast('Connexion réussie 🎉', 'success')
     return true
   }
 
@@ -79,19 +84,20 @@ export const useAuthStore = defineStore('auth', () => {
   // ======================================================
   async function signUp(email: string, password: string): Promise<boolean> {
     loading.value = true
-    const { data, error: err } = await supabase.auth.signUp({ email, password })
+    error.value = null
+
+    const { error: err } = await supabase.auth.signUp({ email, password })
     loading.value = false
 
     if (err) {
-      toast.showToast(err.message, 'danger')
       error.value = err.message
       return false
     }
 
-    toast.showToast('Compte créé ! Vérifiez vos e-mails 📧', 'success')
-    user.value = data.user
-    await fetchProfile()
-    startAutoRefresh()
+    // ⚠️ On n’instancie pas de session, l’utilisateur doit confirmer son e-mail
+    user.value = null
+    profile.value = null
+
     return true
   }
 
@@ -99,28 +105,22 @@ export const useAuthStore = defineStore('auth', () => {
   // 🌍 OAUTH (Google, GitHub)
   // ======================================================
   async function signInWithProvider(provider: 'google' | 'github', redirect?: string) {
+    loading.value = true
+    error.value = null
     try {
-      loading.value = true
-
-      // 💾 Sauvegarde la redirection (pour la restaurer après callback)
       if (redirect) sessionStorage.setItem('redirectAfterOAuth', redirect)
       else sessionStorage.removeItem('redirectAfterOAuth')
 
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
       })
-
-      if (err) {
-        toast.showToast(err.message, 'danger')
-        error.value = err.message
-      }
+      if (err) error.value = err.message
     } finally {
       loading.value = false
     }
   }
+
   // ======================================================
   // ✉️ MAGIC LINK (connexion sans mot de passe)
   // ======================================================
@@ -130,34 +130,25 @@ export const useAuthStore = defineStore('auth', () => {
 
     const { error: err } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
-
     loading.value = false
 
     if (err) {
       error.value = err.message
-      toast.showToast(err.message, 'danger')
       return false
     }
-
-    toast.showToast('Lien magique envoyé à votre e-mail 📩', 'success')
     return true
   }
 
   // ======================================================
   // 🚪 LOGOUT
   // ======================================================
-  async function signOut(redirect = true, message?: string) {
-    console.log('disconnecting')
+  async function signOut(redirect = true) {
     await supabase.auth.signOut()
-    console.log('disconnectinggggg')
     user.value = null
     profile.value = null
     stopAutoRefresh()
-    toast.showToast(message ?? 'Déconnexion effectuée.', message ? 'warning' : 'info')
     if (redirect) router.push('/auth/login')
   }
 
@@ -166,11 +157,8 @@ export const useAuthStore = defineStore('auth', () => {
   // ======================================================
   async function initAuth() {
     loading.value = true
-
     const { data, error } = await supabase.auth.getSession()
-    if (error) {
-      console.warn('Erreur récupération session Supabase', error)
-    }
+    if (error) console.warn('Erreur récupération session Supabase', error)
 
     const session = data.session
     if (session?.user) {
@@ -181,7 +169,6 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       profile.value = null
     }
-
     loading.value = false
   }
 
@@ -192,9 +179,7 @@ export const useAuthStore = defineStore('auth', () => {
     stopAutoRefresh()
     refreshInterval = window.setInterval(
       async () => {
-        if (!(await refreshSession())) {
-          await signOut(true, 'Session expirée, veuillez vous reconnecter.')
-        }
+        if (!(await refreshSession())) await signOut(true)
       },
       60 * 60 * 1000,
     )
@@ -214,23 +199,24 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = session?.user ?? null
 
     if (session?.user) {
+      if (!session.user.email_confirmed_at) {
+        await signOut(true)
+        return
+      }
       try {
-        fetchProfile()
+        await fetchProfile()
       } catch (err) {
         console.warn('Erreur fetchProfile (non bloquant) :', err)
       }
       startAutoRefresh()
     }
 
-    // 🚦 Redirection automatique après OAuth / Magic Link
     if (event === 'SIGNED_IN' && router.currentRoute.value.name === 'auth-callback') {
       const redirect = router.currentRoute.value.query.redirect as string
       router.push(redirect || '/')
     }
 
-    if (event === 'SIGNED_OUT') {
-      router.push('/auth/login')
-    }
+    if (event === 'SIGNED_OUT') router.push('/auth/login')
   })
 
   // ======================================================

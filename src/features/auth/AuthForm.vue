@@ -26,10 +26,10 @@
         input-type="form"
         size="medium"
         autocomplete="off"
-        @input="error = ''"
+        @input="clearMessages"
       />
 
-      <!-- Champ mot de passe seulement si besoin -->
+      <!-- Champ mot de passe -->
       <BasicInput
         v-if="mode !== 'reset' && !modeMagicLink"
         v-model="password"
@@ -40,7 +40,7 @@
         autocomplete="off"
         :suffix-icon="showPassword ? 'eye-off' : 'eye'"
         @suffix-click="showPassword = !showPassword"
-        @input="error = ''"
+        @input="clearMessages"
       />
 
       <!-- Bouton principal -->
@@ -50,7 +50,7 @@
         variant="filled"
         width="full"
         size="medium"
-        :disabled="loading"
+        :disabled="loading || !!message"
         :loading="loading"
         @click="handleSubmit"
       />
@@ -61,7 +61,7 @@
         :label="modeMagicLink ? 'Connexion avec mot de passe 🔑' : 'Connexion par lien magique ✉️'"
         width="full"
         size="small"
-        @click="modeMagicLink = !modeMagicLink"
+        @click="toggleMagicLink"
       />
 
       <!-- 🌍 Login via Provider -->
@@ -157,7 +157,7 @@
   const message = ref('')
   const loading = ref(false)
   const showPassword = ref(false)
-  const modeMagicLink = ref(false) // 👈 toggle Magic Link
+  const modeMagicLink = ref(false)
 
   // Libellés dynamiques
   const titre = computed(() => {
@@ -185,10 +185,21 @@
     return 'Envoyer le lien'
   })
 
-  // 🧠 Action principale selon le mode
-  async function handleSubmit() {
+  // 🧩 Méthodes utilitaires
+  function clearMessages() {
     error.value = ''
     message.value = ''
+    auth.error = null
+  }
+
+  function toggleMagicLink() {
+    modeMagicLink.value = !modeMagicLink.value
+    clearMessages()
+  }
+
+  // 🧠 Soumission du formulaire
+  async function handleSubmit() {
+    clearMessages()
     loading.value = true
 
     if (!email.value.includes('@')) {
@@ -200,29 +211,35 @@
     try {
       if (props.mode === 'login') {
         if (modeMagicLink.value) {
-          // 🔮 Connexion par lien magique
           const success = await auth.signInWithMagicLink(email.value)
-          if (success) message.value = 'Vérifiez votre boîte e-mail pour le lien magique ✨'
-          else error.value = auth.error ?? 'Impossible d’envoyer le lien.'
+          if (success) {
+            message.value = 'Vérifiez votre boîte e-mail pour le lien magique ✨'
+          } else {
+            error.value = auth.error ?? 'Impossible d’envoyer le lien.'
+          }
         } else {
-          // 🔑 Connexion classique
           const success = await auth.signIn(email.value, password.value)
           if (success) {
             const redirect = router.currentRoute.value.query.redirect as string
             router.push(redirect || '/')
-          } else error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+          } else {
+            error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+          }
         }
       }
 
       if (props.mode === 'register') {
         const success = await auth.signUp(email.value, password.value)
-        if (success) message.value = 'Vérifiez vos e-mails pour confirmer votre compte 📧'
-        else error.value = auth.error ?? 'Inscription échouée.'
+        if (success) {
+          message.value = 'Vérifiez vos e-mails pour confirmer votre compte 📧'
+        } else {
+          error.value = auth.error ?? 'Inscription échouée.'
+        }
       }
 
       if (props.mode === 'reset') {
         const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
-          redirectTo: `${window.location.origin}/auth/login`, // ✅ corrigé
+          redirectTo: `${window.location.origin}/auth/login`,
         })
         if (err) error.value = err.message
         else message.value = 'Lien de réinitialisation envoyé ✅'
@@ -299,4 +316,4 @@
   .fade-leave-to {
     opacity: 0;
   }
-</style>   
+</style>

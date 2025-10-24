@@ -29,7 +29,6 @@
     </main>
     <FooterApp class="footer" />
     <AppRegisterGlobals />
-    <ToastContainer />
   </div>
 </template>
 
@@ -43,7 +42,6 @@
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/services/supabaseClient'
-  import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
 
   const cart = useCartStore()
   const sidebar = useSidebarStore()

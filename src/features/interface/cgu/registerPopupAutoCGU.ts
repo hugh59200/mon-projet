@@ -1,4 +1,5 @@
 import { registerPopupAuto } from '@/features/application/popup-auto/PopupAuto'
+import { supabase } from '@/services/supabaseClient'
 import { useAfficheCGUStore } from './useAfficheCGUStore'
 import { useVersionCGUStore } from './useVersionCGUStore'
 
@@ -6,14 +7,39 @@ export function registerPopupAutoCGU() {
   registerPopupAuto({
     key: 'CGU',
     canPopup: async () => {
-      return true
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return false
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('cgu_accepted')
+        .eq('id', user.id)
+        .single()
+
+      return profile?.cgu_accepted === false
     },
-    showPopup: () => {
+
+    showPopup: async () => {
       const dialogCGU = useAfficheCGUStore()
-      return dialogCGU.showDialog({ validationObligatoire: true }).then(() => {
-        const versionStore = useVersionCGUStore()
-        return versionStore.setCguValidées()
-      })
+      await dialogCGU.showDialog({ validationObligatoire: true })
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({
+            cgu_accepted: true,
+            cgu_accepted_at: new Date().toISOString(),
+          })
+          .eq('id', user.id)
+      }
+
+      const versionStore = useVersionCGUStore()
+      versionStore.setCguValidées()
     },
   })
 }

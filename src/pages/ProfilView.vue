@@ -109,7 +109,7 @@
   import { supabase } from '@/services/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
-  import { useAuthStore } from './useAuthStore'
+  import { useAuthStore } from '../features/auth/useAuthStore'
 
   const auth = useAuthStore()
   const toast = useToastStore()

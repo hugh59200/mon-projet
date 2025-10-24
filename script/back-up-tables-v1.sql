@@ -173,3 +173,13 @@ INSERT INTO "public"."orders" ("id", "user_id", "full_name", "email", "address",
 -- ============================================================
 -- ✅ END OF FULL BACKUP
 -- ============================================================
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS cgu_accepted boolean DEFAULT false,
+ADD COLUMN IF NOT EXISTS cgu_accepted_at timestamptz;
+
+UPDATE public.profiles
+SET cgu_accepted = false,
+    cgu_accepted_at = NULL;
+
+

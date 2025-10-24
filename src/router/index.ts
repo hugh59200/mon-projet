@@ -1,8 +1,7 @@
-import { useAuthStore } from '@/features/auth/useAuthStore'
-import { useCartStore } from '@/features/cart/useCartStore'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
+import { registerBaseGuard } from './registerBaseGuard'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -75,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/profil',
     name: 'profil',
-    component: () => import('@/features/auth/ProfilView.vue'),
+    component: () => import('@/pages/ProfilView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Mon profil – Fast Peptides',
@@ -208,51 +207,6 @@ const router = createRouter({
   routes,
 })
 
-// 🧠 Middleware de navigation
-router.beforeEach(async (to) => {
-  const auth = useAuthStore()
-  const cart = useCartStore()
-
-  if (!auth.user) await auth.initAuth()
-
-  const authPages = ['/auth/login', '/auth/register', '/auth/reset-password']
-  if (auth.isAuthenticated && authPages.includes(to.path)) {
-    return { name: 'home' }
-  }
-
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return {
-      path: '/auth/login',
-      query: { redirect: to.fullPath },
-    }
-  }
-
-  if (to.meta.requiresCart && cart.items.length === 0) {
-    return '/panier'
-  }
-
-  if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'access-denied' }
-  }
-
-  // 🧭 SEO dynamique
-  const title =
-    typeof to.meta.getTitle === 'function' ? to.meta.getTitle(to) : to.meta.title || 'Fast Peptides'
-  document.title = title
-
-  const descriptionTag = document.querySelector('meta[name="description"]')
-  const description =
-    typeof to.meta.getDescription === 'function'
-      ? to.meta.getDescription(to)
-      : to.meta.description || 'Peptides de recherche certifiés, livrés rapidement en Europe.'
-
-  if (descriptionTag) descriptionTag.setAttribute('content', description)
-  else {
-    const meta = document.createElement('meta')
-    meta.name = 'description'
-    meta.content = description
-    document.head.appendChild(meta)
-  }
-})
+registerBaseGuard(router)
 
 export default router

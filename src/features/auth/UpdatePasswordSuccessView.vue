@@ -1,40 +1,46 @@
 <template>
   <section class="auth-success">
-    <div class="auth-success__card">
-      <div class="auth-success__icon">
-        <i class="ph ph-check-circle"></i>
+    <transition name="fade">
+      <div class="auth-success__card">
+        <div class="auth-success__icon">
+          <BasicIconNext
+            name="CheckCircle"
+            :size="20"
+          />
+        </div>
+
+        <BasicText
+          size="h4"
+          weight="bold"
+        >
+          Mot de passe mis à jour ✅
+        </BasicText>
+
+        <BasicText
+          size="body-m"
+          color="neutral-500"
+          class="auth-success__subtitle"
+        >
+          Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous reconnecter à
+          votre compte.
+        </BasicText>
+
+        <BasicButton
+          label="Se connecter"
+          type="primary"
+          variant="filled"
+          size="medium"
+          width="full"
+          @click="router.push('/auth/login')"
+        />
       </div>
-
-      <BasicText
-        size="h4"
-        weight="bold"
-      >
-        Mot de passe mis à jour ✅
-      </BasicText>
-
-      <BasicText
-        size="body-m"
-        color="neutral-500"
-        class="auth-success__subtitle"
-      >
-        Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous reconnecter à
-        votre compte.
-      </BasicText>
-
-      <BasicButton
-        label="Se connecter"
-        type="primary"
-        variant="filled"
-        size="medium"
-        width="full"
-        @click="router.push('/auth/login')"
-      />
-    </div>
+    </transition>
   </section>
 </template>
 
 <script setup lang="ts">
   import { useRouter } from 'vue-router'
+
   const router = useRouter()
 </script>
 
@@ -58,10 +64,13 @@
       flex-direction: column;
       gap: 16px;
       align-items: center;
+      animation: fadeInUp 0.4s ease forwards;
     }
 
     &__icon {
-      font-size: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: @primary-700;
       margin-bottom: 8px;
     }
@@ -73,5 +82,26 @@
     button {
       margin-top: 8px;
     }
+  }
+
+  /* ✨ Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

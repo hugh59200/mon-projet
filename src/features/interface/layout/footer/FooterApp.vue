@@ -45,7 +45,7 @@
   import 'md-editor-v3/lib/style.css'
   import { ref } from 'vue'
   import { useAfficheCGU } from '../../cgu'
-  import FastPeptidesVersion from './AktoVersion.md?raw'
+  import FastPeptidesVersion from './FastPeptidesVersion.md?raw'
 
   const toggleModal = ref(false)
 

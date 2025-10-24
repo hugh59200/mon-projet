@@ -14,10 +14,13 @@
         color="neutral-500"
         class="auth__subtitle"
       >
-        Choisissez un nouveau mot de passe pour accéder à votre compte.
+        Définissez un nouveau mot de passe pour votre compte.
       </BasicText>
 
-      <form class="auth__form">
+      <form
+        class="auth__form"
+        @submit.prevent="updatePassword"
+      >
         <BasicInput
           v-model="password"
           :type="showPassword ? 'text' : 'password'"
@@ -27,7 +30,7 @@
           autocomplete="off"
           :suffix-icon="showPassword ? 'eye-off' : 'eye'"
           @suffix-click="showPassword = !showPassword"
-          @input="error = ''"
+          @input="clearMessages"
         />
 
         <BasicInput
@@ -39,7 +42,7 @@
           autocomplete="off"
           :suffix-icon="showConfirm ? 'eye-off' : 'eye'"
           @suffix-click="showConfirm = !showConfirm"
-          @input="error = ''"
+          @input="clearMessages"
         />
 
         <BasicButton
@@ -94,9 +97,13 @@
 
   const router = useRouter()
 
-  async function updatePassword() {
+  function clearMessages() {
     error.value = ''
     message.value = ''
+  }
+
+  async function updatePassword() {
+    clearMessages()
 
     if (password.value.length < 6) {
       error.value = 'Le mot de passe doit contenir au moins 6 caractères.'
@@ -111,6 +118,7 @@
     loading.value = true
 
     const { error: err } = await supabase.auth.updateUser({ password: password.value })
+
     loading.value = false
 
     if (err) {
@@ -118,8 +126,8 @@
       return
     }
 
-    message.value = 'Mot de passe mis à jour ✅'
-    setTimeout(() => router.push('/update-password/success'), 1000)
+    message.value = 'Votre mot de passe a été mis à jour ✅'
+    setTimeout(() => router.push('/auth/login'), 2000)
   }
 </script>
 
@@ -164,6 +172,7 @@
     }
   }
 
+  /* Transitions */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.2s ease;

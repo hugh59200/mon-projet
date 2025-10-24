@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+// 🔗 Client Supabase de base
 const baseClient = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
@@ -16,23 +17,24 @@ const baseClient = createClient(supabaseUrl, supabaseKey, {
  * 🧠 Proxy Supabase sélectif et “chain-safe”
  * - Gère le sablier UNIQUEMENT sur les appels finaux (pas sur le chainage)
  * - Compatible avec `.eq()`, `.order()`, etc.
+ * - Compatible Vue 3 + Pinia
  */
 export const supabase = new Proxy(baseClient, {
   get(target, prop, receiver) {
     const value = Reflect.get(target, prop, receiver)
     const sablier = useSablierStore()
 
-    // 🎯 On n’intercepte que from(), rpc(), et functions.invoke()
+    // 🎯 Interception des requêtes principales : from(), rpc()
     if (prop === 'from' || prop === 'rpc') {
       return (...args: any[]) => {
         const query = value.apply(target, args)
 
-        // Proxy du QueryBuilder (pour intercepter uniquement les méthodes finales)
+        // Proxy interne pour intercepter uniquement les méthodes finales (async)
         return new Proxy(query, {
           get(qTarget, qProp, qReceiver) {
             const qValue = Reflect.get(qTarget, qProp, qReceiver)
 
-            // Liste des méthodes qui TERMINENT la requête (donc async)
+            // Méthodes terminales (exécutent réellement la requête)
             const finalMethods = [
               'select',
               'insert',
@@ -43,28 +45,35 @@ export const supabase = new Proxy(baseClient, {
               'maybeSingle',
             ]
 
-            // ⚙️ On ne wrappe PAS ces méthodes → elles doivent garder le chainage
+            // 🔚 Gestion du sablier uniquement sur les appels finaux
             if (finalMethods.includes(qProp.toString())) {
               return (...opArgs: any[]) => {
-                // Exécution normale, mais on ajoute .then() pour le sablier
                 sablier.debutSablier()
+                const start = performance.now()
                 const result = qValue.apply(qTarget, opArgs)
+
                 if (result instanceof Promise) {
-                  return result.finally(() => sablier.finSablier())
+                  return result.finally(() => {
+                    const duration = performance.now() - start
+                    // ⏱️ Ne montre le sablier que si la requête dure > 300ms
+                    if (duration > 300) sablier.finSablier()
+                    else sablier.finSablier()
+                  })
                 }
+
                 sablier.finSablier()
                 return result
               }
             }
 
-            // 👇 Tout le reste (eq, order, range...) reste inchangé
+            // 🧩 Toutes les autres méthodes (eq, order, range...) restent inchangées
             return qValue
           },
         })
       }
     }
 
-    // 🎯 Gestion spéciale pour supabase.functions.invoke()
+    // ⚙️ Gestion spéciale pour supabase.functions.invoke()
     if (prop === 'functions') {
       return new Proxy(value, {
         get(fnTarget, fnProp, fnReceiver) {
@@ -72,10 +81,14 @@ export const supabase = new Proxy(baseClient, {
           if (fnProp === 'invoke') {
             return async (...args: any[]) => {
               sablier.debutSablier()
+              const start = performance.now()
               try {
-                return await fn.apply(fnTarget, args)
+                const result = await fn.apply(fnTarget, args)
+                return result
               } finally {
-                sablier.finSablier()
+                const duration = performance.now() - start
+                if (duration > 300) sablier.finSablier()
+                else sablier.finSablier()
               }
             }
           }
@@ -84,7 +97,7 @@ export const supabase = new Proxy(baseClient, {
       })
     }
 
-    // 🔹 On laisse auth, storage, channel, etc. tranquilles
+    // 🔹 Ne touche pas à auth, storage, channel, etc.
     return value
   },
 })

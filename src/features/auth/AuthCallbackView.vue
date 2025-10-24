@@ -29,6 +29,7 @@
               color="primary"
             />
           </div>
+
           <BasicButton
             v-else
             label="Retour à la connexion"
@@ -51,12 +52,13 @@
   const route = useRoute()
   const auth = useAuthStore()
 
+  // États locaux
   const loading = ref(true)
   const visible = ref(true)
   const messageTitle = ref('Connexion sécurisée en cours 🔐')
   const messageSubtitle = ref('Fast Peptides vérifie votre compte, un instant…')
 
-  // petite fonction utilitaire pour un délai fluide
+  // ⏱️ Délai fluide pour transitions
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
   onMounted(async () => {
@@ -64,27 +66,43 @@
       const { data, error } = await supabase.auth.getSession()
       if (error) throw error
 
-      if (data.session) {
-        auth.user = data.session.user
-        await auth.initAuth()
-
-        const savedRedirect = sessionStorage.getItem('redirectAfterOAuth')
-        sessionStorage.removeItem('redirectAfterOAuth')
-
-        const redirect =
-          savedRedirect || (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/profil')
-
-        messageTitle.value = 'Connexion réussie ✅'
-        messageSubtitle.value = 'Redirection vers votre espace...'
-
-        await wait(400)
-        visible.value = false
-        await wait(400)
-
-        router.replace(redirect)
-      } else {
-        throw new Error('Aucune session trouvée.')
+      const session = data.session
+      if (!session?.user) {
+        messageTitle.value = 'Lien invalide ou expiré ❌'
+        messageSubtitle.value =
+          'Le lien de confirmation n’est plus valide. Veuillez recommencer la procédure.'
+        loading.value = false
+        return
       }
+
+      // Vérifie si le mail est bien confirmé
+      if (!session.user.email_confirmed_at) {
+        messageTitle.value = 'Adresse e-mail non confirmée ⚠️'
+        messageSubtitle.value =
+          'Veuillez vérifier votre e-mail et cliquer sur le lien de confirmation avant de vous connecter.'
+        await supabase.auth.signOut()
+        loading.value = false
+        return
+      }
+
+      // 🔐 Initialisation de la session valide
+      auth.user = session.user
+      await auth.initAuth()
+
+      // Redirection après OAuth ou lien magique
+      const savedRedirect = sessionStorage.getItem('redirectAfterOAuth')
+      sessionStorage.removeItem('redirectAfterOAuth')
+
+      const redirect =
+        savedRedirect || (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/profil')
+
+      messageTitle.value = 'Connexion réussie ✅'
+      messageSubtitle.value = 'Redirection vers votre espace...'
+
+      await wait(400)
+      visible.value = false
+      await wait(400)
+      router.replace(redirect)
     } catch (err) {
       console.error('Erreur callback:', err)
       messageTitle.value = 'Échec de la connexion ❌'
