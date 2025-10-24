@@ -14,10 +14,7 @@
         @click="isMobileOpen = false"
       >
         <div class="sidebar__icon">
-          <BasicIconNext
-            :name="item.icon"
-            :active="isActive"
-          />
+          <BasicIconNext :name="item.icon" />
 
           <!-- 🔔 Badge pour les nouveaux messages -->
           <template v-if="item.path === '/admin/chat' && chatNotif.unreadCount > 0">
@@ -52,8 +49,8 @@
 
   const sidebar = useSidebarStore()
   const { sidebarItems, isReduced } = storeToRefs(sidebar)
-
   const isMobileOpen = ref(false)
+
   watch(isReduced, () => {
     if (window.innerWidth < 900) isMobileOpen.value = false
   })
@@ -71,18 +68,20 @@
   .sidebar {
     position: relative;
     height: 100%;
-    width: 100%;
+    width: 240px;
     background: @secondary-800;
     color: @neutral-100;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     padding: 20px 0;
-    transition:
-      width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      background-color 0.3s ease;
     box-shadow: inset -1px 0 0 fade(white, 10%);
     box-sizing: border-box;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.reduced {
+      width: 80px;
+    }
 
     &__items {
       display: flex;
@@ -90,7 +89,6 @@
       align-items: stretch;
       gap: 6px;
       padding: 0 12px;
-      width: 100%;
     }
 
     &__item {
@@ -117,6 +115,10 @@
         color: white;
         font-weight: bold;
         box-shadow: 0 0 0 1px fade(white, 8%);
+
+        svg {
+          fill: white;
+        }
       }
     }
 
@@ -131,7 +133,7 @@
     }
   }
 
-  /* 🔔 Petit badge de notif */
+  /* 🔔 Badge de notif */
   .notif-badge {
     position: absolute;
     top: -4px;
@@ -147,5 +149,23 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 0 2px @secondary-800;
+  }
+
+  /* 🧩 Responsive */
+  @media (max-width: 900px) {
+    .sidebar {
+      width: 240px;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      height: calc(100vh - 60px);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1200;
+
+      &.sidebar--open {
+        transform: translateX(0);
+      }
+    }
   }
 </style>

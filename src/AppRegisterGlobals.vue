@@ -3,6 +3,9 @@
   <ToastContainer />
   <CGU />
 
+  <!-- 💬 Chat utilisateur (visible uniquement si connecté et pas admin) -->
+  <ChatWidget v-if="auth.user && !auth.isAdmin" />
+
   <!-- 🆕 Overlay CGU global -->
   <transition name="fade">
     <div
@@ -13,14 +16,21 @@
 </template>
 
 <script setup lang="ts">
+  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { registerPopupAutoCGU } from '@/features/interface/cgu'
   import CGU from '@/features/interface/cgu/CGU.vue'
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
-  import { registerPopupAutoCGU } from './features/interface/cgu'
+  import ChatWidget from '@/features/support/ChatWidget.vue'
+  import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
 
+  /* -------------------------------------------------------------------------- */
+  /*                                 INITIALISATION                             */
+  /* -------------------------------------------------------------------------- */
   registerPopupAutoCGU()
 
   const cgu = useAfficheCGUStore()
+  const auth = useAuthStore()
 </script>
 
 <style lang="less">
@@ -48,6 +58,7 @@
     }
   }
 
+  /* ✨ Transition fade globale */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;

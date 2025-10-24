@@ -156,7 +156,7 @@
       ...p,
       image: p.image || '/default-product-image.jpg',
     })
-    toast.showToast(`✅ ${p.name} ajouté au panier`, 'success')
+    toast.show(`✅ ${p.name} ajouté au panier`, 'success')
   }
 </script>
 

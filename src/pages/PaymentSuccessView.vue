@@ -113,7 +113,7 @@
     } catch (err: any) {
       console.error('💥 Erreur récupération session Stripe:', err)
       errorMessage.value = err.message || 'Erreur inconnue lors de la récupération du paiement.'
-      toast.showToast('Erreur lors du chargement du paiement', 'danger')
+      toast.show('Erreur lors du chargement du paiement', 'danger')
     } finally {
       hasLoaded.value = true // ✅ marquer la fin du chargement
       console.groupEnd()

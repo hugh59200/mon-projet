@@ -38,26 +38,41 @@
             v-for="msg in filteredMessages"
             :key="msg.id"
             :message="msg"
-            :isMine="msg.user_id === adminId"
+            :isMine="msg.sender_role === 'admin'"
           />
+
+          <!-- 💭 Bulle "utilisateur écrit..." -->
+          <div
+            v-if="typing.isTypingUser"
+            class="typing-bubble"
+          >
+            <span class="dot" />
+            <span class="dot" />
+            <span class="dot" />
+          </div>
+
           <div ref="endOfChat" />
         </div>
 
-        <form
-          class="send-box"
-          @submit.prevent="sendAdminMessage"
-        >
+        <!-- 🧩 Barre d'envoi -->
+        <div class="send-box">
           <input
             v-model="adminMessage"
-            placeholder="Répondre au client..."
+            placeholder="Écrire un message..."
             type="text"
+            @input="handleAdminInput"
+            @keyup.enter="sendAdminMessage"
           />
-          <button type="submit">
-            <BasicIcon name="send" />
-          </button>
-        </form>
+          <BasicButton
+            label="Envoyer"
+            type="primary"
+            size="small"
+            @click="sendAdminMessage"
+          />
+        </div>
       </section>
 
+      <!-- 🕳️ Placeholder -->
       <section
         v-else
         class="chat-admin__placeholder"
@@ -78,8 +93,10 @@
   import ChatMessage from '@/features/support/ChatMessage.vue'
   import { supabase } from '@/services/supabaseClient'
   import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
-  import { computed, nextTick, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useChatNotifStore } from './stores/useChatNotifStore'
+  import { useTypingStore } from './stores/useTypingStore'
 
   const props = defineProps({
     isPreview: { type: Boolean, default: false },
@@ -94,9 +111,14 @@
 
   const adminId = useAuthStore().user?.id
   const chatNotif = useChatNotifStore()
+  const typing = useTypingStore()
+  const route = useRoute()
+
+  let typingTimer: any
+  let typingChannel: any
 
   /* -------------------------------------------------------------------------- */
-  /*                            Chargement des données                          */
+  /*                            Chargement des conversations                     */
   /* -------------------------------------------------------------------------- */
   async function fetchConversations() {
     const { data, error } = await supabase
@@ -106,12 +128,12 @@
       user_id,
       content,
       created_at,
-      profiles!inner(email)
+      profiles(email)
     `,
       )
       .order('created_at', { ascending: false })
 
-    if (error) return console.error(error)
+    if (error) return console.error('[fetchConversations]', error)
 
     const grouped = new Map<string, any>()
     data.forEach((msg) => {
@@ -139,12 +161,11 @@
       .eq('user_id', userId)
       .order('created_at', { ascending: true })
 
-    if (error) return console.error(error)
+    if (error) return console.error('[fetchMessages]', error)
 
     messages.value = data || []
-    nextTick(() => endOfChat.value?.scrollIntoView({ behavior: 'smooth' }))
 
-    // 🧩 Canal Realtime
+    // 🧩 Canal Realtime par utilisateur
     supabase
       .channel(`messages-${userId}`)
       .on(
@@ -175,12 +196,33 @@
 
     const { error } = await supabase.from('messages').insert({
       user_id: selectedUserId.value,
+      sender_role: 'admin',
       content: adminMessage.value,
       created_at: new Date().toISOString(),
     })
-    if (error) console.error(error)
+
+    if (error) return console.error('[sendAdminMessage]', error)
+
     adminMessage.value = ''
-    await fetchMessages(selectedUserId.value)
+    // ❌ pas besoin de refetch ici
+    await nextTick()
+    endOfChat.value?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function handleAdminInput() {
+    supabase.channel('typing-status').send({
+      type: 'broadcast',
+      event: 'admin_typing',
+      payload: { isTyping: true },
+    })
+    clearTimeout(typingTimer)
+    typingTimer = setTimeout(() => {
+      supabase.channel('typing-status').send({
+        type: 'broadcast',
+        event: 'admin_typing',
+        payload: { isTyping: false },
+      })
+    }, 1500)
   }
 
   /* -------------------------------------------------------------------------- */
@@ -190,9 +232,65 @@
     messages.value.filter((m) => m.user_id === selectedUserId.value),
   )
 
+  /* -------------------------------------------------------------------------- */
+  /*                        Marquage auto + Typing Realtime                     */
+  /* -------------------------------------------------------------------------- */
   onMounted(async () => {
     await fetchConversations()
+
+    // reset badge si on arrive sur /admin/chat
+    if (route.path === '/admin/chat') {
+      await chatNotif.fetchUnreadCount()
+      const userIds = conversations.value.map((c) => c.user_id)
+      for (const id of userIds) {
+        await chatNotif.markAsRead(id)
+      }
+    }
+
+    // ⚡ Canal "typing"
+    typingChannel = supabase.channel('typing-status')
+    typingChannel
+      .on('broadcast', { event: 'user_typing' }, (payload: { payload: { isTyping: boolean } }) => {
+        typing.isTypingUser = payload.payload.isTyping
+      })
+      .subscribe()
+
+    // ⚡ Canal global pour tous les nouveaux messages utilisateur
+    supabase
+      .channel('messages-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        async (payload) => {
+          const msg = payload.new
+          if (msg.sender_role === 'user') {
+            if (msg.user_id === selectedUserId.value) {
+              messages.value.push(msg)
+              nextTick(() => endOfChat.value?.scrollIntoView({ behavior: 'smooth' }))
+            }
+            await fetchConversations()
+            await chatNotif.fetchUnreadCount()
+          }
+        },
+      )
+      .subscribe()
   })
+
+  onUnmounted(() => {
+    if (typingChannel) supabase.removeChannel(typingChannel)
+  })
+
+  watch(
+    () => route.path,
+    async (newPath) => {
+      if (newPath === '/admin/chat') {
+        const userIds = conversations.value.map((c) => c.user_id)
+        for (const id of userIds) {
+          await chatNotif.markAsRead(id)
+        }
+      }
+    },
+  )
 </script>
 
 <style scoped lang="less">
@@ -246,31 +344,46 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 16px;
+      padding: 0;
       position: relative;
+      background: white;
 
       .messages-list {
         flex: 1;
         overflow-y: auto;
-        max-height: 460px;
-        padding-right: 8px;
+        padding: 16px;
+        min-height: 300px;
+        max-height: calc(100vh - 280px); /* s’adapte dynamiquement à la fenêtre */
       }
 
       .send-box {
         display: flex;
+        align-items: center;
+        gap: 8px;
         border-top: 1px solid @neutral-200;
-        padding: 10px;
+        padding: 12px;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
         input {
           flex: 1;
-          border: none;
+          border: 1px solid @neutral-200;
           outline: none;
-          padding: 8px;
+          padding: 10px 12px;
+          font-size: 14px;
+          border-radius: 8px;
+          background: @neutral-50;
+          &:focus {
+            border-color: @primary-500;
+            background: white;
+          }
         }
+
         button {
-          background: none;
-          border: none;
-          padding: 6px 10px;
-          cursor: pointer;
+          flex-shrink: 0;
         }
       }
     }
@@ -279,6 +392,49 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+  }
+
+  /* 💭 Bulle typing animée façon iMessage */
+  .typing-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-around;
+    background: @neutral-200;
+    border-radius: 16px;
+    padding: 6px 10px;
+    width: 48px;
+    margin: 6px 0 6px 10px;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: fade(@neutral-600, 70%);
+      border-radius: 50%;
+      animation: typingDots 1.3s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+
+  @keyframes typingDots {
+    0%,
+    80%,
+    100% {
+      transform: scale(0.6);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
     }
   }
 </style>

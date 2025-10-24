@@ -20,18 +20,19 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
       const { data, count, error } = await fetchUsersWithCount(search.value, limit, offset)
       if (error) throw error
 
-      users.value = data?.map(user => ({
-        id: user.id,
-        email: user.email ?? '',
-        full_name: user.full_name,
-        role: user.role as 'admin' | 'user',
-        created_at: user.created_at ?? '',
-        avatar_url: user.avatar_url
-      })) ?? []
+      users.value =
+        data?.map((user) => ({
+          id: user.id,
+          email: user.email ?? '',
+          full_name: user.full_name,
+          role: user.role as 'admin' | 'user',
+          created_at: user.created_at ?? '',
+          avatar_url: user.avatar_url,
+        })) ?? []
       totalResults.value = count ?? 0
       totalPages.value = Math.ceil(totalResults.value / limit)
     } catch (err) {
-      toast.showToast('Erreur lors du chargement des utilisateurs', 'danger')
+      toast.show('Erreur lors du chargement des utilisateurs', 'danger')
     } finally {
       loading.value = false
     }
@@ -40,9 +41,9 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
   async function changeRole(user: UserProfile) {
     try {
       await updateUserRole(user.id, user.role)
-      toast.showToast(`Rôle de ${user.email} mis à jour ✅`, 'success')
+      toast.show(`Rôle de ${user.email} mis à jour ✅`, 'success')
     } catch {
-      toast.showToast('Erreur lors de la mise à jour du rôle', 'danger')
+      toast.show('Erreur lors de la mise à jour du rôle', 'danger')
     }
   }
 
@@ -51,9 +52,9 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
     try {
       await deleteUserById(user.id)
       users.value = users.value.filter((u) => u.id !== user.id)
-      toast.showToast('Utilisateur supprimé ✅', 'success')
+      toast.show('Utilisateur supprimé ✅', 'success')
     } catch {
-      toast.showToast('Erreur lors de la suppression', 'danger')
+      toast.show('Erreur lors de la suppression', 'danger')
     }
   }
 

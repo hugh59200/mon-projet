@@ -5,6 +5,7 @@ export type ToastType = 'success' | 'danger' | 'warning' | 'info'
 
 export interface Toast {
   id: number
+  title?: string
   message: string
   type: ToastType
   duration?: number
@@ -14,13 +15,29 @@ export const useToastStore = defineStore('toast', () => {
   const toasts = ref<Toast[]>([])
   let idCounter = 0
 
-  function showToast(message: string, type: ToastType = 'info', duration = 4000) {
+  /** ✅ Nouvelle signature flexible */
+  function show(
+    payload: string | { message: string; title?: string; type?: ToastType; duration?: number },
+    type: ToastType = 'info',
+    duration = 4000,
+  ) {
     const id = ++idCounter
-    const toast: Toast = { id, message, type, duration }
-    toasts.value.push(toast)
+    let toast: Toast
 
-    // Auto-suppression après durée
-    setTimeout(() => removeToast(id), duration)
+    if (typeof payload === 'string') {
+      toast = { id, message: payload, type, duration }
+    } else {
+      toast = {
+        id,
+        title: payload.title,
+        message: payload.message,
+        type: payload.type ?? 'info',
+        duration: payload.duration ?? 4000,
+      }
+    }
+
+    toasts.value.push(toast)
+    setTimeout(() => removeToast(id), toast.duration)
   }
 
   function removeToast(id: number) {
@@ -33,7 +50,7 @@ export const useToastStore = defineStore('toast', () => {
 
   return {
     toasts,
-    showToast,
+    show,
     removeToast,
     clearAll,
   }

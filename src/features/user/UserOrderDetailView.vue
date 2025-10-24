@@ -137,7 +137,8 @@
 
       const { data, error } = await supabase
         .from('orders')
-        .select(`
+        .select(
+          `
           id,
           full_name,
           address,
@@ -149,7 +150,8 @@
           status,
           created_at,
           items
-        `)
+        `,
+        )
         .eq('id', orderId)
         .eq('email', auth.user?.email)
         .single()
@@ -166,7 +168,7 @@
       order.value = data as Order
     } catch (err) {
       console.error('Erreur lors du chargement de la commande:', err)
-      toast.showToast('Erreur lors du chargement de la commande', 'danger')
+      toast.show('Erreur lors du chargement de la commande', 'danger')
       order.value = null
     } finally {
       hasLoaded.value = true // ✅ fin du chargement logique

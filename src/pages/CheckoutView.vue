@@ -202,13 +202,13 @@
   async function submitOrder() {
     await withSablier(async () => {
       if (!auth.user) {
-        toast.showToast('Veuillez vous connecter pour finaliser la commande.', 'danger')
+        toast.show('Veuillez vous connecter pour finaliser la commande.', 'danger')
         router.push('/auth/login')
         return
       }
 
       if (cart.items.length === 0) {
-        toast.showToast('Votre panier est vide.', 'warning')
+        toast.show('Votre panier est vide.', 'warning')
         return
       }
 
@@ -250,13 +250,13 @@
           window.location.href = data.url
         } else {
           // 3️⃣ Simulation ou crypto
-          toast.showToast('Paiement non-Stripe simulé.', 'success')
+          toast.show('Paiement non-Stripe simulé.', 'success')
           cart.clearCart()
           router.push('/profil/commandes')
         }
       } catch (err: any) {
         console.error('❌ Erreur commande/paiement:', err)
-        toast.showToast('Erreur lors du paiement ou de la commande ❌', 'danger')
+        toast.show('Erreur lors du paiement ou de la commande ❌', 'danger')
       }
     })
   }

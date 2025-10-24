@@ -5,6 +5,7 @@
   >
     <HeaderApp class="header" />
     <SidebarApp class="sidebar" />
+
     <main class="content">
       <RouterView v-slot="{ Component }">
         <transition
@@ -20,6 +21,7 @@
           />
         </transition>
       </RouterView>
+
       <transition
         name="fade"
         appear
@@ -27,6 +29,7 @@
         <SablierComponent v-if="sablier.estSablierVisible" />
       </transition>
     </main>
+
     <FooterApp class="footer" />
     <AppRegisterGlobals />
   </div>
@@ -67,7 +70,8 @@
     height: 100vh;
     width: 100vw;
     background-color: @neutral-0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -87,7 +91,9 @@
     background-color: @secondary-800;
     color: white;
     height: 100%;
+    width: 240px;
     z-index: 9;
+    transition: width 0.3s ease;
   }
 
   /* --- CONTENU --- */
@@ -112,11 +118,50 @@
     height: 40px;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .app-grid.sidebar-reduced .footer {
-    left: 80px;
+
+  /* --- Sidebar réduite --- */
+  .app-grid.sidebar-reduced {
+    grid-template-columns: 80px 1fr;
+
+    .sidebar {
+      width: 80px;
+    }
+
+    .footer {
+      left: 80px;
+    }
   }
 
-  /* ✨ TRANSITION entre pages */
+  /* --- Responsive --- */
+  @media (max-width: 900px) {
+    .app-grid {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'header'
+        'content'
+        'footer';
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      height: calc(100vh - 60px);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1200;
+    }
+
+    .sidebar--open {
+      transform: translateX(0);
+    }
+
+    .footer {
+      left: 0;
+    }
+  }
+
+  /* ✨ TRANSITIONS entre pages */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
     transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
@@ -130,7 +175,7 @@
     transform: translateY(-8px);
   }
 
-  /* Effet doux sur le sablier */
+  /* ✨ Sablier */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;

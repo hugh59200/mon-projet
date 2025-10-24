@@ -138,7 +138,7 @@
       .maybeSingle()
 
     if (error) {
-      toast.showToast('Erreur lors du chargement du profil', 'danger')
+      toast.show('Erreur lors du chargement du profil', 'danger')
       console.error(error)
       return
     }
@@ -176,7 +176,7 @@
       .upload(filePath, file!, { upsert: true })
 
     if (uploadError) {
-      toast.showToast('Erreur lors de l’upload de l’image', 'danger')
+      toast.show('Erreur lors de l’upload de l’image', 'danger')
       return
     }
 
@@ -186,10 +186,10 @@
       .eq('id', auth.user.id)
 
     if (updateError) {
-      toast.showToast('Erreur lors de la mise à jour du profil', 'danger')
+      toast.show('Erreur lors de la mise à jour du profil', 'danger')
     } else {
       avatarPreview.value = getPublicUrl(filePath)
-      toast.showToast('Avatar mis à jour 🎨', 'success')
+      toast.show('Avatar mis à jour 🎨', 'success')
     }
   }
 
@@ -207,8 +207,8 @@
 
     loading.value = false
 
-    if (error) toast.showToast('Erreur lors de la mise à jour', 'danger')
-    else toast.showToast('Profil mis à jour ✅', 'success')
+    if (error) toast.show('Erreur lors de la mise à jour', 'danger')
+    else toast.show('Profil mis à jour ✅', 'success')
   }
 
   /* --------------------------------------------- */
@@ -216,7 +216,7 @@
   /* --------------------------------------------- */
   async function updatePassword() {
     if (newPassword.value !== confirmPassword.value) {
-      toast.showToast('Les mots de passe ne correspondent pas ❌', 'danger')
+      toast.show('Les mots de passe ne correspondent pas ❌', 'danger')
       return
     }
 
@@ -226,9 +226,9 @@
     })
     passwordLoading.value = false
 
-    if (error) toast.showToast(error.message, 'danger')
+    if (error) toast.show(error.message, 'danger')
     else {
-      toast.showToast('Mot de passe mis à jour ✅', 'success')
+      toast.show('Mot de passe mis à jour ✅', 'success')
       showPasswordForm.value = false
       oldPassword.value = newPassword.value = confirmPassword.value = ''
     }

@@ -105,7 +105,7 @@
       orders.value = (data ?? []) as Order[]
     } catch (err) {
       console.error('Erreur lors du chargement des commandes:', err)
-      toast.showToast('Erreur lors du chargement de vos commandes', 'danger')
+      toast.show('Erreur lors du chargement de vos commandes', 'danger')
       orders.value = []
     } finally {
       hasLoaded.value = true // ✅ fin du chargement logique

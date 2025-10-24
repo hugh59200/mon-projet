@@ -19,7 +19,9 @@
       >
         <div class="chat-header">
           <span>Support Fast Peptides</span>
-          <button @click="toggleChat"><BasicIconNext name="X" /></button>
+          <button @click="toggleChat">
+            <BasicIconNext name="X" />
+          </button>
         </div>
 
         <div class="chat-messages">
@@ -29,6 +31,17 @@
             :message="msg"
             :isMine="msg.user_id === user?.id"
           />
+
+          <!-- 💭 Bulle typing animée -->
+          <div
+            v-if="typing.isTypingAdmin"
+            class="typing-bubble"
+          >
+            <span class="dot" />
+            <span class="dot" />
+            <span class="dot" />
+          </div>
+
           <div ref="endOfChat" />
         </div>
 
@@ -41,6 +54,7 @@
             type="text"
             placeholder="Écrire un message..."
             required
+            @input="handleInput"
           />
           <button type="submit">
             <BasicIconNext name="Send" />
@@ -54,45 +68,92 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { supabase } from '@/services/supabaseClient'
+  import { storeToRefs } from 'pinia'
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
   import ChatMessage from './ChatMessage.vue'
   import { useChatStore } from './stores/useChatStore'
+  import { useTypingStore } from './stores/useTypingStore'
 
+  /* -------------------------------------------------------------------------- */
+  /*                                    STATE                                   */
+  /* -------------------------------------------------------------------------- */
   const chat = useChatStore()
+  const typing = useTypingStore()
+  const { messages } = storeToRefs(chat) // ✅ Rend messages réactif
   const user = useAuthStore().user
-  const messages = chat.messages
+
   const newMessage = ref('')
   const isOpen = ref(false)
   const endOfChat = ref<HTMLDivElement>()
+  let typingTimer: any
+  let channel: any
+  let typingChannel: any
 
+  /* -------------------------------------------------------------------------- */
+  /*                                  METHODS                                  */
+  /* -------------------------------------------------------------------------- */
   const toggleChat = () => (isOpen.value = !isOpen.value)
 
   const sendMessage = async () => {
     if (!newMessage.value.trim()) return
     await chat.sendMessage(newMessage.value)
     newMessage.value = ''
-    nextTick(() => {
-      endOfChat.value?.scrollIntoView({ behavior: 'smooth' })
-    })
+    nextTick(() => endOfChat.value?.scrollIntoView({ behavior: 'smooth' }))
   }
 
-  let channel: any
+  function handleInput() {
+    // 🔵 envoi signal "user typing"
+    supabase.channel('typing-status').send({
+      type: 'broadcast',
+      event: 'user_typing',
+      payload: { isTyping: true },
+    })
+    clearTimeout(typingTimer)
+    typingTimer = setTimeout(() => {
+      supabase.channel('typing-status').send({
+        type: 'broadcast',
+        event: 'user_typing',
+        payload: { isTyping: false },
+      })
+    }, 1500)
+  }
 
-  onMounted(() => {
+  /* -------------------------------------------------------------------------- */
+  /*                                 LIFECYCLE                                 */
+  /* -------------------------------------------------------------------------- */
+  onMounted(async () => {
+    // ✅ récupère l'historique du user connecté
+    await chat.fetchMessages()
+
+    // ⚡ Realtime messages
     channel = supabase
       .channel('messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
+        chat.addMessage(payload.new),
+      )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
         (payload) => {
-          chat.addMessage(payload.new)
+          const updated = payload.new
+          const index = chat.messages.findIndex((m) => m.id === updated.id)
+          if (index !== -1) chat.messages[index] = updated
         },
       )
+      .subscribe()
+
+    // 👀 Typing realtime
+    typingChannel = supabase.channel('typing-status')
+    typingChannel
+      .on('broadcast', { event: 'admin_typing' }, (payload: { payload: { isTyping: boolean } }) => {
+        typing.isTypingAdmin = payload.payload.isTyping
+      })
       .subscribe()
   })
 
   onUnmounted(() => {
     supabase.removeChannel(channel)
+    supabase.removeChannel(typingChannel)
   })
 
   watch(messages, () => {
@@ -168,5 +229,58 @@
         }
       }
     }
+  }
+
+  /* 💭 Bulle typing animée façon iMessage */
+  .typing-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-around;
+    background: @neutral-200;
+    border-radius: 16px;
+    padding: 6px 10px;
+    width: 48px;
+    margin: 6px 0 6px 10px;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: fade(@neutral-600, 70%);
+      border-radius: 50%;
+      animation: typingDots 1.3s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+
+  @keyframes typingDots {
+    0%,
+    80%,
+    100% {
+      transform: scale(0.6);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Animation fade d'ouverture du chat */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

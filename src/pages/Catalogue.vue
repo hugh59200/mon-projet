@@ -120,7 +120,7 @@
       }
     } catch (err) {
       console.error('Erreur chargement catalogue:', err)
-      toast.showToast('Erreur lors du chargement du catalogue', 'danger')
+      toast.show('Erreur lors du chargement du catalogue', 'danger')
       products.value = []
     } finally {
       hasLoaded.value = true
@@ -147,7 +147,7 @@
 
   function addToCart(product: Product) {
     cart.addToCart({ ...product, stock: product.stock ?? false, image: product.image ?? '' })
-    toast.showToast(`✅ ${product.name} ajouté au panier`, 'success')
+    toast.show(`✅ ${product.name} ajouté au panier`, 'success')
   }
 </script>
 

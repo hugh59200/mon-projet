@@ -188,17 +188,17 @@
     const { data, count, error } = await query
 
     if (error) {
-      toast.showToast('Erreur lors du chargement des commandes', 'danger')
+      toast.show('Erreur lors du chargement des commandes', 'danger')
       console.error(error)
     } else {
-      orders.value = (data ?? []).map(order => ({
+      orders.value = (data ?? []).map((order) => ({
         ...order,
-        items: (order.items as any[] ?? []).map(item => ({
+        items: ((order.items as any[]) ?? []).map((item) => ({
           id: item.id,
           name: item.name,
           quantity: item.quantity,
-          price: item.price
-        }))
+          price: item.price,
+        })),
       })) as Order[]
       total.value = count ?? 0
     }
@@ -238,7 +238,7 @@
       .eq('id', order.id)
 
     if (error) {
-      toast.showToast('Erreur de mise à jour du statut', 'danger')
+      toast.show('Erreur de mise à jour du statut', 'danger')
       return
     }
 
@@ -262,19 +262,19 @@
 
       const result = await res.json()
       if (result.success) {
-        toast.showToast(`Statut mis à jour et email envoyé 📧`, 'success')
+        toast.show(`Statut mis à jour et email envoyé 📧`, 'success')
       } else {
-        toast.showToast('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
+        toast.show('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
       }
     } catch (err) {
       console.error('Erreur envoi email :', err)
-      toast.showToast('Statut mis à jour, mais erreur envoi mail ⚠️', 'warning')
+      toast.show('Statut mis à jour, mais erreur envoi mail ⚠️', 'warning')
     }
   }
 
   function exportCsv() {
     if (orders.value.length === 0) {
-      toast.showToast('Aucune commande à exporter', 'warning')
+      toast.show('Aucune commande à exporter', 'warning')
       return
     }
 

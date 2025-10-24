@@ -175,7 +175,7 @@
     const { data, error } = await supabase.from('orders').select('*').eq('id', id).single()
 
     if (error) {
-      toast.showToast('Erreur lors du chargement de la commande', 'danger')
+      toast.show('Erreur lors du chargement de la commande', 'danger')
       console.error(error)
       return
     }
@@ -231,21 +231,21 @@
       const data = await res.json()
 
       if (data.success) {
-        toast.showToast('Statut mis à jour et email envoyé ✅', 'success')
+        toast.show('Statut mis à jour et email envoyé ✅', 'success')
         await loadOrder()
       } else {
-        toast.showToast('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
+        toast.show('Statut mis à jour, mais email non envoyé ⚠️', 'warning')
       }
     } catch (err) {
       console.error(err)
-      toast.showToast('Erreur lors du changement de statut ⚠️', 'danger')
+      toast.show('Erreur lors du changement de statut ⚠️', 'danger')
     }
   }
 
   // 🚚 Ajout du suivi expédition
   async function handleAddTracking() {
     if (!carrier.value || !trackingNumber.value) {
-      toast.showToast('Veuillez renseigner le transporteur et le numéro de suivi', 'warning')
+      toast.show('Veuillez renseigner le transporteur et le numéro de suivi', 'warning')
       return
     }
 
@@ -284,16 +284,16 @@
       const data = await res.json()
 
       if (data.success) {
-        toast.showToast('Numéro de suivi ajouté et mail envoyé ✅', 'success')
+        toast.show('Numéro de suivi ajouté et mail envoyé ✅', 'success')
         await loadOrder()
         carrier.value = ''
         trackingNumber.value = ''
       } else {
-        toast.showToast('Suivi ajouté, mais mail non envoyé ⚠️', 'warning')
+        toast.show('Suivi ajouté, mais mail non envoyé ⚠️', 'warning')
       }
     } catch (err) {
       console.error(err)
-      toast.showToast('Erreur lors de l’ajout du suivi ⚠️', 'danger')
+      toast.show('Erreur lors de l’ajout du suivi ⚠️', 'danger')
     }
   }
 

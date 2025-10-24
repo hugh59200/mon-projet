@@ -37,13 +37,25 @@
           {{ auth.user.email }}
         </BasicText>
 
-        <BasicButton
-          v-if="auth.isAdmin"
-          label="Admin"
-          type="primary"
-          size="small"
-          @click="router.push('/admin')"
-        />
+        <!-- 🧩 Bouton admin avec badge de notifications -->
+        <div class="admin-chat-button">
+          <BasicButton
+            v-if="auth.isAdmin"
+            label="Admin"
+            type="primary"
+            size="small"
+            @click="router.push('/admin')"
+          />
+          <div
+            v-if="auth.isAdmin && chatNotif.unreadCount > 0"
+            class="badge"
+            @click="router.push('/admin/chat')"
+            title="Nouveaux messages"
+          >
+            {{ chatNotif.unreadCount }}
+          </div>
+        </div>
+
         <BasicButton
           label="Panier"
           type="secondary"
@@ -100,6 +112,8 @@
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
+  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
 
@@ -107,14 +121,50 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const sidebar = useSidebarStore()
+  const chatNotif = useChatNotifStore()
+  const toast = useToastStore()
+
   const { isReduced } = storeToRefs(sidebar)
   const { toggle } = sidebar
 
   async function handleLogout() {
-    console.log('➡️ Tentative de déconnexion...')
     await auth.signOut()
-    console.log('✅ signOut() terminé')
   }
+
+  // onMounted(async () => {
+  //   await chatNotif.fetchUnreadCount()
+  //   chatNotif.listenRealtime()
+
+  //   // ✅ Écoute temps réel pour afficher un toast à chaque nouveau message client
+  //   supabase
+  //     .channel('chat-toast')
+  //     .on(
+  //       'postgres_changes',
+  //       {
+  //         event: 'INSERT',
+  //         schema: 'public',
+  //         table: 'messages',
+  //         filter: 'sender_role=eq.user',
+  //       },
+  //       (payload) => {
+  //         const msg = payload.new
+
+  //         // 💬 Affiche le toast via ton nouveau store
+  //         toast.show({
+  //           title: '💬 Nouveau message client',
+  //           message: msg.content.slice(0, 60),
+  //           type: 'info',
+  //           duration: 6000,
+  //         })
+
+  //         // 🔊 Optionnel : petit son de notification
+  //         const audio = new Audio('/sounds/notify.mp3')
+  //         audio.volume = 0.3
+  //         audio.play().catch(() => {})
+  //       },
+  //     )
+  //     .subscribe()
+  // })
 </script>
 
 <style scoped lang="less">
@@ -126,7 +176,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 24px;
-    // background-color: @secondary-800;
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -153,6 +202,27 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+  }
+
+  /* 🧩 Badge de notification */
+  .admin-chat-button {
+    position: relative;
+    display: inline-block;
+
+    .badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: @danger-600;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      min-width: 20px;
+      text-align: center;
     }
   }
 

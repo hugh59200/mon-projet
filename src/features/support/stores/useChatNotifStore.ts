@@ -27,7 +27,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       .eq('user_id', userId)
       .eq('sender_role', 'user')
 
-    if (!error) await fetchUnreadCount()
+    if (!error) await fetchUnreadCount() // ✅ met à jour immédiatement le badge
   }
 
   /** 🔔 Écoute Realtime pour nouveaux messages */

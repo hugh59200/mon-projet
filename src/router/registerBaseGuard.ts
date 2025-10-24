@@ -5,36 +5,57 @@ import { supabase } from '@/services/supabaseClient'
 import type { Router } from 'vue-router'
 
 /**
- * 🧠 Guard global de base :
- * - Initialise la session Supabase
- * - Recharge le profil si besoin
- * - Déclenche la popup CGU si non acceptées
+ * 🧠 Guard global :
+ * - Vérifie session et profil
+ * - Bloque si email non confirmé
+ * - Déclenche popup CGU si nécessaire
  * - Vérifie panier / maintenance
  */
 export function registerBaseGuard(router: Router) {
-  let isShowingCGU = false // 🔒 évite de multiples popups simultanées
+  let isShowingCGU = false // 🔒 évite popup multiple
 
   router.beforeEach(async (to) => {
     const auth = useAuthStore()
     const cart = useCartStore()
 
-    // ✅ 1. Initialisation session
+    // ✅ 1. Initialisation session Supabase si pas encore fait
     if (!auth.user) {
       await auth.initAuth()
     }
 
-    // ✅ 2. Recharge profil si besoin
-    if (auth.isAuthenticated && !auth.profile) {
-      await auth.initAuth()
+    // 🚨 2. Bloque l’accès si l’email n’est pas confirmé
+    if (auth.user && !auth.user.email_confirmed_at) {
+      console.warn('[Guard] Email non confirmé → redirection vers /auth/login')
+      await supabase.auth.signOut()
+      return '/auth/login'
     }
 
-    // ✅ 3. Vérifie CGU uniquement si connecté et non sur une route publique
+    // ✅ 3. Recharge profil si besoin (après connexion)
+    if (auth.isAuthenticated && !auth.profile) {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', auth.user!.id)
+        .maybeSingle()
+
+      if (error) console.warn('[Guard] Erreur chargement profil:', error)
+      if (!profile || !profile.email) {
+        console.warn('[Guard] Aucun profil lié ou email manquant → déconnexion forcée')
+        await supabase.auth.signOut()
+        return '/auth/login'
+      }
+
+      auth.profile = {
+        id: profile.id,
+        email: profile.email,
+        full_name: profile.full_name || undefined,
+        role: (profile.role as 'admin' | 'user') || undefined,
+      }
+    }
+
+    // ✅ 4. Vérifie CGU uniquement si connecté et pas sur route publique
     const publicRoutes = ['/auth/login', '/auth/register', '/auth/reset-password']
-    if (
-      auth.isAuthenticated &&
-      !publicRoutes.includes(to.path) &&
-      !isShowingCGU // protège contre boucle
-    ) {
+    if (auth.isAuthenticated && !publicRoutes.includes(to.path) && !isShowingCGU) {
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -44,15 +65,15 @@ export function registerBaseGuard(router: Router) {
 
         if (error) throw error
 
-        // 🚨 CGU non acceptées → affiche popup
+        // 🚨 CGU non acceptées → affiche popup obligatoire
         if (data && data.cgu_accepted === false) {
-          console.info('[Guard] CGU non acceptées → affichage automatique de la popup CGU.')
+          console.info('[Guard] CGU non acceptées → affichage popup.')
 
           isShowingCGU = true
           const dialog = useAfficheCGUStore()
           await dialog.showDialog({ validationObligatoire: true })
 
-          // ✅ Met à jour le champ après validation
+          // ✅ Met à jour champ après validation
           await supabase
             .from('profiles')
             .update({
@@ -68,14 +89,10 @@ export function registerBaseGuard(router: Router) {
       }
     }
 
-    // ✅ 4. Vérifie panier plein pour les routes protégées
+    // ✅ 5. Vérifie panier plein pour les routes protégées
     if (to.meta.requiresCart && cart.items.length === 0) {
       return '/panier'
     }
-
-    // ✅ 5. Gestion d’un mode maintenance global
-    // const maintenance = false
-    // if (maintenance && to.path !== '/maintenance') return '/maintenance'
 
     return true
   })

@@ -1,67 +1,87 @@
 <template>
   <div class="admin-dashboard">
-    <BasicText
-      size="h4"
-      weight="bold"
-    >
-      Tableau de bord administrateur
-    </BasicText>
+    <!-- 💬 Chat en aperçu -->
+    <section class="dashboard-card chat-preview">
+      <header class="card-header">
+        <BasicText
+          size="h4"
+          weight="bold"
+        >
+          💬 Messages clients
+        </BasicText>
+        <BasicButton
+          label="Ouvrir le chat complet"
+          type="secondary"
+          size="small"
+          @click="$router.push('/admin/chat')"
+        />
+      </header>
+
+      <ChatAdminView :is-preview="true" />
+    </section>
 
     <!-- 📊 Statistiques globales -->
-    <div class="admin-dashboard__stats">
-      <div
-        class="stat-card"
-        v-for="stat in statCards"
-        :key="stat.label"
+    <section class="dashboard-card">
+      <BasicText
+        size="h4"
+        weight="bold"
       >
-        <p class="label">{{ stat.label }}</p>
-        <p class="value">{{ stat.value }}</p>
+        📈 Vue d’ensemble
+      </BasicText>
+      <div class="stats-grid">
+        <div
+          class="stat-card"
+          v-for="stat in statCards"
+          :key="stat.label"
+        >
+          <p class="label">{{ stat.label }}</p>
+          <p class="value">{{ stat.value }}</p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- 📈 Graphique revenus -->
-    <div class="chart-section">
+    <!-- 💶 Revenus -->
+    <section class="dashboard-card">
       <BasicText
         size="h5"
         weight="bold"
       >
-        Revenus des 7 derniers jours
+        💰 Revenus des 7 derniers jours
       </BasicText>
       <Bar
         :data="chartDataRevenue"
         :options="chartOptions"
       />
-    </div>
+    </section>
 
-    <!-- 📊 Graphique commandes -->
-    <div class="chart-section">
+    <!-- 📦 Commandes -->
+    <section class="dashboard-card">
       <BasicText
         size="h5"
         weight="bold"
       >
-        Commandes des 7 derniers jours
+        📦 Commandes des 7 derniers jours
       </BasicText>
       <Bar
         :data="chartDataOrders"
         :options="chartOptionsOrders"
       />
-    </div>
+    </section>
 
     <!-- 🏆 Top clients -->
-    <div class="chart-section top-clients">
+    <section class="dashboard-card top-clients">
       <BasicText
         size="h5"
         weight="bold"
       >
         🏆 Top 5 clients
       </BasicText>
-
       <table>
         <thead>
           <tr>
             <th>Client</th>
             <th>Commandes</th>
-            <th>Total dépensé (€)</th>
+            <th>Total (€)</th>
             <th>Dernière commande</th>
             <th>Contact</th>
           </tr>
@@ -88,34 +108,17 @@
                 v-if="client.email"
                 class="contact-link"
                 :href="`mailto:${client.email}`"
-                title="Contacter le client"
               >
-                📧 Envoyer un mail
+                📧 Contacter
               </a>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
-    <div class="chart-section chat-preview">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        💬 Derniers messages
-      </BasicText>
-      <ChatAdminView :is-preview="true" />
-      <div class="chat-link">
-        <BasicButton
-          label="Ouvrir le chat complet"
-          type="secondary"
-          size="medium"
-          @click="$router.push('/admin/chat')"
-        />
-      </div>
-    </div>
+    </section>
+
     <!-- 🧭 Navigation -->
-    <div class="admin-dashboard__cards">
+    <section class="dashboard-card nav-actions">
       <BasicButton
         label="👤 Gérer les utilisateurs"
         type="primary"
@@ -128,7 +131,7 @@
         size="large"
         @click="$router.push('/admin/orders')"
       />
-    </div>
+    </section>
   </div>
 </template>
 
@@ -377,116 +380,230 @@
 
 <style scoped lang="less">
   .admin-dashboard {
-    max-width: 900px;
-    margin: 50px auto;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px 100px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 40px;
-    text-align: center;
-    overflow: visible;
-    min-height: 100vh; /* forcer la hauteur minimale */
-    padding-bottom: 100px; /* espace pour les boutons */
+    gap: 32px;
+    font-family: 'Inter', sans-serif;
 
-    &__stats {
+    /* --- CARTE GÉNÉRALE --- */
+    .dashboard-card {
+      background: white;
+      border: 1px solid @neutral-200;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+
+        h4 {
+          margin: 0;
+        }
+      }
+    }
+
+    /* --- STATISTIQUES --- */
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
-      width: 100%;
+      margin-top: 12px;
     }
 
     .stat-card {
-      background: white;
-      border: 1px solid @neutral-200;
+      background: @neutral-50;
       border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-      transition: 0.2s;
+      padding: 16px 12px;
+      text-align: center;
+      transition: all 0.2s ease;
+
       &:hover {
-        background: @neutral-50;
+        background: @neutral-100;
+        transform: translateY(-2px);
       }
+
       .label {
         color: @neutral-600;
         font-size: 14px;
       }
+
       .value {
+        color: @neutral-900;
         font-weight: bold;
         font-size: 20px;
-        color: @neutral-900;
+        margin-top: 4px;
       }
     }
 
-    .chart-section {
-      width: 100%;
-      background: white;
-      border: 1px solid @neutral-200;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    /* --- CHAT PREVIEW --- */
+    .chat-preview {
+      .card-header {
+        margin-bottom: 16px;
+      }
+
+      .ChatAdminView {
+        border-radius: 8px;
+        overflow: hidden;
+        max-height: 420px;
+        border: 1px solid @neutral-200;
+      }
     }
 
-    &__cards {
+    /* --- TOP CLIENTS --- */
+    .top-clients {
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        th,
+        td {
+          padding: 10px;
+          border-bottom: 1px solid @neutral-200;
+        }
+        th {
+          text-align: left;
+          color: @neutral-600;
+          font-weight: 500;
+          font-size: 14px;
+        }
+        td {
+          color: @neutral-900;
+          font-size: 14px;
+        }
+      }
+
+      .client-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .avatar {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+
+      .contact-link {
+        color: @primary-600;
+        font-weight: 500;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    /* --- NAVIGATION --- */
+    .nav-actions {
       display: flex;
-      flex-direction: column;
       gap: 16px;
-      width: 100%;
-      max-width: 400px;
-    }
-  }
+      justify-content: center;
+      flex-wrap: wrap;
 
-  .top-clients {
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      th,
-      td {
-        padding: 8px;
-        border-bottom: 1px solid @neutral-200;
-      }
-      th {
-        text-align: left;
-        color: @neutral-700;
-      }
-      td {
-        color: @neutral-900;
+      button {
+        flex: 1;
+        min-width: 200px;
       }
     }
 
-    .client-cell {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    /* ============================= */
+    /* 📱 RESPONSIVE MOBILE & TABLET */
+    /* ============================= */
 
-      .avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        object-fit: cover;
+    @media (max-width: 900px) {
+      padding: 0 12px 60px;
+
+      .dashboard-card {
+        padding: 16px;
+      }
+
+      .chat-preview {
+        .ChatAdminView {
+          max-height: 300px;
+        }
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        .stat-card {
+          padding: 12px 8px;
+
+          .label {
+            font-size: 12px;
+          }
+          .value {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .top-clients {
+        table {
+          font-size: 12px;
+
+          th,
+          td {
+            padding: 6px 4px;
+          }
+
+          th:nth-child(3),
+          td:nth-child(3),
+          th:nth-child(5),
+          td:nth-child(5) {
+            display: none; /* cache colonnes secondaires sur petit écran */
+          }
+        }
+
+        .avatar {
+          width: 22px;
+          height: 22px;
+        }
+      }
+
+      .nav-actions {
+        flex-direction: column;
+        gap: 10px;
+
+        button {
+          width: 100%;
+          min-width: unset;
+        }
       }
     }
 
-    .contact-link {
-      color: #00796b;
-      font-weight: 500;
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
+    @media (max-width: 600px) {
+      gap: 24px;
+
+      .chat-preview {
+        .ChatAdminView {
+          max-height: 260px;
+        }
       }
-    }
-  }
 
-  .chat-preview {
-    overflow: auto !important; /* rendre le chat scrollable */
-    max-height: 400px;
-    border: 1px solid @neutral-200;
-    border-radius: 10px;
-    background: #fafafa;
+      .dashboard-card {
+        border-radius: 8px;
+      }
 
-    .chat-link {
-      text-align: center;
-      margin-top: 10px;
-      overflow: visible !important;
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
   }
 </style>
