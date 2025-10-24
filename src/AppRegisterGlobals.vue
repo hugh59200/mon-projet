@@ -1,6 +1,5 @@
 <template>
   <DialogComponent />
-  <SablierComponent />
   <CGU />
   <vue3-snackbar
     :duration="5000"
@@ -15,7 +14,6 @@
 <script setup lang="ts">
   import CGU from '@/features/interface/cgu/CGU.vue'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
-  import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { Vue3Snackbar } from 'vue3-snackbar'
   import { registerPopupAutoCGU } from './features/interface/cgu'
 

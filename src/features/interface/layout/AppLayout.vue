@@ -28,11 +28,13 @@
       </transition>
     </main>
     <FooterApp class="footer" />
+    <AppRegisterGlobals />
     <ToastContainer />
   </div>
 </template>
 
 <script setup lang="ts">
+  import AppRegisterGlobals from '@/AppRegisterGlobals.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
@@ -87,7 +89,7 @@
     background-color: @secondary-800;
     color: white;
     height: 100%;
-    z-index: 999;
+    z-index: 9;
   }
 
   /* --- CONTENU --- */
@@ -109,7 +111,7 @@
     left: 240px;
     right: 0;
     z-index: 950;
-    height: 30px;
+    height: 40px;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .app-grid.sidebar-reduced .footer {
