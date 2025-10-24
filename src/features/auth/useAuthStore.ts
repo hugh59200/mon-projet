@@ -204,7 +204,7 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
       try {
-        await fetchProfile()
+        fetchProfile()
       } catch (err) {
         console.warn('Erreur fetchProfile (non bloquant) :', err)
       }

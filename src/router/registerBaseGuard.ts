@@ -1,57 +1,79 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import { useCartStore } from '@/features/cart/useCartStore'
+import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/services/supabaseClient'
 import type { Router } from 'vue-router'
 
 /**
- * 🧠 Guard de base global
- * - Initialise la session utilisateur Supabase
- * - Vérifie certaines conditions globales (profil, CGU, maintenance, etc.)
+ * 🧠 Guard global de base :
+ * - Initialise la session Supabase
+ * - Recharge le profil si besoin
+ * - Déclenche la popup CGU si non acceptées
+ * - Vérifie panier / maintenance
  */
 export function registerBaseGuard(router: Router) {
-  router.beforeEach(async (to, _from) => {
+  let isShowingCGU = false // 🔒 évite de multiples popups simultanées
+
+  router.beforeEach(async (to) => {
     const auth = useAuthStore()
     const cart = useCartStore()
 
-    // ✅ 1. Initialisation de la session (si absente)
+    // ✅ 1. Initialisation session
     if (!auth.user) {
       await auth.initAuth()
     }
 
-    // ✅ 2. Si besoin : forcer un rechargement léger de profil
-    // (inutile d’appeler fetchProfile manuellement : initAuth le fait déjà)
+    // ✅ 2. Recharge profil si besoin
     if (auth.isAuthenticated && !auth.profile) {
       await auth.initAuth()
     }
 
-    // ✅ 3. Vérifie si les CGU doivent être acceptées
-    let profile: any = null
-    if (auth.isAuthenticated && auth.user?.id) {
+    // ✅ 3. Vérifie CGU uniquement si connecté et non sur une route publique
+    const publicRoutes = ['/auth/login', '/auth/register', '/auth/reset-password']
+    if (
+      auth.isAuthenticated &&
+      !publicRoutes.includes(to.path) &&
+      !isShowingCGU // protège contre boucle
+    ) {
       try {
         const { data, error } = await supabase
           .from('profiles')
           .select('cgu_accepted')
-          .eq('id', auth.user.id)
+          .eq('id', auth.user!.id)
           .maybeSingle()
 
         if (error) throw error
-        profile = data
+
+        // 🚨 CGU non acceptées → affiche popup
+        if (data && data.cgu_accepted === false) {
+          console.info('[Guard] CGU non acceptées → affichage automatique de la popup CGU.')
+
+          isShowingCGU = true
+          const dialog = useAfficheCGUStore()
+          await dialog.showDialog({ validationObligatoire: true })
+
+          // ✅ Met à jour le champ après validation
+          await supabase
+            .from('profiles')
+            .update({
+              cgu_accepted: true,
+              cgu_accepted_at: new Date().toISOString(),
+            })
+            .eq('id', auth.user!.id)
+
+          isShowingCGU = false
+        }
       } catch (err) {
-        console.warn('[Guard] Erreur récupération CGU:', err)
+        console.warn('[Guard] Erreur vérification CGU :', err)
       }
     }
 
-    if (auth.isAuthenticated && profile && profile.cgu_accepted === false) {
-      console.info('[Guard] CGU non acceptées → popup CGU auto.')
-      // 👉 tu pourrais ici déclencher ton useAfficheCGUStore().showDialog()
-    }
-
-    // ✅ 4. Si la route exige un panier rempli
+    // ✅ 4. Vérifie panier plein pour les routes protégées
     if (to.meta.requiresCart && cart.items.length === 0) {
       return '/panier'
     }
 
-    // ✅ 5. Si besoin : flag global (ex : maintenance)
+    // ✅ 5. Gestion d’un mode maintenance global
     // const maintenance = false
     // if (maintenance && to.path !== '/maintenance') return '/maintenance'
 
