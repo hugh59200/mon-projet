@@ -1,20 +1,31 @@
 <template>
   <div class="chat-admin">
     <header class="chat-admin__header">
-      <BasicIconNext
-        name="MessageCircle"
-        :size="20"
-      />
-      <BasicText
-        size="h4"
-        weight="semibold"
+      <div class="header-left">
+        <BasicIconNext
+          name="MessageCircle"
+          :size="20"
+        />
+        <BasicText
+          size="h4"
+          weight="semibold"
+        >
+          Messages clients
+        </BasicText>
+      </div>
+
+      <div
+        v-if="totalUnread > 0"
+        class="header-badge"
       >
-        Messages clients
-      </BasicText>
+        {{ totalUnread }} nouveau{{ totalUnread > 1 ? 'x' : '' }} message{{
+          totalUnread > 1 ? 's' : ''
+        }}
+      </div>
     </header>
 
     <div class="chat-admin__layout">
-      <!-- 📋 Sidebar isolée -->
+      <!-- 📋 Sidebar -->
       <ChatSidebar
         :conversations="conversations"
         :selected-id="selectedUserId"
@@ -31,6 +42,7 @@
         current-role="admin"
         :send-message="sendMessage"
         :send-typing="sendTyping"
+        :height="600"
       />
 
       <section
@@ -56,6 +68,8 @@
   import ChatCore from '@/features/support/ChatCore.vue'
   import ChatSidebar from '@/features/support/components/ChatSidebar.vue'
   import { useAdminChat } from '@/features/support/composables/useAdminChat'
+  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
+  import { computed } from 'vue'
 
   const {
     conversations,
@@ -68,6 +82,11 @@
     sendMessage,
     sendTyping,
   } = useAdminChat()
+
+  const notifStore = useChatNotifStore()
+  const totalUnread = computed(() =>
+    Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
+  )
 </script>
 
 <style scoped lang="less">
@@ -77,13 +96,29 @@
     gap: 16px;
     padding: 24px 32px;
     background: @neutral-50;
-    height: 100vh;
 
     &__header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      gap: 12px;
       color: @neutral-800;
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .header-badge {
+        background: @primary-600;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        box-shadow: 0 2px 4px fade(@primary-600, 25%);
+      }
     }
 
     &__layout {
@@ -93,8 +128,8 @@
       border-radius: 16px;
       box-shadow: 0 2px 8px fade(@neutral-900, 5%);
       border: 1px solid @neutral-200;
-      flex: 1;
-      min-height: 0;
+      align-items: stretch; // ✅ étire la sidebar
+      min-height: 600px;
     }
 
     &__placeholder {
@@ -104,6 +139,7 @@
       justify-content: center;
       color: @neutral-600;
       gap: 12px;
+      min-height: 600px;
     }
   }
 </style>

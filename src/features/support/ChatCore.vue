@@ -277,13 +277,15 @@
     }
 
     .chat-loader {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 24px;
+      gap: 12px;
       color: @neutral-600;
+      font-size: 15px;
+      min-height: 600px;
     }
 
     .chat-messages {

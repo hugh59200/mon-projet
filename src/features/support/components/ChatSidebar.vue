@@ -67,32 +67,34 @@
     </div>
 
     <!-- 💬 Liste des conversations -->
-    <transition-group
-      name="fade"
-      tag="div"
-      class="conversation-list"
-    >
-      <ConversationItem
-        v-for="conv in filteredConversations"
-        :key="conv.user_id"
-        :conversation="conv"
-        :active="conv.user_id === selectedId"
-        @select="$emit('select', conv.user_id)"
-      />
-    </transition-group>
+    <div class="conversation-container">
+      <transition-group
+        name="fade"
+        tag="div"
+        class="conversation-list"
+      >
+        <ConversationItem
+          v-for="conv in filteredConversations"
+          :key="conv.user_id"
+          :conversation="conv"
+          :active="conv.user_id === selectedId"
+          @select="$emit('select', conv.user_id)"
+        />
+      </transition-group>
 
-    <!-- 🚫 Aucun résultat -->
-    <div
-      v-if="!filteredConversations.length"
-      class="no-conv"
-    >
-      <BasicIconNext
-        name="Inbox"
-        :size="16"
-      />
-      <span>
-        {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune conversation pour le moment' }}
-      </span>
+      <!-- 🚫 Aucun résultat -->
+      <div
+        v-if="!filteredConversations.length"
+        class="no-conv"
+      >
+        <BasicIconNext
+          name="Inbox"
+          :size="16"
+        />
+        <span>
+          {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune conversation pour le moment' }}
+        </span>
+      </div>
     </div>
   </aside>
 </template>
@@ -125,7 +127,6 @@
 
   /* 👤 Auth info */
   const auth = useAuthStore()
-
   const profileName = computed(() => {
     return auth.profile?.full_name || auth.profile?.email || auth.user?.email || 'Admin inconnu'
   })
@@ -156,13 +157,11 @@
     border-right: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    min-height: 0;
-    max-height: 100%;
+    height: 100%; // ✅ pleine hauteur
+    overflow: hidden;
     scrollbar-width: thin;
-    scroll-behavior: smooth;
 
-    /* 🧭 Section statut / profil */
+    /* 🧭 Profil + statut */
     &__status {
       position: sticky;
       top: 0;
@@ -186,11 +185,13 @@
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
+
           img {
             width: 100%;
             height: 100%;
             object-fit: cover;
           }
+
           .avatar-placeholder {
             width: 100%;
             height: 100%;
@@ -227,6 +228,7 @@
               height: 8px;
               border-radius: 50%;
               background: @neutral-400;
+
               &.online {
                 background: @success-500;
                 box-shadow: 0 0 5px fade(@success-500, 60%);
@@ -261,10 +263,10 @@
       }
     }
 
-    /* 🔍 Barre de recherche sticky */
+    /* 🔍 Barre de recherche */
     &__search {
       position: sticky;
-      top: 62px; // sous le profil
+      top: 62px;
       z-index: 9;
       display: flex;
       align-items: center;
@@ -286,6 +288,7 @@
         font-size: 14px;
         background: white;
         transition: border-color 0.2s ease;
+
         &:focus {
           outline: none;
           border-color: @primary-500;
@@ -302,17 +305,29 @@
         align-items: center;
         justify-content: center;
         transition: color 0.2s;
+
         &:hover {
           color: @neutral-700;
         }
       }
     }
 
+    /* 💬 Liste des conversations */
+    .conversation-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      background: @neutral-50;
+    }
+
     .conversation-list {
       display: flex;
       flex-direction: column;
       padding: 8px;
-      gap: 2px;
+      gap: 4px;
     }
 
     .no-conv {
@@ -333,6 +348,7 @@
     .fade-leave-active {
       transition: all 0.25s ease;
     }
+
     .fade-enter-from,
     .fade-leave-to {
       opacity: 0;
