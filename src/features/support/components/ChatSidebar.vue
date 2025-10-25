@@ -74,8 +74,8 @@
         class="conversation-list"
       >
         <ConversationItem
-          v-for="conv in filteredConversations"
-          :key="conv.user_id"
+          v-for="(conv, i) in filteredConversations"
+          :key="conv.user_id || 'conv-' + i"
           :conversation="conv"
           :active="conv.user_id === selectedId"
           @select="$emit('select', conv.user_id)"
@@ -341,6 +341,14 @@
       gap: 6px;
       padding: 16px;
       text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      border-right: none;
+      border-bottom: 1px solid @neutral-200;
+      height: auto;
+      max-height: 50vh; // facultatif : limite la hauteur si beaucoup de conversations
+      overflow-y: auto;
     }
 
     /* ✨ Transitions */

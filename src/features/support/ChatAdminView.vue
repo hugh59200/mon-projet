@@ -128,8 +128,16 @@
       border-radius: 16px;
       box-shadow: 0 2px 8px fade(@neutral-900, 5%);
       border: 1px solid @neutral-200;
-      align-items: stretch; // ✅ étire la sidebar
+      align-items: stretch;
       min-height: 600px;
+      overflow: hidden;
+
+      /* 📱 Responsive mobile */
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+      }
     }
 
     &__placeholder {

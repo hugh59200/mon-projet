@@ -32,17 +32,29 @@
       </div>
 
       <!-- 💬 Zone des messages -->
-      <transition-group
+      <div
         v-else
-        key="messages"
-        ref="msgList"
-        name="message-fade"
-        tag="div"
-        class="chat-messages"
-        aria-live="polite"
-        @scroll="onScroll"
-        @click="hideNewMessagesBtn"
+        class="chat-content"
       >
+        <transition-group
+          key="messages"
+          ref="msgList"
+          name="message-fade"
+          tag="div"
+          class="chat-messages"
+          aria-live="polite"
+          @scroll="onScroll"
+          @click="hideNewMessagesBtn"
+        >
+          <ChatMessage
+            v-for="(msg, i) in messages"
+            :key="msg.id || 'msg-' + i"
+            :message="msg"
+            :isMine="msg.sender_role === currentRole"
+            :isGrouped="isGroupedMessage(i)"
+          />
+        </transition-group>
+
         <!-- ✍️ Indicateur "en train d’écrire" -->
         <transition name="typing-fade">
           <div
@@ -57,15 +69,7 @@
             </div>
           </div>
         </transition>
-
-        <ChatMessage
-          v-for="(msg, i) in messages"
-          :key="msg.id"
-          :message="msg"
-          :isMine="msg.sender_role === currentRole"
-          :isGrouped="isGroupedMessage(i)"
-        />
-      </transition-group>
+      </div>
     </transition>
 
     <!-- 🔔 Bouton "nouveaux messages" -->
@@ -288,6 +292,13 @@
       min-height: 600px;
     }
 
+    .chat-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      position: relative;
+    }
+
     .chat-messages {
       flex: 1;
       display: flex;
@@ -297,6 +308,35 @@
       background: @neutral-50;
       scroll-behavior: smooth;
       min-height: 0;
+    }
+
+    .typing-bubble-wrapper {
+      display: flex;
+      align-items: center;
+      padding: 0 12px 8px;
+    }
+
+    .typing-bubble {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-around;
+      background: @neutral-200;
+      border-radius: 16px;
+      padding: 6px 10px;
+      width: 48px;
+      .dot {
+        width: 6px;
+        height: 6px;
+        background: fade(@neutral-600, 70%);
+        border-radius: 50%;
+        animation: typingDots 1.3s infinite ease-in-out;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
     }
 
     .chat-input {
@@ -343,33 +383,9 @@
       }
     }
 
-    .typing-bubble-wrapper {
-      display: flex;
-      align-items: center;
-      padding: 0 12px 8px;
-    }
-
-    .typing-bubble {
-      display: inline-flex;
-      align-items: center;
-      justify-content: space-around;
-      background: @neutral-200;
-      border-radius: 16px;
-      padding: 6px 10px;
-      width: 48px;
-      .dot {
-        width: 6px;
-        height: 6px;
-        background: fade(@neutral-600, 70%);
-        border-radius: 50%;
-        animation: typingDots 1.3s infinite ease-in-out;
-      }
-      .dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .dot:nth-child(3) {
-        animation-delay: 0.4s;
-      }
+    @media (max-width: 768px) {
+      height: auto;
+      min-height: 50vh;
     }
 
     @keyframes typingDots {
