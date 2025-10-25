@@ -131,35 +131,6 @@
     }
   }
 
-  /* --- Responsive --- */
-  @media (max-width: 900px) {
-    .app-grid {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        'header'
-        'content'
-        'footer';
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      height: calc(100vh - 60px);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 1200;
-    }
-
-    .sidebar--open {
-      transform: translateX(0);
-    }
-
-    .footer {
-      left: 0;
-    }
-  }
-
   /* ✨ TRANSITIONS entre pages */
   .fade-slide-enter-active,
   .fade-slide-leave-active {

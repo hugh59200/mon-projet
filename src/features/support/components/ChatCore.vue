@@ -111,8 +111,8 @@
 
 <script setup lang="ts">
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import type { ChatRole, Message } from '../types/chat'
   import ChatMessage from './ChatMessage.vue'
-  import type { ChatRole, Message } from './types/chat'
 
   /* 🧩 Props */
   const props = defineProps<{
@@ -297,6 +297,7 @@
       flex-direction: column;
       flex: 1;
       position: relative;
+      min-height: 0; /* 🧩 Important : permet au scroll interne de fonctionner */
     }
 
     .chat-messages {
@@ -304,10 +305,22 @@
       display: flex;
       flex-direction: column-reverse;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 12px;
       background: @neutral-50;
       scroll-behavior: smooth;
-      min-height: 0;
+      min-height: 0; /* 🧩 Permet le scroll vertical */
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: fade(@neutral-500, 40%);
+      border-radius: 4px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: fade(@neutral-600, 60%);
     }
 
     .typing-bubble-wrapper {

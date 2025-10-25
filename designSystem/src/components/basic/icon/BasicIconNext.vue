@@ -16,7 +16,7 @@
   import * as LucideIcons from 'lucide-vue-next'
   import { computed, type Component } from 'vue'
 
-  type IconColor = 'primary-600' | 'pink-400' | 'secondary-800' | 'secondary-1000' | 'grey-800'
+  type IconColor = 'primary-600' | 'pink-400' | 'secondary-800' | 'secondary-1000' | 'grey-800' | 'white'
 
   export type IconNameNext = keyof typeof LucideIcons
 
@@ -103,6 +103,9 @@
     }
     &--color--neutral-300 {
       color: @neutral-300;
+    }
+    &--color--white {
+      color: @white;
     }
 
     &:focus {

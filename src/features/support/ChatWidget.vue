@@ -3,11 +3,16 @@
     class="chat-widget"
     :class="{ open: isOpen }"
   >
+    <!-- 🟢 Bouton principal -->
     <button
       class="chat-toggle"
       @click="toggleChat"
     >
-      <BasicIconNext name="MessageCircle" />
+      <BasicIconNext
+        name="Headphones"
+        :size="26"
+        color="white"
+      />
       <div
         v-if="unreadCount > 0"
         class="chat-badge"
@@ -16,6 +21,7 @@
       </div>
     </button>
 
+    <!-- 💬 Fenêtre de chat -->
     <transition name="fade-scale">
       <div
         v-if="isOpen"
@@ -23,14 +29,22 @@
       >
         <header class="chat-header">
           <div class="chat-title">
-            <BasicIconNext name="Headphones" />
+            <BasicIconNext
+              name="MessageCircle"
+              :size="20"
+              color="white"
+            />
             <span>Support Fast Peptides</span>
           </div>
           <button
             class="close-btn"
             @click="toggleChat"
           >
-            <BasicIconNext name="X" />
+            <BasicIconNext
+              name="X"
+              :size="20"
+              color="white"
+            />
           </button>
         </header>
 
@@ -51,7 +65,7 @@
 
 <script setup lang="ts">
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-  import ChatCore from './ChatCore.vue'
+  import ChatCore from './components/ChatCore.vue'
   import { useUserChat } from './composables/useUserChat'
 
   const { messages, newMessage, isTyping, sendMessage, sendTyping, isReady } = useUserChat()
@@ -103,7 +117,7 @@
 
     .chat-toggle {
       position: relative;
-      background: @primary-600;
+      background: @primary-600; /* turquoise */
       color: white;
       border: none;
       border-radius: 50%;
@@ -111,10 +125,26 @@
       height: 56px;
       box-shadow: 0 4px 12px fade(black, 20%);
       cursor: pointer;
-      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        transform 0.2s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
+
+      /* ✅ Rendre l’icône bien visible */
+      .basic-icon-next {
+        color: white !important;
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+      }
+
       &:hover {
         transform: scale(1.05);
+        background: @primary-700;
+        box-shadow: 0 6px 14px fade(black, 25%);
       }
+
       .chat-badge {
         position: absolute;
         top: 4px;
@@ -129,6 +159,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 2px 6px fade(black, 25%);
       }
     }
 
@@ -152,6 +183,36 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
+      .chat-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    /* ✨ Animation ouverture/fermeture */
+    .fade-scale-enter-active,
+    .fade-scale-leave-active {
+      transition: all 0.25s ease;
+    }
+    .fade-scale-enter-from,
+    .fade-scale-leave-to {
+      opacity: 0;
+      transform: scale(0.9);
     }
   }
 </style>

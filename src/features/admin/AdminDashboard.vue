@@ -1,121 +1,171 @@
 <template>
   <div class="admin-dashboard">
-    <!-- 💬 Chat en aperçu -->
-    <section class="dashboard-card">
-      <ChatAdminView />
-    </section>
-    <!-- 📊 Statistiques globales -->
-    <section class="dashboard-card">
-      <BasicText
-        size="h4"
-        weight="bold"
+    <!-- 🧭 Onglets -->
+    <div class="tabs-header">
+      <button
+        v-for="tab in tabs"
+        :key="tab.key"
+        :class="['tab-btn', { active: activeTab === tab.key }]"
+        @click="activeTab = tab.key"
       >
-        📈 Vue d’ensemble
-      </BasicText>
-      <div class="stats-grid">
-        <div
-          class="stat-card"
-          v-for="stat in statCards"
-          :key="stat.label"
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- 📄 Contenu des onglets -->
+    <div
+      v-if="activeTab === 'stats'"
+      class="tab-content"
+    >
+      <!-- 📊 Statistiques globales -->
+      <section class="dashboard-card">
+        <BasicText
+          size="h4"
+          weight="bold"
         >
-          <p class="label">{{ stat.label }}</p>
-          <p class="value">{{ stat.value }}</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 💶 Revenus -->
-    <section class="dashboard-card">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        💰 Revenus des 7 derniers jours
-      </BasicText>
-      <Bar
-        :data="chartDataRevenue"
-        :options="chartOptions"
-      />
-    </section>
-
-    <!-- 📦 Commandes -->
-    <section class="dashboard-card">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        📦 Commandes des 7 derniers jours
-      </BasicText>
-      <Bar
-        :data="chartDataOrders"
-        :options="chartOptionsOrders"
-      />
-    </section>
-
-    <!-- 🏆 Top clients -->
-    <section class="dashboard-card top-clients">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        🏆 Top 5 clients
-      </BasicText>
-      <table>
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Commandes</th>
-            <th>Total (€)</th>
-            <th>Dernière commande</th>
-            <th>Contact</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="client in topClients"
-            :key="client.id"
+          📈 Vue d’ensemble
+        </BasicText>
+        <div class="stats-grid">
+          <div
+            class="stat-card"
+            v-for="stat in statCards"
+            :key="stat.label"
           >
-            <td class="client-cell">
-              <img
-                v-if="client.avatar_url"
-                :src="client.avatar_url"
-                alt="avatar"
-                class="avatar"
-              />
-              <span>{{ client.name }}</span>
-            </td>
-            <td>{{ client.orders }}</td>
-            <td>{{ client.total.toFixed(2) }}</td>
-            <td>{{ formatDate(client.last_order) }}</td>
-            <td>
-              <a
-                v-if="client.email"
-                class="contact-link"
-                :href="`mailto:${client.email}`"
-              >
-                📧 Contacter
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+            <p class="label">{{ stat.label }}</p>
+            <p class="value">{{ stat.value }}</p>
+          </div>
+        </div>
+      </section>
 
-    <!-- 🧭 Navigation -->
-    <section class="dashboard-card nav-actions">
-      <BasicButton
-        label="👤 Gérer les utilisateurs"
-        type="primary"
-        size="large"
-        @click="$router.push('/admin/users')"
-      />
-      <BasicButton
-        label="📦 Gérer les commandes"
-        type="secondary"
-        size="large"
-        @click="$router.push('/admin/orders')"
-      />
-    </section>
+      <!-- 💶 Revenus -->
+      <section class="dashboard-card">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          💰 Revenus des 7 derniers jours
+        </BasicText>
+        <Bar
+          :data="chartDataRevenue"
+          :options="chartOptions"
+        />
+      </section>
+
+      <!-- 📦 Commandes -->
+      <section class="dashboard-card">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          📦 Commandes des 7 derniers jours
+        </BasicText>
+        <Bar
+          :data="chartDataOrders"
+          :options="chartOptionsOrders"
+        />
+      </section>
+
+      <!-- 🏆 Top clients -->
+      <section class="dashboard-card top-clients">
+        <BasicText
+          size="h5"
+          weight="bold"
+        >
+          🏆 Top 5 clients
+        </BasicText>
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Commandes</th>
+              <th>Total (€)</th>
+              <th>Dernière commande</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="client in topClients"
+              :key="client.id"
+            >
+              <td class="client-cell">
+                <img
+                  v-if="client.avatar_url"
+                  :src="client.avatar_url"
+                  alt="avatar"
+                  class="avatar"
+                />
+                <span>{{ client.name }}</span>
+              </td>
+              <td>{{ client.orders }}</td>
+              <td>{{ client.total.toFixed(2) }}</td>
+              <td>{{ formatDate(client.last_order) }}</td>
+              <td>
+                <a
+                  v-if="client.email"
+                  class="contact-link"
+                  :href="`mailto:${client.email}`"
+                >
+                  📧 Contacter
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- 💬 Chat -->
+    <div
+      v-else-if="activeTab === 'chat'"
+      class="tab-content"
+    >
+      <ChatAdminView />
+    </div>
+
+    <!-- 👤 Gérer les utilisateurs -->
+    <div
+      v-else-if="activeTab === 'users'"
+      class="tab-content"
+    >
+      <section class="dashboard-card center-content">
+        <BasicText
+          size="h4"
+          weight="semibold"
+        >
+          👤 Gérer les utilisateurs
+        </BasicText>
+        <p class="info-text">Ici tu peux gérer la liste des utilisateurs et leurs accès.</p>
+        <BasicButton
+          label="Ouvrir la gestion des utilisateurs"
+          type="primary"
+          size="large"
+          @click="$router.push('/admin/users')"
+        />
+      </section>
+    </div>
+
+    <!-- 📦 Gérer les commandes -->
+    <div
+      v-else-if="activeTab === 'orders'"
+      class="tab-content"
+    >
+      <section class="dashboard-card center-content">
+        <BasicText
+          size="h4"
+          weight="semibold"
+        >
+          📦 Gérer les commandes
+        </BasicText>
+        <p class="info-text">Accède à la liste complète des commandes clients.</p>
+        <BasicButton
+          label="Ouvrir la gestion des commandes"
+          type="secondary"
+          size="large"
+          @click="$router.push('/admin/orders')"
+        />
+      </section>
+    </div>
   </div>
 </template>
 
@@ -136,18 +186,24 @@
 
   ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
+  const tabs = [
+    { key: 'stats', label: '📊 Tableau de bord' },
+    { key: 'chat', label: '💬 Messages clients' },
+    { key: 'users', label: '👤 Gérer les utilisateurs' },
+    { key: 'orders', label: '📦 Gérer les commandes' },
+  ]
+  const activeTab = ref('stats')
+
   interface ChartDataset {
     label: string
     backgroundColor: string
     data: number[]
     borderRadius: number
   }
-
   interface ChartData {
     labels: string[]
     datasets: ChartDataset[]
   }
-
   interface TopClient {
     id: string
     name: string
@@ -158,9 +214,6 @@
     last_order: string | null
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   STATE                                   */
-  /* -------------------------------------------------------------------------- */
   const stats = ref({
     total_orders: 0,
     total_revenue: 0,
@@ -198,9 +251,6 @@
 
   const topClients = ref<TopClient[]>([])
 
-  /* -------------------------------------------------------------------------- */
-  /*                              COMPUTED STATS                               */
-  /* -------------------------------------------------------------------------- */
   const statCards = computed(() => [
     { label: 'Commandes totales', value: stats.value.total_orders },
     { label: 'Revenus totaux', value: `${stats.value.total_revenue.toFixed(2)}€` },
@@ -208,9 +258,6 @@
     { label: 'Commandes en attente', value: stats.value.pending_orders },
   ])
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 FUNCTIONS                                 */
-  /* -------------------------------------------------------------------------- */
   async function loadStats() {
     const { count: totalOrders } = await supabase
       .from('orders')
@@ -367,39 +414,59 @@
     max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px 100px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
     font-family: 'Inter', sans-serif;
 
-    /* --- CARTE GÉNÉRALE --- */
-    .dashboard-card {
-      background: white;
-      border: 1px solid @neutral-200;
+    .tabs-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      background: #f9f9f9;
       border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-      transition: all 0.2s ease;
+      padding: 10px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 
-      &:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-      }
+      .tab-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        background-color: #e6f3f2;
+        color: #0b5e55;
 
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-        gap: 12px;
+        &.active {
+          background-color: #00796b;
+          color: white;
+        }
 
-        h4 {
-          margin: 0;
+        &:hover {
+          background-color: #009688;
+          color: white;
         }
       }
     }
 
-    /* --- STATISTIQUES --- */
+    .tab-content {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 24px;
+    }
+
+    .dashboard-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    /* --- Grille des stats --- */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -408,171 +475,73 @@
     }
 
     .stat-card {
-      background: @neutral-50;
+      background: #f3f4f6;
       border-radius: 10px;
       padding: 16px 12px;
       text-align: center;
       transition: all 0.2s ease;
 
       &:hover {
-        background: @neutral-100;
+        background: #e5e7eb;
         transform: translateY(-2px);
       }
 
       .label {
-        color: @neutral-600;
+        color: #6b7280;
         font-size: 14px;
       }
 
       .value {
-        color: @neutral-900;
+        color: #111827;
         font-weight: bold;
         font-size: 20px;
         margin-top: 4px;
       }
     }
 
-    /* --- TOP CLIENTS --- */
-    .top-clients {
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 12px;
-        th,
-        td {
-          padding: 10px;
-          border-bottom: 1px solid @neutral-200;
-        }
-        th {
-          text-align: left;
-          color: @neutral-600;
-          font-weight: 500;
-          font-size: 14px;
-        }
-        td {
-          color: @neutral-900;
-          font-size: 14px;
-        }
+    .top-clients table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #e5e7eb;
       }
 
-      .client-cell {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .avatar {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-      }
-
-      .contact-link {
-        color: @primary-600;
+      th {
+        text-align: left;
+        color: #6b7280;
         font-weight: 500;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
+        font-size: 14px;
+      }
+
+      td {
+        color: #111827;
+        font-size: 14px;
       }
     }
 
-    /* --- NAVIGATION --- */
-    .nav-actions {
+    .client-cell {
       display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
 
-      button {
-        flex: 1;
-        min-width: 200px;
+      .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     }
 
-    /* ============================= */
-    /* 📱 RESPONSIVE MOBILE & TABLET */
-    /* ============================= */
-
-    @media (max-width: 900px) {
-      padding: 0 12px 60px;
-
-      .dashboard-card {
-        padding: 16px;
-      }
-
-      .chat-preview {
-        .ChatAdminView {
-          max-height: 300px;
-        }
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-
-        .stat-card {
-          padding: 12px 8px;
-
-          .label {
-            font-size: 12px;
-          }
-          .value {
-            font-size: 16px;
-          }
-        }
-      }
-
-      .top-clients {
-        table {
-          font-size: 12px;
-
-          th,
-          td {
-            padding: 6px 4px;
-          }
-
-          th:nth-child(3),
-          td:nth-child(3),
-          th:nth-child(5),
-          td:nth-child(5) {
-            display: none; /* cache colonnes secondaires sur petit écran */
-          }
-        }
-
-        .avatar {
-          width: 22px;
-          height: 22px;
-        }
-      }
-
-      .nav-actions {
-        flex-direction: column;
-        gap: 10px;
-
-        button {
-          width: 100%;
-          min-width: unset;
-        }
-      }
-    }
-
-    @media (max-width: 600px) {
-      gap: 24px;
-
-      .chat-preview {
-        .ChatAdminView {
-          max-height: 260px;
-        }
-      }
-
-      .dashboard-card {
-        border-radius: 8px;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
+    .contact-link {
+      color: #00796b;
+      font-weight: 500;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
       }
     }
   }

@@ -134,22 +134,4 @@
     justify-content: center;
     box-shadow: 0 0 0 2px @secondary-800;
   }
-
-  /* 🧩 Responsive */
-  @media (max-width: 900px) {
-    .sidebar {
-      width: 240px;
-      position: fixed;
-      top: 60px;
-      left: 0;
-      height: calc(100vh - 60px);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 1200;
-
-      &.sidebar--open {
-        transform: translateX(0);
-      }
-    }
-  }
 </style>

@@ -43,7 +43,7 @@
         <div
           v-if="auth.isAdmin"
           class="admin-chat-button"
-          @click="router.push('/admin/chat')"
+          @click="router.push('/admin')"
         >
           <BasicButton
             label="Admin"
@@ -154,6 +154,7 @@
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     background: @neutral-900;
+    user-select: none;
 
     &__left {
       display: flex;

@@ -65,11 +65,11 @@
 </template>
 
 <script setup lang="ts">
-  import ChatCore from '@/features/support/ChatCore.vue'
   import ChatSidebar from '@/features/support/components/ChatSidebar.vue'
   import { useAdminChat } from '@/features/support/composables/useAdminChat'
   import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
   import { computed } from 'vue'
+  import ChatCore from './components/ChatCore.vue'
 
   const {
     conversations,
@@ -130,7 +130,7 @@
       border: 1px solid @neutral-200;
       align-items: stretch;
       min-height: 600px;
-      overflow: hidden;
+      overflow: visible;
 
       /* 📱 Responsive mobile */
       @media (max-width: 768px) {
