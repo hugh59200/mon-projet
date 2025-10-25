@@ -2,7 +2,19 @@
   <div
     class="chat-core"
     :style="computedStyle"
+    role="region"
+    aria-label="Zone de conversation"
   >
+    <!-- 🔌 Offline banner -->
+    <transition name="fade-scale">
+      <div
+        v-if="!isOnline"
+        class="chat-offline-banner"
+      >
+        Vous êtes hors ligne — vos messages seront envoyés dès que possible.
+      </div>
+    </transition>
+
     <!-- 🔄 Loader -->
     <transition
       name="fade-scale"
@@ -12,24 +24,30 @@
         v-if="loading"
         key="loader"
         class="chat-loader"
+        role="status"
+        aria-live="polite"
       >
         <BasicLoader />
         <span>Chargement des messages...</span>
       </div>
 
       <!-- 💬 Zone des messages -->
-      <div
+      <transition-group
         v-else
         key="messages"
         ref="msgList"
+        name="message-fade"
+        tag="div"
         class="chat-messages"
+        aria-live="polite"
         @scroll="onScroll"
         @click="hideNewMessagesBtn"
       >
         <!-- ✍️ Indicateur "en train d’écrire" -->
         <transition name="typing-fade">
           <div
-            v-if="isTyping"
+            v-if="localIsTyping"
+            key="typing"
             class="typing-bubble-wrapper"
           >
             <div class="typing-bubble">
@@ -41,12 +59,13 @@
         </transition>
 
         <ChatMessage
-          v-for="msg in messages"
+          v-for="(msg, i) in messages"
           :key="msg.id"
           :message="msg"
           :isMine="msg.sender_role === currentRole"
+          :isGrouped="isGroupedMessage(i)"
         />
-      </div>
+      </transition-group>
     </transition>
 
     <!-- 🔔 Bouton "nouveaux messages" -->
@@ -62,22 +81,24 @@
 
     <!-- 🧩 Zone d’envoi -->
     <form
-      v-if="showInput"
       class="chat-input"
       @submit.prevent="sendMessage"
+      aria-label="Zone de saisie du message"
     >
       <input
+        ref="inputRef"
         v-model="newMessage"
         type="text"
         placeholder="Écrire un message..."
-        @input="sendTyping"
         required
+        aria-label="Champ de texte du message"
+        @input="sendTyping"
       />
       <BasicButton
         label="Envoyer"
         type="primary"
         size="small"
-        :disabled="!newMessage.trim()"
+        :disabled="!newMessage.trim() || !isOnline"
         @click="sendMessage"
       />
     </form>
@@ -85,31 +106,56 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
   import ChatMessage from './ChatMessage.vue'
   import type { ChatRole, Message } from './types/chat'
 
-  /* 🧩 Props avec showInput par défaut à true */
-  const props = withDefaults(
-    defineProps<{
-      messages: Message[]
-      isTyping: boolean
-      loading?: boolean
-      currentRole: ChatRole
-      sendMessage: () => void
-      sendTyping: () => void
-      showInput?: boolean
-      height?: string | number
-      maxHeight?: string | number
-      minHeight?: string | number
-    }>(),
-    {
-      showInput: true, // ✅ par défaut visible
-    },
-  )
+  /* 🧩 Props */
+  const props = defineProps<{
+    messages: Message[]
+    isTyping: boolean
+    loading?: boolean
+    currentRole: ChatRole
+    sendMessage: () => void
+    sendTyping: () => void
+    showInput?: boolean
+    height?: string | number
+    maxHeight?: string | number
+    minHeight?: string | number
+  }>()
 
   /* 💬 v-model pour le champ d’entrée */
   const newMessage = defineModel<string>('newMessage', { default: '' })
+
+  /* 🧠 Typing plus naturel */
+  const localIsTyping = ref(false)
+  let typingTimeout: ReturnType<typeof setTimeout> | null = null
+  watch(
+    () => props.isTyping,
+    (val) => {
+      if (val) {
+        localIsTyping.value = true
+        clearTimeout(typingTimeout!)
+      } else {
+        typingTimeout = setTimeout(() => (localIsTyping.value = false), 600)
+      }
+    },
+  )
+
+  /* 🌐 Détection offline */
+  const isOnline = ref(true)
+  const handleOnlineChange = () => {
+    isOnline.value = navigator.onLine
+  }
+  onMounted(() => {
+    isOnline.value = navigator.onLine
+    window.addEventListener('online', handleOnlineChange)
+    window.addEventListener('offline', handleOnlineChange)
+  })
+  onUnmounted(() => {
+    window.removeEventListener('online', handleOnlineChange)
+    window.removeEventListener('offline', handleOnlineChange)
+  })
 
   /* 🎨 Style calculé dynamiquement */
   const computedStyle = computed(() => {
@@ -118,11 +164,12 @@
       flexDirection: 'column',
       overflow: 'hidden',
       background: 'white',
+      position: 'relative',
     }
 
     if (props.height)
       style.height = typeof props.height === 'number' ? `${props.height}px` : props.height
-    else style.flex = '1' // ✅ par défaut on garde flex:1
+    else style.flex = '1'
 
     if (props.maxHeight)
       style.maxHeight =
@@ -143,10 +190,20 @@
   const scrollToBottom = () => {
     const el = msgList.value
     if (!el) return
-    el.scrollTop = el.scrollHeight
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: 'smooth',
+    })
     showNewMessagesBtn.value = false
     isNearBottom.value = true
     clearTimeout(autoHideTimer!)
+  }
+
+  const hideNewMessagesBtn = () => {
+    if (showNewMessagesBtn.value) {
+      showNewMessagesBtn.value = false
+      clearTimeout(autoHideTimer!)
+    }
   }
 
   const onScroll = () => {
@@ -161,13 +218,7 @@
     }
   }
 
-  const hideNewMessagesBtn = () => {
-    if (showNewMessagesBtn.value) {
-      showNewMessagesBtn.value = false
-      clearTimeout(autoHideTimer!)
-    }
-  }
-
+  /* 🧩 Gestion auto-scroll lors de nouveaux messages */
   watch(
     () => props.messages.length,
     async (newLen, oldLen) => {
@@ -184,24 +235,46 @@
         clearTimeout(autoHideTimer!)
         autoHideTimer = setTimeout(() => {
           if (showNewMessagesBtn.value) showNewMessagesBtn.value = false
-        }, 2000)
+        }, 2500)
       }
     },
   )
 
+  /* ✍️ Groupement de messages successifs du même auteur */
+  const isGroupedMessage = (index: number) => {
+    const msg = props.messages[index]
+    const prev = props.messages[index + 1]
+    return prev && prev.sender_role === msg?.sender_role
+  }
+
+  /* ⌨️ Auto focus sur le champ input */
+  const inputRef = ref<HTMLInputElement | null>(null)
+  onMounted(() => {
+    nextTick(() => inputRef.value?.focus())
+  })
+
+  /* 🧹 Nettoyage */
   onUnmounted(() => {
     clearTimeout(autoHideTimer!)
+    clearTimeout(typingTimeout!)
   })
 </script>
 
 <style scoped lang="less">
   .chat-core {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
     border-top: 1px solid @neutral-200;
     background: white;
-    position: relative; // ✅ pour bouton flottant
+    display: flex;
+    flex-direction: column;
+
+    .chat-offline-banner {
+      background: fade(@danger-600, 10%);
+      color: @danger-700;
+      text-align: center;
+      padding: 6px;
+      font-size: 13px;
+      border-bottom: 1px solid fade(@danger-600, 15%);
+    }
 
     .chat-loader {
       display: flex;
@@ -213,9 +286,8 @@
       color: @neutral-600;
     }
 
-    /* 💬 Messages */
     .chat-messages {
-      flex: 1 1 auto;
+      flex: 1;
       display: flex;
       flex-direction: column-reverse;
       overflow-y: auto;
@@ -225,7 +297,6 @@
       min-height: 0;
     }
 
-    /* 🧩 Zone d’entrée */
     .chat-input {
       flex-shrink: 0;
       display: flex;
@@ -241,6 +312,8 @@
         border-radius: 8px;
         padding: 8px 12px;
         background: @neutral-50;
+        font-size: 14px;
+
         &:focus {
           border-color: @primary-500;
           background: white;
@@ -262,6 +335,7 @@
       font-weight: 500;
       cursor: pointer;
       box-shadow: 0 2px 8px fade(black, 15%);
+      transition: background 0.2s ease;
       &:hover {
         background: @primary-700;
       }
@@ -281,7 +355,6 @@
       border-radius: 16px;
       padding: 6px 10px;
       width: 48px;
-
       .dot {
         width: 6px;
         height: 6px;
@@ -289,7 +362,6 @@
         border-radius: 50%;
         animation: typingDots 1.3s infinite ease-in-out;
       }
-
       .dot:nth-child(2) {
         animation-delay: 0.2s;
       }
@@ -311,6 +383,7 @@
       }
     }
 
+    /* Animations */
     .fade-scale-enter-active,
     .fade-scale-leave-active {
       transition: all 0.35s ease;
@@ -335,6 +408,14 @@
     .slide-fade-leave-to {
       opacity: 0;
       transform: translateY(8px) scale(0.98);
+    }
+
+    .message-fade-enter-active {
+      transition: all 0.25s ease;
+    }
+    .message-fade-enter-from {
+      opacity: 0;
+      transform: translateY(6px);
     }
   }
 </style>
