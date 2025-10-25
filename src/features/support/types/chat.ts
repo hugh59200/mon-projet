@@ -30,15 +30,20 @@ export const TypingEventMap: Record<ChatRole, TypingEvent> = {
  */
 export type Message = Tables<'messages'>
 
-/**
- * Conversation regroupée (n'existe pas en DB)
- * Utilisée côté admin pour la liste des clients
- */
-export interface Conversation {
+export type Conversation = Tables<'conversations'>
+
+/** Vue SQL : conversation_overview */
+export type ConversationOverview = {
   user_id: string
-  user_email?: string | null
-  lastMessagePreview: string | null
-  lastDate: string | null
+  user_email: string | null
+  full_name: string | null
+  last_read_message_id: number | null
+  last_read_at: string | null
+  last_admin_message_id: number | null
+  last_admin_read_at: string | null
+  last_message: string | null
+  last_message_at: string | null
+  unread_count: number
 }
 
 /* -------------------------------------------------------------------------- */

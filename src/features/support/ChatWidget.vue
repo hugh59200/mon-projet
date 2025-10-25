@@ -1,117 +1,109 @@
 <template>
   <div
-    class="chat-container"
+    class="chat-widget"
     :class="{ open: isOpen }"
   >
-    <!-- 🟢 Bouton flottant -->
     <button
       class="chat-toggle"
       @click="toggleChat"
     >
       <BasicIconNext name="MessageCircle" />
+      <div
+        v-if="unreadCount > 0"
+        class="chat-badge"
+      >
+        {{ unreadCount }}
+      </div>
     </button>
 
-    <!-- 💬 Fenêtre de chat -->
-    <transition name="fade">
+    <transition name="fade-scale">
       <div
         v-if="isOpen"
         class="chat-window"
       >
-        <div class="chat-header">
-          <span>Support Fast Peptides</span>
-          <button @click="toggleChat">
+        <header class="chat-header">
+          <div class="chat-title">
+            <BasicIconNext name="Headphones" />
+            <span>Support Fast Peptides</span>
+          </div>
+          <button
+            class="close-btn"
+            @click="toggleChat"
+          >
             <BasicIconNext name="X" />
           </button>
-        </div>
+        </header>
 
-        <!-- 🔄 Loader pendant initialisation -->
-        <div
-          v-if="!isReady"
-          class="chat-loader"
-        >
-          <BasicLoader />
-          <span>Connexion au support...</span>
-        </div>
-
-        <!-- 💬 Contenu du chat -->
-        <template v-else>
-          <!-- Transition group = animation sur messages -->
-          <transition-group
-            name="message-fade"
-            tag="div"
-            class="chat-messages"
-          >
-            <ChatMessage
-              v-for="msg in messages"
-              :key="msg.id"
-              :message="msg"
-              :isMine="msg.sender_role === 'user'"
-            />
-
-            <!-- 💭 Bulle "l’admin écrit..." -->
-            <transition name="typing-fade">
-              <div
-                v-if="isTyping"
-                class="typing-bubble"
-                key="typing"
-              >
-                <span class="dot" />
-                <span class="dot" />
-                <span class="dot" />
-              </div>
-            </transition>
-          </transition-group>
-
-          <!-- 🧩 Zone d’envoi -->
-          <form
-            class="chat-input"
-            @submit.prevent="sendMessage"
-          >
-            <input
-              v-model="newMessage"
-              type="text"
-              placeholder="Écrire un message..."
-              required
-              @input="sendTyping"
-            />
-            <button type="submit">
-              <BasicIconNext name="Send" />
-            </button>
-          </form>
-        </template>
+        <ChatCore
+          v-model:new-message="newMessage"
+          :messages="messages"
+          :is-typing="isTyping"
+          :loading="!isReady"
+          current-role="user"
+          :send-message="sendMessage"
+          :send-typing="sendTyping"
+          :height="600"
+        />
       </div>
     </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { nextTick, ref, watch } from 'vue'
-  import ChatMessage from './ChatMessage.vue'
+  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import ChatCore from './ChatCore.vue'
   import { useUserChat } from './composables/useUserChat'
 
-  const { messages, newMessage, isTyping, sendMessage, sendTyping, isReady, observeMessages } =
-    useUserChat()
+  const { messages, newMessage, isTyping, sendMessage, sendTyping, isReady } = useUserChat()
 
   const isOpen = ref(false)
-  const toggleChat = () => (isOpen.value = !isOpen.value)
+  const unreadCount = ref(0)
+  let hideBadgeTimer: ReturnType<typeof setTimeout> | null = null
 
-  watch(isOpen, async (open) => {
-    if (open) {
-      await nextTick()
-      observeMessages()
+  const toggleChat = () => {
+    isOpen.value = !isOpen.value
+    if (isOpen.value) {
+      unreadCount.value = 0
+      clearTimeout(hideBadgeTimer!)
     }
-  })
+  }
+
+  watch(
+    () => messages.value.length,
+    async (newLen, oldLen) => {
+      if (newLen <= oldLen) return
+      await nextTick()
+      const lastMsg = messages.value[0]
+      const fromAdmin = lastMsg?.sender_role === 'admin'
+      if (!isOpen.value && fromAdmin) {
+        unreadCount.value++
+        clearTimeout(hideBadgeTimer!)
+        hideBadgeTimer = setTimeout(() => (unreadCount.value = 0), 2000)
+      }
+    },
+  )
+
+  const handleClickAnywhere = () => {
+    if (unreadCount.value > 0) {
+      unreadCount.value = 0
+      clearTimeout(hideBadgeTimer!)
+    }
+  }
+
+  onMounted(() => document.addEventListener('click', handleClickAnywhere))
+  onUnmounted(() => document.removeEventListener('click', handleClickAnywhere))
 </script>
 
 <style scoped lang="less">
-  .chat-container {
+  .chat-widget {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 1200;
+    z-index: 9999;
 
     .chat-toggle {
-      background-color: @primary-600;
+      position: relative;
+      background: @primary-600;
       color: white;
       border: none;
       border-radius: 50%;
@@ -119,9 +111,24 @@
       height: 56px;
       box-shadow: 0 4px 12px fade(black, 20%);
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s ease;
       &:hover {
         transform: scale(1.05);
+      }
+      .chat-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: @danger-600;
+        color: white;
+        border-radius: 999px;
+        min-width: 20px;
+        height: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 
@@ -129,136 +136,22 @@
       position: absolute;
       bottom: 70px;
       right: 0;
-      width: 320px;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px fade(black, 20%);
+      width: 340px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px fade(black, 25%);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-
-      .chat-header {
-        background-color: @secondary-800;
-        color: white;
-        padding: 12px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .chat-loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 24px;
-        color: @neutral-600;
-        font-size: 14px;
-      }
-
-      .chat-messages {
-        flex: 1;
-        padding: 12px;
-        overflow-y: auto;
-        max-height: 300px;
-        background-color: @neutral-50;
-        scroll-behavior: smooth;
-      }
-
-      .chat-input {
-        display: flex;
-        border-top: 1px solid @neutral-200;
-
-        input {
-          flex: 1;
-          padding: 10px;
-          border: none;
-          outline: none;
-          background: @neutral-50;
-        }
-
-        button {
-          background: none;
-          border: none;
-          padding: 10px 12px;
-          cursor: pointer;
-        }
-      }
-    }
-  }
-
-  /* 💭 Animation "admin tape..." */
-  .typing-bubble {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-around;
-    background: @neutral-200;
-    border-radius: 16px;
-    padding: 6px 10px;
-    width: 48px;
-    margin: 6px 0 6px 10px;
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      background: fade(@neutral-600, 70%);
-      border-radius: 50%;
-      animation: typingDots 1.3s infinite ease-in-out;
     }
 
-    .dot:nth-child(2) {
-      animation-delay: 0.2s;
+    .chat-header {
+      background: @primary-700;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-  }
-
-  @keyframes typingDots {
-    0%,
-    80%,
-    100% {
-      transform: scale(0.6);
-      opacity: 0.5;
-    }
-    40% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  /* ✨ Transitions */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.25s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
-
-  .typing-fade-enter-active,
-  .typing-fade-leave-active {
-    transition: opacity 0.3s ease;
-  }
-  .typing-fade-enter-from,
-  .typing-fade-leave-to {
-    opacity: 0;
-  }
-
-  /* 💬 Animation sur nouveaux messages */
-  .message-fade-enter-active {
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .message-fade-leave-active {
-    transition: opacity 0.25s ease;
-  }
-  .message-fade-enter-from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  .message-fade-leave-to {
-    opacity: 0;
-    transform: translateY(-5px);
   }
 </style>

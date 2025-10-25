@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversations: {
+        Row: {
+          last_admin_message_id: number | null
+          last_admin_read_at: string | null
+          last_read_at: string | null
+          last_read_message_id: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          last_admin_message_id?: number | null
+          last_admin_read_at?: string | null
+          last_read_at?: string | null
+          last_read_message_id?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          last_admin_message_id?: number | null
+          last_admin_read_at?: string | null
+          last_read_at?: string | null
+          last_read_message_id?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -43,6 +70,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "messages_user_id_fkey"
             columns: ["user_id"]
@@ -124,6 +158,13 @@ export type Database = {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -200,7 +241,43 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      conversation_overview: {
+        Row: {
+          full_name: string | null
+          last_admin_message_id: number | null
+          last_admin_read_at: string | null
+          last_message: string | null
+          last_message_at: string | null
+          last_read_at: string | null
+          last_read_message_id: number | null
+          unread_count: number | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      messages_unread_view: {
+        Row: {
+          count: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_full_order:

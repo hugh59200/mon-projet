@@ -11,13 +11,14 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
   /** 🗺️ Détail des non-lus par utilisateur */
   const unreadByUser = ref<Record<string, number>>({})
 
-  /** 🔄 Charge les non-lus regroupés par utilisateur */
+  /** 🧭 Dernier message lu par utilisateur (synchro cross-device) */
+  const lastReadByUser = ref<Record<string, number | null>>({})
+
+  // ============================================================
+  // 🔄 Chargement des non-lus (basé sur la vue SQL messages_unread_view)
+  // ============================================================
   const fetchUnreadByUser = async () => {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('user_id')
-      .eq('is_read', false)
-      .eq('sender_role', 'user')
+    const { data, error } = await supabase.from('messages_unread_view').select('*')
 
     if (error) {
       console.error('[fetchUnreadByUser]', error)
@@ -25,18 +26,29 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     }
 
     const map: Record<string, number> = {}
-    for (const msg of data || []) {
-      if (!msg.user_id) continue
-      map[msg.user_id] = (map[msg.user_id] || 0) + 1
+    for (const row of data || []) {
+      if (!row.user_id) continue
+      map[row.user_id] = Number(row.count)
     }
 
     unreadByUser.value = map
     unreadCount.value = Object.values(map).reduce((a, b) => a + b, 0)
   }
 
-  /** 🧠 Marque les messages d’un user comme lus */
-  const markAsRead = async (userId: string) => {
-    const { error } = await supabase
+  // ============================================================
+  // 🧠 Marque une conversation comme lue
+  //   → met à jour la table messages (pour rétrocompatibilité)
+  //   → met aussi à jour conversations.last_read_message_id
+  // ============================================================
+  const markAsRead = async (userId: string, lastMessageId?: number) => {
+    if (!userId) return
+
+    // ⚡ Mise à jour immédiate de l’état local
+    unreadByUser.value[userId] = 0
+    unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
+
+    // 🧠 1. Met à jour les messages non lus de cet utilisateur
+    await supabase
       .from('messages')
       .update({
         is_read: true,
@@ -44,11 +56,24 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       } satisfies TablesUpdate<'messages'>)
       .eq('user_id', userId)
       .eq('sender_role', 'user')
+      .eq('is_read', false)
 
-    if (!error) await fetchUnreadByUser()
+    // 🗂️ 2. Met à jour la table conversations
+    const { error } = await supabase.from('conversations').upsert({
+      user_id: userId,
+      last_read_message_id: lastMessageId ?? null,
+      last_read_at: new Date().toISOString(),
+    })
+
+    if (error) console.error('[markAsRead]', error)
+
+    // 🔄 3. Synchronisation (vue SQL)
+    await fetchUnreadByUser()
   }
 
-  /** 🔔 Écoute Realtime pour nouveaux messages utilisateurs */
+  // ============================================================
+  // 🔔 Realtime : nouveau message utilisateur = incrément compteur
+  // ============================================================
   const listenRealtime = () => {
     supabase
       .channel('messages-realtime')
@@ -64,13 +89,20 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
           const msg = payload.new as Message
           if (!msg.user_id) return
 
+          // Incrémente localement
           unreadByUser.value[msg.user_id] = (unreadByUser.value[msg.user_id] || 0) + 1
-
           unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
         },
       )
       .subscribe()
   }
 
-  return { unreadCount, unreadByUser, fetchUnreadByUser, markAsRead, listenRealtime }
+  return {
+    unreadCount,
+    unreadByUser,
+    lastReadByUser,
+    fetchUnreadByUser,
+    markAsRead,
+    listenRealtime,
+  }
 })

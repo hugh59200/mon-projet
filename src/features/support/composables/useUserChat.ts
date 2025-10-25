@@ -1,5 +1,6 @@
 import { supabase } from '@/services/supabaseClient'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
 
 export function useUserChat() {
@@ -17,41 +18,49 @@ export function useUserChat() {
   let msgChannel: ReturnType<typeof supabase.channel> | null = null
   let observer: MutationObserver | null = null
 
-  const cleanup = () => {
-    typingChannel && supabase.removeChannel(typingChannel)
-    msgChannel && supabase.removeChannel(msgChannel)
-    observer?.disconnect()
-    typingChannel = msgChannel = observer = null
-  }
+  /* ------------------------------ Helpers ------------------------------ */
+  const getMessagesEl = () =>
+    document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
 
-  const scrollToEnd = (force = false) => {
-    const el = document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
+  const scrollToEnd = (instant = false) => {
+    const el = getMessagesEl()
     if (!el) return
     requestAnimationFrame(() => {
-      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100 || force
-      if (nearBottom) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: instant ? 'auto' : 'smooth',
+      })
     })
   }
 
   const observeMessages = () => {
-    const el = document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
+    const el = getMessagesEl()
     if (!el) return
     observer?.disconnect()
     observer = new MutationObserver(() => scrollToEnd())
-    observer.observe(el, { childList: true })
+    observer.observe(el, { childList: true, subtree: true })
   }
 
+  /* ------------------------------ Typing ------------------------------- */
   const ensureTypingChannel = () => {
     if (typingChannel) return
-    typingChannel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
+    typingChannel = supabase.channel('typing-status', {
+      config: { broadcast: { self: false } },
+    })
     typingChannel
-      .on('broadcast', { event: 'admin_typing' }, (e) => (isTyping.value = e.payload.isTyping))
+      .on('broadcast', { event: 'admin_typing' }, (e) => {
+        isTyping.value = e.payload.isTyping
+      })
       .subscribe()
   }
 
   const sendTyping = () => {
     ensureTypingChannel()
-    typingChannel!.send({ type: 'broadcast', event: 'user_typing', payload: { isTyping: true } })
+    typingChannel!.send({
+      type: 'broadcast',
+      event: 'user_typing',
+      payload: { isTyping: true },
+    })
     clearTimeout(typingTimer!)
     typingTimer = setTimeout(
       () =>
@@ -64,28 +73,10 @@ export function useUserChat() {
     )
   }
 
-  const fetchMessages = async () => {
-    if (!userId.value) return
-    isReady.value = false
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('user_id', userId.value)
-      .order('created_at', { ascending: true })
-
-    if (error) console.error('[fetchMessages]', error)
-
-    messages.value = data ?? []
-    isReady.value = true
-    subscribeRealtime()
-    await nextTick()
-    observeMessages()
-    scrollToEnd(true)
-  }
-
+  /* ------------------------------ Messages ------------------------------ */
   const subscribeRealtime = () => {
     if (!userId.value) return
-    msgChannel && supabase.removeChannel(msgChannel)
+    if (msgChannel) supabase.removeChannel(msgChannel)
     ensureTypingChannel()
 
     msgChannel = supabase
@@ -98,38 +89,61 @@ export function useUserChat() {
           table: 'messages',
           filter: `user_id=eq.${userId.value}`,
         },
-        (payload) => messages.value.push(payload.new as Message),
+        async (payload) => {
+          const msg = payload.new as Message
+          messages.value.unshift(msg)
+          await nextTick()
+          scrollToEnd()
+        },
       )
       .subscribe()
   }
 
+  const fetchMessages = async () => {
+    if (!userId.value) return
+    isReady.value = false
+
+    const { data, error } = await chatApi.fetchMessages(userId.value)
+    if (error) {
+      console.error('[fetchMessages]', error)
+      errorMessage.value = 'Impossible de charger les messages.'
+      isReady.value = true
+      return
+    }
+
+    messages.value = data ?? []
+    isReady.value = true
+
+    await nextTick()
+    observeMessages()
+    scrollToEnd(true)
+    subscribeRealtime()
+  }
+
   const sendMessage = async () => {
     if (!newMessage.value.trim() || !userId.value) return
-    const { error } = await supabase.from('messages').insert({
-      user_id: userId.value,
-      sender_role: role,
-      content: newMessage.value,
-      created_at: new Date().toISOString(),
-    })
+    const content = newMessage.value
+    newMessage.value = ''
+    const { error } = await chatApi.sendMessage(userId.value, role, content)
     if (!error) {
-      newMessage.value = ''
+      await nextTick()
       scrollToEnd(true)
     }
   }
 
+  /* ------------------------------ Lifecycle ------------------------------ */
   onMounted(async () => {
     const { data } = await supabase.auth.getUser()
     userId.value = data.user?.id ?? null
+
     if (!userId.value) {
       isReady.value = true
       console.warn('[useUserChat] Aucun utilisateur connecté.')
       return
     }
 
-    ensureTypingChannel()
     await fetchMessages()
-    await nextTick()
-    observeMessages()
+    ensureTypingChannel()
   })
 
   watch(
@@ -140,7 +154,11 @@ export function useUserChat() {
     },
   )
 
-  onUnmounted(cleanup)
+  onUnmounted(() => {
+    typingChannel && supabase.removeChannel(typingChannel)
+    msgChannel && supabase.removeChannel(msgChannel)
+    observer?.disconnect()
+  })
 
   return {
     messages,
@@ -148,9 +166,8 @@ export function useUserChat() {
     isTyping,
     isReady,
     errorMessage,
-    fetchMessages,
     sendMessage,
     sendTyping,
-    observeMessages, // 👈 rendu accessible pour le widget
+    observeMessages,
   }
 }

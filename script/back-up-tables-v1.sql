@@ -254,5 +254,128 @@ ALTER PUBLICATION supabase_realtime ADD TABLE
   public.products,
   public.profiles;
 
--- Vérification :
--- SELECT * FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
+-- ============================================================
+-- 💬 TABLE : CONVERSATIONS (état par utilisateur)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.conversations (
+  user_id uuid PRIMARY KEY REFERENCES public.profiles (id) ON DELETE CASCADE,
+  last_read_message_id bigint REFERENCES public.messages (id) ON DELETE SET NULL,
+  last_read_at timestamptz DEFAULT now(),
+  last_admin_message_id bigint REFERENCES public.messages (id) ON DELETE SET NULL,
+  last_admin_read_at timestamptz,
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_last_read_message_id ON public.conversations (last_read_message_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_last_admin_message_id ON public.conversations (last_admin_message_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_updated_at ON public.conversations (updated_at);
+
+-- ============================================================
+-- 🔐 RLS (Row Level Security)
+-- ============================================================
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  EXECUTE 'DROP POLICY IF EXISTS "User can read own conversation" ON public.conversations';
+  EXECUTE 'DROP POLICY IF EXISTS "User can update own conversation" ON public.conversations';
+  EXECUTE 'DROP POLICY IF EXISTS "Admin full access conversations" ON public.conversations';
+END $$;
+
+-- 👤 Un utilisateur peut lire / mettre à jour uniquement sa propre conversation
+CREATE POLICY "User can read own conversation"
+  ON public.conversations FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "User can update own conversation"
+  ON public.conversations FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- 🧑‍💼 Un administrateur peut tout lire / modifier
+CREATE POLICY "Admin full access conversations"
+  ON public.conversations FOR ALL TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- ============================================================
+-- ⚙️ TRIGGER : mise à jour automatique du timestamp
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.touch_conversation_updated_at()
+RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_conversations_touch_updated_at ON public.conversations;
+CREATE TRIGGER tr_conversations_touch_updated_at
+BEFORE UPDATE ON public.conversations
+FOR EACH ROW
+EXECUTE FUNCTION public.touch_conversation_updated_at();
+
+-- ============================================================
+-- 🌱 SEED : conversations initiales
+-- ============================================================
+INSERT INTO public.conversations (user_id, last_read_message_id, last_read_at)
+SELECT DISTINCT user_id, MAX(id), MAX(created_at)
+FROM public.messages
+GROUP BY user_id
+ON CONFLICT (user_id) DO NOTHING;
+
+-- ============================================================
+-- 🔍 VIEW : messages_unread_view
+--   → compte le nombre de messages non lus par conversation
+-- ============================================================
+DROP VIEW IF EXISTS public.messages_unread_view CASCADE;
+
+CREATE OR REPLACE VIEW public.messages_unread_view AS
+SELECT
+  m.user_id,
+  COUNT(*) AS count
+FROM public.messages m
+LEFT JOIN public.conversations c ON c.user_id = m.user_id
+WHERE
+  m.sender_role = 'user'
+  AND (
+    c.last_read_message_id IS NULL
+    OR m.id > c.last_read_message_id
+  )
+GROUP BY m.user_id;
+
+-- ============================================================
+-- 🧩 EXEMPLE DE VUE ADMIN
+--   → facilite les requêtes côté dashboard (dernier message, etc.)
+-- ============================================================
+DROP VIEW IF EXISTS public.conversation_overview CASCADE;
+
+CREATE OR REPLACE VIEW public.conversation_overview AS
+SELECT
+  p.id AS user_id,
+  p.email AS user_email,
+  p.full_name,
+  c.last_read_message_id,
+  c.last_read_at,
+  c.last_admin_message_id,
+  c.last_admin_read_at,
+  m.content AS last_message,
+  m.created_at AS last_message_at,
+  (SELECT COUNT(*) FROM public.messages mu
+    WHERE mu.user_id = p.id
+      AND mu.sender_role = 'user'
+      AND (c.last_read_message_id IS NULL OR mu.id > c.last_read_message_id)
+  ) AS unread_count
+FROM public.profiles p
+LEFT JOIN public.conversations c ON c.user_id = p.id
+LEFT JOIN LATERAL (
+  SELECT content, created_at
+  FROM public.messages
+  WHERE messages.user_id = p.id
+  ORDER BY created_at DESC
+  LIMIT 1
+) m ON TRUE;
+
+-- ============================================================
+-- 🔔 ACTIVER LE REALTIME POUR LES NOUVELLES TABLES / VUES
+-- ============================================================
+ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
+

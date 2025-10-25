@@ -1,16 +1,15 @@
 import { supabase } from '@/services/supabaseClient'
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { chatApi } from '../services/chatApi'
 import { useChatNotifStore } from '../stores/useChatNotifStore'
-import { useChatScrollStore } from '../stores/useChatScrollStore'
-import type { ChatRole, Conversation, Message } from '../types/chat'
+import type { ChatRole, ConversationOverview, Message } from '../types/chat'
 
 export function useAdminChat() {
   const role: ChatRole = 'admin'
   const chatNotif = useChatNotifStore()
-  const scrollStore = useChatScrollStore()
 
   const messages = ref<Message[]>([])
-  const conversations = ref<Conversation[]>([])
+  const conversations = ref<ConversationOverview[]>([])
   const newMessage = ref('')
   const selectedUserId = ref<string | null>(null)
   const isReady = ref(false)
@@ -20,34 +19,49 @@ export function useAdminChat() {
   let typingTimer: ReturnType<typeof setTimeout> | null = null
   let typingChannel: ReturnType<typeof supabase.channel> | null = null
   let msgChannel: ReturnType<typeof supabase.channel> | null = null
-  let observer: MutationObserver | null = null
 
-  /* ---------------------------------- Helpers ---------------------------------- */
-  const getMessagesEl = () =>
-    document.querySelector('.messages-list') as HTMLElement | null
+  /* ------------------------------ Realtime ------------------------------ */
+  const subscribeRealtime = (userId: string) => {
+    if (!userId) return
+    if (msgChannel) supabase.removeChannel(msgChannel)
 
-  const scrollToEnd = (force = false) => {
-    const el = getMessagesEl()
-    if (!el) return
-    requestAnimationFrame(() => {
-      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100 || force
-      if (nearBottom) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    })
+    msgChannel = supabase
+      .channel(`admin-messages-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `user_id=eq.${userId}`,
+        },
+        async (payload) => {
+          const msg = payload.new as Message
+          console.log('⚡ Nouveau message reçu (admin):', msg)
+          messages.value.unshift(msg)
+          await nextTick()
+
+          // ✅ Si c’est dans la conversation active
+          if (selectedUserId.value === userId) {
+            chatNotif.unreadByUser[userId] = 0
+            await chatNotif.markAsRead(userId, msg.id)
+            await chatNotif.fetchUnreadByUser()
+          }
+        },
+      )
+      .subscribe()
   }
 
-  const observeMessages = () => {
-    const el = getMessagesEl()
-    if (!el) return
-    observer?.disconnect()
-    observer = new MutationObserver(() => scrollToEnd())
-    observer.observe(el, { childList: true, subtree: true })
-  }
-
+  /* ------------------------------ Typing ------------------------------- */
   const ensureTypingChannel = () => {
     if (typingChannel) return
-    typingChannel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
+    typingChannel = supabase.channel('typing-status', {
+      config: { broadcast: { self: false } },
+    })
     typingChannel
-      .on('broadcast', { event: 'user_typing' }, (e) => (isTyping.value = e.payload.isTyping))
+      .on('broadcast', { event: 'user_typing' }, (e) => {
+        isTyping.value = e.payload.isTyping
+      })
       .subscribe()
   }
 
@@ -70,127 +84,45 @@ export function useAdminChat() {
     )
   }
 
-  /* -------------------------------- Conversations -------------------------------- */
+  /* -------------------------- Conversations ---------------------------- */
   const fetchConversations = async () => {
     isReady.value = false
-    const { data, error } = await supabase
-      .from('messages')
-      .select('user_id, content, created_at, profiles(email)')
-      .order('created_at', { ascending: false })
-
-    if (error || !data) {
-      console.error('[fetchConversations]', error)
-      return
+    const { data, error } = await chatApi.fetchAllConversations()
+    if (!error && data) {
+      conversations.value = data as ConversationOverview[]
     }
-
-    const map = new Map<string, Conversation>()
-    data.forEach((msg) => {
-      if (!msg.user_id || map.has(msg.user_id)) return
-      map.set(msg.user_id, {
-        user_id: msg.user_id,
-        user_email: msg.profiles?.email,
-        lastMessagePreview: msg.content.slice(0, 50),
-        lastDate: msg.created_at,
-      })
-    })
-
-    conversations.value = [...map.values()]
     isReady.value = true
   }
 
-  /* ---------------------------------- Messages ---------------------------------- */
+  /* ----------------------------- Messages ------------------------------ */
   const fetchMessages = async (userId: string) => {
     isMessagesLoading.value = true
-    messages.value = []
-
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: true })
-
-    if (error) {
-      console.error('[fetchMessages]', error)
-      return
-    }
-
-    messages.value = data ?? []
+    const { data, error } = await chatApi.fetchMessages(userId)
+    if (!error && data) messages.value = data
     isMessagesLoading.value = false
-    subscribeRealtime(userId)
+
+    const lastMsg = messages.value.at(-1)
+    if (lastMsg) await chatNotif.markAsRead(userId, lastMsg.id)
   }
 
-  const subscribeRealtime = (userId: string) => {
-    msgChannel && supabase.removeChannel(msgChannel)
-    ensureTypingChannel()
-
-    msgChannel = supabase
-      .channel(`admin-messages-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `user_id=eq.${userId}`,
-        },
-        async (payload) => {
-          messages.value.push(payload.new as Message)
-          await nextTick()
-          scrollToEnd()
-        },
-      )
-      .subscribe()
-  }
-
-  /* ----------------------------------- Scroll ----------------------------------- */
-  const restoreScrollAfterMount = async (userId: string) => {
-    // attendre la fin de la transition fade-scale (~300ms)
-    await new Promise((r) => setTimeout(r, 300))
-    const el = getMessagesEl()
-    if (!el) return
-    const saved = scrollStore.getScroll(userId)
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: saved, behavior: 'auto' })
-    })
-    el.onscroll = () => scrollStore.saveScroll(userId, el.scrollTop)
-  }
-
+  /* ----------------------------- Sélection ----------------------------- */
   const selectConversation = async (uid: string) => {
-    // sauvegarde la position avant de changer
-    if (selectedUserId.value) {
-      const el = getMessagesEl()
-      if (el) scrollStore.saveScroll(selectedUserId.value, el.scrollTop)
-    }
-
     selectedUserId.value = uid
     await fetchMessages(uid)
-    await chatNotif.markAsRead(uid)
-
-    // restauration différée
-    restoreScrollAfterMount(uid)
+    subscribeRealtime(uid)
+    await chatNotif.fetchUnreadByUser()
   }
 
-  /* -------------------------------- Envoi message -------------------------------- */
+  /* --------------------------- Envoi message --------------------------- */
   const sendMessage = async () => {
     if (!newMessage.value.trim() || !selectedUserId.value) return
-
     const content = newMessage.value
     newMessage.value = ''
-
-    const { error } = await supabase.from('messages').insert({
-      user_id: selectedUserId.value,
-      sender_role: role,
-      content,
-      created_at: new Date().toISOString(),
-    })
-
-    if (!error) {
-      await nextTick()
-      scrollToEnd(true)
-    }
+    const { error } = await chatApi.sendMessage(selectedUserId.value, role, content)
+    if (!error) await nextTick()
   }
 
-  /* -------------------------------- Lifecycle -------------------------------- */
+  /* ----------------------------- Lifecycle ----------------------------- */
   onMounted(() => {
     fetchConversations()
     ensureTypingChannel()
@@ -201,7 +133,6 @@ export function useAdminChat() {
   onUnmounted(() => {
     typingChannel && supabase.removeChannel(typingChannel)
     msgChannel && supabase.removeChannel(msgChannel)
-    observer?.disconnect()
   })
 
   return {
@@ -213,10 +144,8 @@ export function useAdminChat() {
     conversations,
     selectedUserId,
     fetchConversations,
-    fetchMessages,
     sendMessage,
     selectConversation,
     sendTyping,
-    observeMessages,
   }
 }
