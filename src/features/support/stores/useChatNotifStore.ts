@@ -5,20 +5,36 @@ import { ref } from 'vue'
 import type { Message } from '../types/chat'
 
 export const useChatNotifStore = defineStore('chatNotif', () => {
+  /** 🔢 Total global des non-lus */
   const unreadCount = ref<number>(0)
 
-  /** 🔄 Charge le nombre de messages non lus (messages sender_role='user') */
-  const fetchUnreadCount = async () => {
-    const { count, error } = await supabase
+  /** 🗺️ Détail des non-lus par utilisateur */
+  const unreadByUser = ref<Record<string, number>>({})
+
+  /** 🔄 Charge les non-lus regroupés par utilisateur */
+  const fetchUnreadByUser = async () => {
+    const { data, error } = await supabase
       .from('messages')
-      .select('*', { count: 'exact', head: true })
+      .select('user_id')
       .eq('is_read', false)
       .eq('sender_role', 'user')
 
-    if (!error && count !== null) unreadCount.value = count
+    if (error) {
+      console.error('[fetchUnreadByUser]', error)
+      return
+    }
+
+    const map: Record<string, number> = {}
+    for (const msg of data || []) {
+      if (!msg.user_id) continue
+      map[msg.user_id] = (map[msg.user_id] || 0) + 1
+    }
+
+    unreadByUser.value = map
+    unreadCount.value = Object.values(map).reduce((a, b) => a + b, 0)
   }
 
-  /** 🧠 Marque les messages d'un user comme lus */
+  /** 🧠 Marque les messages d’un user comme lus */
   const markAsRead = async (userId: string) => {
     const { error } = await supabase
       .from('messages')
@@ -29,7 +45,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       .eq('user_id', userId)
       .eq('sender_role', 'user')
 
-    if (!error) await fetchUnreadCount()
+    if (!error) await fetchUnreadByUser()
   }
 
   /** 🔔 Écoute Realtime pour nouveaux messages utilisateurs */
@@ -46,11 +62,15 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
         },
         (payload) => {
           const msg = payload.new as Message
-          if (msg.sender_role === 'user') unreadCount.value++
+          if (!msg.user_id) return
+
+          unreadByUser.value[msg.user_id] = (unreadByUser.value[msg.user_id] || 0) + 1
+
+          unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
         },
       )
       .subscribe()
   }
 
-  return { unreadCount, fetchUnreadCount, markAsRead, listenRealtime }
+  return { unreadCount, unreadByUser, fetchUnreadByUser, markAsRead, listenRealtime }
 })

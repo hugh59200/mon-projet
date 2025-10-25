@@ -1,91 +1,95 @@
 import { supabase } from '@/services/supabaseClient'
-import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { ChatRole, Message } from '../types/chat'
 
 export function useUserChat() {
   const role: ChatRole = 'user'
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧱 States                                                                  */
-  /* -------------------------------------------------------------------------- */
   const messages = ref<Message[]>([])
   const newMessage = ref('')
   const isReady = ref(false)
+  const isTyping = ref(false)
   const userId = ref<string | null>(null)
-  const isTyping = ref(false) // 👈 indique si l’admin est en train d’écrire
+  const errorMessage = ref<string | null>(null)
 
   let typingTimer: ReturnType<typeof setTimeout> | null = null
-  const channels: any[] = []
+  let typingChannel: ReturnType<typeof supabase.channel> | null = null
+  let msgChannel: ReturnType<typeof supabase.channel> | null = null
+  let observer: MutationObserver | null = null
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧹 Helpers                                                                 */
-  /* -------------------------------------------------------------------------- */
-  function cleanup() {
-    for (const ch of channels) {
-      try {
-        supabase.removeChannel(ch)
-      } catch (e) {
-        console.warn('[useUserChat] cleanup error', e)
-      }
-    }
-    channels.length = 0
+  const cleanup = () => {
+    typingChannel && supabase.removeChannel(typingChannel)
+    msgChannel && supabase.removeChannel(msgChannel)
+    observer?.disconnect()
+    typingChannel = msgChannel = observer = null
   }
 
-  function scrollToEnd() {
-    const el = document.querySelector('.chat-messages') as HTMLElement | null
+  const scrollToEnd = (force = false) => {
+    const el = document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
     if (!el) return
-    nextTick(() => el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }))
+    requestAnimationFrame(() => {
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100 || force
+      if (nearBottom) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+    })
   }
 
-  function sendTyping(event: 'user_typing' | 'admin_typing') {
-    const channel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
-    channels.push(channel)
-    channel.send({ type: 'broadcast', event, payload: { isTyping: true } })
-    if (typingTimer) clearTimeout(typingTimer)
-    typingTimer = setTimeout(() => {
-      channel.send({ type: 'broadcast', event, payload: { isTyping: false } })
-    }, 1500)
+  const observeMessages = () => {
+    const el = document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
+    if (!el) return
+    observer?.disconnect()
+    observer = new MutationObserver(() => scrollToEnd())
+    observer.observe(el, { childList: true })
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* 🔐 Init User + Messages                                                    */
-  /* -------------------------------------------------------------------------- */
-  async function initUser() {
-    const { data, error } = await supabase.auth.getUser()
-    if (error) {
-      console.error('[useUserChat:initUser]', error)
-      return
-    }
-    userId.value = data.user?.id ?? null
-    if (userId.value) await fetchMessages()
-    isReady.value = true
+  const ensureTypingChannel = () => {
+    if (typingChannel) return
+    typingChannel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
+    typingChannel
+      .on('broadcast', { event: 'admin_typing' }, (e) => (isTyping.value = e.payload.isTyping))
+      .subscribe()
   }
 
-  async function fetchMessages() {
+  const sendTyping = () => {
+    ensureTypingChannel()
+    typingChannel!.send({ type: 'broadcast', event: 'user_typing', payload: { isTyping: true } })
+    clearTimeout(typingTimer!)
+    typingTimer = setTimeout(
+      () =>
+        typingChannel!.send({
+          type: 'broadcast',
+          event: 'user_typing',
+          payload: { isTyping: false },
+        }),
+      1500,
+    )
+  }
+
+  const fetchMessages = async () => {
     if (!userId.value) return
     isReady.value = false
-
     const { data, error } = await supabase
       .from('messages')
       .select('*')
       .eq('user_id', userId.value)
       .order('created_at', { ascending: true })
 
-    if (error) return console.error('[fetchMessages]', error)
+    if (error) console.error('[fetchMessages]', error)
+
     messages.value = data ?? []
     isReady.value = true
     subscribeRealtime()
+    await nextTick()
+    observeMessages()
+    scrollToEnd(true)
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* 🔔 Realtime                                                                */
-  /* -------------------------------------------------------------------------- */
-  function subscribeRealtime() {
-    cleanup()
+  const subscribeRealtime = () => {
+    if (!userId.value) return
+    msgChannel && supabase.removeChannel(msgChannel)
+    ensureTypingChannel()
 
-    const msgCh = supabase
-      .channel(`messages-${userId.value}`)
+    msgChannel = supabase
+      .channel(`user-messages-${userId.value}`)
       .on(
         'postgres_changes',
         {
@@ -94,62 +98,59 @@ export function useUserChat() {
           table: 'messages',
           filter: `user_id=eq.${userId.value}`,
         },
-        (payload: RealtimePostgresChangesPayload<Message>) => {
-          messages.value.push(payload.new as Message)
-          nextTick(scrollToEnd)
-        },
+        (payload) => messages.value.push(payload.new as Message),
       )
       .subscribe()
-
-    // ✅ L'utilisateur écoute les "admin_typing"
-    const typingCh = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
-    typingCh
-      .on('broadcast', { event: 'admin_typing' }, (payload: { payload: { isTyping: boolean } }) => {
-        isTyping.value = payload.payload.isTyping
-      })
-      .subscribe()
-
-    channels.push(msgCh, typingCh)
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* ✉️ Send Message + Input                                                    */
-  /* -------------------------------------------------------------------------- */
-  async function sendMessage() {
-    const text = newMessage.value.trim()
-    if (!text || !userId.value) return
-
+  const sendMessage = async () => {
+    if (!newMessage.value.trim() || !userId.value) return
     const { error } = await supabase.from('messages').insert({
       user_id: userId.value,
       sender_role: role,
-      content: text,
+      content: newMessage.value,
       created_at: new Date().toISOString(),
     })
-
-    if (error) return console.error('[sendMessage]', error)
-    newMessage.value = ''
-    nextTick(scrollToEnd)
+    if (!error) {
+      newMessage.value = ''
+      scrollToEnd(true)
+    }
   }
 
-  // ✅ L’utilisateur envoie "user_typing"
-  function handleInput() {
-    sendTyping('user_typing')
-  }
+  onMounted(async () => {
+    const { data } = await supabase.auth.getUser()
+    userId.value = data.user?.id ?? null
+    if (!userId.value) {
+      isReady.value = true
+      console.warn('[useUserChat] Aucun utilisateur connecté.')
+      return
+    }
 
-  /* -------------------------------------------------------------------------- */
-  /* ♻️ Lifecycle                                                               */
-  /* -------------------------------------------------------------------------- */
-  onMounted(initUser)
+    ensureTypingChannel()
+    await fetchMessages()
+    await nextTick()
+    observeMessages()
+  })
+
+  watch(
+    () => messages.value.length,
+    async () => {
+      await nextTick()
+      scrollToEnd()
+    },
+  )
+
   onUnmounted(cleanup)
 
   return {
-    type: role,
     messages,
     newMessage,
     isTyping,
     isReady,
+    errorMessage,
     fetchMessages,
     sendMessage,
-    handleInput,
+    sendTyping,
+    observeMessages, // 👈 rendu accessible pour le widget
   }
 }

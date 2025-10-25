@@ -1,85 +1,107 @@
 import { supabase } from '@/services/supabaseClient'
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useChatNotifStore } from '../stores/useChatNotifStore'
+import { useChatScrollStore } from '../stores/useChatScrollStore'
 import type { ChatRole, Conversation, Message } from '../types/chat'
 
 export function useAdminChat() {
   const role: ChatRole = 'admin'
   const chatNotif = useChatNotifStore()
+  const scrollStore = useChatScrollStore()
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧱 States                                                                  */
-  /* -------------------------------------------------------------------------- */
   const messages = ref<Message[]>([])
-  const newMessage = ref('')
-  const isReady = ref(false)
   const conversations = ref<Conversation[]>([])
+  const newMessage = ref('')
   const selectedUserId = ref<string | null>(null)
-  const isTyping = ref(false) // 👈 indique si l'utilisateur tape
+  const isReady = ref(false)
+  const isMessagesLoading = ref(false)
+  const isTyping = ref(false)
 
   let typingTimer: ReturnType<typeof setTimeout> | null = null
-  const channels: any[] = []
+  let typingChannel: ReturnType<typeof supabase.channel> | null = null
+  let msgChannel: ReturnType<typeof supabase.channel> | null = null
+  let observer: MutationObserver | null = null
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧹 Helpers                                                                 */
-  /* -------------------------------------------------------------------------- */
-  function cleanup() {
-    for (const ch of channels) {
-      try {
-        supabase.removeChannel(ch)
-      } catch (e) {
-        console.warn('[useAdminChat] cleanup error:', e)
-      }
-    }
-    channels.length = 0
-  }
+  /* ---------------------------------- Helpers ---------------------------------- */
+  const getMessagesEl = () =>
+    document.querySelector('.messages-list') as HTMLElement | null
 
-  function scrollToEnd() {
-    const el = document.querySelector('.messages-list, .chat-messages') as HTMLElement | null
+  const scrollToEnd = (force = false) => {
+    const el = getMessagesEl()
     if (!el) return
-    nextTick(() => el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }))
+    requestAnimationFrame(() => {
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100 || force
+      if (nearBottom) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+    })
   }
 
-  function sendTyping(event: 'user_typing' | 'admin_typing') {
-    const channel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
-    channels.push(channel)
-    channel.send({ type: 'broadcast', event, payload: { isTyping: true } })
-    if (typingTimer) clearTimeout(typingTimer)
-    typingTimer = setTimeout(() => {
-      channel.send({ type: 'broadcast', event, payload: { isTyping: false } })
-    }, 1500)
+  const observeMessages = () => {
+    const el = getMessagesEl()
+    if (!el) return
+    observer?.disconnect()
+    observer = new MutationObserver(() => scrollToEnd())
+    observer.observe(el, { childList: true, subtree: true })
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* 💬 Conversations + Messages                                                */
-  /* -------------------------------------------------------------------------- */
-  async function fetchConversations() {
+  const ensureTypingChannel = () => {
+    if (typingChannel) return
+    typingChannel = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
+    typingChannel
+      .on('broadcast', { event: 'user_typing' }, (e) => (isTyping.value = e.payload.isTyping))
+      .subscribe()
+  }
+
+  const sendTyping = () => {
+    ensureTypingChannel()
+    typingChannel!.send({
+      type: 'broadcast',
+      event: 'admin_typing',
+      payload: { isTyping: true },
+    })
+    clearTimeout(typingTimer!)
+    typingTimer = setTimeout(
+      () =>
+        typingChannel!.send({
+          type: 'broadcast',
+          event: 'admin_typing',
+          payload: { isTyping: false },
+        }),
+      1500,
+    )
+  }
+
+  /* -------------------------------- Conversations -------------------------------- */
+  const fetchConversations = async () => {
     isReady.value = false
     const { data, error } = await supabase
       .from('messages')
-      .select(`user_id, content, created_at, profiles(email)`)
+      .select('user_id, content, created_at, profiles(email)')
       .order('created_at', { ascending: false })
 
-    if (error || !data) return console.error('[fetchConversations]', error)
+    if (error || !data) {
+      console.error('[fetchConversations]', error)
+      return
+    }
 
     const map = new Map<string, Conversation>()
-    for (const msg of data) {
-      if (msg.user_id && !map.has(msg.user_id)) {
-        map.set(msg.user_id, {
-          user_id: msg.user_id,
-          user_email: msg.profiles?.email,
-          lastMessagePreview: msg.content.slice(0, 50),
-          lastDate: msg.created_at,
-        })
-      }
-    }
+    data.forEach((msg) => {
+      if (!msg.user_id || map.has(msg.user_id)) return
+      map.set(msg.user_id, {
+        user_id: msg.user_id,
+        user_email: msg.profiles?.email,
+        lastMessagePreview: msg.content.slice(0, 50),
+        lastDate: msg.created_at,
+      })
+    })
+
     conversations.value = [...map.values()]
     isReady.value = true
   }
 
-  async function fetchMessages(userId: string) {
-    if (!userId) return
-    isReady.value = false
+  /* ---------------------------------- Messages ---------------------------------- */
+  const fetchMessages = async (userId: string) => {
+    isMessagesLoading.value = true
+    messages.value = []
 
     const { data, error } = await supabase
       .from('messages')
@@ -87,89 +109,114 @@ export function useAdminChat() {
       .eq('user_id', userId)
       .order('created_at', { ascending: true })
 
-    if (error) return console.error('[fetchMessages]', error)
+    if (error) {
+      console.error('[fetchMessages]', error)
+      return
+    }
+
     messages.value = data ?? []
-    isReady.value = true
+    isMessagesLoading.value = false
     subscribeRealtime(userId)
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* 🔔 Realtime                                                                */
-  /* -------------------------------------------------------------------------- */
-  function subscribeRealtime(userId: string) {
-    cleanup()
+  const subscribeRealtime = (userId: string) => {
+    msgChannel && supabase.removeChannel(msgChannel)
+    ensureTypingChannel()
 
-    const msgCh = supabase
+    msgChannel = supabase
       .channel(`admin-messages-${userId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages', filter: `user_id=eq.${userId}` },
-        (payload) => {
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `user_id=eq.${userId}`,
+        },
+        async (payload) => {
           messages.value.push(payload.new as Message)
+          await nextTick()
           scrollToEnd()
         },
       )
       .subscribe()
-
-    // ✅ L’admin écoute les "user_typing"
-    const typingCh = supabase.channel('typing-status', { config: { broadcast: { self: false } } })
-    typingCh
-      .on('broadcast', { event: 'user_typing' }, (payload: { payload: { isTyping: boolean } }) => {
-        isTyping.value = payload.payload.isTyping // ✅ correction ici
-      })
-      .subscribe()
-
-    channels.push(msgCh, typingCh)
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* ✉️ Send + Typing + Select                                                  */
-  /* -------------------------------------------------------------------------- */
-  async function sendMessage() {
+  /* ----------------------------------- Scroll ----------------------------------- */
+  const restoreScrollAfterMount = async (userId: string) => {
+    // attendre la fin de la transition fade-scale (~300ms)
+    await new Promise((r) => setTimeout(r, 300))
+    const el = getMessagesEl()
+    if (!el) return
+    const saved = scrollStore.getScroll(userId)
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: saved, behavior: 'auto' })
+    })
+    el.onscroll = () => scrollStore.saveScroll(userId, el.scrollTop)
+  }
+
+  const selectConversation = async (uid: string) => {
+    // sauvegarde la position avant de changer
+    if (selectedUserId.value) {
+      const el = getMessagesEl()
+      if (el) scrollStore.saveScroll(selectedUserId.value, el.scrollTop)
+    }
+
+    selectedUserId.value = uid
+    await fetchMessages(uid)
+    await chatNotif.markAsRead(uid)
+
+    // restauration différée
+    restoreScrollAfterMount(uid)
+  }
+
+  /* -------------------------------- Envoi message -------------------------------- */
+  const sendMessage = async () => {
     if (!newMessage.value.trim() || !selectedUserId.value) return
+
+    const content = newMessage.value
+    newMessage.value = ''
 
     const { error } = await supabase.from('messages').insert({
       user_id: selectedUserId.value,
       sender_role: role,
-      content: newMessage.value,
+      content,
       created_at: new Date().toISOString(),
     })
 
     if (!error) {
-      newMessage.value = ''
-      scrollToEnd()
+      await nextTick()
+      scrollToEnd(true)
     }
   }
 
-  // ✅ L’admin envoie "admin_typing"
-  function handleInput() {
-    sendTyping('admin_typing')
-  }
+  /* -------------------------------- Lifecycle -------------------------------- */
+  onMounted(() => {
+    fetchConversations()
+    ensureTypingChannel()
+    chatNotif.fetchUnreadByUser()
+    chatNotif.listenRealtime()
+  })
 
-  async function selectConversation(uid: string) {
-    selectedUserId.value = uid
-    await fetchMessages(uid)
-    await chatNotif.markAsRead(uid)
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /* ♻️ Lifecycle                                                               */
-  /* -------------------------------------------------------------------------- */
-  onMounted(fetchConversations)
-  onUnmounted(cleanup)
+  onUnmounted(() => {
+    typingChannel && supabase.removeChannel(typingChannel)
+    msgChannel && supabase.removeChannel(msgChannel)
+    observer?.disconnect()
+  })
 
   return {
-    type: role,
     messages,
     newMessage,
     isTyping,
     isReady,
+    isMessagesLoading,
     conversations,
     selectedUserId,
     fetchConversations,
     fetchMessages,
     sendMessage,
     selectConversation,
-    handleInput,
+    sendTyping,
+    observeMessages,
   }
 }

@@ -179,7 +179,7 @@ export const useAuthStore = defineStore('auth', () => {
         await signOut(true)
         return
       }
-      await fetchProfile()
+      fetchProfile()
       startAutoRefresh()
     }
 

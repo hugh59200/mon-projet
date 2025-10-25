@@ -1,5 +1,6 @@
 <template>
   <nav class="auth-navbar">
+    <!-- 🧭 Gauche -->
     <div class="auth-navbar__left">
       <BasicIconNext
         :name="isReduced ? 'LayoutGrid' : 'Menu'"
@@ -28,6 +29,7 @@
       </BasicText>
     </div>
 
+    <!-- 🧩 Droite -->
     <div class="auth-navbar__right">
       <template v-if="auth.user">
         <BasicText
@@ -37,35 +39,44 @@
           {{ auth.user.email }}
         </BasicText>
 
-        <!-- 🧩 Bouton admin avec badge de notifications -->
-        <div class="admin-chat-button">
+        <!-- 👨‍💼 Admin -->
+        <div
+          v-if="auth.isAdmin"
+          class="admin-chat-button"
+          @click="router.push('/admin/chat')"
+        >
           <BasicButton
-            v-if="auth.isAdmin"
             label="Admin"
             type="primary"
             size="small"
-            @click="router.push('/admin')"
           />
-          <div
-            v-if="auth.isAdmin && chatNotif.unreadCount > 0"
-            class="badge"
-            @click="router.push('/admin/chat')"
-            title="Nouveaux messages"
-          >
-            {{ chatNotif.unreadCount }}
-          </div>
+          <transition name="badge-pop">
+            <div
+              v-if="chatNotif.unreadCount > 0"
+              class="badge"
+              title="Nouveaux messages"
+            >
+              {{ chatNotif.unreadCount }}
+            </div>
+          </transition>
         </div>
 
-        <BasicButton
-          label="Panier"
-          type="secondary"
-          size="small"
+        <!-- 🛒 Panier -->
+        <div
+          class="cart-zone"
           @click="router.push('/panier')"
-        />
-        <BasicBadge
-          v-if="cart.totalItems > 0"
-          :label="cart.totalItems.toString()"
-        />
+        >
+          <BasicButton
+            label="Panier"
+            type="secondary"
+            size="small"
+          />
+          <BasicBadge
+            v-if="cart.totalItems > 0"
+            :label="cart.totalItems.toString()"
+          />
+        </div>
+
         <BasicButton
           label="Paiement"
           type="secondary"
@@ -73,12 +84,14 @@
           :disabled="cart.totalItems === 0"
           @click="cart.totalItems > 0 && router.push('/paiement')"
         />
+
         <BasicButton
           label="Mon profil"
           type="secondary"
           size="small"
           @click="router.push('/profil')"
         />
+
         <BasicButton
           label="Se déconnecter"
           type="secondary"
@@ -92,7 +105,6 @@
         <BasicButton
           label="Connexion"
           type="primary"
-          variant="filled"
           size="small"
           @click="router.push('/auth/login')"
         />
@@ -114,7 +126,6 @@
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
   import { storeToRefs } from 'pinia'
-  import { onMounted } from 'vue'
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
@@ -129,11 +140,6 @@
   async function handleLogout() {
     await auth.signOut()
   }
-
-  onMounted(async () => {
-    await chatNotif.fetchUnreadCount()
-    chatNotif.listenRealtime()
-  })
 </script>
 
 <style scoped lang="less">
@@ -146,7 +152,8 @@
     align-items: center;
     padding: 0 24px;
     color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    background: @neutral-900;
 
     &__left {
       display: flex;
@@ -161,6 +168,7 @@
     &__logo {
       cursor: pointer;
       user-select: none;
+      color: white;
       transition: opacity 0.2s ease;
       &:hover {
         opacity: 0.85;
@@ -172,29 +180,61 @@
       align-items: center;
       gap: 12px;
     }
+
+    &__email {
+      color: @neutral-200;
+    }
   }
 
-  /* 🧩 Badge de notification */
+  /* 🧩 Bouton admin avec badge */
   .admin-chat-button {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
 
     .badge {
       position: absolute;
-      top: -8px;
-      right: -8px;
+      top: -6px;
+      right: -6px;
       background: @danger-600;
       color: white;
       border-radius: 50%;
       padding: 2px 6px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
-      cursor: pointer;
       min-width: 20px;
-      text-align: center;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px fade(@neutral-900, 80%);
+      transition: transform 0.2s ease;
     }
   }
 
+  /* 🛍️ Zone panier */
+  .cart-zone {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  /* 💫 Pop-in du badge */
+  .badge-pop-enter-active {
+    transition: all 0.25s ease;
+  }
+  .badge-pop-enter-from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  .badge-pop-leave-to {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  /* 🧩 Logo */
   .logo-icon {
     display: flex;
     align-items: center;

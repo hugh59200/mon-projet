@@ -8,74 +8,89 @@
     </BasicText>
 
     <div class="chat-admin__layout">
-      <!-- 📜 Liste des conversations -->
+      <!-- 📜 Conversations -->
       <aside class="chat-admin__sidebar">
-        <!-- 🔄 Loader pendant initialisation -->
         <div
-          v-if="!isReady"
-          class="loader"
+          v-for="conv in conversations"
+          :key="conv.user_id"
+          class="conversation-item"
+          :class="{ active: conv.user_id === selectedUserId }"
+          @click="selectConversation(conv.user_id)"
         >
-          <BasicLoader />
-          <span>Chargement des conversations...</span>
+          <div class="conversation-header">
+            <BasicIconNext name="User" />
+            <span class="email">{{ conv.user_email || 'Utilisateur anonyme' }}</span>
+          </div>
+          <div class="conversation-footer">
+            <small class="preview">{{ conv.lastMessagePreview }}</small>
+            <div
+              v-if="unreadCountByUser[conv.user_id]"
+              class="badge"
+            >
+              {{ unreadCountByUser[conv.user_id] }}
+            </div>
+          </div>
         </div>
 
-        <template v-else>
-          <div
-            v-for="conv in conversations"
-            :key="conv.user_id"
-            class="conversation-item"
-            :class="{ active: conv.user_id === selectedUserId }"
-            @click="selectConversation(conv.user_id)"
-          >
-            <div class="conversation-header">
-              <BasicIconNext name="User" />
-              <span>{{ conv.user_email || 'Utilisateur anonyme' }}</span>
-            </div>
-            <small>{{ conv.lastMessagePreview }}</small>
-          </div>
-
-          <div
-            v-if="conversations.length === 0"
-            class="no-conv"
-          >
-            Aucune conversation pour le moment.
-          </div>
-        </template>
+        <div
+          v-if="!conversations.length"
+          class="no-conv"
+        >
+          Aucune conversation pour le moment.
+        </div>
       </aside>
 
-      <!-- 💬 Zone de discussion -->
+      <!-- 💬 Zone messages -->
       <section
         v-if="selectedUserId"
         class="chat-admin__messages"
       >
-        <div class="messages-list">
-          <ChatMessage
-            v-for="msg in messages"
-            :key="msg.id"
-            :message="msg"
-            :isMine="msg.sender_role === 'admin'"
-          />
-
-          <!-- 💭 Bulle "utilisateur écrit..." -->
+        <transition
+          name="fade-scale"
+          mode="out-in"
+        >
           <div
-            v-if="isTyping"
-            class="typing-bubble"
+            v-if="isMessagesLoading"
+            key="loader"
+            class="messages-loader"
           >
-            <span class="dot" />
-            <span class="dot" />
-            <span class="dot" />
+            <BasicLoader />
+            <span>Chargement des messages...</span>
           </div>
 
-          <div ref="endOfChat" />
-        </div>
+          <div
+            v-else
+            key="messages"
+            class="messages-list"
+          >
+            <ChatMessage
+              v-for="msg in messages"
+              :key="msg.id"
+              :message="msg"
+              :isMine="msg.sender_role === 'admin'"
+            />
 
-        <!-- 🧩 Barre d'envoi -->
+            <!-- 💭 "Utilisateur écrit..." -->
+            <transition name="typing-fade">
+              <div
+                v-if="isTyping"
+                class="typing-bubble"
+              >
+                <span class="dot" />
+                <span class="dot" />
+                <span class="dot" />
+              </div>
+            </transition>
+          </div>
+        </transition>
+
+        <!-- 🧩 Input -->
         <div class="send-box">
           <input
             v-model="newMessage"
-            placeholder="Écrire un message..."
             type="text"
-            @input="handleInput"
+            placeholder="Écrire un message..."
+            @input="sendTyping"
             @keyup.enter="sendMessage"
           />
           <BasicButton
@@ -107,6 +122,8 @@
 <script setup lang="ts">
   import ChatMessage from '@/features/support/ChatMessage.vue'
   import { useAdminChat } from '@/features/support/composables/useAdminChat'
+  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
+  import { computed, nextTick, watch } from 'vue'
 
   const {
     conversations,
@@ -114,11 +131,22 @@
     selectedUserId,
     newMessage,
     isTyping,
-    isReady,
+    isMessagesLoading,
     selectConversation,
     sendMessage,
-    handleInput,
+    sendTyping,
+    observeMessages,
   } = useAdminChat()
+
+  const chatNotif = useChatNotifStore()
+  const unreadCountByUser = computed(() => chatNotif.unreadByUser)
+
+  // ✅ Quand une conversation s’ouvre, on rebranche l’observateur après transition
+  watch(selectedUserId, async (uid) => {
+    if (!uid) return
+    await nextTick()
+    setTimeout(observeMessages, 250)
+  })
 </script>
 
 <style scoped lang="less">
@@ -139,20 +167,11 @@
     }
 
     &__sidebar {
+      position: relative;
       background: @neutral-50;
       border-right: 1px solid @neutral-200;
       overflow-y: auto;
       padding: 8px;
-      position: relative;
-
-      .loader {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px;
-        color: @neutral-600;
-        font-size: 14px;
-      }
 
       .no-conv {
         text-align: center;
@@ -165,14 +184,19 @@
         padding: 10px 12px;
         border-radius: 8px;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
 
         &:hover {
-          background: fade(@primary-600, 10%);
+          background: fade(@primary-600, 8%);
         }
 
         &.active {
           background: fade(@primary-600, 15%);
+          border-left: 3px solid @primary-600;
+          box-shadow: inset 3px 0 0 fade(@primary-600, 25%);
         }
 
         .conversation-header {
@@ -181,10 +205,45 @@
           gap: 8px;
           font-weight: 500;
           color: @neutral-900;
+
+          .email {
+            flex: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
         }
 
-        small {
-          color: @neutral-600;
+        .conversation-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .preview {
+            color: @neutral-600;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            margin-right: 8px;
+          }
+
+          .badge {
+            background: @primary-600;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 999px;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            line-height: 1;
+            flex-shrink: 0;
+          }
         }
       }
     }
@@ -193,11 +252,24 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
       background: white;
       border-left: 1px solid @neutral-200;
       height: 600px;
-      overflow: hidden;
+      position: relative;
+
+      .messages-loader {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: @neutral-600;
+        font-size: 14px;
+        background: fade(white, 90%);
+        z-index: 5;
+      }
 
       .messages-list {
         flex: 1;
@@ -264,14 +336,9 @@
       animation: typingDots 1.3s infinite ease-in-out;
     }
 
-    .dot:nth-child(1) {
-      animation-delay: 0s;
-    }
-
     .dot:nth-child(2) {
       animation-delay: 0.2s;
     }
-
     .dot:nth-child(3) {
       animation-delay: 0.4s;
     }
@@ -290,18 +357,43 @@
     }
   }
 
-  /* 🎨 Scrollbar custom */
-  .messages-list::-webkit-scrollbar {
-    width: 8px;
+  /* ✨ Animations messages */
+  .message-fade-enter-active {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .messages-list::-webkit-scrollbar-thumb {
-    background: fade(@neutral-600, 40%);
-    border-radius: 8px;
+  .message-fade-leave-active {
+    transition: opacity 0.25s ease;
   }
-  .messages-list::-webkit-scrollbar-thumb:hover {
-    background: fade(@neutral-600, 60%);
+  .message-fade-enter-from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  .messages-list::-webkit-scrollbar-track {
-    background: fade(@neutral-100, 60%);
+  .message-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  /* ✨ Transition globale (chargement ↔ contenu) */
+  .fade-scale-enter-active,
+  .fade-scale-leave-active {
+    transition: all 0.35s ease;
+  }
+  .fade-scale-enter-from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  .fade-scale-leave-to {
+    opacity: 0;
+    transform: scale(0.98) translateY(-8px);
+  }
+
+  /* 💭 Typing subtle fade */
+  .typing-fade-enter-active,
+  .typing-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .typing-fade-enter-from,
+  .typing-fade-leave-to {
+    opacity: 0;
   }
 </style>

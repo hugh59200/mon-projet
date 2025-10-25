@@ -3,7 +3,7 @@
     class="chat-container"
     :class="{ open: isOpen }"
   >
-    <!-- Bouton flottant -->
+    <!-- 🟢 Bouton flottant -->
     <button
       class="chat-toggle"
       @click="toggleChat"
@@ -11,7 +11,7 @@
       <BasicIconNext name="MessageCircle" />
     </button>
 
-    <!-- Fenêtre de chat -->
+    <!-- 💬 Fenêtre de chat -->
     <transition name="fade">
       <div
         v-if="isOpen"
@@ -35,7 +35,12 @@
 
         <!-- 💬 Contenu du chat -->
         <template v-else>
-          <div class="chat-messages">
+          <!-- Transition group = animation sur messages -->
+          <transition-group
+            name="message-fade"
+            tag="div"
+            class="chat-messages"
+          >
             <ChatMessage
               v-for="msg in messages"
               :key="msg.id"
@@ -43,19 +48,21 @@
               :isMine="msg.sender_role === 'user'"
             />
 
-            <!-- 💭 Bulle "admin typing" -->
-            <div
-              v-if="isTyping"
-              class="typing-bubble"
-            >
-              <span class="dot" />
-              <span class="dot" />
-              <span class="dot" />
-            </div>
+            <!-- 💭 Bulle "l’admin écrit..." -->
+            <transition name="typing-fade">
+              <div
+                v-if="isTyping"
+                class="typing-bubble"
+                key="typing"
+              >
+                <span class="dot" />
+                <span class="dot" />
+                <span class="dot" />
+              </div>
+            </transition>
+          </transition-group>
 
-            <div ref="endOfChat" />
-          </div>
-
+          <!-- 🧩 Zone d’envoi -->
           <form
             class="chat-input"
             @submit.prevent="sendMessage"
@@ -65,7 +72,7 @@
               type="text"
               placeholder="Écrire un message..."
               required
-              @input="handleInput"
+              @input="sendTyping"
             />
             <button type="submit">
               <BasicIconNext name="Send" />
@@ -78,14 +85,22 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { nextTick, ref, watch } from 'vue'
   import ChatMessage from './ChatMessage.vue'
   import { useUserChat } from './composables/useUserChat'
 
-  const { messages, newMessage, isTyping, sendMessage, handleInput, isReady } = useUserChat()
+  const { messages, newMessage, isTyping, sendMessage, sendTyping, isReady, observeMessages } =
+    useUserChat()
 
   const isOpen = ref(false)
   const toggleChat = () => (isOpen.value = !isOpen.value)
+
+  watch(isOpen, async (open) => {
+    if (open) {
+      await nextTick()
+      observeMessages()
+    }
+  })
 </script>
 
 <style scoped lang="less">
@@ -147,17 +162,21 @@
         overflow-y: auto;
         max-height: 300px;
         background-color: @neutral-50;
+        scroll-behavior: smooth;
       }
 
       .chat-input {
         display: flex;
         border-top: 1px solid @neutral-200;
+
         input {
           flex: 1;
           padding: 10px;
           border: none;
           outline: none;
+          background: @neutral-50;
         }
+
         button {
           background: none;
           border: none;
@@ -168,7 +187,7 @@
     }
   }
 
-  /* 💭 Bulle typing animée façon iMessage */
+  /* 💭 Animation "admin tape..." */
   .typing-bubble {
     display: inline-flex;
     align-items: center;
@@ -187,9 +206,6 @@
       animation: typingDots 1.3s infinite ease-in-out;
     }
 
-    .dot:nth-child(1) {
-      animation-delay: 0s;
-    }
     .dot:nth-child(2) {
       animation-delay: 0.2s;
     }
@@ -211,6 +227,7 @@
     }
   }
 
+  /* ✨ Transitions */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.25s ease;
@@ -218,5 +235,30 @@
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
+  }
+
+  .typing-fade-enter-active,
+  .typing-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .typing-fade-enter-from,
+  .typing-fade-leave-to {
+    opacity: 0;
+  }
+
+  /* 💬 Animation sur nouveaux messages */
+  .message-fade-enter-active {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .message-fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .message-fade-enter-from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .message-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-5px);
   }
 </style>
