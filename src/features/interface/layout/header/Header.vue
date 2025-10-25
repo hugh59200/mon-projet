@@ -113,8 +113,8 @@
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { storeToRefs } from 'pinia'
+  import { onMounted } from 'vue'
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
@@ -122,7 +122,6 @@
   const cart = useCartStore()
   const sidebar = useSidebarStore()
   const chatNotif = useChatNotifStore()
-  const toast = useToastStore()
 
   const { isReduced } = storeToRefs(sidebar)
   const { toggle } = sidebar
@@ -131,40 +130,10 @@
     await auth.signOut()
   }
 
-  // onMounted(async () => {
-  //   await chatNotif.fetchUnreadCount()
-  //   chatNotif.listenRealtime()
-
-  //   // ✅ Écoute temps réel pour afficher un toast à chaque nouveau message client
-  //   supabase
-  //     .channel('chat-toast')
-  //     .on(
-  //       'postgres_changes',
-  //       {
-  //         event: 'INSERT',
-  //         schema: 'public',
-  //         table: 'messages',
-  //         filter: 'sender_role=eq.user',
-  //       },
-  //       (payload) => {
-  //         const msg = payload.new
-
-  //         // 💬 Affiche le toast via ton nouveau store
-  //         toast.show({
-  //           title: '💬 Nouveau message client',
-  //           message: msg.content.slice(0, 60),
-  //           type: 'info',
-  //           duration: 6000,
-  //         })
-
-  //         // 🔊 Optionnel : petit son de notification
-  //         const audio = new Audio('/sounds/notify.mp3')
-  //         audio.volume = 0.3
-  //         audio.play().catch(() => {})
-  //       },
-  //     )
-  //     .subscribe()
-  // })
+  onMounted(async () => {
+    await chatNotif.fetchUnreadCount()
+    chatNotif.listenRealtime()
+  })
 </script>
 
 <style scoped lang="less">

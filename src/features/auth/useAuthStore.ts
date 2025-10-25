@@ -1,14 +1,11 @@
 import router from '@/router'
 import { supabase } from '@/services/supabaseClient'
+import type { Tables } from '@/types/supabase'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-interface Profile {
-  id: string
-  email: string
-  full_name?: string
-  role?: 'admin' | 'user'
-}
+export type Profile = Tables<'profiles'>
+type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<any | null>(null)
@@ -17,13 +14,13 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref<string | null>(null)
   let refreshInterval: number | null = null
 
-  // --- COMPUTED ---
   const isAuthenticated = computed(() => !!user.value)
-  const isAdmin = computed(() => (profile.value?.role || '') === 'admin')
+  const isAdmin = computed(() => profile.value?.role === 'admin')
+  const role = computed<UserRole>(() => (profile.value?.role as UserRole) || 'user')
 
-  // ======================================================
-  // 🧩 PROFIL UTILISATEUR
-  // ======================================================
+  /* -------------------------------------------------------------------------- */
+  /*                               FETCH PROFILE                                */
+  /* -------------------------------------------------------------------------- */
   async function fetchProfile() {
     if (!user.value) return
     const { data, error: err } = await supabase
@@ -36,19 +33,13 @@ export const useAuthStore = defineStore('auth', () => {
       console.warn('Erreur profil (non bloquante):', err)
       return
     }
-    if (data && data.id && data.email) {
-      profile.value = {
-        id: data.id,
-        email: data.email,
-        full_name: data.full_name || undefined,
-        role: (data.role as 'admin' | 'user') || undefined
-      }
-    }
+
+    if (data) profile.value = data
   }
 
-  // ======================================================
-  // 🔁 SESSION
-  // ======================================================
+  /* -------------------------------------------------------------------------- */
+  /*                                AUTH LOGIC                                  */
+  /* -------------------------------------------------------------------------- */
   async function refreshSession() {
     const { data, error: err } = await supabase.auth.getSession()
     if (err || !data.session?.user) return false
@@ -56,9 +47,6 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
-  // ======================================================
-  // 🔐 LOGIN (Email + MDP)
-  // ======================================================
   async function signIn(email: string, password: string): Promise<boolean> {
     loading.value = true
     error.value = null
@@ -71,40 +59,15 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    // 🔍 Vérifie si le mail est confirmé
-    const isConfirmed = !!data.user?.email_confirmed_at
-    if (!isConfirmed) {
+    if (!data.user?.email_confirmed_at) {
       error.value = 'Veuillez confirmer votre e-mail avant de vous connecter 📧'
       await supabase.auth.signOut()
       return false
     }
 
-    // ✅ Connexion normale
     user.value = data.user
     await fetchProfile()
     startAutoRefresh()
-    return true
-  }
-
-  // ======================================================
-  // 🧾 INSCRIPTION
-  // ======================================================
-  async function signUp(email: string, password: string): Promise<boolean> {
-    loading.value = true
-    error.value = null
-
-    const { error: err } = await supabase.auth.signUp({ email, password })
-    loading.value = false
-
-    if (err) {
-      error.value = err.message
-      return false
-    }
-
-    // ⚠️ On n’instancie pas de session, l’utilisateur doit confirmer son e-mail
-    user.value = null
-    profile.value = null
-
     return true
   }
 
@@ -148,9 +111,22 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
-  // ======================================================
-  // 🚪 LOGOUT
-  // ======================================================
+  async function signUp(email: string, password: string): Promise<boolean> {
+    loading.value = true
+    error.value = null
+    const { error: err } = await supabase.auth.signUp({ email, password })
+    loading.value = false
+
+    if (err) {
+      error.value = err.message
+      return false
+    }
+
+    user.value = null
+    profile.value = null
+    return true
+  }
+
   async function signOut(redirect = true) {
     await supabase.auth.signOut()
     user.value = null
@@ -159,14 +135,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (redirect) router.push('/auth/login')
   }
 
-  // ======================================================
-  // 🚀 INIT AUTH
-  // ======================================================
   async function initAuth() {
     loading.value = true
     const { data, error } = await supabase.auth.getSession()
     if (error) console.warn('Erreur récupération session Supabase', error)
-
     const session = data.session
     if (session?.user) {
       user.value = session.user
@@ -179,9 +151,6 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = false
   }
 
-  // ======================================================
-  // 🕒 AUTO REFRESH SESSION
-  // ======================================================
   function startAutoRefresh() {
     stopAutoRefresh()
     refreshInterval = window.setInterval(
@@ -199,9 +168,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // ======================================================
-  // 🔊 LISTENER GLOBAL SUPABASE
-  // ======================================================
+  /* -------------------------------------------------------------------------- */
+  /*                               EVENT LISTENER                               */
+  /* -------------------------------------------------------------------------- */
   supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = session?.user ?? null
 
@@ -210,11 +179,7 @@ export const useAuthStore = defineStore('auth', () => {
         await signOut(true)
         return
       }
-      try {
-        fetchProfile()
-      } catch (err) {
-        console.warn('Erreur fetchProfile (non bloquant) :', err)
-      }
+      await fetchProfile()
       startAutoRefresh()
     }
 
@@ -226,21 +191,19 @@ export const useAuthStore = defineStore('auth', () => {
     if (event === 'SIGNED_OUT') router.push('/auth/login')
   })
 
-  // ======================================================
-  // EXPORTS
-  // ======================================================
   return {
     user,
     profile,
+    role,
     loading,
     error,
     isAuthenticated,
     isAdmin,
     signUp,
     signIn,
-    signOut,
     signInWithProvider,
     signInWithMagicLink,
+    signOut,
     initAuth,
   }
 })

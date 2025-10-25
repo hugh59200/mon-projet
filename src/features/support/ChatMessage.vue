@@ -33,19 +33,19 @@
 </template>
 
 <script setup lang="ts">
-  interface ChatMessageProps {
-    message: {
-      id: number
-      content: string
-      created_at?: string | null
-      is_read?: boolean | null
-      read_at?: string | null
-    }
+  import type { Message } from '@/features/support/types/chat'
+
+  interface Props {
+    message: Message
     isMine: boolean
   }
-  defineProps<ChatMessageProps>()
 
-  function formatDate(date?: string | null) {
+  defineProps<Props>()
+
+  /**
+   * Formate l'heure (ex: "14:05")
+   */
+  function formatDate(date?: string | null): string {
     if (!date) return ''
     const d = new Date(date)
     return d.toLocaleTimeString('fr-FR', {
@@ -118,6 +118,7 @@
 
     .checkmarks {
       font-weight: bold;
+
       &.pending {
         color: fade(@neutral-600, 60%);
       }

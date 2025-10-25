@@ -10,18 +10,11 @@
         :to="item.path"
         class="sidebar__item"
         active-class="active"
-        v-slot="{ isActive }"
         @click="isMobileOpen = false"
       >
         <div class="sidebar__icon">
           <BasicIconNext :name="item.icon" />
-
-          <!-- 🔔 Badge pour les nouveaux messages -->
-          <template v-if="item.path === '/admin/chat' && chatNotif.unreadCount > 0">
-            <span class="notif-badge">{{ chatNotif.unreadCount }}</span>
-          </template>
         </div>
-
         <transition name="fade-slide">
           <div
             v-if="!isReduced"
@@ -42,9 +35,8 @@
 </template>
 
 <script setup lang="ts">
-  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
   import { storeToRefs } from 'pinia'
-  import { onMounted, ref, watch } from 'vue'
+  import { ref, watch } from 'vue'
   import { useSidebarStore } from './useSidebarStore'
 
   const sidebar = useSidebarStore()
@@ -53,14 +45,6 @@
 
   watch(isReduced, () => {
     if (window.innerWidth < 900) isMobileOpen.value = false
-  })
-
-  // 🔔 Store des notifications
-  const chatNotif = useChatNotifStore()
-
-  onMounted(async () => {
-    await chatNotif.fetchUnreadCount()
-    chatNotif.listenRealtime()
   })
 </script>
 

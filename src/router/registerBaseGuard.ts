@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore, type Profile } from '@/features/auth/useAuthStore'
 import { useCartStore } from '@/features/cart/useCartStore'
 import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/services/supabaseClient'
@@ -48,9 +48,13 @@ export function registerBaseGuard(router: Router) {
       auth.profile = {
         id: profile.id,
         email: profile.email,
-        full_name: profile.full_name || undefined,
-        role: (profile.role as 'admin' | 'user') || undefined,
-      }
+        full_name: profile.full_name || null,
+        role: (profile.role as 'admin' | 'user') || null,
+        avatar_url: null,
+        cgu_accepted: null,
+        cgu_accepted_at: null,
+        created_at: null,
+      } as Profile
     }
 
     // ✅ 4. Vérifie CGU uniquement si connecté et pas sur route publique
