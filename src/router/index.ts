@@ -160,54 +160,16 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-
-  {
-    path: '/admin/orders',
-    name: 'admin-orders',
-    component: () => import('@/features/admin/OrdersAdminView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      title: 'Commandes (Admin) – Fast Peptides',
-    },
-  },
-  {
-    path: '/admin/orders/:id',
-    name: 'admin-order-detail',
-    component: () => import('@/features/admin/OrderDetailView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
-    },
-  },
   {
     path: '/admin',
     component: () => import('@/features/admin/AdminTabsView.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true, title: 'Administration – Fast Peptides' },
-    redirect: { name: 'admin-stats' },
-    children: [
-      {
-        path: 'chat',
-        name: '💬 Messages clients',
-        component: () => import('@/features/admin/sections/AdminChatView.vue'),
-      },
-      {
-        path: 'stats',
-        name: '📊 Tableau de bord',
-        component: () => import('@/features/admin/sections/AdminStatsView.vue'),
-      },
-      {
-        path: 'users',
-        name: '👤 Utilisateurs',
-        component: () => import('@/features/admin/sections/AdminUsersView.vue'),
-      },
-      {
-        path: 'orders',
-        name: '📦 Commandes',
-        component: () => import('@/features/admin/sections/AdminOrdersView.vue'),
-      },
-    ],
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Espace administrateur – Fast Peptides',
+      description:
+        'Accédez au tableau de bord administrateur pour gérer les commandes, utilisateurs, statistiques et messages clients.',
+    },
   },
   {
     path: '/profil/commandes',
@@ -226,16 +188,6 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
-    },
-  },
-  {
-    path: '/admin/users',
-    name: 'admin-users',
-    component: () => import('@/features/admin/UsersAdminView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      title: 'Utilisateurs (Admin) – Fast Peptides',
     },
   },
 ]

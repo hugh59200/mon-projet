@@ -1,85 +1,69 @@
 .modal {
-  position: absolute;
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
+  background-color: fade(@neutral-900, 30%);
   z-index: 1000;
-  background-color: fade(@neutral-900, 20%); /* légère transparence sombre si tu veux un fond */
-
-  border-radius: @border-radius-l;
-  z-index: 900; // Le sablier est à 1000
-
-  /* Ne pas toucher HUGO STP */
-  &.sablier-devant {
-    z-index: 100;
-  }
-
-  svg {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-  }
 
   .modal__dialog {
+    display: flex;
+    flex-direction: column;
+    background: @white;
     border-radius: @border-radius-l;
-    max-width: 80%;
-    background-color: @white;
-    box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 0px 30px fade(@neutral-900, 15%);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh; /* ✅ limite la taille du popup */
+    overflow: hidden; /* ✅ évite que le contenu déborde */
+    animation: modalIn 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     transform: scale(0.96);
     opacity: 0;
-    animation: modalIn 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  }
 
-  @keyframes modalIn {
-    to {
-      transform: scale(1);
-      opacity: 1;
+    @keyframes modalIn {
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   }
 
   &__header {
-    border-top-left-radius: @border-radius-m;
-    border-top-right-radius: @border-radius-m;
-    padding: 32px 48px 32px 24px;
-    position: relative;
+    flex-shrink: 0; /* ✅ reste visible même quand on scroll */
+    padding: 0px 24px;
     background-color: @secondary-900;
+    color: @white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     svg {
       fill: @white;
+      cursor: pointer;
     }
   }
 
   &__content {
-    padding: 32px 24px;
-    position: relative;
+    flex: 1; /* ✅ occupe la hauteur restante */
+    overflow-y: auto; /* ✅ rend scrollable le contenu */
+    padding: 24px;
+    background-color: @neutral-50;
 
-    svg {
-      fill: @neutral-500;
+    /* petit style de scrollbar propre */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: fade(@neutral-600, 40%);
+      border-radius: 8px;
     }
   }
 
   &__actions {
-    padding: 12px 24px 24px 24px;
-  }
-}
-
-@media screen and (max-height: 720px) {
-  .modal {
-    &__header {
-      padding: 16px 48px 16px 24px;
-    }
-
-    &__content {
-      padding: 18px 24px;
-    }
-
-    &__actions {
-      padding: 0px 24px 12px 24px;
-    }
+    flex-shrink: 0; /* ✅ ne bouge pas */
+    padding: 16px 24px;
+    background-color: @neutral-50;
+    border-top: 1px solid @neutral-200;
   }
 }

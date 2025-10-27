@@ -1,10 +1,6 @@
 // Auto-generated from router/index.ts
 export type RouteName =
   'access-denied' |
-  'admin-order-detail' |
-  'admin-orders' |
-  'admin-stats' |
-  'admin-users' |
   'auth-callback' |
   'cart' |
   'catalogue' |
@@ -21,8 +17,4 @@ export type RouteName =
   'update-password' |
   'update-password-success' |
   'user-order-detail' |
-  'user-orders' |
-  '👤 Utilisateurs' |
-  '💬 Messages clients' |
-  '📊 Tableau de bord' |
-  '📦 Commandes'
+  'user-orders'

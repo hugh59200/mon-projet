@@ -185,10 +185,4 @@
       }
     }
   }
-
-  @container (max-width: 300px) {
-    :deep(.btn__label) {
-      display: none;
-    }
-  }
 </style>

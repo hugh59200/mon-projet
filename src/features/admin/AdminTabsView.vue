@@ -1,46 +1,48 @@
 <template>
-  <div class="admin-tabs-view">
+  <div class="tabs-view">
     <WrapperForm
       v-model="selectedTab"
       :tabs="tabs"
       show-stepper
-      tabs-placement="center"
-      :key="selectedTab"
+      :tabs-placement="tabsPlacement"
     >
-      <router-view />
+      <component :is="tabComponents[selectedTab]" />
     </WrapperForm>
   </div>
 </template>
 
 <script setup lang="ts">
-  import type { RouteName } from '@/router/route-name'
-  import { useNavigationTabs } from '@designSystem/components/wrapper/form/useNavigationTabs'
-  import { computed } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { ref } from 'vue'
+  import AdminChatView from './sections/AdminChatView.vue'
+  import AdminOrdersView from './sections/AdminOrdersView.vue'
+  import AdminStatsView from './sections/AdminStatsView.vue'
+  import AdminUsersView from './sections/AdminUsersView.vue'
 
-  const props = withDefaults(
-    defineProps<{
-      tabsPlacement?: 'center' | 'start'
-      tabsTitle?: string[]
-    }>(),
-    { tabsPlacement: 'center' },
-  )
-
-  const { tabs, goToTab, getTabsTitle } = useNavigationTabs(props.tabsTitle)
-
-  const route = useRoute()
-
-  const selectedTab = computed({
-    get: () => getTabsTitle(route.name as RouteName),
-    set: (routeName: RouteName) => {
-      goToTab(routeName)
-    },
+  withDefaults(defineProps<{ tabsPlacement?: 'center' | 'start'; tabsTitle?: string[] }>(), {
+    tabsPlacement: 'center',
   })
+
+  const tabs = [
+    { tabKey: '💬 Messages clients' },
+    { tabKey: '📊 Tableau de bord' },
+    { tabKey: '👤 Utilisateurs' },
+    { tabKey: '📦 Commandes' },
+  ]
+
+  const tabComponents = {
+    '💬 Messages clients': AdminChatView,
+    '📊 Tableau de bord': AdminStatsView,
+    '👤 Utilisateurs': AdminUsersView,
+    '📦 Commandes': AdminOrdersView,
+  } as const
+
+  const selectedTab = ref<keyof typeof tabComponents>('💬 Messages clients')
 </script>
 
-<style scoped>
-  .admin-tabs-view {
+<style scoped lang="less">
+  .tabs-view {
     height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
