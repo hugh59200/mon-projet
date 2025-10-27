@@ -59,6 +59,7 @@ declare module 'vue' {
     WrapperInputNumber: typeof import('./../designSystem/src/components/wrapper/inputNumber/WrapperInputNumber.vue')['default']
     WrapperInputTelephone: typeof import('./../designSystem/src/components/wrapper/inputTelephone/WrapperInputTelephone.vue')['default']
     WrapperLabelHint: typeof import('./../designSystem/src/components/wrapper/labelHint/WrapperLabelHint.vue')['default']
+    WrapperLoader: typeof import('./../designSystem/src/components/wrapper/loader/WrapperLoader.vue')['default']
     WrapperToggleSwitch: typeof import('./../designSystem/src/components/wrapper/toggleSwitch/WrapperToggleSwitch.vue')['default']
   }
 }

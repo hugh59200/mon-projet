@@ -1,5 +1,5 @@
 <template>
-  <!-- 🧭 BARRE D’ACTIONS (DESKTOP) -->
+  <!-- 🧭 Toolbar (desktop) -->
   <div class="orders-toolbar orders-toolbar--desktop cardLayoutWrapper">
     <div class="elem elem--span-10">
       <BasicInput
@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <!-- 📄 PAGINATION -->
+  <!-- 📄 Pagination -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -52,147 +52,131 @@
     @change="page = $event"
   />
 
-  <!-- 🧱 TABLEAU (DESKTOP) -->
-  <div
-    class="orders--desktop"
-    v-if="!loading"
+  <!-- 🌐 Wrapper global -->
+  <WrapperLoader
+    :loading="loading"
+    :is-empty="!loading && filteredOrders.length === 0"
+    message="Chargement des commandes..."
+    empty-message="Aucune commande pour le moment 🛍️"
   >
-    <div class="cardLayoutWrapper cardLayoutWrapper--header">
-      <div class="elem elem--span-10"><span>Client</span></div>
-      <div class="elem elem--center elem--span-4"><span>Total</span></div>
-      <div class="elem elem--center elem--span-6"><span>Date</span></div>
-      <div class="elem elem--center elem--span-10"><span>Statut</span></div>
-      <div class="elem elem--center elem--span-6"><span>Détails</span></div>
-    </div>
-
-    <div
-      class="gridElemWrapper"
-      v-for="order in filteredOrders"
-      :key="order.id"
-    >
-      <div class="cardLayoutWrapper">
-        <BasicCell :span="10">
-          <div class="client">
-            <strong>{{ order.full_name }}</strong>
-            <div class="sous-titre">{{ order.email }}</div>
-          </div>
-        </BasicCell>
-
-        <BasicCell
-          :text="formatCurrency(order.total_amount)"
-          center
-          :span="4"
-        />
-
-        <BasicCell
-          center
-          :span="6"
-        >
-          {{ formatDate(order.created_at) }}
-        </BasicCell>
-
-        <BasicCell
-          center
-          :span="10"
-        >
-          <BasicDropdown
-            v-model="localStatuses[order.id]"
-            :items="STATUSES"
-            size="small"
-            dropdown-type="table"
-            force-value
-            @update:model-value="(v) => handleStatusChange(order, v as string)"
-          />
-        </BasicCell>
-
-        <BasicCellActionIcon
-          icon-name="eye"
-          tooltip="Voir la commande"
-          center
-          :span="6"
-          @click="openOrderModal(order.id)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- 📱 VERSION MOBILE -->
-  <div
-    class="orders--mobile"
-    v-if="!loading"
-  >
-    <div class="orders-toolbar-mobile">
-      <BasicInput
-        v-model="search"
-        placeholder="Rechercher..."
-        icon-name="search"
-        clearable
-      />
-
-      <div class="row">
-        <BasicDropdown
-          v-model="sortKey"
-          :items="SORT_OPTIONS"
-          size="small"
-          label="Trier"
-          dropdown-type="table"
-          force-value
-        />
-        <BasicDropdown
-          v-model="statusFilter"
-          :items="STATUSES_WITH_ALL"
-          size="small"
-          label="Statut"
-          dropdown-type="table"
-          force-value
-        />
+    <!-- 🧱 Desktop -->
+    <div class="orders--desktop">
+      <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="elem elem--span-10"><span>Client</span></div>
+        <div class="elem elem--center elem--span-4"><span>Total</span></div>
+        <div class="elem elem--center elem--span-6"><span>Date</span></div>
+        <div class="elem elem--center elem--span-10"><span>Statut</span></div>
+        <div class="elem elem--center elem--span-6"><span>Détails</span></div>
       </div>
 
-      <BasicButton
-        label="Réinitialiser les filtres"
-        type="secondary"
-        size="small"
-        variant="outlined"
-        block
-        @click="resetFilters"
-      />
-    </div>
-
-    <div class="mobile-cards-list">
-      <OrderCardMobile
+      <div
+        class="gridElemWrapper"
         v-for="order in filteredOrders"
         :key="order.id"
-        v-model:status="localStatuses[order.id]"
-        :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
-        :order="order"
-        :statuses="STATUSES"
-        :format-date="formatDate"
-        :format-currency="formatCurrency"
-        :handle-status-change="handleStatusChange"
-        :open-order-modal="openOrderModal"
-      />
-    </div>
-  </div>
+      >
+        <div class="cardLayoutWrapper">
+          <BasicCell :span="10">
+            <div class="client">
+              <strong>{{ order.full_name }}</strong>
+              <div class="sous-titre">{{ order.email }}</div>
+            </div>
+          </BasicCell>
 
-  <!-- 🌀 LOADING -->
-  <div
-    v-if="loading"
-    class="orders__loading"
-  >
-    <BasicLoader
-      size="medium"
-      color="primary"
-    />
-    <p>Chargement des commandes...</p>
-  </div>
-  <EmptyTablePlaceholder v-if="!loading && filteredOrders.length === 0">
-    <template #content>
-      Aucun commande trouvée 😅
-      <br />
-      Essayez d’ajuster vos filtres ou de réinitialiser la recherche.
-    </template>
-  </EmptyTablePlaceholder>
-  <!-- 🪟 MODALE DÉTAILS COMMANDE -->
+          <BasicCell
+            :text="formatCurrency(order.total_amount)"
+            center
+            :span="4"
+          />
+
+          <BasicCell
+            center
+            :span="6"
+          >
+            {{ formatDate(order.created_at) }}
+          </BasicCell>
+
+          <BasicCell
+            center
+            :span="10"
+          >
+            <BasicDropdown
+              v-model="localStatuses[order.id]"
+              :items="STATUSES"
+              size="small"
+              dropdown-type="table"
+              force-value
+              @update:model-value="(v) => handleStatusChange(order, v as string)"
+            />
+          </BasicCell>
+
+          <BasicCellActionIcon
+            icon-name="eye"
+            tooltip="Voir la commande"
+            center
+            :span="6"
+            @click="openOrderModal(order.id)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 📱 Mobile -->
+    <div class="orders--mobile">
+      <div class="orders-toolbar-mobile">
+        <BasicInput
+          v-model="search"
+          placeholder="Rechercher..."
+          icon-name="search"
+          clearable
+        />
+
+        <div class="row">
+          <BasicDropdown
+            v-model="sortKey"
+            :items="SORT_OPTIONS"
+            size="small"
+            label="Trier"
+            dropdown-type="table"
+            force-value
+          />
+          <BasicDropdown
+            v-model="statusFilter"
+            :items="STATUSES_WITH_ALL"
+            size="small"
+            label="Statut"
+            dropdown-type="table"
+            force-value
+          />
+        </div>
+
+        <BasicButton
+          label="Réinitialiser les filtres"
+          type="secondary"
+          size="small"
+          variant="outlined"
+          block
+          @click="resetFilters"
+        />
+      </div>
+
+      <div class="mobile-cards-list">
+        <OrderCardMobile
+          v-for="order in filteredOrders"
+          :key="order.id"
+          v-model:status="localStatuses[order.id]"
+          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
+          :order="order"
+          :statuses="STATUSES"
+          :format-date="formatDate"
+          :format-currency="formatCurrency"
+          :handle-status-change="handleStatusChange"
+          :open-order-modal="openOrderModal"
+        />
+      </div>
+    </div>
+  </WrapperLoader>
+
+  <!-- 🪟 Modal -->
   <teleport to="#app">
     <AdminOrderDetailsModal
       v-if="selectedOrderId"

@@ -1,5 +1,5 @@
 <template>
-  <!-- 🔍 Toolbar de filtrage (desktop) -->
+  <!-- 🔍 Toolbar (desktop) -->
   <div class="users-toolbar users-toolbar--desktop cardLayoutWrapper">
     <div class="elem elem--span-12">
       <BasicInput
@@ -52,140 +52,124 @@
     @change="page = $event"
   />
 
-  <!-- 🧱 TABLEAU DESKTOP -->
-  <div
-    v-if="!loading"
-    class="users--desktop"
+  <!-- 🌐 Wrapper global -->
+  <WrapperLoader
+    :loading="loading"
+    :is-empty="!loading && filteredUsers.length === 0"
+    message="Chargement des utilisateurs..."
+    empty-message="Aucun utilisateur trouvé 😅"
   >
-    <div class="cardLayoutWrapper cardLayoutWrapper--header">
-      <div class="elem elem--span-10"><span>Email</span></div>
-      <div class="elem elem--span-8"><span>Nom</span></div>
-      <div class="elem elem--center elem--span-6"><span>Rôle</span></div>
-      <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
-      <div class="elem elem--center elem--span-6"><span>Actions</span></div>
-    </div>
-
-    <div
-      class="gridElemWrapper"
-      v-for="user in filteredUsers"
-      :key="user.id"
-    >
-      <div class="cardLayoutWrapper">
-        <BasicCell :span="10">{{ user.email }}</BasicCell>
-        <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
-        <BasicCell
-          center
-          :span="6"
-        >
-          <BasicDropdown
-            v-model="localRoles[user.id]"
-            :items="ROLES"
-            size="small"
-            dropdown-type="table"
-            force-value
-            @update:model-value="(v) => v && handleRoleChange(user, v)"
-          />
-        </BasicCell>
-        <BasicCell
-          :span="6"
-          center
-        >
-          {{ formatDate(user.created_at) }}
-        </BasicCell>
-        <BasicCellActionIcon
-          icon-name="eye"
-          tooltip="Voir"
-          center
-          :span="3"
-          @click="openUserModal(user.id)"
-        />
-        <BasicCellActionIcon
-          icon-name="trash"
-          tooltip="Supprimer"
-          center
-          :span="3"
-          @click="handleDelete(user)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- 📱 MOBILE -->
-  <div
-    v-if="!loading"
-    class="users--mobile"
-  >
-    <div class="users-toolbar-mobile">
-      <BasicInput
-        v-model="search"
-        placeholder="Rechercher..."
-        icon-name="search"
-        clearable
-      />
-
-      <div class="row">
-        <BasicDropdown
-          v-model="sortKey"
-          :items="SORT_OPTIONS"
-          size="small"
-          label="Trier"
-          dropdown-type="table"
-          force-value
-        />
-        <BasicDropdown
-          v-model="selectedRole"
-          :items="ROLE_FILTERS"
-          size="small"
-          label="Rôle"
-          dropdown-type="table"
-          force-value
-        />
+    <!-- 🧱 Desktop -->
+    <div class="users--desktop">
+      <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="elem elem--span-10"><span>Email</span></div>
+        <div class="elem elem--span-8"><span>Nom</span></div>
+        <div class="elem elem--center elem--span-6"><span>Rôle</span></div>
+        <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
+        <div class="elem elem--center elem--span-6"><span>Actions</span></div>
       </div>
 
-      <BasicButton
-        label="Réinitialiser les filtres"
-        type="secondary"
-        size="small"
-        variant="outlined"
-        block
-        @click="resetFilters"
-      />
-    </div>
-    <div class="mobile-cards-list">
-      <UserCardMobile
+      <div
+        class="gridElemWrapper"
         v-for="user in filteredUsers"
         :key="user.id"
-        v-model:role="localRoles[user.id]!"
-        :user="user"
-        :roles="ROLES"
-        :format-date="formatDate"
-        :handle-role-change="handleRoleChange"
-        :open-user-modal="openUserModal"
-        :handle-delete="handleDelete"
-      />
+      >
+        <div class="cardLayoutWrapper">
+          <BasicCell :span="10">{{ user.email }}</BasicCell>
+          <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
+          <BasicCell
+            center
+            :span="6"
+          >
+            <BasicDropdown
+              v-model="localRoles[user.id]"
+              :items="ROLES"
+              size="small"
+              dropdown-type="table"
+              force-value
+              @update:model-value="(v) => v && handleRoleChange(user, v)"
+            />
+          </BasicCell>
+          <BasicCell
+            :span="6"
+            center
+          >
+            {{ formatDate(user.created_at) }}
+          </BasicCell>
+          <BasicCellActionIcon
+            icon-name="eye"
+            tooltip="Voir"
+            center
+            :span="3"
+            @click="openUserModal(user.id)"
+          />
+          <BasicCellActionIcon
+            icon-name="trash"
+            tooltip="Supprimer"
+            center
+            :span="3"
+            @click="handleDelete(user)"
+          />
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- 🌀 LOADING -->
-  <div
-    v-if="loading"
-    class="users__loading"
-  >
-    <BasicLoader
-      size="medium"
-      color="primary"
-    />
-    <p>Chargement des utilisateurs...</p>
-  </div>
-  <EmptyTablePlaceholder v-if="!loading && filteredUsers.length === 0">
-    <template #content>
-      Aucun utilisateur trouvé 😅
-      <br />
-      Essayez d’ajuster vos filtres ou de réinitialiser la recherche.
-    </template>
-  </EmptyTablePlaceholder>
+    <!-- 📱 Mobile -->
+    <div class="users--mobile">
+      <div class="users-toolbar-mobile">
+        <BasicInput
+          v-model="search"
+          placeholder="Rechercher..."
+          icon-name="search"
+          clearable
+        />
 
-  <!-- 🔍 Détails utilisateur -->
+        <div class="row">
+          <BasicDropdown
+            v-model="sortKey"
+            :items="SORT_OPTIONS"
+            size="small"
+            label="Trier"
+            dropdown-type="table"
+            force-value
+          />
+          <BasicDropdown
+            v-model="selectedRole"
+            :items="ROLE_FILTERS"
+            size="small"
+            label="Rôle"
+            dropdown-type="table"
+            force-value
+          />
+        </div>
+
+        <BasicButton
+          label="Réinitialiser les filtres"
+          type="secondary"
+          size="small"
+          variant="outlined"
+          block
+          @click="resetFilters"
+        />
+      </div>
+
+      <div class="mobile-cards-list">
+        <UserCardMobile
+          v-for="user in filteredUsers"
+          :key="user.id"
+          v-model:role="localRoles[user.id]!"
+          :user="user"
+          :roles="ROLES"
+          :format-date="formatDate"
+          :handle-role-change="handleRoleChange"
+          :open-user-modal="openUserModal"
+          :handle-delete="handleDelete"
+        />
+      </div>
+    </div>
+  </WrapperLoader>
+
+  <!-- 🪟 Modal -->
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
