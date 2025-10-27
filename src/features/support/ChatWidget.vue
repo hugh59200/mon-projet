@@ -91,8 +91,6 @@
       const fromAdmin = lastMsg?.sender_role === 'admin'
       if (!isOpen.value && fromAdmin) {
         unreadCount.value++
-        clearTimeout(hideBadgeTimer!)
-        hideBadgeTimer = setTimeout(() => (unreadCount.value = 0), 2000)
       }
     },
   )
@@ -100,7 +98,6 @@
   const handleClickAnywhere = () => {
     if (unreadCount.value > 0) {
       unreadCount.value = 0
-      clearTimeout(hideBadgeTimer!)
     }
   }
 
@@ -147,8 +144,8 @@
 
       .chat-badge {
         position: absolute;
-        top: 4px;
-        right: 4px;
+        top: -4px;
+        right: 0px;
         background: @danger-600;
         color: white;
         border-radius: 999px;

@@ -297,9 +297,10 @@
       flex-direction: column;
       flex: 1;
       position: relative;
-      min-height: 0; /* 🧩 Important : permet au scroll interne de fonctionner */
+      min-height: 0;
     }
 
+    /* zone scrollable */
     .chat-messages {
       flex: 1;
       display: flex;
@@ -309,7 +310,9 @@
       padding: 12px;
       background: @neutral-50;
       scroll-behavior: smooth;
-      min-height: 0; /* 🧩 Permet le scroll vertical */
+      min-height: 0;
+      /* ✅ On réserve un peu d’espace pour la bulle "is typing" */
+      padding-bottom: 20px;
     }
 
     .chat-messages::-webkit-scrollbar {
@@ -324,9 +327,15 @@
     }
 
     .typing-bubble-wrapper {
+      position: absolute;
+      bottom: 10px;
+      left: 50px;
+      width: 100%;
       display: flex;
       align-items: center;
       padding: 0 12px 8px;
+      background: @neutral-50;
+      pointer-events: none; // évite de bloquer le scroll ou les clics
     }
 
     .typing-bubble {
@@ -337,6 +346,7 @@
       border-radius: 16px;
       padding: 6px 10px;
       width: 48px;
+
       .dot {
         width: 6px;
         height: 6px;
