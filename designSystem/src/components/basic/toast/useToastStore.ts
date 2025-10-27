@@ -19,7 +19,7 @@ export const useToastStore = defineStore('toast', () => {
   function show(
     payload: string | { message: string; title?: string; type?: ToastType; duration?: number },
     type: ToastType = 'info',
-    duration = 4000,
+    duration = 2000,
   ) {
     const id = ++idCounter
     let toast: Toast
@@ -32,7 +32,7 @@ export const useToastStore = defineStore('toast', () => {
         title: payload.title,
         message: payload.message,
         type: payload.type ?? 'info',
-        duration: payload.duration ?? 4000,
+        duration: payload.duration ?? 2000,
       }
     }
 

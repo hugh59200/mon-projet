@@ -12,8 +12,10 @@ const corsHeaders = {
   'Content-Type': 'application/json',
 }
 
+// ✅ Gestion de l’environnement
+const ENV = Deno.env.get('ENV') || 'development'
+
 serve(async (req) => {
-  // ✅ CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { status: 200, headers: corsHeaders })
   }
@@ -23,7 +25,6 @@ serve(async (req) => {
     console.log('🧾 Corps reçu :', body)
 
     if (!body) {
-      console.error('❌ Aucun body JSON reçu !')
       return new Response(JSON.stringify({ error: 'Request body manquant ou invalide.' }), {
         status: 400,
         headers: corsHeaders,
@@ -33,12 +34,24 @@ serve(async (req) => {
     const { amount, email, orderId } = body
 
     if (!amount || !email) {
-      console.error('❌ amount et email manquants :', body)
       return new Response(JSON.stringify({ error: 'amount et email sont requis' }), {
         status: 400,
         headers: corsHeaders,
       })
     }
+
+    // ✅ URLs dynamiques selon l'environnement
+    const successUrl =
+      ENV === 'development'
+        ? `https://localhost:5278/paiement/success?session_id={CHECKOUT_SESSION_ID}`
+        : `https://fast-peptides/paiement/success?session_id={CHECKOUT_SESSION_ID}.com`
+
+    const cancelUrl =
+      ENV === 'development'
+        ? `https://localhost:5278/paiement/cancel`
+        : `https://fast-peptides/paiement/cancel.com`
+
+    console.log('🌐 URLs dynamiques :', { successUrl, cancelUrl })
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -54,12 +67,10 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      success_url: 'https://localhost:5278/paiement/success?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://localhost:5278/paiement/cancel',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: { order_id: orderId || 'unknown' },
     })
-
-    console.log('✅ Session Stripe créée :', session.id)
 
     return new Response(
       JSON.stringify({

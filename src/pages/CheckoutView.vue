@@ -39,7 +39,12 @@
             </BasicText>
           </div>
         </div>
-        <BasicText weight="bold">{{ (item.quantity * item.price).toFixed(2) }} €</BasicText>
+        <BasicText
+          weight="bold"
+          class="checkout__item-price"
+        >
+          {{ (item.quantity * item.price).toFixed(2) }} €
+        </BasicText>
       </div>
 
       <div class="checkout__total">
@@ -59,7 +64,7 @@
       </div>
     </div>
 
-    <!-- 🏠 Informations client -->
+    <!-- 🏠 Adresse de livraison -->
     <div class="checkout__infos">
       <BasicText
         size="h5"
@@ -104,7 +109,7 @@
       </div>
     </div>
 
-    <!-- 💳 Choix du paiement -->
+    <!-- 💳 Méthode de paiement -->
     <div class="checkout__payment">
       <BasicText
         size="h5"
@@ -213,7 +218,6 @@
       }
 
       try {
-        // 1️⃣ Crée une commande "pending"
         const payload = {
           email: auth.user.email,
           full_name: fullName.value,
@@ -235,7 +239,6 @@
 
         if (orderError || !order) throw orderError
 
-        // 2️⃣ Paiement Stripe
         if (selectedPayment.value === 'stripe') {
           const { data, error } = await supabase.functions.invoke('create-stripe-session', {
             body: {
@@ -249,7 +252,6 @@
             throw new Error('Erreur lors de la création de la session Stripe.')
           window.location.href = data.url
         } else {
-          // 3️⃣ Simulation ou crypto
           toast.show('Paiement non-Stripe simulé.', 'success')
           cart.clearCart()
           router.push('/profil/commandes')
@@ -285,20 +287,21 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
+    /* --- Items du panier --- */
     &__item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid @neutral-100;
-      padding-bottom: 8px;
+      padding: 10px 0;
 
       &-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
       }
 
       &-img {
@@ -307,6 +310,11 @@
         object-fit: cover;
         border-radius: 6px;
         border: 1px solid @neutral-200;
+      }
+
+      &-price {
+        margin-left: 16px; // espace entre le texte et le prix
+        white-space: nowrap;
       }
     }
 
@@ -317,6 +325,19 @@
       padding-top: 8px;
     }
 
+    /* --- Formulaire adresse --- */
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    &__row {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* --- Méthodes de paiement --- */
     &__methods {
       display: flex;
       flex-direction: column;
