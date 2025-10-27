@@ -2,41 +2,56 @@
   <transition
     name="fade"
     mode="out-in"
+    :duration="1"
   >
-    <!-- 🌀 État LOADING -->
-    <div
-      v-if="loading"
-      key="loading"
-      class="wrapper-loader__state"
-    >
-      <BasicLoader
-        size="medium"
-        color="primary"
-      />
-      <p v-if="message">{{ message }}</p>
-    </div>
+    <template v-if="loading && !hasLoaded">
+      <!-- 🌀 PREMIER CHARGEMENT -->
+      <div
+        key="first-loading"
+        class="wrapper-loader__state"
+      >
+        <BasicLoader
+          size="medium"
+          color="primary"
+        />
+        <p v-if="message">{{ message }}</p>
+      </div>
+    </template>
 
-    <!-- 🌿 État EMPTY -->
-    <div
-      v-else-if="isEmpty"
-      key="empty"
-      class="wrapper-loader__state"
-    >
-      <slot name="empty">
-        <EmptyTablePlaceholder>
-          <template #content>{{ emptyMessage }}</template>
-        </EmptyTablePlaceholder>
-      </slot>
-    </div>
+    <template v-else-if="hasLoaded && isEmpty">
+      <!-- 🌿 EMPTY -->
+      <div
+        key="empty"
+        class="wrapper-loader__state"
+      >
+        <slot name="empty">
+          <EmptyTablePlaceholder>
+            <template #content>{{ emptyMessage }}</template>
+          </EmptyTablePlaceholder>
+        </slot>
+      </div>
+    </template>
 
-    <!-- 📦 État DATA -->
-    <div
-      v-else
-      key="data"
-      class="wrapper-loader__content"
-    >
-      <slot />
-    </div>
+    <template v-else>
+      <!-- 📦 DATA -->
+      <div
+        key="data"
+        class="wrapper-loader__content"
+      >
+        <!-- 🔁 petit overlay pendant reload -->
+        <div
+          v-if="loading && hasLoaded"
+          class="loader-overlay"
+        >
+          <BasicLoader
+            size="small"
+            color="primary"
+          />
+        </div>
+
+        <slot />
+      </div>
+    </template>
   </transition>
 </template>
 
@@ -45,6 +60,7 @@
 
   defineProps<{
     loading: boolean
+    hasLoaded?: boolean
     isEmpty?: boolean
     message?: string
     emptyMessage?: string
@@ -57,7 +73,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     text-align: center;
     gap: 12px;
     padding: 60px 20px;
@@ -66,15 +81,23 @@
   }
 
   .wrapper-loader__content {
+    position: relative;
     width: 100%;
     height: 100%;
   }
 
-  /* ✨ Transition fade douce */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.25s ease;
+  .loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: fade(@neutral-50, 70%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: inherit;
   }
+
+  /* ✨ Transition fade douce */
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;

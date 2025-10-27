@@ -1,5 +1,4 @@
 <template>
-  <!-- 🔍 Toolbar (desktop) -->
   <div class="users-toolbar users-toolbar--desktop cardLayoutWrapper">
     <div class="elem elem--span-12">
       <BasicInput
@@ -9,7 +8,6 @@
         clearable
       />
     </div>
-
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="sortKey"
@@ -20,7 +18,6 @@
         force-value
       />
     </div>
-
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="selectedRole"
@@ -31,7 +28,6 @@
         force-value
       />
     </div>
-
     <div class="elem elem--center elem--span-6 justify-end">
       <BasicButton
         label="Réinitialiser"
@@ -42,8 +38,6 @@
       />
     </div>
   </div>
-
-  <!-- 📄 Pagination -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -51,15 +45,13 @@
     :nb-results="total"
     @change="page = $event"
   />
-
-  <!-- 🌐 Wrapper global -->
   <WrapperLoader
     :loading="loading"
-    :is-empty="!loading && filteredUsers.length === 0"
+    :has-loaded="hasLoaded"
+    :is-empty="hasLoaded && filteredData.length === 0"
     message="Chargement des utilisateurs..."
     empty-message="Aucun utilisateur trouvé 😅"
   >
-    <!-- 🧱 Desktop -->
     <div class="users--desktop">
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <div class="elem elem--span-10"><span>Email</span></div>
@@ -68,10 +60,9 @@
         <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
         <div class="elem elem--center elem--span-6"><span>Actions</span></div>
       </div>
-
       <div
         class="gridElemWrapper"
-        v-for="user in filteredUsers"
+        v-for="user in filteredData"
         :key="user.id"
       >
         <div class="cardLayoutWrapper">
@@ -113,49 +104,10 @@
         </div>
       </div>
     </div>
-
-    <!-- 📱 Mobile -->
     <div class="users--mobile">
-      <div class="users-toolbar-mobile">
-        <BasicInput
-          v-model="search"
-          placeholder="Rechercher..."
-          icon-name="search"
-          clearable
-        />
-
-        <div class="row">
-          <BasicDropdown
-            v-model="sortKey"
-            :items="SORT_OPTIONS"
-            size="small"
-            label="Trier"
-            dropdown-type="table"
-            force-value
-          />
-          <BasicDropdown
-            v-model="selectedRole"
-            :items="ROLE_FILTERS"
-            size="small"
-            label="Rôle"
-            dropdown-type="table"
-            force-value
-          />
-        </div>
-
-        <BasicButton
-          label="Réinitialiser les filtres"
-          type="secondary"
-          size="small"
-          variant="outlined"
-          block
-          @click="resetFilters"
-        />
-      </div>
-
       <div class="mobile-cards-list">
         <UserCardMobile
-          v-for="user in filteredUsers"
+          v-for="user in filteredData"
           :key="user.id"
           v-model:role="localRoles[user.id]!"
           :user="user"
@@ -168,8 +120,6 @@
       </div>
     </div>
   </WrapperLoader>
-
-  <!-- 🪟 Modal -->
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -184,88 +134,51 @@
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { ref, watchEffect } from 'vue'
+  import { usePaginatedSupabaseTable } from '../composables/usePaginatedSupabaseTable'
   import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
 
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
-  const users = ref<UserRow[]>([])
-  const localRoles = ref<Record<string, string>>({})
-  const loading = ref(false)
-  const page = ref(1)
-  const perPage = 8
-  const total = ref(0)
-  const search = ref('')
-  const sortKey = ref('created_at_desc')
-  const selectedRole = ref('all')
+  /* --- Composable --- */
+  const {
+    filteredData,
+    total,
+    nbPages,
+    loading,
+    page,
+    search,
+    sortKey,
+    hasLoaded,
+    fetchData,
+    reset,
+  } = usePaginatedSupabaseTable<UserRow>({
+    table: 'profiles',
+    orderBy: 'created_at',
+    ascending: false,
+    searchFn: (u, q) =>
+      (u.email?.toLowerCase()?.includes(q) ?? false) ||
+      (u.full_name?.toLowerCase()?.includes(q) ?? false),
+  })
 
+  /* --- Filtres supplémentaires --- */
+  const selectedRole = ref<'all' | 'user' | 'admin'>('all')
+  const localRoles = ref<Record<string, string>>({})
   const ROLES = [
     { id: 'user', label: 'Utilisateur' },
     { id: 'admin', label: 'Administrateur' },
   ]
   const ROLE_FILTERS = [{ id: 'all', label: 'Tous' }, ...ROLES]
   const SORT_OPTIONS = [
-    { id: 'created_at_desc', label: 'Plus récents' },
-    { id: 'created_at_asc', label: 'Plus anciens' },
-    { id: 'email_asc', label: 'Email A-Z' },
-    { id: 'email_desc', label: 'Email Z-A' },
+    { id: 'created_at', label: 'Plus récents' },
+    { id: 'email', label: 'Email' },
   ]
 
-  const nbPages = computed(() => Math.ceil(total.value / perPage))
-
-  const filteredUsers = computed(() => {
-    let list = [...users.value]
-    if (selectedRole.value !== 'all') list = list.filter((u) => u.role === selectedRole.value)
-    if (search.value.trim()) {
-      const q = search.value.toLowerCase()
-      list = list.filter(
-        (u) =>
-          u.email?.toLowerCase().includes(q) ||
-          (u.full_name && u.full_name.toLowerCase().includes(q)),
-      )
-    }
-    switch (sortKey.value) {
-      case 'created_at_asc':
-        list.sort((a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime())
-        break
-      case 'email_asc':
-        list.sort((a, b) => (a.email ?? '').localeCompare(b.email ?? ''))
-        break
-      case 'email_desc':
-        list.sort((a, b) => (b.email ?? '').localeCompare(a.email ?? ''))
-        break
-      default:
-        list.sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime())
-    }
-    return list
-  })
-
+  /* --- Actions --- */
   function resetFilters() {
-    search.value = ''
-    sortKey.value = 'created_at_desc'
     selectedRole.value = 'all'
-  }
-
-  async function loadUsers() {
-    loading.value = true
-    const from = (page.value - 1) * perPage
-    const to = from + perPage - 1
-
-    const { data, count, error } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(from, to)
-
-    loading.value = false
-
-    if (error) toast.show('Erreur de chargement', 'danger')
-    else {
-      users.value = data || []
-      total.value = count || 0
-      localRoles.value = Object.fromEntries(users.value.map((u) => [u.id, u.role || 'user']))
-    }
+    reset()
   }
 
   async function handleRoleChange(user: UserRow, newRole: string) {
@@ -282,10 +195,19 @@
     if (error) toast.show('Erreur suppression', 'danger')
     else {
       toast.show('Utilisateur supprimé ✅', 'success')
-      loadUsers()
+      fetchData()
     }
   }
 
+  /* --- Modale --- */
+  const isModalVisible = ref(false)
+  const selectedUserId = ref<string | null>(null)
+  function openUserModal(id: string) {
+    selectedUserId.value = id
+    isModalVisible.value = true
+  }
+
+  /* --- Utils --- */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -295,17 +217,15 @@
     })
   }
 
-  /* --- Modale utilisateur --- */
-  const isModalVisible = ref(false)
-  const selectedUserId = ref<string | null>(null)
-
-  function openUserModal(id: string) {
-    selectedUserId.value = id
-    isModalVisible.value = true
-  }
-
-  watch(page, loadUsers)
-  onMounted(loadUsers)
+  watchEffect(() => {
+    if (filteredData.value.length > 0) {
+      const newRoles: Record<string, string> = {}
+      for (const u of filteredData.value) {
+        newRoles[u.id] = u.role ?? 'user' // ou 'user' par défaut
+      }
+      localRoles.value = newRoles
+    }
+  })
 </script>
 
 <style scoped lang="less">
