@@ -54,21 +54,7 @@
             :isGrouped="isGroupedMessage(i)"
           />
         </transition-group>
-
-        <!-- ✍️ Indicateur "en train d’écrire" -->
-        <transition name="typing-fade">
-          <div
-            v-if="localIsTyping"
-            key="typing"
-            class="typing-bubble-wrapper"
-          >
-            <div class="typing-bubble">
-              <span class="dot" />
-              <span class="dot" />
-              <span class="dot" />
-            </div>
-          </div>
-        </transition>
+        <ChatTypingIndicator :isTyping="localIsTyping" />
       </div>
     </transition>
 
@@ -82,37 +68,21 @@
         Nouveaux messages
       </button>
     </transition>
-
-    <!-- 🧩 Zone d’envoi -->
-    <form
-      class="chat-input"
-      @submit.prevent="sendMessage"
-      aria-label="Zone de saisie du message"
-    >
-      <input
-        ref="inputRef"
-        v-model="newMessage"
-        type="text"
-        placeholder="Écrire un message..."
-        required
-        aria-label="Champ de texte du message"
-        @input="sendTyping"
-      />
-      <BasicButton
-        label="Envoyer"
-        type="primary"
-        size="small"
-        :disabled="!newMessage.trim() || !isOnline"
-        @click="sendMessage"
-      />
-    </form>
+    <ChatInput
+      v-model="newMessage"
+      :isOnline="isOnline"
+      @send="sendMessage"
+      @typing="sendTyping"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
   import type { ChatRole, Message } from '../types/chat'
+  import ChatInput from './ChatInput.vue'
   import ChatMessage from './ChatMessage.vue'
+  import ChatTypingIndicator from './ChatTypingIndicator.vue'
 
   /* 🧩 Props */
   const props = defineProps<{
@@ -326,66 +296,6 @@
       background: fade(@neutral-600, 60%);
     }
 
-    .typing-bubble-wrapper {
-      position: absolute;
-      bottom: 10px;
-      left: 50px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 0 12px 8px;
-      background: @neutral-50;
-      pointer-events: none; // évite de bloquer le scroll ou les clics
-    }
-
-    .typing-bubble {
-      display: inline-flex;
-      align-items: center;
-      justify-content: space-around;
-      background: @neutral-200;
-      border-radius: 16px;
-      padding: 6px 10px;
-      width: 48px;
-
-      .dot {
-        width: 6px;
-        height: 6px;
-        background: fade(@neutral-600, 70%);
-        border-radius: 50%;
-        animation: typingDots 1.3s infinite ease-in-out;
-      }
-      .dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .dot:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-    }
-
-    .chat-input {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-top: 1px solid @neutral-200;
-      padding: 10px 12px;
-      background: white;
-
-      input {
-        flex: 1;
-        border: 1px solid @neutral-200;
-        border-radius: 8px;
-        padding: 8px 12px;
-        background: @neutral-50;
-        font-size: 14px;
-
-        &:focus {
-          border-color: @primary-500;
-          background: white;
-        }
-      }
-    }
-
     .new-messages-btn {
       position: absolute;
       bottom: 70px;
@@ -409,19 +319,6 @@
     @media (max-width: 768px) {
       height: auto;
       min-height: 50vh;
-    }
-
-    @keyframes typingDots {
-      0%,
-      80%,
-      100% {
-        transform: scale(0.6);
-        opacity: 0.5;
-      }
-      40% {
-        transform: scale(1);
-        opacity: 1;
-      }
     }
 
     /* Animations */

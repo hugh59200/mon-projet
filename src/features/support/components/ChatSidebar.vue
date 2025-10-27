@@ -109,6 +109,7 @@
   const props = defineProps<{
     conversations: ConversationOverview[]
     selectedId?: string | null
+    isTyping?: boolean
   }>()
 
   const emit = defineEmits<{

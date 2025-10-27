@@ -14,11 +14,28 @@
       </div>
 
       <div class="conversation-footer">
-        <small class="preview">{{ conversation.last_message || 'Aucun message' }}</small>
+        <!-- ✅ Bloc stable : affiche soit le message, soit l’indicateur -->
+        <div class="preview-wrapper">
+          <small
+            class="preview"
+            v-show="!isTyping"
+          >
+            {{ conversation.last_message || 'Aucun message' }}
+          </small>
+
+          <div
+            v-show="isTyping"
+            class="typing-indicator"
+          >
+            <span class="dot" />
+            <span class="dot" />
+            <span class="dot" />
+          </div>
+        </div>
 
         <div class="right-info">
           <span
-            v-if="conversation.last_message_at"
+            v-if="conversation.last_message_at && !isTyping"
             class="time"
           >
             {{ formattedTime }}
@@ -39,11 +56,14 @@
 <script setup lang="ts">
   import type { ConversationOverview } from '@/features/support/types/chat'
   import { computed } from 'vue'
+  import { useAdminChat } from '../composables/useAdminChat'
 
   const props = defineProps<{
     conversation: ConversationOverview
     active?: boolean
   }>()
+
+  const { isTyping } = useAdminChat()
 
   const emit = defineEmits<{
     (e: 'select', userId: string): void
@@ -64,7 +84,7 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 14px 14px; // 🔥 +4px de vertical pour aérer
+    padding: 14px 14px;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -72,11 +92,11 @@
     background: transparent;
     position: relative;
 
-    /* 🌫 Séparateur plus espacé et plus léger */
+    /* 🌫 Séparateur */
     &::after {
       content: '';
       position: absolute;
-      bottom: -3px; // plus d’air entre éléments
+      bottom: -3px;
       left: 52px;
       right: 10px;
       height: 1px;
@@ -136,7 +156,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 5px; // un peu plus d’espace entre email et message
+      gap: 5px;
       overflow: hidden;
 
       .conversation-header {
@@ -159,17 +179,51 @@
         justify-content: space-between;
         gap: 8px;
 
-        .preview {
+        /* ✅ Conteneur stable */
+        .preview-wrapper {
           flex: 1;
+          position: relative;
+          min-height: 18px; // garde la même hauteur dans tous les cas
+          display: flex;
+          align-items: center;
+
+          .preview,
+          .typing-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.25s ease;
+          }
+        }
+
+        .preview {
           font-size: 13px;
           color: @neutral-600;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          transition: color 0.2s ease;
+        }
 
-          .conversation-item:hover & {
-            color: @neutral-700;
+        .typing-indicator {
+          gap: 4px;
+          height: 18px;
+
+          .dot {
+            width: 5px;
+            height: 5px;
+            background: @neutral-500;
+            border-radius: 50%;
+            animation: typingDots 1.3s infinite ease-in-out;
+          }
+
+          .dot:nth-child(2) {
+            animation-delay: 0.2s;
+          }
+          .dot:nth-child(3) {
+            animation-delay: 0.4s;
           }
         }
 
@@ -199,6 +253,19 @@
             padding: 0 6px;
             box-shadow: 0 1px 3px fade(@primary-600, 30%);
           }
+        }
+      }
+
+      @keyframes typingDots {
+        0%,
+        80%,
+        100% {
+          transform: scale(0.6);
+          opacity: 0.5;
+        }
+        40% {
+          transform: scale(1);
+          opacity: 1;
         }
       }
     }

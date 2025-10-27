@@ -29,6 +29,7 @@
       <ChatSidebar
         :conversations="conversations"
         :selected-id="selectedUserId"
+        :is-typing="isTyping"
         @select="selectConversation"
       />
 
@@ -133,7 +134,7 @@
       overflow: visible;
 
       /* 📱 Responsive mobile */
-      @media (max-width: 768px) {
+      @media (max-width: 1200px) {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
         min-height: 100vh;
