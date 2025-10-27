@@ -68,16 +68,23 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
     await fetchProfile()
     startAutoRefresh()
+
+    // 🚀 Redirection post-login automatique
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    router.push(redirect || '/')
+
     return true
   }
 
   // ======================================================
   // 🌍 OAUTH (Google, GitHub)
   // ======================================================
-  async function signInWithProvider(provider: 'google' | 'github', redirect?: string) {
+  async function signInWithProvider(provider: 'google' | 'github') {
     loading.value = true
     error.value = null
+
     try {
+      const redirect = router.currentRoute.value.query.redirect as string | undefined
       if (redirect) sessionStorage.setItem('redirectAfterOAuth', redirect)
       else sessionStorage.removeItem('redirectAfterOAuth')
 
@@ -184,8 +191,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     if (event === 'SIGNED_IN' && router.currentRoute.value.name === 'auth-callback') {
-      const redirect = router.currentRoute.value.query.redirect as string
-      router.push(redirect || '/')
+      const redirect = sessionStorage.getItem('redirectAfterOAuth') || '/'
+      sessionStorage.removeItem('redirectAfterOAuth')
+      router.push(redirect)
     }
 
     if (event === 'SIGNED_OUT') router.push('/auth/login')
