@@ -105,7 +105,7 @@
           size="large"
           width="full"
           :disabled="cart.items.length === 0"
-          @click="$router.push('/paiement')"
+          @click="$router.push('/checkout')"
         />
       </div>
     </div>

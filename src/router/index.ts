@@ -117,9 +117,9 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/paiement',
+    path: '/checkout',
     name: 'checkout',
-    component: () => import('@/pages/CheckoutView.vue'),
+    component: () => import('@/features/checkout/CheckoutView.vue'),
     meta: {
       requiresCart: true,
       requiresAuth: true,
@@ -128,23 +128,39 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/paiement/success',
-    name: 'payment-success',
-    component: () => import('@/pages/PaymentSuccessView.vue'),
-    meta: {
-      title: 'Paiement réussi – Fast Peptides',
-      description: 'Votre paiement a été traité avec succès. Merci pour votre commande !',
-    },
+    path: '/paiement',
+    component: () => import('@/features/checkout/paiement/PaymentResultWrapper.vue'),
+    children: [
+      {
+        path: 'result',
+        name: 'payment-result',
+        component: () => import('@/features/checkout/paiement/PaymentResultView.vue'),
+        meta: {
+          title: 'Vérification du paiement – Fast Peptides',
+          description: 'Vérification de l’état du paiement en cours.',
+        },
+      },
+      {
+        path: 'success',
+        name: 'payment-success',
+        component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
+        meta: {
+          title: 'Paiement réussi – Fast Peptides',
+          description: 'Votre paiement a été traité avec succès.',
+        },
+      },
+      {
+        path: 'cancel',
+        name: 'payment-cancel',
+        component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
+        meta: {
+          title: 'Paiement annulé – Fast Peptides',
+          description: 'Votre paiement a été annulé.',
+        },
+      },
+    ],
   },
-  {
-    path: '/paiement/cancel',
-    name: 'payment-cancel',
-    component: () => import('@/pages/PaymentCancelView.vue'),
-    meta: {
-      title: 'Paiement annulé – Fast Peptides',
-      description: 'Votre paiement a été annulé. Vous pouvez réessayer ou modifier votre panier.',
-    },
-  },
+
   {
     path: '/admin/orders',
     name: 'admin-orders',
@@ -167,19 +183,31 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin',
-    name: 'admin-dashboard',
-    component: () => import('@/features/admin/AdminDashboard.vue'),
+    component: () => import('@/features/admin/AdminTabsView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true, title: 'Administration – Fast Peptides' },
-  },
-  {
-    path: '/admin/chat',
-    name: 'admin-chat',
-    component: () => import('@/features/support/ChatAdminView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      title: 'Chat (Admin) – Fast Peptides',
-    },
+    redirect: { name: 'admin-stats' },
+    children: [
+      {
+        path: 'chat',
+        name: '💬 Messages clients',
+        component: () => import('@/features/admin/sections/AdminChatView.vue'),
+      },
+      {
+        path: 'stats',
+        name: '📊 Tableau de bord',
+        component: () => import('@/features/admin/sections/AdminStatsView.vue'),
+      },
+      {
+        path: 'users',
+        name: '👤 Utilisateurs',
+        component: () => import('@/features/admin/sections/AdminUsersView.vue'),
+      },
+      {
+        path: 'orders',
+        name: '📦 Commandes',
+        component: () => import('@/features/admin/sections/AdminOrdersView.vue'),
+      },
+    ],
   },
   {
     path: '/profil/commandes',

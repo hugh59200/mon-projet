@@ -19,30 +19,25 @@
         v-if="isMobile || showStepper"
         class="wrapper-form__header"
       >
-        <BasicText class="wrapper-form__title">
-          {{ ((currentTab?.tabKey === 'Synthèse' && addTabInfo) ? currentTab?.tabKey + ' : ' + addTabInfo : currentTab?.tabKey) || '' }}
-        </BasicText>
-        <div class="wrapper-form__stepper">
-          <BasicButton
-            :disabled="!canMovePrevious"
-            label="Précédent"
-            type="secondary"
-            variant="ghost"
-            size="small"
-            iconName="arrow-left"
-            @click="handleMovePrevious"
-          />
-          <BasicButton
-            :disabled="!canMoveNext"
-            label="Suivant"
-            type="secondary"
-            variant="ghost"
-            size="small"
-            iconRight
-            iconName="arrow-right"
-            @click="handleMoveNext"
-          />
-        </div>
+        <BasicButton
+          :disabled="!canMovePrevious"
+          label="Précédent"
+          type="secondary"
+          variant="ghost"
+          size="small"
+          iconName="arrow-left"
+          @click="handleMovePrevious"
+        />
+        <BasicButton
+          :disabled="!canMoveNext"
+          label="Suivant"
+          type="secondary"
+          variant="ghost"
+          size="small"
+          iconRight
+          iconName="arrow-right"
+          @click="handleMoveNext"
+        />
       </div>
       <div
         ref="scrollContainer"
@@ -57,10 +52,10 @@
 </template>
 
 <script setup lang="ts">
-  import { toRef, ref, watch, inject } from 'vue'
-  import { useWrapperFormLogic, type TabsStepperEmit } from './useWrapperFormLogic'
-  import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
   import { DEVICE_BREAKPOINT } from '@/plugin/device-breakpoint'
+  import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
+  import { inject, ref, toRef, watch } from 'vue'
+  import { useWrapperFormLogic, type TabsStepperEmit } from './useWrapperFormLogic'
 
   const modelValue = defineModel<TabsModel>()
 
@@ -88,11 +83,8 @@
 
   const emit = defineEmits<TabsStepperEmit>()
 
-  const { currentTab, canMovePrevious, canMoveNext, handleMovePrevious, handleMoveNext } = useWrapperFormLogic(
-    modelValue,
-    toRef(props, 'tabs'),
-    emit,
-  )
+  const { currentTab, canMovePrevious, canMoveNext, handleMovePrevious, handleMoveNext } =
+    useWrapperFormLogic(modelValue, toRef(props, 'tabs'), emit)
 </script>
 
 <style scoped lang="less">
@@ -119,11 +111,7 @@
     }
 
     &__header {
-      padding: 0 @spacing-20;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
+      display: none;
     }
 
     &__stepper {
@@ -152,7 +140,7 @@
     }
   }
 
-  @container (max-width: @breakpoint-mobile) {
+  @media (max-width: 1000px) {
     .wrapper-form {
       &__title {
         display: none;
@@ -160,6 +148,14 @@
       &__stepper {
         flex: 1;
       }
+      &__header {
+        padding: 0 @spacing-20;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+      }
+
       &__content {
         padding: 0 12px;
         gap: 20px;

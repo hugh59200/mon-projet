@@ -43,7 +43,7 @@
         <div
           v-if="auth.isAdmin"
           class="admin-chat-button"
-          @click="router.push('/admin')"
+          @click="router.push('/admin/chat')"
         >
           <BasicButton
             label="Admin"
@@ -82,7 +82,7 @@
           type="secondary"
           size="small"
           :disabled="cart.totalItems === 0"
-          @click="cart.totalItems > 0 && router.push('/paiement')"
+          @click="cart.totalItems > 0 && router.push('/checkout')"
         />
 
         <BasicButton

@@ -1,171 +1,101 @@
 <template>
   <div class="admin-dashboard">
-    <!-- 🧭 Onglets -->
-    <div class="tabs-header">
-      <button
-        v-for="tab in tabs"
-        :key="tab.key"
-        :class="['tab-btn', { active: activeTab === tab.key }]"
-        @click="activeTab = tab.key"
+    <!-- 📊 Statistiques globales -->
+    <section class="dashboard-card">
+      <BasicText
+        size="h4"
+        weight="bold"
       >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- 📄 Contenu des onglets -->
-    <div
-      v-if="activeTab === 'stats'"
-      class="tab-content"
-    >
-      <!-- 📊 Statistiques globales -->
-      <section class="dashboard-card">
-        <BasicText
-          size="h4"
-          weight="bold"
+        📈 Vue d’ensemble
+      </BasicText>
+      <div class="stats-grid">
+        <div
+          class="stat-card"
+          v-for="stat in statCards"
+          :key="stat.label"
         >
-          📈 Vue d’ensemble
-        </BasicText>
-        <div class="stats-grid">
-          <div
-            class="stat-card"
-            v-for="stat in statCards"
-            :key="stat.label"
-          >
-            <p class="label">{{ stat.label }}</p>
-            <p class="value">{{ stat.value }}</p>
-          </div>
+          <p class="label">{{ stat.label }}</p>
+          <p class="value">{{ stat.value }}</p>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 💶 Revenus -->
-      <section class="dashboard-card">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          💰 Revenus des 7 derniers jours
-        </BasicText>
-        <Bar
-          :data="chartDataRevenue"
-          :options="chartOptions"
-        />
-      </section>
+    <!-- 💶 Revenus -->
+    <section class="dashboard-card">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        💰 Revenus des 7 derniers jours
+      </BasicText>
+      <Bar
+        :data="chartDataRevenue"
+        :options="chartOptions"
+      />
+    </section>
 
-      <!-- 📦 Commandes -->
-      <section class="dashboard-card">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          📦 Commandes des 7 derniers jours
-        </BasicText>
-        <Bar
-          :data="chartDataOrders"
-          :options="chartOptionsOrders"
-        />
-      </section>
+    <!-- 📦 Commandes -->
+    <section class="dashboard-card">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        📦 Commandes des 7 derniers jours
+      </BasicText>
+      <Bar
+        :data="chartDataOrders"
+        :options="chartOptionsOrders"
+      />
+    </section>
 
-      <!-- 🏆 Top clients -->
-      <section class="dashboard-card top-clients">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          🏆 Top 5 clients
-        </BasicText>
-        <table>
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Commandes</th>
-              <th>Total (€)</th>
-              <th>Dernière commande</th>
-              <th>Contact</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="client in topClients"
-              :key="client.id"
-            >
-              <td class="client-cell">
-                <img
-                  v-if="client.avatar_url"
-                  :src="client.avatar_url"
-                  alt="avatar"
-                  class="avatar"
-                />
-                <span>{{ client.name }}</span>
-              </td>
-              <td>{{ client.orders }}</td>
-              <td>{{ client.total.toFixed(2) }}</td>
-              <td>{{ formatDate(client.last_order) }}</td>
-              <td>
-                <a
-                  v-if="client.email"
-                  class="contact-link"
-                  :href="`mailto:${client.email}`"
-                >
-                  📧 Contacter
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </div>
-
-    <!-- 💬 Chat -->
-    <div
-      v-else-if="activeTab === 'chat'"
-      class="tab-content"
-    >
-      <ChatAdminView />
-    </div>
-
-    <!-- 👤 Gérer les utilisateurs -->
-    <div
-      v-else-if="activeTab === 'users'"
-      class="tab-content"
-    >
-      <section class="dashboard-card center-content">
-        <BasicText
-          size="h4"
-          weight="semibold"
-        >
-          👤 Gérer les utilisateurs
-        </BasicText>
-        <p class="info-text">Ici tu peux gérer la liste des utilisateurs et leurs accès.</p>
-        <BasicButton
-          label="Ouvrir la gestion des utilisateurs"
-          type="primary"
-          size="large"
-          @click="$router.push('/admin/users')"
-        />
-      </section>
-    </div>
-
-    <!-- 📦 Gérer les commandes -->
-    <div
-      v-else-if="activeTab === 'orders'"
-      class="tab-content"
-    >
-      <section class="dashboard-card center-content">
-        <BasicText
-          size="h4"
-          weight="semibold"
-        >
-          📦 Gérer les commandes
-        </BasicText>
-        <p class="info-text">Accède à la liste complète des commandes clients.</p>
-        <BasicButton
-          label="Ouvrir la gestion des commandes"
-          type="secondary"
-          size="large"
-          @click="$router.push('/admin/orders')"
-        />
-      </section>
-    </div>
+    <!-- 🏆 Top clients -->
+    <section class="dashboard-card top-clients">
+      <BasicText
+        size="h5"
+        weight="bold"
+      >
+        🏆 Top 5 clients
+      </BasicText>
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Commandes</th>
+            <th>Total (€)</th>
+            <th>Dernière commande</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="client in topClients"
+            :key="client.id"
+          >
+            <td class="client-cell">
+              <img
+                v-if="client.avatar_url"
+                :src="client.avatar_url"
+                alt="avatar"
+                class="avatar"
+              />
+              <span>{{ client.name }}</span>
+            </td>
+            <td>{{ client.orders }}</td>
+            <td>{{ client.total.toFixed(2) }}</td>
+            <td>{{ formatDate(client.last_order) }}</td>
+            <td>
+              <a
+                v-if="client.email"
+                class="contact-link"
+                :href="`mailto:${client.email}`"
+              >
+                📧 Contacter
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </div>
 </template>
 
@@ -182,17 +112,8 @@
   } from 'chart.js'
   import { computed, onMounted, ref } from 'vue'
   import { Bar } from 'vue-chartjs'
-  import ChatAdminView from '../support/ChatAdminView.vue'
 
   ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
-
-  const tabs = [
-    { key: 'stats', label: '📊 Tableau de bord' },
-    { key: 'chat', label: '💬 Messages clients' },
-    { key: 'users', label: '👤 Gérer les utilisateurs' },
-    { key: 'orders', label: '📦 Gérer les commandes' },
-  ]
-  const activeTab = ref('stats')
 
   interface ChartDataset {
     label: string
@@ -408,7 +329,6 @@
     await Promise.all([loadStats(), loadWeeklyData(), loadTopClients()])
   })
 </script>
-
 <style scoped lang="less">
   .admin-dashboard {
     max-width: 1100px;
