@@ -1,5 +1,5 @@
 <template>
-  <div class="users-toolbar users-toolbar--desktop cardLayoutWrapper">
+  <div class="users-toolbar cardLayoutWrapper">
     <div class="elem elem--span-12">
       <BasicInput
         v-model="search"
@@ -8,6 +8,7 @@
         clearable
       />
     </div>
+
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="sortKey"
@@ -18,6 +19,7 @@
         force-value
       />
     </div>
+
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="selectedRole"
@@ -28,6 +30,7 @@
         force-value
       />
     </div>
+
     <div class="elem elem--center elem--span-6 justify-end">
       <BasicButton
         label="Réinitialiser"
@@ -38,6 +41,7 @@
       />
     </div>
   </div>
+
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -45,6 +49,7 @@
     :nb-results="total"
     @change="page = $event"
   />
+
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -60,6 +65,7 @@
         <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
         <div class="elem elem--center elem--span-6"><span>Actions</span></div>
       </div>
+
       <div
         class="gridElemWrapper"
         v-for="user in filteredData"
@@ -104,6 +110,7 @@
         </div>
       </div>
     </div>
+
     <div class="users--mobile">
       <div class="mobile-cards-list">
         <UserCardMobile
@@ -120,6 +127,7 @@
       </div>
     </div>
   </WrapperLoader>
+
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -221,7 +229,7 @@
     if (filteredData.value.length > 0) {
       const newRoles: Record<string, string> = {}
       for (const u of filteredData.value) {
-        newRoles[u.id] = u.role ?? 'user' // ou 'user' par défaut
+        newRoles[u.id] = u.role ?? 'user'
       }
       localRoles.value = newRoles
     }
@@ -230,130 +238,66 @@
 
 <style scoped lang="less">
   .users-toolbar {
+    display: grid;
+    grid-template-columns: repeat(36, 1fr);
+    gap: 12px;
     border: 1px solid @neutral-200;
     border-radius: 8px;
     background: @neutral-50;
     margin-bottom: 16px;
     padding: 10px 14px;
-    grid-template-columns: repeat(36, 1fr);
-    gap: 12px;
+
     .elem {
       display: flex;
       align-items: center;
     }
+
     .justify-end {
       justify-content: flex-end;
     }
-  }
-  .users-toolbar-mobile {
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    .row {
+
+    /* --- Responsive version sans doublon --- */
+    @media (max-width: 1000px) {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
+
+      .elem {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 150px;
+      }
+
+      /* Recherche pleine largeur */
+      .elem--span-12 {
+        flex: 1 1 100%;
+      }
+
+      /* Réinitialiser pleine largeur */
+      .justify-end {
+        justify-content: flex-end;
+        flex: 1 1 100%;
+      }
     }
   }
+
   .users--desktop {
     display: block;
   }
   .users--mobile {
     display: none;
   }
-  .mobile-cards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px; // <-- l'espacement magique
-  }
-  .user-card {
-    background: @white;
-    border: 1px solid @neutral-200;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 1px 3px fade(@neutral-900, 6%);
-    transition:
-      box-shadow 0.2s ease,
-      transform 0.2s ease;
-    &:hover {
-      box-shadow: 0 3px 8px fade(@neutral-900, 8%);
-      transform: translateY(-2px);
-    }
-    &__header {
-      display: flex;
-      justify-content: space-between;
-    }
-    &__info {
-      display: flex;
-      flex-direction: column;
-    }
-    &__email {
-      font-weight: 600;
-      color: @primary-950;
-    }
-    &__name {
-      font-size: @font-size-body-m;
-      color: @neutral-500;
-    }
-    &__role {
-      .role-chip {
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: @font-size-body-s;
-        font-weight: 600;
-        &--user {
-          background: fade(@neutral-400, 15%);
-          color: @neutral-700;
-        }
-        &--admin {
-          background: fade(@primary-400, 15%);
-          color: @primary-700;
-        }
-      }
-    }
-    &__infos {
-      border-top: 1px solid @neutral-100;
-      padding-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      .label {
-        color: @neutral-500;
-      }
-      .value {
-        color: @primary-900;
-      }
-    }
-    &__actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-  }
-  .users__loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    gap: 12px;
-    padding: 60px 20px;
-    color: @neutral-600;
-    min-height: 200px;
-  }
   @media (max-width: 1000px) {
-    .users-toolbar--desktop,
     .users--desktop {
       display: none;
     }
     .users--mobile {
       display: block;
     }
+  }
+
+  .mobile-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 </style>
