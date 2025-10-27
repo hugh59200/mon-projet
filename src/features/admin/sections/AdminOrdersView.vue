@@ -1,5 +1,5 @@
 <template>
-  <!-- BARRE D’ACTIONS (DESKTOP) -->
+  <!-- 🧭 BARRE D’ACTIONS (DESKTOP) -->
   <div class="orders-toolbar orders-toolbar--desktop cardLayoutWrapper">
     <div class="elem elem--span-10">
       <BasicInput
@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <!-- PAGINATION -->
+  <!-- 📄 PAGINATION -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -52,8 +52,11 @@
     @change="page = $event"
   />
 
-  <!-- TABLEAU (DESKTOP) -->
-  <div class="orders--desktop">
+  <!-- 🧱 TABLEAU (DESKTOP) -->
+  <div
+    class="orders--desktop"
+    v-if="!loading"
+  >
     <div class="cardLayoutWrapper cardLayoutWrapper--header">
       <div class="elem elem--span-10"><span>Client</span></div>
       <div class="elem elem--center elem--span-4"><span>Total</span></div>
@@ -82,15 +85,15 @@
         />
 
         <BasicCell
-          :span="6"
           center
+          :span="6"
         >
           {{ formatDate(order.created_at) }}
         </BasicCell>
 
         <BasicCell
-          :span="10"
           center
+          :span="10"
         >
           <BasicDropdown
             v-model="localStatuses[order.id]"
@@ -106,15 +109,18 @@
           icon-name="eye"
           tooltip="Voir la commande"
           center
-          @click="openOrderModal(order.id)"
           :span="6"
+          @click="openOrderModal(order.id)"
         />
       </div>
     </div>
   </div>
 
-  <!-- VERSION MOBILE -->
-  <div class="orders--mobile">
+  <!-- 📱 VERSION MOBILE -->
+  <div
+    class="orders--mobile"
+    v-if="!loading"
+  >
     <div class="orders-toolbar-mobile">
       <BasicInput
         v-model="search"
@@ -152,58 +158,41 @@
       />
     </div>
 
-    <div
-      class="order-card"
-      v-for="order in filteredOrders"
-      :key="order.id"
-    >
-      <div class="order-card__header">
-        <div class="order-card__client">
-          <div class="order-card__name">{{ order.full_name }}</div>
-          <div class="order-card__email">{{ order.email }}</div>
-        </div>
-        <div class="order-card__status">
-          <span
-            class="status-chip"
-            :class="`status-chip--${localStatuses[order.id]}`"
-          >
-            {{ STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—' }}
-          </span>
-        </div>
-      </div>
-
-      <div class="order-card__infos">
-        <div class="order-card__line">
-          <span class="label">Montant :</span>
-          <span class="value">{{ formatCurrency(order.total_amount) }}</span>
-        </div>
-        <div class="order-card__line">
-          <span class="label">Date :</span>
-          <span class="value">{{ formatDate(order.created_at) }}</span>
-        </div>
-      </div>
-
-      <div class="order-card__actions">
-        <WrapperDropdown
-          label="Modifier le statut"
-          :items="STATUSES"
-          v-model="localStatuses[order.id]"
-          @update:model-value="(v) => handleStatusChange(order, v as string)"
-          force-value
-        />
-        <BasicButton
-          label="Voir les détails"
-          type="secondary"
-          size="small"
-          variant="outlined"
-          block
-          @click="openOrderModal(order.id)"
-        />
-      </div>
+    <div class="mobile-cards-list">
+      <OrderCardMobile
+        v-for="order in filteredOrders"
+        :key="order.id"
+        v-model:status="localStatuses[order.id]"
+        :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
+        :order="order"
+        :statuses="STATUSES"
+        :format-date="formatDate"
+        :format-currency="formatCurrency"
+        :handle-status-change="handleStatusChange"
+        :open-order-modal="openOrderModal"
+      />
     </div>
   </div>
 
-  <!-- POPUP (commun desktop + mobile) -->
+  <!-- 🌀 LOADING -->
+  <div
+    v-if="loading"
+    class="orders__loading"
+  >
+    <BasicLoader
+      size="medium"
+      color="primary"
+    />
+    <p>Chargement des commandes...</p>
+  </div>
+  <EmptyTablePlaceholder v-if="!loading && filteredOrders.length === 0">
+    <template #content>
+      Aucun commande trouvée 😅
+      <br />
+      Essayez d’ajuster vos filtres ou de réinitialiser la recherche.
+    </template>
+  </EmptyTablePlaceholder>
+  <!-- 🪟 MODALE DÉTAILS COMMANDE -->
   <teleport to="#app">
     <AdminOrderDetailsModal
       v-if="selectedOrderId"
@@ -214,34 +203,25 @@
 </template>
 
 <script setup lang="ts">
+  import { OrderCardMobile } from '@/features/admin/sections/mobile'
   import { supabase } from '@/services/supabaseClient'
+  import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, shallowRef, watch } from 'vue'
   import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
 
-  const isModalVisible = ref(false)
-  const selectedOrderId = ref<string | null>(null)
-
-  function openOrderModal(id: string) {
-    selectedOrderId.value = id
-    isModalVisible.value = true
-  }
-
-  type Order = {
-    id: string
-    full_name: string
-    email: string
-    total_amount: number | null
-    created_at: string | null
-    status: string | null
-  }
+  type OrderRow = Tables<'orders'>
 
   const toast = useToastStore()
-  const orders = ref<Order[]>([])
+  const orders = shallowRef<OrderRow[]>([])
   const localStatuses = ref<Record<string, string>>({})
   const page = ref(1)
   const perPage = 8
   const total = ref(0)
+  const search = ref('')
+  const sortKey = ref('created_at_desc')
+  const statusFilter = ref('all')
+  const loading = ref(false)
 
   const STATUSES = [
     { id: 'pending', label: 'En attente' },
@@ -250,10 +230,7 @@
     { id: 'completed', label: 'Terminée' },
     { id: 'canceled', label: 'Annulée' },
   ]
-
-  const search = ref('')
-  const sortKey = ref('created_at_desc')
-  const statusFilter = ref('all')
+  const STATUSES_WITH_ALL = [{ id: 'all', label: 'Tous' }, ...STATUSES]
 
   const SORT_OPTIONS = [
     { id: 'created_at_desc', label: 'Plus récentes' },
@@ -261,8 +238,6 @@
     { id: 'amount_desc', label: 'Montant décroissant' },
     { id: 'amount_asc', label: 'Montant croissant' },
   ]
-
-  const STATUSES_WITH_ALL = [{ id: 'all', label: 'Tous' }, ...STATUSES]
 
   const nbPages = computed(() => Math.ceil(total.value / perPage))
 
@@ -295,6 +270,7 @@
   }
 
   async function loadOrders() {
+    loading.value = true
     const from = (page.value - 1) * perPage
     const to = from + perPage - 1
     const { data, count, error } = await supabase
@@ -302,9 +278,11 @@
       .select('*', { count: 'exact' })
       .range(from, to)
 
+    loading.value = false
+
     if (error) toast.show('Erreur lors du chargement des commandes', 'danger')
     else {
-      orders.value = (data ?? []) as Order[]
+      orders.value = (data ?? []) as OrderRow[]
       total.value = count ?? 0
       localStatuses.value = Object.fromEntries(
         orders.value.map((o) => [o.id, o.status || 'pending']),
@@ -312,7 +290,7 @@
     }
   }
 
-  async function handleStatusChange(order: Order, newValue: string) {
+  async function handleStatusChange(order: OrderRow, newValue: string) {
     localStatuses.value[order.id] = newValue
     const { error } = await supabase.from('orders').update({ status: newValue }).eq('id', order.id)
     if (error) toast.show('Erreur de mise à jour', 'danger')
@@ -333,15 +311,20 @@
     return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
   }
 
+  /* --- Modale commande --- */
+  const isModalVisible = ref(false)
+  const selectedOrderId = ref<string | null>(null)
+
+  function openOrderModal(id: string) {
+    selectedOrderId.value = id
+    isModalVisible.value = true
+  }
+
   watch(page, loadOrders)
   onMounted(loadOrders)
 </script>
 
 <style scoped lang="less">
-  /* ========================= */
-  /* ===== TOOLBARS ===== */
-  /* ========================= */
-
   .orders-toolbar {
     border: 1px solid @neutral-200;
     border-radius: 8px;
@@ -359,14 +342,8 @@
     .justify-end {
       justify-content: flex-end;
     }
-
-    :deep(.basic-input),
-    :deep(.basic-dropdown) {
-      width: 100%;
-    }
   }
 
-  /* ===== Toolbar Mobile ===== */
   .orders-toolbar-mobile {
     background: @neutral-50;
     border: 1px solid @neutral-200;
@@ -380,153 +357,34 @@
     .row {
       display: flex;
       gap: 10px;
-
-      :deep(.basic-dropdown) {
-        flex: 1;
-      }
-    }
-
-    :deep(.basic-input) {
-      width: 100%;
-    }
-
-    :deep(.basic-button) {
-      margin-top: 4px;
     }
   }
-
-  /* ========================= */
-  /* ===== MOBILE CARDS ===== */
-  /* ========================= */
 
   .orders--mobile {
     display: none;
   }
-
-  .order-card {
-    background: @white;
-    border: 1px solid @neutral-200;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 1px 3px fade(@neutral-900, 6%);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition:
-      box-shadow 0.2s ease,
-      transform 0.2s ease;
-
-    &:hover {
-      box-shadow: 0 3px 8px fade(@neutral-900, 8%);
-      transform: translateY(-2px);
-    }
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    &__client {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    &__name {
-      font-weight: @font-weight-semibold;
-      font-size: @font-size-body-l;
-      color: @primary-950;
-    }
-
-    &__email {
-      font-size: @font-size-body-m;
-      color: @neutral-500;
-    }
-
-    &__status {
-      .status-chip {
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: @font-size-body-s;
-        font-weight: @font-weight-semibold;
-        text-transform: capitalize;
-        white-space: nowrap;
-
-        /* Statuts mappés sur ton DS */
-        &--pending {
-          background: fade(@warning-400, 15%);
-          color: @warning-700;
-        }
-
-        &--confirmed {
-          background: fade(@primary-400, 15%);
-          color: @primary-700;
-        }
-
-        &--shipped {
-          background: fade(@indigo-400, 15%);
-          color: @indigo-700;
-        }
-
-        &--completed {
-          background: fade(@success-400, 15%);
-          color: @success-700;
-        }
-
-        &--canceled {
-          background: fade(@danger-400, 15%);
-          color: @danger-700;
-        }
-      }
-    }
-
-    &__infos {
-      border-top: 1px solid @neutral-100;
-      padding-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: @font-size-body-m;
-
-      .order-card__line {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .label {
-        color: @neutral-500;
-      }
-
-      .value {
-        font-weight: @font-weight-regular;
-        color: @primary-900;
-      }
-    }
-
-    &__actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 8px;
-
-      :deep(.basic-button) {
-        font-size: @font-size-body-m;
-      }
-    }
+  .orders--desktop {
+    display: block;
   }
 
-  /* ========================= */
-  /* ===== RESPONSIVE ===== */
-  /* ========================= */
+  .orders__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    gap: 12px;
+    padding: 60px 20px;
+    color: @neutral-600;
+    min-height: 200px;
+  }
 
   @media (max-width: 1000px) {
     .orders-toolbar--desktop,
     .orders--desktop {
       display: none;
     }
-
     .orders--mobile {
       display: block;
     }

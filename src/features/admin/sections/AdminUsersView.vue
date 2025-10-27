@@ -151,60 +151,18 @@
         @click="resetFilters"
       />
     </div>
-
-    <div
-      class="user-card"
-      v-for="user in filteredUsers"
-      :key="user.id"
-    >
-      <div class="user-card__header">
-        <div class="user-card__info">
-          <div class="user-card__email">{{ user.email }}</div>
-          <div class="user-card__name">{{ user.full_name || '—' }}</div>
-        </div>
-        <div class="user-card__role">
-          <span
-            class="role-chip"
-            :class="`role-chip--${localRoles[user.id]}`"
-          >
-            {{ localRoles[user.id] }}
-          </span>
-        </div>
-      </div>
-
-      <div class="user-card__infos">
-        <div class="user-card__line">
-          <span class="label">Créé le :</span>
-          <span class="value">{{ formatDate(user.created_at) }}</span>
-        </div>
-      </div>
-
-      <div class="user-card__actions">
-        <BasicDropdown
-          v-model="localRoles[user.id]"
-          :items="ROLES"
-          size="small"
-          dropdown-type="table"
-          force-value
-          @update:model-value="(v) => handleRoleChange(user, v as string)"
-        />
-        <BasicButton
-          label="Voir le profil"
-          type="secondary"
-          size="small"
-          variant="outlined"
-          block
-          @click="openUserModal(user.id)"
-        />
-        <BasicButton
-          label="Supprimer"
-          type="danger"
-          size="small"
-          variant="outlined"
-          block
-          @click="handleDelete(user)"
-        />
-      </div>
+    <div class="mobile-cards-list">
+      <UserCardMobile
+        v-for="user in filteredUsers"
+        :key="user.id"
+        v-model:role="localRoles[user.id]!"
+        :user="user"
+        :roles="ROLES"
+        :format-date="formatDate"
+        :handle-role-change="handleRoleChange"
+        :open-user-modal="openUserModal"
+        :handle-delete="handleDelete"
+      />
     </div>
   </div>
 
@@ -219,6 +177,13 @@
     />
     <p>Chargement des utilisateurs...</p>
   </div>
+  <EmptyTablePlaceholder v-if="!loading && filteredUsers.length === 0">
+    <template #content>
+      Aucun utilisateur trouvé 😅
+      <br />
+      Essayez d’ajuster vos filtres ou de réinitialiser la recherche.
+    </template>
+  </EmptyTablePlaceholder>
 
   <!-- 🔍 Détails utilisateur -->
   <teleport to="#app">
@@ -231,15 +196,9 @@
 </template>
 
 <script setup lang="ts">
+  import { UserCardMobile } from '@/features/admin/sections/mobile'
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicCell from '@designSystem/components/basic/cell/BasicCell.vue'
-  import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
-  import BasicDropdown from '@designSystem/components/basic/dropdown/BasicDropdown.vue'
-  import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
-  import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
-  import BasicPagination from '@designSystem/components/basic/pagination/BasicPagination.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
   import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
@@ -250,11 +209,9 @@
   const users = ref<UserRow[]>([])
   const localRoles = ref<Record<string, string>>({})
   const loading = ref(false)
-
   const page = ref(1)
   const perPage = 8
   const total = ref(0)
-
   const search = ref('')
   const sortKey = ref('created_at_desc')
   const selectedRole = ref('all')
@@ -404,6 +361,11 @@
   .users--mobile {
     display: none;
   }
+  .mobile-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px; // <-- l'espacement magique
+  }
   .user-card {
     background: @white;
     border: 1px solid @neutral-200;
@@ -470,9 +432,16 @@
     }
   }
   .users__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
     text-align: center;
-    padding: 40px;
+    gap: 12px;
+    padding: 60px 20px;
     color: @neutral-600;
+    min-height: 200px;
   }
   @media (max-width: 1000px) {
     .users-toolbar--desktop,

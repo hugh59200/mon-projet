@@ -377,5 +377,18 @@ LEFT JOIN LATERAL (
 -- ============================================================
 -- 🔔 ACTIVER LE REALTIME POUR LES NOUVELLES TABLES / VUES
 -- ============================================================
-ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
 
+
+
+create view user_overview as
+select
+  u.id,
+  u.email,
+  u.raw_user_meta_data->>'name' as display_name,
+  u.created_at as auth_created_at,
+  p.full_name,
+  p.role,
+  p.cgu_accepted,
+  p.created_at as profile_created_at
+from auth.users u
+left join public.profiles p on u.id = p.id;
