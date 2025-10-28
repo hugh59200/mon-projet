@@ -44,7 +44,7 @@
       readonly: false,
       deactivated: false,
       span: 2,
-      iconColor: 'grey-800',
+      iconColor: 'neutral-400',
       iconSize: 16,
       sortAsc: undefined,
       isActive: false,

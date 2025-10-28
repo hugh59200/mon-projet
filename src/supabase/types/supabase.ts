@@ -86,6 +86,54 @@ export type Database = {
           },
         ]
       }
+      news: {
+        Row: {
+          author_id: string | null
+          content: string | null
+          excerpt: string | null
+          id: string
+          image: string | null
+          published_at: string | null
+          slug: string
+          title: string
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string | null
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          published_at?: string | null
+          slug: string
+          title: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string | null
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          published_at?: string | null
+          slug?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address: string | null

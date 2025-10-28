@@ -142,14 +142,11 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/composables/useAdminTable'
-  import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
   import BasicToolbar from '../../BasicToolbar.vue'
   import AdminProductModal from '../modale/AdminProductModal.vue'
   import ProductCardMobileReadonly from './ProductCardMobileReadonly.vue'
-
-  type ProductRow = Tables<'products'>
 
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, fetchData, reset } =
     useAdminTable<'products'>({

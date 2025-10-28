@@ -23,9 +23,15 @@
       class="product__content"
     >
       <div class="product__image">
-        <img
-          :src="product.image || '/default-product-image.jpg'"
-          :alt="product.name"
+        <!-- 🖼️ Image avec zoom -->
+        <InnerImageZoom
+          v-if="product.image"
+          :src="product.image"
+          :zoomSrc="product.image"
+          alt="Image du produit"
+          class="product__zoom"
+          :moveType="'drag'"
+          :zoomType="'click'"
         />
       </div>
 
@@ -88,7 +94,7 @@
     >
       <BasicText
         size="body-l"
-        color="red"
+        color="danger-400"
       >
         Produit introuvable
       </BasicText>
@@ -99,26 +105,19 @@
 <script setup lang="ts">
   import { useCartStore } from '@/features/cart/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
+  import type { Tables } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
+  import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
-  interface Product {
-    id: string
-    name: string
-    category: string
-    price: number
-    purity: number | null
-    stock: boolean
-    image: string | null
-    description?: string | null
-  }
+  type ProductRow = Tables<'products'>
 
   const route = useRoute()
   const cart = useCartStore()
   const toast = useToastStore()
 
-  const product = ref<Product | null>(null)
+  const product = ref<ProductRow | null>(null)
   const loading = ref(true)
 
   onMounted(async () => {
@@ -151,10 +150,11 @@
   })
 
   // 🛒 Fonction d'ajout au panier
-  function addToCart(p: Product) {
+  function addToCart(p: ProductRow) {
     cart.addToCart({
       ...p,
       image: p.image || '/default-product-image.jpg',
+      stock: p.stock ?? false,
     })
     toast.show(`✅ ${p.name} ajouté au panier`, 'success')
   }
@@ -166,7 +166,6 @@
     flex-direction: column;
     padding: 40px 60px;
     gap: 20px;
-    user-select: none;
 
     &__back {
       align-self: flex-start;
@@ -183,12 +182,18 @@
       flex: 1;
       min-width: 300px;
       max-width: 400px;
+      user-select: none;
 
-      img {
+      .product__zoom {
         width: 100%;
         border-radius: 12px;
         border: 1px solid @neutral-200;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        cursor: zoom-in;
+
+        :deep(img) {
+          border-radius: 12px;
+        }
       }
     }
 

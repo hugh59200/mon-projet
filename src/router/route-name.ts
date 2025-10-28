@@ -1,6 +1,8 @@
 // Auto-generated from router/index.ts
 export type RouteName =
   'access-denied' |
+  'actualite-detail' |
+  'actualites' |
   'auth-callback' |
   'cart' |
   'catalogue' |

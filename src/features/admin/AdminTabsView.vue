@@ -17,7 +17,7 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { computed, ref } from 'vue'
-
+  import AdminNewsTable from './actualités/AdminNewsTable.vue'
   import AdminChatView from './chat/AdminChatView.vue'
   import AdminOrdersView from './orders/AdminOrdersView.vue'
   import AdminProductsTable from './products/AdminProductsTable.vue'
@@ -42,6 +42,7 @@
     { tabKey: 'Utilisateurs' },
     { tabKey: 'Commandes' },
     { tabKey: 'Produits' },
+    { tabKey: 'Actualités' },
   ]
 
   const tabComponents = {
@@ -50,6 +51,7 @@
     Utilisateurs: AdminUsersView,
     Commandes: AdminOrdersView,
     Produits: AdminProductsTable,
+    Actualités: AdminNewsTable,
   } as const
 
   const selectedTab = ref<keyof typeof tabComponents>('Messagerie')

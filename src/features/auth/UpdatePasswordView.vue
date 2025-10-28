@@ -61,7 +61,7 @@
             v-if="error"
             class="auth__error"
             size="body-s"
-            color="red"
+            color="danger-400"
           >
             {{ error }}
           </BasicText>

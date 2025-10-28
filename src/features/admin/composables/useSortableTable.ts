@@ -11,7 +11,7 @@ export function useSortableTable<T extends string>(sortKey: Ref<T>, sortAsc: Ref
   }
 
   function getSortColor(k: T): IconColor {
-    if (sortKey.value !== k) return 'grey-800'
+    if (sortKey.value !== k) return 'gray-800' as IconColor
     return sortAsc.value ? 'primary-600' : 'primary-400'
   }
 

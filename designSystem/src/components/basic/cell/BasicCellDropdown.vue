@@ -16,14 +16,14 @@
       :readonly
       :deletable
       :force-value
-      :key-id
-      :key-label
-      :key-icon-name
+      :key-id="keyId as TKeyId"
+      :key-label="keyLabel as TKeyId"
+      :key-icon-name="keyIconName as TKeyIconName"
     />
   </BasicCell>
 </template>
 
-<script setup lang="ts" generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId">
+<script setup lang="ts" generic="TDropdownKey extends DropdownId = DropdownId, TDropdownItem extends DropdownItem<TDropdownKey> = DropdownItem<TDropdownKey>, TKeyId extends keyof DropdownItem<TDropdownKey> = keyof DropdownItem<TDropdownKey>, TKeyIconName extends keyof DropdownItem<TDropdownKey> = keyof DropdownItem<TDropdownKey>">
   import type { BasicCellProps } from './BasicCell.types'
   import BasicCell from './BasicCell.vue'
   import type { DropdownItem, DropdownId, DropdownProps } from '@designSystem/components'

@@ -131,7 +131,6 @@
                 :name="product.stock ? 'CheckCircle' : 'XCircle'"
                 :color="product.stock ? 'success-600' : 'danger-600'"
               />
-              <span>{{ product.stock ? 'En stock' : 'Rupture' }}</span>
             </div>
           </BasicCell>
 
@@ -254,14 +253,15 @@
   .product-name-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 
     .product-thumb {
-      width: 32px;
-      height: 32px;
+      width: 48px;
+      height: 48px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid @neutral-200;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
   }
 
@@ -287,13 +287,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 24px; /* ⬆️ augmenté de 8px → 16px pour plus d’espace */
+    padding: 2px 0; /* un léger padding vertical pour équilibrer */
 
     .action-icon {
       cursor: pointer;
-      transition: opacity 0.2s;
+      font-size: 16px;
+      width: 20x;
+      height: 20px;
+      transition:
+        opacity 0.2s,
+        transform 0.15s;
       &:hover {
         opacity: 0.7;
+        transform: scale(1.1);
       }
 
       &--delete {

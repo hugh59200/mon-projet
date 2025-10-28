@@ -392,3 +392,40 @@ select
   p.created_at as profile_created_at
 from auth.users u
 left join public.profiles p on u.id = p.id;
+
+
+-- ============================================================
+-- 📰 TABLE : NEWS (Actualités / Blog)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.news (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug text UNIQUE NOT NULL,
+  title text NOT NULL,
+  excerpt text,
+  content text,
+  image text,
+  published_at timestamptz DEFAULT now(),
+  author_id uuid REFERENCES public.profiles (id) ON DELETE SET NULL
+);
+
+ALTER TABLE public.news ENABLE ROW LEVEL SECURITY;
+
+-- 🧩 Policies
+DO $$
+BEGIN
+  EXECUTE 'DROP POLICY IF EXISTS "Public can read news" ON public.news';
+  EXECUTE 'DROP POLICY IF EXISTS "Admin full access news" ON public.news';
+END $$;
+
+CREATE POLICY "Public can read news"
+  ON public.news FOR SELECT USING (true);
+
+CREATE POLICY "Admin full access news"
+  ON public.news FOR ALL TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- 🪣 Bucket creation
+insert into storage.buckets (id, name, public)
+values ('news-images', 'news-images', true)
+on conflict (id) do nothing;

@@ -107,6 +107,29 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/actualites',
+    name: 'actualites',
+    component: () => import('@/features/actualités/ActualitesView.vue'),
+    meta: {
+      label: 'Actualités',
+      icon: 'Newspaper', // ou un autre nom d’icône présent dans ton design system
+      order: 3, // pour qu’elle s’affiche après Catalogue
+      title: 'Actualités – Fast Peptides',
+      description:
+        'Découvrez les dernières actualités, études et innovations dans le domaine des peptides sur Fast Peptides.',
+    },
+  },
+  {
+    path: '/actualites/:slug',
+    name: 'actualite-detail',
+    component: () => import('@/features/actualités/ActualiteDetailView.vue'),
+    meta: {
+      getTitle: (route) => `${route.params.slug as string} – Actualités Peptides – Fast Peptides`,
+      description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
+    },
+  },
+
+  {
     path: '/panier',
     name: 'cart',
     component: () => import('@/pages/PanierView.vue'),

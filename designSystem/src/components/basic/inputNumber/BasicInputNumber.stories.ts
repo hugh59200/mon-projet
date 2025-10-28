@@ -53,7 +53,7 @@ export const AvecIconeDroite: StoryObj<typeof BasicInputNumber> = {
     modelValue: null,
     size: 'medium',
     iconState: 'iconRight',
-    iconName: 'calendar',
+    iconName: 'Calendar',
     placeholder: 'Sélectionner une date...',
   },
 }

@@ -31,7 +31,7 @@
       <div class="date-container">
         <div class="date-day">
           <BasicText
-            color="red"
+            color="danger-400"
             size="body-xl"
             weight="bold"
           >

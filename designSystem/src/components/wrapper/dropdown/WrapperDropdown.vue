@@ -9,16 +9,16 @@
   >
     <BasicDropdown
       v-model="modelValue"
-      :items
-      :placeholder
-      :size
-      :disabled
-      :readonly
-      :deletable
-      :force-value
-      :key-id
-      :key-label
-      :key-icon-name
+      :items="items"
+      :placeholder="placeholder"
+      :size="size"
+      :disabled="disabled"
+      :readonly="readonly"
+      :deletable="deletable"
+      :force-value="forceValue"
+      :key-id="keyId"
+      :key-label="keyLabel"
+      :key-icon-name="keyIconName"
     />
   </WrapperFormElements>
 </template>
@@ -26,11 +26,15 @@
 <script
   setup
   lang="ts"
-  generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId"
+  generic="TDropdownKey extends DropdownId = DropdownId, TDropdownItem extends DropdownItem<TDropdownKey> = DropdownItem<TDropdownKey>"
 >
   import type { DropdownId, DropdownItem, WrapperDropdownProps } from '@designSystem/components'
 
-  withDefaults(defineProps<WrapperDropdownProps<TDropdownItem>>(), {
+  withDefaults(defineProps<WrapperDropdownProps<TDropdownItem> & {
+    keyId?: keyof DropdownItem<TDropdownKey>
+    keyLabel?: keyof DropdownItem<TDropdownKey>
+    keyIconName?: keyof DropdownItem<TDropdownKey>
+  }>(), {
     deletable: true,
   })
 

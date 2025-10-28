@@ -261,7 +261,7 @@
         await supabase.storage.from('product-images').remove([oldImagePath.value])
       }
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('product-images')
         .upload(fullPath, selectedFile.value, { cacheControl: '3600', upsert: true })
 
