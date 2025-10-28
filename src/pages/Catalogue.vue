@@ -205,8 +205,8 @@
 
     &__grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 50px 20px;
     }
 
     &__empty {

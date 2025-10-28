@@ -83,7 +83,6 @@
 
     /* ✨ Hover global */
     &:hover {
-      transform: translateY(-6px);
       border-color: @primary-300;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
     }
@@ -104,11 +103,6 @@
         border-radius: 8px;
         display: block;
         transition: transform 0.35s ease;
-      }
-
-      /* 🪶 Zoom fluide au survol */
-      .product-cart:hover & img {
-        transform: scale(1.06);
       }
     }
 

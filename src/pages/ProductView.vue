@@ -189,7 +189,6 @@
         border-radius: 12px;
         border: 1px solid @neutral-200;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        cursor: zoom-in;
 
         :deep(img) {
           border-radius: 12px;
