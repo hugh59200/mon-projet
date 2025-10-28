@@ -13,6 +13,7 @@
       :tabKey="currentTab?.tabKey"
       :tabState="currentTab?.tabState"
       class="wrapper-form__tabs--mobile"
+      style="height: 500px"
     />
     <div class="wrapper-form__main">
       <div
@@ -166,12 +167,11 @@
       &__tabs--mobile {
         max-width: 300px;
         width: 300px;
-        height: 60px;
         align-self: center;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: @spacing-15 @spacing-20;
+        padding: @spacing-20 @spacing-20;
         gap: @spacing-5;
         user-select: none;
         font-size: @font-size-body-l;

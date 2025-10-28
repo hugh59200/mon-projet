@@ -49,7 +49,6 @@
     :nb-results="total"
     @change="page = $event"
   />
-
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -65,7 +64,6 @@
         <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
         <div class="elem elem--center elem--span-6"><span>Actions</span></div>
       </div>
-
       <div
         class="gridElemWrapper"
         v-for="user in filteredData"
@@ -110,7 +108,6 @@
         </div>
       </div>
     </div>
-
     <div class="users--mobile">
       <div class="mobile-cards-list">
         <UserCardMobile
@@ -127,7 +124,6 @@
       </div>
     </div>
   </WrapperLoader>
-
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -149,7 +145,6 @@
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
-  /* --- Composable --- */
   const {
     filteredData,
     total,
@@ -170,7 +165,6 @@
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
-  /* --- Filtres supplémentaires --- */
   const selectedRole = ref<'all' | 'user' | 'admin'>('all')
   const localRoles = ref<Record<string, string>>({})
   const ROLES = [
@@ -183,7 +177,6 @@
     { id: 'email', label: 'Email' },
   ]
 
-  /* --- Actions --- */
   function resetFilters() {
     selectedRole.value = 'all'
     reset()
@@ -207,7 +200,6 @@
     }
   }
 
-  /* --- Modale --- */
   const isModalVisible = ref(false)
   const selectedUserId = ref<string | null>(null)
   function openUserModal(id: string) {
@@ -215,7 +207,6 @@
     isModalVisible.value = true
   }
 
-  /* --- Utils --- */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -246,46 +237,12 @@
     background: @neutral-50;
     margin-bottom: 16px;
     padding: 10px 14px;
-
-    .elem {
-      display: flex;
-      align-items: center;
-    }
-
-    .justify-end {
-      justify-content: flex-end;
-    }
-
-    /* --- Responsive version sans doublon --- */
-    @media (max-width: 1000px) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-
-      .elem {
-        flex: 1 1 calc(50% - 10px);
-        min-width: 150px;
-      }
-
-      /* Recherche pleine largeur */
-      .elem--span-12 {
-        flex: 1 1 100%;
-      }
-
-      /* Réinitialiser pleine largeur */
-      .justify-end {
-        justify-content: flex-end;
-        flex: 1 1 100%;
-      }
-    }
   }
 
-  .users--desktop {
-    display: block;
-  }
   .users--mobile {
     display: none;
   }
+
   @media (max-width: 1000px) {
     .users--desktop {
       display: none;

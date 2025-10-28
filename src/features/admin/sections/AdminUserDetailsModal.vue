@@ -139,15 +139,16 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="less">
   .user-detail--compact {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
+
   .user-detail__info,
   .user-detail__orders {
-    background: #fff;
+    background-color: @neutral-100;
     border: 1px solid #d0d5dd;
     border-radius: 8px;
     padding: 16px 18px;

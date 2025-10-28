@@ -1,5 +1,4 @@
 <template>
-  <!-- 🧭 BARRE D’ACTIONS -->
   <div class="orders-toolbar cardLayoutWrapper">
     <div class="elem elem--span-12">
       <BasicInput
@@ -9,7 +8,6 @@
         clearable
       />
     </div>
-
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="sortKey"
@@ -20,7 +18,6 @@
         force-value
       />
     </div>
-
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="statusFilter"
@@ -31,7 +28,6 @@
         force-value
       />
     </div>
-
     <div class="elem elem--center elem--span-6 justify-end">
       <BasicButton
         label="Réinitialiser"
@@ -42,8 +38,6 @@
       />
     </div>
   </div>
-
-  <!-- 📄 PAGINATION -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -51,8 +45,6 @@
     :nb-results="total"
     @change="page = $event"
   />
-
-  <!-- 🧱 WRAPPER PRINCIPAL -->
   <WrapperLoader
     :loading="loading"
     :has-loaded="orders.length > 0"
@@ -60,16 +52,14 @@
     message="Chargement des commandes..."
     empty-message="Aucune commande trouvée 😅"
   >
-    <!-- TABLEAU DESKTOP -->
-    <div class="orders-table-wrapper orders--desktop">
-      <div class="orders-table-header cardLayoutWrapper">
+    <div class="orders--desktop">
+      <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <div class="elem elem--span-10"><span>Client</span></div>
         <div class="elem elem--center elem--span-4"><span>Total</span></div>
         <div class="elem elem--center elem--span-6"><span>Date</span></div>
         <div class="elem elem--center elem--span-10"><span>Statut</span></div>
         <div class="elem elem--center elem--span-6"><span>Détails</span></div>
       </div>
-
       <div
         v-for="order in filteredOrders"
         :key="order.id"
@@ -82,20 +72,17 @@
               <div class="sous-titre">{{ order.email }}</div>
             </div>
           </BasicCell>
-
           <BasicCell
             :text="formatCurrency(order.total_amount)"
             center
             :span="4"
           />
-
           <BasicCell
             center
             :span="6"
           >
             {{ formatDate(order.created_at) }}
           </BasicCell>
-
           <BasicCell
             center
             :span="10"
@@ -109,7 +96,6 @@
               @update:model-value="(v) => handleStatusChange(order, v as string)"
             />
           </BasicCell>
-
           <BasicCellActionIcon
             icon-name="eye"
             tooltip="Voir la commande"
@@ -120,8 +106,6 @@
         </div>
       </div>
     </div>
-
-    <!-- VERSION MOBILE -->
     <div class="orders--mobile">
       <div class="mobile-cards-list">
         <OrderCardMobile
@@ -139,8 +123,6 @@
       </div>
     </div>
   </WrapperLoader>
-
-  <!-- 🪟 MODALE -->
   <teleport to="#app">
     <AdminOrderDetailsModal
       v-if="selectedOrderId"
@@ -254,7 +236,6 @@
     return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
   }
 
-  /* --- Modale --- */
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
   function openOrderModal(id: string) {
@@ -275,78 +256,12 @@
     padding: 10px 14px;
     grid-template-columns: repeat(36, 1fr);
     gap: 12px;
-
-    .elem {
-      display: flex;
-      align-items: center;
-    }
-
-    .justify-end {
-      justify-content: flex-end;
-    }
-
-    @media (max-width: 900px) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-
-      .elem {
-        flex: 1 1 calc(50% - 10px);
-        min-width: 160px;
-      }
-
-      .elem--span-12 {
-        flex: 1 1 100%;
-      }
-
-      .justify-end {
-        flex: 1 1 100%;
-        justify-content: flex-end;
-      }
-    }
   }
 
-  .orders-table-wrapper {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px fade(@neutral-900, 10%);
-    background: @white;
-
-    .orders-table-header {
-      background: @primary-900;
-      color: @white;
-      font-weight: 600;
-      border-radius: 12px 12px 0 0;
-      padding: 12px 16px;
-    }
-
-    .orders-row {
-      padding: 12px 16px;
-      border-bottom: 1px solid @neutral-200;
-      &:last-child {
-        border-bottom: none;
-      }
-
-      .client {
-        display: flex;
-        flex-direction: column;
-        strong {
-          color: @primary-950;
-        }
-        .sous-titre {
-          font-size: 13px;
-          color: @neutral-500;
-        }
-      }
-    }
-  }
-
-  .orders--desktop {
-    display: block;
-  }
   .orders--mobile {
     display: none;
   }
+
   @media (max-width: 1000px) {
     .orders--desktop {
       display: none;

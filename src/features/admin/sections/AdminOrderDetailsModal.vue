@@ -214,7 +214,7 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="less">
   .order-detail--compact {
     display: flex;
     flex-direction: column;
@@ -224,7 +224,7 @@
   /* --- Bloc principal (infos + actions) --- */
   .order-detail__info,
   .order-detail__products {
-    background: #fff;
+    background-color: @neutral-100;
     border: 1px solid #d0d5dd;
     border-radius: 8px;
     padding: 16px 18px;
