@@ -1,13 +1,15 @@
 <template>
-  <div class="users-toolbar users-toolbar--desktop cardLayoutWrapper">
+  <!-- 🧭 BARRE D’ACTIONS -->
+  <div class="orders-toolbar cardLayoutWrapper">
     <div class="elem elem--span-12">
       <BasicInput
         v-model="search"
-        placeholder="Rechercher un utilisateur..."
+        placeholder="Rechercher une commande..."
         icon-name="search"
         clearable
       />
     </div>
+
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
         v-model="sortKey"
@@ -18,16 +20,18 @@
         force-value
       />
     </div>
+
     <div class="elem elem--center elem--span-8">
       <BasicDropdown
-        v-model="selectedRole"
-        :items="ROLE_FILTERS"
+        v-model="statusFilter"
+        :items="STATUSES_WITH_ALL"
         size="small"
-        label="Rôle"
+        label="Statut"
         dropdown-type="table"
         force-value
       />
     </div>
+
     <div class="elem elem--center elem--span-6 justify-end">
       <BasicButton
         label="Réinitialiser"
@@ -38,6 +42,8 @@
       />
     </div>
   </div>
+
+  <!-- 📄 PAGINATION -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -45,170 +51,195 @@
     :nb-results="total"
     @change="page = $event"
   />
+
+  <!-- 🧱 WRAPPER PRINCIPAL -->
   <WrapperLoader
     :loading="loading"
-    :has-loaded="hasLoaded"
-    :is-empty="hasLoaded && filteredData.length === 0"
+    :has-loaded="orders.length > 0"
+    :is-empty="!loading && filteredOrders.length === 0"
     message="Chargement des commandes..."
-    empty-message="Aucune commande pour le moment 🛍️"
+    empty-message="Aucune commande trouvée 😅"
   >
-    <div class="orders--desktop">
-      <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <div class="elem elem--span-10"><span>Email</span></div>
-        <div class="elem elem--span-8"><span>Nom</span></div>
-        <div class="elem elem--center elem--span-6"><span>Rôle</span></div>
-        <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
-        <div class="elem elem--center elem--span-6"><span>Actions</span></div>
+    <!-- TABLEAU DESKTOP -->
+    <div class="orders-table-wrapper orders--desktop">
+      <div class="orders-table-header cardLayoutWrapper">
+        <div class="elem elem--span-10"><span>Client</span></div>
+        <div class="elem elem--center elem--span-4"><span>Total</span></div>
+        <div class="elem elem--center elem--span-6"><span>Date</span></div>
+        <div class="elem elem--center elem--span-10"><span>Statut</span></div>
+        <div class="elem elem--center elem--span-6"><span>Détails</span></div>
       </div>
 
       <div
+        v-for="order in filteredOrders"
+        :key="order.id"
         class="gridElemWrapper"
-        v-for="user in filteredData"
-        :key="user.id"
       >
-        <div class="cardLayoutWrapper">
-          <BasicCell :span="10">{{ user.email }}</BasicCell>
-          <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
+        <div class="cardLayoutWrapper orders-row">
+          <BasicCell :span="10">
+            <div class="client">
+              <strong>{{ order.full_name }}</strong>
+              <div class="sous-titre">{{ order.email }}</div>
+            </div>
+          </BasicCell>
+
+          <BasicCell
+            :text="formatCurrency(order.total_amount)"
+            center
+            :span="4"
+          />
+
           <BasicCell
             center
             :span="6"
           >
+            {{ formatDate(order.created_at) }}
+          </BasicCell>
+
+          <BasicCell
+            center
+            :span="10"
+          >
             <BasicDropdown
-              v-model="localRoles[user.id]"
-              :items="ROLES"
+              v-model="localStatuses[order.id]"
+              :items="STATUSES"
               size="small"
               dropdown-type="table"
               force-value
-              @update:model-value="(v) => v && handleRoleChange(user, v)"
+              @update:model-value="(v) => handleStatusChange(order, v as string)"
             />
           </BasicCell>
-          <BasicCell
-            :span="6"
-            center
-          >
-            {{ formatDate(user.created_at) }}
-          </BasicCell>
+
           <BasicCellActionIcon
             icon-name="eye"
-            tooltip="Voir"
+            tooltip="Voir la commande"
             center
-            :span="3"
-            @click="openUserModal(user.id)"
-          />
-          <BasicCellActionIcon
-            icon-name="trash"
-            tooltip="Supprimer"
-            center
-            :span="3"
-            @click="handleDelete(user)"
+            :span="6"
+            @click="openOrderModal(order.id)"
           />
         </div>
       </div>
     </div>
+
+    <!-- VERSION MOBILE -->
     <div class="orders--mobile">
       <div class="mobile-cards-list">
-        <UserCardMobile
-          v-for="user in filteredData"
-          :key="user.id"
-          v-model:role="localRoles[user.id]!"
-          :user="user"
-          :roles="ROLES"
+        <OrderCardMobile
+          v-for="order in filteredOrders"
+          :key="order.id"
+          v-model:status="localStatuses[order.id]"
+          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
+          :order="order"
+          :statuses="STATUSES"
           :format-date="formatDate"
-          :handle-role-change="handleRoleChange"
-          :open-user-modal="openUserModal"
-          :handle-delete="handleDelete"
+          :format-currency="formatCurrency"
+          :handle-status-change="handleStatusChange"
+          :open-order-modal="openOrderModal"
         />
       </div>
     </div>
   </WrapperLoader>
+
+  <!-- 🪟 MODALE -->
   <teleport to="#app">
-    <AdminUserDetailsModal
-      v-if="selectedUserId"
+    <AdminOrderDetailsModal
+      v-if="selectedOrderId"
       v-model="isModalVisible"
-      :user-id="selectedUserId"
+      :order-id="selectedOrderId"
     />
   </teleport>
 </template>
 
 <script setup lang="ts">
-  import { UserCardMobile } from '@/features/admin/sections/mobile'
+  import { OrderCardMobile } from '@/features/admin/sections/mobile'
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { ref, watchEffect } from 'vue'
-  import { usePaginatedSupabaseTable } from '../composables/usePaginatedSupabaseTable'
-  import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
+  import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+  import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
 
-  type UserRow = Tables<'profiles'>
+  type OrderRow = Tables<'orders'>
   const toast = useToastStore()
 
-  /* --- Composable --- */
-  const {
-    filteredData,
-    total,
-    nbPages,
-    loading,
-    page,
-    search,
-    sortKey,
-    hasLoaded,
-    fetchData,
-    reset,
-  } = usePaginatedSupabaseTable<UserRow>({
-    table: 'profiles',
-    orderBy: 'created_at',
-    ascending: false,
-    searchFn: (u, q) =>
-      (u.email?.toLowerCase().includes(q) ?? false) ||
-      (u.full_name?.toLowerCase().includes(q) ?? false),
+  const orders = shallowRef<OrderRow[]>([])
+  const localStatuses = ref<Record<string, string>>({})
+  const page = ref(1)
+  const perPage = 8
+  const total = ref(0)
+  const search = ref('')
+  const sortKey = ref('created_at_desc')
+  const statusFilter = ref('all')
+  const loading = ref(false)
+
+  const STATUSES = [
+    { id: 'pending', label: 'En attente' },
+    { id: 'confirmed', label: 'Confirmée' },
+    { id: 'shipped', label: 'Expédiée' },
+    { id: 'completed', label: 'Terminée' },
+    { id: 'canceled', label: 'Annulée' },
+  ]
+  const STATUSES_WITH_ALL = [{ id: 'all', label: 'Tous' }, ...STATUSES]
+  const SORT_OPTIONS = [
+    { id: 'created_at_desc', label: 'Plus récentes' },
+    { id: 'created_at_asc', label: 'Plus anciennes' },
+    { id: 'amount_desc', label: 'Montant décroissant' },
+    { id: 'amount_asc', label: 'Montant croissant' },
+  ]
+  const nbPages = computed(() => Math.ceil(total.value / perPage))
+
+  const filteredOrders = computed(() => {
+    let list = [...orders.value]
+    if (statusFilter.value !== 'all') list = list.filter((o) => o.status === statusFilter.value)
+    if (search.value.trim())
+      list = list.filter((o) => o.full_name.toLowerCase().includes(search.value.toLowerCase()))
+    switch (sortKey.value) {
+      case 'created_at_asc':
+        list.sort((a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime())
+        break
+      case 'amount_desc':
+        list.sort((a, b) => (b.total_amount ?? 0) - (a.total_amount ?? 0))
+        break
+      case 'amount_asc':
+        list.sort((a, b) => (a.total_amount ?? 0) - (b.total_amount ?? 0))
+        break
+      default:
+        list.sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime())
+    }
+    return list
   })
 
-  /* --- Filtres supplémentaires --- */
-  const selectedRole = ref<'all' | 'user' | 'admin'>('all')
-  const localRoles = ref<Record<string, string>>({})
-  const ROLES = [
-    { id: 'user', label: 'Utilisateur' },
-    { id: 'admin', label: 'Administrateur' },
-  ]
-  const ROLE_FILTERS = [{ id: 'all', label: 'Tous' }, ...ROLES]
-  const SORT_OPTIONS = [
-    { id: 'created_at', label: 'Plus récents' },
-    { id: 'email', label: 'Email' },
-  ]
-
-  /* --- Actions --- */
   function resetFilters() {
-    selectedRole.value = 'all'
-    reset()
+    search.value = ''
+    sortKey.value = 'created_at_desc'
+    statusFilter.value = 'all'
   }
 
-  async function handleRoleChange(user: UserRow, newRole: string) {
-    localRoles.value[user.id] = newRole
-    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
-    if (error) toast.show('Erreur de mise à jour du rôle', 'danger')
-    else toast.show('Rôle mis à jour ✅', 'success')
-  }
-
-  async function handleDelete(user: UserRow) {
-    const confirmDelete = confirm(`Supprimer ${user.email} ?`)
-    if (!confirmDelete) return
-    const { error } = await supabase.from('profiles').delete().eq('id', user.id)
-    if (error) toast.show('Erreur suppression', 'danger')
+  async function loadOrders() {
+    loading.value = true
+    const from = (page.value - 1) * perPage
+    const to = from + perPage - 1
+    const { data, count, error } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact' })
+      .range(from, to)
+    loading.value = false
+    if (error) toast.show('Erreur lors du chargement', 'danger')
     else {
-      toast.show('Utilisateur supprimé ✅', 'success')
-      fetchData()
+      orders.value = data ?? []
+      total.value = count ?? 0
+      localStatuses.value = Object.fromEntries(
+        orders.value.map((o) => [o.id, o.status || 'pending']),
+      )
     }
   }
 
-  /* --- Modale --- */
-  const isModalVisible = ref(false)
-  const selectedUserId = ref<string | null>(null)
-  function openUserModal(id: string) {
-    selectedUserId.value = id
-    isModalVisible.value = true
+  async function handleStatusChange(order: OrderRow, newValue: string) {
+    localStatuses.value[order.id] = newValue
+    const { error } = await supabase.from('orders').update({ status: newValue }).eq('id', order.id)
+    if (error) toast.show('Erreur de mise à jour', 'danger')
+    else toast.show('Statut mis à jour ✅', 'success')
   }
 
-  /* --- Utils --- */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -218,15 +249,21 @@
     })
   }
 
-  watchEffect(() => {
-    if (filteredData.value.length > 0) {
-      const newRoles: Record<string, string> = {}
-      for (const u of filteredData.value) {
-        newRoles[u.id] = u.role ?? 'user' // ou 'user' par défaut
-      }
-      localRoles.value = newRoles
-    }
-  })
+  function formatCurrency(amount: number | null) {
+    if (amount == null) return '-'
+    return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+  }
+
+  /* --- Modale --- */
+  const isModalVisible = ref(false)
+  const selectedOrderId = ref<string | null>(null)
+  function openOrderModal(id: string) {
+    selectedOrderId.value = id
+    isModalVisible.value = true
+  }
+
+  watch(page, loadOrders)
+  onMounted(loadOrders)
 </script>
 
 <style scoped lang="less">
@@ -247,57 +284,81 @@
     .justify-end {
       justify-content: flex-end;
     }
-  }
 
-  .orders-toolbar-mobile {
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    .row {
+    @media (max-width: 900px) {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
+
+      .elem {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 160px;
+      }
+
+      .elem--span-12 {
+        flex: 1 1 100%;
+      }
+
+      .justify-end {
+        flex: 1 1 100%;
+        justify-content: flex-end;
+      }
     }
   }
 
-  .orders--mobile {
-    display: none;
+  .orders-table-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px fade(@neutral-900, 10%);
+    background: @white;
+
+    .orders-table-header {
+      background: @primary-900;
+      color: @white;
+      font-weight: 600;
+      border-radius: 12px 12px 0 0;
+      padding: 12px 16px;
+    }
+
+    .orders-row {
+      padding: 12px 16px;
+      border-bottom: 1px solid @neutral-200;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .client {
+        display: flex;
+        flex-direction: column;
+        strong {
+          color: @primary-950;
+        }
+        .sous-titre {
+          font-size: 13px;
+          color: @neutral-500;
+        }
+      }
+    }
   }
+
   .orders--desktop {
     display: block;
   }
-
-  .mobile-cards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px; // <-- l'espacement magique
+  .orders--mobile {
+    display: none;
   }
-
-  .orders__loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    gap: 12px;
-    padding: 60px 20px;
-    color: @neutral-600;
-    min-height: 200px;
-  }
-
   @media (max-width: 1000px) {
-    .orders-toolbar--desktop,
     .orders--desktop {
       display: none;
     }
     .orders--mobile {
       display: block;
     }
+  }
+
+  .mobile-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 </style>

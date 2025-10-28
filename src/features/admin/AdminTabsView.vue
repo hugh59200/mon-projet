@@ -1,14 +1,13 @@
 <template>
-  <div class="tabs-view">
-    <WrapperForm
-      v-model="selectedTab"
-      :tabs="tabs"
-      show-stepper
-      :tabs-placement="tabsPlacement"
-    >
-      <component :is="tabComponents[selectedTab]" />
-    </WrapperForm>
-  </div>
+  <WrapperForm
+    v-model="selectedTab"
+    :tabs="tabs"
+    show-stepper
+    :tabs-placement="tabsPlacement"
+    class="tabs-view"
+  >
+    <component :is="tabComponents[selectedTab]" />
+  </WrapperForm>
 </template>
 
 <script setup lang="ts">

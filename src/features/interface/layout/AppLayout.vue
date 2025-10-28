@@ -69,8 +69,8 @@
       'sidebar footer';
     height: 100vh;
     width: 100vw;
-    background-color: @neutral-0;
     overflow: hidden;
+    background-color: @neutral-0;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -99,19 +99,16 @@
   .content {
     grid-area: content;
     background-color: @neutral-0;
-    padding: 40px 60px 80px;
+    padding: 40px 60px;
     overflow-y: auto;
-    height: 100%;
-    min-height: 0;
-    scroll-behavior: smooth;
     position: relative;
   }
 
   /* --- FOOTER --- */
   .footer {
-    position: fixed;
+    position: relative;
     bottom: 0;
-    left: 240px;
+    left: 0px;
     right: 0;
     z-index: 950;
     height: 40px;
@@ -124,10 +121,6 @@
 
     .sidebar {
       width: 80px;
-    }
-
-    .footer {
-      left: 80px;
     }
   }
 
