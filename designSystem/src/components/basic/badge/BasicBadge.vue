@@ -9,18 +9,24 @@
       },
     ]"
   >
-    <BasicText
-      class="badge__label"
-      :size="textSizeMapping[size]"
-      weight="semibold"
-      wrapAll
-      :nbMaxLines
-    >
-      {{ label }}
-    </BasicText>
+    <!-- 🧩 Slot : permet d'insérer du contenu custom -->
+    <slot>
+      <BasicText
+        class="badge__label"
+        :size="textSizeMapping[size]"
+        weight="semibold"
+        wrapAll
+        :nbMaxLines
+      >
+        {{ label }}
+      </BasicText>
+    </slot>
+
+    <!-- ❌ Icône de suppression -->
     <BasicIcon
       v-if="deletable"
       name="close-square"
+      class="badge__close-icon"
       @click="$emit('click-delete')"
     />
   </div>
@@ -46,4 +52,13 @@
 
 <style lang="less">
   @import './BasicBadge.less';
+
+  /* Bonus : petite transition d’apparition */
+  .badge {
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
 </style>

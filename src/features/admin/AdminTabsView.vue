@@ -6,28 +6,42 @@
     :tabs-placement="tabsPlacement"
     class="tabs-view"
   >
-    <component :is="tabComponents[selectedTab]" />
+    <!-- ✅ Passe automatiquement la prop readonly à tous les sous-composants -->
+    <component
+      :is="tabComponents[selectedTab]"
+      v-bind="{ readonly: !isAdmin }"
+    />
   </WrapperForm>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { computed, ref } from 'vue'
+
   import AdminChatView from './chat/AdminChatView.vue'
   import AdminOrdersView from './orders/AdminOrdersView.vue'
+  import AdminProductsTable from './products/AdminProductsTable.vue'
   import AdminStatsView from './stats/AdminStatsView.vue'
   import AdminUsersView from './users/AdminUsersView.vue'
-  import AdminProductsView from './products/AdminProductsView.vue' 
 
-  withDefaults(defineProps<{ tabsPlacement?: 'center' | 'start'; tabsTitle?: string[] }>(), {
-    tabsPlacement: 'center',
-  })
+  withDefaults(
+    defineProps<{
+      tabsPlacement?: 'center' | 'start'
+    }>(),
+    {
+      tabsPlacement: 'center',
+    },
+  )
+
+  const auth = useAuthStore()
+  const isAdmin = computed(() => auth.isAdmin)
 
   const tabs = [
     { tabKey: 'Messagerie' },
     { tabKey: 'Statistiques' },
     { tabKey: 'Utilisateurs' },
     { tabKey: 'Commandes' },
-    { tabKey: 'Produits' }, // 🆕 nouvel onglet
+    { tabKey: 'Produits' },
   ]
 
   const tabComponents = {
@@ -35,7 +49,7 @@
     Statistiques: AdminStatsView,
     Utilisateurs: AdminUsersView,
     Commandes: AdminOrdersView,
-    Produits: AdminProductsView, // 🆕 lié à notre nouvelle vue
+    Produits: AdminProductsTable,
   } as const
 
   const selectedTab = ref<keyof typeof tabComponents>('Messagerie')
