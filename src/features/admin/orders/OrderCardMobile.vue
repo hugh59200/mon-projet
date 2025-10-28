@@ -38,7 +38,7 @@
         size="small"
         dropdown-type="table"
         force-value
-        @update:model-value="(v) => handleStatusChange(order, v as string)"
+        @update:model-value="(v) => handleStatusChange(order, v as OrderStatus)"
       />
 
       <BasicButton
@@ -55,10 +55,11 @@
 
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
+  import type { OrderStatus } from '@/supabase/types/supabase.types'
   import MobileCard from '../mobile/MobileCard.vue'
 
   type OrderRow = Tables<'orders'>
-  type StatusOption = { id: string; label: string }
+  type StatusOption = { id: OrderStatus; label: string }
 
   defineProps<{
     order: OrderRow
@@ -66,11 +67,11 @@
     statuses: StatusOption[]
     formatDate: (d: string | null) => string
     formatCurrency: (a: number | null) => string
-    handleStatusChange: (order: OrderRow, status: string) => void
+    handleStatusChange: (order: OrderRow, status: OrderStatus) => void
     openOrderModal: (id: string) => void
   }>()
 
-  const modelValue = defineModel<string>('status')
+  const modelValue = defineModel<OrderStatus>('status', { required: true })
 </script>
 
 <style scoped lang="less">
@@ -119,7 +120,6 @@
     .label {
       color: @neutral-500;
     }
-
     .value {
       color: @primary-900;
     }

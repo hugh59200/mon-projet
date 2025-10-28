@@ -30,7 +30,7 @@
         size="small"
         dropdown-type="table"
         force-value
-        @update:model-value="(v) => handleRoleChange(user, v as string)"
+        @update:model-value="(v) => handleRoleChange(user, v as Role)"
       />
 
       <BasicButton
@@ -55,23 +55,23 @@
 
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
+  import type { Role } from '@/supabase/types/supabase.types' // ✅ on importe Role
   import MobileCard from '../mobile/MobileCard.vue'
 
   type UserRow = Tables<'profiles'>
-  type RoleOption = { id: string; label: string }
+  type RoleOption = { id: Role; label: string }
 
   defineProps<{
     user: UserRow
     roles: RoleOption[]
     formatDate: (d: string | null) => string
-    handleRoleChange: (user: UserRow, role: string) => void
+    handleRoleChange: (user: UserRow, role: Role) => void
     openUserModal: (id: string) => void
     handleDelete: (user: UserRow) => void
   }>()
 
-  const modelValue = defineModel<string>('role', { required: true })
+  const modelValue = defineModel<Role>('role', { required: true })
 </script>
-
 <style scoped lang="less">
   .user-header {
     display: flex;

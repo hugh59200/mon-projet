@@ -5,6 +5,7 @@
     :show-reset="true"
     @reset="reset()"
   />
+
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -13,6 +14,7 @@
     :auto-fetch="fetchData"
     @change="page = $event"
   />
+
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -20,6 +22,7 @@
     message="Chargement des utilisateurs..."
     empty-message="Aucun utilisateur trouvé 😅"
   >
+    <!-- 💻 TABLEAU DESKTOP -->
     <div class="users--desktop">
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <BasicCell
@@ -111,8 +114,24 @@
         </div>
       </div>
     </div>
+
+    <!-- 📱 CARTES MOBILES -->
+    <div class="mobile-cards-list">
+      <UserCardMobile
+        v-for="user in filteredData"
+        :key="user.id"
+        v-model:role="localRoles[user.id]!"
+        :user="user"
+        :roles="ROLES"
+        :format-date="formatDate"
+        :handle-role-change="handleRoleChange"
+        :open-user-modal="openUserModal"
+        :handle-delete="handleDelete"
+      />
+    </div>
   </WrapperLoader>
 
+  <!-- 🪟 MODAL -->
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -135,6 +154,7 @@
   import { ref, watch } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
   import AdminUserDetailsModal from '../users/AdminUserDetailsModal.vue'
+  import UserCardMobile from '../users/UserCardMobile.vue'
 
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
@@ -163,13 +183,18 @@
 
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
-  const localRoles = ref<Record<string, string>>({})
+  // ✅ Typage fort avec vérification des rôles valides
+  const localRoles = ref<Record<string, Role>>({})
 
   watch(
     filteredData,
     (rows) => {
-      const roles: Record<string, string> = {}
-      for (const u of rows) roles[u.id] = u.role ?? 'user'
+      const roles: Record<string, Role> = {}
+      const validRoles: Role[] = ['user', 'admin']
+      for (const u of rows) {
+        const role = (u.role as Role) ?? 'user'
+        roles[u.id] = validRoles.includes(role) ? role : 'user'
+      }
       localRoles.value = roles
     },
     { immediate: true },
@@ -208,13 +233,18 @@
   .users--mobile {
     display: none;
   }
+  .mobile-cards-list {
+    display: none;
+  }
 
   @media (max-width: 1000px) {
     .users--desktop {
       display: none;
     }
-    .users--mobile {
-      display: block;
+    .mobile-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
   }
 </style>
