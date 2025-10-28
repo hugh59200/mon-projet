@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
-  import MobileCard from '../sections/mobile/MobileCard.vue'
+  import MobileCard from '../mobile/MobileCard.vue'
 
   type OrderRow = Tables<'orders'>
   type StatusOption = { id: string; label: string }

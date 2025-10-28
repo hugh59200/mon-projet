@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
-  import MobileCard from './MobileCard.vue'
+  import MobileCard from '../mobile/MobileCard.vue'
 
   type UserRow = Tables<'profiles'>
   type RoleOption = { id: string; label: string }

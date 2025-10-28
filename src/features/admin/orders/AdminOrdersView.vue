@@ -5,7 +5,6 @@
     :show-reset="true"
     @reset="reset()"
   />
-
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -14,7 +13,6 @@
     :auto-fetch="fetchData"
     @change="page = $event"
   />
-
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
