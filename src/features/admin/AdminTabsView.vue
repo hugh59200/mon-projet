@@ -22,20 +22,20 @@
   })
 
   const tabs = [
-    { tabKey: '💬 Messages clients' },
-    { tabKey: '📊 Tableau de bord' },
-    { tabKey: '👤 Utilisateurs' },
-    { tabKey: '📦 Commandes' },
+    { tabKey: 'Messagerie' },
+    { tabKey: 'Statistiques' },
+    { tabKey: 'Utilisateurs' },
+    { tabKey: 'Commandes' },
   ]
 
   const tabComponents = {
-    '💬 Messages clients': AdminChatView,
-    '📊 Tableau de bord': AdminStatsView,
-    '👤 Utilisateurs': AdminUsersView,
-    '📦 Commandes': AdminOrdersView,
+    Messagerie: AdminChatView,
+    Statistiques: AdminStatsView,
+    Utilisateurs: AdminUsersView,
+    Commandes: AdminOrdersView,
   } as const
 
-  const selectedTab = ref<keyof typeof tabComponents>('💬 Messages clients')
+  const selectedTab = ref<keyof typeof tabComponents>('Messagerie')
 </script>
 
 <style scoped lang="less">

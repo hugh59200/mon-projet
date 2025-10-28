@@ -99,11 +99,19 @@
   .content {
     grid-area: content;
     background-color: @neutral-0;
-    padding: 40px 60px;
+    padding: 2.5vw 4vw;
     overflow-y: auto;
     position: relative;
-  }
+    transition: padding 0.3s ease;
 
+    @media (max-width: 900px) {
+      padding: 16px 20px; // petit padding mobile
+    }
+
+    @media (min-width: 1400px) {
+      padding: 50px 80px; // padding large sur grand écran
+    }
+  }
   /* --- FOOTER --- */
   .footer {
     position: relative;
