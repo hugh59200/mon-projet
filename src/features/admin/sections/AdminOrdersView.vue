@@ -28,6 +28,7 @@
     empty-message="Aucune commande trouvée 😅"
   >
     <div class="orders--desktop">
+      <!-- HEADER -->
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <BasicCell
           :span="10"
@@ -71,6 +72,7 @@
         />
       </div>
 
+      <!-- ROWS -->
       <div
         v-for="order in filteredData"
         :key="order.id"
@@ -108,7 +110,8 @@
               size="small"
               dropdown-type="table"
               force-value
-              @update:model-value="(v) => handleStatusChange(order, v as string)"
+              :item-class="(s: { id: string }) => getStatusClass(s.id)"
+              @update:model-value="(v) => updateStatus(order, v as OrderStatus)"
             />
           </BasicCell>
 
@@ -136,14 +139,21 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/composables/useSortableTable'
-  import { supabase } from '@/services/supabaseClient'
-  import type { Tables } from '@/types/supabase'
+  import { SORT_OPTIONS, STATUSES, STATUS_FILTERS } from '@/features/admin/constants/orders'
+  import { updateOrderStatus } from '@/supabase/api/orders'
+  import type { Tables } from '@/supabase/types/supabase'
+  import type { OrderStatus } from '@/supabase/types/supabase.types'
+  import { formatCurrency, formatDate } from '@/utils/index'
+  import { getStatusClass } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { ref, shallowRef, watchEffect } from 'vue'
+  import { ref, watchEffect } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
   import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
 
-  type OrderRow = Tables<'orders'>
+  type OrderRow = Pick<
+    Tables<'orders'>,
+    'id' | 'status' | 'full_name' | 'email' | 'total_amount' | 'created_at'
+  >
   const toast = useToastStore()
 
   const {
@@ -169,21 +179,6 @@
 
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
-  const STATUSES = [
-    { id: 'pending', label: 'En attente' },
-    { id: 'confirmed', label: 'Confirmée' },
-    { id: 'shipped', label: 'Expédiée' },
-    { id: 'completed', label: 'Terminée' },
-    { id: 'canceled', label: 'Annulée' },
-  ]
-  const STATUS_FILTERS = [{ id: 'all', label: 'Tous' }, ...STATUSES]
-  const SORT_OPTIONS = [
-    { id: 'created_at', label: 'Date' },
-    { id: 'full_name', label: 'Client' },
-    { id: 'total_amount', label: 'Montant' },
-    { id: 'status', label: 'Statut' },
-  ]
-
   const models = ref<{ sortKey: string; status: string }>({
     sortKey: 'created_at',
     status: 'all',
@@ -195,7 +190,7 @@
     reset()
   }
 
-  const localStatuses = shallowRef<Record<string, string>>({})
+  const localStatuses = ref<Record<string, string>>({})
 
   watchEffect(() => {
     const statuses: Record<string, string> = {}
@@ -203,42 +198,25 @@
     localStatuses.value = statuses
   })
 
-  async function handleStatusChange(order: Pick<OrderRow, 'id' | 'status'>, newValue: string) {
-    localStatuses.value[order.id] = newValue
-    const { error } = await supabase.from('orders').update({ status: newValue }).eq('id', order.id)
-
-    if (error) toast.show('Erreur de mise à jour', 'danger')
-    else toast.show('Statut mis à jour ✅', 'success')
+  async function updateStatus(order: OrderRow, newStatus: OrderStatus) {
+    try {
+      localStatuses.value[order.id] = newStatus
+      await updateOrderStatus(order.id, newStatus)
+      toast.show('Statut mis à jour ✅', 'success')
+    } catch (err: any) {
+      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
+    }
   }
 
-  /* Modal */
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
   function openOrderModal(id: string) {
     selectedOrderId.value = id
     isModalVisible.value = true
   }
-
-  /* Utils */
-  function formatDate(date: string | null) {
-    if (!date) return '-'
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
-  function formatCurrency(amount: number | null) {
-    if (amount == null) return '-'
-    return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-  }
 </script>
 
 <style scoped lang="less">
-  .orders--mobile {
-    display: none;
-  }
-
   .client-info {
     display: flex;
     flex-direction: column;
@@ -263,9 +241,5 @@
     .orders--mobile {
       display: block;
     }
-  }
-  .sous-titre {
-    color: @neutral-600;
-    font-size: 0.85rem;
   }
 </style>

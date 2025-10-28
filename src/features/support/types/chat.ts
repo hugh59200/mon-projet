@@ -2,7 +2,7 @@
 /* 🧠  Types centraux du module "Support Chat"                                */
 /* -------------------------------------------------------------------------- */
 
-import type { Tables } from '@/types/supabase'
+import type { Tables } from '@/supabase/types/supabase'
 
 /* -------------------------------------------------------------------------- */
 /* 🎭 Rôles et événements                                                     */

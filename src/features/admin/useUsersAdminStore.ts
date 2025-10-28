@@ -73,7 +73,7 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
 })
 
 // helper (ajoute dans le même fichier ou dans ton service)
-import { supabase } from '@/services/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 
 async function fetchUsersWithCount(search = '', limit = 10, offset = 0) {
   let query = supabase

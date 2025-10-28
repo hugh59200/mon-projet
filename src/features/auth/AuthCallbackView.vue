@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useAuthStore } from './useAuthStore'

@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'

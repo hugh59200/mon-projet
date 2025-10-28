@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 
 export const chatApi = {
   /** 🔄 Récupère tous les messages d'un utilisateur */

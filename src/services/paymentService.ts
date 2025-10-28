@@ -1,5 +1,5 @@
 // ✅ src/services/paymentService.ts
-import { supabase } from '@/services/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 
 /**
  * Types de prestataires de paiement supportés

@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
   import { useCartStore } from '@/features/cart/useCartStore'
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import { RouterLink, useRoute } from 'vue-router'

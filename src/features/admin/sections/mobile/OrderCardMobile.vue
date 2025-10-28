@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/types/supabase'
+  import type { Tables } from '@/supabase/types/supabase'
   import MobileCard from './MobileCard.vue'
 
   type OrderRow = Tables<'orders'>

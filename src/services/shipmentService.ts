@@ -1,5 +1,5 @@
 // src/services/orderService.ts
-import { supabase } from '@/services/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 
 export interface ShipmentPayload {
   order_id: string

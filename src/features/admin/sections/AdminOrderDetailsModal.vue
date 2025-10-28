@@ -130,7 +130,8 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { formatCurrency, formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { BadgeType } from '@designSystem/index'
   import { onMounted, ref, watch } from 'vue'
@@ -199,19 +200,6 @@
 
   watch(() => props.orderId, loadOrder)
   onMounted(loadOrder)
-
-  function formatDate(d: string) {
-    return new Date(d).toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
-  function formatCurrency(a: number | null) {
-    return a == null ? '-' : a.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-  }
 </script>
 
 <style scoped lang="less">

@@ -28,6 +28,7 @@
     empty-message="Aucun utilisateur trouvé 😅"
   >
     <div class="users--desktop">
+      <!-- HEADER -->
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <BasicCell
           :span="10"
@@ -70,6 +71,7 @@
         />
       </div>
 
+      <!-- ROWS -->
       <div
         v-for="user in filteredData"
         :key="user.id"
@@ -88,7 +90,7 @@
               size="small"
               dropdown-type="table"
               force-value
-              @update:model-value="(v) => v && handleRoleChange(user, v)"
+              @update:model-value="(v) => v && handleRoleChange(user, v as Role)"
             />
           </BasicCell>
           <BasicCell
@@ -128,10 +130,13 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/composables/useSortableTable'
-  import { supabase } from '@/services/supabaseClient'
-  import type { Tables } from '@/types/supabase'
+  import { ROLE_FILTERS, ROLES, SORT_OPTIONS } from '@/features/admin/constants/users'
+  import { deleteUser, updateUserRole } from '@/supabase/api/users'
+  import type { Tables } from '@/supabase/types/supabase'
+  import type { Role } from '@/supabase/types/supabase.types'
+  import { formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { ref, watchEffect } from 'vue'
+  import { ref, watch } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
   import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
 
@@ -146,7 +151,6 @@
     search,
     sortKey,
     sortAsc,
-    activeFilters,
     loading,
     hasLoaded,
     fetchData,
@@ -169,23 +173,7 @@
     selectedRole: 'all',
   })
 
-  watchEffect(() => {
-    models.value.sortKey = sortKey.value
-    models.value.selectedRole = activeFilters.value.role ?? 'all'
-  })
-
   /* Dropdown data */
-  const ROLES = [
-    { id: 'user', label: 'Utilisateur' },
-    { id: 'admin', label: 'Administrateur' },
-  ]
-  const ROLE_FILTERS = [{ id: 'all', label: 'Tous' }, ...ROLES]
-  const SORT_OPTIONS = [
-    { id: 'created_at', label: 'Date de création' },
-    { id: 'email', label: 'Email' },
-    { id: 'full_name', label: 'Nom' },
-    { id: 'role', label: 'Rôle' },
-  ]
 
   function resetFilters() {
     models.value.selectedRole = 'all'
@@ -196,26 +184,33 @@
   /* Local roles sync + CRUD */
   const localRoles = ref<Record<string, string>>({})
 
-  watchEffect(() => {
-    const roles: Record<string, string> = {}
-    for (const u of filteredData.value) roles[u.id] = u.role ?? 'user'
-    localRoles.value = roles
-  })
+  watch(
+    filteredData,
+    (rows) => {
+      const roles: Record<string, string> = {}
+      for (const u of rows) roles[u.id] = u.role ?? 'user'
+      localRoles.value = roles
+    },
+    { immediate: true },
+  )
 
-  async function handleRoleChange(user: UserRow, newRole: string) {
-    localRoles.value[user.id] = newRole
-    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
-    if (error) toast.show('Erreur de mise à jour du rôle', 'danger')
-    else toast.show('Rôle mis à jour ✅', 'success')
+  async function handleRoleChange(user: UserRow, newRole: Role) {
+    try {
+      await updateUserRole(user.id, newRole)
+      toast.show('Rôle mis à jour ✅', 'success')
+    } catch (err: any) {
+      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
+    }
   }
 
   async function handleDelete(user: UserRow) {
     if (!confirm(`Supprimer ${user.email} ?`)) return
-    const { error } = await supabase.from('profiles').delete().eq('id', user.id)
-    if (error) toast.show('Erreur suppression', 'danger')
-    else {
+    try {
+      await deleteUser(user.id)
       toast.show('Utilisateur supprimé ✅', 'success')
       fetchData()
+    } catch (err: any) {
+      toast.show(`Erreur suppression : ${(err as Error).message}`, 'danger')
     }
   }
 
@@ -227,21 +222,16 @@
     isModalVisible.value = true
   }
 
-  /* Utils */
-  function formatDate(date: string | null) {
-    if (!date) return '-'
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
+  /* Optionnel : éviter les warnings TS */
+  void toggleSort
+  void getSortColor
 </script>
 
 <style scoped lang="less">
   .users--mobile {
     display: none;
   }
+
   @media (max-width: 1000px) {
     .users--desktop {
       display: none;

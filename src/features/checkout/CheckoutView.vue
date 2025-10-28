@@ -161,7 +161,7 @@
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import { type PaymentProvider } from '@/services/paymentService'
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { Bitcoin, CreditCard, TestTube } from 'lucide-vue-next'
   import { ref } from 'vue'

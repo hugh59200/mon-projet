@@ -1,6 +1,6 @@
 import router from '@/router'
-import { supabase } from '@/services/supabaseClient'
-import type { Tables } from '@/types/supabase'
+import { supabase } from '@/supabase/supabaseClient'
+import type { Tables } from '@/supabase/types/supabase'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 

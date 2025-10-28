@@ -100,7 +100,8 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { formatDate } from '@/utils/index'
   import {
     BarElement,
     CategoryScale,
@@ -314,15 +315,6 @@
       .map(([id, c]) => ({ id, ...c }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 5)
-  }
-
-  function formatDate(date: string | null) {
-    if (!date) return '-'
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
   }
 
   onMounted(async () => {

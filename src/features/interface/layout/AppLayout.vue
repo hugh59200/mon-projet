@@ -44,7 +44,7 @@
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
 
   const cart = useCartStore()
   const sidebar = useSidebarStore()

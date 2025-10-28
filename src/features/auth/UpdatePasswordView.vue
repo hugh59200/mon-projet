@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 

@@ -60,10 +60,11 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
-
+  
   type Order = {
     id: string
     total_amount: number
@@ -116,16 +117,6 @@
   onMounted(async () => {
     await loadUserOrders()
   })
-
-  function formatDate(date: string) {
-    return new Date(date).toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
 
   function statusColor(status: string) {
     switch (status) {

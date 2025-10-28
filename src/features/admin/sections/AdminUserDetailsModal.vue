@@ -89,8 +89,9 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { supabase } from '@/services/supabaseClient'
-  import type { Tables } from '@/types/supabase'
+  import { supabase } from '@/supabase/supabaseClient'
+  import type { Tables } from '@/supabase/types/supabase'
+  import { formatCurrency, formatDate } from '@/utils/index'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { onMounted, ref, watch } from 'vue'
@@ -125,18 +126,6 @@
       loadOrders()
     },
   )
-
-  function formatDate(date: string | null) {
-    if (!date) return '-'
-    return new Date(date).toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
-  function formatCurrency(v: number | null) {
-    return v == null ? '-' : v.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-  }
 </script>
 
 <style scoped lang="less">

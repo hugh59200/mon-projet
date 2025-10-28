@@ -138,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/services/supabaseClient'
+  import { supabase } from '@/supabase/supabaseClient'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from './useAuthStore'

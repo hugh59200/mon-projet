@@ -1,101 +1,103 @@
-import { supabase } from '@/services/supabaseClient'
-import type { Database, Tables } from '@/types/supabase'
-import { onMounted, ref, watchEffect } from 'vue'
+import { supabase } from '@/supabase/supabaseClient'
+import type { Database, Tables } from '@/supabase/types/supabase'
+import { ref, watch, watchEffect } from 'vue'
 
-type TableName = Extract<keyof Database['public']['Tables'], string>
-
-type RowType<T extends TableName> = Tables<T>
-
-interface AdminTableOptions<T extends TableName> {
-  table: T
-  orderBy?: keyof RowType<T> & string
-  ascending?: boolean
-  filters?: Record<string, any>
-  searchFn?: (row: RowType<T>, query: string) => boolean
-  perPage?: number
-  autoFetch?: boolean
+/** Simple utilitaire pour "debouncer" une fonction */
+function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
+  let timer: ReturnType<typeof setTimeout>
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), delay)
+  }
 }
 
-export function useAdminTable<T extends TableName>(options: AdminTableOptions<T>) {
-  const {
-    table,
-    orderBy = 'created_at',
-    ascending = false,
-    filters = {},
-    searchFn,
-    perPage = 10,
-    autoFetch = true,
-  } = options
+type TableName = keyof Database['public']['Tables'] & string
 
-  const data = ref<RowType<T>[]>([])
-  const filteredData = ref<RowType<T>[]>([])
+interface UseAdminTableOptions<T extends TableName> {
+  table: T
+  orderBy?: keyof Tables<T> & string
+  ascending?: boolean
+  filters?: Record<string, any>
+  searchFn?: (row: Tables<T>, query: string) => boolean
+}
+
+export function useAdminTable<T extends TableName>(options: UseAdminTableOptions<T>) {
+  const { table, orderBy = 'created_at', ascending = false, filters = {}, searchFn } = options
+
+  // --- State
+  const data = ref<Tables<T>[]>([])
+  const filteredData = ref<Tables<T>[]>([])
   const total = ref(0)
   const nbPages = ref(1)
   const page = ref(1)
   const search = ref('')
-  const sortKey = ref(orderBy as keyof RowType<T> & string)
+  const sortKey = ref(orderBy)
   const sortAsc = ref(ascending)
-  const activeFilters = ref<Record<string, any>>({ ...filters })
+  const activeFilters = ref(filters)
   const loading = ref(false)
   const hasLoaded = ref(false)
 
+  // --- Main fetch
   async function fetchData() {
     loading.value = true
-    const from = (page.value - 1) * perPage
-    const to = from + perPage - 1
+    try {
+      const query = supabase
+        .from(table)
+        .select('*', { count: 'exact' })
+        .order(sortKey.value, { ascending: sortAsc.value })
 
-    const {
-      data: rows,
-      count,
-      error,
-    } = await supabase.from(table).select('*', { count: 'exact' }).range(from, to)
+      // Appliquer les filtres si présents
+      Object.entries(activeFilters.value).forEach(([key, value]) => {
+        if (value && value !== 'all') query.eq(key, value)
+      })
 
-    loading.value = false
+      // 🧩 TS ne sait pas que le résultat est bien typé — on le force légèrement
+      const { data: rows, count, error } = await query
 
-    if (error) {
-      console.error(`[useAdminTable] ${table}:`, error)
-      return
+      if (error) throw error
+
+      // ✅ Fix typage : cast explicite avec vérif runtime
+      const validRows = Array.isArray(rows) ? (rows as Tables<T>[]) : []
+
+      data.value = validRows
+      total.value = count ?? validRows.length
+      nbPages.value = Math.ceil(total.value / 20) || 1
+      hasLoaded.value = true
+
+      // Application du filtre de recherche local
+      if (searchFn && search.value) {
+        const q = search.value.toLowerCase().trim()
+        filteredData.value = validRows.filter((row) => searchFn(row, q))
+      } else {
+        filteredData.value = validRows
+      }
+    } catch (err) {
+      console.error('Erreur fetchData:', err)
+    } finally {
+      loading.value = false
     }
-
-    data.value = (rows ?? []) as RowType<T>[]
-    total.value = count ?? 0
-    nbPages.value = Math.ceil((count ?? 0) / perPage)
-    hasLoaded.value = true
-    applyFilters()
   }
 
-  function applyFilters() {
-    let result = [...data.value]
-    for (const [key, val] of Object.entries(activeFilters.value)) {
-      if (val && val !== 'all') result = result.filter((r: any) => r[key] === val)
-    }
-    if (search.value && searchFn)
-      result = result.filter((r) => searchFn(r as RowType<T>, search.value.toLowerCase()))
+  // --- Debounce sur la recherche
+  const debouncedFetch = debounce(fetchData, 400)
+  watch(search, () => debouncedFetch())
 
-    result.sort((a: any, b: any) => {
-      const av = a[sortKey.value]
-      const bv = b[sortKey.value]
-      if (av == null || bv == null) return 0
-      if (typeof av === 'string') return sortAsc.value ? av.localeCompare(bv) : bv.localeCompare(av)
-      return sortAsc.value ? av - bv : bv - av
-    })
+  // --- Rechargement auto sur tri / filtre
+  watchEffect(() => {
+    fetchData()
+  })
 
-    filteredData.value = result
-  }
-
-  watchEffect(applyFilters)
-
+  // --- Reset complet
   function reset() {
     search.value = ''
-    activeFilters.value = { ...filters }
-    sortKey.value = orderBy as string
+    sortKey.value = orderBy
     sortAsc.value = ascending
+    activeFilters.value = filters
     fetchData()
   }
 
-  if (autoFetch) onMounted(fetchData)
-
   return {
+    data,
     filteredData,
     total,
     nbPages,

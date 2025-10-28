@@ -1,5 +1,5 @@
-import { supabase } from '@/services/supabaseClient'
-import type { TablesUpdate } from '@/types/supabase'
+import { supabase } from '@/supabase/supabaseClient'
+import type { TablesUpdate } from '@/supabase/types/supabase'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Message } from '../types/chat'
