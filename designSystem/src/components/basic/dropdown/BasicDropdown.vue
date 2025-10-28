@@ -23,53 +23,53 @@
         :iconName="item.iconName"
         :size
         :active="dropdownKey === item.id"
-        @click="selectItem(item.id)"
+        @click="() => selectItem(item.id as T)"
       />
     </template>
   </DropdownContainer>
 </template>
 
-<script setup lang="ts" generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId">
-  import { computed } from 'vue'
-  import type { DropdownProps, DropdownItem, DropdownId } from '@designSystem/components'
+<script setup lang="ts" generic="T extends string | number | boolean | undefined">
+  import type { DropdownItem, DropdownProps } from '@designSystem/components'
   import { useDropdownMenuHandler } from '@designSystem/components/wrapper/dropdownContainer/useDropdownMenuHandler'
   import { useDropdownNavigation } from '@designSystem/components/wrapper/dropdownContainer/useDropdownNavigation'
+  import { computed } from 'vue'
 
-  const props = withDefaults(defineProps<DropdownProps<TDropdownItem>>(), {
+  const props = withDefaults(defineProps<DropdownProps<DropdownItem<T>>>(), {
     placeholder: 'Sélectionnez un élément',
     forceValue: false,
     deletable: true,
   })
 
-  const dropdownKey = defineModel<TDropdownKey>()
+  const dropdownKey = defineModel<T>()
 
-  const { isOpen, computedItems } = useDropdownMenuHandler<TDropdownItem>(
+  const { isOpen, computedItems } = useDropdownMenuHandler<DropdownItem<T>>(
     props.items,
     props.keyId,
     props.keyLabel,
     props.keyIconName,
   )
 
-  const { selectIndex, makeId, handleArrowDownKey, handleArrowUpKey, handleTab, handleSpace } = useDropdownNavigation(
-    computedItems,
-    isOpen,
-  )
+  const { selectIndex, makeId, handleArrowDownKey, handleArrowUpKey, handleTab, handleSpace } =
+    useDropdownNavigation(computedItems, isOpen)
 
-  const selectItem = (dropdownId: DropdownId) => {
+  // ✅ Typage exact
+  const selectItem = (dropdownId: T | undefined) => {
+    if (dropdownId === undefined) return
     if (props.readonly) return
-    if (props.forceValue !== true && dropdownKey.value === dropdownId) {
-      dropdownKey.value = undefined
-    } else {
-      dropdownKey.value = dropdownId as TDropdownKey
-    }
+
+    dropdownKey.value =
+      props.forceValue !== true && dropdownKey.value === dropdownId ? undefined : dropdownId
   }
 
+  // ✅ Label dynamique
   const selectedLabel = computed(() => {
-    if (dropdownKey.value === null || dropdownKey.value === undefined) return ''
-    const item = computedItems.value.find((item) => item.id === dropdownKey.value)
-    return item ? item.label : ''
+    if (!dropdownKey.value) return ''
+    const item = computedItems.value.find((i) => i.id === dropdownKey.value)
+    return item?.label ?? ''
   })
 
+  // ✅ Navigation clavier
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case 'Enter':
@@ -79,22 +79,20 @@
       case ' ':
         event.preventDefault()
         handleSpace()
-        selectItem(computedItems.value[selectIndex.value]!.id)
+        selectItem(computedItems.value[selectIndex.value]?.id as T)
         break
       case 'ArrowDown':
         event.preventDefault()
         handleArrowDownKey()
-        selectItem(computedItems.value[selectIndex.value]!.id)
+        selectItem(computedItems.value[selectIndex.value]?.id as T)
         break
       case 'ArrowUp':
         event.preventDefault()
         handleArrowUpKey()
-        selectItem(computedItems.value[selectIndex.value]!.id)
+        selectItem(computedItems.value[selectIndex.value]?.id as T)
         break
       case 'Tab':
         handleTab()
-        break
-      default:
         break
     }
   }

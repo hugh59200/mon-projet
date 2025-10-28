@@ -86,7 +86,7 @@
               dropdown-type="table"
               force-value
               :item-class="(r: { id: string }) => getRoleClass(r.id)"
-              @update:model-value="(v) => v && handleRoleChange(user, v as Role)"
+              @update:model-value="(v) => v && handleRoleChange(user, v)"
             />
           </BasicCell>
 

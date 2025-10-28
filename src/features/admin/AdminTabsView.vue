@@ -16,6 +16,7 @@
   import AdminOrdersView from './orders/AdminOrdersView.vue'
   import AdminStatsView from './stats/AdminStatsView.vue'
   import AdminUsersView from './users/AdminUsersView.vue'
+  import AdminProductsView from './products/AdminProductsView.vue' 
 
   withDefaults(defineProps<{ tabsPlacement?: 'center' | 'start'; tabsTitle?: string[] }>(), {
     tabsPlacement: 'center',
@@ -26,6 +27,7 @@
     { tabKey: 'Statistiques' },
     { tabKey: 'Utilisateurs' },
     { tabKey: 'Commandes' },
+    { tabKey: 'Produits' }, // 🆕 nouvel onglet
   ]
 
   const tabComponents = {
@@ -33,6 +35,7 @@
     Statistiques: AdminStatsView,
     Utilisateurs: AdminUsersView,
     Commandes: AdminOrdersView,
+    Produits: AdminProductsView, // 🆕 lié à notre nouvelle vue
   } as const
 
   const selectedTab = ref<keyof typeof tabComponents>('Messagerie')

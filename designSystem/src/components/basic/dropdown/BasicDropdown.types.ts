@@ -4,7 +4,7 @@ import type { AlertInputProps } from '../alert'
 export type DropdownSize = 'small' | 'medium' | 'large'
 export type DropdownType = 'form' | 'table'
 
-export type DropdownId = number | string | boolean | undefined | null
+export type DropdownId = number | string | boolean | undefined
 
 export type DropdownItem<T = DropdownId> = {
   id: T

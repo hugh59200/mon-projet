@@ -105,7 +105,7 @@
               dropdown-type="table"
               force-value
               :item-class="(s: { id: string }) => getStatusClass(s.id)"
-              @update:model-value="(v) => v && handleStatusChange(order, v as OrderStatus)"
+              @update:model-value="(v) => v && handleStatusChange(order, v)"
             />
           </BasicCell>
 
