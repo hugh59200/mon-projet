@@ -12,10 +12,10 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import AdminChatView from './sections/AdminChatView.vue'
-  import AdminOrdersView from './sections/AdminOrdersView.vue'
-  import AdminStatsView from './sections/AdminStatsView.vue'
-  import AdminUsersView from './sections/AdminUsersView.vue'
+  import AdminChatView from './chat/AdminChatView.vue'
+  import AdminOrdersView from './orders/AdminOrdersView.vue'
+  import AdminStatsView from './stats/AdminStatsView.vue'
+  import AdminUsersView from './users/AdminUsersView.vue'
 
   withDefaults(defineProps<{ tabsPlacement?: 'center' | 'start'; tabsTitle?: string[] }>(), {
     tabsPlacement: 'center',

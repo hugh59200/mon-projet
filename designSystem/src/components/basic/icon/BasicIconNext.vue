@@ -15,15 +15,14 @@
 <script setup lang="ts">
   import * as LucideIcons from 'lucide-vue-next'
   import { computed, type Component } from 'vue'
-
-  type IconColor = 'primary-600' | 'pink-400' | 'secondary-800' | 'secondary-1000' | 'grey-800' | 'white'
+  import type { IconColor } from './BasicIcon.type'
 
   export type IconNameNext = keyof typeof LucideIcons
 
   interface Props {
     name: IconNameNext
     size?: number
-    color?: IconColor
+    color: IconColor
     strokeWidth?: number
     pointer?: boolean
     disabled?: boolean

@@ -1,8 +1,8 @@
 import { supabase } from '@/supabase/supabaseClient'
 import type { Database, Tables } from '@/supabase/types/supabase'
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
-/** Simple utilitaire pour "debouncer" une fonction */
+/** 🕐 Utilitaire de debounce pour les recherches */
 function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
   let timer: ReturnType<typeof setTimeout>
   return (...args: Parameters<T>) => {
@@ -12,17 +12,26 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
 }
 
 type TableName = keyof Database['public']['Tables'] & string
+type SearchFunction<T> = (row: T, query: string) => boolean
 
 interface UseAdminTableOptions<T extends TableName> {
   table: T
   orderBy?: keyof Tables<T> & string
   ascending?: boolean
   filters?: Record<string, any>
-  searchFn?: (row: Tables<T>, query: string) => boolean
+  searchFn?: SearchFunction<Tables<T>>
+  limit?: number // 🧩 ajout pagination dynamique
 }
 
 export function useAdminTable<T extends TableName>(options: UseAdminTableOptions<T>) {
-  const { table, orderBy = 'created_at', ascending = false, filters = {}, searchFn } = options
+  const {
+    table,
+    orderBy = 'created_at',
+    ascending = false,
+    filters = {},
+    searchFn,
+    limit = 20,
+  } = options
 
   // --- State
   const data = ref<Tables<T>[]>([])
@@ -41,33 +50,34 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
   async function fetchData() {
     loading.value = true
     try {
-      const query = supabase
+      const from = (page.value - 1) * limit
+      const to = page.value * limit - 1
+
+      let query = supabase
         .from(table)
         .select('*', { count: 'exact' })
         .order(sortKey.value, { ascending: sortAsc.value })
+        .range(from, to)
 
-      // Appliquer les filtres si présents
-      Object.entries(activeFilters.value).forEach(([key, value]) => {
-        if (value && value !== 'all') query.eq(key, value)
-      })
+      // Appliquer les filtres actifs
+      for (const [key, value] of Object.entries(activeFilters.value)) {
+        if (value && value !== 'all') query = query.eq(key, value)
+      }
 
-      // 🧩 TS ne sait pas que le résultat est bien typé — on le force légèrement
       const { data: rows, count, error } = await query
-
       if (error) throw error
 
-      // ✅ Fix typage : cast explicite avec vérif runtime
       const validRows = Array.isArray(rows) ? (rows as Tables<T>[]) : []
-
       data.value = validRows
       total.value = count ?? validRows.length
-      nbPages.value = Math.ceil(total.value / 20) || 1
+      nbPages.value = Math.ceil(total.value / limit) || 1
       hasLoaded.value = true
 
-      // Application du filtre de recherche local
+      // Filtrage local (search)
       if (searchFn && search.value) {
         const q = search.value.toLowerCase().trim()
-        filteredData.value = validRows.filter((row) => searchFn(row, q))
+        const safeSearch = searchFn as (r: any, q: string) => boolean
+        filteredData.value = validRows.filter((row) => safeSearch(row, q))
       } else {
         filteredData.value = validRows
       }
@@ -82,8 +92,8 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
   const debouncedFetch = debounce(fetchData, 400)
   watch(search, () => debouncedFetch())
 
-  // --- Rechargement auto sur tri / filtre
-  watchEffect(() => {
+  // --- Rafraîchissement sur tri / filtres / pagination
+  watch([sortKey, sortAsc, activeFilters, page], () => {
     fetchData()
   })
 
@@ -93,8 +103,14 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     sortKey.value = orderBy
     sortAsc.value = ascending
     activeFilters.value = filters
+    page.value = 1
     fetchData()
   }
+
+  // --- Fetch initial
+  onMounted(() => {
+    fetchData()
+  })
 
   return {
     data,

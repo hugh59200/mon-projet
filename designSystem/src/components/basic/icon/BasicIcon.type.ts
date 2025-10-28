@@ -7,6 +7,7 @@ export type IconColor =
   | 'secondary-800'
   | 'secondary-1000'
   | 'grey-800'
+  | 'white'
 
 export type IconProps = {
   name: IconName

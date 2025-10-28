@@ -1,0 +1,43 @@
+/* src/assets/styles/roles.less */
+
+.role-badge {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  display: inline-block;
+  text-transform: capitalize;
+  transition: all 0.25s ease;
+}
+
+/* Mode clair */
+.role--admin {
+  color: #b91c1c;
+  background-color: #fee2e2;
+}
+
+.role--user {
+  color: #2563eb;
+  background-color: #dbeafe;
+}
+
+.role--manager {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+  .role--admin {
+    color: #fecaca;
+    background-color: #7f1d1d;
+  }
+  .role--user {
+    color: #93c5fd;
+    background-color: #1e3a8a;
+  }
+  .role--manager {
+    color: #86efac;
+    background-color: #14532d;
+  }
+}

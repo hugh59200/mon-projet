@@ -3,12 +3,15 @@
     class="pagination"
     v-if="nbPages > 1"
   >
+    <!-- Flèche gauche -->
     <BasicIcon
       name="arrow-left"
       active
       :class="{ 'arrow--disabled': currentPage === 1, arrow: true }"
       @click="prevPage"
     />
+
+    <!-- Pages -->
     <div
       v-for="page in pages"
       :key="page.num"
@@ -21,66 +24,77 @@
       ]"
       @click="goToPage(page)"
     >
-      <BasicText :size="page.num > 3 ? 'body-s' : 'body-m'">
-        {{ page.type === 'ellipse' ? '...' : page.num }}
+      <BasicText :size="page.type === 'ellipse' ? 'body-s' : 'body-m'">
+        {{ page.type === 'ellipse' ? '…' : page.num }}
       </BasicText>
     </div>
+
+    <!-- Flèche droite -->
     <BasicIcon
       name="arrow-right"
       active
-      @click="nextPage"
       :class="{ 'arrow--disabled': currentPage === nbPages, arrow: true }"
+      @click="nextPage"
     />
+
+    <!-- Résumé des résultats -->
     <BasicText
       v-if="nbResults && nbResults > 0"
       class="pagination__span"
     >
-      {{ nbResults }} résultats
+      {{ nbResults }} résultat{{ nbResults > 1 ? 's' : '' }}
     </BasicText>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
+
+  interface Page {
+    type: 'num' | 'ellipse'
+    num: number
+  }
 
   const props = defineProps<{
     nbPages: number
     currentPage: number
     nbPagesMax: number
     nbResults?: number
+    autoFetch?: () => Promise<void> // 🧩 optionnelle : intégration directe avec fetchData
   }>()
 
   const emit = defineEmits<{
     (e: 'change', page: number): void
   }>()
 
-  const prevPage = function () {
+  // --- Navigation
+  const prevPage = () => {
     if (props.currentPage > 1) emit('change', props.currentPage - 1)
   }
-  const nextPage = function () {
+  const nextPage = () => {
     if (props.currentPage < props.nbPages) emit('change', props.currentPage + 1)
   }
-
-  const goToPage = function (page: Page) {
+  const goToPage = (page: Page) => {
     if (page.type === 'ellipse') return
     if (page.num > 0 && page.num <= props.nbPages) emit('change', page.num)
   }
 
-  type Page = { type: 'num' | 'ellipse'; num: number }
-
+  // --- Pagination dynamique
   const pages = computed(() => {
     let result = Array.from(Array(props.nbPages).keys()).map<Page>((index) => ({
       type: 'num',
       num: index + 1,
-      key: index,
     }))
+
     if (props.nbPages <= props.nbPagesMax) return result
 
     const start = Math.min(
-      Math.max(props.currentPage - props.nbPagesMax / 2, 0),
+      Math.max(props.currentPage - Math.floor(props.nbPagesMax / 2), 0),
       props.nbPages - props.nbPagesMax,
     )
+
     result = [...result.splice(start, props.nbPagesMax)]
+
     if (props.currentPage > props.nbPagesMax / 2) {
       result[0] = { type: 'num', num: 1 }
       result[1] = { type: 'ellipse', num: Number.MIN_VALUE }
@@ -90,10 +104,50 @@
       result[props.nbPagesMax - 1] = { type: 'num', num: props.nbPages }
       result[props.nbPagesMax - 2] = { type: 'ellipse', num: Number.MAX_VALUE }
     }
+
     return result
   })
+
+  // --- 🔁 Auto-fetch quand la page change (intégration directe avec useAdminTable)
+  watch(
+    () => props.currentPage,
+    async () => {
+      if (props.autoFetch) await props.autoFetch()
+    },
+  )
 </script>
 
 <style lang="less">
   @import './BasicPagination.less';
+
+  .arrow {
+    cursor: pointer;
+    &--disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  }
+
+  .pagination__button {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+    padding: 4px 10px;
+    border-radius: 6px;
+
+    &--active {
+      background: @primary-100;
+      color: @primary-800;
+      font-weight: 600;
+    }
+
+    &.pagination__ellipsis {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &:hover:not(&--active):not(.pagination__ellipsis) {
+      background: @neutral-100;
+    }
+  }
 </style>

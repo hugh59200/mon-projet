@@ -8,22 +8,6 @@
         clearable
       />
     </div>
-
-    <div
-      v-for="(dropdown, index) in dropdowns"
-      :key="index"
-      class="elem elem--center elem--span-8"
-    >
-      <BasicDropdown
-        v-model="models[dropdown.key]"
-        :items="dropdown.items"
-        size="small"
-        :label="dropdown.label"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-
     <div
       v-if="showReset"
       class="elem elem--center elem--span-6 justify-end"
@@ -40,26 +24,12 @@
 </template>
 
 <script setup lang="ts">
-  interface DropdownOption {
-    id: string
-    label: string
-  }
-
-  interface DropdownConfig {
-    key: string
-    label: string
-    items: DropdownOption[]
-  }
-
   defineProps<{
-    dropdowns: DropdownConfig[]
     searchPlaceholder?: string
     showReset?: boolean
   }>()
 
   const search = defineModel<string>('search')
-  const models = defineModel<Record<string, string>>('models', { default: () => ({}) })
-
   const emit = defineEmits<{ (e: 'reset'): void }>()
 </script>
 

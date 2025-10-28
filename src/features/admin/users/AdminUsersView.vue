@@ -1,25 +1,18 @@
 <template>
   <BasicToolbar
     v-model:search="search"
-    v-model:models="models"
-    v-model:sortAsc="sortAsc"
     :search-placeholder="'Rechercher un utilisateur...'"
-    :dropdowns="[
-      { key: 'sortKey', label: 'Trier par', items: SORT_OPTIONS },
-      { key: 'selectedRole', label: 'Rôle', items: ROLE_FILTERS },
-    ]"
     :show-reset="true"
-    @reset="resetFilters"
+    @reset="reset()"
   />
-
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
-    :nb-pages-max="5"
     :nb-results="total"
+    :nb-pages-max="5"
+    :auto-fetch="fetchData"
     @change="page = $event"
   />
-
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -28,7 +21,6 @@
     empty-message="Aucun utilisateur trouvé 😅"
   >
     <div class="users--desktop">
-      <!-- HEADER -->
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <BasicCell
           :span="10"
@@ -71,7 +63,6 @@
         />
       </div>
 
-      <!-- ROWS -->
       <div
         v-for="user in filteredData"
         :key="user.id"
@@ -80,6 +71,7 @@
         <div class="cardLayoutWrapper">
           <BasicCell :span="10">{{ user.email }}</BasicCell>
           <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
+
           <BasicCell
             center
             :span="6"
@@ -90,15 +82,18 @@
               size="small"
               dropdown-type="table"
               force-value
+              :item-class="(r: { id: string }) => getRoleClass(r.id)"
               @update:model-value="(v) => v && handleRoleChange(user, v as Role)"
             />
           </BasicCell>
+
           <BasicCell
             center
             :span="6"
           >
             {{ formatDate(user.created_at) }}
           </BasicCell>
+
           <BasicCellActionIcon
             icon-name="eye"
             tooltip="Voir"
@@ -130,15 +125,16 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/composables/useSortableTable'
-  import { ROLE_FILTERS, ROLES, SORT_OPTIONS } from '@/features/admin/constants/users'
+  import { ROLES } from '@/features/admin/constants/users'
   import { deleteUser, updateUserRole } from '@/supabase/api/users'
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
+  import { getRoleClass } from '@/utils/roles'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watch } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
-  import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
+  import AdminUserDetailsModal from '../users/AdminUserDetailsModal.vue'
 
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
@@ -167,21 +163,6 @@
 
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
-  /* Toolbar models */
-  const models = ref<{ sortKey: string; selectedRole: 'all' | 'user' | 'admin' }>({
-    sortKey: 'created_at',
-    selectedRole: 'all',
-  })
-
-  /* Dropdown data */
-
-  function resetFilters() {
-    models.value.selectedRole = 'all'
-    models.value.sortKey = 'created_at'
-    reset()
-  }
-
-  /* Local roles sync + CRUD */
   const localRoles = ref<Record<string, string>>({})
 
   watch(
@@ -221,10 +202,6 @@
     selectedUserId.value = id
     isModalVisible.value = true
   }
-
-  /* Optionnel : éviter les warnings TS */
-  void toggleSort
-  void getSortColor
 </script>
 
 <style scoped lang="less">
