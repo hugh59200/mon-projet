@@ -1,8 +1,8 @@
 <template>
-  <!-- 🔧 Toolbar réutilisable -->
   <BasicToolbar
     v-model:search="search"
-    v-model:models="models"
+    v-model:sortKey="sortKey"
+    v-model:selectedRole="selectedRole"
     :search-placeholder="'Rechercher un utilisateur...'"
     :dropdowns="[
       { key: 'sortKey', label: 'Trier par', items: SORT_OPTIONS },
@@ -12,7 +12,6 @@
     @reset="resetFilters"
   />
 
-  <!-- 📄 Pagination -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -21,7 +20,6 @@
     @change="page = $event"
   />
 
-  <!-- 🔁 Loader -->
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -40,9 +38,9 @@
       </div>
 
       <div
-        class="gridElemWrapper"
         v-for="user in filteredData"
         :key="user.id"
+        class="gridElemWrapper"
       >
         <div class="cardLayoutWrapper">
           <BasicCell :span="10">{{ user.email }}</BasicCell>
@@ -86,26 +84,8 @@
         </div>
       </div>
     </div>
-
-    <!-- 📱 Mobile -->
-    <div class="users--mobile">
-      <div class="mobile-cards-list">
-        <UserCardMobile
-          v-for="user in filteredData"
-          :key="user.id"
-          v-model:role="localRoles[user.id]!"
-          :user="user"
-          :roles="ROLES"
-          :format-date="formatDate"
-          :handle-role-change="handleRoleChange"
-          :open-user-modal="openUserModal"
-          :handle-delete="handleDelete"
-        />
-      </div>
-    </div>
   </WrapperLoader>
 
-  <!-- 🪟 Modal -->
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -116,7 +96,6 @@
 </template>
 
 <script setup lang="ts">
-  import { UserCardMobile } from '@/features/admin/sections/mobile'
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -128,53 +107,39 @@
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
-  /** 📦 Table Supabase avec pagination */
+  /* 🧭 Table paginée */
   const {
     filteredData,
     total,
     nbPages,
     loading,
+    hasLoaded,
     page,
     search,
     sortKey,
-    hasLoaded,
+    activeFilters,
     fetchData,
     reset,
   } = usePaginatedSupabaseTable<UserRow>({
     table: 'profiles',
     orderBy: 'created_at',
     ascending: false,
+    filters: { role: 'all' },
     searchFn: (u, q) =>
       (u.email?.toLowerCase()?.includes(q) ?? false) ||
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
-  /** 🎚️ Filtres et rôles */
+  /* 🔍 Filtres spécifiques */
   const selectedRole = ref<'all' | 'user' | 'admin'>('all')
+  watch(selectedRole, (role) => {
+    activeFilters.value.role = role
+    fetchData()
+  })
+
   const localRoles = ref<Record<string, string>>({})
 
-  /** 🧠 Données du modèle toolbar */
-  const models = ref<Record<string, string>>({
-    sortKey: sortKey.value,
-    selectedRole: selectedRole.value,
-  })
-
-  /** 🔄 Synchronisation descendante (Vue → Toolbar) */
-  watch([sortKey, selectedRole], ([newSort, newRole]) => {
-    models.value = { ...models.value, sortKey: newSort, selectedRole: newRole }
-  })
-
-  /** 🔄 Synchronisation montante (Toolbar → Vue) */
-  watch(
-    models,
-    (newModels) => {
-      sortKey.value = newModels.sortKey ?? 'created_at'
-      selectedRole.value = newModels.selectedRole as any
-    },
-    { deep: true },
-  )
-
-  /** ⚙️ Données statiques */
+  /* Dropdowns */
   const ROLES = [
     { id: 'user', label: 'Utilisateur' },
     { id: 'admin', label: 'Administrateur' },
@@ -185,13 +150,13 @@
     { id: 'email', label: 'Email' },
   ]
 
-  /** ♻️ Réinitialisation */
+  /* ♻️ Réinitialiser */
   function resetFilters() {
     selectedRole.value = 'all'
     reset()
   }
 
-  /** 🧩 CRUD */
+  /* 🧩 CRUD */
   async function handleRoleChange(user: UserRow, newRole: string) {
     localRoles.value[user.id] = newRole
     const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
@@ -210,7 +175,7 @@
     }
   }
 
-  /** 🪟 Modal */
+  /* 🪟 Modal */
   const isModalVisible = ref(false)
   const selectedUserId = ref<string | null>(null)
   function openUserModal(id: string) {
@@ -218,7 +183,7 @@
     isModalVisible.value = true
   }
 
-  /** 🕒 Format utils */
+  /* 🕒 Format utils */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -228,7 +193,7 @@
     })
   }
 
-  /** 🔁 Mise à jour des rôles locaux */
+  /* 🔁 Sync des rôles locaux */
   watchEffect(() => {
     if (filteredData.value.length > 0) {
       const newRoles: Record<string, string> = {}

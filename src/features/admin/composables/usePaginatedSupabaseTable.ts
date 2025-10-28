@@ -13,6 +13,9 @@ interface UsePaginatedSupabaseTableOptions<T> {
   transformFn?: (data: T[]) => T[]
 }
 
+/**
+ * 🔁 Composable générique de chargement, pagination et filtrage Supabase
+ */
 export function usePaginatedSupabaseTable<T extends Record<string, any>>(
   options: UsePaginatedSupabaseTableOptions<T>,
 ) {
@@ -34,9 +37,11 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
   const search = ref('')
   const sortKey = ref(orderBy as string)
   const sortAsc = ref(ascending)
+  const activeFilters = ref<Record<string, any>>(filters)
 
   const nbPages = computed(() => Math.ceil(total.value / perPage))
 
+  /** 🔄 Chargement depuis Supabase */
   async function fetchData() {
     loading.value = true
     const from = (page.value - 1) * perPage
@@ -49,14 +54,13 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
 
     if (sortKey.value) query = query.order(sortKey.value, { ascending: sortAsc.value })
 
-    Object.entries(filters).forEach(([key, value]) => {
+    Object.entries(activeFilters.value).forEach(([key, value]) => {
       if (value !== undefined && value !== 'all') query = query.eq(key, value)
     })
 
     const { data: rows, count, error } = (await query) as PostgrestSingleResponse<T[]>
-
     loading.value = false
-    hasLoaded.value = true // ✅ ici
+    hasLoaded.value = true
 
     if (error) {
       console.error(`Erreur chargement table "${String(table)}":`, error)
@@ -70,6 +74,7 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
     total.value = count ?? 0
   }
 
+  /** 🔍 Filtrage local */
   const filteredData = computed(() => {
     let list = [...(data.value as T[])]
     if (searchFn && search.value.trim()) {
@@ -79,14 +84,17 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
     return list
   })
 
+  /** ♻️ Reset */
   function reset() {
     search.value = ''
     page.value = 1
     sortKey.value = orderBy as string
     sortAsc.value = ascending
+    activeFilters.value = filters
+    fetchData()
   }
 
-  watch([page, sortKey, sortAsc], fetchData)
+  watch([page, sortKey, sortAsc, activeFilters], fetchData, { deep: true })
   onMounted(fetchData)
 
   return {
@@ -95,11 +103,12 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
     total,
     nbPages,
     loading,
-    hasLoaded, // ✅
+    hasLoaded,
     page,
     search,
     sortKey,
     sortAsc,
+    activeFilters,
     fetchData,
     reset,
   }

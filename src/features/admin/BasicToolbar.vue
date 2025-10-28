@@ -12,12 +12,22 @@
 
     <!-- 🔽 Dropdowns dynamiques -->
     <div
-      v-for="(dropdown, index) in dropdowns"
-      :key="index"
+      v-for="dropdown in dropdowns"
+      :key="dropdown.key"
       class="elem elem--center elem--span-8"
     >
       <BasicDropdown
-        v-model="models[dropdown.key]"
+        v-if="dropdown.key === 'sortKey'"
+        v-model="sortKey"
+        :items="dropdown.items"
+        size="small"
+        :label="dropdown.label"
+        dropdown-type="table"
+        force-value
+      />
+      <BasicDropdown
+        v-else-if="dropdown.key === 'selectedRole'"
+        v-model="selectedRole"
         :items="dropdown.items"
         size="small"
         :label="dropdown.label"
@@ -36,18 +46,13 @@
         type="secondary"
         size="small"
         variant="outlined"
-        @click="onReset"
+        @click="$emit('reset')"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  /**
-   * ✅ Version moderne avec defineModel() (Vue 3.4+)
-   * Chaque v-model:<clé> est automatiquement typé et lié.
-   */
-
   interface DropdownOption {
     id: string
     label: string
@@ -59,30 +64,21 @@
     items: DropdownOption[]
   }
 
-  /* Props */
-  const props = defineProps<{
-    /** Liste de dropdowns dynamiques */
+  defineProps<{
     dropdowns: DropdownConfig[]
-
-    /** Placeholder du champ de recherche */
     searchPlaceholder?: string
-
-    /** Afficher ou non le bouton de reset */
     showReset?: boolean
   }>()
 
-  /* defineModel() pour chaque valeur contrôlée */
+  /* ✅ declare tes v-models */
   const search = defineModel<string>('search')
-  const models = defineModel<Record<string, string>>('models', { required: true })
+  const sortKey = defineModel<string>('sortKey')
+  const selectedRole = defineModel<string>('selectedRole')
 
-  /* Événement reset */
+  /* ✅ déclare aussi l'event custom 'reset' */
   const emit = defineEmits<{
     (e: 'reset'): void
   }>()
-
-  function onReset() {
-    emit('reset')
-  }
 </script>
 
 <style scoped lang="less">
