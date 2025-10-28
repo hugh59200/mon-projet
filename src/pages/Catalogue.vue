@@ -23,39 +23,40 @@
       <!-- 🧭 Filtres -->
       <aside class="catalogue__filters">
         <BasicText
-          size="body-l"
+          size="h5"
           weight="bold"
         >
           Filtres
         </BasicText>
 
+        <!-- ✅ Catégorie : multiselect -->
         <div class="catalogue__filter">
-          <BasicText size="body-s">Catégorie</BasicText>
-          <select v-model="selectedCategory">
-            <option value="">Toutes les catégories</option>
-            <option
-              v-for="cat in categories"
-              :key="cat"
-              :value="cat"
-            >
-              {{ cat }}
-            </option>
-          </select>
+          <BasicText>Catégorie</BasicText>
+          <BasicDropdownMultiple
+            v-model="selectedCategory"
+            :items="categoryItems"
+            placeholder="Toutes les catégories"
+            searchable
+            deletable
+            size="medium"
+          />
         </div>
 
+        <!-- ✅ Disponibilité : dropdown simple -->
         <div class="catalogue__filter">
-          <BasicText size="body-s">Disponibilité</BasicText>
-          <select v-model="stockFilter">
-            <option value="">Toutes</option>
-            <option value="available">En stock</option>
-            <option value="unavailable">Rupture</option>
-          </select>
+          <BasicText>Disponibilité</BasicText>
+          <BasicDropdown
+            v-model="stockFilter"
+            :items="stockItems"
+            placeholder="Toutes les disponibilités"
+            size="medium"
+            deletable
+          />
         </div>
       </aside>
 
       <!-- 🛒 Liste scrollable -->
       <section class="catalogue__list">
-        <!-- 🚫 Aucun produit trouvé -->
         <div
           v-if="hasLoaded && filteredProducts.length === 0"
           class="catalogue__empty"
@@ -63,7 +64,6 @@
           <BasicText>Aucun produit trouvé.</BasicText>
         </div>
 
-        <!-- ✅ Liste -->
         <div
           v-else-if="filteredProducts.length > 0"
           class="catalogue__grid"
@@ -106,9 +106,9 @@
   const products = ref<Product[]>([])
   const categories = ref<string[]>([])
   const searchTerm = ref('')
-  const selectedCategory = ref('')
-  const stockFilter = ref('')
-  const hasLoaded = ref(false) // ✅ fin du chargement logique
+  const selectedCategory = ref<string[]>([]) // 🔹 multiple
+  const stockFilter = ref<string | undefined>(undefined) // 🔹 simple
+  const hasLoaded = ref(false)
 
   async function loadProducts() {
     try {
@@ -131,12 +131,30 @@
     await loadProducts()
   })
 
+  /* 🔹 Dropdown items */
+  const categoryItems = computed(() =>
+    categories.value.map((cat) => ({
+      id: cat,
+      label: cat,
+    })),
+  )
+
+  const stockItems = [
+    { id: 'available', label: 'En stock' },
+    { id: 'unavailable', label: 'Rupture' },
+  ]
+
+  /* 🔹 Filtrage des produits */
   const filteredProducts = computed(() => {
     return products.value.filter((p) => {
       const matchSearch = p.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-      const matchCategory = !selectedCategory.value || p.category === selectedCategory.value
+
+      const matchCategory =
+        selectedCategory.value.length === 0 || selectedCategory.value.includes(p.category)
+
       const matchStock =
         !stockFilter.value || (stockFilter.value === 'available' ? p.stock : !p.stock)
+
       return matchSearch && matchCategory && matchStock
     })
   })
@@ -146,7 +164,11 @@
   }
 
   function addToCart(product: Product) {
-    cart.addToCart({ ...product, stock: product.stock ?? false, image: product.image ?? '' })
+    cart.addToCart({
+      ...product,
+      stock: product.stock ?? false,
+      image: product.image ?? '',
+    })
     toast.show(`✅ ${product.name} ajouté au panier`, 'success')
   }
 </script>
@@ -162,10 +184,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 32px;
+      padding: 20px 40px;
       background: white;
-      border-bottom: 1px solid @neutral-200;
+      border-bottom: 1px solid fade(@neutral-200, 70%);
       flex-shrink: 0;
+      box-shadow: 0 2px 8px fade(@neutral-900, 6%);
     }
 
     &__body {
@@ -176,57 +199,82 @@
 
     &__filters {
       width: 260px;
-      background: fade(@secondary-800, 8%);
-      border-right: 1px solid fade(@neutral-100, 20%);
-      padding: 20px;
+      background: fade(@secondary-800, 6%);
+      border-right: 1px solid fade(@neutral-100, 25%);
+      padding: 24px 20px;
       flex-shrink: 0;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-
-      select {
-        width: 100%;
-        padding: 6px 8px;
-        border-radius: 6px;
-        border: 1px solid @neutral-300;
-        background: white;
-      }
+      gap: 18px;
     }
 
     &__list {
       flex: 1;
       overflow-y: auto;
-      padding: 24px 32px;
-      background: @neutral-50;
+      padding: 40px 60px;
+      background: linear-gradient(to bottom, @neutral-50, @neutral-100);
       display: flex;
       flex-direction: column;
     }
 
     &__grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 50px 20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 56px 44px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background: fade(@neutral-300, 25%);
+        pointer-events: none;
+        transform: translateX(-50%);
+      }
     }
 
     &__empty {
       text-align: center;
-      padding: 40px;
+      padding: 60px;
+      color: fade(@neutral-700, 80%);
+    }
+
+    @media (max-width: 1200px) {
+      &__grid {
+        gap: 48px 32px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        &::before {
+          display: none;
+        }
+      }
     }
 
     @media (max-width: 900px) {
       &__body {
         flex-direction: column;
       }
+
       &__filters {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid @neutral-200;
         flex-direction: row;
         flex-wrap: wrap;
-      }
-      &__list {
+        background: white;
         padding: 16px;
+        gap: 12px;
+      }
+
+      &__list {
+        padding: 20px;
+      }
+
+      &__grid {
+        gap: 32px 20px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       }
     }
   }
