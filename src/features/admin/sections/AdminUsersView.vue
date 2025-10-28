@@ -28,50 +28,41 @@
     empty-message="Aucun utilisateur trouvé 😅"
   >
     <div class="users--desktop">
-      <!-- HEADER -->
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <BasicCell
           :span="10"
           text="Email"
           icon-name="ArrowUpDown"
-          :sort-asc="sortKey === 'email' ? sortAsc : undefined"
           :is-active="sortKey === 'email'"
-          :icon-color="sortKey === 'email' ? 'primary-600' : 'grey-800'"
+          :icon-color="getSortColor('email')"
           :on-icon-click="() => toggleSort('email')"
         />
-
         <BasicCell
           :span="8"
           text="Nom"
           icon-name="ArrowUpDown"
-          :sort-asc="sortKey === 'full_name' ? sortAsc : undefined"
           :is-active="sortKey === 'full_name'"
-          :icon-color="sortKey === 'full_name' ? 'primary-600' : 'grey-800'"
+          :icon-color="getSortColor('full_name')"
           :on-icon-click="() => toggleSort('full_name')"
         />
-
         <BasicCell
           center
           :span="6"
           text="Rôle"
           icon-name="ArrowUpDown"
-          :sort-asc="sortKey === 'role' ? sortAsc : undefined"
           :is-active="sortKey === 'role'"
-          :icon-color="sortKey === 'role' ? 'primary-600' : 'grey-800'"
+          :icon-color="getSortColor('role')"
           :on-icon-click="() => toggleSort('role')"
         />
-
         <BasicCell
           center
           :span="6"
           text="Créé le"
           icon-name="ArrowUpDown"
-          :sort-asc="sortKey === 'created_at' ? sortAsc : undefined"
           :is-active="sortKey === 'created_at'"
-          :icon-color="sortKey === 'created_at' ? 'primary-600' : 'grey-800'"
+          :icon-color="getSortColor('created_at')"
           :on-icon-click="() => toggleSort('created_at')"
         />
-
         <BasicCell
           center
           :span="6"
@@ -79,7 +70,6 @@
         />
       </div>
 
-      <!-- ROWS -->
       <div
         v-for="user in filteredData"
         :key="user.id"
@@ -88,7 +78,6 @@
         <div class="cardLayoutWrapper">
           <BasicCell :span="10">{{ user.email }}</BasicCell>
           <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
-
           <BasicCell
             center
             :span="6"
@@ -102,14 +91,12 @@
               @update:model-value="(v) => v && handleRoleChange(user, v)"
             />
           </BasicCell>
-
           <BasicCell
-            :span="6"
             center
+            :span="6"
           >
             {{ formatDate(user.created_at) }}
           </BasicCell>
-
           <BasicCellActionIcon
             icon-name="eye"
             tooltip="Voir"
@@ -139,32 +126,32 @@
 </template>
 
 <script setup lang="ts">
+  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/composables/useSortableTable'
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { ref, watch, watchEffect } from 'vue'
+  import { ref, watchEffect } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
-  import { usePaginatedSupabaseTable } from '../composables/usePaginatedSupabaseTable'
   import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
 
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
-  /* Pagination / data composable */
   const {
     filteredData,
     total,
     nbPages,
-    loading,
-    hasLoaded,
     page,
     search,
     sortKey,
     sortAsc,
     activeFilters,
+    loading,
+    hasLoaded,
     fetchData,
     reset,
-  } = usePaginatedSupabaseTable<UserRow>({
+  } = useAdminTable<'profiles'>({
     table: 'profiles',
     orderBy: 'created_at',
     ascending: false,
@@ -173,6 +160,8 @@
       (u.email?.toLowerCase()?.includes(q) ?? false) ||
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
+
+  const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
   /* Toolbar models */
   const models = ref<{ sortKey: string; selectedRole: 'all' | 'user' | 'admin' }>({
@@ -184,14 +173,6 @@
     models.value.sortKey = sortKey.value
     models.value.selectedRole = activeFilters.value.role ?? 'all'
   })
-
-  watch(models, (val) => {
-    sortKey.value = val.sortKey
-    activeFilters.value.role = val.selectedRole
-  })
-
-  /* Local roles */
-  const localRoles = ref<Record<string, string>>({})
 
   /* Dropdown data */
   const ROLES = [
@@ -206,24 +187,21 @@
     { id: 'role', label: 'Rôle' },
   ]
 
-  /* Sorting logic */
-  function toggleSort(key: string) {
-    if (sortKey.value === key) {
-      sortAsc.value = !sortAsc.value
-    } else {
-      sortKey.value = key
-      sortAsc.value = true
-    }
-  }
-
-  /* Reset */
   function resetFilters() {
     models.value.selectedRole = 'all'
     models.value.sortKey = 'created_at'
     reset()
   }
 
-  /* CRUD */
+  /* Local roles sync + CRUD */
+  const localRoles = ref<Record<string, string>>({})
+
+  watchEffect(() => {
+    const roles: Record<string, string> = {}
+    for (const u of filteredData.value) roles[u.id] = u.role ?? 'user'
+    localRoles.value = roles
+  })
+
   async function handleRoleChange(user: UserRow, newRole: string) {
     localRoles.value[user.id] = newRole
     const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
@@ -232,8 +210,7 @@
   }
 
   async function handleDelete(user: UserRow) {
-    const confirmDelete = confirm(`Supprimer ${user.email} ?`)
-    if (!confirmDelete) return
+    if (!confirm(`Supprimer ${user.email} ?`)) return
     const { error } = await supabase.from('profiles').delete().eq('id', user.id)
     if (error) toast.show('Erreur suppression', 'danger')
     else {
@@ -250,7 +227,7 @@
     isModalVisible.value = true
   }
 
-  /* Date formatting */
+  /* Utils */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -259,24 +236,12 @@
       year: 'numeric',
     })
   }
-
-  /* Sync local roles */
-  watchEffect(() => {
-    if (filteredData.value.length > 0) {
-      const newRoles: Record<string, string> = {}
-      for (const u of filteredData.value) {
-        newRoles[u.id] = u.role ?? 'user'
-      }
-      localRoles.value = newRoles
-    }
-  })
 </script>
 
 <style scoped lang="less">
   .users--mobile {
     display: none;
   }
-
   @media (max-width: 1000px) {
     .users--desktop {
       display: none;
@@ -284,11 +249,5 @@
     .users--mobile {
       display: block;
     }
-  }
-
-  .mobile-cards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
   }
 </style>

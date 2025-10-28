@@ -1,43 +1,17 @@
 <template>
-  <div class="orders-toolbar cardLayoutWrapper">
-    <div class="elem elem--span-12">
-      <BasicInput
-        v-model="search"
-        placeholder="Rechercher une commande..."
-        icon-name="search"
-        clearable
-      />
-    </div>
-    <div class="elem elem--center elem--span-8">
-      <BasicDropdown
-        v-model="sortKey"
-        :items="SORT_OPTIONS"
-        size="small"
-        label="Trier par"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-    <div class="elem elem--center elem--span-8">
-      <BasicDropdown
-        v-model="statusFilter"
-        :items="STATUSES_WITH_ALL"
-        size="small"
-        label="Statut"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-    <div class="elem elem--center elem--span-6 justify-end">
-      <BasicButton
-        label="Réinitialiser"
-        type="secondary"
-        size="small"
-        variant="outlined"
-        @click="resetFilters"
-      />
-    </div>
-  </div>
+  <BasicToolbar
+    v-model:search="search"
+    v-model:models="models"
+    v-model:sortAsc="sortAsc"
+    :search-placeholder="'Rechercher une commande...'"
+    :dropdowns="[
+      { key: 'sortKey', label: 'Trier par', items: SORT_OPTIONS },
+      { key: 'status', label: 'Statut', items: STATUS_FILTERS },
+    ]"
+    :show-reset="true"
+    @reset="resetFilters"
+  />
+
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -45,47 +19,88 @@
     :nb-results="total"
     @change="page = $event"
   />
+
   <WrapperLoader
     :loading="loading"
-    :has-loaded="orders.length > 0"
-    :is-empty="!loading && filteredOrders.length === 0"
+    :has-loaded="hasLoaded"
+    :is-empty="hasLoaded && filteredData.length === 0"
     message="Chargement des commandes..."
     empty-message="Aucune commande trouvée 😅"
   >
     <div class="orders--desktop">
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <div class="elem elem--span-10"><span>Client</span></div>
-        <div class="elem elem--center elem--span-4"><span>Total</span></div>
-        <div class="elem elem--center elem--span-6"><span>Date</span></div>
-        <div class="elem elem--center elem--span-10"><span>Statut</span></div>
-        <div class="elem elem--center elem--span-6"><span>Détails</span></div>
+        <BasicCell
+          :span="10"
+          text="Client"
+          icon-name="ArrowUpDown"
+          :is-active="sortKey === 'full_name'"
+          :icon-color="getSortColor('full_name')"
+          :on-icon-click="() => toggleSort('full_name')"
+        />
+        <BasicCell
+          center
+          :span="4"
+          text="Total"
+          icon-name="ArrowUpDown"
+          :is-active="sortKey === 'total_amount'"
+          :icon-color="getSortColor('total_amount')"
+          :on-icon-click="() => toggleSort('total_amount')"
+        />
+        <BasicCell
+          center
+          :span="6"
+          text="Date"
+          icon-name="ArrowUpDown"
+          :is-active="sortKey === 'created_at'"
+          :icon-color="getSortColor('created_at')"
+          :on-icon-click="() => toggleSort('created_at')"
+        />
+        <BasicCell
+          center
+          :span="8"
+          text="Statut"
+          icon-name="ArrowUpDown"
+          :is-active="sortKey === 'status'"
+          :icon-color="getSortColor('status')"
+          :on-icon-click="() => toggleSort('status')"
+        />
+        <BasicCell
+          center
+          :span="6"
+          text="Détails"
+        />
       </div>
+
       <div
-        v-for="order in filteredOrders"
+        v-for="order in filteredData"
         :key="order.id"
         class="gridElemWrapper"
       >
-        <div class="cardLayoutWrapper orders-row">
+        <div class="cardLayoutWrapper">
           <BasicCell :span="10">
-            <div class="client">
-              <strong>{{ order.full_name }}</strong>
-              <div class="sous-titre">{{ order.email }}</div>
+            <div class="client-info">
+              <span class="client-name">{{ order.full_name }}</span>
+              <span class="client-email">{{ order.email }}</span>
             </div>
           </BasicCell>
+
           <BasicCell
-            :text="formatCurrency(order.total_amount)"
             center
             :span="4"
-          />
+          >
+            {{ formatCurrency(order.total_amount) }}
+          </BasicCell>
+
           <BasicCell
             center
             :span="6"
           >
             {{ formatDate(order.created_at) }}
           </BasicCell>
+
           <BasicCell
             center
-            :span="10"
+            :span="8"
           >
             <BasicDropdown
               v-model="localStatuses[order.id]"
@@ -96,6 +111,7 @@
               @update:model-value="(v) => handleStatusChange(order, v as string)"
             />
           </BasicCell>
+
           <BasicCellActionIcon
             icon-name="eye"
             tooltip="Voir la commande"
@@ -106,23 +122,8 @@
         </div>
       </div>
     </div>
-    <div class="orders--mobile">
-      <div class="mobile-cards-list">
-        <OrderCardMobile
-          v-for="order in filteredOrders"
-          :key="order.id"
-          v-model:status="localStatuses[order.id]"
-          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
-          :order="order"
-          :statuses="STATUSES"
-          :format-date="formatDate"
-          :format-currency="formatCurrency"
-          :handle-status-change="handleStatusChange"
-          :open-order-modal="openOrderModal"
-        />
-      </div>
-    </div>
   </WrapperLoader>
+
   <teleport to="#app">
     <AdminOrderDetailsModal
       v-if="selectedOrderId"
@@ -133,25 +134,40 @@
 </template>
 
 <script setup lang="ts">
-  import { OrderCardMobile } from '@/features/admin/sections/mobile'
+  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/composables/useSortableTable'
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+  import { ref, shallowRef, watchEffect } from 'vue'
+  import BasicToolbar from '../BasicToolbar.vue'
   import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
 
   type OrderRow = Tables<'orders'>
   const toast = useToastStore()
 
-  const orders = shallowRef<OrderRow[]>([])
-  const localStatuses = ref<Record<string, string>>({})
-  const page = ref(1)
-  const perPage = 8
-  const total = ref(0)
-  const search = ref('')
-  const sortKey = ref('created_at_desc')
-  const statusFilter = ref('all')
-  const loading = ref(false)
+  const {
+    filteredData,
+    total,
+    nbPages,
+    page,
+    search,
+    sortKey,
+    sortAsc,
+    loading,
+    hasLoaded,
+    reset,
+  } = useAdminTable<'orders'>({
+    table: 'orders',
+    orderBy: 'created_at',
+    ascending: false,
+    filters: { status: 'all' },
+    searchFn: (o, q) =>
+      (o.full_name?.toLowerCase()?.includes(q) ?? false) ||
+      (o.email?.toLowerCase()?.includes(q) ?? false),
+  })
+
+  const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
   const STATUSES = [
     { id: 'pending', label: 'En attente' },
@@ -160,68 +176,50 @@
     { id: 'completed', label: 'Terminée' },
     { id: 'canceled', label: 'Annulée' },
   ]
-  const STATUSES_WITH_ALL = [{ id: 'all', label: 'Tous' }, ...STATUSES]
+  const STATUS_FILTERS = [{ id: 'all', label: 'Tous' }, ...STATUSES]
   const SORT_OPTIONS = [
-    { id: 'created_at_desc', label: 'Plus récentes' },
-    { id: 'created_at_asc', label: 'Plus anciennes' },
-    { id: 'amount_desc', label: 'Montant décroissant' },
-    { id: 'amount_asc', label: 'Montant croissant' },
+    { id: 'created_at', label: 'Date' },
+    { id: 'full_name', label: 'Client' },
+    { id: 'total_amount', label: 'Montant' },
+    { id: 'status', label: 'Statut' },
   ]
-  const nbPages = computed(() => Math.ceil(total.value / perPage))
 
-  const filteredOrders = computed(() => {
-    let list = [...orders.value]
-    if (statusFilter.value !== 'all') list = list.filter((o) => o.status === statusFilter.value)
-    if (search.value.trim())
-      list = list.filter((o) => o.full_name.toLowerCase().includes(search.value.toLowerCase()))
-    switch (sortKey.value) {
-      case 'created_at_asc':
-        list.sort((a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime())
-        break
-      case 'amount_desc':
-        list.sort((a, b) => (b.total_amount ?? 0) - (a.total_amount ?? 0))
-        break
-      case 'amount_asc':
-        list.sort((a, b) => (a.total_amount ?? 0) - (b.total_amount ?? 0))
-        break
-      default:
-        list.sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime())
-    }
-    return list
+  const models = ref<{ sortKey: string; status: string }>({
+    sortKey: 'created_at',
+    status: 'all',
   })
 
   function resetFilters() {
-    search.value = ''
-    sortKey.value = 'created_at_desc'
-    statusFilter.value = 'all'
+    models.value.status = 'all'
+    models.value.sortKey = 'created_at'
+    reset()
   }
 
-  async function loadOrders() {
-    loading.value = true
-    const from = (page.value - 1) * perPage
-    const to = from + perPage - 1
-    const { data, count, error } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact' })
-      .range(from, to)
-    loading.value = false
-    if (error) toast.show('Erreur lors du chargement', 'danger')
-    else {
-      orders.value = data ?? []
-      total.value = count ?? 0
-      localStatuses.value = Object.fromEntries(
-        orders.value.map((o) => [o.id, o.status || 'pending']),
-      )
-    }
-  }
+  const localStatuses = shallowRef<Record<string, string>>({})
 
-  async function handleStatusChange(order: OrderRow, newValue: string) {
+  watchEffect(() => {
+    const statuses: Record<string, string> = {}
+    for (const o of filteredData.value) statuses[o.id] = o.status ?? 'pending'
+    localStatuses.value = statuses
+  })
+
+  async function handleStatusChange(order: Pick<OrderRow, 'id' | 'status'>, newValue: string) {
     localStatuses.value[order.id] = newValue
     const { error } = await supabase.from('orders').update({ status: newValue }).eq('id', order.id)
+
     if (error) toast.show('Erreur de mise à jour', 'danger')
     else toast.show('Statut mis à jour ✅', 'success')
   }
 
+  /* Modal */
+  const isModalVisible = ref(false)
+  const selectedOrderId = ref<string | null>(null)
+  function openOrderModal(id: string) {
+    selectedOrderId.value = id
+    isModalVisible.value = true
+  }
+
+  /* Utils */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -230,36 +228,32 @@
       year: 'numeric',
     })
   }
-
   function formatCurrency(amount: number | null) {
     if (amount == null) return '-'
     return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
   }
-
-  const isModalVisible = ref(false)
-  const selectedOrderId = ref<string | null>(null)
-  function openOrderModal(id: string) {
-    selectedOrderId.value = id
-    isModalVisible.value = true
-  }
-
-  watch(page, loadOrders)
-  onMounted(loadOrders)
 </script>
 
 <style scoped lang="less">
-  .orders-toolbar {
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    background-color: @neutral-50;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    grid-template-columns: repeat(36, 1fr);
-    gap: 12px;
-  }
-
   .orders--mobile {
     display: none;
+  }
+
+  .client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .client-name {
+    font-weight: 600;
+    color: @neutral-900;
+  }
+
+  .client-email {
+    color: @neutral-600;
+    font-size: 0.85rem;
+    word-break: break-word;
   }
 
   @media (max-width: 1000px) {
@@ -270,10 +264,8 @@
       display: block;
     }
   }
-
-  .mobile-cards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  .sous-titre {
+    color: @neutral-600;
+    font-size: 0.85rem;
   }
 </style>

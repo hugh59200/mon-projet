@@ -1,35 +1,17 @@
 <template>
-  <div :class="[...classes, { 'is-active': isActive }]">
-    <!-- Texte ou slot -->
-    <span
-      v-if="text"
-      class="truncate"
-    >
-      {{ text }}
-    </span>
+  <div :class="classes">
+    <span v-if="text">{{ text }}</span>
     <slot v-else />
 
-    <!-- Icône de tri animée -->
-    <transition
-      name="fade-rotate"
-      mode="out-in"
-    >
-      <BasicIconNext
-        v-if="iconName"
-        :key="iconName + (sortAsc ? '-asc' : '-desc')"
-        :name="resolvedIcon"
-        :color="isActive ? 'primary-600' : iconColor"
-        :size="iconSize"
-        :pointer="!!onIconClick"
-        @click="onIconClick && onIconClick()"
-        class="basic-cell__icon ml-1"
-      />
-    </transition>
-
-    <!-- Barre d’indicateur active -->
-    <div
-      v-if="isActive"
-      class="basic-cell__active-indicator"
+    <!-- 🔽 Icône dynamique -->
+    <BasicIconNext
+      v-if="iconName && resolvedIcon"
+      :name="resolvedIcon"
+      :color="iconColor"
+      :size="iconSize"
+      :pointer="!!onIconClick"
+      @click="onIconClick && onIconClick()"
+      class="ml-1 transition-transform duration-150"
     />
   </div>
 </template>
@@ -70,7 +52,7 @@
   )
 
   const classes = computed(() => {
-    const out: string[] = ['elem', 'basic-cell']
+    const out: string[] = ['elem']
     if (props.center) out.push('elem--center')
     if (props.span) out.push(`elem--span-${props.span}`)
     if (props.danger) out.push('elem--danger')
@@ -80,86 +62,18 @@
       if (Array.isArray(props.extraClass)) out.push(...props.extraClass)
       else out.push(props.extraClass)
     }
+    if (props.isActive) out.push('active')
     return out
   })
 
-  /* 🌀 Gestion dynamique de l’icône selon sens du tri */
   const resolvedIcon = computed(() => {
-    if (!props.iconName) return 'ArrowUpDown'
-    if (props.sortAsc === undefined) return props.iconName
+    if (!props.isActive) return props.iconName
     return props.sortAsc ? 'ArrowUp' : 'ArrowDown'
   })
 </script>
 
 <style scoped lang="less">
-  .basic-cell {
-    position: relative;
-    cursor: default;
-    user-select: none;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: @primary-700;
-    }
-
-    /* Flèche de tri */
-    .basic-cell__icon {
-      transition:
-        transform 0.25s ease,
-        color 0.25s ease,
-        opacity 0.25s ease;
-      opacity: 0.75;
-
-      &:hover {
-        opacity: 1;
-        transform: scale(1.1);
-        color: @primary-600;
-      }
-    }
-
-    /* Barre animée */
-    .basic-cell__active-indicator {
-      position: absolute;
-      bottom: -4px;
-      left: 20%;
-      right: 20%;
-      height: 2px;
-      border-radius: 2px;
-      background: @primary-500;
-      transform: scaleX(0);
-      opacity: 0;
-      transition:
-        transform 0.3s ease,
-        opacity 0.3s ease;
-    }
-
-    &.is-active .basic-cell__active-indicator {
-      transform: scaleX(1);
-      opacity: 1;
-    }
-  }
-
-  /* Animation morph pour l’icône */
-  .fade-rotate-enter-active,
-  .fade-rotate-leave-active {
-    transition:
-      opacity 0.25s ease,
-      transform 0.25s ease;
-  }
-  .fade-rotate-enter-from {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.85);
-  }
-  .fade-rotate-enter-to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-  .fade-rotate-leave-from {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-  .fade-rotate-leave-to {
-    opacity: 0;
-    transform: rotate(90deg) scale(0.85);
+  .elem.active {
+    color: @primary-600;
   }
 </style>
