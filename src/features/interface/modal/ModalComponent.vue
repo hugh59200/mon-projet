@@ -12,7 +12,6 @@
         class="modal__header"
       >
         <BasicText
-          size="body-xl"
           weight="bold"
           color="white"
           nbMaxLines="2"

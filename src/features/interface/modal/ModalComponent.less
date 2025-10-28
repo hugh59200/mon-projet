@@ -4,66 +4,83 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: fade(@neutral-900, 30%);
-  z-index: 1000;
+  z-index: 9000;
+  backdrop-filter: blur(1px) brightness(98%);
+  padding: 100px 16px;
+  box-sizing: border-box;
 
-  .modal__dialog {
+  &__dialog {
     display: flex;
     flex-direction: column;
-    background: @white;
-    border-radius: @border-radius-l;
-    box-shadow: 0px 0px 30px fade(@neutral-900, 15%);
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh; /* ✅ limite la taille du popup */
-    overflow: hidden; /* ✅ évite que le contenu déborde */
-    animation: modalIn 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    transform: scale(0.96);
-    opacity: 0;
-
-    @keyframes modalIn {
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
+    max-height: calc(100vh - 200px);
+    width: 100%;
+    max-width: 700px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden; /* pour ne pas que le contenu déborde */
   }
 
   &__header {
-    flex-shrink: 0; /* ✅ reste visible même quand on scroll */
-    padding: 0px 24px;
-    background-color: @secondary-900;
-    color: @white;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 24px;
+    background-color: @secondary-900;
+    color: white;
+    border-top-left-radius: @border-radius-m;
+    border-top-right-radius: @border-radius-m;
+    position: relative;
 
+    /* le titre (slot header) */
+    .basic-text,
+    h4,
+    span,
+    div {
+      margin: 0;
+      color: white;
+    }
+
+    /* l’icône de fermeture */
     svg {
-      fill: @white;
+      flex-shrink: 0;
       cursor: pointer;
+      fill: @white;
+      width: 20px;
+      height: 20px;
     }
   }
 
   &__content {
-    flex: 1; /* ✅ occupe la hauteur restante */
-    overflow-y: auto; /* ✅ rend scrollable le contenu */
-    padding: 24px;
-    background-color: @neutral-50;
+    flex: 1 1 auto; /* occupe l’espace restant */
+    overflow-y: auto; /* scroll uniquement ici */
+    padding: 12px;
+    position: relative;
 
-    /* petit style de scrollbar propre */
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: fade(@neutral-600, 40%);
-      border-radius: 8px;
+    svg {
+      fill: @neutral-500;
     }
   }
 
   &__actions {
-    flex-shrink: 0; /* ✅ ne bouge pas */
-    padding: 16px 24px;
-    background-color: @neutral-50;
-    border-top: 1px solid @neutral-200;
+    flex-shrink: 0;
+    padding: 12px 24px 24px 24px;
+    border-top: 1px solid #eee;
+    background: white;
+  }
+}
+
+@media (max-height: 700px) {
+  .modal {
+    padding: 50px 8px;
+
+    &__dialog {
+      max-height: calc(100vh - 100px);
+    }
+
+    &__header {
+      padding: 16px;
+    }
   }
 }

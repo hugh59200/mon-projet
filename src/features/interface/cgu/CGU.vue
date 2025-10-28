@@ -85,8 +85,6 @@
 <style scoped lang="less">
   .scroll-container {
     overflow-y: auto;
-    height: 60vh;
-    width: 60vw;
     .loader-container {
       height: 60vh;
       display: flex;

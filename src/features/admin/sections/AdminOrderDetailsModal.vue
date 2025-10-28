@@ -3,15 +3,7 @@
     v-model="visible"
     :closable="true"
   >
-    <template #header>
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        Détails de la commande
-      </BasicText>
-    </template>
-
+    <template #header>Détails de la commande</template>
     <template #content>
       <div class="order-detail order-detail--compact">
         <!-- Bloc 1 : Infos + statut + livraison -->
