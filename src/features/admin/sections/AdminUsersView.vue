@@ -1,47 +1,18 @@
 <template>
-  <div class="users-toolbar cardLayoutWrapper">
-    <div class="elem elem--span-12">
-      <BasicInput
-        v-model="search"
-        placeholder="Rechercher un utilisateur..."
-        icon-name="search"
-        clearable
-      />
-    </div>
+  <!-- 🔧 Toolbar réutilisable -->
+  <BasicToolbar
+    v-model:search="search"
+    v-model:models="models"
+    :search-placeholder="'Rechercher un utilisateur...'"
+    :dropdowns="[
+      { key: 'sortKey', label: 'Trier par', items: SORT_OPTIONS },
+      { key: 'selectedRole', label: 'Rôle', items: ROLE_FILTERS },
+    ]"
+    :show-reset="true"
+    @reset="resetFilters"
+  />
 
-    <div class="elem elem--center elem--span-8">
-      <BasicDropdown
-        v-model="sortKey"
-        :items="SORT_OPTIONS"
-        size="small"
-        label="Trier par"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-
-    <div class="elem elem--center elem--span-8">
-      <BasicDropdown
-        v-model="selectedRole"
-        :items="ROLE_FILTERS"
-        size="small"
-        label="Rôle"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-
-    <div class="elem elem--center elem--span-6 justify-end">
-      <BasicButton
-        label="Réinitialiser"
-        type="secondary"
-        size="small"
-        variant="outlined"
-        @click="resetFilters"
-      />
-    </div>
-  </div>
-
+  <!-- 📄 Pagination -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -49,6 +20,8 @@
     :nb-results="total"
     @change="page = $event"
   />
+
+  <!-- 🔁 Loader -->
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -56,6 +29,7 @@
     message="Chargement des utilisateurs..."
     empty-message="Aucun utilisateur trouvé 😅"
   >
+    <!-- 💻 Desktop -->
     <div class="users--desktop">
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
         <div class="elem elem--span-10"><span>Email</span></div>
@@ -64,6 +38,7 @@
         <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
         <div class="elem elem--center elem--span-6"><span>Actions</span></div>
       </div>
+
       <div
         class="gridElemWrapper"
         v-for="user in filteredData"
@@ -72,6 +47,7 @@
         <div class="cardLayoutWrapper">
           <BasicCell :span="10">{{ user.email }}</BasicCell>
           <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
+
           <BasicCell
             center
             :span="6"
@@ -85,12 +61,14 @@
               @update:model-value="(v) => v && handleRoleChange(user, v)"
             />
           </BasicCell>
+
           <BasicCell
             :span="6"
             center
           >
             {{ formatDate(user.created_at) }}
           </BasicCell>
+
           <BasicCellActionIcon
             icon-name="eye"
             tooltip="Voir"
@@ -108,6 +86,8 @@
         </div>
       </div>
     </div>
+
+    <!-- 📱 Mobile -->
     <div class="users--mobile">
       <div class="mobile-cards-list">
         <UserCardMobile
@@ -124,6 +104,8 @@
       </div>
     </div>
   </WrapperLoader>
+
+  <!-- 🪟 Modal -->
   <teleport to="#app">
     <AdminUserDetailsModal
       v-if="selectedUserId"
@@ -138,13 +120,15 @@
   import { supabase } from '@/services/supabaseClient'
   import type { Tables } from '@/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { ref, watchEffect } from 'vue'
+  import { ref, watch, watchEffect } from 'vue'
+  import BasicToolbar from '../BasicToolbar.vue'
   import { usePaginatedSupabaseTable } from '../composables/usePaginatedSupabaseTable'
   import AdminUserDetailsModal from './AdminUserDetailsModal.vue'
 
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
+  /** 📦 Table Supabase avec pagination */
   const {
     filteredData,
     total,
@@ -165,8 +149,32 @@
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
+  /** 🎚️ Filtres et rôles */
   const selectedRole = ref<'all' | 'user' | 'admin'>('all')
   const localRoles = ref<Record<string, string>>({})
+
+  /** 🧠 Données du modèle toolbar */
+  const models = ref<Record<string, string>>({
+    sortKey: sortKey.value,
+    selectedRole: selectedRole.value,
+  })
+
+  /** 🔄 Synchronisation descendante (Vue → Toolbar) */
+  watch([sortKey, selectedRole], ([newSort, newRole]) => {
+    models.value = { ...models.value, sortKey: newSort, selectedRole: newRole }
+  })
+
+  /** 🔄 Synchronisation montante (Toolbar → Vue) */
+  watch(
+    models,
+    (newModels) => {
+      sortKey.value = newModels.sortKey ?? 'created_at'
+      selectedRole.value = newModels.selectedRole as any
+    },
+    { deep: true },
+  )
+
+  /** ⚙️ Données statiques */
   const ROLES = [
     { id: 'user', label: 'Utilisateur' },
     { id: 'admin', label: 'Administrateur' },
@@ -177,11 +185,13 @@
     { id: 'email', label: 'Email' },
   ]
 
+  /** ♻️ Réinitialisation */
   function resetFilters() {
     selectedRole.value = 'all'
     reset()
   }
 
+  /** 🧩 CRUD */
   async function handleRoleChange(user: UserRow, newRole: string) {
     localRoles.value[user.id] = newRole
     const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
@@ -200,6 +210,7 @@
     }
   }
 
+  /** 🪟 Modal */
   const isModalVisible = ref(false)
   const selectedUserId = ref<string | null>(null)
   function openUserModal(id: string) {
@@ -207,6 +218,7 @@
     isModalVisible.value = true
   }
 
+  /** 🕒 Format utils */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -216,6 +228,7 @@
     })
   }
 
+  /** 🔁 Mise à jour des rôles locaux */
   watchEffect(() => {
     if (filteredData.value.length > 0) {
       const newRoles: Record<string, string> = {}
@@ -228,17 +241,6 @@
 </script>
 
 <style scoped lang="less">
-  .users-toolbar {
-    display: grid;
-    grid-template-columns: repeat(36, 1fr);
-    gap: 12px;
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    background: @neutral-50;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-  }
-
   .users--mobile {
     display: none;
   }
