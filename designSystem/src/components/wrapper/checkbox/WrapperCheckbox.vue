@@ -1,6 +1,5 @@
 <template>
   <WrapperFormElements
-    :required
     :hint
     :alertLabel
     :alertType
@@ -11,8 +10,18 @@
       :label
       :disabled
       :readonly
+      :required
     >
-      <slot></slot>
+      <template v-if="$slots.default">
+        <div :class="{ required }">
+          <slot></slot>
+        </div>
+      </template>
+      <template v-else>
+        <BasicText :class="{ required }">
+          {{ label }}
+        </BasicText>
+      </template>
     </BasicCheckbox>
   </WrapperFormElements>
 </template>
@@ -24,3 +33,11 @@
 
   const modelValue = defineModel<boolean | null>()
 </script>
+
+<style lang="less" scoped>
+  .required::after {
+    content: '*';
+    color: @danger-600;
+    margin-left: 4px;
+  }
+</style>

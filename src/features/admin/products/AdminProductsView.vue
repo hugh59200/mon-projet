@@ -1,11 +1,22 @@
 <template>
+  <!-- 🔍 Toolbar avec recherche + reset + ajout -->
   <BasicToolbar
     v-model:search="search"
     :search-placeholder="'Rechercher un produit...'"
     :show-reset="true"
     @reset="reset()"
-  />
+  >
+    <template #actions>
+      <BasicButton
+        label="+ Ajouter un produit"
+        type="primary"
+        size="small"
+        @click="isCreateModalVisible = true"
+      />
+    </template>
+  </BasicToolbar>
 
+  <!-- 📄 Pagination -->
   <BasicPagination
     :current-page="page"
     :nb-pages="nbPages"
@@ -15,6 +26,7 @@
     @change="page = $event"
   />
 
+  <!-- 💾 Tableau principal -->
   <WrapperLoader
     :loading="loading"
     :has-loaded="hasLoaded"
@@ -74,21 +86,18 @@
       >
         <div class="cardLayoutWrapper">
           <BasicCell :span="12">{{ product.name }}</BasicCell>
-
           <BasicCell
             center
             :span="8"
           >
             {{ product.category }}
           </BasicCell>
-
           <BasicCell
             center
             :span="4"
           >
             {{ formatCurrency(product.price) }}
           </BasicCell>
-
           <BasicCell
             center
             :span="4"
@@ -117,12 +126,18 @@
     </div>
   </WrapperLoader>
 
-  <!-- 🪟 MODAL -->
+  <!-- 🪟 MODALS -->
   <teleport to="#app">
-    <AdminProductDetailsModal
-      v-if="selectedProductId"
+    <!-- ➕ Création -->
+    <AdminProductModal
+      v-model="isCreateModalVisible"
+      @saved="fetchData"
+    />
+
+    <AdminProductModal
       v-model="isModalVisible"
       :product-id="selectedProductId"
+      :readonly="false"
     />
   </teleport>
 </template>
@@ -133,10 +148,11 @@
   import { deleteProduct } from '@/supabase/api/products'
   import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency } from '@/utils/index'
+  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
-  import AdminProductDetailsModal from './AdminProductDetailsModal.vue'
+  import AdminProductModal from './AdminProductModal.vue'
 
   type ProductRow = Tables<'products'>
   const toast = useToastStore()
@@ -164,6 +180,7 @@
 
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
+  // 🗑 Suppression produit
   async function handleDelete(product: ProductRow) {
     if (!confirm(`Supprimer ${product.name} ?`)) return
     try {
@@ -175,9 +192,11 @@
     }
   }
 
-  /* Modal */
+  // 🪟 Modals
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)
+  const isCreateModalVisible = ref(false)
+
   function openProductModal(id: string) {
     selectedProductId.value = id
     isModalVisible.value = true
