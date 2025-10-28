@@ -1,6 +1,5 @@
 <template>
   <div class="basic-toolbar cardLayoutWrapper">
-    <!-- 🔍 Recherche -->
     <div class="elem elem--span-12">
       <BasicInput
         v-model="search"
@@ -10,24 +9,13 @@
       />
     </div>
 
-    <!-- 🔽 Dropdowns dynamiques -->
     <div
-      v-for="dropdown in dropdowns"
-      :key="dropdown.key"
+      v-for="(dropdown, index) in dropdowns"
+      :key="index"
       class="elem elem--center elem--span-8"
     >
       <BasicDropdown
-        v-if="dropdown.key === 'sortKey'"
-        v-model="sortKey"
-        :items="dropdown.items"
-        size="small"
-        :label="dropdown.label"
-        dropdown-type="table"
-        force-value
-      />
-      <BasicDropdown
-        v-else-if="dropdown.key === 'selectedRole'"
-        v-model="selectedRole"
+        v-model="models[dropdown.key]"
         :items="dropdown.items"
         size="small"
         :label="dropdown.label"
@@ -36,7 +24,6 @@
       />
     </div>
 
-    <!-- ♻️ Bouton Réinitialiser -->
     <div
       v-if="showReset"
       class="elem elem--center elem--span-6 justify-end"
@@ -46,7 +33,7 @@
         type="secondary"
         size="small"
         variant="outlined"
-        @click="$emit('reset')"
+        @click="emit('reset')"
       />
     </div>
   </div>
@@ -70,15 +57,10 @@
     showReset?: boolean
   }>()
 
-  /* ✅ declare tes v-models */
   const search = defineModel<string>('search')
-  const sortKey = defineModel<string>('sortKey')
-  const selectedRole = defineModel<string>('selectedRole')
+  const models = defineModel<Record<string, string>>('models', { default: () => ({}) })
 
-  /* ✅ déclare aussi l'event custom 'reset' */
-  const emit = defineEmits<{
-    (e: 'reset'): void
-  }>()
+  const emit = defineEmits<{ (e: 'reset'): void }>()
 </script>
 
 <style scoped lang="less">

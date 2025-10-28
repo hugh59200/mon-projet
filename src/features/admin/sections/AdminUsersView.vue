@@ -1,8 +1,8 @@
 <template>
   <BasicToolbar
     v-model:search="search"
-    v-model:sortKey="sortKey"
-    v-model:selectedRole="selectedRole"
+    v-model:models="models"
+    v-model:sortAsc="sortAsc"
     :search-placeholder="'Rechercher un utilisateur...'"
     :dropdowns="[
       { key: 'sortKey', label: 'Trier par', items: SORT_OPTIONS },
@@ -27,16 +27,59 @@
     message="Chargement des utilisateurs..."
     empty-message="Aucun utilisateur trouvé 😅"
   >
-    <!-- 💻 Desktop -->
     <div class="users--desktop">
+      <!-- HEADER -->
       <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <div class="elem elem--span-10"><span>Email</span></div>
-        <div class="elem elem--span-8"><span>Nom</span></div>
-        <div class="elem elem--center elem--span-6"><span>Rôle</span></div>
-        <div class="elem elem--center elem--span-6"><span>Créé le</span></div>
-        <div class="elem elem--center elem--span-6"><span>Actions</span></div>
+        <BasicCell
+          :span="10"
+          text="Email"
+          icon-name="ArrowUpDown"
+          :sort-asc="sortKey === 'email' ? sortAsc : undefined"
+          :is-active="sortKey === 'email'"
+          :icon-color="sortKey === 'email' ? 'primary-600' : 'grey-800'"
+          :on-icon-click="() => toggleSort('email')"
+        />
+
+        <BasicCell
+          :span="8"
+          text="Nom"
+          icon-name="ArrowUpDown"
+          :sort-asc="sortKey === 'full_name' ? sortAsc : undefined"
+          :is-active="sortKey === 'full_name'"
+          :icon-color="sortKey === 'full_name' ? 'primary-600' : 'grey-800'"
+          :on-icon-click="() => toggleSort('full_name')"
+        />
+
+        <BasicCell
+          center
+          :span="6"
+          text="Rôle"
+          icon-name="ArrowUpDown"
+          :sort-asc="sortKey === 'role' ? sortAsc : undefined"
+          :is-active="sortKey === 'role'"
+          :icon-color="sortKey === 'role' ? 'primary-600' : 'grey-800'"
+          :on-icon-click="() => toggleSort('role')"
+        />
+
+        <BasicCell
+          center
+          :span="6"
+          text="Créé le"
+          icon-name="ArrowUpDown"
+          :sort-asc="sortKey === 'created_at' ? sortAsc : undefined"
+          :is-active="sortKey === 'created_at'"
+          :icon-color="sortKey === 'created_at' ? 'primary-600' : 'grey-800'"
+          :on-icon-click="() => toggleSort('created_at')"
+        />
+
+        <BasicCell
+          center
+          :span="6"
+          text="Actions"
+        />
       </div>
 
+      <!-- ROWS -->
       <div
         v-for="user in filteredData"
         :key="user.id"
@@ -107,7 +150,7 @@
   type UserRow = Tables<'profiles'>
   const toast = useToastStore()
 
-  /* 🧭 Table paginée */
+  /* Pagination / data composable */
   const {
     filteredData,
     total,
@@ -117,6 +160,7 @@
     page,
     search,
     sortKey,
+    sortAsc,
     activeFilters,
     fetchData,
     reset,
@@ -130,33 +174,56 @@
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
-  /* 🔍 Filtres spécifiques */
-  const selectedRole = ref<'all' | 'user' | 'admin'>('all')
-  watch(selectedRole, (role) => {
-    activeFilters.value.role = role
-    fetchData()
+  /* Toolbar models */
+  const models = ref<{ sortKey: string; selectedRole: 'all' | 'user' | 'admin' }>({
+    sortKey: 'created_at',
+    selectedRole: 'all',
   })
 
+  watchEffect(() => {
+    models.value.sortKey = sortKey.value
+    models.value.selectedRole = activeFilters.value.role ?? 'all'
+  })
+
+  watch(models, (val) => {
+    sortKey.value = val.sortKey
+    activeFilters.value.role = val.selectedRole
+  })
+
+  /* Local roles */
   const localRoles = ref<Record<string, string>>({})
 
-  /* Dropdowns */
+  /* Dropdown data */
   const ROLES = [
     { id: 'user', label: 'Utilisateur' },
     { id: 'admin', label: 'Administrateur' },
   ]
   const ROLE_FILTERS = [{ id: 'all', label: 'Tous' }, ...ROLES]
   const SORT_OPTIONS = [
-    { id: 'created_at', label: 'Plus récents' },
+    { id: 'created_at', label: 'Date de création' },
     { id: 'email', label: 'Email' },
+    { id: 'full_name', label: 'Nom' },
+    { id: 'role', label: 'Rôle' },
   ]
 
-  /* ♻️ Réinitialiser */
+  /* Sorting logic */
+  function toggleSort(key: string) {
+    if (sortKey.value === key) {
+      sortAsc.value = !sortAsc.value
+    } else {
+      sortKey.value = key
+      sortAsc.value = true
+    }
+  }
+
+  /* Reset */
   function resetFilters() {
-    selectedRole.value = 'all'
+    models.value.selectedRole = 'all'
+    models.value.sortKey = 'created_at'
     reset()
   }
 
-  /* 🧩 CRUD */
+  /* CRUD */
   async function handleRoleChange(user: UserRow, newRole: string) {
     localRoles.value[user.id] = newRole
     const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
@@ -175,7 +242,7 @@
     }
   }
 
-  /* 🪟 Modal */
+  /* Modal */
   const isModalVisible = ref(false)
   const selectedUserId = ref<string | null>(null)
   function openUserModal(id: string) {
@@ -183,7 +250,7 @@
     isModalVisible.value = true
   }
 
-  /* 🕒 Format utils */
+  /* Date formatting */
   function formatDate(date: string | null) {
     if (!date) return '-'
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -193,7 +260,7 @@
     })
   }
 
-  /* 🔁 Sync des rôles locaux */
+  /* Sync local roles */
   watchEffect(() => {
     if (filteredData.value.length > 0) {
       const newRoles: Record<string, string> = {}

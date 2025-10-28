@@ -13,9 +13,6 @@ interface UsePaginatedSupabaseTableOptions<T> {
   transformFn?: (data: T[]) => T[]
 }
 
-/**
- * 🔁 Composable générique de chargement, pagination et filtrage Supabase
- */
 export function usePaginatedSupabaseTable<T extends Record<string, any>>(
   options: UsePaginatedSupabaseTableOptions<T>,
 ) {
@@ -41,7 +38,6 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
 
   const nbPages = computed(() => Math.ceil(total.value / perPage))
 
-  /** 🔄 Chargement depuis Supabase */
   async function fetchData() {
     loading.value = true
     const from = (page.value - 1) * perPage
@@ -52,8 +48,7 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
       .select('*', { count: 'exact' })
       .range(from, to)
 
-    if (sortKey.value) query = query.order(sortKey.value, { ascending: sortAsc.value })
-
+    // ⚙️ Appliquer les filtres serveurs (mais pas le tri)
     Object.entries(activeFilters.value).forEach(([key, value]) => {
       if (value !== undefined && value !== 'all') query = query.eq(key, value)
     })
@@ -74,17 +69,32 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
     total.value = count ?? 0
   }
 
-  /** 🔍 Filtrage local */
+  /* 🧠 Tri + recherche locale */
   const filteredData = computed(() => {
     let list = [...(data.value as T[])]
+
+    // Recherche locale
     if (searchFn && search.value.trim()) {
       const q = search.value.trim().toLowerCase()
       list = list.filter((item: T) => searchFn(item, q))
     }
+
+    // Tri client local
+    if (sortKey.value) {
+      list.sort((a: any, b: any) => {
+        const va = a[sortKey.value]
+        const vb = b[sortKey.value]
+        if (va == null) return 1
+        if (vb == null) return -1
+        if (typeof va === 'string' && typeof vb === 'string')
+          return sortAsc.value ? va.localeCompare(vb) : vb.localeCompare(va)
+        return sortAsc.value ? (va > vb ? 1 : -1) : va < vb ? 1 : -1
+      })
+    }
+
     return list
   })
 
-  /** ♻️ Reset */
   function reset() {
     search.value = ''
     page.value = 1
@@ -94,7 +104,8 @@ export function usePaginatedSupabaseTable<T extends Record<string, any>>(
     fetchData()
   }
 
-  watch([page, sortKey, sortAsc, activeFilters], fetchData, { deep: true })
+  // 👇 Plus besoin de refetch sur sortKey/sortAsc
+  watch([page, activeFilters], fetchData, { deep: true })
   onMounted(fetchData)
 
   return {
