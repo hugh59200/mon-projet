@@ -13,12 +13,12 @@
           mode="out-in"
           appear
         >
-          <component
-            :is="Component"
-            :key="$route.fullPath"
-            @vue:beforeMount="sablier.debutSablier"
-            @vue:mounted="sablier.finSablier"
-          />
+          <keep-alive include="Actualites">
+            <component
+              :is="Component"
+              :key="$route.path"
+            />
+          </keep-alive>
         </transition>
       </RouterView>
 
