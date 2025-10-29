@@ -12,21 +12,27 @@
   background-color: fade(@neutral-100, 60%);
   transition: all 0.25s ease;
   font-weight: 500;
+  border-bottom: 3px solid transparent; // base neutre
 
   &:hover {
     background-color: fade(@neutral-200, 80%);
     color: @primary-700;
   }
 
+  /* ✅ Onglet actif — mise en avant claire */
   &--selected {
     background-color: @white;
     color: @primary-700;
     font-weight: 600;
+    border-bottom: 3px solid @primary-600; // ligne visible sous l'onglet
     z-index: 2;
+    box-shadow: 0 2px 8px fade(@primary-500, 15%);
   }
 
+  /* ⚪ Onglet inactif */
   &--unselected {
     color: @neutral-500;
+    border-bottom: 3px solid transparent;
   }
 
   svg {
@@ -37,6 +43,7 @@
   &--success {
     fill: @success-500;
   }
+
   &--danger {
     fill: @danger-500;
   }

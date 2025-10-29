@@ -5,43 +5,48 @@
       :class="`tabs--${tabsPlacement}`"
       ref="tabsContainer"
     >
-      <slot>
-        <BasicTab
-          v-for="tab in tabs"
-          :tabKey="tab.tabKey"
-          :tabState="tab.tabState"
-          :key="tab.tabKey!"
-        />
-      </slot>
+      <!-- Liste des onglets -->
+      <BasicTab
+        v-for="tab in tabs"
+        :key="tab.routeName"
+        v-model="modelValue"
+        :tabKey="tab.tabKey"
+        :tabState="tab.tabState"
+        :routeName="tab.routeName"
+        :color="tab.color"
+      >
+        <template #tab-text>
+          {{ tab.tabKey }}
+        </template>
+      </BasicTab>
+
+      <!-- ✅ Indicateur animé -->
       <div
         class="tabs__indicator"
         :style="indicatorStyle"
-      ></div>
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
-  import { BasicTabsKey, type BasicTabsProvided, type TabsModel } from './BasicTabs.types'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
+  import type { TabProps } from '../tab/BasicTab.types'
+  import type { TabsModel } from './BasicTabs.types'
 
-  const selectedTab = defineModel<TabsModel>()
-
-  const props = defineProps<{
+  /**
+   * Props & modèle bidirectionnel (v-model)
+   */
+  defineProps<{
     tabs?: TabProps[]
     tabsPlacement?: 'center' | 'start'
   }>()
 
-  const change = (value: TabsModel) => {
-    selectedTab.value = value
-  }
+  const modelValue = defineModel<TabsModel>()
 
-  provide<BasicTabsProvided>(BasicTabsKey, {
-    selectedTab,
-    change,
-  })
-
-  // 🎯 Gestion de l'indicateur glissant
+  /**
+   * 🎯 Gestion de l’indicateur glissant sous l’onglet actif
+   */
   const tabsContainer = ref<HTMLElement | null>(null)
   const indicatorLeft = ref(0)
   const indicatorWidth = ref(0)
@@ -57,7 +62,7 @@
     }
   }
 
-  watch(selectedTab, async () => {
+  watch(modelValue, async () => {
     await nextTick()
     updateIndicator()
   })
@@ -67,7 +72,9 @@
     window.addEventListener('resize', updateIndicator)
   })
 
-  // 💅 Style dynamique
+  /**
+   * 💅 Style dynamique de l’indicateur
+   */
   const indicatorStyle = computed(() => ({
     transform: `translateX(${indicatorLeft.value}px)`,
     width: `${indicatorWidth.value}px`,
@@ -108,7 +115,7 @@
     }
 
     .tab {
-      flex: none; /* ✅ évite la contraction */
+      flex: none;
       white-space: nowrap;
       min-width: 120px;
     }

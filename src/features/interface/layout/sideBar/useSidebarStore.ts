@@ -4,34 +4,23 @@ import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIcon
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+// useSidebarStore.ts
+
 export const useSidebarStore = defineStore('sidebar', () => {
-  // état sidebar
   const isReduced = ref(false)
-
   const toggle = () => (isReduced.value = !isReduced.value)
-
-  // récupération de l’auth
   const auth = useAuthStore()
 
-  // génération dynamique des items
+  const allowedSidebarNames = ['home', 'catalogue', 'actualites'] // 👈 seulement ces routes
+
   const sidebarItems = computed(() => {
     return router
       .getRoutes()
       .filter((route) => {
+        if (!allowedSidebarNames.includes(route.name as string)) return false
         if (!route.meta.label || !route.meta.icon) return false
-
-        // accessibilité
         if (route.meta.requiresAuth && !auth.isAuthenticated) return false
         if (route.meta.requiresAdmin && !auth.isAdmin) return false
-
-        // visibilité personnalisée
-        if (route.meta.visibility) {
-          if (typeof route.meta.visibility === 'function') {
-            return route.meta.visibility(route) === 'visible'
-          }
-          return route.meta.visibility === 'visible'
-        }
-
         return true
       })
       .sort((a, b) => (a.meta.order || 0) - (b.meta.order || 0))
@@ -43,9 +32,5 @@ export const useSidebarStore = defineStore('sidebar', () => {
       }))
   })
 
-  return {
-    isReduced,
-    toggle,
-    sidebarItems,
-  }
+  return { isReduced, toggle, sidebarItems }
 })

@@ -5,15 +5,15 @@
     class="tabs-view"
   >
     <router-view v-slot="{ Component }">
-      <keep-alive include="Actualites">
-        <transition
-          name="fade-slide"
-          mode="out-in"
-          appear
-        >
+      <transition
+        name="fade-slide"
+        mode="out-in"
+        appear
+      >
+        <keep-alive include="Actualites">
           <component :is="Component" />
-        </transition>
-      </keep-alive>
+        </keep-alive>
+      </transition>
     </router-view>
   </WrapperForm>
 </template>
@@ -27,12 +27,10 @@
   const route = useRoute()
   const { tabs, goToTab } = useNavigationTabs()
 
-  // ✅ lier directement la route courante
+  // ✅ Corrigé : on travaille avec les noms de routes, pas les labels
   const selectedTab = computed({
     get: () => route.name as RouteName,
-    set: (routeName: RouteName) => {
-      goToTab(routeName)
-    },
+    set: (routeName: RouteName) => goToTab(routeName),
   })
 </script>
 

@@ -3,26 +3,25 @@
     :is="iconComponent"
     v-bind="computedProps"
     class="basic-icon-next"
-    :class="[
-      `basic-icon-next--color--${colorClass}`,
-      { 'basic-icon-next--pointer': pointer },
-      { 'basic-icon-next--not-allowed': disabled && !pointer },
-      { 'basic-icon-next--disabled': disabled },
-    ]"
+    :style="{ color: color }"
+    :class="{
+      'basic-icon-next--pointer': pointer,
+      'basic-icon-next--not-allowed': disabled && !pointer,
+      'basic-icon-next--disabled': disabled,
+    }"
   />
 </template>
 
 <script setup lang="ts">
   import * as LucideIcons from 'lucide-vue-next'
   import { computed, type Component } from 'vue'
-  import type { IconColor } from './BasicIcon.type'
 
   export type IconNameNext = keyof typeof LucideIcons
 
   interface IconNextProps {
     name: IconNameNext
     size?: number
-    color?: IconColor
+    color?: string
     strokeWidth?: number
     pointer?: boolean
     disabled?: boolean
@@ -30,7 +29,7 @@
 
   const props = withDefaults(defineProps<IconNextProps>(), {
     size: 20,
-    color: 'primary-600',
+    color: 'currentColor', // 🟢 ← important
     strokeWidth: 1.5,
     pointer: false,
     disabled: false,
@@ -42,11 +41,9 @@
 
   const computedProps = computed(() => ({
     size: props.size,
-    color: 'currentColor',
+    color: 'currentColor', // 🟢 laisse Lucide suivre la couleur CSS
     'stroke-width': props.strokeWidth,
   }))
-
-  const colorClass = computed(() => (props.disabled ? 'neutral-300' : props.color))
 </script>
 
 <style scoped lang="less">

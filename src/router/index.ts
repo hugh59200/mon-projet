@@ -208,8 +208,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Messagerie',
           icon: 'MessageSquare',
-          title: 'Messagerie – Fast Peptides',
-          description: 'Discutez avec les utilisateurs et suivez les conversations clients.',
+          color: '#3B82F6', // 🔵 Bleu
         },
       },
       {
@@ -219,8 +218,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Statistiques',
           icon: 'BarChart3',
-          title: 'Statistiques – Fast Peptides',
-          description: 'Consultez les données de performance et les indicateurs clés du site.',
+          color: '#10B981', // 🟢 Vert
         },
       },
       {
@@ -230,9 +228,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Utilisateurs',
           icon: 'Users',
-          title: 'Utilisateurs – Fast Peptides',
-          description:
-            'Gérez les comptes clients, les droits d’accès et les informations de profil.',
+          color: '#F59E0B', // 🟠 Orange
         },
       },
       {
@@ -242,8 +238,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Commandes',
           icon: 'ShoppingCart',
-          title: 'Commandes – Fast Peptides',
-          description: 'Suivez et gérez les commandes en cours ou terminées sur la plateforme.',
+          color: '#EF4444', // 🔴 Rouge
         },
       },
       {
@@ -253,8 +248,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Produits',
           icon: 'PackageSearch',
-          title: 'Produits – Fast Peptides',
-          description: 'Ajoutez, modifiez ou supprimez les peptides disponibles dans le catalogue.',
+          color: '#8B5CF6', // 🟣 Violet
         },
       },
       {
@@ -264,8 +258,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Actualités',
           icon: 'Newspaper',
-          title: 'Actualités – Fast Peptides',
-          description: 'Publiez les dernières études, nouvelles et annonces importantes.',
+          color: '#F97316', // 🟧 Orange clair
         },
       },
       {
@@ -275,8 +268,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Catégories',
           icon: 'FolderTree',
-          title: 'Catégories – Fast Peptides',
-          description: 'Organisez vos produits et articles par thématique de recherche.',
+          color: '#06B6D4', // 🩵 Cyan
         },
       },
     ],
