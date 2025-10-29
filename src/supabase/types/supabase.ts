@@ -96,6 +96,7 @@ export type Database = {
           published_at: string | null
           slug: string
           title: string
+          topic_id: string | null
         }
         Insert: {
           author_id?: string | null
@@ -106,6 +107,7 @@ export type Database = {
           published_at?: string | null
           slug: string
           title: string
+          topic_id?: string | null
         }
         Update: {
           author_id?: string | null
@@ -116,6 +118,7 @@ export type Database = {
           published_at?: string | null
           slug?: string
           title?: string
+          topic_id?: string | null
         }
         Relationships: [
           {
@@ -132,7 +135,38 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "news_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "news_topics"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      news_topics: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image: string | null
+          label: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          image?: string | null
+          label: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          label?: string
+        }
+        Relationships: []
       }
       orders: {
         Row: {

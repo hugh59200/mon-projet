@@ -19,7 +19,7 @@
       class="icon-container"
       v-if="iconName"
     >
-      <BasicIcon
+      <BasicIconNext
         :name="iconName"
         :active
       />

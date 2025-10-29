@@ -4,7 +4,7 @@
       :label
       :active
       :type
-      icon-name="arrow-down"
+      icon-name="ArrowDown"
       :disabled
       :size
       @click="toggleDropdownButton"

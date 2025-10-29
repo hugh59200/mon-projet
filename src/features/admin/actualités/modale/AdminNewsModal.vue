@@ -13,7 +13,7 @@
       <div class="news-form">
         <!-- 🧾 Titre -->
         <WrapperInput
-          v-model="form.title"
+          v-model="form.title as InputModel"
           label="Titre"
           placeholder="Ex : Nouvelle étude sur le BPC-157"
           :readonly="readonly"
@@ -47,6 +47,25 @@
           />
         </WrapperFormElements>
 
+        <!-- 🧭 Catégorie (topic) -->
+        <WrapperFormElements label="Catégorie (topic)">
+          <WrapperDropdown
+            v-model="form.topic_id!"
+            :items="topicsOptions"
+            placeholder="Choisir un topic existant"
+            key-id="id"
+            key-label="label"
+            :disabled="readonly"
+          />
+          <WrapperInput
+            v-if="!readonly"
+            v-model="newTopicLabel"
+            label="Ou créer un nouveau topic"
+            placeholder="Ex : Innovation médicale"
+            hint="Ce champ est optionnel — il créera un nouveau topic s’il n’existe pas encore."
+          />
+        </WrapperFormElements>
+
         <!-- 🖼️ Image principale -->
         <WrapperFormElements label="Image principale">
           <BasicInput
@@ -74,7 +93,6 @@
               :src="imagePreview"
               alt="Aperçu image actualité"
             />
-
             <BasicButton
               v-if="!readonly"
               label="Supprimer"
@@ -101,26 +119,27 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { supabase } from '@/supabase/supabaseClient'
   import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import type { InputModel } from '@designSystem/index'
   import { computed, onMounted, ref, watch } from 'vue'
+  import { createNews, fetchNewsById, updateNews, uploadNewsImage } from '../api'
+  import { deleteTopicImage } from '../api/topicImages'
+  import { createTopic, fetchTopics } from '../api/topics'
 
+  /* 💾 Props / Events */
   const visible = defineModel<boolean>()
-  const props = defineProps<{
-    newsId?: string | null
-    readonly?: boolean
-  }>()
+  const props = defineProps<{ newsId?: string | null; readonly?: boolean }>()
   const emit = defineEmits(['saved'])
   const toast = useToastStore()
 
-  /* État */
+  /* 🧱 State */
   const loading = ref(false)
-  const uploadLoading = ref(false)
   const imagePreview = ref<string | null>(null)
   const selectedFile = ref<File | null>(null)
   const fileInputRef = ref<HTMLInputElement | null>(null)
-  const oldImagePath = ref<string | null>(null)
+  const topicsOptions = ref<{ id: string; label: string }[]>([])
+  const newTopicLabel = ref('')
 
   const form = ref<TablesInsert<'news'>>({
     title: '',
@@ -130,6 +149,7 @@
     image: null,
     published_at: new Date().toISOString(),
     author_id: null,
+    topic_id: '',
   })
 
   const isEditMode = computed(() => !!props.newsId)
@@ -142,12 +162,31 @@
         : 'Publier une actualité',
   )
 
-  /* 🖱️ Sélecteur fichier */
+  /* 📂 Topics */
+  async function loadTopics() {
+    const topics = await fetchTopics()
+    topicsOptions.value = topics.map((t) => ({ id: t.id, label: t.label }))
+  }
+
+  async function createTopicIfNeeded(): Promise<string | null> {
+    if (!newTopicLabel.value.trim()) return null
+    try {
+      const topic = await createTopic({ label: newTopicLabel.value })
+      await loadTopics()
+      toast.show(`Topic "${topic.label}" créé ✅`, 'success')
+      newTopicLabel.value = ''
+      return topic.id
+    } catch (err: any) {
+      toast.show(`Erreur création topic : ${(err as Error).message}`, 'danger')
+      return null
+    }
+  }
+
+  /* 📤 Image Upload */
   function openFilePicker() {
     if (!readonly.value) fileInputRef.value?.click()
   }
 
-  /* 📤 Sélection fichier */
   function handleFileChange(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0]
     if (!file) return
@@ -159,71 +198,38 @@
     imagePreview.value = URL.createObjectURL(file)
   }
 
-  /* 🔎 Extraire nom fichier */
   function extractFileName(url: string | null | undefined): string | null {
     if (!url) return null
     const parts = url.split('/')
     return parts[parts.length - 1] ?? null
   }
 
-  /* 🧾 Charger actualité existante */
-  async function loadNews() {
-    if (!props.newsId) return
-    const { data, error } = await supabase.from('news').select('*').eq('id', props.newsId).single()
-
-    if (error) return toast.show('Erreur chargement actualité', 'danger')
-    form.value = data
-    imagePreview.value = data.image || null
-    if (data.image) oldImagePath.value = data.image.split('/news-images/')[1] ?? null
-  }
-
-  /* ☁️ Upload image */
-  async function uploadImage(): Promise<string | null> {
-    if (!selectedFile.value || !form.value.slug) return null
-    uploadLoading.value = true
+  async function removeImage() {
+    if (readonly.value || !form.value.image) return
     try {
-      const folderPath = `news/${form.value.slug}`
-      const fileExt = selectedFile.value.name.split('.').pop()
-      const fileName = `news-${form.value.slug}.${fileExt}`
-      const fullPath = `${folderPath}/${fileName}`
-
-      if (oldImagePath.value) {
-        await supabase.storage.from('news-images').remove([oldImagePath.value])
-      }
-
-      const { error } = await supabase.storage
-        .from('news-images')
-        .upload(fullPath, selectedFile.value, { cacheControl: '3600', upsert: true })
-
-      if (error) throw error
-
-      const { data: publicUrlData } = supabase.storage.from('news-images').getPublicUrl(fullPath)
-      oldImagePath.value = fullPath
-      return publicUrlData.publicUrl
+      await deleteTopicImage(form.value.image)
+      form.value.image = null
+      imagePreview.value = null
+      toast.show('Image supprimée du serveur 🗑️', 'info')
     } catch (err: any) {
-      toast.show(`Erreur upload : ${(err as Error).message}`, 'danger')
-      return null
-    } finally {
-      uploadLoading.value = false
+      toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
     }
   }
 
-  /* ❌ Supprimer image */
-  async function removeImage() {
-    if (readonly.value) return
+  /* 🧾 Chargement d’un article existant */
+  async function loadNews() {
+    if (!props.newsId) return
     try {
-      if (form.value.image) {
-        const path = form.value.image.split('/news-images/')[1]
-        if (path) {
-          await supabase.storage.from('news-images').remove([path])
-          toast.show('Image supprimée du serveur 🗑️', 'info')
-        }
-        form.value.image = null
+      const data = await fetchNewsById(props.newsId)
+      if (!data) return toast.show('Actualité introuvable', 'warning')
+      if (data.topic_id) {
+        form.value.topic_id = data.topic_id
       }
-      selectedFile.value = null
-      imagePreview.value = null
-    } catch (err: any) {
-      toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
+      form.value = data
+      console.log(form)
+      imagePreview.value = data.image || null
+    } catch {
+      toast.show('Erreur chargement actualité', 'danger')
     }
   }
 
@@ -236,20 +242,27 @@
 
     loading.value = true
     try {
+      // 🔹 Création du topic si besoin
+      if (!form.value.topic_id && newTopicLabel.value) {
+        const topicId = await createTopicIfNeeded()
+        if (topicId) form.value.topic_id = topicId
+      }
+
+      // 🔹 Upload de l’image si sélectionnée
       if (selectedFile.value) {
-        const uploadedUrl = await uploadImage()
-        if (uploadedUrl) form.value.image = uploadedUrl
+        const uploadedUrl = await uploadNewsImage(form.value.slug, selectedFile.value)
+        form.value.image = uploadedUrl
       }
 
-      let error
+      // 🔹 Enregistrement (create / update)
       if (isEditMode.value && props.newsId) {
-        ;({ error } = await supabase.from('news').update(form.value).eq('id', props.newsId))
+        await updateNews(props.newsId, form.value)
+        toast.show('Actualité mise à jour ✅', 'success')
       } else {
-        ;({ error } = await supabase.from('news').insert(form.value))
+        await createNews(form.value)
+        toast.show('Actualité publiée ✅', 'success')
       }
 
-      if (error) throw error
-      toast.show(isEditMode.value ? 'Actualité mise à jour ✅' : 'Actualité publiée ✅', 'success')
       emit('saved')
       visible.value = false
     } catch (err: any) {
@@ -259,7 +272,11 @@
     }
   }
 
-  onMounted(loadNews)
+  /* 🔁 Init */
+  onMounted(async () => {
+    await loadTopics()
+    await loadNews()
+  })
   watch(() => props.newsId, loadNews)
 </script>
 

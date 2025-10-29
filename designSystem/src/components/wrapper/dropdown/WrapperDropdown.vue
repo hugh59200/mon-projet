@@ -26,9 +26,9 @@
 <script
   setup
   lang="ts"
-  generic="TDropdownKey extends DropdownId = DropdownId, TDropdownItem extends DropdownItem<TDropdownKey> = DropdownItem<TDropdownKey>"
+  generic="TDropdownKey extends string | number | boolean | undefined = string | number | boolean | undefined, TDropdownItem extends DropdownItem<TDropdownKey> = DropdownItem<TDropdownKey>"
 >
-  import type { DropdownId, DropdownItem, WrapperDropdownProps } from '@designSystem/components'
+  import type {  DropdownItem, WrapperDropdownProps } from '@designSystem/components'
 
   withDefaults(defineProps<WrapperDropdownProps<TDropdownItem> & {
     keyId?: keyof DropdownItem<TDropdownKey>

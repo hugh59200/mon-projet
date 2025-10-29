@@ -393,10 +393,31 @@ select
 from auth.users u
 left join public.profiles p on u.id = p.id;
 
+-- ============================================
+-- 🧬 TABLE: public.news_topics
+-- ============================================
 
--- ============================================================
--- 📰 TABLE : NEWS (Actualités / Blog)
--- ============================================================
+CREATE TABLE IF NOT EXISTS public.news_topics (
+  id text PRIMARY KEY, -- ex: 'recherche', 'marche', etc.
+  label text NOT NULL,
+  description text,
+  image text, -- URL de l'image du topic
+  created_at timestamptz DEFAULT now()
+);
+
+-- Préremplissage
+INSERT INTO public.news_topics (id, label, description, image)
+VALUES
+  ('recherche', 'Recherche & Innovation', 'Les dernières avancées sur les peptides.', '/images/topics/innovation.jpg'),
+  ('reglementation', 'Réglementation & Conformité', 'Les évolutions légales et politiques du marché.', '/images/topics/reglementation.jpg'),
+  ('marche', 'Marché & Économie', 'Les tendances et la croissance du marché des peptides.', '/images/topics/marche.jpg'),
+  ('usages', 'Usages & Performances', 'Les applications sportives et les bénéfices sur la santé.', '/images/topics/performance.jpg'),
+  ('bien-etre', 'Bien-être & Cosmétiques', 'Les peptides dans les soins, la beauté et le bien-être.', '/images/topics/bienetre.jpg')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================
+-- 📰 TABLE: public.news
+-- ============================================
 
 CREATE TABLE IF NOT EXISTS public.news (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -409,23 +430,63 @@ CREATE TABLE IF NOT EXISTS public.news (
   author_id uuid REFERENCES public.profiles (id) ON DELETE SET NULL
 );
 
-ALTER TABLE public.news ENABLE ROW LEVEL SECURITY;
+-- ➕ Ajout de la colonne topic_id (après coup si manquante)
+ALTER TABLE public.news
+  ADD COLUMN IF NOT EXISTS topic_id text REFERENCES public.news_topics (id) ON DELETE SET NULL;
 
--- 🧩 Policies
+-- ✅ Index pour accélérer les requêtes par topic
+CREATE INDEX IF NOT EXISTS idx_news_topic_id ON public.news (topic_id);
+
+-- ============================================
+-- 🔒 Row Level Security
+-- ============================================
+
+ALTER TABLE public.news ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.news_topics ENABLE ROW LEVEL SECURITY;
+
+-- 🔁 Suppression et recréation propre des policies
 DO $$
 BEGIN
   EXECUTE 'DROP POLICY IF EXISTS "Public can read news" ON public.news';
   EXECUTE 'DROP POLICY IF EXISTS "Admin full access news" ON public.news';
+  EXECUTE 'DROP POLICY IF EXISTS "Public can read topics" ON public.news_topics';
+  EXECUTE 'DROP POLICY IF EXISTS "Admin full access topics" ON public.news_topics';
 END $$;
 
+-- --- Policies pour NEWS ---
 CREATE POLICY "Public can read news"
-  ON public.news FOR SELECT USING (true);
+  ON public.news
+  FOR SELECT
+  USING (true);
 
 CREATE POLICY "Admin full access news"
-  ON public.news FOR ALL TO authenticated
+  ON public.news
+  FOR ALL
+  TO authenticated
   USING (public.is_admin(auth.uid()));
 
--- 🪣 Bucket creation
-insert into storage.buckets (id, name, public)
-values ('news-images', 'news-images', true)
-on conflict (id) do nothing;
+-- --- Policies pour TOPICS ---
+CREATE POLICY "Public can read topics"
+  ON public.news_topics
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Admin full access topics"
+  ON public.news_topics
+  FOR ALL
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- ============================================
+-- 🪣 Buckets Supabase Storage
+-- ============================================
+
+-- Bucket pour les images des actualités
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('news-images', 'news-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Bucket pour les images des topics
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('topic-images', 'topic-images', true)
+ON CONFLICT (id) DO NOTHING;

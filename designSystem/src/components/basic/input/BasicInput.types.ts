@@ -1,3 +1,4 @@
+import type { IconColor } from '../icon'
 import type { IconNameNext } from '../icon/BasicIconNext.vue'
 
 export type InputSize = 'small' | 'medium' | 'large'
@@ -14,10 +15,12 @@ export type InputProps = {
   placeholder?: string
   maxlength?: number
   iconState?: IconState
-  iconName?: IconNameNext | undefined
+  iconName?: IconNameNext
   deletable?: boolean
   disabled?: boolean
   readonly?: boolean
+  iconColor?: IconColor
+  pointer?: boolean
   validationState?: ValidationState
   autocomplete?: 'off' | 'on'
   inputType?: 'form' | 'table'

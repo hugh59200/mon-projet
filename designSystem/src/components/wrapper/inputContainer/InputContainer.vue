@@ -59,7 +59,6 @@
   import { useDialog } from '@/features/interface/dialog'
   import type {
     AlertInputProps,
-    IconColor,
     InputDateModel,
     InputDureeModel,
     InputNumberModel,
@@ -67,34 +66,23 @@
     InputTelephoneModel,
   } from '@designSystem/components'
   import BasicAlert from '@designSystem/components/basic/alert/BasicAlert.vue'
-  import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 
   /* --- Props --- */
-  withDefaults(
-    defineProps<
-      Omit<InputProps, 'iconName'> & // ❌ on retire l'ancien type
-        AlertInputProps & {
-          iconName?: IconNameNext // ✅ on remplace par Lucide
-          iconColor?: IconColor
-          pointer?: boolean
-        }
-    >(),
-    {
-      size: 'medium',
-      iconName: undefined,
-      iconState: 'iconRight',
-      deletable: false,
-      readonly: false,
-      disabled: false,
-      inputType: 'form',
-      hasBg: true,
-      wrap: false,
-      hasLabel: true,
-      alertMaxlength: undefined,
-      iconColor: 'primary-600',
-      pointer: false,
-    },
-  )
+  withDefaults(defineProps<InputProps & AlertInputProps>(), {
+    size: 'medium',
+    iconName: undefined,
+    iconState: 'iconRight',
+    deletable: false,
+    readonly: false,
+    disabled: false,
+    inputType: 'form',
+    hasBg: true,
+    wrap: false,
+    hasLabel: true,
+    alertMaxlength: undefined,
+    iconColor: 'primary-600',
+    pointer: false,
+  })
 
   /* --- v-model --- */
   type InputModel = InputDateModel | InputDureeModel | InputTelephoneModel | InputNumberModel

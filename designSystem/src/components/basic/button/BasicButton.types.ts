@@ -1,4 +1,4 @@
-import type { IconName } from '@designSystem/fondation/icons/iconsList'
+import type { IconNameNext } from '../icon/BasicIconNext.vue'
 
 export type ButtonType = 'primary' | 'reverse' | 'secondary' | 'danger'
 export type ButtonSize = 'large' | 'medium' | 'small'
@@ -9,7 +9,7 @@ export type ButtonProps = {
   size?: ButtonSize
   variant?: ButtonVariant
   label?: string
-  iconName?: IconName | undefined
+  iconName?: IconNameNext
   iconRight?: boolean
   disabled?: boolean
   active?: boolean

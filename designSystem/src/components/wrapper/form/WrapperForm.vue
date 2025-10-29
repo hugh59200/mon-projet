@@ -26,7 +26,7 @@
           type="secondary"
           variant="ghost"
           size="small"
-          iconName="arrow-left"
+          iconName="ArrowLeft"
           @click="handleMovePrevious"
         />
         <BasicButton
@@ -36,7 +36,7 @@
           variant="ghost"
           size="small"
           iconRight
-          iconName="arrow-right"
+          iconName="ArrowRight"
           @click="handleMoveNext"
         />
       </div>

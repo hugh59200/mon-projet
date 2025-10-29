@@ -6,7 +6,7 @@
       type="secondary"
       variant="ghost"
       size="small"
-      iconName="arrow-left"
+      iconName="ArrowLeft"
       @click="$emit('movePrevious')"
     />
     <BasicButton
@@ -16,7 +16,7 @@
       variant="ghost"
       size="small"
       iconRight
-      iconName="arrow-right"
+      iconName="ArrowRight"
       @click="$emit('moveNext')"
     />
   </div>

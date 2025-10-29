@@ -32,7 +32,7 @@
           type="secondary"
           size="small"
           @click="pdfElem.download('cgu.pdf')"
-          iconName="add"
+          iconName="MoveUp"
           iconRight
           :disabled="!canDownload"
         />

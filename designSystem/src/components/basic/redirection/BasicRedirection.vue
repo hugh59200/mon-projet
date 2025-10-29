@@ -15,7 +15,7 @@
           <BasicButton
             class="basic-redirection__btn"
             v-bind="props"
-            icon-name="arrow-up"
+            icon-name="ArrowUp"
             @click="onClick"
           />
         </BasicTooltip>
