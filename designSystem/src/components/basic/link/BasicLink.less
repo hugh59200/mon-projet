@@ -1,85 +1,92 @@
 .standalone-link {
-  background: none;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 6px;
+  background: none;
   text-decoration: none;
   cursor: pointer;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.25s ease;
+  color: inherit; /* ← clé pour l’héritage de couleur */
+  user-select: none;
 
+  /* --- Icônes --- */
+  svg {
+    flex-shrink: 0;
+    fill: currentColor; /* ← important : suit la couleur du texte */
+    transition:
+      transform 0.25s ease,
+      fill 0.25s ease;
+  }
+
+  /* --- Taille --- */
+  &--medium svg {
+    transform: scale(0.8);
+  }
+
+  &--small svg {
+    transform: scale(0.65);
+  }
+
+  /* --- Animation icône --- */
   &--with-icon {
-    display: flex;
+    &:hover .icon-left {
+      transform: translateX(-4px);
+    }
+    &:hover .icon-right {
+      transform: translateX(4px);
+    }
   }
 
+  /* --- Désactivé --- */
   &--disabled {
+    opacity: 0.6;
     cursor: not-allowed;
-    color: @neutral-400;
-
-    svg {
-      fill: @neutral-300;
-    }
+    pointer-events: none;
   }
 
-  &--medium {
-    svg {
-      transform: scale(0.75);
-    }
-  }
-
-  &--small {
-    svg {
-      transform: scale(0.5);
-    }
-  }
-
+  /* --- Thèmes de couleur --- */
   &--primary {
-    &:not(.standalone-link--disabled) {
-      .addLinkColors(@primary-default-text, @primary-hover-text);
-    }
+    .addLinkColors(@primary-600, @primary-800);
   }
 
   &--secondary {
-    &:not(.standalone-link--disabled) {
-      .addLinkColors(@secondary-default-text, @secondary-hover-text);
-    }
+    .addLinkColors(@neutral-700, @neutral-900);
   }
 
   &--light {
-    &:not(.standalone-link--disabled) {
-      .addLinkColors(@light-default-text, @light-hover-text);
-    }
+    .addLinkColors(@white, @neutral-200);
   }
 
   &--dark {
-    &:not(.standalone-link--disabled) {
-      .addLinkColors(@dark-default-text, @dark-hover-text);
-    }
+    .addLinkColors(@neutral-900, @neutral-700);
+  }
+
+  /* --- Soulignement progressif --- */
+  /* On applique la ligne à tout le contenu du lien */
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 28px; /* espace avant le texte (ajuste selon la taille de l'icône) */
+    width: 0;
+    height: 1.5px;
+    background-color: currentColor;
+    transition: width 0.25s ease;
+  }
+
+  &:hover:after {
+    width: calc(100% - 34px); /* prend la largeur du texte seulement */
   }
 }
 
+/* --- Couleur dynamique --- */
 .addLinkColors(@default-color, @hover-color) {
   color: @default-color;
 
-  svg {
-    fill: @default-color;
-  }
-
   &:hover {
     color: @hover-color;
-    text-decoration: underline;
-
-    svg {
-      fill: @hover-color;
-    }
   }
 }
-
-@primary-default-text: @primary-600;
-@primary-hover-text: @primary-800;
-
-@secondary-default-text: @secondary-800;
-@secondary-hover-text: @secondary-900;
-
-@light-default-text: @white;
-@light-hover-text: @secondary-300;
-
-@dark-default-text: @secondary-1000;
-@dark-hover-text: @secondary-1000;

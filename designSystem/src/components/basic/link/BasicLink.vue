@@ -4,8 +4,8 @@
     :to="to"
     :href="href"
     :disabled="disabled"
+    class="standalone-link"
     :class="[
-      'standalone-link',
       `standalone-link--${type}`,
       `standalone-link--${size}`,
       {
@@ -18,7 +18,7 @@
   >
     <BasicIconNext
       v-if="state === 'icon-left'"
-      :name="'ArrowLeft'"
+      :name="iconName || 'ArrowLeft'"
       class="icon-left"
     />
 
@@ -37,7 +37,7 @@
 
     <BasicIconNext
       v-if="state === 'icon-right'"
-      :name="'ArrowRight'"
+      :name="iconName || 'ArrowRight'"
       class="icon-right"
     />
   </component>
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
   import type { LinkSize, StandaloneLinkProps, TextSize } from '@designSystem/components'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { computed } from 'vue'
 
@@ -56,7 +57,7 @@
       }
     >(),
     {
-      state: 'text-only',
+      state: 'icon-left',
       type: 'primary',
       size: 'medium',
       iconName: undefined,
@@ -80,11 +81,37 @@
   }
 </script>
 
-<style lang="less">
+<style scoped lang="less">
   @import './BasicLink.less';
 
-  .standalone-link--with-icon:hover .icon-left {
-    transform: translateX(-4px);
-    transition: transform 0.2s ease;
+  /* ✅ Améliorations UX / UI */
+  .standalone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    line-height: 1.4;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
+
+    &--with-icon {
+      svg {
+        transition: transform 0.25s ease;
+      }
+
+      &:hover .icon-left {
+        transform: translateX(-4px);
+      }
+
+      &:hover .icon-right {
+        transform: translateX(4px);
+      }
+    }
+
+    &--disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
   }
 </style>

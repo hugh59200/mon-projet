@@ -2,10 +2,23 @@
   <div class="page article-detail">
     <BasicLink
       :to="'/actualites'"
+      type="secondary"
+      state="icon-left"
       iconName="ArrowLeft"
+      size="medium"
     >
-      ← Retour aux
-      <strong>actualités</strong>
+      <BasicText
+        color="primary-600"
+        weight="light"
+      >
+        Retour aux
+      </BasicText>
+      <BasicText
+        weight="bold"
+        color="primary-600"
+      >
+        actualités
+      </BasicText>
     </BasicLink>
     <article v-if="article">
       <BasicText
