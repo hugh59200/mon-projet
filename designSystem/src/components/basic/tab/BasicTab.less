@@ -1,34 +1,36 @@
 .tab {
-  flex: 1;
-  display: flex;
+  position: relative;
+  flex: none;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: @spacing-20;
+  padding: @spacing-15 @spacing-20;
   gap: @spacing-5;
-  border-top-left-radius: @spacing-10;
-  border-top-right-radius: @spacing-10;
-  user-select: none;
-  transition:
-    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s,
-    color 0.3s;
-  max-height: 0;
+  border-radius: @spacing-10 @spacing-10 0 0;
+  cursor: pointer;
+  color: @neutral-600;
+  background-color: fade(@neutral-100, 60%);
+  transition: all 0.25s ease;
+  font-weight: 500;
 
-  &--selected,
-  &--unselected:hover {
-    line-height: 1.1;
-    background: @white;
+  &:hover {
+    background-color: fade(@neutral-200, 80%);
+    color: @primary-700;
+  }
+
+  &--selected {
+    background-color: @white;
+    color: @primary-700;
+    font-weight: 600;
     z-index: 2;
   }
 
   &--unselected {
     color: @neutral-500;
-    cursor: pointer;
-    z-index: 1;
   }
 
   svg {
-    transform: scale(0.7);
+    transform: scale(0.85);
     flex: none;
   }
 

@@ -17,36 +17,29 @@ export function useNavigationTabs(tabsTitle?: string[]) {
     return parent.children
       .filter((child) => isAccessible(child.name as RouteName))
       .map((child) => ({
-        tabKey: child.name as TabProps['tabKey'],
+        routeName: child.name as RouteName,
+        tabKey: (child.meta?.label as string) || (child.name as string),
+        // tabState: child.meta?.icon as IconNameNext | undefined, // ✅ typage fort ici
       }))
   })
 
   const tabs = computed(() => {
     if (!tabsTitle) return tabsRoutes.value
 
-    if (tabsTitle.length !== tabsRoutes.value.length) return tabsRoutes.value
-
-    return tabsTitle.map((tabKey) => {
-      return {
-        tabKey,
-      }
+    return tabsTitle.map((label) => {
+      const found = tabsRoutes.value.find((t) => t.tabKey === label)
+      return found ?? { tabKey: label, routeName: label as RouteName }
     })
   })
 
-  const getTabsRoute = (name: RouteName) => {
-    return tabsRoutes.value.at(tabs.value.findIndex((t) => t.tabKey === name))!.tabKey as string
-  }
-
   const getTabsTitle = (name: RouteName) => {
-    return tabs.value.at(tabsRoutes.value.findIndex((t) => t.tabKey === name))!.tabKey as string
+    const match = tabsRoutes.value.find((t) => t.routeName === name)
+    return match ? match.tabKey : name
   }
 
   const goToTab = (name: RouteName) => {
-    const routeName = getTabsRoute(name)
-
-    router.push({
-      name: routeName,
-    })
+    const target = tabsRoutes.value.find((t) => t.tabKey === name || t.routeName === name)
+    if (target) router.push({ name: target.routeName })
   }
 
   return { tabs, goToTab, getTabsTitle }

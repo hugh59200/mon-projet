@@ -2,61 +2,38 @@
   <WrapperForm
     v-model="selectedTab"
     :tabs="tabs"
-    show-stepper
-    :tabs-placement="tabsPlacement"
     class="tabs-view"
   >
-    <component
-      :is="tabComponents[selectedTab]"
-      v-bind="{ readonly: !isAdmin }"
-    />
+    <router-view v-slot="{ Component }">
+      <keep-alive include="Actualites">
+        <transition
+          name="fade-slide"
+          mode="out-in"
+          appear
+        >
+          <component :is="Component" />
+        </transition>
+      </keep-alive>
+    </router-view>
   </WrapperForm>
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { computed, ref } from 'vue'
-  import AdminChatView from './chat/AdminChatView.vue'
-  import AdminNewsTable from './news/AdminNewsTable.vue'
-  import AdminOrdersView from './orders/AdminOrdersView.vue'
-  import AdminProductsTable from './products/AdminProductsTable.vue'
-  import AdminStatsView from './stats/AdminStatsView.vue'
-  import AdminTopicsTable from './topics/AdminTopicsTable.vue' // ✅ import du module Topics
-  import AdminUsersView from './users/AdminUsersView.vue'
+  import type { RouteName } from '@/router/route-name'
+  import { useNavigationTabs } from '@designSystem/components/wrapper/form/useNavigationTabs'
+  import { computed } from 'vue'
+  import { useRoute } from 'vue-router'
 
-  withDefaults(
-    defineProps<{
-      tabsPlacement?: 'center' | 'start'
-    }>(),
-    {
-      tabsPlacement: 'center',
+  const route = useRoute()
+  const { tabs, goToTab } = useNavigationTabs()
+
+  // ✅ lier directement la route courante
+  const selectedTab = computed({
+    get: () => route.name as RouteName,
+    set: (routeName: RouteName) => {
+      goToTab(routeName)
     },
-  )
-
-  const auth = useAuthStore()
-  const isAdmin = computed(() => auth.isAdmin)
-
-  const tabs = [
-    { tabKey: 'Messagerie' },
-    { tabKey: 'Statistiques' },
-    { tabKey: 'Utilisateurs' },
-    { tabKey: 'Commandes' },
-    { tabKey: 'Produits' },
-    { tabKey: 'Actualités' },
-    { tabKey: 'Catégories (Topics)' }, // ✅ nouvel onglet
-  ]
-
-  const tabComponents = {
-    Messagerie: AdminChatView,
-    Statistiques: AdminStatsView,
-    Utilisateurs: AdminUsersView,
-    Commandes: AdminOrdersView,
-    Produits: AdminProductsTable,
-    Actualités: AdminNewsTable,
-    'Catégories (Topics)': AdminTopicsTable, // ✅ correspondance de composant
-  } as const
-
-  const selectedTab = ref<keyof typeof tabComponents>('Messagerie')
+  })
 </script>
 
 <style scoped lang="less">

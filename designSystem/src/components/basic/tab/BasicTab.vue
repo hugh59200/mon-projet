@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="tabRef"
     :class="['tab', `tab--${tabClass}`]"
     @click="handleTabClick"
     @mouseenter="isHovered = true"
@@ -17,17 +18,16 @@
         :tabState
         :selected
       />
-      <template v-if="!$slots['tab-text']">
-        {{ tabKey }}
-      </template>
+      <template v-if="!$slots['tab-text']">{{ tabKey }}</template>
     </BasicText>
+
     <slot
       name="tab-icon"
       :tabKey
       :tabState
       :selected
     />
-    <BasicIcon
+    <BasicIconNext
       v-if="!$slots['tab-icon'] && tabState"
       :class="[`tab--${tabState}`]"
       :name="tabState"
@@ -38,22 +38,23 @@
 
 <script setup lang="ts">
   import { computed, inject, ref } from 'vue'
-  import type { TabProps } from './BasicTab.types'
   import { BasicTabsKey, type BasicTabsProvided } from '../tabs/BasicTabs.types'
+  import type { TabProps } from './BasicTab.types'
 
   const tabs = inject<BasicTabsProvided>(BasicTabsKey, null as any)
   const props = defineProps<TabProps>()
 
-  const tabClass = computed(() => {
-    return tabs?.selectedTab?.value === props.tabKey ? 'selected' : 'unselected'
-  })
+  const tabRef = ref<HTMLElement | null>(null)
+
+  const tabClass = computed(() =>
+    tabs?.selectedTab?.value === props.tabKey ? 'selected' : 'unselected',
+  )
 
   const handleTabClick = () => {
     tabs?.change(props.tabKey)
   }
 
   const selected = computed(() => tabClass.value === 'selected')
-
   const isHovered = ref(false)
 </script>
 

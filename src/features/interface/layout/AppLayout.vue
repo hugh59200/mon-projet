@@ -5,7 +5,6 @@
   >
     <HeaderApp class="header" />
     <SidebarApp class="sidebar" />
-
     <main class="content">
       <RouterView v-slot="{ Component }">
         <transition
@@ -14,14 +13,10 @@
           appear
         >
           <keep-alive include="Actualites">
-            <component
-              :is="Component"
-              :key="$route.path"
-            />
+            <component :is="Component" />
           </keep-alive>
         </transition>
       </RouterView>
-
       <transition
         name="fade"
         appear
@@ -29,7 +24,6 @@
         <SablierComponent v-if="sablier.estSablierVisible" />
       </transition>
     </main>
-
     <FooterApp class="footer" />
     <AppRegisterGlobals />
   </div>

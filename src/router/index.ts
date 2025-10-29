@@ -1,3 +1,10 @@
+import AdminChatView from '@/features/admin/chat/AdminChatView.vue'
+import AdminNewsTable from '@/features/admin/news/AdminNewsTable.vue'
+import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
+import AdminProductsTable from '@/features/admin/products/AdminProductsTable.vue'
+import AdminStatsView from '@/features/admin/stats/AdminStatsView.vue'
+import AdminTopicsTable from '@/features/admin/topics/AdminTopicsTable.vue'
+import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
@@ -191,8 +198,88 @@ const routes: Array<RouteRecordRaw> = [
       requiresAdmin: true,
       title: 'Espace administrateur – Fast Peptides',
       description:
-        'Accédez au tableau de bord administrateur pour gérer les commandes, utilisateurs, statistiques et messages clients.',
+        'Gérez les produits, utilisateurs, commandes, statistiques et actualités du site Fast Peptides.',
     },
+    children: [
+      {
+        path: 'messagerie',
+        name: 'AdminMessagerie',
+        component: AdminChatView,
+        meta: {
+          label: 'Messagerie',
+          icon: 'MessageSquare',
+          title: 'Messagerie – Fast Peptides',
+          description: 'Discutez avec les utilisateurs et suivez les conversations clients.',
+        },
+      },
+      {
+        path: 'stats',
+        name: 'AdminStats',
+        component: AdminStatsView,
+        meta: {
+          label: 'Statistiques',
+          icon: 'BarChart3',
+          title: 'Statistiques – Fast Peptides',
+          description: 'Consultez les données de performance et les indicateurs clés du site.',
+        },
+      },
+      {
+        path: 'utilisateurs',
+        name: 'AdminUsers',
+        component: AdminUsersView,
+        meta: {
+          label: 'Utilisateurs',
+          icon: 'Users',
+          title: 'Utilisateurs – Fast Peptides',
+          description:
+            'Gérez les comptes clients, les droits d’accès et les informations de profil.',
+        },
+      },
+      {
+        path: 'commandes',
+        name: 'AdminOrders',
+        component: AdminOrdersView,
+        meta: {
+          label: 'Commandes',
+          icon: 'ShoppingCart',
+          title: 'Commandes – Fast Peptides',
+          description: 'Suivez et gérez les commandes en cours ou terminées sur la plateforme.',
+        },
+      },
+      {
+        path: 'produits',
+        name: 'AdminProducts',
+        component: AdminProductsTable,
+        meta: {
+          label: 'Produits',
+          icon: 'PackageSearch',
+          title: 'Produits – Fast Peptides',
+          description: 'Ajoutez, modifiez ou supprimez les peptides disponibles dans le catalogue.',
+        },
+      },
+      {
+        path: 'actualites',
+        name: 'AdminNews',
+        component: AdminNewsTable,
+        meta: {
+          label: 'Actualités',
+          icon: 'Newspaper',
+          title: 'Actualités – Fast Peptides',
+          description: 'Publiez les dernières études, nouvelles et annonces importantes.',
+        },
+      },
+      {
+        path: 'topics',
+        name: 'AdminTopics',
+        component: AdminTopicsTable,
+        meta: {
+          label: 'Catégories',
+          icon: 'FolderTree',
+          title: 'Catégories – Fast Peptides',
+          description: 'Organisez vos produits et articles par thématique de recherche.',
+        },
+      },
+    ],
   },
   {
     path: '/profil/commandes',
@@ -218,6 +305,9 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 registerBaseGuard(router)

@@ -3,18 +3,23 @@
     class="wrapper-form"
     style="margin-top: 16px"
   >
+    <!-- 🧭 Onglets desktop -->
     <BasicTabs
       class="wrapper-form__tabs--desktop"
       v-model="modelValue"
-      :tabs
-      :tabsPlacement
+      :tabs="tabs"
+      :tabsPlacement="tabsPlacement"
     />
+
+    <!-- 📱 Onglet mobile -->
     <BasicTab
       :tabKey="currentTab?.tabKey"
       :tabState="currentTab?.tabState"
       class="wrapper-form__tabs--mobile"
       style="height: 500px"
     />
+
+    <!-- 🧩 Contenu principal -->
     <div class="wrapper-form__main">
       <div
         v-if="isMobile || showStepper"
@@ -40,10 +45,8 @@
           @click="handleMoveNext"
         />
       </div>
-      <div
-        ref="scrollContainer"
-        class="scroll-container scrollable scrollbar"
-      >
+
+      <div class="scroll-container scrollable scrollbar">
         <div class="wrapper-form__content">
           <slot />
         </div>
@@ -76,10 +79,13 @@
 
   const scrollContainer = ref<HTMLElement | null>(null)
 
-  watch(modelValue, () => {
-    requestAnimationFrame(() => {
-      scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' })
-    })
+  // 🔁 Scroll automatique vers le haut quand on change d’onglet
+  watch(modelValue, (newValue, oldValue) => {
+    if (newValue !== oldValue && !window.location.pathname.includes('/admin')) {
+      requestAnimationFrame(() => {
+        scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    }
   })
 
   const emit = defineEmits<TabsStepperEmit>()
@@ -101,67 +107,15 @@
       }
     }
 
-    &s--desktop {
+    &__tabs--desktop {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 12px;
-
-      /* Active le scroll horizontal */
+      flex-wrap: nowrap;
       overflow-x: auto;
       overflow-y: hidden;
-      white-space: nowrap;
+      gap: 12px;
       scroll-behavior: smooth;
-
-      /* Masque la scrollbar sur les navigateurs modernes */
-      scrollbar-width: thin;
-      scrollbar-color: fade(@neutral-700, 40%) transparent;
-
-      &::-webkit-scrollbar {
-        height: 6px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: fade(@neutral-700, 30%);
-        border-radius: 3px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      /* 🩶 Indique visuellement qu’il y a plus d’onglets à droite */
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 40px;
-        height: 100%;
-        background: linear-gradient(to left, fade(@neutral-100, 100%), transparent);
-        pointer-events: none;
-      }
-
-      /* Idem à gauche si besoin (optionnel, pour symétrie) */
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 40px;
-        height: 100%;
-        background: linear-gradient(to right, fade(@neutral-100, 100%), transparent);
-        pointer-events: none;
-      }
-
-      /* 📱 En mobile, le scroll reste activé mais moins visible */
-      @media (max-width: 800px) {
-        gap: 8px;
-        &::after,
-        &::before {
-          display: none;
-        }
-      }
     }
 
     &__main {
@@ -209,9 +163,11 @@
       &__title {
         display: none;
       }
+
       &__stepper {
         flex: 1;
       }
+
       &__header {
         padding: 0 @spacing-20;
         display: flex;
@@ -224,9 +180,11 @@
         padding: 0 12px;
         gap: 20px;
       }
+
       &__tabs--desktop {
         display: none;
       }
+
       &__tabs--mobile {
         max-width: 300px;
         width: 300px;
