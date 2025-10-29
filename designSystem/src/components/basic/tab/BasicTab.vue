@@ -13,15 +13,8 @@
       class="tab__label"
       :style="{ color: textColor }"
     >
-      <slot
-        name="tab-text"
-        :tabKey="tabKey"
-        :tabState="tabState"
-        :selected="isSelected"
-      />
-      <template v-if="!$slots['tab-text']">{{ tabKey }}</template>
+      {{ tabKey }}
     </BasicText>
-
     <slot
       name="tab-icon"
       :tabKey="tabKey"

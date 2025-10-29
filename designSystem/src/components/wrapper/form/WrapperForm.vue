@@ -1,39 +1,10 @@
 <template>
-  <div
-    class="wrapper-form"
-    style="margin-top: 16px"
-  >
-    <!-- 🧭 Onglets desktop -->
+  <div class="wrapper-form">
+    <!-- 🧭 Onglets (géré entièrement dans BasicTabs) -->
     <BasicTabs
-      class="wrapper-form__tabs--desktop"
       v-model="modelValue"
       :tabs="tabs"
       :tabsPlacement="tabsPlacement"
-    >
-      <template #default>
-        <BasicTab
-          v-for="tab in tabs"
-          :key="tab.routeName"
-          :tabKey="tab.tabKey"
-          :tabState="tab.tabState"
-          :routeName="tab.routeName"
-        >
-          <template #tab-text>
-            {{ tab.tabKey }}
-          </template>
-        </BasicTab>
-      </template>
-    </BasicTabs>
-
-    <!-- 📱 Onglet mobile -->
-    <BasicTab
-      v-if="currentTab"
-      :tabKey="currentTab.tabKey"
-      :tabState="currentTab.tabState"
-      :routeName="currentTab.routeName"
-      :color="currentTab.color"
-      class="wrapper-form__tabs--mobile"
-      style="height: 500px"
     />
 
     <!-- 🧩 Contenu principal -->
@@ -91,9 +62,8 @@
   )
 
   const { isMobile } = inject(DEVICE_BREAKPOINT)!
-  const scrollContainer = ref<HTMLElement | null>(null)
 
-  console.log(props.tabs)
+  const scrollContainer = ref<HTMLElement | null>(null)
 
   watch(modelValue, (newValue, oldValue) => {
     if (newValue !== oldValue && !window.location.pathname.includes('/admin')) {
@@ -104,8 +74,11 @@
   })
 
   const emit = defineEmits<TabsStepperEmit>()
-  const { currentTab, canMovePrevious, canMoveNext, handleMovePrevious, handleMoveNext } =
-    useWrapperFormLogic(modelValue, toRef(props, 'tabs'), emit)
+  const { canMovePrevious, canMoveNext, handleMovePrevious, handleMoveNext } = useWrapperFormLogic(
+    modelValue,
+    toRef(props, 'tabs'),
+    emit,
+  )
 </script>
 
 <style scoped lang="less">
@@ -114,25 +87,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-
-    &__tabs {
-      &--mobile {
-        display: none;
-      }
-    }
-
-    &__tabs--desktop {
-      position: relative;
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
-      gap: 12px;
-      scroll-behavior: smooth;
-      background-color: fade(@neutral-50, 50%);
-      border-bottom: 1px solid fade(@neutral-300, 40%);
-    }
+    margin: 20px 0;
 
     &__main {
       flex: 1;
@@ -162,23 +117,6 @@
     }
 
     @media (max-width: 1000px) {
-      &__tabs--desktop {
-        display: none;
-      }
-      &__tabs--mobile {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        max-width: 300px;
-        align-self: center;
-        background-color: white;
-        padding: @spacing-15;
-        border-radius: @spacing-15;
-        font-size: @font-size-body-l;
-        :deep(.text) {
-          font-weight: 900 !important;
-        }
-      }
       &__header {
         padding: 0 @spacing-20;
         display: flex;
