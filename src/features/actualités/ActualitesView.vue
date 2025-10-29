@@ -4,8 +4,9 @@
     <BasicCarousel
       v-if="topics.length"
       :items="topics"
-      :item-width="300"
-      :gap="24"
+      :item-width="340"
+      :gap="32"
+      :transparent-items="true"
     >
       <template #item="{ item }">
         <RouterLink
@@ -18,13 +19,17 @@
           />
           <div class="overlay">
             <BasicText
-              size="h4"
+              size="h3"
               weight="semibold"
               color="white"
+              class="topic-title"
             >
               {{ item.label }}
             </BasicText>
-            <p>{{ item.description }}</p>
+            <div
+              class="topic-description"
+              v-html="parseAndSanitize(item.description)"
+            />
           </div>
         </RouterLink>
       </template>
@@ -86,13 +91,10 @@
           </BasicText>
 
           <!-- Extrait -->
-          <BasicText
-            size="body-m"
-            color="neutral-700"
+          <div
             class="excerpt"
-          >
-            {{ article.excerpt }}
-          </BasicText>
+            v-html="parseAndSanitize(article.excerpt)"
+          />
         </div>
       </RouterLink>
     </div>
@@ -103,6 +105,7 @@
   import type { NewsArticle, NewsTopic } from '@/features/actualités/api/news'
   import { fetchNews, fetchNewsTopics } from '@/features/actualités/api/news'
   import { formatDate } from '@/utils/index'
+  import { parseAndSanitize } from '@/utils/sanitize'
   import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { computed, onMounted, ref, watch } from 'vue'
@@ -147,25 +150,17 @@
   .topic-card {
     position: relative;
     display: block;
-    border-radius: 16px;
+    border-radius: 18px;
     overflow: hidden;
-    height: 200px;
+    height: 220px;
     text-decoration: none;
+    transition: transform 0.3s ease;
     background: @neutral-200;
-    transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 6px 16px fade(@neutral-900, 10%);
-
-      .overlay {
-        background: fade(@neutral-900, 70%);
-      }
-
       img {
-        transform: scale(1.05);
+        transform: scale(1.08);
       }
     }
 
@@ -173,23 +168,37 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
+      transition: transform 0.6s ease;
     }
 
     .overlay {
       position: absolute;
       inset: 0;
-      background: fade(@neutral-900, 55%);
-      color: white;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 18px;
+      padding: 20px;
+      color: white;
+      background: linear-gradient(to top, fade(@neutral-900, 88%) 0%, fade(@neutral-900, 55%) 100%);
       transition: background 0.3s ease;
 
-      p {
-        font-size: 0.9rem;
-        opacity: 0.9;
+      .topic-title {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+        text-shadow: 0 3px 6px fade(black, 75%);
+      }
+
+      .topic-description {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        opacity: 0.95;
+        text-shadow: 0 2px 4px fade(black, 80%);
+
+        :deep([style*='color:#0070f3']),
+        :deep(a),
+        :deep(span) {
+          color: #6ec9ff !important;
+        }
       }
     }
   }
@@ -251,6 +260,40 @@
 
       .excerpt {
         line-height: 1.45;
+        font-size: 0.95rem;
+        color: @neutral-700;
+
+        :deep(p) {
+          margin-bottom: 10px;
+        }
+
+        :deep(strong) {
+          font-weight: 600;
+          color: @neutral-900;
+        }
+
+        :deep(em) {
+          font-style: italic;
+          opacity: 0.85;
+        }
+
+        :deep(a) {
+          color: @primary-600;
+          text-decoration: underline;
+
+          &:hover {
+            color: @primary-800;
+          }
+        }
+
+        :deep(ul) {
+          padding-left: 20px;
+          margin-top: 6px;
+
+          li {
+            list-style-type: disc;
+          }
+        }
       }
     }
   }

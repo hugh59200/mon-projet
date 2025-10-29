@@ -50,10 +50,11 @@ export function useImageHandler(readonly: () => boolean, adapter: ImageHandlerAd
   }
 
   /** 🚀 Upload via l’adaptateur fourni */
-  async function uploadImage(identifier: string): Promise<string | null> {
+  async function uploadImage(identifier: string, previousUrl?: string): Promise<string | null> {
     if (!selectedFile.value) return null
     try {
-      const uploadedUrl = await adapter.upload(identifier, selectedFile.value)
+      // 👇 On transmet l'ancienne URL si elle existe
+      const uploadedUrl = await (adapter.upload as any)(identifier, selectedFile.value, previousUrl)
       toast.show('Image téléchargée ✅', 'success')
       return uploadedUrl
     } catch (err: any) {

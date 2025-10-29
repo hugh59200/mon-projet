@@ -48,23 +48,22 @@
         </WrapperFormElements>
 
         <!-- 🧭 Catégorie (topic) -->
-        <WrapperFormElements label="Catégorie (topic)">
-          <WrapperDropdown
-            v-model="form.topic_id!"
-            :items="topicsOptions"
-            placeholder="Choisir un topic existant"
-            key-id="id"
-            key-label="label"
-            :disabled="readonly"
-          />
-          <WrapperInput
-            v-if="!readonly"
-            v-model="newTopicLabel"
-            label="Ou créer un nouveau topic"
-            placeholder="Ex : Innovation médicale"
-            hint="Ce champ est optionnel — il créera un nouveau topic s’il n’existe pas encore."
-          />
-        </WrapperFormElements>
+        <WrapperDropdown
+          v-model="form.topic_id!"
+          :items="topicsOptions"
+          placeholder="Choisir un topic existant"
+          label="Catégorie (topic)"
+          key-id="id"
+          key-label="label"
+          :disabled="readonly"
+        />
+        <WrapperInput
+          v-if="!readonly"
+          v-model="newTopicLabel"
+          label="Ou créer un nouveau topic"
+          placeholder="Ex : Innovation médicale"
+          hint="Ce champ est optionnel — il créera un nouveau topic s’il n’existe pas encore."
+        />
 
         <!-- 🖼️ Image principale -->
         <WrapperFormElements label="Image principale">
@@ -86,25 +85,38 @@
           />
 
           <div
-            v-if="imagePreview"
+            v-if="imagePreview || form.image"
             class="image-preview"
           >
             <img
-              :src="imagePreview"
+              :src="imagePreview || form.image || undefined"
               alt="Aperçu image actualité"
             />
-            <BasicButton
+            <div
+              class="image-actions"
               v-if="!readonly"
-              label="Supprimer"
-              type="secondary"
-              variant="outlined"
-              size="small"
-              @click="removeImage(form.image)"
-            />
+            >
+              <BasicButton
+                label="Supprimer l’image"
+                type="secondary"
+                variant="outlined"
+                size="small"
+                @click="handleRemoveImage"
+              />
+              <BasicButton
+                label="Changer d’image"
+                type="primary"
+                variant="ghost"
+                size="small"
+                @click="openFilePicker"
+              />
+            </div>
           </div>
         </WrapperFormElements>
-
-        <!-- 🚀 Bouton action -->
+      </div>
+    </template>
+    <template #actions>
+      <div class="justify-content-space-evenly flex">
         <BasicButton
           v-if="!readonly"
           :label="isEditMode ? 'Mettre à jour' : 'Publier l’actualité'"
@@ -159,7 +171,7 @@
         : 'Publier une actualité',
   )
 
-  /* 📸 Image handler (composable) */
+  /* 📸 Image handler (upload/suppression) */
   const {
     fileInputRef,
     selectedFile,
@@ -192,15 +204,42 @@
     }
   }
 
+  async function handleRemoveImage() {
+    if (!form.value.image) return
+    if (!confirm('Supprimer cette image définitivement ?')) return
+
+    try {
+      await removeImage(form.value.image)
+      form.value.image = null
+      imagePreview.value = null
+      selectedFile.value = null
+      toast.show('Image supprimée ✅', 'success')
+    } catch (err: any) {
+      toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
+    }
+  }
+
   /* 🧾 Chargement d’un article existant */
   async function loadNews() {
     if (!props.newsId) return
     try {
       const data = await fetchNewsById(props.newsId)
       if (!data) return toast.show('Actualité introuvable', 'warning')
-      form.value = data
+
+      // 🔹 On ne garde que les champs existants dans la table "news"
+      form.value = {
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt,
+        content: data.content,
+        image: data.image,
+        topic_id: data.topic_id,
+        published_at: data.published_at,
+        author_id: data.author_id,
+      }
+
       imagePreview.value = data.image || null
-    } catch {
+    } catch (err) {
       toast.show('Erreur chargement actualité', 'danger')
     }
   }
@@ -222,16 +261,20 @@
 
       // 🔹 Upload de l’image si sélectionnée
       if (selectedFile.value) {
-        const uploadedUrl = await uploadImage(form.value.slug)
+        const uploadedUrl = await uploadImage(form.value.title)
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
-      // 🔹 Enregistrement (create / update)
+      // 🧹 Nettoyage avant envoi à Supabase (évite le bug "topic" field)
+      const payload = { ...form.value }
+      delete (payload as any).topic
+
+      // 🔹 Enregistrement (update / create)
       if (isEditMode.value && props.newsId) {
-        await updateNews(props.newsId, form.value)
+        await updateNews(props.newsId, payload)
         toast.show('Actualité mise à jour ✅', 'success')
       } else {
-        await createNews(form.value)
+        await createNews(payload)
         toast.show('Actualité publiée ✅', 'success')
       }
 
@@ -313,6 +356,12 @@
       border-radius: 10px;
       object-fit: contain;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      &-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
     }
   }
 

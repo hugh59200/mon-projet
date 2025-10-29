@@ -85,7 +85,7 @@
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { deleteTopicImage } from '../api/topicImages'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
 
@@ -126,6 +126,10 @@
     selectedTopicId.value = id
     isModalVisible.value = true
   }
+
+  watch(isModalVisible, (val) => {
+    if (!val) fetchData()
+  })
 </script>
 
 <style scoped lang="less">

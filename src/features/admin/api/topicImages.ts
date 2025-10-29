@@ -1,46 +1,62 @@
 import { supabase } from '@/supabase/supabaseClient'
 
-/**
- * Nettoie un nom pour en faire un chemin valide dans Supabase Storage.
- */
+/** Nettoie le nom du topic pour un chemin valide */
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .normalize('NFD') // enlève les accents
-    .replace(/[\u0300-\u036f]/g, '') // décompose les caractères accentués
-    .replace(/[^a-z0-9]+/g, '-') // remplace tout ce qui n’est pas alphanumérique par -
-    .replace(/(^-|-$)/g, '') // supprime les tirets en trop
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
 }
 
-/**
- * ☁️ Upload une image de topic dans le bucket `topic-images`
- * et retourne son URL publique.
- */
-export async function uploadTopicImage(slug: string, file: File): Promise<string> {
-  const safeSlug = slugify(slug)
-  const ext = file.name.split('.').pop()
-  const filePath = `topics/${safeSlug}/topic-${safeSlug}.${ext}`
+/** ☁️ Upload une image de topic dans Supabase Storage (avec suppression préalable) */
+export async function uploadTopicImage(
+  label: string,
+  file: File,
+  previousUrl?: string,
+): Promise<string> {
+  try {
+    const safeSlug = slugify(label)
+    const ext = file.name.split('.').pop() ?? 'jpg'
+    const timestamp = Date.now()
+    const filePath = `topics/${safeSlug}/topic-${safeSlug}-${timestamp}.${ext}`
 
-  const { error: uploadError } = await supabase.storage
-    .from('topic-images')
-    .upload(filePath, file, { upsert: true, cacheControl: '3600' })
+    // 🗑️ Supprimer l’ancienne image si présente
+    if (previousUrl) {
+      const oldPath = previousUrl.split('/topic-images/')[1]
+      if (oldPath) {
+        await supabase.storage.from('topic-images').remove([oldPath])
+      }
+    }
 
-  if (uploadError) throw new Error(`Erreur upload image topic : ${uploadError.message}`)
+    // ☁️ Upload du nouveau fichier (pas de upsert ici)
+    const { error: uploadError } = await supabase.storage
+      .from('topic-images')
+      .upload(filePath, file)
 
-  const { data } = supabase.storage.from('topic-images').getPublicUrl(filePath)
-  return data.publicUrl
+    if (uploadError) throw new Error(uploadError.message)
+
+    // 🔗 Récupération de l’URL publique
+    const { data } = supabase.storage.from('topic-images').getPublicUrl(filePath)
+    if (!data?.publicUrl) throw new Error('Impossible de récupérer l’URL publique')
+
+    // ✅ Ajout d’un cache-bust pour forcer l’actualisation visuelle
+    return `${data.publicUrl}?v=${timestamp}`
+  } catch (err: any) {
+    console.error('❌ Erreur uploadTopicImage :', err.message)
+    throw new Error(`Erreur upload image topic : ${err.message}`)
+  }
 }
 
-/**
- * 🗑️ Supprime une image de topic du bucket `topic-images`
- */
+/** 🗑️ Supprime une image existante dans Supabase Storage */
 export async function deleteTopicImage(imageUrl: string): Promise<boolean> {
   try {
     const path = imageUrl.split('/topic-images/')[1]
     if (!path) return false
 
     const { error } = await supabase.storage.from('topic-images').remove([path])
-    if (error) throw new Error(`Erreur suppression image topic : ${error.message}`)
+    if (error) throw new Error(error.message)
 
     return true
   } catch (err: any) {

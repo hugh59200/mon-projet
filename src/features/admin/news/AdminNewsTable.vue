@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une actualité..."
@@ -19,6 +20,7 @@
       </template>
     </BasicToolbar>
 
+    <!-- 💾 Loader + Liste -->
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -32,22 +34,35 @@
           :key="article.id"
           class="news-item"
         >
+          <!-- 🧱 Bloc gauche : image + texte -->
           <div class="news-info">
-            <h3>{{ article.title }}</h3>
-            <p class="excerpt">{{ article.excerpt || '—' }}</p>
-            <p class="date">
-              Publié le
-              {{ new Date(article.published_at!).toLocaleDateString() }}
-            </p>
+            <div class="thumb-container">
+              <img
+                :src="article.image || fallbackImage"
+                alt="Image de l’actualité"
+                class="news-thumb"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="news-text">
+              <h3>{{ article.title }}</h3>
+              <p class="excerpt">{{ article.excerpt || '—' }}</p>
+              <p class="date">
+                Publié le
+                {{ new Date(article.published_at!).toLocaleDateString() }}
+              </p>
+            </div>
           </div>
 
+          <!-- 🧰 Actions -->
           <div
             v-if="!readonly"
             class="actions"
           >
             <BasicIconNext
               name="Eye"
-              tooltip="Voir"
+              tooltip="Voir / Modifier"
               class="action-icon"
               @click="openNewsModal(article.id)"
             />
@@ -62,6 +77,7 @@
       </div>
     </WrapperLoader>
 
+    <!-- 🪟 Modales -->
     <teleport to="#app">
       <!-- ➕ Création -->
       <AdminNewsModal
@@ -87,7 +103,9 @@
   import { useAdminTable } from '@/features/admin/shared/useAdminTable'
   import type { Tables } from '@/supabase/types/supabase'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { ref } from 'vue'
   import BasicToolbar from '../BasicToolbar.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
@@ -95,7 +113,6 @@
   type NewsRow = Tables<'news'>
 
   const props = defineProps<{ readonly?: boolean }>()
-
   const toast = useToastStore()
 
   const { filteredData, loading, hasLoaded, fetchData, reset, search } = useAdminTable<'news'>({
@@ -106,6 +123,9 @@
       (n.title?.toLowerCase()?.includes(q) ?? false) ||
       (n.excerpt?.toLowerCase()?.includes(q) ?? false),
   })
+
+  // 🖼️ Image de fallback
+  const fallbackImage = '/images/placeholder-news.png'
 
   async function handleDelete(article: NewsRow) {
     if (props.readonly) return
@@ -133,43 +153,83 @@
   .news-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
   }
 
   .news-item {
     background: white;
-    padding: 16px;
+    padding: 16px 20px;
     border-radius: 12px;
     box-shadow: 0 1px 4px fade(@neutral-900, 5%);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: fade(@primary-100, 10%);
+    }
   }
 
-  .news-info h3 {
-    margin: 0;
-    font-size: 1.1rem;
-  }
+  .news-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 
-  .excerpt {
-    color: fade(@neutral-900, 70%);
-    font-size: 0.95rem;
-  }
+    .thumb-container {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: fade(@neutral-200, 40%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  .date {
-    font-size: 0.8rem;
-    color: fade(@neutral-900, 60%);
+    .news-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-text {
+      display: flex;
+      flex-direction: column;
+
+      h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: @neutral-900;
+      }
+
+      .excerpt {
+        margin: 0;
+        color: fade(@neutral-900, 70%);
+        font-size: 0.9rem;
+      }
+
+      .date {
+        font-size: 0.8rem;
+        color: fade(@neutral-900, 60%);
+      }
+    }
   }
 
   .actions {
     display: flex;
-    align-items: center;
-    gap: 18px;
+    gap: 12px;
 
     .action-icon {
       cursor: pointer;
+      transition:
+        opacity 0.2s,
+        transform 0.2s;
+
       &:hover {
-        opacity: 0.7;
+        opacity: 0.8;
         transform: scale(1.1);
       }
 

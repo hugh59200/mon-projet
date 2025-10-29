@@ -44,7 +44,7 @@
         size="body-l"
         color="neutral-900"
         class="content"
-        v-html="article.content"
+        v-html="parsedContent"
       />
     </article>
 
@@ -56,13 +56,19 @@
   import type { NewsArticle } from '@/features/actualités/api/news'
   import { fetchNewsBySlug } from '@/features/actualités/api/news'
   import { formatDate } from '@/utils/index'
+  import { parseAndSanitize } from '@/utils/sanitize'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
   const article = ref<NewsArticle | null>(null)
   const route = useRoute()
+
+  // ✅ Markdown ou HTML sécurisé
+  const parsedContent = computed(() =>
+    article.value?.content ? parseAndSanitize(article.value.content) : '',
+  )
 
   onMounted(async () => {
     article.value = await fetchNewsBySlug(route.params.slug as string)

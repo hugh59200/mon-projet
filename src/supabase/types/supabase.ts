@@ -151,13 +151,15 @@ export type Database = {
           id: string
           image: string | null
           label: string
+          slug: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
-          id: string
+          id?: string
           image?: string | null
           label: string
+          slug?: string | null
         }
         Update: {
           created_at?: string | null
@@ -165,6 +167,7 @@ export type Database = {
           id?: string
           image?: string | null
           label?: string
+          slug?: string | null
         }
         Relationships: []
       }

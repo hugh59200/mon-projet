@@ -3,12 +3,15 @@
     v-model="visible"
     :closable="true"
   >
+    <!-- 🧠 En-tête -->
     <template #header>
       {{ headerTitle }}
     </template>
 
+    <!-- 🧱 Contenu -->
     <template #content>
       <div class="topic-form">
+        <!-- 🏷️ Nom -->
         <WrapperInput
           v-model="form.label"
           label="Nom du topic"
@@ -16,6 +19,7 @@
           required
         />
 
+        <!-- 🖼️ Image -->
         <WrapperFormElements label="Image du topic (optionnelle)">
           <BasicInput
             readonly
@@ -34,32 +38,38 @@
           />
 
           <div
-            v-if="imagePreview"
+            v-if="imagePreview || form.image"
             class="image-preview"
           >
             <img
-              :src="imagePreview"
-              alt="Aperçu topic"
+              :src="imagePreview || form.image || undefined"
+              alt="Aperçu du topic"
             />
-            <BasicButton
-              label="Supprimer"
-              type="secondary"
-              size="small"
-              variant="outlined"
-              @click="removeImage(form.image)"
-            />
+            <div class="image-actions">
+              <BasicButton
+                v-if="form.image"
+                label="Supprimer l’image"
+                type="secondary"
+                size="small"
+                variant="outlined"
+                @click="handleRemoveImage"
+              />
+              <BasicButton
+                label="Changer d’image"
+                type="primary"
+                size="small"
+                variant="ghost"
+                @click="openFilePicker"
+              />
+            </div>
           </div>
         </WrapperFormElements>
       </div>
     </template>
+
+    <!-- 🧭 Actions -->
     <template #actions>
       <div class="justify-content-space-evenly flex">
-        <BasicButton
-          label="Supprimer"
-          type="secondary"
-          variant="outlined"
-          @click="handleRemoveImage"
-        />
         <BasicButton
           label="Enregistrer"
           type="primary"
@@ -90,12 +100,13 @@
   const toast = useToastStore()
   const loading = ref(false)
 
-  // Formulaire typé selon la table Supabase
+  // 🧾 Formulaire typé selon la table Supabase
   const form = ref<Pick<Tables<'news_topics'>, 'label' | 'image'>>({
     label: '',
     image: null,
   })
 
+  // 🧩 Gestion d'image via le composable
   const {
     fileInputRef,
     selectedFile,
@@ -117,21 +128,36 @@
 
     loading.value = true
     try {
-      // Upload d'image si sélectionnée
+      let uploadedUrl: string | null = null
+
+      // 🔹 Upload avec suppression de l’ancienne image + timestamp unique
       if (selectedFile.value) {
-        const uploadedUrl = await uploadImage(form.value.label)
-        if (uploadedUrl) form.value.image = uploadedUrl
+        uploadedUrl = await uploadImage(form.value.label, form.value.image ?? undefined)
+        form.value.image = uploadedUrl
+        imagePreview.value = uploadedUrl
       }
 
-      // Mise à jour ou création
+      // 🔹 Création ou mise à jour
       if (props.topicId) {
-        await updateTopic(props.topicId, form.value)
+        // ✅ Mise à jour du topic avec la nouvelle image
+        const updated = await updateTopic(props.topicId, {
+          label: form.value.label,
+          image: uploadedUrl ?? form.value.image ?? null,
+        })
+
+        // 🔁 Rafraîchir localement l'image avec cache-bust
+        if (updated?.image) {
+          form.value.image = `${updated.image}?v=${Date.now()}`
+          imagePreview.value = form.value.image
+        }
+
         toast.show('Topic mis à jour ✅', 'success')
       } else {
         await createTopic(form.value)
         toast.show('Topic créé ✅', 'success')
       }
 
+      // ✅ Fermeture & rafraîchissement
       emit('saved')
       visible.value = false
     } catch (err: any) {
@@ -141,26 +167,42 @@
     }
   }
 
+  // 🗑️ Suppression manuelle de l’image
   async function handleRemoveImage() {
     if (!form.value.image) return
     if (!confirm('Supprimer cette image définitivement ?')) return
 
     try {
       await removeImage(form.value.image)
+
+      // ✅ MAJ côté front
       form.value.image = null
       imagePreview.value = null
       selectedFile.value = null
+
+      // ✅ MAJ côté base Supabase
+      if (props.topicId) {
+        await updateTopic(props.topicId, { image: null })
+      }
+
       toast.show('Image supprimée ✅', 'success')
+
+      // 🧭 Fermeture de la modale + rafraîchissement parent
+      emit('saved')
+      visible.value = false
     } catch (err: any) {
       toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
     }
   }
 
-  // Chargement du topic existant
+  // 📦 Chargement du topic existant
   onMounted(async () => {
     if (props.topicId) {
       const data = await fetchTopicById(props.topicId)
-      if (data) form.value = { label: data.label, image: data.image }
+      if (data) {
+        form.value.label = data.label
+        form.value.image = data.image
+      }
     }
   })
 </script>
@@ -172,9 +214,11 @@
     gap: 20px;
     padding: 16px;
   }
+
   .hidden-input {
     display: none;
   }
+
   .image-preview {
     display: flex;
     flex-direction: column;
@@ -183,6 +227,13 @@
     img {
       max-width: 240px;
       border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
     }
   }
 </style>

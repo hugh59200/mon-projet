@@ -33,6 +33,7 @@
           v-for="(item, index) in items"
           :key="index"
           class="carousel-item"
+          :class="{ solid: !transparentItems }"
           :style="itemStyle"
         >
           <slot
@@ -66,12 +67,14 @@
     itemWidth?: number
     gap?: number
     showArrows?: boolean
+    transparentItems?: boolean
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    itemWidth: 280,
-    gap: 20,
+    itemWidth: 320,
+    gap: 28,
     showArrows: true,
+    transparentItems: true,
   })
 
   const carouselRef = ref<HTMLDivElement | null>(null)
@@ -88,12 +91,13 @@
     flex: `0 0 ${props.itemWidth}px`,
   }))
 
-  // --- Scroll horizontal via boutons
+  // --- Défilement via boutons
   const scrollLeft = () => {
     if (!carouselRef.value) return
     carouselRef.value.scrollBy({ left: -props.itemWidth - props.gap, behavior: 'smooth' })
     updateScrollPosition()
   }
+
   const scrollRight = () => {
     if (!carouselRef.value) return
     carouselRef.value.scrollBy({ left: props.itemWidth + props.gap, behavior: 'smooth' })
@@ -111,19 +115,19 @@
     return scrollPosition.value >= maxScroll
   })
 
-  // --- Scroll à la molette
+  // --- Scroll molette + drag souris/tactile
   const onWheel = (e: WheelEvent) => {
     if (!carouselRef.value) return
     carouselRef.value.scrollLeft += e.deltaY
     updateScrollPosition()
   }
 
-  // --- Drag souris
   const onMouseDown = (e: MouseEvent) => {
     isDragging.value = true
     startX.value = e.pageX - (carouselRef.value?.offsetLeft ?? 0)
     scrollStart.value = carouselRef.value?.scrollLeft ?? 0
   }
+
   const onMouseMove = (e: MouseEvent) => {
     if (!isDragging.value || !carouselRef.value) return
     const x = e.pageX - carouselRef.value.offsetLeft
@@ -131,16 +135,17 @@
     carouselRef.value.scrollLeft = scrollStart.value - walk
     updateScrollPosition()
   }
+
   const onMouseUp = () => {
     isDragging.value = false
   }
 
-  // --- Drag tactile
   const onTouchStart = (e: TouchEvent) => {
     isDragging.value = true
     startX.value = e.touches[0]!.pageX
     scrollStart.value = carouselRef.value?.scrollLeft ?? 0
   }
+
   const onTouchMove = (e: TouchEvent) => {
     if (!isDragging.value || !carouselRef.value) return
     const x = e.touches[0]!.pageX
@@ -148,6 +153,7 @@
     carouselRef.value.scrollLeft = scrollStart.value - walk
     updateScrollPosition()
   }
+
   const onTouchEnd = () => {
     isDragging.value = false
   }
@@ -164,6 +170,7 @@
     align-items: center;
     position: relative;
     width: 100%;
+    overflow: hidden;
   }
 
   .carousel-container {
@@ -172,7 +179,7 @@
     flex: 1;
     cursor: grab;
     user-select: none;
-    padding: 6px 0;
+    padding: 8px 0;
 
     &:active {
       cursor: grabbing;
@@ -181,33 +188,44 @@
 
   .carousel-track {
     display: flex;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease;
   }
 
   .carousel-item {
-    background: white;
-    border-radius: 16px;
+    border-radius: 18px;
     overflow: hidden;
-    transition: transform 0.25s ease;
-    box-shadow: 0 3px 10px fade(@neutral-900, 5%);
+    transition:
+      transform 0.35s ease,
+      box-shadow 0.35s ease;
+    box-shadow: 0 4px 16px fade(@neutral-900, 8%);
+    background: transparent;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px fade(@neutral-900, 10%);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 8px 20px fade(@neutral-900, 12%);
+    }
+
+    &.solid {
+      background: white;
     }
   }
 
-  /* Position et ajustement des boutons */
+  /* Navigation */
   .nav-btn {
     flex-shrink: 0;
     z-index: 10;
+    transition: transform 0.2s ease;
 
     &.prev {
-      margin-right: 12px;
+      margin-right: 16px;
     }
 
     &.next {
-      margin-left: 12px;
+      margin-left: 16px;
+    }
+
+    &:hover {
+      transform: scale(1.05);
     }
   }
 </style>
