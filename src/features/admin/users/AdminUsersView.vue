@@ -109,6 +109,7 @@
               icon-name="trash"
               tooltip="Supprimer"
               center
+              danger
               :span="3"
               @click="handleDelete(user)"
             />

@@ -1,5 +1,12 @@
 // Auto-generated from router/index.ts
 export type RouteName =
+  'AdminMessagerie' |
+  'AdminNews' |
+  'AdminOrders' |
+  'AdminProducts' |
+  'AdminStats' |
+  'AdminTopics' |
+  'AdminUsers' |
   'access-denied' |
   'actualite-detail' |
   'actualites' |

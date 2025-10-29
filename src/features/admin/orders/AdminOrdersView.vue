@@ -36,7 +36,7 @@
           />
           <BasicCell
             center
-            :span="4"
+            :span="6"
             text="Total"
             icon-name="ArrowUpDown"
             :is-active="sortKey === 'total_amount'"
@@ -83,7 +83,7 @@
 
             <BasicCell
               center
-              :span="4"
+              :span="6"
             >
               {{ formatCurrency(order.total_amount) }}
             </BasicCell>

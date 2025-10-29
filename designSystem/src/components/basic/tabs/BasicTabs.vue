@@ -5,7 +5,7 @@
       :class="`tabs--${tabsPlacement}`"
       ref="tabsContainer"
     >
-      <!-- Liste des onglets -->
+      <!-- 🔹 Onglets -->
       <BasicTab
         v-for="tab in tabs"
         :key="tab.routeName"
@@ -34,50 +34,55 @@
   import type { TabProps } from '../tab/BasicTab.types'
   import type { TabsModel } from './BasicTabs.types'
 
-  /**
-   * Props & modèle bidirectionnel (v-model)
-   */
-  defineProps<{
+  /* Props + modèle bidirectionnel */
+  const props = defineProps<{
     tabs?: TabProps[]
     tabsPlacement?: 'center' | 'start'
   }>()
 
   const modelValue = defineModel<TabsModel>()
 
-  /**
-   * 🎯 Gestion de l’indicateur glissant sous l’onglet actif
-   */
+  /* Refs internes */
   const tabsContainer = ref<HTMLElement | null>(null)
   const indicatorLeft = ref(0)
   const indicatorWidth = ref(0)
 
+  /* 🎯 Met à jour la position de l’indicateur */
   const updateIndicator = () => {
     if (!tabsContainer.value) return
     const activeTab = tabsContainer.value.querySelector('.tab--selected') as HTMLElement | null
     if (activeTab) {
-      const rect = activeTab.getBoundingClientRect()
-      const containerRect = tabsContainer.value.getBoundingClientRect()
-      indicatorLeft.value = rect.left - containerRect.left + tabsContainer.value.scrollLeft
-      indicatorWidth.value = rect.width
+      const scrollLeft = tabsContainer.value.scrollLeft
+      indicatorLeft.value = activeTab.offsetLeft - scrollLeft // ✅ compensation du scroll
+      indicatorWidth.value = activeTab.offsetWidth
     }
   }
 
+  /* 🧭 Watch automatique sur le modèle */
   watch(modelValue, async () => {
     await nextTick()
     updateIndicator()
   })
 
+  /* Initialisation */
   onMounted(() => {
     nextTick(updateIndicator)
     window.addEventListener('resize', updateIndicator)
+    tabsContainer.value?.addEventListener('scroll', updateIndicator)
   })
 
-  /**
-   * 💅 Style dynamique de l’indicateur
-   */
+  /* 💅 Style dynamique */
+  const activeColor = computed(() => {
+    const active = props.tabs?.find(
+      (t) => t.routeName === modelValue.value || t.tabKey === modelValue.value,
+    )
+    return active?.color || '#0EA5E9'
+  })
+
   const indicatorStyle = computed(() => ({
     transform: `translateX(${indicatorLeft.value}px)`,
     width: `${indicatorWidth.value}px`,
+    backgroundColor: activeColor.value,
   }))
 </script>
 
@@ -120,16 +125,16 @@
       min-width: 120px;
     }
 
-    /* ✅ Barre d’indicateur animée */
     &__indicator {
       position: absolute;
       bottom: 0;
+      left: 0;
       height: 3px;
-      background-color: @primary-600;
       border-radius: 3px;
       transition:
         transform 0.3s ease,
-        width 0.3s ease;
+        width 0.3s ease,
+        background-color 0.3s ease;
     }
   }
 </style>

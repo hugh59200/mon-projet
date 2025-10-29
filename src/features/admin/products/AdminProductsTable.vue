@@ -118,7 +118,6 @@
             >
               {{ product.purity ? product.purity + '%' : '—' }}
             </BasicCell>
-
             <!-- 📦 Stock -->
             <BasicCell
               center
@@ -134,32 +133,24 @@
                 />
               </div>
             </BasicCell>
-
-            <!-- 🧰 Actions -->
-            <BasicCell
-              v-if="!readonly"
+            <BasicCellActionIcon
+              icon-name="eye"
+              tooltip="Voir"
               center
-              :span="6"
-            >
-              <div class="actions">
-                <BasicIconNext
-                  name="Eye"
-                  tooltip="Voir le produit"
-                  class="action-icon"
-                  @click="openProductModal(product.id)"
-                />
-                <BasicIconNext
-                  name="Trash2"
-                  tooltip="Supprimer"
-                  class="action-icon action-icon--delete"
-                  @click="handleDelete(product)"
-                />
-              </div>
-            </BasicCell>
+              :span="3"
+              @click="openProductModal(product.id)"
+            />
+            <BasicCellActionIcon
+              icon-name="trash"
+              tooltip="Supprimer"
+              center
+              danger
+              :span="3"
+              @click="handleDelete(product)"
+            />
           </div>
         </div>
       </div>
-
       <!-- 📱 VERSION MOBILE -->
       <div class="mobile-cards-list">
         <component

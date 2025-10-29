@@ -4,12 +4,10 @@
     class="tab"
     :class="{ 'tab--selected': isSelected, 'tab--unselected': !isSelected }"
     @click="handleSelect"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
   >
     <BasicText
-      :wrap-all="!isSelected && !isHovered"
-      :nb-max-lines="isSelected || isHovered ? '2' : '1'"
+      :wrap-all="!isSelected"
+      :nb-max-lines="isSelected ? '2' : '1'"
       :size="isSelected ? 'body-l' : 'body-m'"
       :weight="isSelected ? 'semibold' : 'regular'"
       class="tab__label"
@@ -34,25 +32,17 @@
       v-if="!$slots['tab-icon'] && tabState"
       class="tab__icon"
       :name="tabState"
-      :style="{ color: iconColor }"
+      :color="iconColor"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import type { TabProps } from './BasicTab.types'
 
-  /**
-   * Props + modèle bidirectionnel (v-model)
-   */
   const props = defineProps<TabProps>()
   const modelValue = defineModel<string | number | null | undefined>()
-
-  const tabRef = ref<HTMLElement | null>(null)
-  const isHovered = ref(false)
-
-  console.log(props.color)
 
   const isSelected = computed(
     () => modelValue.value === props.routeName || modelValue.value === props.tabKey,
@@ -62,15 +52,11 @@
     modelValue.value = props.routeName ?? props.tabKey
   }
 
-  /**
-   * 🎨 Gestion des couleurs dynamiques
-   */
-  const iconColor = computed(() => {
-    if (!props.color) return '#9CA3AF' // gris neutre
-    return isSelected.value ? props.color : '#9CA3AF'
-  })
-
   const textColor = computed(() => (isSelected.value && props.color ? props.color : ''))
+
+  const iconColor = computed(
+    () => (isSelected.value ? props.color : '#9CA3AF'), // ✅ gris explicite
+  )
 </script>
 
 <style scoped lang="less">
@@ -106,7 +92,6 @@
       font-weight: 600;
       z-index: 3;
       box-shadow: 0 -1px 8px fade(@primary-600, 25%);
-
       .tab__icon {
         opacity: 1;
         fill: currentColor;

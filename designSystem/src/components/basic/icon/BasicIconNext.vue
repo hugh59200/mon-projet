@@ -41,7 +41,7 @@
 
   const computedProps = computed(() => ({
     size: props.size,
-    color: 'currentColor', // 🟢 laisse Lucide suivre la couleur CSS
+    color: props.color || 'currentColor', // ✅ si tu passes une couleur, elle est prioritaire
     'stroke-width': props.strokeWidth,
   }))
 </script>
