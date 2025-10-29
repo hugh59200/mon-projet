@@ -1,14 +1,13 @@
 <template>
   <div class="page article-detail">
-    <RouterLink
-      to="/actualites"
-      class="back"
+    <BasicLink
+      :to="'/actualites'"
+      iconName="ArrowLeft"
     >
-      ← Retour aux actualités
-    </RouterLink>
-
+      ← Retour aux
+      <strong>actualités</strong>
+    </BasicLink>
     <article v-if="article">
-      <!-- 🧩 Titre -->
       <BasicText
         size="h1"
         weight="semibold"
@@ -18,7 +17,6 @@
         {{ article.title }}
       </BasicText>
 
-      <!-- 📅 Date -->
       <BasicText
         size="body-s"
         fontStyle="italic"
@@ -28,18 +26,14 @@
         {{ formatDate(article.published_at) }}
       </BasicText>
 
-      <!-- 🖼 Image zoomable -->
       <InnerImageZoom
         v-if="article.image"
         :src="article.image"
         :zoomSrc="article.image"
         class="cover-zoom"
         alt="Image de l’article"
-        :moveType="'drag'"
-        :zoomType="'click'"
       />
 
-      <!-- 📰 Contenu HTML stylé -->
       <BasicText
         size="body-l"
         color="neutral-900"
@@ -48,105 +42,118 @@
       />
     </article>
 
-    <p v-else>Article introuvable.</p>
+    <section
+      v-if="relatedArticles.length"
+      class="related-section"
+    >
+      <BasicText
+        size="h2"
+        weight="semibold"
+        color="neutral-900"
+        class="related-title"
+      >
+        Articles similaires
+      </BasicText>
+
+      <BasicCarousel
+        :items="relatedArticles"
+        :item-width="300"
+        :gap="24"
+        :show-arrows="true"
+      >
+        <template #item="{ item }">
+          <RouterLink
+            :to="`/actualites/${item.slug}`"
+            class="related-card"
+          >
+            <img
+              :src="item.image"
+              :alt="item.title"
+            />
+            <div class="overlay">
+              <BasicText
+                size="h5"
+                weight="semibold"
+                color="white"
+              >
+                {{ item.title }}
+              </BasicText>
+            </div>
+          </RouterLink>
+        </template>
+      </BasicCarousel>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
   import type { NewsArticle } from '@/features/actualités/api/news'
-  import { fetchNewsBySlug } from '@/features/actualités/api/news'
+  import { fetchNews, fetchNewsBySlug } from '@/features/actualités/api/news'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
+  import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { computed, onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
   const article = ref<NewsArticle | null>(null)
+  const relatedArticles = ref<NewsArticle[]>([])
   const route = useRoute()
 
-  // ✅ Markdown ou HTML sécurisé
   const parsedContent = computed(() =>
     article.value?.content ? parseAndSanitize(article.value.content) : '',
   )
 
   onMounted(async () => {
-    article.value = await fetchNewsBySlug(route.params.slug as string)
+    const slug = route.params.slug as string
+    article.value = await fetchNewsBySlug(slug)
+
+    if (article.value?.topic_id) {
+      const all = await fetchNews(article.value.topic_id)
+      relatedArticles.value = all.filter((a) => a.slug !== slug).slice(0, 5)
+    }
   })
 </script>
 
 <style scoped lang="less">
-  .article-detail {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 40px 20px;
-  }
+  .related-section {
+    margin-top: 64px;
 
-  .back {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: @primary-500;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
+    .related-title {
+      margin-bottom: 20px;
+      text-align: center;
     }
-  }
 
-  /* Titre */
-  .title {
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  /* Date */
-  .date {
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  /* Image zoomable */
-  .cover-zoom {
-    display: block;
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px fade(@neutral-900, 10%);
-    cursor: zoom-in;
-
-    :deep(img) {
+    .related-card {
+      position: relative;
+      display: block;
       border-radius: 12px;
-    }
-  }
+      overflow: hidden;
+      text-decoration: none;
 
-  /* Contenu stylé */
-  .content {
-    line-height: 1.7;
+      img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+      }
 
-    :deep(p) {
-      margin-bottom: 16px;
-    }
+      &:hover img {
+        transform: scale(1.05);
+      }
 
-    :deep(h2),
-    :deep(h3) {
-      margin-top: 24px;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    :deep(ul),
-    :deep(ol) {
-      padding-left: 20px;
-      margin-bottom: 16px;
-    }
-
-    :deep(a) {
-      color: @primary-600;
-      text-decoration: underline;
-
-      &:hover {
-        color: @primary-800;
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          fade(@neutral-900, 85%) 0%,
+          fade(@neutral-900, 40%) 100%
+        );
+        display: flex;
+        align-items: flex-end;
+        padding: 12px;
       }
     }
   }

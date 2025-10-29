@@ -19,7 +19,7 @@
 
   export type IconNameNext = keyof typeof LucideIcons
 
-  interface Props {
+  interface IconNextProps {
     name: IconNameNext
     size?: number
     color?: IconColor
@@ -28,7 +28,7 @@
     disabled?: boolean
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<IconNextProps>(), {
     size: 20,
     color: 'primary-600',
     strokeWidth: 1.5,

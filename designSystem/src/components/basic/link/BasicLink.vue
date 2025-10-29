@@ -1,5 +1,9 @@
 <template>
-  <span
+  <component
+    :is="tag"
+    :to="to"
+    :href="href"
+    :disabled="disabled"
     :class="[
       'standalone-link',
       `standalone-link--${type}`,
@@ -12,43 +16,62 @@
     ]"
     @click.stop="!disabled ? $emit('link-click') : undefined"
   >
-    <BasicIcon
+    <BasicIconNext
       v-if="state === 'icon-left'"
-      :name="iconName?.length ? 'arrow-up' : 'arrow-right'"
-      :active="iconName?.length > 0"
+      :name="'ArrowLeft'"
+      class="icon-left"
     />
-    <BasicText
-      v-if="label"
-      class="standalone-link__label"
-      :size="textSizeMapping[size]"
-      :wrap="wrapLink"
-      :nb-max-lines
-      :wrap-all
-    >
-      {{ label }}
-    </BasicText>
-    <BasicIcon
+
+    <slot>
+      <BasicText
+        v-if="label"
+        class="standalone-link__label"
+        :size="textSizeMapping[size]"
+        :wrap="wrapLink"
+        :nb-max-lines="nbMaxLines"
+        :wrap-all="wrapAll"
+      >
+        {{ label }}
+      </BasicText>
+    </slot>
+
+    <BasicIconNext
       v-if="state === 'icon-right'"
-      name="arrow-right"
+      :name="'ArrowRight'"
+      class="icon-right"
     />
-  </span>
+  </component>
 </template>
 
 <script setup lang="ts">
   import type { LinkSize, StandaloneLinkProps, TextSize } from '@designSystem/components'
+  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
+  import { computed } from 'vue'
 
-  withDefaults(defineProps<StandaloneLinkProps>(), {
-    state: 'text-only',
-    type: 'primary',
-    size: 'medium',
-    iconName: undefined,
-    wrapLink: false,
-    wrapAll: false,
-    disabled: false,
-    nbMaxLines: undefined,
-  })
+  const props = withDefaults(
+    defineProps<
+      StandaloneLinkProps & {
+        to?: string
+        href?: string
+      }
+    >(),
+    {
+      state: 'text-only',
+      type: 'primary',
+      size: 'medium',
+      iconName: undefined,
+      wrapLink: false,
+      wrapAll: false,
+      disabled: false,
+      nbMaxLines: undefined,
+      to: undefined,
+      href: undefined,
+    },
+  )
 
   defineEmits(['link-click'])
+
+  const tag = computed(() => (props.to ? 'RouterLink' : props.href ? 'a' : 'span'))
 
   const textSizeMapping: Record<LinkSize, TextSize> = {
     large: 'body-xl',
@@ -59,4 +82,9 @@
 
 <style lang="less">
   @import './BasicLink.less';
+
+  .standalone-link--with-icon:hover .icon-left {
+    transform: translateX(-4px);
+    transition: transform 0.2s ease;
+  }
 </style>

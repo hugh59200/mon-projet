@@ -1,15 +1,15 @@
-import type { IconName } from '@designSystem/fondation/icons/iconsList'
+import type { IconNameNext } from '../icon/BasicIconNext.vue'
 
 export type LinkType = 'primary' | 'secondary' | 'light' | 'dark'
 export type LinkSize = 'large' | 'medium' | 'small'
 export type LinkState = 'icon-left' | 'icon-right' | 'text-only'
 
 export type StandaloneLinkProps = {
-  label: string
+  label?: string
   state?: LinkState
   type?: LinkType
   size?: LinkSize
-  iconName?: IconName | undefined
+  iconName?: IconNameNext
   disabled?: boolean
   wrapLink?: boolean
   wrapAll?: boolean

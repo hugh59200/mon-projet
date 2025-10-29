@@ -143,10 +143,12 @@
 <style scoped lang="less">
   .page-title {
     display: block;
-    margin: 28px 0;
+    margin: 28px 0 24px;
+    text-align: center;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
   }
 
-  /* --- Style des topics du carrousel --- */
+  /* --- Carrousel des catégories --- */
   .topic-card {
     position: relative;
     display: block;
@@ -183,17 +185,16 @@
       transition: background 0.3s ease;
 
       .topic-title {
-        font-size: 1.3rem;
+        font-size: clamp(1.1rem, 2vw, 1.3rem);
         margin-bottom: 6px;
         text-shadow: 0 3px 6px fade(black, 75%);
       }
 
       .topic-description {
-        font-size: 0.95rem;
+        font-size: clamp(0.9rem, 1.5vw, 0.95rem);
         line-height: 1.5;
         opacity: 0.95;
         text-shadow: 0 2px 4px fade(black, 80%);
-
         :deep([style*='color:#0070f3']),
         :deep(a),
         :deep(span) {
@@ -203,11 +204,17 @@
     }
   }
 
-  /* --- Articles --- */
+  /* --- Grille des articles --- */
   .articles {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 28px;
+    padding: 0 12px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
   }
 
   .article-card {
@@ -251,16 +258,18 @@
 
       .article-title {
         margin-bottom: 6px;
+        font-size: clamp(1.05rem, 2vw, 1.15rem);
       }
 
       .date {
         display: block;
         margin-bottom: 10px;
+        font-size: 0.9rem;
       }
 
       .excerpt {
         line-height: 1.45;
-        font-size: 0.95rem;
+        font-size: clamp(0.9rem, 1.5vw, 0.95rem);
         color: @neutral-700;
 
         :deep(p) {
