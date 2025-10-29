@@ -1,13 +1,25 @@
-// src/features/actualités/api/topicImages.ts
 import { supabase } from '@/supabase/supabaseClient'
+
+/**
+ * Nettoie un nom pour en faire un chemin valide dans Supabase Storage.
+ */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD') // enlève les accents
+    .replace(/[\u0300-\u036f]/g, '') // décompose les caractères accentués
+    .replace(/[^a-z0-9]+/g, '-') // remplace tout ce qui n’est pas alphanumérique par -
+    .replace(/(^-|-$)/g, '') // supprime les tirets en trop
+}
 
 /**
  * ☁️ Upload une image de topic dans le bucket `topic-images`
  * et retourne son URL publique.
  */
 export async function uploadTopicImage(slug: string, file: File): Promise<string> {
+  const safeSlug = slugify(slug)
   const ext = file.name.split('.').pop()
-  const filePath = `topics/${slug}/topic-${slug}.${ext}`
+  const filePath = `topics/${safeSlug}/topic-${safeSlug}.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from('topic-images')
@@ -35,13 +47,4 @@ export async function deleteTopicImage(imageUrl: string): Promise<boolean> {
     console.warn('⚠️ Erreur lors de la suppression de l’image topic :', err)
     return false
   }
-}
-
-/**
- * 🔍 Génère un chemin d’image unique à partir d’un slug
- * (utile pour éviter les collisions)
- */
-export function getTopicImagePath(slug: string, fileName: string): string {
-  const ext = fileName.split('.').pop()
-  return `topics/${slug}/topic-${slug}.${ext}`
 }

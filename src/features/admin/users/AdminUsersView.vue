@@ -1,150 +1,152 @@
 <template>
-  <BasicToolbar
-    v-model:search="search"
-    :search-placeholder="'Rechercher un utilisateur...'"
-    :show-reset="true"
-    @reset="reset()"
-  />
+  <div>
+    <BasicToolbar
+      v-model:search="search"
+      :search-placeholder="'Rechercher un utilisateur...'"
+      :show-reset="true"
+      @reset="reset()"
+    />
 
-  <BasicPagination
-    :current-page="page"
-    :nb-pages="nbPages"
-    :nb-results="total"
-    :nb-pages-max="5"
-    :auto-fetch="fetchData"
-    @change="page = $event"
-  />
+    <BasicPagination
+      :current-page="page"
+      :nb-pages="nbPages"
+      :nb-results="total"
+      :nb-pages-max="5"
+      :auto-fetch="fetchData"
+      @change="page = $event"
+    />
 
-  <WrapperLoader
-    :loading="loading"
-    :has-loaded="hasLoaded"
-    :is-empty="hasLoaded && filteredData.length === 0"
-    message="Chargement des utilisateurs..."
-    empty-message="Aucun utilisateur trouvé 😅"
-  >
-    <!-- 💻 TABLEAU DESKTOP -->
-    <div class="users--desktop">
-      <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <BasicCell
-          :span="10"
-          text="Email"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'email'"
-          :icon-color="getSortColor('email')"
-          :on-icon-click="() => toggleSort('email')"
-        />
-        <BasicCell
-          :span="8"
-          text="Nom"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'full_name'"
-          :icon-color="getSortColor('full_name')"
-          :on-icon-click="() => toggleSort('full_name')"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Rôle"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'role'"
-          :icon-color="getSortColor('role')"
-          :on-icon-click="() => toggleSort('role')"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Créé le"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'created_at'"
-          :icon-color="getSortColor('created_at')"
-          :on-icon-click="() => toggleSort('created_at')"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Actions"
-        />
-      </div>
-
-      <div
-        v-for="user in filteredData"
-        :key="user.id"
-        class="gridElemWrapper"
-      >
-        <div class="cardLayoutWrapper">
-          <BasicCell :span="10">{{ user.email }}</BasicCell>
-          <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
-
+    <WrapperLoader
+      :loading="loading"
+      :has-loaded="hasLoaded"
+      :is-empty="hasLoaded && filteredData.length === 0"
+      message="Chargement des utilisateurs..."
+      empty-message="Aucun utilisateur trouvé 😅"
+    >
+      <!-- 💻 TABLEAU DESKTOP -->
+      <div class="users--desktop">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
-            center
-            :span="6"
-          >
-            <BasicDropdown
-              v-model="localRoles[user.id]"
-              :items="ROLES"
-              size="small"
-              dropdown-type="table"
-              force-value
-              :item-class="(r: { id: string }) => getRoleClass(r.id)"
-              @update:model-value="(v) => v && handleRoleChange(user, v)"
-            />
-          </BasicCell>
-
-          <BasicCell
-            center
-            :span="6"
-          >
-            {{ formatDate(user.created_at) }}
-          </BasicCell>
-
-          <BasicCellActionIcon
-            icon-name="eye"
-            tooltip="Voir"
-            center
-            :span="3"
-            @click="openUserModal(user.id)"
+            :span="10"
+            text="Email"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'email'"
+            :icon-color="getSortColor('email')"
+            :on-icon-click="() => toggleSort('email')"
           />
-          <BasicCellActionIcon
-            icon-name="trash"
-            tooltip="Supprimer"
+          <BasicCell
+            :span="8"
+            text="Nom"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'full_name'"
+            :icon-color="getSortColor('full_name')"
+            :on-icon-click="() => toggleSort('full_name')"
+          />
+          <BasicCell
             center
-            :span="3"
-            @click="handleDelete(user)"
+            :span="6"
+            text="Rôle"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'role'"
+            :icon-color="getSortColor('role')"
+            :on-icon-click="() => toggleSort('role')"
+          />
+          <BasicCell
+            center
+            :span="6"
+            text="Créé le"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'created_at'"
+            :icon-color="getSortColor('created_at')"
+            :on-icon-click="() => toggleSort('created_at')"
+          />
+          <BasicCell
+            center
+            :span="6"
+            text="Actions"
           />
         </div>
+
+        <div
+          v-for="user in filteredData"
+          :key="user.id"
+          class="gridElemWrapper"
+        >
+          <div class="cardLayoutWrapper">
+            <BasicCell :span="10">{{ user.email }}</BasicCell>
+            <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
+
+            <BasicCell
+              center
+              :span="6"
+            >
+              <BasicDropdown
+                v-model="localRoles[user.id]"
+                :items="ROLES"
+                size="small"
+                dropdown-type="table"
+                force-value
+                :item-class="(r: { id: string }) => getRoleClass(r.id)"
+                @update:model-value="(v) => v && handleRoleChange(user, v)"
+              />
+            </BasicCell>
+
+            <BasicCell
+              center
+              :span="6"
+            >
+              {{ formatDate(user.created_at) }}
+            </BasicCell>
+
+            <BasicCellActionIcon
+              icon-name="eye"
+              tooltip="Voir"
+              center
+              :span="3"
+              @click="openUserModal(user.id)"
+            />
+            <BasicCellActionIcon
+              icon-name="trash"
+              tooltip="Supprimer"
+              center
+              :span="3"
+              @click="handleDelete(user)"
+            />
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- 📱 CARTES MOBILES -->
-    <div class="mobile-cards-list">
-      <UserCardMobile
-        v-for="user in filteredData"
-        :key="user.id"
-        v-model:role="localRoles[user.id]!"
-        :user="user"
-        :roles="ROLES"
-        :format-date="formatDate"
-        :handle-role-change="handleRoleChange"
-        :open-user-modal="openUserModal"
-        :handle-delete="handleDelete"
+      <!-- 📱 CARTES MOBILES -->
+      <div class="mobile-cards-list">
+        <UserCardMobile
+          v-for="user in filteredData"
+          :key="user.id"
+          v-model:role="localRoles[user.id]!"
+          :user="user"
+          :roles="ROLES"
+          :format-date="formatDate"
+          :handle-role-change="handleRoleChange"
+          :open-user-modal="openUserModal"
+          :handle-delete="handleDelete"
+        />
+      </div>
+    </WrapperLoader>
+
+    <!-- 🪟 MODAL -->
+    <teleport to="#app">
+      <AdminUserDetailsModal
+        v-if="selectedUserId"
+        v-model="isModalVisible"
+        :user-id="selectedUserId"
       />
-    </div>
-  </WrapperLoader>
-
-  <!-- 🪟 MODAL -->
-  <teleport to="#app">
-    <AdminUserDetailsModal
-      v-if="selectedUserId"
-      v-model="isModalVisible"
-      :user-id="selectedUserId"
-    />
-  </teleport>
+    </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
-  import { useSortableTable } from '@/features/admin/composables/useSortableTable'
   import { ROLES } from '@/features/admin/constants/users'
+  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/useSortableTable'
   import { deleteUser, updateUserRole } from '@/supabase/api/users'
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'

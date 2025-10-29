@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
+  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
   import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
   import BasicToolbar from '../../BasicToolbar.vue'

@@ -1,200 +1,202 @@
 <template>
-  <!-- 🔍 Toolbar -->
-  <BasicToolbar
-    v-model:search="search"
-    search-placeholder="Rechercher un produit..."
-    show-reset
-    show-role
-    @reset="reset()"
-  >
-    <template
-      v-if="!readonly"
-      #actions
+  <div>
+    <!-- 🔍 Toolbar -->
+    <BasicToolbar
+      v-model:search="search"
+      search-placeholder="Rechercher un produit..."
+      show-reset
+      show-role
+      @reset="reset()"
     >
-      <BasicButton
-        label="+ Ajouter un produit"
-        type="primary"
-        size="small"
-        @click="isCreateModalVisible = true"
-      />
-    </template>
-  </BasicToolbar>
-
-  <!-- 📄 Pagination -->
-  <BasicPagination
-    :current-page="page"
-    :nb-pages="nbPages"
-    :nb-results="total"
-    :nb-pages-max="5"
-    :auto-fetch="fetchData"
-    @change="page = $event"
-  />
-
-  <!-- 💾 Tableau principal -->
-  <WrapperLoader
-    :loading="loading"
-    :has-loaded="hasLoaded"
-    :is-empty="hasLoaded && filteredData.length === 0"
-    message="Chargement des produits..."
-    empty-message="Aucun produit trouvé 😅"
-  >
-    <!-- 💻 TABLEAU DESKTOP -->
-    <div class="products--desktop">
-      <!-- 🧱 HEADER -->
-      <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <BasicCell
-          :span="10"
-          text="Nom"
-        />
-        <BasicCell
-          center
-          :span="8"
-          text="Catégorie"
-        />
-        <BasicCell
-          center
-          :span="4"
-          text="Prix (€)"
-        />
-        <BasicCell
-          center
-          :span="4"
-          text="Pureté (%)"
-        />
-        <BasicCell
-          center
-          :span="4"
-          text="Stock"
-        />
-        <BasicCell
-          v-if="!readonly"
-          center
-          :span="6"
-          text="Actions"
-        />
-      </div>
-
-      <!-- 🧩 LIGNES -->
-      <div
-        v-for="product in filteredData"
-        :key="product.id"
-        class="gridElemWrapper"
+      <template
+        v-if="!readonly"
+        #actions
       >
-        <div class="cardLayoutWrapper product-row">
-          <!-- 🧱 Nom + Image -->
-          <BasicCell :span="10">
-            <div class="product-name-cell">
-              <img
-                v-if="product.image"
-                :src="product.image"
-                alt="Image"
-                class="product-thumb"
-              />
-              <span>{{ product.name || '—' }}</span>
-            </div>
-          </BasicCell>
+        <BasicButton
+          label="+ Ajouter un produit"
+          type="primary"
+          size="small"
+          @click="isCreateModalVisible = true"
+        />
+      </template>
+    </BasicToolbar>
 
-          <!-- 🏷️ Catégorie -->
+    <!-- 📄 Pagination -->
+    <BasicPagination
+      :current-page="page"
+      :nb-pages="nbPages"
+      :nb-results="total"
+      :nb-pages-max="5"
+      :auto-fetch="fetchData"
+      @change="page = $event"
+    />
+
+    <!-- 💾 Tableau principal -->
+    <WrapperLoader
+      :loading="loading"
+      :has-loaded="hasLoaded"
+      :is-empty="hasLoaded && filteredData.length === 0"
+      message="Chargement des produits..."
+      empty-message="Aucun produit trouvé 😅"
+    >
+      <!-- 💻 TABLEAU DESKTOP -->
+      <div class="products--desktop">
+        <!-- 🧱 HEADER -->
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+          <BasicCell
+            :span="10"
+            text="Nom"
+          />
           <BasicCell
             center
             :span="8"
-          >
-            {{ product.category || '—' }}
-          </BasicCell>
-
-          <!-- 💰 Prix -->
+            text="Catégorie"
+          />
           <BasicCell
             center
             :span="4"
-          >
-            {{ formatCurrency(product.price) }}
-          </BasicCell>
-
-          <!-- ⚗️ Pureté -->
+            text="Prix (€)"
+          />
           <BasicCell
             center
             :span="4"
-          >
-            {{ product.purity ? product.purity + '%' : '—' }}
-          </BasicCell>
-
-          <!-- 📦 Stock -->
+            text="Pureté (%)"
+          />
           <BasicCell
             center
             :span="4"
-          >
-            <div
-              class="stock-status"
-              :class="product.stock ? 'stock-status--in' : 'stock-status--out'"
-            >
-              <BasicIconNext
-                :name="product.stock ? 'CheckCircle' : 'XCircle'"
-                :color="product.stock ? 'success-600' : 'danger-600'"
-              />
-            </div>
-          </BasicCell>
-
-          <!-- 🧰 Actions -->
+            text="Stock"
+          />
           <BasicCell
             v-if="!readonly"
             center
             :span="6"
-          >
-            <div class="actions">
-              <BasicIconNext
-                name="Eye"
-                tooltip="Voir le produit"
-                class="action-icon"
-                @click="openProductModal(product.id)"
-              />
-              <BasicIconNext
-                name="Trash2"
-                tooltip="Supprimer"
-                class="action-icon action-icon--delete"
-                @click="handleDelete(product)"
-              />
-            </div>
-          </BasicCell>
+            text="Actions"
+          />
+        </div>
+
+        <!-- 🧩 LIGNES -->
+        <div
+          v-for="product in filteredData"
+          :key="product.id"
+          class="gridElemWrapper"
+        >
+          <div class="cardLayoutWrapper product-row">
+            <!-- 🧱 Nom + Image -->
+            <BasicCell :span="10">
+              <div class="product-name-cell">
+                <img
+                  v-if="product.image"
+                  :src="product.image"
+                  alt="Image"
+                  class="product-thumb"
+                />
+                <span>{{ product.name || '—' }}</span>
+              </div>
+            </BasicCell>
+
+            <!-- 🏷️ Catégorie -->
+            <BasicCell
+              center
+              :span="8"
+            >
+              {{ product.category || '—' }}
+            </BasicCell>
+
+            <!-- 💰 Prix -->
+            <BasicCell
+              center
+              :span="4"
+            >
+              {{ formatCurrency(product.price) }}
+            </BasicCell>
+
+            <!-- ⚗️ Pureté -->
+            <BasicCell
+              center
+              :span="4"
+            >
+              {{ product.purity ? product.purity + '%' : '—' }}
+            </BasicCell>
+
+            <!-- 📦 Stock -->
+            <BasicCell
+              center
+              :span="4"
+            >
+              <div
+                class="stock-status"
+                :class="product.stock ? 'stock-status--in' : 'stock-status--out'"
+              >
+                <BasicIconNext
+                  :name="product.stock ? 'CheckCircle' : 'XCircle'"
+                  :color="product.stock ? 'success-600' : 'danger-600'"
+                />
+              </div>
+            </BasicCell>
+
+            <!-- 🧰 Actions -->
+            <BasicCell
+              v-if="!readonly"
+              center
+              :span="6"
+            >
+              <div class="actions">
+                <BasicIconNext
+                  name="Eye"
+                  tooltip="Voir le produit"
+                  class="action-icon"
+                  @click="openProductModal(product.id)"
+                />
+                <BasicIconNext
+                  name="Trash2"
+                  tooltip="Supprimer"
+                  class="action-icon action-icon--delete"
+                  @click="handleDelete(product)"
+                />
+              </div>
+            </BasicCell>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 📱 VERSION MOBILE -->
-    <div class="mobile-cards-list">
-      <component
-        :is="readonly ? ProductCardMobileReadonly : ProductCardMobile"
-        v-for="product in filteredData"
-        :key="product.id"
-        :product="product"
-        :format-currency="formatCurrency"
-        :open-product-modal="openProductModal"
-        v-bind="!readonly ? { editProduct: openEditProduct, handleDelete } : {}"
+      <!-- 📱 VERSION MOBILE -->
+      <div class="mobile-cards-list">
+        <component
+          :is="readonly ? ProductCardMobileReadonly : ProductCardMobile"
+          v-for="product in filteredData"
+          :key="product.id"
+          :product="product"
+          :format-currency="formatCurrency"
+          :open-product-modal="openProductModal"
+          v-bind="!readonly ? { editProduct: openEditProduct, handleDelete } : {}"
+        />
+      </div>
+    </WrapperLoader>
+
+    <!-- 🪟 MODALES -->
+    <teleport to="#app">
+      <!-- ➕ Création -->
+      <AdminProductModal
+        v-if="!readonly"
+        v-model="isCreateModalVisible"
+        @saved="fetchData"
       />
-    </div>
-  </WrapperLoader>
 
-  <!-- 🪟 MODALES -->
-  <teleport to="#app">
-    <!-- ➕ Création -->
-    <AdminProductModal
-      v-if="!readonly"
-      v-model="isCreateModalVisible"
-      @saved="fetchData"
-    />
-
-    <!-- 🔍 Lecture / Édition -->
-    <AdminProductModal
-      v-if="selectedProductId"
-      v-model="isModalVisible"
-      :product-id="selectedProductId"
-      :readonly="readonly"
-      @saved="fetchData"
-    />
-  </teleport>
+      <!-- 🔍 Lecture / Édition -->
+      <AdminProductModal
+        v-if="selectedProductId"
+        v-model="isModalVisible"
+        :product-id="selectedProductId"
+        :readonly="readonly"
+        @saved="fetchData"
+      />
+    </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
+  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
   import { deleteProduct } from '@/supabase/api/products'
   import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency } from '@/utils/index'

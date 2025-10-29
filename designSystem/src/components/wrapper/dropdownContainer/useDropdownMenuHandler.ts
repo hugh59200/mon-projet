@@ -1,11 +1,21 @@
 import { useScrollIntoView } from '@/features/interface/composables/useScrollIntoView'
 import type { DropdownItem } from '@designSystem/components'
-import { computed, nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  unref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from 'vue'
 
 export type DropdownDirection = 'up' | 'down'
 
+// ✅ on autorise soit un tableau, soit un Ref/ComputedRef
 export function useDropdownMenuHandler<T = DropdownItem>(
-  items: T[] = [],
+  items: T[] | Ref<T[]> | ComputedRef<T[]> = [],
   keyId?: keyof T,
   keyLabel?: keyof T,
   keyIconName?: keyof T,
@@ -18,8 +28,11 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 
   const { makeId, makeVisible } = useScrollIntoView()
 
+  // ✅ Unref ici : fonctionne avec tableaux, ref, ou computed
+  const resolvedItems = computed(() => unref(items) ?? [])
+
   const computedItems = computed<DropdownItem[]>(() =>
-    items.map((item: T) => ({
+    resolvedItems.value.map((item: T) => ({
       id: item[(keyId as keyof T) ?? ('id' as keyof T)] as DropdownItem['id'],
       label: item[(keyLabel as keyof T) ?? ('label' as keyof T)] as DropdownItem['label'],
       iconName: item[
@@ -51,7 +64,6 @@ export function useDropdownMenuHandler<T = DropdownItem>(
   const attach = async () => {
     detach()
     io.value = new IntersectionObserver(([entry]) => {
-      // ✅ Correction : ferme uniquement quand le dropdown devient invisible
       if (!entry!.isIntersecting && isOpen.value) {
         isOpen.value = false
       }

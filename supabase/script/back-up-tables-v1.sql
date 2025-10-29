@@ -490,3 +490,49 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('topic-images', 'topic-images', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 🔒 Policies RLS pour le bucket topic-images
+-- ============================================================
+
+-- Supprime d'abord les anciennes policies si existantes
+DO $$
+BEGIN
+  EXECUTE 'DROP POLICY IF EXISTS "Allow public read access on topic-images" ON storage.objects';
+  EXECUTE 'DROP POLICY IF EXISTS "Allow admins to upload topic images" ON storage.objects';
+  EXECUTE 'DROP POLICY IF EXISTS "Allow admins to delete topic images" ON storage.objects';
+  EXECUTE 'DROP POLICY IF EXISTS "Allow public list of topic-images" ON storage.objects';
+END $$;
+
+-- Lecture publique (pour afficher les images sur le site)
+CREATE POLICY "Allow public read access on topic-images"
+  ON storage.objects
+  FOR SELECT
+  USING (bucket_id = 'topic-images');
+
+-- Lister les images du bucket
+CREATE POLICY "Allow public list of topic-images"
+  ON storage.objects
+  FOR SELECT
+  USING (bucket_id = 'topic-images');
+
+-- Upload réservé aux admins authentifiés
+CREATE POLICY "Allow admins to upload topic images"
+  ON storage.objects
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    bucket_id = 'topic-images'
+    AND public.is_admin(auth.uid())
+  );
+
+-- Suppression réservée aux admins authentifiés
+CREATE POLICY "Allow admins to delete topic images"
+  ON storage.objects
+  FOR DELETE
+  TO authenticated
+  USING (
+    bucket_id = 'topic-images'
+    AND public.is_admin(auth.uid())
+  );
+

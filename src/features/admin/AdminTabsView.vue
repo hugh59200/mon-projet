@@ -6,7 +6,6 @@
     :tabs-placement="tabsPlacement"
     class="tabs-view"
   >
-    <!-- ✅ Passe automatiquement la prop readonly à tous les sous-composants -->
     <component
       :is="tabComponents[selectedTab]"
       v-bind="{ readonly: !isAdmin }"
@@ -17,11 +16,12 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { computed, ref } from 'vue'
-  import AdminNewsTable from './actualités/AdminNewsTable.vue'
   import AdminChatView from './chat/AdminChatView.vue'
+  import AdminNewsTable from './news/AdminNewsTable.vue'
   import AdminOrdersView from './orders/AdminOrdersView.vue'
   import AdminProductsTable from './products/AdminProductsTable.vue'
   import AdminStatsView from './stats/AdminStatsView.vue'
+  import AdminTopicsTable from './topics/AdminTopicsTable.vue' // ✅ import du module Topics
   import AdminUsersView from './users/AdminUsersView.vue'
 
   withDefaults(
@@ -43,6 +43,7 @@
     { tabKey: 'Commandes' },
     { tabKey: 'Produits' },
     { tabKey: 'Actualités' },
+    { tabKey: 'Catégories (Topics)' }, // ✅ nouvel onglet
   ]
 
   const tabComponents = {
@@ -52,6 +53,7 @@
     Commandes: AdminOrdersView,
     Produits: AdminProductsTable,
     Actualités: AdminNewsTable,
+    'Catégories (Topics)': AdminTopicsTable, // ✅ correspondance de composant
   } as const
 
   const selectedTab = ref<keyof typeof tabComponents>('Messagerie')

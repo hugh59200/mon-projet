@@ -99,7 +99,7 @@
               type="secondary"
               variant="outlined"
               size="small"
-              @click="removeImage"
+              @click="removeImage(form.image)"
             />
           </div>
         </WrapperFormElements>
@@ -123,9 +123,9 @@
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { InputModel } from '@designSystem/index'
   import { computed, onMounted, ref, watch } from 'vue'
-  import { createNews, fetchNewsById, updateNews, uploadNewsImage } from '../api'
-  import { deleteTopicImage } from '../api/topicImages'
-  import { createTopic, fetchTopics } from '../api/topics'
+  import { createNews, fetchNewsById, updateNews } from '../../api'
+  import { createTopic, fetchTopics } from '../../api/topics'
+  import { useNewsImageHandler } from '../composables/useNewsImageHandler'
 
   /* 💾 Props / Events */
   const visible = defineModel<boolean>()
@@ -135,9 +135,6 @@
 
   /* 🧱 State */
   const loading = ref(false)
-  const imagePreview = ref<string | null>(null)
-  const selectedFile = ref<File | null>(null)
-  const fileInputRef = ref<HTMLInputElement | null>(null)
   const topicsOptions = ref<{ id: string; label: string }[]>([])
   const newTopicLabel = ref('')
 
@@ -162,6 +159,19 @@
         : 'Publier une actualité',
   )
 
+  /* 📸 Image handler (composable) */
+  const {
+    fileInputRef,
+    selectedFile,
+    imagePreview,
+    openFilePicker,
+    handleFileChange,
+    extractFileName,
+    uploadImage,
+    removeImage,
+    reset: resetImageHandler,
+  } = useNewsImageHandler(() => readonly.value)
+
   /* 📂 Topics */
   async function loadTopics() {
     const topics = await fetchTopics()
@@ -182,51 +192,13 @@
     }
   }
 
-  /* 📤 Image Upload */
-  function openFilePicker() {
-    if (!readonly.value) fileInputRef.value?.click()
-  }
-
-  function handleFileChange(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      toast.show('Veuillez sélectionner une image valide', 'warning')
-      return
-    }
-    selectedFile.value = file
-    imagePreview.value = URL.createObjectURL(file)
-  }
-
-  function extractFileName(url: string | null | undefined): string | null {
-    if (!url) return null
-    const parts = url.split('/')
-    return parts[parts.length - 1] ?? null
-  }
-
-  async function removeImage() {
-    if (readonly.value || !form.value.image) return
-    try {
-      await deleteTopicImage(form.value.image)
-      form.value.image = null
-      imagePreview.value = null
-      toast.show('Image supprimée du serveur 🗑️', 'info')
-    } catch (err: any) {
-      toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
-    }
-  }
-
   /* 🧾 Chargement d’un article existant */
   async function loadNews() {
     if (!props.newsId) return
     try {
       const data = await fetchNewsById(props.newsId)
       if (!data) return toast.show('Actualité introuvable', 'warning')
-      if (data.topic_id) {
-        form.value.topic_id = data.topic_id
-      }
       form.value = data
-      console.log(form)
       imagePreview.value = data.image || null
     } catch {
       toast.show('Erreur chargement actualité', 'danger')
@@ -250,8 +222,8 @@
 
       // 🔹 Upload de l’image si sélectionnée
       if (selectedFile.value) {
-        const uploadedUrl = await uploadNewsImage(form.value.slug, selectedFile.value)
-        form.value.image = uploadedUrl
+        const uploadedUrl = await uploadImage(form.value.slug)
+        if (uploadedUrl) form.value.image = uploadedUrl
       }
 
       // 🔹 Enregistrement (create / update)
@@ -277,7 +249,26 @@
     await loadTopics()
     await loadNews()
   })
+
   watch(() => props.newsId, loadNews)
+
+  /* 🧹 Reset complet quand on ferme la modal */
+  watch(visible, (val) => {
+    if (!val) {
+      form.value = {
+        title: '',
+        slug: '',
+        excerpt: '',
+        content: '',
+        image: null,
+        published_at: new Date().toISOString(),
+        author_id: null,
+        topic_id: '',
+      }
+      resetImageHandler()
+      newTopicLabel.value = ''
+    }
+  })
 </script>
 
 <style scoped lang="less">

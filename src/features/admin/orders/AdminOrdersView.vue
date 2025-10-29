@@ -1,156 +1,158 @@
 <template>
-  <BasicToolbar
-    v-model:search="search"
-    :search-placeholder="'Rechercher une commande...'"
-    :show-reset="true"
-    @reset="reset()"
-  />
+  <div>
+    <BasicToolbar
+      v-model:search="search"
+      :search-placeholder="'Rechercher une commande...'"
+      :show-reset="true"
+      @reset="reset()"
+    />
 
-  <BasicPagination
-    :current-page="page"
-    :nb-pages="nbPages"
-    :nb-results="total"
-    :nb-pages-max="5"
-    :auto-fetch="fetchData"
-    @change="page = $event"
-  />
+    <BasicPagination
+      :current-page="page"
+      :nb-pages="nbPages"
+      :nb-results="total"
+      :nb-pages-max="5"
+      :auto-fetch="fetchData"
+      @change="page = $event"
+    />
 
-  <WrapperLoader
-    :loading="loading"
-    :has-loaded="hasLoaded"
-    :is-empty="hasLoaded && filteredData.length === 0"
-    message="Chargement des commandes..."
-    empty-message="Aucune commande trouvée 😅"
-  >
-    <!-- 💻 TABLEAU DESKTOP -->
-    <div class="orders--desktop">
-      <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <BasicCell
-          :span="10"
-          text="Client"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'full_name'"
-          :icon-color="getSortColor('full_name')"
-          :on-icon-click="() => toggleSort('full_name')"
-        />
-        <BasicCell
-          center
-          :span="4"
-          text="Total"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'total_amount'"
-          :icon-color="getSortColor('total_amount')"
-          :on-icon-click="() => toggleSort('total_amount')"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Date"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'created_at'"
-          :icon-color="getSortColor('created_at')"
-          :on-icon-click="() => toggleSort('created_at')"
-        />
-        <BasicCell
-          center
-          :span="8"
-          text="Statut"
-          icon-name="ArrowUpDown"
-          :is-active="sortKey === 'status'"
-          :icon-color="getSortColor('status')"
-          :on-icon-click="() => toggleSort('status')"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Détails"
-        />
-      </div>
-
-      <div
-        v-for="order in filteredData"
-        :key="order.id"
-        class="gridElemWrapper"
-      >
-        <div class="cardLayoutWrapper">
-          <BasicCell :span="10">
-            <div class="client-info">
-              <span class="client-name">{{ order.full_name }}</span>
-              <span class="client-email">{{ order.email }}</span>
-            </div>
-          </BasicCell>
-
+    <WrapperLoader
+      :loading="loading"
+      :has-loaded="hasLoaded"
+      :is-empty="hasLoaded && filteredData.length === 0"
+      message="Chargement des commandes..."
+      empty-message="Aucune commande trouvée 😅"
+    >
+      <!-- 💻 TABLEAU DESKTOP -->
+      <div class="orders--desktop">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+          <BasicCell
+            :span="10"
+            text="Client"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'full_name'"
+            :icon-color="getSortColor('full_name')"
+            :on-icon-click="() => toggleSort('full_name')"
+          />
           <BasicCell
             center
             :span="4"
-          >
-            {{ formatCurrency(order.total_amount) }}
-          </BasicCell>
-
+            text="Total"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'total_amount'"
+            :icon-color="getSortColor('total_amount')"
+            :on-icon-click="() => toggleSort('total_amount')"
+          />
           <BasicCell
             center
             :span="6"
-          >
-            {{ formatDate(order.created_at) }}
-          </BasicCell>
-
+            text="Date"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'created_at'"
+            :icon-color="getSortColor('created_at')"
+            :on-icon-click="() => toggleSort('created_at')"
+          />
           <BasicCell
             center
             :span="8"
-          >
-            <BasicDropdown
-              v-model="localStatuses[order.id]"
-              :items="STATUSES"
-              size="small"
-              dropdown-type="table"
-              force-value
-              :item-class="(s: { id: string }) => getStatusClass(s.id)"
-              @update:model-value="(v) => v && handleStatusChange(order, v)"
-            />
-          </BasicCell>
-
-          <BasicCellActionIcon
-            icon-name="eye"
-            tooltip="Voir la commande"
+            text="Statut"
+            icon-name="ArrowUpDown"
+            :is-active="sortKey === 'status'"
+            :icon-color="getSortColor('status')"
+            :on-icon-click="() => toggleSort('status')"
+          />
+          <BasicCell
             center
             :span="6"
-            @click="openOrderModal(order.id)"
+            text="Détails"
           />
         </div>
+
+        <div
+          v-for="order in filteredData"
+          :key="order.id"
+          class="gridElemWrapper"
+        >
+          <div class="cardLayoutWrapper">
+            <BasicCell :span="10">
+              <div class="client-info">
+                <span class="client-name">{{ order.full_name }}</span>
+                <span class="client-email">{{ order.email }}</span>
+              </div>
+            </BasicCell>
+
+            <BasicCell
+              center
+              :span="4"
+            >
+              {{ formatCurrency(order.total_amount) }}
+            </BasicCell>
+
+            <BasicCell
+              center
+              :span="6"
+            >
+              {{ formatDate(order.created_at) }}
+            </BasicCell>
+
+            <BasicCell
+              center
+              :span="8"
+            >
+              <BasicDropdown
+                v-model="localStatuses[order.id]"
+                :items="STATUSES"
+                size="small"
+                dropdown-type="table"
+                force-value
+                :item-class="(s: { id: string }) => getStatusClass(s.id)"
+                @update:model-value="(v) => v && handleStatusChange(order, v)"
+              />
+            </BasicCell>
+
+            <BasicCellActionIcon
+              icon-name="eye"
+              tooltip="Voir la commande"
+              center
+              :span="6"
+              @click="openOrderModal(order.id)"
+            />
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- 📱 CARTES MOBILES -->
-    <div class="mobile-cards-list">
-      <OrderCardMobile
-        v-for="order in filteredData"
-        :key="order.id"
-        v-model:status="localStatuses[order.id]!"
-        :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
-        :order="order"
-        :statuses="STATUSES"
-        :format-date="formatDate"
-        :format-currency="formatCurrency"
-        :handle-status-change="handleStatusChange"
-        :open-order-modal="openOrderModal"
+      <!-- 📱 CARTES MOBILES -->
+      <div class="mobile-cards-list">
+        <OrderCardMobile
+          v-for="order in filteredData"
+          :key="order.id"
+          v-model:status="localStatuses[order.id]!"
+          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
+          :order="order"
+          :statuses="STATUSES"
+          :format-date="formatDate"
+          :format-currency="formatCurrency"
+          :handle-status-change="handleStatusChange"
+          :open-order-modal="openOrderModal"
+        />
+      </div>
+    </WrapperLoader>
+
+    <!-- 🪟 MODAL -->
+    <teleport to="#app">
+      <AdminOrderDetailsModal
+        v-if="selectedOrderId"
+        v-model="isModalVisible"
+        :order-id="selectedOrderId"
       />
-    </div>
-  </WrapperLoader>
-
-  <!-- 🪟 MODAL -->
-  <teleport to="#app">
-    <AdminOrderDetailsModal
-      v-if="selectedOrderId"
-      v-model="isModalVisible"
-      :order-id="selectedOrderId"
-    />
-  </teleport>
+    </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/composables/useAdminTable'
-  import { useSortableTable } from '@/features/admin/composables/useSortableTable'
   import { STATUSES } from '@/features/admin/constants/orders'
+  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/useSortableTable'
   import { updateOrderStatus } from '@/supabase/api/orders'
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
