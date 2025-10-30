@@ -67,42 +67,28 @@
 <style scoped lang="less">
   /* 🧩 Carte Produit */
   .product-cart {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid @neutral-200;
-    padding: 16px;
-    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid fade(@neutral-200, 70%);
     transition: all 0.25s ease;
+    background: #fff;
     cursor: pointer;
     height: 100%;
-    user-select: none;
 
-    /* ✨ Hover global */
     &:hover {
-      border-color: @primary-300;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
     }
 
     &__image {
-      width: 100%;
-      height: 180px;
+      height: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 12px;
-      overflow: hidden;
-
+      margin-bottom: 10px;
       img {
         max-height: 100%;
-        width: auto;
         object-fit: contain;
-        border-radius: 8px;
-        display: block;
-        transition: transform 0.35s ease;
       }
     }
 
@@ -110,16 +96,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      flex-grow: 1;
       gap: 4px;
-      min-height: 75px;
     }
 
     &__name {
+      font-weight: 600;
+      font-size: 1rem;
       color: @neutral-900;
-      line-height: 1.3;
-      min-height: 22px;
     }
 
     &__meta {

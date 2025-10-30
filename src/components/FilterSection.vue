@@ -2,7 +2,7 @@
   <section class="filter-section">
     <header
       class="filter-section__header"
-      @click="open = !open"
+      @click="toggle"
     >
       <BasicText weight="semibold">{{ title }}</BasicText>
       <BasicIconNext
@@ -23,10 +23,30 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
 
-  defineProps<{ title: string }>()
-  const open = ref(true)
+  const props = defineProps<{
+    title: string
+    modelValue?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: boolean]
+  }>()
+
+  const open = ref(props.modelValue ?? true)
+
+  watch(
+    () => props.modelValue,
+    (v) => {
+      if (v !== undefined) open.value = v
+    },
+  )
+
+  function toggle() {
+    open.value = !open.value
+    emit('update:modelValue', open.value)
+  }
 </script>
 
 <style scoped lang="less">
@@ -35,6 +55,7 @@
     border: 1px solid @neutral-200;
     border-radius: 12px;
     overflow: hidden;
+    transition: all 0.2s ease;
 
     &__header {
       display: flex;
@@ -44,7 +65,6 @@
       cursor: pointer;
       color: @neutral-800;
       user-select: none;
-      transition: background 0.15s ease;
 
       &:hover {
         background: fade(@neutral-900, 4%);
@@ -57,7 +77,6 @@
     }
   }
 
-  /* Animation douce */
   .fade-enter-active,
   .fade-leave-active {
     transition: all 0.25s ease;

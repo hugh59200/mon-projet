@@ -1,0 +1,94 @@
+import type { Tables } from '@/supabase/types/supabase'
+import { computed, ref, type Ref } from 'vue'
+
+type Product = Tables<'products'>
+
+type Range = {
+  min: number
+  max: number
+  from: number
+  to: number
+  step: number
+}
+
+/**
+ * Gère les filtres dynamiques du catalogue (prix, stock, tags, catégories)
+ */
+export function useFilters(products: Ref<Product[]>, priceRange: Ref<Range>) {
+  // 🧭 États des filtres
+  const selectedCategories = ref<string[]>([])
+  const inStockOnly = ref(false)
+  const selectedTags = ref<string[]>([])
+
+  // 💸 Filtrage par prix
+  const priceFiltered = computed(() =>
+    products.value.filter(
+      (p) => p.price >= priceRange.value.from && p.price <= priceRange.value.to,
+    ),
+  )
+
+  // 🏷️ Tags
+  const allTags = computed<string[]>(() => {
+    const set = new Set<string>()
+    for (const p of products.value) (p.tags || []).forEach((t) => set.add(t))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  })
+
+  const tagItemsWithCounts = computed(() =>
+    allTags.value.map((tag) => ({
+      id: tag,
+      label: tag,
+      count: priceFiltered.value.reduce(
+        (acc, p) => acc + ((p.tags || []).includes(tag) ? 1 : 0),
+        0,
+      ),
+    })),
+  )
+
+  // 📦 Catégories
+  const categories = computed<string[]>(() =>
+    Array.from(new Set(products.value.map((p) => p.category).filter(Boolean))).sort(),
+  )
+
+  const categoryItemsWithCounts = computed(() =>
+    categories.value.map((cat) => ({
+      id: cat,
+      label: `${cat} (${priceFiltered.value.filter((p) => p.category === cat).length})`,
+    })),
+  )
+
+  // 📊 Stock
+  const stockCount = computed(() => priceFiltered.value.filter((p) => !!p.stock).length)
+
+  // 🧮 Filtrage combiné
+  const filteredProducts = computed<Product[]>(() => {
+    return priceFiltered.value.filter((p) => {
+      const catOk =
+        selectedCategories.value.length === 0 || selectedCategories.value.includes(p.category ?? '')
+      const stockOk = !inStockOnly.value || !!p.stock
+      const tagOk =
+        selectedTags.value.length === 0 ||
+        (p.tags || []).some((t) => selectedTags.value.includes(t))
+      return catOk && stockOk && tagOk
+    })
+  })
+
+  // 🔁 Sélection tags
+  function toggleTag(id: string) {
+    selectedTags.value.includes(id)
+      ? (selectedTags.value = selectedTags.value.filter((t) => t !== id))
+      : selectedTags.value.push(id)
+  }
+
+  return {
+    selectedCategories,
+    inStockOnly,
+    selectedTags,
+    allTags,
+    tagItemsWithCounts,
+    categoryItemsWithCounts,
+    stockCount,
+    filteredProducts,
+    toggleTag,
+  }
+}

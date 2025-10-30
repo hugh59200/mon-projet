@@ -92,7 +92,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/catalogue',
     name: 'catalogue',
-    component: () => import('@/pages/Catalogue.vue'),
+    component: () => import('@/features/catalogue/Catalogue.vue'),
     meta: {
       requiresAuth: true,
       label: 'Catalogue',
