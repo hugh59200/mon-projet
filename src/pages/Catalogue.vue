@@ -63,6 +63,7 @@
             <BasicText weight="semibold">Prix</BasicText>
             <BasicIconNext name="ChevronsDownUp" />
           </div>
+
           <BasicRange
             v-model="priceRange"
             :min="priceMin"
@@ -195,7 +196,15 @@
   const toast = useToastStore()
   const router = useRouter()
 
-  const { min: priceMin, max: priceMax, from: priceFrom, to: priceTo, setMinMax } = useRange(0, 0)
+  const { min: priceMin, max: priceMax, from: priceFrom, to: priceTo } = useRange(0, 0)
+
+  const priceRange = computed({
+    get: () => ({ from: priceFrom.value, to: priceTo.value }),
+    set: (value: { from: number; to: number }) => {
+      priceFrom.value = value.from
+      priceTo.value = value.to
+    },
+  })
 
   /* State */
   const loading = ref(false)
@@ -224,15 +233,6 @@
   const selectedCategories = ref<string[]>([])
   const inStockOnly = ref(false)
   const selectedTags = ref<string[]>([])
-
-  /* Price slider */
-  const priceRange = computed({
-    get: () => ({ from: priceFrom.value, to: priceTo.value }),
-    set: (value: { from: number; to: number }) => {
-      priceFrom.value = value.from
-      priceTo.value = value.to
-    },
-  })
 
   /* Load data */
   async function loadProducts() {

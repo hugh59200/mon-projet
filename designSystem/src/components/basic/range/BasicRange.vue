@@ -1,13 +1,16 @@
 <template>
   <div class="basic-range">
-    <div class="basic-range__slider">
+    <div
+      class="basic-range__slider"
+      @click="onTrackClick"
+    >
       <input
         type="range"
         class="range range--min"
         :min="min"
         :max="max"
         :step="step"
-        v-model.number="localFrom"
+        v-model.number="local.from"
       />
       <input
         type="range"
@@ -15,7 +18,7 @@
         :min="min"
         :max="max"
         :step="step"
-        v-model.number="localTo"
+        v-model.number="local.to"
       />
       <div
         class="range-track"
@@ -25,18 +28,18 @@
 
     <div class="basic-range__inputs">
       <BasicInputNumber
-        v-model="localFrom"
+        v-model="local.from"
         :decimal="2"
         text-align="right"
         :min="min"
-        :max="localTo"
+        :max="local.to"
         icon-left="euro"
       />
       <BasicInputNumber
-        v-model="localTo"
+        v-model="local.to"
         :decimal="2"
         text-align="right"
-        :min="localFrom"
+        :min="local.from"
         :max="max"
         icon-left="euro"
       />
@@ -45,11 +48,9 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
+  import { computed, reactive, watch } from 'vue'
 
-  const model = defineModel<{ from: number; to: number }>({
-    required: true,
-  })
+  const model = defineModel<{ from: number; to: number }>({ required: true })
 
   const props = defineProps<{
     min: number
@@ -59,31 +60,60 @@
 
   const step = computed(() => props.step ?? 0.1)
 
-  // Copies locales synchronisées
-  const localFrom = ref(model.value.from ?? props.min)
-  const localTo = ref(model.value.to ?? props.max)
-
-  // Synchronisation vers le parent
-  watch([localFrom, localTo], ([from, to]) => {
-    const clampedFrom = Math.min(Math.max(from, props.min), to)
-    const clampedTo = Math.max(Math.min(to, props.max), from)
-    model.value = { from: clampedFrom, to: clampedTo }
+  // --- état local réactif lié au v-model parent
+  const local = reactive({
+    from: model.value.from ?? props.min,
+    to: model.value.to ?? props.max,
   })
 
-  // Synchronisation descendante (parent → enfant)
+  // --- synchronisation descendante
   watch(
     () => model.value,
     (v) => {
-      localFrom.value = v.from
-      localTo.value = v.to
+      if (!v) return
+      local.from = v.from
+      local.to = v.to
+    },
+    { deep: true, immediate: true },
+  )
+
+  // --- synchronisation montante
+  watch(
+    () => ({ ...local }),
+    (v) => {
+      const from = Math.min(Math.max(v.from, props.min), v.to)
+      const to = Math.max(Math.min(v.to, props.max), from)
+      model.value = { from, to }
     },
     { deep: true },
   )
 
+  // --- clic sur la barre pour bouger la poignée la plus proche
+  function onTrackClick(e: MouseEvent) {
+    const slider = (e.currentTarget as HTMLElement).querySelector('.range') as HTMLInputElement
+    if (!slider) return
+
+    const rect = slider.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const percent = clickX / rect.width
+    const value = props.min + percent * (props.max - props.min)
+
+    const distFrom = Math.abs(value - local.from)
+    const distTo = Math.abs(value - local.to)
+
+    if (distFrom < distTo) local.from = Math.min(value, local.to)
+    else local.to = Math.max(value, local.from)
+  }
+
+  // --- track colorée
+  const thumbOffset = 8
   const trackStyle = computed(() => {
-    const left = ((localFrom.value - props.min) / (props.max - props.min)) * 100
-    const right = ((localTo.value - props.min) / (props.max - props.min)) * 100
-    return { left: `${left}%`, width: `${Math.max(0, right - left)}%` }
+    const leftPct = ((local.from - props.min) / (props.max - props.min)) * 100
+    const rightPct = ((local.to - props.min) / (props.max - props.min)) * 100
+    return {
+      left: `calc(${leftPct}% + ${thumbOffset}px)`,
+      width: `calc(${Math.max(0, rightPct - leftPct)}% - ${thumbOffset * 2}px)`,
+    }
   })
 </script>
 
@@ -96,19 +126,22 @@
 
     &__slider {
       position: relative;
-      height: 30px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
     }
 
     .range {
       position: absolute;
       left: 0;
       right: 0;
-      top: 8px;
       width: 100%;
       -webkit-appearance: none;
       appearance: none;
       background: none;
       pointer-events: none;
+      z-index: 2;
 
       &::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -120,6 +153,13 @@
         border: 2px solid white;
         box-shadow: 0 0 0 1px fade(@primary-600, 30%);
         cursor: pointer;
+        z-index: 3;
+        position: relative;
+        transition: transform 0.1s ease;
+      }
+
+      &::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
       }
 
       &::-moz-range-thumb {
@@ -131,6 +171,11 @@
         border: 2px solid white;
         box-shadow: 0 0 0 1px fade(@primary-600, 30%);
         cursor: pointer;
+        transition: transform 0.1s ease;
+      }
+
+      &::-moz-range-thumb:hover {
+        transform: scale(1.1);
       }
 
       &::-webkit-slider-runnable-track,
@@ -143,10 +188,11 @@
 
     .range-track {
       position: absolute;
-      top: 15px;
       height: 4px;
       background: @primary-500;
       border-radius: 2px;
+      z-index: 1;
+      pointer-events: none;
     }
 
     &__inputs {

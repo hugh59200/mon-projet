@@ -1,4 +1,3 @@
-// composables/useRange.ts
 import { computed, ref, watch } from 'vue'
 
 export function useRange(minInitial = 0, maxInitial = 100) {
