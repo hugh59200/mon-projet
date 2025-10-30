@@ -155,6 +155,7 @@
       ...p,
       image: p.image || '/default-product-image.jpg',
       stock: p.stock ?? false,
+      quantity: 0,
     })
     toast.show(`✅ ${p.name} ajouté au panier`, 'success')
   }

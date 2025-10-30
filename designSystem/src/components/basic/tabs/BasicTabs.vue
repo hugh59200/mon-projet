@@ -1,10 +1,14 @@
 <template>
-  <div class="tabs-wrapper">
+  <div
+    class="tabs-wrapper"
+    v-responsive-animate.fade.once
+  >
     <Transition name="fade">
       <div
         class="tabs"
         :class="[`tabs--${tabsPlacement}`, { 'tabs--mobile': isMobile }]"
         ref="tabsContainer"
+        v-responsive-animate.slide.once
       >
         <!-- 🔹 Onglets -->
         <BasicTab
@@ -16,10 +20,9 @@
           :routeName="tab.routeName"
           :color="tab.color"
           class="tabs__item"
+          v-responsive-animate.fade.stagger="{ delay: 60, speed: 400 }"
         >
-          <template #tab-text>
-            {{ tab.tabKey }}
-          </template>
+          <template #tab-text>{{ tab.tabKey }}</template>
         </BasicTab>
 
         <!-- ✅ Indicateur animé (desktop uniquement) -->
@@ -27,6 +30,7 @@
           v-if="!isMobile"
           class="tabs__indicator"
           :style="indicatorStyle"
+          v-responsive-animate.zoom.once
         />
       </div>
     </Transition>
@@ -34,57 +38,27 @@
 </template>
 
 <script setup lang="ts">
-  import { DEVICE_BREAKPOINT } from '@/plugin/device-breakpoint'
-  import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import type { TabProps } from '../tab/BasicTab.types'
   import type { TabsModel } from './BasicTabs.types'
+  import { useTabsIndicatorStore } from './useTabsIndicatorStore'
 
+  /* === Props === */
   const props = defineProps<{
     tabs?: TabProps[]
     tabsPlacement?: 'center' | 'start'
   }>()
 
+  /* === Setup === */
   const modelValue = defineModel<TabsModel>()
-
-  const { isMobile } = inject(DEVICE_BREAKPOINT)!
+  const { isMobile } = useDeviceBreakpoint()
+  const route = useRoute()
   const tabsContainer = ref<HTMLElement | null>(null)
   const indicatorLeft = ref(0)
   const indicatorWidth = ref(0)
-
-  /* 🎯 Met à jour la position de l’indicateur */
-  const updateIndicator = () => {
-    if (!tabsContainer.value) return
-    const activeTab = tabsContainer.value.querySelector('.tab--selected') as HTMLElement | null
-    if (activeTab) {
-      const scrollLeft = tabsContainer.value.scrollLeft
-      indicatorLeft.value = activeTab.offsetLeft - scrollLeft
-      indicatorWidth.value = activeTab.offsetWidth
-    }
-  }
-
-  /* 🧭 Watch automatique */
-  watch(modelValue, async () => {
-    await nextTick()
-    updateIndicator()
-  })
-
-  /* 🧭 Watch isMobile pour recalcul et recentrage */
-  watch(isMobile, (newVal, oldVal) => {
-    if (!tabsContainer.value) return
-
-    const el = tabsContainer.value
-    if (!newVal && oldVal) {
-      // quand on repasse desktop → ajoute la classe de sortie
-      el.classList.add('leaving')
-      setTimeout(() => el.classList.remove('leaving'), 300)
-    }
-  })
-
-  onMounted(() => {
-    nextTick(updateIndicator)
-    window.addEventListener('resize', updateIndicator)
-    tabsContainer.value?.addEventListener('scroll', updateIndicator)
-  })
+  const indicatorStore = useTabsIndicatorStore()
 
   /* 💅 Couleur dynamique */
   const activeColor = computed(() => {
@@ -94,6 +68,71 @@
     return active?.color || '#0EA5E9'
   })
 
+  /* 🎯 Calcul et MAJ indicateur */
+  async function updateIndicator(persist = true) {
+    await nextTick()
+    const container = tabsContainer.value
+    if (!container) return
+
+    const activeTab = container.querySelector('.tab--selected') as HTMLElement | null
+    if (!activeTab) return
+
+    const scrollLeft = container.scrollLeft
+    const left = activeTab.offsetLeft - scrollLeft
+    const width = activeTab.offsetWidth
+
+    // Évite recalcul inutile
+    if (indicatorLeft.value === left && indicatorWidth.value === width) return
+
+    indicatorLeft.value = left
+    indicatorWidth.value = width
+
+    if (persist) {
+      const key = route.name?.toString() ?? 'default'
+      indicatorStore.setIndicator(left, width, activeColor.value, key)
+    }
+  }
+
+  /* 🧭 Suivi des changements */
+  watch(modelValue, () => updateIndicator(true))
+
+  watch(isMobile, async (newVal, oldVal) => {
+    if (oldVal && !newVal) {
+      const key = route.name?.toString() ?? 'default'
+      const saved = indicatorStore.getIndicator(key)
+      indicatorLeft.value = saved.left
+      indicatorWidth.value = saved.width
+      await nextTick()
+      requestAnimationFrame(() => updateIndicator(false))
+    }
+  })
+
+  const handleResize = () => updateIndicator(true)
+  const handleScroll = () => updateIndicator(true)
+
+  onMounted(async () => {
+    await nextTick()
+
+    const key = route.name?.toString() ?? 'default'
+    const saved = indicatorStore.getIndicator(key)
+    if (saved.width > 0) {
+      indicatorLeft.value = saved.left
+      indicatorWidth.value = saved.width
+    }
+
+    requestAnimationFrame(() => updateIndicator(true))
+
+    window.addEventListener('resize', handleResize)
+    tabsContainer.value?.addEventListener('scroll', handleScroll)
+  })
+
+  // 🧹 Nettoyage ici, pas dans onMounted()
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize)
+    tabsContainer.value?.removeEventListener('scroll', handleScroll)
+  })
+
+  /* 💫 Style indicateur dynamique */
   const indicatorStyle = computed(() => ({
     transform: `translateX(${indicatorLeft.value}px)`,
     width: `${indicatorWidth.value}px`,
@@ -149,8 +188,8 @@
       height: 3px;
       border-radius: 3px;
       transition:
-        transform 0.3s ease,
-        width 0.3s ease,
+        transform 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+        width 0.45s cubic-bezier(0.25, 1, 0.5, 1),
         background-color 0.3s ease;
     }
 
@@ -168,7 +207,6 @@
       height: fit-content;
       min-height: 54px;
       transition: all 0.25s ease;
-      animation: fadeSlideInBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; /* 🎯 rebond doux */
 
       .tab {
         display: none;
@@ -219,48 +257,16 @@
       .tabs__indicator {
         display: none;
       }
-
-      &.leaving {
-        animation: fadeSlideOut 0.3s ease both;
-      }
     }
 
-    /* ✨ Apparition avec rebond (easeOutBack) */
-    @keyframes fadeSlideInBounce {
-      0% {
-        opacity: 0;
-        transform: translateY(-16px) scale(0.98);
-      }
-      60% {
-        opacity: 1;
-        transform: translateY(4px) scale(1.02);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+    /* 🌈 Transition fade globale */
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.25s ease;
     }
-
-    /* 💨 Disparition fluide */
-    @keyframes fadeSlideOut {
-      from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-6px) scale(0.98);
-      }
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
     }
-  }
-
-  /* 🌈 Transition entre mobile / desktop */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.25s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
   }
 </style>

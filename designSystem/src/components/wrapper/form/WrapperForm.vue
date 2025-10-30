@@ -44,9 +44,9 @@
 </template>
 
 <script setup lang="ts">
-  import { DEVICE_BREAKPOINT } from '@/plugin/device-breakpoint'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
-  import { inject, ref, toRef, watch } from 'vue'
+  import { ref, toRef, watch } from 'vue'
   import { useWrapperFormLogic, type TabsStepperEmit } from './useWrapperFormLogic'
 
   const modelValue = defineModel<TabsModel>()
@@ -61,7 +61,7 @@
     { tabsPlacement: 'center' },
   )
 
-  const { isMobile } = inject(DEVICE_BREAKPOINT)!
+  const { isMobile } = useDeviceBreakpoint()
 
   const scrollContainer = ref<HTMLElement | null>(null)
 

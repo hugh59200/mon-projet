@@ -1,7 +1,13 @@
 <template>
-  <div class="catalogue">
+  <div
+    class="catalogue"
+    v-responsive-animate.fade.once
+  >
     <!-- 🔹 Header -->
-    <header class="catalogue__header">
+    <header
+      class="catalogue__header"
+      v-responsive-animate.slide.once
+    >
       <BasicText
         size="h2"
         weight="bold"
@@ -9,7 +15,10 @@
         Catalogue de peptides
       </BasicText>
 
-      <div class="catalogue__header-right">
+      <div
+        class="catalogue__header-right"
+        v-responsive-animate.fade.once
+      >
         <!-- Recherche mobile -->
         <WrapperInput
           v-if="isMobile"
@@ -21,7 +30,10 @@
         />
 
         <!-- Boutons -->
-        <div class="catalogue__buttons">
+        <div
+          class="catalogue__buttons"
+          v-responsive-animate.fade.stagger="{ delay: 70 }"
+        >
           <WrapperButton
             v-if="isMobile"
             button-label="Filtres"
@@ -43,11 +55,15 @@
     </header>
 
     <!-- 🔹 Corps principal -->
-    <div class="catalogue__body">
+    <div
+      class="catalogue__body"
+      v-responsive-animate.slide.once
+    >
       <!-- 🧭 Filtres latéraux (desktop) -->
       <aside
         v-if="!isMobile"
         class="catalogue__filters"
+        v-responsive-animate.fade.scroll
       >
         <FilterPanel
           :allOpen="allOpen"
@@ -70,7 +86,10 @@
       </aside>
 
       <!-- 🛒 Liste des produits -->
-      <section class="catalogue__list">
+      <section
+        class="catalogue__list"
+        v-responsive-animate.fade.scroll
+      >
         <WrapperLoader
           :loading="loading"
           :has-loaded="hasLoaded"
@@ -81,6 +100,7 @@
           <div
             v-if="hasLoaded"
             class="catalogue__summary"
+            v-responsive-animate.fade.once
           >
             <BasicText color="neutral-700">
               {{ filteredProducts.length }} résultat{{ filteredProducts.length > 1 ? 's' : '' }}
@@ -90,6 +110,7 @@
           <div
             v-if="filteredProducts.length"
             class="catalogue__grid"
+            v-responsive-animate.zoom.scroll.stagger="{ delay: 90, speed: 600 }"
           >
             <ProductCard
               v-for="product in paginatedProducts"
@@ -103,6 +124,7 @@
           <div
             v-if="nbPages > 1"
             class="catalogue__pagination-bottom"
+            v-responsive-animate.fade.once
           >
             <BasicPagination
               :current-page="page"
@@ -119,6 +141,7 @@
     <ModalComponent
       v-model="showFilters"
       :closable="true"
+      v-responsive-animate.zoom.once
     >
       <template #header>Filtres</template>
 
@@ -144,7 +167,10 @@
       </template>
 
       <template #actions>
-        <div class="justify-content-center flex">
+        <div
+          class="justify-content-center flex"
+          v-responsive-animate.slide.once
+        >
           <BasicButton
             label="Fermer"
             type="primary"
@@ -165,13 +191,13 @@
   import { usePagination } from '@/features/catalogue/composables/usePagination'
   import { useProducts } from '@/features/catalogue/composables/useProducts'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { DEVICE_BREAKPOINT } from '@/plugin/device-breakpoint'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { inject, onMounted, ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
 
-  const { isMobile } = inject(DEVICE_BREAKPOINT)!
+  const { isMobile } = useDeviceBreakpoint()
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
   const {
     selectedCategories,

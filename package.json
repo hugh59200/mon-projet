@@ -26,6 +26,7 @@
     "marked": "^16.4.1",
     "md-editor-v3": "^6.1.0",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "plugin-basic-ssl": "^0.0.1-security",
     "recharts": "^3.3.0",
     "supabase": "^2.53.6",

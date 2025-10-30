@@ -140,12 +140,7 @@
   const { toggle } = sidebar
 
   function goToAdmin() {
-    adminTabStore.loadLastTab()
-
-    const target = adminTabStore.lastTab
-      ? { name: adminTabStore.lastTab }
-      : { name: 'AdminMessagerie' } // fallback au premier onglet
-
+    const target = adminTabStore.getRedirectRoute()
     router.push(target)
   }
 
