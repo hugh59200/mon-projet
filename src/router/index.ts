@@ -274,6 +274,19 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/faq',
+    name: 'faq',
+    component: () => import('@/pages/FaqView.vue'),
+    meta: {
+      label: 'FAQ',
+      icon: 'HelpCircle',
+      order: 4,
+      title: 'FAQ – Fast Peptides',
+      description:
+        'Questions fréquentes sur la qualité, la manipulation, l’expédition et la conformité (RUO) des peptides.',
+    },
+  },
+  {
     path: '/profil/commandes',
     name: 'user-orders',
     component: () => import('@/features/user/UserOrdersView.vue'),

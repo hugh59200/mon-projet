@@ -4,14 +4,12 @@ import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIcon
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-// useSidebarStore.ts
-
 export const useSidebarStore = defineStore('sidebar', () => {
   const isReduced = ref(false)
   const toggle = () => (isReduced.value = !isReduced.value)
   const auth = useAuthStore()
 
-  const allowedSidebarNames = ['home', 'catalogue', 'actualites'] // 👈 seulement ces routes
+  const allowedSidebarNames = ['home', 'catalogue', 'actualites', 'faq']
 
   const sidebarItems = computed(() => {
     return router
