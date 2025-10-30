@@ -13,7 +13,7 @@ export const useCartStore = defineStore('cart', () => {
   watch(items, (val) => localStorage.setItem('cart', JSON.stringify(val)), { deep: true })
 
   // ➕ Ajouter / ➖ Retirer / 🔄 Mettre à jour
-  function addToCart(product: Omit<CartItem, 'quantity'>) {
+  function addToCart(product: CartItem) {
     const existing = items.value.find((i) => i.id === product.id)
     if (existing) existing.quantity++
     else items.value.push({ ...product, quantity: 1 })

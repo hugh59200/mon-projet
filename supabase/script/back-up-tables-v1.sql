@@ -673,3 +673,28 @@ SET content = $$
 <p style="color:#0070f3;">Une approche durable et efficace du soin de la peau.</p>
 $$
 WHERE slug = 'biotechnologie-bien-etre-cutane';
+
+-- 🧩 Ajouts légers pour les filtres avancés
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS tags text[] DEFAULT '{}'::text[];
+
+-- 🔎 Index pour les filtres par tags (performant)
+CREATE INDEX IF NOT EXISTS idx_products_tags_gin ON public.products USING GIN (tags);
+
+-- (Optionnel) quelques tags de démo pour tes seeds existants
+UPDATE public.products
+SET tags = ARRAY['nootropique','bien-etre','99%']
+WHERE name IN ('Semax','Selank','DSIP');
+
+UPDATE public.products
+SET tags = ARRAY['performance','98%','hot']
+WHERE name = 'IGF-1 LR3';
+
+UPDATE public.products
+SET tags = ARRAY['metabolisme','perte-de-poids','99%']
+WHERE name = 'Retatrutide';
+
+UPDATE public.products
+SET tags = ARRAY['libido','bien-etre','99%']
+WHERE name = 'PT-141';
+

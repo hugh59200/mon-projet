@@ -266,6 +266,7 @@ export type Database = {
           price: number
           purity: number | null
           stock: boolean | null
+          tags: string[] | null
         }
         Insert: {
           category: string
@@ -277,6 +278,7 @@ export type Database = {
           price: number
           purity?: number | null
           stock?: boolean | null
+          tags?: string[] | null
         }
         Update: {
           category?: string
@@ -288,6 +290,7 @@ export type Database = {
           price?: number
           purity?: number | null
           stock?: boolean | null
+          tags?: string[] | null
         }
         Relationships: []
       }

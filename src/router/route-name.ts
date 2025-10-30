@@ -14,6 +14,7 @@ export type RouteName =
   'cart' |
   'catalogue' |
   'checkout' |
+  'faq' |
   'home' |
   'login' |
   'payment-cancel' |
