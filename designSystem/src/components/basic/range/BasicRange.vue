@@ -4,25 +4,25 @@
       class="basic-range__slider"
       @click="onTrackClick"
     >
-      <!-- 2 inputs de range superposés -->
+      <!-- curseurs -->
       <input
         type="range"
         class="range range--min"
-        :min="model.min"
-        :max="model.max"
-        :step="model.step"
-        v-model.number="local.from"
+        :min="min"
+        :max="max"
+        :step="step"
+        v-model.number="from"
       />
       <input
         type="range"
         class="range range--max"
-        :min="model.min"
-        :max="model.max"
-        :step="model.step"
-        v-model.number="local.to"
+        :min="min"
+        :max="max"
+        :step="step"
+        v-model.number="to"
       />
 
-      <!-- Barre colorée et base -->
+      <!-- barre -->
       <div class="range-base"></div>
       <div
         class="range-track"
@@ -30,22 +30,22 @@
       ></div>
     </div>
 
-    <!-- Inputs numériques -->
+    <!-- inputs -->
     <div class="basic-range__inputs">
       <BasicInputNumber
-        v-model="local.from"
+        v-model="from"
         :decimal="2"
         text-align="right"
-        :min="model.min"
-        :max="local.to"
+        :min="min"
+        :max="to"
         icon-left="euro"
       />
       <BasicInputNumber
-        v-model="local.to"
+        v-model="to"
         :decimal="2"
         text-align="right"
-        :min="local.from"
-        :max="model.max"
+        :min="from"
+        :max="max"
         icon-left="euro"
       />
     </div>
@@ -53,9 +53,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, reactive, watch } from 'vue'
+  import { useRange } from '@/features/catalogue/composables/useRange'
+  import { computed, watch } from 'vue'
 
-  // 🔹 Un seul modèle global
+  // modèle unique (parent <-> enfant)
   const model = defineModel<{
     min: number
     max: number
@@ -64,60 +65,52 @@
     step?: number
   }>({ required: true })
 
-  const local = reactive({
-    from: model.value.from,
-    to: model.value.to,
-  })
+  // hook
+  const { range, trackStyle } = useRange(model.value.min, model.value.max, model.value.step ?? 0.1)
 
-  // Synchronisation descendante
+  // synchronisation modèle parent <-> hook interne
   watch(
     () => model.value,
     (v) => {
-      local.from = v.from
-      local.to = v.to
+      range.min = v.min
+      range.max = v.max
+      range.from = v.from
+      range.to = v.to
+      range.step = v.step ?? 0.1
     },
     { deep: true, immediate: true },
   )
 
-  // Synchronisation montante + clamp
   watch(
-    () => ({ ...local }),
+    () => ({ ...range }),
     (v) => {
-      const clampedFrom = Math.min(Math.max(v.from, model.value.min), v.to)
-      const clampedTo = Math.max(Math.min(v.to, model.value.max), clampedFrom)
-
-      model.value = {
-        ...model.value,
-        from: clampedFrom,
-        to: clampedTo,
-      }
-
-      local.from = clampedFrom
-      local.to = clampedTo
+      model.value = { ...model.value, ...v }
     },
     { deep: true },
   )
 
-  // Track colorée calculée
-  const trackStyle = computed(() => {
-    const leftPct = ((local.from - model.value.min) / (model.value.max - model.value.min)) * 100
-    const rightPct = ((local.to - model.value.min) / (model.value.max - model.value.min)) * 100
-    return {
-      left: `${Math.max(0, leftPct)}%`,
-      width: `${Math.max(0, rightPct - leftPct)}%`,
-    }
+  // proxies simples pour le template (évite les erreurs TS)
+  const min = computed(() => range.min)
+  const max = computed(() => range.max)
+  const step = computed(() => range.step)
+  const from = computed({
+    get: () => range.from,
+    set: (v) => (range.from = v),
+  })
+  const to = computed({
+    get: () => range.to,
+    set: (v) => (range.to = v),
   })
 
-  // Clic sur le track pour bouger la poignée la plus proche
+  // clic sur track
   function onTrackClick(e: MouseEvent) {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const percent = (e.clientX - rect.left) / rect.width
-    const value = model.value.min + percent * (model.value.max - model.value.min)
-
-    const distFrom = Math.abs(value - local.from)
-    const distTo = Math.abs(value - local.to)
-    if (distFrom < distTo) local.from = Math.min(value, local.to)
-    else local.to = Math.max(value, local.from)
+    const value = range.min + percent * (range.max - range.min)
+    const distFrom = Math.abs(value - range.from)
+    const distTo = Math.abs(value - range.to)
+    if (distFrom < distTo) range.from = Math.min(value, range.to)
+    else range.to = Math.max(value, range.from)
   }
 </script>
 
@@ -130,13 +123,12 @@
 
     &__slider {
       position: relative;
-      height: 38px; // ✅ plus haut pour ne plus couper les boules
+      height: 38px;
       display: flex;
       align-items: center;
       cursor: pointer;
     }
 
-    /* --- Base grise --- */
     .range-base {
       position: absolute;
       top: 18px;
@@ -148,7 +140,6 @@
       z-index: 1;
     }
 
-    /* --- Barre active --- */
     .range-track {
       position: absolute;
       top: 18px;
@@ -162,7 +153,6 @@
         width 0.1s ease;
     }
 
-    /* --- Inputs range --- */
     .range {
       position: absolute;
       width: 100%;

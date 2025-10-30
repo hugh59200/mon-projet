@@ -65,6 +65,7 @@
           </div>
           <BasicRange v-model="priceRange" />
         </div>
+
         <!-- Catégories (multi) -->
         <div class="catalogue__filter">
           <div class="filter__label">
@@ -91,7 +92,7 @@
           />
         </div>
 
-        <!-- Tags (multi avec compteurs) -->
+        <!-- Tags -->
         <div
           v-if="allTags.length"
           class="catalogue__filter"
@@ -99,7 +100,6 @@
           <div class="filter__label">
             <BasicText weight="semibold">Tags</BasicText>
           </div>
-
           <div class="tags-list">
             <BasicBadge
               v-for="t in tagItemsWithCounts"
@@ -123,7 +123,6 @@
           message="Chargement du catalogue..."
           empty-message="Aucun produit trouvé avec ces filtres."
         >
-          <!-- Résumé & pagination top -->
           <div
             class="catalogue__summary"
             v-if="hasLoaded"
@@ -154,7 +153,6 @@
             />
           </div>
 
-          <!-- Pagination bottom -->
           <div
             class="catalogue__pagination-bottom"
             v-if="nbPages > 1"
@@ -176,7 +174,6 @@
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
-  import { useRange } from '@/features/catalogue/composables/useRange'
   import { supabase } from '@/supabase/supabaseClient'
   import type { Tables } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -190,13 +187,12 @@
   const toast = useToastStore()
   const router = useRouter()
 
-  const { min: priceMin, max: priceMax, from: priceFrom, to: priceTo } = useRange(0, 0)
-
+  /* 🔹 Range local simple (aucun hook) */
   const priceRange = ref({
-    min: priceMin,
-    max: priceMax,
-    from: priceFrom,
-    to: priceTo,
+    min: 0,
+    max: 0,
+    from: 0,
+    to: 0,
     step: 0.1,
   })
 
@@ -250,13 +246,14 @@
 
       products.value = rows
 
+      // bornes de prix
       const prices = rows.map((p) => p.price)
       const min = Math.min(...prices)
       const max = Math.max(...prices)
-      priceMin.value = isFinite(min) ? Math.floor(min) : 0
-      priceMax.value = isFinite(max) ? Math.ceil(max) : 0
-      priceFrom.value = priceMin.value
-      priceTo.value = priceMax.value
+      priceRange.value.min = isFinite(min) ? Math.floor(min) : 0
+      priceRange.value.max = isFinite(max) ? Math.ceil(max) : 0
+      priceRange.value.from = priceRange.value.min
+      priceRange.value.to = priceRange.value.max
     } catch (err) {
       console.error(err)
       toast.show('Erreur lors du chargement du catalogue', 'danger')
@@ -300,9 +297,11 @@
   /* Dynamic counts */
   const stockCount = computed(() => priceFiltered.value.filter((p) => !!p.stock).length)
 
-  /* Filtering pipeline (dans l’ordre : prix → texte → categories → stock → tags) */
+  /* Filtering pipeline */
   const priceFiltered = computed(() =>
-    products.value.filter((p) => p.price >= priceFrom.value && p.price <= priceTo.value),
+    products.value.filter(
+      (p) => p.price >= priceRange.value.from && p.price <= priceRange.value.to,
+    ),
   )
 
   const searchFiltered = computed(() => {
@@ -352,7 +351,6 @@
 
   /* Pagination */
   const filteredProducts = sortedProducts
-
   const nbPages = computed(() =>
     Math.max(1, Math.ceil(filteredProducts.value.length / pageSize.value)),
   )
@@ -364,19 +362,8 @@
   })
 
   watch(
-    [
-      searchTerm,
-      selectedCategories,
-      inStockOnly,
-      selectedTags,
-      priceFrom,
-      priceTo,
-      sortBy,
-      pageSize,
-    ],
-    () => {
-      page.value = 1
-    },
+    [searchTerm, selectedCategories, inStockOnly, selectedTags, sortBy, pageSize],
+    () => (page.value = 1),
   )
 
   /* Actions */
@@ -385,10 +372,10 @@
     selectedCategories.value = []
     inStockOnly.value = false
     selectedTags.value = []
-    priceFrom.value = priceMin.value
-    priceTo.value = priceMax.value
     sortBy.value = 'default'
     page.value = 1
+    priceRange.value.from = priceRange.value.min
+    priceRange.value.to = priceRange.value.max
   }
 
   function toggleTag(id: string) {
