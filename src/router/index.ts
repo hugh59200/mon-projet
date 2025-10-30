@@ -200,6 +200,7 @@ const routes: Array<RouteRecordRaw> = [
       description:
         'Gérez les produits, utilisateurs, commandes, statistiques et actualités du site Fast Peptides.',
     },
+    redirect: { name: 'AdminMessagerie' },
     children: [
       {
         path: 'messagerie',

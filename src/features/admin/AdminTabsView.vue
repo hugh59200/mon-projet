@@ -27,7 +27,6 @@
   const route = useRoute()
   const { tabs, goToTab } = useNavigationTabs()
 
-  // ✅ Corrigé : on travaille avec les noms de routes, pas les labels
   const selectedTab = computed({
     get: () => route.name as RouteName,
     set: (routeName: RouteName) => goToTab(routeName),

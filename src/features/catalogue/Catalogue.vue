@@ -352,7 +352,7 @@
 
       &__grid {
         grid-template-columns: repeat(2, minmax(160px, 1fr));
-        gap: 18px;
+        gap: 42px 10px;
       }
 
       &__header {
@@ -381,8 +381,8 @@
 
     @media (max-width: 600px) {
       &__grid {
-        grid-template-columns: repeat(2, minmax(140px, 1fr));
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 42px;
       }
 
       &__header {
