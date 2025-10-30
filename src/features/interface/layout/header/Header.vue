@@ -43,7 +43,7 @@
         <div
           v-if="auth.isAdmin"
           class="admin-chat-button"
-          @click="router.push('/admin')"
+          @click="goToAdmin"
         >
           <BasicButton
             label="Admin"
@@ -121,6 +121,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
@@ -133,11 +134,24 @@
   const cart = useCartStore()
   const sidebar = useSidebarStore()
   const chatNotif = useChatNotifStore()
+  const adminTabStore = useAdminTabStore()
 
   const { isReduced } = storeToRefs(sidebar)
   const { toggle } = sidebar
 
+  function goToAdmin() {
+    adminTabStore.loadLastTab()
+
+    const target = adminTabStore.lastTab
+      ? { name: adminTabStore.lastTab }
+      : { name: 'AdminMessagerie' } // fallback au premier onglet
+
+    router.push(target)
+  }
+
   async function handleLogout() {
+    const adminTabStore = useAdminTabStore()
+    adminTabStore.clearLastTab()
     await auth.signOut()
   }
 </script>
