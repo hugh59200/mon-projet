@@ -181,6 +181,7 @@
 <script setup lang="ts">
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
+  import { useRange } from '@/features/catalogue/composables/useRange'
   import { supabase } from '@/supabase/supabaseClient'
   import type { Tables } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -193,6 +194,8 @@
   const cart = useCartStore()
   const toast = useToastStore()
   const router = useRouter()
+
+  const { min: priceMin, max: priceMax, from: priceFrom, to: priceTo, setMinMax } = useRange(0, 0)
 
   /* State */
   const loading = ref(false)
@@ -223,10 +226,6 @@
   const selectedTags = ref<string[]>([])
 
   /* Price slider */
-  const priceMin = ref(0)
-  const priceMax = ref(0)
-  const priceFrom = ref(0)
-  const priceTo = ref(0)
   const priceRange = computed({
     get: () => ({ from: priceFrom.value, to: priceTo.value }),
     set: (value: { from: number; to: number }) => {

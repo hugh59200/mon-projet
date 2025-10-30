@@ -106,6 +106,7 @@
       top: 8px;
       width: 100%;
       -webkit-appearance: none;
+      appearance: none;
       background: none;
       pointer-events: none;
 
@@ -142,7 +143,7 @@
 
     .range-track {
       position: absolute;
-      top: 10px;
+      top: 15px;
       height: 4px;
       background: @primary-500;
       border-radius: 2px;
