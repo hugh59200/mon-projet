@@ -27,6 +27,8 @@ export function useRange(minInitial = 0, maxInitial = 100) {
     to.value = clamp(to.value, from.value, max.value)
   })
 
+  
+
   return {
     min,
     max,

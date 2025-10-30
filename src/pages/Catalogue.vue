@@ -63,13 +63,7 @@
             <BasicText weight="semibold">Prix</BasicText>
             <BasicIconNext name="ChevronsDownUp" />
           </div>
-
-          <BasicRange
-            v-model="priceRange"
-            :min="priceMin"
-            :max="priceMax"
-            :step="0.1"
-          />
+          <BasicRange v-model="priceRange" />
         </div>
         <!-- Catégories (multi) -->
         <div class="catalogue__filter">
@@ -198,12 +192,12 @@
 
   const { min: priceMin, max: priceMax, from: priceFrom, to: priceTo } = useRange(0, 0)
 
-  const priceRange = computed({
-    get: () => ({ from: priceFrom.value, to: priceTo.value }),
-    set: (value: { from: number; to: number }) => {
-      priceFrom.value = value.from
-      priceTo.value = value.to
-    },
+  const priceRange = ref({
+    min: priceMin,
+    max: priceMax,
+    from: priceFrom,
+    to: priceTo,
+    step: 0.1,
   })
 
   /* State */
