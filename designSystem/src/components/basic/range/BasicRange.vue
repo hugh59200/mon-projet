@@ -35,18 +35,22 @@
       <BasicInputNumber
         v-model="from"
         :decimal="2"
-        text-align="right"
         :min="min"
         :max="to"
-        icon-left="euro"
+        icon-name="Euro"
+        icon-state="iconLeft"
+        text-align="right"
+        size="small"
       />
       <BasicInputNumber
         v-model="to"
         :decimal="2"
         text-align="right"
         :min="from"
+        icon-name="Euro"
+        icon-state="iconLeft"
         :max="max"
-        icon-left="euro"
+        size="small"
       />
     </div>
   </div>

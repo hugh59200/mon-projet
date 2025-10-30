@@ -58,48 +58,35 @@
         </div>
 
         <!-- Prix -->
-        <div class="catalogue__filter">
-          <div class="filter__label">
-            <BasicText weight="semibold">Prix</BasicText>
-            <BasicIconNext name="ChevronsDownUp" />
-          </div>
-          <BasicRange v-model="priceRange" />
-        </div>
+        <FilterSection title="Prix">
+          <BasicRange
+            v-if="priceRange.max > priceRange.min"
+            v-model="priceRange"
+          />
+        </FilterSection>
 
-        <!-- Catégories (multi) -->
-        <div class="catalogue__filter">
-          <div class="filter__label">
-            <BasicText weight="semibold">Catégorie</BasicText>
-          </div>
-          <BasicDropdownMultiple
+        <FilterSection title="Catégorie">
+          <WrapperDropdownMultiple
             v-model="selectedCategories"
             :items="categoryItemsWithCounts"
             placeholder="Toutes les catégories"
             searchable
             deletable
-            size="medium"
+            size="small"
           />
-        </div>
+        </FilterSection>
 
-        <!-- Disponibilité -->
-        <div class="catalogue__filter">
-          <div class="filter__label">
-            <BasicText weight="semibold">Disponibilité</BasicText>
-          </div>
+        <FilterSection title="Disponibilité">
           <WrapperCheckbox
             v-model="inStockOnly"
             :label="`En stock (${stockCount})`"
           />
-        </div>
+        </FilterSection>
 
-        <!-- Tags -->
-        <div
+        <FilterSection
           v-if="allTags.length"
-          class="catalogue__filter"
+          title="Tags"
         >
-          <div class="filter__label">
-            <BasicText weight="semibold">Tags</BasicText>
-          </div>
           <div class="tags-list">
             <BasicBadge
               v-for="t in tagItemsWithCounts"
@@ -111,7 +98,7 @@
               @click="toggleTag(t.id)"
             />
           </div>
-        </div>
+        </FilterSection>
       </aside>
 
       <!-- 🛒 Liste -->
@@ -172,6 +159,7 @@
 </template>
 
 <script setup lang="ts">
+  import FilterSection from '@/components/FilterSection.vue'
   import ProductCard from '@/features/cart/ProductCart.vue'
   import { useCartStore } from '@/features/cart/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
@@ -190,12 +178,11 @@
   /* 🔹 Range local simple (aucun hook) */
   const priceRange = ref({
     min: 0,
-    max: 0,
+    max: 100, // <-- par défaut
     from: 0,
-    to: 0,
+    to: 100, // <-- à droite par défaut
     step: 0.1,
   })
-
   /* State */
   const loading = ref(false)
   const hasLoaded = ref(false)
@@ -250,8 +237,17 @@
       const prices = rows.map((p) => p.price)
       const min = Math.min(...prices)
       const max = Math.max(...prices)
-      priceRange.value.min = isFinite(min) ? Math.floor(min) : 0
-      priceRange.value.max = isFinite(max) ? Math.ceil(max) : 0
+      const rawMin = isFinite(min) ? Math.floor(min) : 0
+      const rawMax = isFinite(max) ? Math.ceil(max) : 0
+
+      if (rawMax <= rawMin) {
+        // élargit artificiellement l'intervalle d'un pas
+        priceRange.value.min = rawMin
+        priceRange.value.max = rawMin + (priceRange.value.step || 0.1)
+      } else {
+        priceRange.value.min = rawMin
+        priceRange.value.max = rawMax
+      }
       priceRange.value.from = priceRange.value.min
       priceRange.value.to = priceRange.value.max
     } catch (err) {
@@ -271,11 +267,17 @@
   )
 
   const categoryItemsWithCounts = computed(() => {
+    if (!categories.value.length) return []
     const counts: Record<string, number> = {}
     for (const p of priceFiltered.value) {
-      counts[p.category] = (counts[p.category] || 0) + 1
+      const cat = p.category || ''
+      counts[cat] = (counts[cat] || 0) + 1
     }
-    return categories.value.map((c) => ({ id: c, label: `${c} (${counts[c] || 0})` }))
+    return categories.value.map((c) => ({ id: String(c), label: `${c} (${counts[c] || 0})` }))
+  })
+
+  onMounted(() => {
+    console.log('cat items', categoryItemsWithCounts.value)
   })
 
   const allTags = computed(() => {

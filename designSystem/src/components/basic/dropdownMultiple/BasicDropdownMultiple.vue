@@ -29,11 +29,15 @@
   </DropdownContainer>
 </template>
 
-<script setup lang="ts" generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId">
-  import { computed } from 'vue'
-  import type { DropdownProps, DropdownItem, DropdownId } from '@designSystem/components'
+<script
+  setup
+  lang="ts"
+  generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId"
+>
+  import type { DropdownId, DropdownItem, DropdownProps } from '@designSystem/components'
   import { useDropdownMenuHandler } from '@designSystem/components/wrapper/dropdownContainer/useDropdownMenuHandler'
   import { useDropdownNavigation } from '@designSystem/components/wrapper/dropdownContainer/useDropdownNavigation'
+  import { computed, unref } from 'vue'
 
   const props = withDefaults(defineProps<DropdownProps<TDropdownItem>>(), {
     placeholder: 'Sélectionnez un ou plusieurs éléments',
@@ -42,17 +46,17 @@
 
   const dropdownKey = defineModel<TDropdownKey[]>()
 
+  const resolvedItems = computed(() => unref(props.items) ?? [])
+
   const { isOpen, computedItems } = useDropdownMenuHandler<TDropdownItem>(
-    props.items,
+    resolvedItems,
     props.keyId,
     props.keyLabel,
     props.keyIconName,
   )
 
-  const { selectIndex, makeId, handleArrowDownKey, handleArrowUpKey, handleTab, handleSpace } = useDropdownNavigation(
-    computedItems,
-    isOpen,
-  )
+  const { selectIndex, makeId, handleArrowDownKey, handleArrowUpKey, handleTab, handleSpace } =
+    useDropdownNavigation(computedItems, isOpen)
 
   const selectItem = (dropdownId: DropdownId) => {
     if (props.readonly) return
