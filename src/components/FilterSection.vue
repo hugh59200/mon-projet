@@ -54,7 +54,7 @@
     background: #fff;
     border: 1px solid @neutral-200;
     border-radius: 12px;
-    overflow: hidden;
+    // overflow: hidden;
     transition: all 0.2s ease;
 
     &__header {

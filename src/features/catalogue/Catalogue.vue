@@ -11,7 +11,7 @@
 
       <div class="catalogue__header-right">
         <!-- Recherche mobile -->
-        <BasicInput
+        <WrapperInput
           v-if="isMobile"
           v-model="searchTerm"
           placeholder="Rechercher..."
@@ -22,20 +22,21 @@
 
         <!-- Boutons -->
         <div class="catalogue__buttons">
-          <BasicButton
+          <WrapperButton
             v-if="isMobile"
-            label="Filtres"
+            button-label="Filtres"
             type="secondary"
             variant="outlined"
+            width="full"
             size="small"
             icon-left="SlidersHorizontal"
             @click="showFilters = true"
           />
-          <BasicDropdown
+          <WrapperDropdown
             v-model="sortBy"
             :items="sortItems"
+            force-value
             size="small"
-            dropdown-type="table"
           />
         </div>
       </div>
@@ -45,7 +46,7 @@
     <div class="catalogue__body">
       <!-- 🧭 Filtres latéraux (desktop) -->
       <aside
-        v-if="isDesktop"
+        v-if="!isMobile"
         class="catalogue__filters"
       >
         <FilterPanel
@@ -143,12 +144,14 @@
       </template>
 
       <template #actions>
-        <BasicButton
-          label="Fermer"
-          type="primary"
-          block
-          @click="showFilters = false"
-        />
+        <div class="justify-content-center flex">
+          <BasicButton
+            label="Fermer"
+            type="primary"
+            block
+            @click="showFilters = false"
+          />
+        </div>
       </template>
     </ModalComponent>
   </div>
@@ -168,7 +171,7 @@
   import { useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
 
-  const { isDesktop, isMobile } = inject(DEVICE_BREAKPOINT)!
+  const { isMobile } = inject(DEVICE_BREAKPOINT)!
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
   const {
     selectedCategories,
@@ -216,7 +219,7 @@
 </script>
 
 <style scoped lang="less">
-  /* ===== LAYOUT GLOBAL ===== */
+  /* 🌐 ==================== PAGE CATALOGUE ==================== */
   .catalogue {
     width: 100%;
     display: flex;
@@ -230,15 +233,47 @@
     &__header {
       width: 100%;
       max-width: 1280px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px fade(@neutral-900, 10%);
-      padding: 16px 24px;
-      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px fade(@neutral-900, 8%);
+      padding: 28px 32px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.25s ease;
+
+      /* Titre principal */
+      h2,
+      .basic-text {
+        font-size: 2rem;
+        font-weight: 800;
+        color: @neutral-900;
+        margin: 0;
+      }
+
+      /* Conteneur droit (recherche, tri, filtres) */
+      &-right {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px 16px;
+        width: 100%;
+      }
+
+      /* Barre de recherche mobile */
+      .catalogue__search {
+        min-width: 180px;
+        max-width: 280px;
+      }
+
+      /* Filtres + Tri */
+      .catalogue__buttons {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 10px;
+      }
     }
 
     /* === BODY === */
@@ -251,6 +286,7 @@
       gap: 24px;
     }
 
+    /* === FILTRES === */
     &__filters {
       flex-shrink: 0;
       width: 260px;
@@ -261,6 +297,7 @@
       overflow-y: auto;
     }
 
+    /* === LISTE PRODUITS === */
     &__list {
       flex: 1;
       background: #fff;
@@ -279,8 +316,11 @@
 
     &__grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      justify-items: stretch;
+      align-items: stretch;
+      gap: 48px 28px;
+      padding-bottom: 20px;
     }
 
     &__pagination-bottom {
@@ -290,13 +330,7 @@
     }
 
     /* === RESPONSIVE === */
-    @media (max-width: 1200px) {
-      &__grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       padding: 20px 12px;
 
       &__filters {
@@ -317,17 +351,31 @@
       }
 
       &__grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        width: 100%;
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+        gap: 18px;
       }
 
       &__header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 12px 16px;
-        border-radius: 8px;
+        padding: 16px 18px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px fade(@neutral-900, 6%);
+        gap: 14px;
+
+        h2,
+        .basic-text {
+          font-size: 1.5rem;
+        }
+
+        &-right {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+
+        .catalogue__buttons {
+          width: 100%;
+          justify-content: space-between;
+        }
       }
     }
 
@@ -335,6 +383,14 @@
       &__grid {
         grid-template-columns: repeat(2, minmax(140px, 1fr));
         gap: 12px;
+      }
+
+      &__header {
+        padding: 14px;
+        h2,
+        .basic-text {
+          font-size: 1.3rem;
+        }
       }
     }
   }

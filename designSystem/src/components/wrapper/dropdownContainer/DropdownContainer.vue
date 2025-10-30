@@ -62,11 +62,11 @@
 </template>
 
 <script setup lang="ts" generic="TDropdownItem = DropdownItem">
-  import { ref, computed } from 'vue'
-  import { useAutoId, type DropdownItem, type DropdownProps } from '@designSystem/components'
   import { useDialog } from '@/features/interface/dialog'
-  import { useDropdownMenuHandler } from './useDropdownMenuHandler'
+  import { useAutoId, type DropdownItem, type DropdownProps } from '@designSystem/components'
+  import { computed, ref } from 'vue'
   import type { DropdownContainerEvent } from './DropdownContainer.types'
+  import { useDropdownMenuHandler } from './useDropdownMenuHandler'
 
   const id = useAutoId('input-dropdown')
   const dropdownRef = ref<HTMLElement | null>(null)
@@ -84,13 +84,8 @@
     selectedLabel: '',
   })
 
-  const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } = useDropdownMenuHandler(
-    props.items,
-    props.keyId,
-    props.keyLabel,
-    props.keyIconName,
-    dropdownRef,
-  )
+  const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } =
+    useDropdownMenuHandler(props.items, props.keyId, props.keyLabel, props.keyIconName, dropdownRef)
 
   const dynamicPlaceholder = computed(() =>
     !computedItems.value.length

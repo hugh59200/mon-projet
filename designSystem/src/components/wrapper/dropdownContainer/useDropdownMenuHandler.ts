@@ -13,7 +13,6 @@ import {
 
 export type DropdownDirection = 'up' | 'down'
 
-// ✅ on autorise soit un tableau, soit un Ref/ComputedRef
 export function useDropdownMenuHandler<T = DropdownItem>(
   items: T[] | Ref<T[]> | ComputedRef<T[]> = [],
   keyId?: keyof T,
@@ -28,7 +27,6 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 
   const { makeId, makeVisible } = useScrollIntoView()
 
-  // ✅ Unref ici : fonctionne avec tableaux, ref, ou computed
   const resolvedItems = computed(() => unref(items) ?? [])
 
   const computedItems = computed<DropdownItem[]>(() =>
@@ -63,11 +61,26 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 
   const attach = async () => {
     detach()
-    io.value = new IntersectionObserver(([entry]) => {
-      if (!entry!.isIntersecting && isOpen.value) {
-        isOpen.value = false
-      }
-    })
+
+    // ⛔️ 1. si on est dans une modale ou un conteneur overflow, on ne met PAS d’observer
+    const rootEl = dropdownRef?.value
+
+    if (rootEl?.closest('.modal__dialog')) {
+      return
+    }
+
+    // ✅ 2. sinon on attache comme avant
+    io.value = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry!.isIntersecting && isOpen.value) {
+          isOpen.value = false
+        }
+      },
+      {
+        root: scrollRoot.value ?? null,
+        threshold: 0.01,
+      },
+    )
 
     if (dropdownRef?.value) {
       io.value.observe(dropdownRef.value)
@@ -76,10 +89,13 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 
   watch(isOpen, async (open) => {
     if (open) {
-      scrollRoot.value = (dropdownRef?.value ?? null)?.closest?.('.scroll-container') ?? null
+      // on cherche un root scrollable… mais on accepte qu’il n’y en ait pas
+      const el = dropdownRef?.value ?? null
+      scrollRoot.value = el?.closest?.('.content') ?? null
+
       await nextTick()
       updateDropdownVisibilityAndDirection()
-      attach()
+      await attach()
     } else {
       detach()
     }
