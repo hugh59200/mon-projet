@@ -63,61 +63,13 @@
             <BasicText weight="semibold">Prix</BasicText>
             <BasicIconNext name="ChevronsDownUp" />
           </div>
-
-          <div class="price-range">
-            <div class="price-range__slider">
-              <!-- double slider -->
-              <input
-                type="range"
-                class="range range--min"
-                :min="priceMin"
-                :max="priceMax"
-                step="0.1"
-                v-model.number="priceFrom"
-              />
-              <input
-                type="range"
-                class="range range--max"
-                :min="priceMin"
-                :max="priceMax"
-                step="0.1"
-                v-model.number="priceTo"
-              />
-              <div
-                class="range-track"
-                :style="rangeTrackStyle"
-              />
-            </div>
-
-            <div class="price-range__inputs">
-              <BasicInput
-                :model-value="formatPrice(priceFrom)"
-                @update:model-value="
-                  (v) =>
-                    (priceFrom = clampNumber(
-                      parseFloat((v || '').replace(',', '.')) || priceMin,
-                      priceMin,
-                      priceTo,
-                    ))
-                "
-                icon-left="euro"
-              />
-              <BasicInput
-                :model-value="formatPrice(priceTo)"
-                @update:model-value="
-                  (v) =>
-                    (priceTo = clampNumber(
-                      parseFloat((v || '').replace(',', '.')) || priceMax,
-                      priceFrom,
-                      priceMax,
-                    ))
-                "
-                icon-left="euro"
-              />
-            </div>
-          </div>
+          <BasicRange
+            v-model="priceRange"
+            :min="priceMin"
+            :max="priceMax"
+            :step="0.1"
+          />
         </div>
-
         <!-- Catégories (multi) -->
         <div class="catalogue__filter">
           <div class="filter__label">
@@ -275,10 +227,13 @@
   const priceMax = ref(0)
   const priceFrom = ref(0)
   const priceTo = ref(0)
-
-  /* Helpers */
-  const clampNumber = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max)
-  const formatPrice = (v: number) => v.toFixed(2).replace('.', ',')
+  const priceRange = computed({
+    get: () => ({ from: priceFrom.value, to: priceTo.value }),
+    set: (value: { from: number; to: number }) => {
+      priceFrom.value = value.from
+      priceTo.value = value.to
+    },
+  })
 
   /* Load data */
   async function loadProducts() {
@@ -394,8 +349,6 @@
       case 'price-desc':
         return arr.sort((a, b) => b.price - a.price)
       case 'new':
-        // created_at n’est pas dans l’interface mais revient de Supabase -> on laisse fallback si absent
-        // @ts-ignore
         return arr.sort(
           (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime(),
         )
@@ -406,14 +359,17 @@
 
   /* Pagination */
   const filteredProducts = sortedProducts
+
   const nbPages = computed(() =>
     Math.max(1, Math.ceil(filteredProducts.value.length / pageSize.value)),
   )
+
   const paginatedProducts = computed(() => {
     page.value = Math.min(page.value, nbPages.value)
     const start = (page.value - 1) * pageSize.value
     return filteredProducts.value.slice(start, start + pageSize.value)
   })
+
   watch(
     [
       searchTerm,
@@ -429,13 +385,6 @@
       page.value = 1
     },
   )
-
-  /* UI helpers */
-  const rangeTrackStyle = computed(() => {
-    const left = ((priceFrom.value - priceMin.value) / (priceMax.value - priceMin.value)) * 100
-    const right = ((priceTo.value - priceMin.value) / (priceMax.value - priceMin.value)) * 100
-    return { left: `${left}%`, width: `${Math.max(0, right - left)}%` }
-  })
 
   /* Actions */
   function resetAll() {
