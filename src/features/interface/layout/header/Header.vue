@@ -5,10 +5,8 @@
   >
     <!-- 🧭 Gauche -->
     <div class="auth-navbar__left">
-      <!-- 🍔 Burger menu -->
       <button
         class="burger-btn"
-        v-feedback-animate.glow="{ color: 'rgba(255,255,255,0.6)', scale: 1.1 }"
         @click="toggleMobileMenu"
         aria-label="Ouvrir le menu"
       >
@@ -18,7 +16,6 @@
         />
       </button>
 
-      <!-- 🧬 Logo -->
       <div
         class="logo"
         @click="router.push('/')"
@@ -38,7 +35,7 @@
       </div>
     </div>
 
-    <!-- 📚 Liens Desktop -->
+    <!-- 📚 Desktop links -->
     <div class="auth-navbar__center">
       <MainNavLinks />
     </div>
@@ -75,12 +72,14 @@
       >
         <aside
           class="mobile-drawer"
-          v-responsive-animate.slide.once
+          v-click-outside="{ callback: closeMenu }"
+          v-responsive-animate.slide.stagger.once="{ delay: 70 }"
         >
           <div class="drawer-header">
             <img
               src="@/assets/logo-app.png"
               class="drawer-logo"
+              alt="logo"
             />
             <BasicText
               weight="bold"
@@ -90,8 +89,11 @@
             </BasicText>
           </div>
 
-          <!-- ✅ Liens verticaux -->
-          <div class="drawer-links">
+          <!-- ✅ Navigation principale -->
+          <div
+            class="drawer-links"
+            v-responsive-animate.slide.stagger.once="{ delay: 50 }"
+          >
             <MainNavLinks
               direction="column"
               @navigate="closeMenu"
@@ -100,23 +102,27 @@
 
           <div class="drawer-divider"></div>
 
+          <!-- 👤 Profil -->
           <template v-if="auth.user">
-            <button
-              class="drawer-link"
-              @click="goTo('/profil')"
+            <div
+              class="drawer-links"
+              v-responsive-animate.slide.stagger.once="{ delay: 80 }"
             >
-              Mon profil
-            </button>
-            <button
-              class="drawer-link"
-              @click="goTo('/panier')"
-            >
-              Mon panier
-            </button>
+              <button
+                class="drawer-link"
+                @click="goTo('/profil')"
+              >
+                Mon profil
+              </button>
+            </div>
           </template>
 
+          <!-- 🔐 Auth (non connecté) -->
           <template v-else>
-            <div class="drawer-auth">
+            <div
+              class="drawer-auth"
+              v-responsive-animate.slide.stagger.once="{ delay: 100 }"
+            >
               <BasicButton
                 label="Connexion"
                 type="primary"
@@ -140,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-  import { vFeedbackAnimate } from '@/directives/vFeedbackAnimate'
+  import { vClickOutside } from '@/directives/vClickOutside'
   import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import CartMenu from '@/features/catalogue/pop-up/CartMenu.vue'
@@ -151,7 +157,10 @@
   import MainNavLinks from './MainNavLinks.vue'
 
   defineOptions({
-    directives: { feedbackAnimate: vFeedbackAnimate, responsiveAnimate: vResponsiveAnimate },
+    directives: {
+      clickOutside: vClickOutside,
+      responsiveAnimate: vResponsiveAnimate,
+    },
   })
 
   const router = useRouter()
@@ -159,21 +168,15 @@
   const { isMobile } = useDeviceBreakpoint()
   const isMenuOpen = ref(false)
 
-  function toggleMobileMenu() {
-    isMenuOpen.value = !isMenuOpen.value
-  }
-  function closeMenu() {
-    isMenuOpen.value = false
-  }
-  function goTo(path: string) {
+  const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
+  const closeMenu = () => (isMenuOpen.value = false)
+  const goTo = (path: string) => {
     closeMenu()
     router.push(path)
   }
 
-  // 🔁 ferme à chaque changement de route
   router.afterEach(() => closeMenu())
 
-  // 📏 ferme si retour en desktop
   const stopWatch = watch(isMobile, (mobile) => {
     if (!mobile) closeMenu()
   })
@@ -181,7 +184,6 @@
 </script>
 
 <style scoped lang="less">
-  /* --- STRUCTURE --- */
   .auth-navbar {
     z-index: 1000;
     height: 64px;
@@ -212,24 +214,24 @@
     }
   }
 
-  /* --- LOGO --- */
   .logo {
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
-
+    caret-color: transparent;
     .logo-img {
       width: 38px;
       height: 38px;
       transition: transform 0.25s ease;
+      caret-color: transparent;
       &:hover {
         transform: scale(1.08);
       }
     }
   }
 
-  /* --- BURGER --- */
+  /* --- Burger button --- */
   .burger-btn {
     display: none;
     background: transparent;
@@ -238,13 +240,12 @@
     cursor: pointer;
     padding: 4px;
     transition: transform 0.2s ease;
-
     &:hover {
       transform: scale(1.1);
     }
   }
 
-  /* --- OVERLAY --- */
+  /* --- Overlay --- */
   .mobile-overlay {
     position: fixed;
     inset: 0;
@@ -255,9 +256,8 @@
     justify-content: flex-start;
   }
 
-  /* --- DRAWER --- */
+  /* --- Drawer --- */
   .mobile-drawer {
-    position: relative;
     width: 270px;
     height: 100vh;
     background: fade(@neutral-800, 96%);
@@ -270,10 +270,12 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
     overflow-y: auto;
+    overflow-x: hidden; /* ✅ Empêche le débordement */
+    scrollbar-width: thin;
+    scrollbar-color: fade(white, 25%) transparent;
+    position: relative;
 
-    /* 🌈 Glow vertical */
     &::after {
       content: '';
       position: absolute;
@@ -290,7 +292,6 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 12px;
-
       .drawer-logo {
         width: 28px;
         height: 28px;
@@ -300,14 +301,15 @@
     .drawer-links {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
+      gap: 8px;
+      width: 100%;
     }
 
     .drawer-divider {
       height: 1px;
       background: fade(white, 12%);
-      margin: 8px 0;
+      margin: 12px 0;
+      width: 100%;
     }
 
     .drawer-link {
@@ -318,6 +320,7 @@
       padding: 8px 0;
       font-size: 16px;
       cursor: pointer;
+      transition: color 0.25s ease;
       &:hover {
         color: @primary-400;
       }
@@ -331,7 +334,7 @@
     }
   }
 
-  /* --- TRANSITION --- */
+  /* --- Animation slide --- */
   .slide-left-enter-active,
   .slide-left-leave-active {
     transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
@@ -342,10 +345,10 @@
   }
   .slide-left-leave-to {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(-80%); /* ✅ effet fermeture plus fluide */
   }
 
-  /* --- RESPONSIVE --- */
+  /* --- Responsive --- */
   @media (max-width: 900px) {
     .auth-navbar {
       padding: 0 16px;

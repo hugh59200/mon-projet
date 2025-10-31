@@ -85,12 +85,13 @@
 
   /* --- MODE VERTICAL (drawer mobile) --- */
   .main-nav--vertical {
+    margin-top: 15px;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
 
     .main-nav__link {
-      width: 100%;
+      width: 60%;
       padding: 10px 12px;
       font-size: 16px;
 

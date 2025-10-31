@@ -114,6 +114,7 @@
     justify-content: center;
     color: white;
     transition: transform 0.25s ease;
+    user-select: none;
     &:hover {
       transform: scale(1.12);
     }

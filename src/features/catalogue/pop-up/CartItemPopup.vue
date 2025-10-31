@@ -112,6 +112,7 @@
     transform: translateY(0);
     transition: all 0.25s ease;
 
+
     .popup-content {
       display: flex;
       align-items: center;
