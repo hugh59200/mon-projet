@@ -1,4 +1,3 @@
-// 📁 src/directives/vResponsiveAnimate.ts
 import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
 import { nextTick, watch } from 'vue'
 
@@ -10,30 +9,34 @@ declare global {
 }
 
 /**
- * 💫 v-responsive-animate.[style].[stagger]
- * Anime un élément (et ses enfants) lors du montage, du changement de breakpoint,
- * ou quand il entre dans le viewport.
+ * 💫 v-responsive-animate.[style].[modifiers]
+ * Anime un élément à l’entrée (montage, scroll ou changement de breakpoint)
  *
- * 🔸 Styles : fade | slide | zoom | bounce
+ * 🔸 Styles :
+ *    fade | slide | zoom | bounce | pulse | glow
+ *
  * 🔸 Modifiers :
- *   - stagger → anime les enfants avec délai progressif
- *   - once → ne s’anime qu’une seule fois à l’entrée du viewport
- *   - scroll → déclenche l’animation à l’apparition dans le viewport
- * 🔸 Options :
- *   { delay?: number, speed?: number, threshold?: number }
+ *   - stagger → anime les enfants en cascade
+ *   - once → ne s’anime qu’une seule fois
+ *   - scroll → déclenche quand visible à l’écran
  *
- * Exemple :
- * <div v-responsive-animate.fade.scroll.stagger="{ delay: 80, speed: 600 }" />
+ * 🔸 Options :
+ *   { delay?: number, speed?: number, threshold?: number, color?: string, scale?: number }
  */
 export const vResponsiveAnimate = {
   mounted(el: HTMLElement, binding: any) {
     const { isMobile } = useDeviceBreakpoint()
     const opts = binding.value || {}
 
-    const delay = Number(opts.delay ?? 80) // délai entre enfants (ms)
-    const speed = Number(opts.speed ?? 450) // durée animation (ms)
-    const threshold = Number(opts.threshold ?? 0.15) // % de visibilité avant déclenchement
+    const delay = Number(opts.delay ?? 80)
+    const speed = Number(opts.speed ?? 450)
+    const threshold = Number(opts.threshold ?? 0.15)
     const once = binding.modifiers.once ?? true
+    const color = opts.color ?? 'rgba(255,255,255,0.3)'
+    const scale = opts.scale ?? 1.1
+
+    // 🧠 Respect du "prefers-reduced-motion"
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     // 🎨 Style choisi
     const style =
@@ -44,31 +47,89 @@ export const vResponsiveAnimate = {
           ? 'zoom'
           : binding.modifiers.bounce
             ? 'bounce'
-            : 'fade')
+            : binding.modifiers.pulse
+              ? 'pulse'
+              : binding.modifiers.glow
+                ? 'glow'
+                : 'fade')
 
-    // 🧠 Respect du prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
+    // ⚙️ Fonctions d’animation basées sur le style
+    const animateStyle = (element: HTMLElement, type: 'in' | 'out' = 'in') => {
+      element.style.setProperty('--responsive-speed', `${speed}ms`)
 
-    const enterClass = `responsive-enter-${style}`
-    const leaveClass = `responsive-leave-${style}`
+      switch (style) {
+        case 'pulse':
+          element.animate(
+            [
+              { transform: 'scale(1)', boxShadow: 'none', opacity: 0 },
+              { transform: `scale(${scale})`, boxShadow: `0 0 10px ${color}`, opacity: 1 },
+              { transform: 'scale(1)', boxShadow: 'none', opacity: 1 },
+            ],
+            {
+              duration: speed,
+              easing: 'ease-out',
+              fill: 'forwards',
+            },
+          )
+          break
 
-    const play = (type: 'in' | 'out' = 'in') => {
-      el.style.setProperty('--responsive-speed', `${speed}ms`)
-      el.classList.remove(enterClass, leaveClass)
-      void el.offsetWidth // force reflow
-      el.classList.add(type === 'in' ? enterClass : leaveClass)
+        case 'glow':
+          element.animate(
+            [
+              { boxShadow: `0 0 0 ${color}`, opacity: 0 },
+              { boxShadow: `0 0 16px ${color}`, opacity: 1 },
+              { boxShadow: `0 0 0 ${color}`, opacity: 1 },
+            ],
+            { duration: speed * 1.2, easing: 'ease-in-out', fill: 'forwards' },
+          )
+          break
+
+        case 'bounce':
+          element.animate(
+            [
+              { transform: 'scale(0.9)', opacity: 0 },
+              { transform: `scale(${scale * 1.05})`, opacity: 1 },
+              { transform: 'scale(1)', opacity: 1 },
+            ],
+            { duration: speed, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' },
+          )
+          break
+
+        case 'slide':
+          element.animate(
+            [
+              { transform: 'translateY(20px)', opacity: 0 },
+              { transform: 'translateY(0)', opacity: 1 },
+            ],
+            { duration: speed, easing: 'ease-out', fill: 'forwards' },
+          )
+          break
+
+        case 'zoom':
+          element.animate(
+            [
+              { transform: 'scale(0.95)', opacity: 0 },
+              { transform: 'scale(1)', opacity: 1 },
+            ],
+            { duration: speed, easing: 'ease-out', fill: 'forwards' },
+          )
+          break
+
+        default: // fade
+          element.animate([{ opacity: 0 }, { opacity: 1 }], {
+            duration: speed,
+            easing: 'ease-in-out',
+            fill: 'forwards',
+          })
+      }
     }
 
+    // 🧩 Animation en cascade
     const playStagger = async () => {
       await nextTick()
       const children = Array.from(el.children) as HTMLElement[]
       children.forEach((child, i) => {
-        child.style.setProperty('--responsive-speed', `${speed}ms`)
-        child.style.animationDelay = `${i * delay}ms`
-        child.classList.remove(enterClass, leaveClass)
-        void child.offsetWidth
-        child.classList.add(enterClass)
+        setTimeout(() => animateStyle(child, 'in'), i * delay)
       })
     }
 
@@ -79,15 +140,10 @@ export const vResponsiveAnimate = {
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              if (binding.modifiers.stagger) playStagger()
-              else play('in')
-
-              if (once && observer) {
-                observer.disconnect()
-              }
+              binding.modifiers.stagger ? playStagger() : animateStyle(el, 'in')
+              if (once && observer) observer.disconnect()
             } else if (!once) {
-              // rejoue la sortie seulement si pas "once"
-              play('out')
+              animateStyle(el, 'out')
             }
           })
         },
@@ -96,38 +152,31 @@ export const vResponsiveAnimate = {
       observer.observe(el)
     }
 
-    // 🎬 Animation initiale
+    // 🎬 Démarrage
     const playInitial = () => {
-      if (binding.modifiers.scroll) {
-        setupObserver()
-      } else if (binding.modifiers.stagger) {
-        playStagger()
-      } else {
-        play('in')
-      }
+      if (binding.modifiers.scroll) setupObserver()
+      else if (binding.modifiers.stagger) playStagger()
+      else animateStyle(el, 'in')
     }
 
     playInitial()
 
-    // 🧭 Réagit aux changements mobile ↔ desktop
+    // 📱 Re-anime sur changement de breakpoint
     const stop = watch(
       isMobile,
-      async (_newVal, oldVal) => {
-        if (oldVal === undefined) return
-        if (binding.modifiers.scroll) return // l’observer gère ça
-
-        // Joue la sortie puis rejoue l'entrée
-        binding.modifiers.stagger ? playStagger() : play('out')
-
+      async (_new, old) => {
+        if (old === undefined) return
+        if (binding.modifiers.scroll) return
+        animateStyle(el, 'out')
         await nextTick()
         setTimeout(() => {
-          binding.modifiers.stagger ? playStagger() : play('in')
+          binding.modifiers.stagger ? playStagger() : animateStyle(el, 'in')
         }, speed * 0.6)
       },
       { immediate: false },
     )
 
-    // 🧹 Nettoyage (⚡ plus de onScopeDispose warning)
+    // 🧹 Nettoyage
     el.__responsiveStop__ = stop
     el.__responsiveObserver__ = observer
   },
@@ -135,10 +184,8 @@ export const vResponsiveAnimate = {
   unmounted(el: any) {
     const stop = el.__responsiveStop__
     const observer = el.__responsiveObserver__
-
     if (typeof stop === 'function') stop()
     if (observer) observer.disconnect()
-
     delete el.__responsiveStop__
     delete el.__responsiveObserver__
   },

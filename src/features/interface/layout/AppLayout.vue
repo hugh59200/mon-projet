@@ -1,10 +1,9 @@
 <template>
-  <div
-    class="app-grid"
-    :class="{ 'sidebar-reduced': sidebar.isReduced }"
-  >
+  <div class="app-layout">
+    <!-- 🔝 Header global -->
     <HeaderApp class="header" />
-    <SidebarApp class="sidebar" />
+
+    <!-- 🧩 Contenu principal -->
     <main class="content">
       <RouterView v-slot="{ Component }">
         <transition
@@ -17,6 +16,7 @@
           </keep-alive>
         </transition>
       </RouterView>
+
       <transition
         name="fade"
         appear
@@ -24,7 +24,10 @@
         <SablierComponent v-if="sablier.estSablierVisible" />
       </transition>
     </main>
+
+    <!-- 🔻 Footer -->
     <FooterApp class="footer" />
+
     <AppRegisterGlobals />
   </div>
 </template>
@@ -34,16 +37,13 @@
   import { useCartStore } from '@/features/catalogue/cart/useCartStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
-  import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'
-  import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
-  import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/supabase/supabaseClient'
 
   const cart = useCartStore()
-  const sidebar = useSidebarStore()
   const sablier = useSablierStore()
 
+  // 🧠 Déconnexion auto du panier à la déconnexion
   supabase.auth.onAuthStateChange((_event, session) => {
     if (!session) cart.items = []
   })
@@ -52,84 +52,60 @@
 <style scoped lang="less">
   @import '/src/assets/Mont/Mont.less';
 
-  /* --- STRUCTURE GRID --- */
-  .app-grid {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    grid-template-rows: 60px 1fr auto;
-    grid-template-areas:
-      'header header'
-      'sidebar content'
-      'sidebar footer';
-    height: 100vh;
-    width: 100vw;
+  /* --- STRUCTURE --- */
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    background: @neutral-0;
     overflow: hidden;
-    background-color: @neutral-0;
-    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* --- HEADER --- */
   .header {
-    grid-area: header;
     position: sticky;
     top: 0;
     z-index: 1000;
-    height: 60px;
+    height: 64px;
     background-color: @secondary-800;
-  }
-
-  /* --- SIDEBAR --- */
-  .sidebar {
-    grid-area: sidebar;
-    background-color: @secondary-800;
-    color: white;
-    height: 100%;
-    width: 240px;
-    z-index: 9;
-    transition: width 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   }
 
   /* --- CONTENU --- */
   .content {
-    grid-area: content;
-    background-color: @neutral-0;
+    flex: 1;
     padding: 2.5vw 4vw;
     overflow-y: auto;
+    background: @neutral-0;
     position: relative;
     transition: padding 0.3s ease;
 
     @media (max-width: 900px) {
-      padding: 16px 20px; // petit padding mobile
+      padding: 16px 20px;
     }
 
     @media (min-width: 1400px) {
-      padding: 50px 80px; // padding large sur grand écran
+      padding: 50px 80px;
     }
   }
+
   /* --- FOOTER --- */
   .footer {
+    flex-shrink: 0;
     position: relative;
     bottom: 0;
-    left: 0px;
+    left: 0;
     right: 0;
-    z-index: 950;
     height: 40px;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* --- Sidebar réduite --- */
-  .app-grid.sidebar-reduced {
-    grid-template-columns: 80px 1fr;
-
-    .sidebar {
-      width: 80px;
-    }
+    z-index: 950;
+    background: @secondary-900;
   }
 
   /* ✨ TRANSITIONS entre pages */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .fade-slide-enter-from {
     opacity: 0;

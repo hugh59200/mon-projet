@@ -1,4 +1,3 @@
-import '@/assets/styles/animations.less'
 import directives from '@/directives'
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
