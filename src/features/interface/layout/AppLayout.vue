@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
   import AppRegisterGlobals from '@/AppRegisterGlobals.vue'
-  import { useCartStore } from '@/features/cart/useCartStore'
+  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
   import SidebarApp from '@/features/interface/layout/sideBar/SidebarApp.vue'

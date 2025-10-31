@@ -10,6 +10,7 @@
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
+  z-index: @z-tooltip;
 
   &.is-visible {
     opacity: 1;
@@ -17,41 +18,44 @@
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     border: 6px solid transparent;
+    /* On utilise les variables dynamiques pour déplacer la flèche */
+    transform: translateX(var(--arrow-shift-x, 0)) translateY(var(--arrow-shift-y, 0));
+    transition: transform 0.2s ease;
   }
 
   &--bottom::after {
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
     border-top: 0;
     border-bottom-color: @secondary-900;
+    transform: translateX(calc(-50% - var(--arrow-shift-x, 0)));
   }
 
   &--top::after {
     top: 100%;
     left: 50%;
-    transform: translateX(-50%);
     border-bottom: 0;
     border-top-color: @secondary-900;
+    transform: translateX(calc(-50% - var(--arrow-shift-x, 0)));
   }
 
   &--right::after {
     right: 100%;
     top: 50%;
-    transform: translateY(-50%);
     border-left: 0;
     border-right-color: @secondary-900;
+    transform: translateY(calc(-50% - var(--arrow-shift-y, 0)));
   }
 
   &--left::after {
     left: 100%;
     top: 50%;
-    transform: translateY(-50%);
     border-right: 0;
     border-left-color: @secondary-900;
+    transform: translateY(calc(-50% - var(--arrow-shift-y, 0)));
   }
 }
 

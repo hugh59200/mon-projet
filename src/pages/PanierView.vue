@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useCartStore } from '@/features/cart/useCartStore'
+  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
   const cart = useCartStore()
 </script>
 

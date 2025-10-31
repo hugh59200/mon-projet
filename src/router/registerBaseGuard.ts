@@ -1,5 +1,5 @@
 import { useAuthStore, type Profile } from '@/features/auth/useAuthStore'
-import { useCartStore } from '@/features/cart/useCartStore'
+import { useCartStore } from '@/features/catalogue/cart/useCartStore'
 import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Router } from 'vue-router'

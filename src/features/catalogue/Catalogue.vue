@@ -184,8 +184,8 @@
 </template>
 
 <script setup lang="ts">
-  import ProductCard from '@/features/cart/ProductCart.vue'
-  import { useCartStore } from '@/features/cart/useCartStore'
+  import ProductCard from '@/features/catalogue/cart/ProductCart.vue'
+  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
   import { useFilters } from '@/features/catalogue/composables/useFilters'
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'

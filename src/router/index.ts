@@ -105,7 +105,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/catalogue/:id',
     name: 'product-detail',
-    component: () => import('@/pages/ProductView.vue'),
+    component: () => import('@/features/catalogue/ProductDetails.vue'),
     meta: {
       requiresAuth: true,
       title: 'Produit – Fast Peptides',

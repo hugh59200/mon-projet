@@ -1,4 +1,3 @@
-// src/types/pinia.d.ts
 import 'pinia'
 
 declare module 'pinia' {
@@ -12,7 +11,9 @@ declare module 'pinia' {
       | {
           key?: string
           storage?: Storage
-          paths?: string[]
+          paths?: Array<keyof S> // ✅ important : keyof S pour typer les champs du store
+          beforeRestore?: (ctx: { store: Store }) => void
+          afterRestore?: (ctx: { store: Store }) => void
         }
   }
 }

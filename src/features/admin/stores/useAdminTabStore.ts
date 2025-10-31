@@ -6,17 +6,10 @@ export const useAdminTabStore = defineStore(
   () => {
     const lastTab = ref<string | null>(null)
 
-    function setLastTab(tabName: string) {
-      lastTab.value = tabName
-    }
-
-    function clearLastTab() {
-      lastTab.value = null
-    }
-
-    function getRedirectRoute() {
-      return lastTab.value ? { name: lastTab.value } : { name: 'AdminMessagerie' }
-    }
+    const setLastTab = (tab: string) => (lastTab.value = tab)
+    const clearLastTab = () => (lastTab.value = null)
+    const getRedirectRoute = () =>
+      lastTab.value ? { name: lastTab.value } : { name: 'AdminMessagerie' }
 
     return { lastTab, setLastTab, clearLastTab, getRedirectRoute }
   },
@@ -24,6 +17,7 @@ export const useAdminTabStore = defineStore(
     persist: {
       key: 'admin:last-tab',
       storage: localStorage,
+      pick: ['lastTab'], // ✅ nouvelle syntaxe v4
     },
   },
 )
