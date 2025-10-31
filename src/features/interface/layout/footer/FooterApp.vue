@@ -56,7 +56,39 @@
 </script>
 
 <style lang="less" scoped>
-  @import './FooterApp.less';
+  footer {
+    background-color: @secondary-700;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 16px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+
+    &__content {
+      max-height: 660px;
+      overflow: scroll;
+    }
+
+    .chip {
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      &--green {
+        background-color: @persian-600;
+      }
+      &--blue {
+        background-color: @blue-600;
+      }
+    }
+  }
+
+  @media screen and (max-width: 720px) {
+    footer :deep(.text) {
+      font-size: 10px;
+    }
+  }
 
   .footer__content {
     max-height: 60vh;

@@ -186,7 +186,7 @@
     z-index: 950;
     background: fade(@neutral-100, 60%);
     backdrop-filter: blur(10px);
-    padding: 8px 0;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
   }
 
   /* ============================

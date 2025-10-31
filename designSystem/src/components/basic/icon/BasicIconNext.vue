@@ -3,12 +3,14 @@
     :is="iconComponent"
     v-bind="computedProps"
     class="basic-icon-next"
-    :style="{ color: color }"
-    :class="{
-      'basic-icon-next--pointer': pointer,
-      'basic-icon-next--not-allowed': disabled && !pointer,
-      'basic-icon-next--disabled': disabled,
-    }"
+    :class="[
+      colorClass,
+      {
+        'basic-icon-next--pointer': pointer,
+        'basic-icon-next--not-allowed': disabled && !pointer,
+        'basic-icon-next--disabled': disabled,
+      },
+    ]"
   />
 </template>
 
@@ -29,21 +31,30 @@
 
   const props = withDefaults(defineProps<IconNextProps>(), {
     size: 20,
-    color: 'currentColor', // 🟢 ← important
+    color: 'currentColor',
     strokeWidth: 1.5,
     pointer: false,
     disabled: false,
   })
 
+  // ✅ Sélection dynamique du composant icône
   const iconComponent = computed(() => {
     return (LucideIcons[props.name] as Component) || LucideIcons.HelpCircle
   })
 
+  // ✅ Props passées à Lucide
   const computedProps = computed(() => ({
     size: props.size,
-    color: props.color || 'currentColor', // ✅ si tu passes une couleur, elle est prioritaire
+    color: props.color.startsWith('#') ? props.color : 'currentColor',
     'stroke-width': props.strokeWidth,
   }))
+
+  // ✅ Classe dynamique pour les tokens type "primary-600"
+  const colorClass = computed(() => {
+    if (!props.color) return null
+    const isDesignToken = /^[a-zA-Z]+-\d{2,4}$/.test(props.color)
+    return isDesignToken ? `basic-icon-next--color--${props.color}` : null
+  })
 </script>
 
 <style scoped lang="less">
@@ -56,7 +67,13 @@
     animation: fadeIn 0.25s ease forwards;
     transition:
       opacity 0.3s ease,
-      transform 0.3s ease;
+      transform 0.3s ease,
+      color 0.25s ease;
+
+    svg {
+      display: block;
+      stroke: currentColor; /* ✅ toutes les couleurs passent par currentColor */
+    }
 
     &--pointer {
       cursor: pointer;
@@ -74,10 +91,6 @@
     &:focus {
       outline: none;
       box-shadow: @focus-global;
-    }
-
-    svg {
-      display: block;
     }
   }
 

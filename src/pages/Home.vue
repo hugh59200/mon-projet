@@ -6,12 +6,13 @@
         <BasicText
           size="h2"
           weight="bold"
+          color="primary-600"
         >
           Peptides de Recherche Haut de Gamme
         </BasicText>
         <BasicText
           size="body-l"
-          color="neutral-500"
+          color="neutral-700"
           class="home__hero-sub"
         >
           Pureté certifiée • Livraison rapide en Europe • Laboratoires agréés
@@ -49,6 +50,7 @@
         size="h3"
         weight="bold"
         class="home__section-title"
+        color="secondary-600"
       >
         Nos gammes principales
       </BasicText>
@@ -62,8 +64,14 @@
           <BasicIconNext
             :name="cat.icon"
             :size="40"
+            :color="cat.color"
           />
-          <BasicText weight="bold">{{ cat.label }}</BasicText>
+          <BasicText
+            weight="bold"
+            color="neutral-700"
+          >
+            {{ cat.label }}
+          </BasicText>
           <BasicText
             size="body-s"
             color="neutral-500"
@@ -80,6 +88,7 @@
         size="h3"
         weight="bold"
         class="home__section-title"
+        color="primary-600"
       >
         Notre engagement qualité
       </BasicText>
@@ -89,13 +98,14 @@
           v-for="q in quality"
           :key="q.text"
           class="home__quality-item"
+          :style="{ borderColor: q.color + '33' }"
         >
           <BasicIconNext
             :name="q.icon"
             :size="28"
-            color="primary-600"
+            :color="q.color"
           />
-          <BasicText>{{ q.text }}</BasicText>
+          <BasicText color="neutral-700">{{ q.text }}</BasicText>
         </div>
       </div>
     </section>
@@ -105,12 +115,13 @@
       <BasicText
         size="h4"
         weight="bold"
+        color="white"
       >
         Commencez vos recherches dès aujourd’hui
       </BasicText>
       <BasicButton
         label="Voir le catalogue"
-        type="primary"
+        type="secondary"
         variant="filled"
         size="large"
         @click="$router.push('/catalogue')"
@@ -127,11 +138,13 @@
     icon: IconNameNext
     label: string
     desc: string
+    color: string
   }
 
   interface QualityItem {
     icon: IconNameNext
     text: string
+    color: string
   }
 
   const categories = ref<Category[]>([
@@ -139,24 +152,27 @@
       icon: 'FlaskRound',
       label: 'Peptides de performance',
       desc: 'GHK-Cu, BPC-157, CJC-1295 et plus',
+      color: 'primary-600',
     },
     {
       icon: 'Dna',
       label: 'Peptides de récupération',
       desc: 'Optimisez votre récupération musculaire et articulaire',
+      color: 'success-600',
     },
     {
       icon: 'Microscope',
       label: 'Peptides de recherche cellulaire',
       desc: 'Destinés à la recherche scientifique uniquement',
+      color: 'info-600',
     },
   ])
 
   const quality = ref<QualityItem[]>([
-    { icon: 'CheckCircle', text: 'Pureté testée ≥ 99% (HPLC & MS)' },
-    { icon: 'ShieldCheck', text: 'Stock européen – expédition sous 24h' },
-    { icon: 'Truck', text: 'Livraison rapide dans toute l’UE' },
-    { icon: 'Leaf', text: 'Sans excipient ni conservateur inutile' },
+    { icon: 'CheckCircle', text: 'Pureté testée ≥ 99% (HPLC & MS)', color: 'success-600' },
+    { icon: 'ShieldCheck', text: 'Stock européen – expédition sous 24h', color: 'info-600' },
+    { icon: 'Truck', text: 'Livraison rapide dans toute l’UE', color: 'warning-600' },
+    { icon: 'Leaf', text: 'Sans excipient ni conservateur inutile', color: 'primary-600' },
   ])
 </script>
 
@@ -167,12 +183,18 @@
     gap: 80px;
     padding: 40px 60px;
 
+    /* 🧬 HERO */
     &__hero {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 60px;
       flex-wrap: wrap;
+
+      background: linear-gradient(135deg, fade(@primary-50, 60%), fade(@secondary-50, 60%));
+      border-radius: 16px;
+      padding: 40px 50px;
+      box-shadow: 0 2px 14px fade(@neutral-500, 10%);
     }
 
     &__hero-content {
@@ -197,20 +219,17 @@
       img {
         max-width: 480px;
         width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 16px;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
       }
     }
 
+    /* 💊 CATEGORIES */
     &__categories {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 32px;
-    }
-
-    &__section-title {
-      text-align: center;
     }
 
     &__grid {
@@ -237,37 +256,27 @@
 
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        border-color: @primary-200;
+        box-shadow: 0 4px 14px fade(@neutral-600, 15%);
+        border-color: @primary-300;
       }
 
       .basic-icon-next {
-        color: @primary-600;
         margin-bottom: 6px;
+        transition: transform 0.3s ease;
 
-        svg {
-          width: 40px;
-          height: 40px;
-          stroke-width: 1.75;
+        &:hover {
+          transform: scale(1.1);
         }
-      }
-
-      .basic-text {
-        text-align: center;
-        line-height: 1.4;
-      }
-
-      // Sous-texte
-      .basic-text[color='neutral-500'] {
-        font-size: 0.9rem;
       }
     }
 
+    /* 🧪 QUALITÉ */
     &__quality {
-      background: @neutral-50;
-      padding: 40px;
-      border-radius: 12px;
+      background: linear-gradient(90deg, fade(@primary-50, 80%), fade(@neutral-100, 80%));
+      padding: 50px;
+      border-radius: 16px;
       text-align: center;
+      box-shadow: 0 2px 12px fade(@neutral-600, 10%);
 
       &-list {
         display: flex;
@@ -284,29 +293,27 @@
         background: white;
         padding: 12px 18px;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         border: 1px solid @neutral-200;
         transition: all 0.25s ease;
 
         &:hover {
-          border-color: @primary-300;
-          background: @primary-200;
+          transform: translateY(-2px);
+          box-shadow: 0 3px 8px fade(@neutral-700, 12%);
         }
+      }
+    }
 
-        .basic-icon-next {
-          color: @primary-600;
-          flex-shrink: 0;
+    /* 🚀 CTA FINAL */
+    &__cta {
+      background: linear-gradient(135deg, @primary-700, @secondary-700);
+      color: white;
+      padding: 50px 20px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 6px 20px fade(@neutral-800, 20%);
 
-          svg {
-            width: 22px;
-            height: 22px;
-            stroke-width: 1.8;
-          }
-        }
-
-        .basic-text {
-          font-size: 0.95rem;
-        }
+      .basic-button {
+        margin-top: 16px;
       }
     }
   }
