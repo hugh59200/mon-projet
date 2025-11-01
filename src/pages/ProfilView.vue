@@ -30,7 +30,7 @@
           type="file"
           accept="image/*"
           class="profil__avatar-input"
-          @change="uploadAvatar"
+          @change="handleAvatarSelect"
         />
       </div>
 
@@ -67,7 +67,7 @@
         />
       </div>
 
-      <!-- 🔐 Formulaire de mot de passe -->
+      <!-- 🔐 Changement mot de passe -->
       <transition name="fade">
         <div
           v-if="showPasswordForm"
@@ -126,7 +126,7 @@
   const passwordLoading = ref(false)
 
   /* --------------------------------------------- */
-  /* 🔄 Fonctions principales                      */
+  /* 🔄 Charger le profil                          */
   /* --------------------------------------------- */
   async function loadProfile(retry = 0) {
     if (!auth.user) return
@@ -151,7 +151,7 @@
     if (data) {
       profile.value = data
       editableName.value = data.full_name ?? ''
-      if (data.avatar_url) avatarPreview.value = getPublicUrl(data.avatar_url)
+      avatarPreview.value = data.avatar_url ? getPublicUrl(data.avatar_url) : null
     }
   }
 
@@ -161,35 +161,42 @@
   }
 
   /* --------------------------------------------- */
-  /* 🖼️ Upload avatar                              */
+  /* 🖼️ Sélection + upload de l’avatar             */
   /* --------------------------------------------- */
-  async function uploadAvatar(e: Event) {
+  async function handleAvatarSelect(e: Event) {
     const target = e.target as HTMLInputElement
     if (!target.files?.length || !auth.user) return
 
-    const file = target.files[0]
-    const fileExt = file?.name.split('.').pop()
+    const file = target.files[0] as File
+    const fileExt = file.name.split('.').pop()
     const filePath = `${auth.user.id}-${Date.now()}.${fileExt}`
 
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file!, { upsert: true })
+    try {
+      // 👀 Preview immédiate
+      const reader = new FileReader()
+      reader.onload = () => (avatarPreview.value = reader.result as string)
+      reader.readAsDataURL(file)
 
-    if (uploadError) {
-      toast.show('Erreur lors de l’upload de l’image', 'danger')
-      return
-    }
+      // 🆙 Upload vers le bucket "avatars"
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
 
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ avatar_url: filePath })
-      .eq('id', auth.user.id)
+      if (uploadError) throw uploadError
 
-    if (updateError) {
-      toast.show('Erreur lors de la mise à jour du profil', 'danger')
-    } else {
+      // 🔗 Mise à jour du profil
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: filePath })
+        .eq('id', auth.user.id)
+
+      if (updateError) throw updateError
+
       avatarPreview.value = getPublicUrl(filePath)
       toast.show('Avatar mis à jour 🎨', 'success')
+    } catch (error) {
+      console.error(error)
+      toast.show("Erreur lors de l'upload de l'image", 'danger')
     }
   }
 
@@ -260,17 +267,14 @@
       margin: 0 auto;
     }
 
-    &__avatar-img,
-    &__avatar-placeholder {
+    &__avatar-img {
       width: 120px;
       height: 120px;
       border-radius: 50%;
       object-fit: cover;
       background: @neutral-100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
+      border: 2px solid fade(@neutral-300, 40%);
+      transition: all 0.25s ease;
     }
 
     &__avatar-input {
@@ -294,7 +298,6 @@
     }
   }
 
-  /* Animation fluide */
   .fade-enter-active,
   .fade-leave-active {
     transition: all 0.3s ease;

@@ -322,25 +322,6 @@ FROM public.messages
 GROUP BY user_id
 ON CONFLICT (user_id) DO NOTHING;
 
--- ============================================================
--- 🔍 VIEW : messages_unread_view
---   → compte le nombre de messages non lus par conversation
--- ============================================================
-DROP VIEW IF EXISTS public.messages_unread_view CASCADE;
-
-CREATE OR REPLACE VIEW public.messages_unread_view AS
-SELECT
-  m.user_id,
-  COUNT(*) AS count
-FROM public.messages m
-LEFT JOIN public.conversations c ON c.user_id = m.user_id
-WHERE
-  m.sender_role = 'user'
-  AND (
-    c.last_read_message_id IS NULL
-    OR m.id > c.last_read_message_id
-  )
-GROUP BY m.user_id;
 
 -- ============================================================
 -- 🧩 EXEMPLE DE VUE ADMIN
@@ -697,4 +678,66 @@ WHERE name = 'Retatrutide';
 UPDATE public.products
 SET tags = ARRAY['libido','bien-etre','99%']
 WHERE name = 'PT-141';
+
+-- ============================================================
+-- 🧩 Ajout du champ avatar_url à la table profiles (si manquant)
+-- ============================================================
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS avatar_url text;
+
+COMMENT ON COLUMN public.profiles.avatar_url IS
+  'Chemin relatif du fichier avatar stocké dans le bucket Supabase (ex: avatars/uuid-timestamp.png)';
+
+DROP POLICY IF EXISTS "Update own profile" ON public.profiles;
+
+CREATE POLICY "Update own profile"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+  -- ============================================================
+-- 📦 BUCKET : avatars
+-- ============================================================
+
+-- ✅ Crée le bucket avatars s’il n’existe pas déjà
+insert into storage.buckets (id, name, public)
+select 'avatars', 'avatars', true
+where not exists (select 1 from storage.buckets where id = 'avatars');
+
+-- ============================================================
+-- 🔐 POLICIES : gestion des avatars
+-- ============================================================
+
+-- 🗑 On nettoie au cas où
+do $$
+begin
+  execute 'drop policy if exists "Users can upload avatars" on storage.objects';
+  execute 'drop policy if exists "Public can view avatars" on storage.objects';
+  execute 'drop policy if exists "Users can update own avatars" on storage.objects';
+  execute 'drop policy if exists "Users can delete own avatars" on storage.objects';
+end $$;
+
+-- 👤 Autoriser les utilisateurs connectés à uploader dans le bucket avatars
+create policy "Users can upload avatars"
+on storage.objects for insert
+to authenticated
+with check (bucket_id = 'avatars' and owner = auth.uid());
+
+-- 👀 Autoriser la lecture publique (si le bucket est public)
+create policy "Public can view avatars"
+on storage.objects for select
+using (bucket_id = 'avatars');
+
+-- ✏️ Autoriser les utilisateurs à mettre à jour leur propre avatar
+create policy "Users can update own avatars"
+on storage.objects for update
+to authenticated
+using (bucket_id = 'avatars' and owner = auth.uid());
+
+-- 🗑 Autoriser les utilisateurs à supprimer leur propre avatar
+create policy "Users can delete own avatars"
+on storage.objects for delete
+to authenticated
+using (bucket_id = 'avatars' and owner = auth.uid());
 
