@@ -741,3 +741,128 @@ on storage.objects for delete
 to authenticated
 using (bucket_id = 'avatars' and owner = auth.uid());
 
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS phone text,
+ADD COLUMN IF NOT EXISTS address text,
+ADD COLUMN IF NOT EXISTS country text,
+ADD COLUMN IF NOT EXISTS birthdate date,
+ADD COLUMN IF NOT EXISTS gender text CHECK (gender IN ('male','female','other'));
+
+
+-- ============================================================
+-- 🧠 Ajout du champ ui_preferences à la table profiles
+-- ============================================================
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS ui_preferences jsonb DEFAULT '{}'::jsonb;
+
+COMMENT ON COLUMN public.profiles.ui_preferences IS
+  'Stocke les préférences d’interface utilisateur (ex: sections ouvertes du profil, thème, etc.) au format JSON.';
+
+-- ============================================================
+-- 🔒 Mise à jour des politiques RLS (Row Level Security)
+-- ============================================================
+
+-- Supprime l’ancienne policy si elle existe
+DROP POLICY IF EXISTS "Update own profile" ON public.profiles;
+
+-- ✅ Politique permettant à chaque utilisateur de modifier uniquement son propre profil
+CREATE POLICY "Update own profile"
+  ON public.profiles
+  FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+-- ✅ Politique de lecture personnelle (utile si tu veux fetch depuis le client)
+DROP POLICY IF EXISTS "Select own profile" ON public.profiles;
+CREATE POLICY "Select own profile"
+  ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+-- Active RLS si ce n’est pas déjà fait
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================
+-- 🧹 Vérification du champ et valeur par défaut
+-- ============================================================
+
+-- Initialise les préférences vides pour les profils existants (évite les erreurs de parsing)
+UPDATE public.profiles
+SET ui_preferences = '{}'::jsonb
+WHERE ui_preferences IS NULL;
+
+-- Index optionnel (si tu veux faire des requêtes JSON spécifiques)
+-- CREATE INDEX IF NOT EXISTS profiles_ui_preferences_idx ON public.profiles USING gin (ui_preferences);
+-- ============================================================
+-- 🧩 EXTENSION DU PROFIL UTILISATEUR
+-- Ajout des champs nécessaires pour ton site de retail
+-- ============================================================
+
+-- ✅ 1. Ajout des colonnes manquantes
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS full_name text,
+  ADD COLUMN IF NOT EXISTS phone text,
+  ADD COLUMN IF NOT EXISTS address text,
+  ADD COLUMN IF NOT EXISTS avatar_url text,
+  ADD COLUMN IF NOT EXISTS ui_preferences jsonb DEFAULT '{}'::jsonb;
+
+-- ✅ 2. Documentation des nouvelles colonnes
+COMMENT ON COLUMN public.profiles.full_name IS
+  'Nom complet de l’utilisateur (affiché dans le profil).';
+
+COMMENT ON COLUMN public.profiles.phone IS
+  'Numéro de téléphone de contact.';
+
+COMMENT ON COLUMN public.profiles.address IS
+  'Adresse principale de livraison ou de facturation.';
+
+COMMENT ON COLUMN public.profiles.avatar_url IS
+  'Chemin relatif du fichier avatar dans le bucket Supabase (ex: avatars/uuid-timestamp.png).';
+
+COMMENT ON COLUMN public.profiles.ui_preferences IS
+  'Stocke les préférences d’interface utilisateur au format JSON (ex: sections du profil, thème, etc.).';
+
+-- ✅ 3. Initialisation pour les anciens utilisateurs
+UPDATE public.profiles
+SET ui_preferences = '{}'::jsonb
+WHERE ui_preferences IS NULL;
+
+-- ============================================================
+-- 🔒 4. Politiques RLS (sécurité par utilisateur)
+-- ============================================================
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Supprime les anciennes policies pour éviter les doublons
+DROP POLICY IF EXISTS "Select own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Update own profile" ON public.profiles;
+
+-- Lecture sécurisée
+CREATE POLICY "Select own profile"
+  ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+-- Mise à jour sécurisée
+CREATE POLICY "Update own profile"
+  ON public.profiles
+  FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, phone, address, avatar_url, ui_preferences)
+  VALUES (new.id, '', '', '', NULL, '{}'::jsonb);
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

@@ -296,34 +296,52 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
+          birthdate: string | null
           cgu_accepted: boolean | null
           cgu_accepted_at: string | null
+          country: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
+          gender: string | null
           id: string
+          phone: string | null
           role: string | null
+          ui_preferences: Json | null
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
+          birthdate?: string | null
           cgu_accepted?: boolean | null
           cgu_accepted_at?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
+          phone?: string | null
           role?: string | null
+          ui_preferences?: Json | null
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
+          birthdate?: string | null
           cgu_accepted?: boolean | null
           cgu_accepted_at?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
+          phone?: string | null
           role?: string | null
+          ui_preferences?: Json | null
         }
         Relationships: []
       }

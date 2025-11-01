@@ -81,7 +81,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/profil',
     name: 'profil',
-    component: () => import('@/pages/ProfilView.vue'),
+    component: () => import('@/features/profile/ProfilView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Mon profil – Fast Peptides',

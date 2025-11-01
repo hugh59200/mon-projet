@@ -72,6 +72,9 @@
     }
 
     &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px; /* <== espace uniforme entre inputs et boutons */
       padding: 12px;
       border-top: 1px solid fade(@neutral-200, 50%);
     }
