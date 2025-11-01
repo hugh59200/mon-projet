@@ -54,7 +54,7 @@ export const vResponsiveAnimate = {
                 : 'fade')
 
     // ⚙️ Fonctions d’animation basées sur le style
-    const animateStyle = (element: HTMLElement, type: 'in' | 'out' = 'in') => {
+    const animateStyle = (element: HTMLElement, _type: 'in' | 'out' = 'in') => {
       element.style.setProperty('--responsive-speed', `${speed}ms`)
 
       switch (style) {

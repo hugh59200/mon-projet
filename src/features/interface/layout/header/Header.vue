@@ -5,17 +5,15 @@
   >
     <!-- 🧭 Gauche -->
     <div class="auth-navbar__left">
-      <button
-        class="burger-btn"
+      <BasicButton
         @click="toggleMobileMenu"
         aria-label="Ouvrir le menu"
-      >
-        <BasicIconNext
-          :name="isMenuOpen ? 'X' : 'Menu'"
-          :size="22"
-        />
-      </button>
-
+        :icon-name="isMenuOpen ? 'X' : 'Menu'"
+        size="small"
+        type="reverse"
+        variant="ghost"
+        class="burder"
+      />
       <div
         class="logo"
         @click="router.push('/')"
@@ -64,84 +62,7 @@
     </div>
 
     <!-- 📱 Drawer mobile -->
-    <transition name="slide-left">
-      <div
-        v-if="isMenuOpen"
-        class="mobile-overlay"
-        @click.self="closeMenu"
-      >
-        <aside
-          class="mobile-drawer"
-          v-click-outside="{ callback: closeMenu }"
-          v-responsive-animate.slide.stagger.once="{ delay: 70 }"
-        >
-          <div class="drawer-header">
-            <img
-              src="@/assets/logo-app.png"
-              class="drawer-logo"
-              alt="logo"
-            />
-            <BasicText
-              weight="bold"
-              color="white"
-            >
-              Menu
-            </BasicText>
-          </div>
-
-          <!-- ✅ Navigation principale -->
-          <div
-            class="drawer-links"
-            v-responsive-animate.slide.stagger.once="{ delay: 50 }"
-          >
-            <MainNavLinks
-              direction="column"
-              @navigate="closeMenu"
-            />
-          </div>
-
-          <div class="drawer-divider"></div>
-
-          <!-- 👤 Profil -->
-          <template v-if="auth.user">
-            <div
-              class="drawer-links"
-              v-responsive-animate.slide.stagger.once="{ delay: 80 }"
-            >
-              <button
-                class="drawer-link"
-                @click="goTo('/profil')"
-              >
-                Mon profil
-              </button>
-            </div>
-          </template>
-
-          <!-- 🔐 Auth (non connecté) -->
-          <template v-else>
-            <div
-              class="drawer-auth"
-              v-responsive-animate.slide.stagger.once="{ delay: 100 }"
-            >
-              <BasicButton
-                label="Connexion"
-                type="primary"
-                full
-                size="small"
-                @click="goTo('/auth/login')"
-              />
-              <BasicButton
-                label="Inscription"
-                type="reverse"
-                full
-                size="small"
-                @click="goTo('/auth/register')"
-              />
-            </div>
-          </template>
-        </aside>
-      </div>
-    </transition>
+    <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
 
@@ -155,6 +76,7 @@
   import { onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
+  import MobileDrawer from './MobileDrawer.vue'
 
   defineOptions({
     directives: {
@@ -198,7 +120,21 @@
     &__left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 16px;
+
+      .btn {
+        gap: 6px;
+
+        &:hover {
+          background: fade(white, 10%);
+          color: @white;
+        }
+
+        &.is-active {
+          background: fade(@primary-500, 25%);
+          color: @white;
+        }
+      }
     }
 
     &__center {

@@ -1,6 +1,5 @@
 <template>
   <div class="app-layout">
-    <!-- ✨ HEADER avec glassmorphism et animations directives -->
     <header
       class="header"
       v-responsive-animate.fade.once="{ speed: 600 }"
@@ -17,8 +16,6 @@
         <HeaderApp />
       </div>
     </header>
-
-    <!-- 🌍 CONTENU PRINCIPAL -->
     <main
       class="content"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"
@@ -29,12 +26,9 @@
           mode="out-in"
           appear
         >
-          <keep-alive include="Actualites">
-            <component :is="Component" />
-          </keep-alive>
+          <component :is="Component" />
         </transition>
       </RouterView>
-
       <transition
         name="fade"
         appear
@@ -42,8 +36,6 @@
         <SablierComponent v-if="sablier.estSablierVisible" />
       </transition>
     </main>
-
-    <!-- 🦶 FOOTER -->
     <footer
       class="footer"
       v-responsive-animate.slide.once="{ speed: 700 }"
@@ -51,7 +43,6 @@
       <FooterApp />
     </footer>
 
-    <!-- Enregistrement global -->
     <AppRegisterGlobals />
   </div>
 </template>
@@ -111,9 +102,6 @@
 <style scoped lang="less">
   @import '/src/assets/Mont/Mont.less';
 
-  /* ============================
-   🧩 STRUCTURE
-============================ */
   .app-layout {
     display: flex;
     flex-direction: column;
@@ -123,9 +111,6 @@
     overflow-y: auto;
   }
 
-  /* ============================
-   🧭 HEADER GLASSMORPHISM
-============================ */
   .header {
     position: sticky;
     top: 0;
@@ -162,9 +147,6 @@
     opacity: 1;
   }
 
-  /* ============================
-   📄 CONTENU
-============================ */
   .content {
     min-width: 250px;
     flex: 1;
@@ -180,9 +162,6 @@
     }
   }
 
-  /* ============================
-   🦶 FOOTER
-============================ */
   .footer {
     z-index: 950;
     background: fade(@neutral-100, 60%);
@@ -190,9 +169,6 @@
     box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
   }
 
-  /* ============================
-   ✨ TRANSITIONS
-============================ */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
     transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
@@ -214,9 +190,6 @@
     opacity: 0;
   }
 
-  /* ============================
-   🧠 SCROLLBAR CUSTOM
-============================ */
   .app-layout::-webkit-scrollbar {
     width: 8px;
   }

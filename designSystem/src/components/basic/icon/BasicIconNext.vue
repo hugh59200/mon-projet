@@ -9,6 +9,7 @@
         'basic-icon-next--pointer': pointer,
         'basic-icon-next--not-allowed': disabled && !pointer,
         'basic-icon-next--disabled': disabled,
+        'basic-icon-next--active': active,
       },
     ]"
   />
@@ -27,6 +28,7 @@
     strokeWidth?: number
     pointer?: boolean
     disabled?: boolean
+    active?: boolean
   }
 
   const props = withDefaults(defineProps<IconNextProps>(), {
@@ -35,21 +37,24 @@
     strokeWidth: 1.5,
     pointer: false,
     disabled: false,
+    active: false,
   })
 
-  // ✅ Sélection dynamique du composant icône
+  // ✅ Sélection dynamique de l’icône Lucide
   const iconComponent = computed(() => {
     return (LucideIcons[props.name] as Component) || LucideIcons.HelpCircle
   })
 
-  // ✅ Props passées à Lucide
+  // ✅ Props : toujours "outline", jamais rempli
   const computedProps = computed(() => ({
     size: props.size,
     color: props.color.startsWith('#') ? props.color : 'currentColor',
     'stroke-width': props.strokeWidth,
+    stroke: props.color,
+    // fill: 'none', // ❌ jamais rempli
   }))
 
-  // ✅ Classe dynamique pour les tokens type "primary-600"
+  // ✅ Classe dynamique pour tokens (primary-600, etc.)
   const colorClass = computed(() => {
     if (!props.color) return null
     const isDesignToken = /^[a-zA-Z]+-\d{2,4}$/.test(props.color)
@@ -68,12 +73,9 @@
     transition:
       opacity 0.3s ease,
       transform 0.3s ease,
+      stroke 0.25s ease,
       color 0.25s ease;
-
-    svg {
-      display: block;
-      stroke: currentColor; /* ✅ toutes les couleurs passent par currentColor */
-    }
+    fill: transparent !important;
 
     &--pointer {
       cursor: pointer;
@@ -88,13 +90,15 @@
       pointer-events: none;
     }
 
+    &--active {
+      stroke-width: 1.8;
+    }
+
     &:focus {
       outline: none;
       box-shadow: @focus-global;
     }
   }
-
-  /* === COULEURS === */
 
   /* Basics */
   .basic-icon-next--color--white {

@@ -7,15 +7,19 @@
       v-for="item in sidebarItems"
       :key="item.path"
       :to="item.path"
-      class="main-nav__link"
+      class="main-nav__item"
       active-class="active"
       @click="$emit('navigate')"
     >
-      <BasicIconNext
-        :name="item.icon"
-        :size="18"
+      <BasicButton
+        :label="item.label"
+        :iconName="item.icon"
+        type="reverse"
+        variant="ghost"
+        size="small"
+        :class="['main-nav__btn']"
+        :active="$route.path === item.path"
       />
-      <span>{{ item.label }}</span>
     </RouterLink>
   </nav>
 </template>
@@ -25,16 +29,16 @@
   import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
 
+  const { sidebarItems } = storeToRefs(useSidebarStore())
+
   const props = defineProps({
     direction: {
       type: String,
-      default: 'row', // 'row' (desktop) ou 'column' (mobile drawer)
+      default: 'row',
     },
   })
 
   defineEmits(['navigate'])
-
-  const { sidebarItems } = storeToRefs(useSidebarStore())
 
   const directionClass = computed(() =>
     props.direction === 'column' ? 'main-nav--vertical' : 'main-nav--horizontal',
@@ -47,62 +51,45 @@
     align-items: center;
     gap: 26px;
 
-    &__link {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: fade(white, 80%);
-      font-weight: 500;
+    &__item {
       text-decoration: none;
-      transition: all 0.25s ease;
-      padding: 6px 8px;
-      border-radius: 6px;
-      cursor: pointer;
+    }
+
+    &__btn {
+      gap: 6px;
+      padding: 6px 10px;
 
       &:hover {
-        color: white;
         background: fade(white, 10%);
-      }
-
-      &.active {
         color: white;
-        background: fade(@primary-500, 25%);
-        box-shadow: 0 0 0 1px fade(@primary-500, 25%);
       }
 
-      svg {
-        width: 18px;
-        height: 18px;
+      &.is-active {
+        background: fade(@primary-500, 25%);
+        color: white;
       }
     }
   }
 
-  /* --- MODE HORIZONTAL (desktop) --- */
   .main-nav--horizontal {
     flex-direction: row;
     justify-content: center;
   }
 
-  /* --- MODE VERTICAL (drawer mobile) --- */
+  /* --- VERTICAL (drawer mobile) --- */
   .main-nav--vertical {
     margin-top: 15px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 14px;
 
-    .main-nav__link {
-      width: 60%;
+    .main-nav__btn {
+      width: 200px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 8px;
+      border-radius: 14px;
       padding: 10px 12px;
-      font-size: 16px;
-
-      &:hover {
-        background: fade(white, 8%);
-      }
-
-      &.active {
-        background: fade(@primary-500, 25%);
-        box-shadow: none;
-      }
     }
   }
 </style>
