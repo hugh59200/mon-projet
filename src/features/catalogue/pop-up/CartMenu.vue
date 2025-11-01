@@ -7,22 +7,20 @@
     <div
       class="cart-icon"
       ref="cartIcon"
-      @click="router.push('/panier')"
     >
       <BasicIconNext
         class="shopping-icon"
         name="ShoppingCart"
         :size="26"
-        v-feedback-animate.glow="{ color: '#fff', duration: 800 }"
       />
-
-      <div
-        class="cart-badge"
-        v-feedback-animate.pulse="{ color: '#ff4d4f', scale: 1.3, duration: 900 }"
-      >
-        {{ cart.totalItems }}
+      <div class="cart-badge">
+        <BasicText
+          size="body-s"
+          weight="bold"
+        >
+          {{ cart.totalItems }}
+        </BasicText>
       </div>
-
       <CartItemPopup
         v-if="showCartPopup && lastAddedProduct"
         :product="lastAddedProduct"
@@ -115,25 +113,24 @@
     color: white;
     transition: transform 0.25s ease;
     user-select: none;
-    &:hover {
-      transform: scale(1.12);
-    }
+    margin-bottom: -5px;
 
     .cart-badge {
       position: absolute;
-      top: -7px;
-      right: -8px;
+      top: -9px;
+      right: -2px;
       background: @danger-500;
       color: white;
       border-radius: 50%;
-      height: 16px;
-      width: 16px;
+      height: 14px;
+      width: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
-      font-weight: bold;
       box-shadow: 0 0 0 2px @neutral-900;
+      &:hover {
+        transform: scale(1.12);
+      }
     }
   }
 

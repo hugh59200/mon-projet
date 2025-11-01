@@ -119,7 +119,6 @@
 
     &:hover {
       background: fade(white, 10%);
-      transform: scale(1.1);
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
     }
 

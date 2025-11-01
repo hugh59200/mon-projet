@@ -181,95 +181,6 @@
     }
   }
 
-  /* --- Overlay --- */
-  .mobile-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    z-index: 2000;
-    display: flex;
-    justify-content: flex-start;
-  }
-
-  /* --- Drawer --- */
-  .mobile-drawer {
-    width: 270px;
-    height: 100vh;
-    background: fade(@neutral-800, 96%);
-    color: white;
-    box-shadow:
-      2px 0 25px rgba(0, 0, 0, 0.45),
-      inset -2px 0 8px rgba(255, 255, 255, 0.05);
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden; /* ✅ Empêche le débordement */
-    scrollbar-width: thin;
-    scrollbar-color: fade(white, 25%) transparent;
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: -1px;
-      width: 6px;
-      height: 100%;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0.08), transparent);
-      border-radius: 0 12px 12px 0;
-    }
-
-    .drawer-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-      .drawer-logo {
-        width: 28px;
-        height: 28px;
-      }
-    }
-
-    .drawer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .drawer-divider {
-      height: 1px;
-      background: fade(white, 12%);
-      margin: 12px 0;
-      width: 100%;
-    }
-
-    .drawer-link {
-      background: none;
-      border: none;
-      color: white;
-      text-align: left;
-      padding: 8px 0;
-      font-size: 16px;
-      cursor: pointer;
-      transition: color 0.25s ease;
-      &:hover {
-        color: @primary-400;
-      }
-    }
-
-    .drawer-auth {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: auto;
-    }
-  }
-
   /* --- Animation slide --- */
   .slide-left-enter-active,
   .slide-left-leave-active {
@@ -306,7 +217,7 @@
       }
 
       &__right {
-        gap: 16px;
+        gap: 20px;
       }
     }
   }
