@@ -3,22 +3,26 @@ import { supabase } from '@/supabase/supabaseClient'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { chatApi } from '../services/chatApi'
 import { useChatNotifStore } from '../stores/useChatNotifStore'
+import { useChatWidgetStore } from '../stores/useChatWidgetStore'
 import type { ChatRole, Message } from '../types/chat'
 
 export function useUserChat() {
+  /* ------------------------------ Stores ------------------------------ */
   const auth = useAuthStore()
-  const userId = computed(() => auth.user?.id ?? null)
-  const role: ChatRole = 'user'
-
   const notif = useChatNotifStore()
+  const chatWidget = useChatWidgetStore()
 
   /* ------------------------------ State ------------------------------ */
+  const userId = computed(() => auth.user?.id ?? null)
+  const role: ChatRole = 'user'
+  const isChatOpen = ref(false)
   const messages = ref<Message[]>([])
   const newMessage = ref('')
   const isTyping = ref(false)
   const isReady = ref(false)
   const errorMessage = ref<string | null>(null)
 
+  /* ------------------------------ Internals ------------------------------ */
   let msgChannel: ReturnType<typeof supabase.channel> | null = null
   let typingChannel: ReturnType<typeof supabase.channel> | null = null
   let typingTimer: ReturnType<typeof setTimeout> | null = null
@@ -103,7 +107,6 @@ export function useUserChat() {
     if (messages.value.some((m) => m.sender_role === 'admin' && !m.is_read)) {
       const lastAdminMsg = messages.value.filter((m) => m.sender_role === 'admin').at(-1)
       await notif.markAsRead(userId.value, lastAdminMsg?.id)
-      // ✅ met à jour l’état local pour affichage immédiat
       messages.value.forEach((m) => {
         if (m.sender_role === 'admin') m.is_read = true
       })
@@ -123,17 +126,27 @@ export function useUserChat() {
           const msg = payload.new as Message
           const idx = messages.value.findIndex((m) => m.id === msg.id)
 
+          // ➕ Nouveau message reçu
           if (payload.eventType === 'INSERT' && idx === -1) {
             messages.value.push(reactive(msg))
             await nextTick()
             scrollToEnd()
 
+            // 👂 Si message vient de l’admin
             if (msg.sender_role === 'admin') {
-              await notif.markAsRead(userId.value, msg.id)
-              msg.is_read = true
+              if (isChatOpen.value) {
+                // ✅ Chat ouvert → on marque lu direct
+                await notif.markAsRead(userId.value, msg.id)
+                msg.is_read = true
+                chatWidget.resetUnread()
+              } else {
+                // 🚨 Chat fermé → incrémente le badge rouge local
+                chatWidget.incrementUnread()
+              }
             }
           }
 
+          // 🔁 Mise à jour message
           if (payload.eventType === 'UPDATE' && idx !== -1) {
             Object.assign(messages.value[idx] ?? {}, msg)
           }
@@ -178,6 +191,7 @@ export function useUserChat() {
     clearTimeout(typingTimer!)
   })
 
+  /* ------------------------------ Watchers ------------------------------ */
   watch(
     () => messages.value.length,
     async () => {
@@ -186,6 +200,7 @@ export function useUserChat() {
     },
   )
 
+  /* ------------------------------ Return ------------------------------ */
   return {
     messages,
     newMessage,
@@ -195,5 +210,6 @@ export function useUserChat() {
     sendMessage,
     sendTyping,
     initChat,
+    isChatOpen,
   }
 }

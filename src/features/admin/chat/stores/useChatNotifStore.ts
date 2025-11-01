@@ -1,32 +1,22 @@
 import { supabase } from '@/supabase/supabaseClient'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useUserChat } from '../composables/useUserChat'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
 
 export const useChatNotifStore = defineStore('chatNotif', () => {
-  /** 🧭 Rôle courant : 'admin' ou 'user' */
   const role = ref<ChatRole>('admin')
-
-  /** 🔢 Total global des non-lus */
   const unreadCount = ref<number>(0)
-
-  /** 🗺️ Détail des non-lus par utilisateur */
   const unreadByUser = ref<Record<string, number>>({})
-
-  /** 🧭 Dernier message lu par utilisateur */
   const lastReadByUser = ref<Record<string, number | null>>({})
+  let isRealtimeListening = false
 
-  /* ============================================================
-   * 🔧 Changement de rôle (utile pour débogage ou multi-rôle)
-   * ============================================================ */
   const setRole = (newRole: ChatRole) => {
     role.value = newRole
   }
 
-  /* ============================================================
-   * 🔄 Charge la vue SQL messages_unread_view
-   * ============================================================ */
+  /* --------------------- 🔄 Récupération DB --------------------- */
   const fetchUnreadByUser = async () => {
     const { data, error } = await supabase.from('messages_unread_view').select('*')
     if (error) {
@@ -44,57 +34,73 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     unreadCount.value = Object.values(map).reduce((a, b) => a + b, 0)
   }
 
-  /* ============================================================
-   * 🧠 Marque une conversation comme lue
-   * ============================================================ */
+  /* --------------------- ✅ Marquer comme lu --------------------- */
   const markAsRead = async (userId: string, lastMessageId?: number) => {
     if (!userId) return
+
     const senderRoleToMark = role.value === 'admin' ? 'user' : 'admin'
 
-    // ✅ Mise à jour locale immédiate
     unreadByUser.value[userId] = 0
-    unreadByUser.value = { ...unreadByUser.value } // force reactivité
+    unreadByUser.value = { ...unreadByUser.value }
     unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
 
-    // 🔄 maj distante (DB)
-    await chatApi.markMessagesAsRead(userId, senderRoleToMark)
-    await chatApi.markConversationRead(userId, lastMessageId)
+    if (role.value === 'user') {
+      unreadByUser.value = {}
+      unreadCount.value = 0
+    }
 
-    // 🔁 Optionnel : re-sync complet
-    await fetchUnreadByUser()
+    await Promise.all([
+      chatApi.markMessagesAsRead(userId, senderRoleToMark),
+      chatApi.markConversationRead(userId, lastMessageId),
+    ])
+
+    if (role.value === 'admin') {
+      await fetchUnreadByUser()
+    }
   }
 
-  /* ============================================================
-   * 🔔 Realtime : nouveau message = incrément compteur
-   * ============================================================ */
+  /* --------------------- 🔔 Realtime listener --------------------- */
   const listenRealtime = () => {
+    if (isRealtimeListening) return
+    isRealtimeListening = true
+
+    const { isChatOpen } = useUserChat()
+
     supabase
       .channel('messages-realtime')
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        },
-        (payload) => {
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        async (payload) => {
           const msg = payload.new as Message
           if (!msg.user_id || msg.is_read) return
 
-          // Filtrage selon le rôle
+          // ⚙️ On compte uniquement les messages "pertinents"
           const shouldCount =
             (role.value === 'admin' && msg.sender_role === 'user') ||
             (role.value === 'user' && msg.sender_role === 'admin')
 
           if (!shouldCount) return
 
-          unreadByUser.value[msg.user_id] = (unreadByUser.value[msg.user_id] || 0) + 1
-          unreadByUser.value = { ...unreadByUser.value } // ⚡️ force le refresh visuel
+          // 🚨 Si le chat est ouvert → marquer direct comme lu
+          if (isChatOpen.value) {
+            await chatApi.markMessagesAsRead(msg.user_id, role.value === 'admin' ? 'user' : 'admin')
+            return
+          }
 
+          // ✅ Sinon, on incrémente le compteur
+          unreadByUser.value[msg.user_id] = (unreadByUser.value[msg.user_id] || 0) + 1
+          unreadByUser.value = { ...unreadByUser.value }
           unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
         },
       )
       .subscribe()
+  }
+
+  const resetUnread = () => {
+    unreadCount.value = 0
+    unreadByUser.value = {}
+    lastReadByUser.value = {}
   }
 
   return {
@@ -106,5 +112,6 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     fetchUnreadByUser,
     markAsRead,
     listenRealtime,
+    resetUnread,
   }
 })

@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useChatNotifStore } from '@/features/admin/chat/stores/useChatNotifStore'
   import type { ConversationOverview } from '@/features/admin/chat/types/chat'
   import { computed, ref } from 'vue'
   import ConversationItem from './ConversationItem.vue'
@@ -74,18 +75,28 @@
   const props = defineProps<{
     conversations: ConversationOverview[]
     selectedId?: string | null
-    isTypingByUser?: Record<string, boolean> // ✅ ajouté
+    isTypingByUser?: Record<string, boolean>
   }>()
 
   defineEmits<{ (e: 'select', userId: string): void }>()
 
+  const notifStore = useChatNotifStore()
   const searchQuery = ref('')
+
   const filteredConversations = computed(() => {
     const q = searchQuery.value.trim().toLowerCase()
-    if (!q) return props.conversations
-    return props.conversations.filter(
-      (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
-    )
+    const base = q
+      ? props.conversations.filter(
+          (c) =>
+            c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
+        )
+      : props.conversations
+
+    // 🧠 Injection du compteur live venant du store
+    return base.map((conv) => ({
+      ...conv,
+      unread_count: notifStore.unreadByUser[conv.user_id] || 0,
+    }))
   })
 </script>
 
