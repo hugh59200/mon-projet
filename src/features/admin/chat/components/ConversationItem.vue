@@ -14,7 +14,6 @@
       </div>
 
       <div class="conversation-footer">
-        <!-- ✅ Bloc stable : affiche soit le message, soit l’indicateur -->
         <div class="preview-wrapper">
           <small
             class="preview"
@@ -40,7 +39,6 @@
           >
             {{ formattedTime }}
           </span>
-
           <div
             v-if="conversation.unread_count"
             class="badge"
@@ -54,20 +52,20 @@
 </template>
 
 <script setup lang="ts">
-  import type { ConversationOverview } from '@/features/support/types/chat'
+  import type { ConversationOverview } from '@/features/admin/chat/types/chat'
   import { computed } from 'vue'
-  import { useAdminChat } from '../composables/useAdminChat'
 
   const props = defineProps<{
     conversation: ConversationOverview
     active?: boolean
+    isTypingByUser?: Record<string, boolean> // ✅ ajouté
   }>()
 
-  const { isTyping } = useAdminChat()
+  defineEmits<{ (e: 'select', userId: string): void }>()
 
-  const emit = defineEmits<{
-    (e: 'select', userId: string): void
-  }>()
+  const isTyping = computed(() => {
+    return !!props.isTypingByUser?.[props.conversation.user_id]
+  })
 
   const formattedTime = computed(() => {
     const date = props.conversation.last_message_at

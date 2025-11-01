@@ -14,10 +14,10 @@
         color="white"
       />
       <div
-        v-if="unreadCount > 0"
+        v-if="chatNotif.unreadCount > 0"
         class="chat-badge"
       >
-        {{ unreadCount }}
+        {{ chatNotif.unreadCount }}
       </div>
     </button>
 
@@ -48,7 +48,9 @@
           </button>
         </header>
 
+        <!-- 💭 Chat principal -->
         <ChatCore
+          v-if="userId"
           v-model:new-message="newMessage"
           :messages="messages"
           :is-typing="isTyping"
@@ -64,44 +66,69 @@
 </template>
 
 <script setup lang="ts">
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { onMounted, onUnmounted, ref, watch } from 'vue'
   import ChatCore from './components/ChatCore.vue'
   import { useUserChat } from './composables/useUserChat'
+  import { useChatNotifStore } from './stores/useChatNotifStore'
+  import { useChatWidgetStore } from './stores/useChatWidgetStore'
 
-  const { messages, newMessage, isTyping, sendMessage, sendTyping, isReady } = useUserChat()
+  /* ------------------------- Stores ------------------------- */
+  const chatNotif = useChatNotifStore()
+  const chatStore = useChatWidgetStore()
 
+  /* ------------------------- State ------------------------- */
   const isOpen = ref(false)
-  const unreadCount = ref(0)
-  let hideBadgeTimer: ReturnType<typeof setTimeout> | null = null
+  const userId = ref<string | null>(null)
 
-  const toggleChat = () => {
+  /* ✅ Composable appelé directement, sans attendre */
+  /* 🚀 Initialise plus tard, quand on a l’ID */
+  const chat = useUserChat()
+
+  const { messages, newMessage, isTyping, isReady, sendMessage, sendTyping, initChat } = chat
+
+  /* ------------------------- Lifecycle ------------------------- */
+  onMounted(async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    userId.value = user?.id ?? null
+    console.log(user?.app_metadata)
+
+    await initChat() // ✅ Initialisation différée
+
+    chatNotif.setRole('user')
+    chatNotif.listenRealtime()
+    chatNotif.fetchUnreadByUser()
+  })
+
+  /* ------------------------- Toggle Chat ------------------------- */
+  const toggleChat = async () => {
     isOpen.value = !isOpen.value
+
     if (isOpen.value) {
-      unreadCount.value = 0
-      clearTimeout(hideBadgeTimer!)
-    }
-  }
-
-  watch(
-    () => messages.value.length,
-    async (newLen, oldLen) => {
-      if (newLen <= oldLen) return
-      await nextTick()
-      const lastMsg = messages.value[0]
-      const fromAdmin = lastMsg?.sender_role === 'admin'
-      if (!isOpen.value && fromAdmin) {
-        unreadCount.value++
+      chatStore.resetUnread()
+      const { data } = await supabase.auth.getUser()
+      const uid = data.user?.id
+      if (uid) {
+        const lastMsg = messages.value.at(-1)
+        if (lastMsg) {
+          await chatNotif.markAsRead(uid, lastMsg.id)
+        }
       }
-    },
-  )
-
-  const handleClickAnywhere = () => {
-    if (unreadCount.value > 0) {
-      unreadCount.value = 0
     }
   }
 
-  onMounted(() => document.addEventListener('click', handleClickAnywhere))
+  /* ------------------------- Sync Store ------------------------- */
+  watch(
+    () => chatStore.isOpen,
+    (val) => (isOpen.value = val),
+  )
+  watch(isOpen, (val) => (chatStore.isOpen = val))
+
+  /* ------------------------- Global click reset ------------------------- */
+  const handleClickAnywhere = () => chatStore.resetUnread()
+  document.addEventListener('click', handleClickAnywhere)
   onUnmounted(() => document.removeEventListener('click', handleClickAnywhere))
 </script>
 
@@ -114,7 +141,7 @@
 
     .chat-toggle {
       position: relative;
-      background: @primary-600; /* turquoise */
+      background: @primary-600;
       color: white;
       border: none;
       border-radius: 50%;
@@ -130,22 +157,15 @@
         background 0.3s ease,
         box-shadow 0.3s ease;
 
-      /* ✅ Rendre l’icône bien visible */
-      .basic-icon-next {
-        color: white !important;
-        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
-      }
-
       &:hover {
         transform: scale(1.05);
         background: @primary-700;
-        box-shadow: 0 6px 14px fade(black, 25%);
       }
 
       .chat-badge {
         position: absolute;
         top: -4px;
-        right: 0px;
+        right: 0;
         background: @danger-600;
         color: white;
         border-radius: 999px;
@@ -180,25 +200,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-
-      .chat-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        font-size: 15px;
-      }
-
-      .close-btn {
-        background: transparent;
-        border: none;
-        color: white;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
     }
 
     /* ✨ Animation ouverture/fermeture */

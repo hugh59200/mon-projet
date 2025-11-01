@@ -21,7 +21,7 @@
   import CGU from '@/features/interface/cgu/CGU.vue'
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
-  import ChatWidget from '@/features/support/ChatWidget.vue'
+  import ChatWidget from '@/features/admin/chat/ChatWidget.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
 
   /* -------------------------------------------------------------------------- */

@@ -36,11 +36,8 @@
         v-else
         class="chat-content"
       >
-        <transition-group
-          key="messages"
+        <div
           ref="msgList"
-          name="message-fade"
-          tag="div"
           class="chat-messages"
           aria-live="polite"
           @scroll="onScroll"
@@ -53,7 +50,7 @@
             :isMine="msg.sender_role === currentRole"
             :isGrouped="isGroupedMessage(i)"
           />
-        </transition-group>
+        </div>
         <ChatTypingIndicator :isTyping="localIsTyping" />
       </div>
     </transition>
@@ -63,11 +60,12 @@
       <button
         v-if="showNewMessagesBtn"
         class="new-messages-btn"
-        @click="scrollToBottom"
+        @click="scrollToBottomSmooth"
       >
         Nouveaux messages
       </button>
     </transition>
+
     <ChatInput
       v-model="newMessage"
       :isOnline="isOnline"
@@ -84,7 +82,7 @@
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
 
-  /* 🧩 Props */
+  /* ---------------------- Props ---------------------- */
   const props = defineProps<{
     messages: Message[]
     isTyping: boolean
@@ -98,10 +96,9 @@
     minHeight?: string | number
   }>()
 
-  /* 💬 v-model pour le champ d’entrée */
   const newMessage = defineModel<string>('newMessage', { default: '' })
 
-  /* 🧠 Typing plus naturel */
+  /* ---------------------- Typing ---------------------- */
   const localIsTyping = ref(false)
   let typingTimeout: ReturnType<typeof setTimeout> | null = null
   watch(
@@ -116,11 +113,9 @@
     },
   )
 
-  /* 🌐 Détection offline */
+  /* ---------------------- Online / Offline ---------------------- */
   const isOnline = ref(true)
-  const handleOnlineChange = () => {
-    isOnline.value = navigator.onLine
-  }
+  const handleOnlineChange = () => (isOnline.value = navigator.onLine)
   onMounted(() => {
     isOnline.value = navigator.onLine
     window.addEventListener('online', handleOnlineChange)
@@ -131,7 +126,7 @@
     window.removeEventListener('offline', handleOnlineChange)
   })
 
-  /* 🎨 Style calculé dynamiquement */
+  /* ---------------------- Style dynamique ---------------------- */
   const computedStyle = computed(() => {
     const style: Record<string, string> = {
       display: 'flex',
@@ -155,23 +150,23 @@
     return style
   })
 
-  /* ⚙️ Scroll automatique et bouton "nouveaux messages" */
+  /* ---------------------- Scroll & "nouveaux messages" ---------------------- */
   const msgList = ref<HTMLElement | null>(null)
   const showNewMessagesBtn = ref(false)
   const isNearBottom = ref(true)
   let autoHideTimer: ReturnType<typeof setTimeout> | null = null
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     const el = msgList.value
     if (!el) return
-    el.scrollTo({
-      top: el.scrollHeight,
-      behavior: 'smooth',
-    })
+    el.scrollTo({ top: el.scrollHeight, behavior })
     showNewMessagesBtn.value = false
     isNearBottom.value = true
     clearTimeout(autoHideTimer!)
   }
+
+  /* ✅ Version sans paramètre pour éviter l’erreur TS */
+  const scrollToBottomSmooth = () => scrollToBottom('smooth')
 
   const hideNewMessagesBtn = () => {
     if (showNewMessagesBtn.value) {
@@ -192,19 +187,23 @@
     }
   }
 
-  /* 🧩 Gestion auto-scroll lors de nouveaux messages */
+  /* ---------------------- Auto scroll sur nouveaux messages ---------------------- */
   watch(
     () => props.messages.length,
     async (newLen, oldLen) => {
       if (newLen <= oldLen) return
       await nextTick()
+
       const el = msgList.value
       if (!el) return
+
       const near = el.scrollHeight - el.scrollTop - el.clientHeight < 20
-      const lastMsg = props.messages[0]
+      const lastMsg = props.messages.at(-1)
       const isMine = lastMsg?.sender_role === props.currentRole
-      if (isMine || near) scrollToBottom()
-      else {
+
+      if (isMine || near) {
+        scrollToBottom('smooth')
+      } else {
         showNewMessagesBtn.value = true
         clearTimeout(autoHideTimer!)
         autoHideTimer = setTimeout(() => {
@@ -214,20 +213,17 @@
     },
   )
 
-  /* ✍️ Groupement de messages successifs du même auteur */
+  /* ---------------------- Groupement ---------------------- */
   const isGroupedMessage = (index: number) => {
     const msg = props.messages[index]
-    const prev = props.messages[index + 1]
+    const prev = props.messages[index - 1]
     return prev && prev.sender_role === msg?.sender_role
   }
 
-  /* ⌨️ Auto focus sur le champ input */
-  const inputRef = ref<HTMLInputElement | null>(null)
+  /* ---------------------- Lifecycle ---------------------- */
   onMounted(() => {
-    nextTick(() => inputRef.value?.focus())
+    nextTick(() => scrollToBottom('auto'))
   })
-
-  /* 🧹 Nettoyage */
   onUnmounted(() => {
     clearTimeout(autoHideTimer!)
     clearTimeout(typingTimeout!)
@@ -274,15 +270,15 @@
     .chat-messages {
       flex: 1;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column; /* ✅ ordre naturel */
       overflow-y: auto;
       overflow-x: hidden;
       padding: 12px;
       background: @neutral-50;
       scroll-behavior: smooth;
       min-height: 0;
-      /* ✅ On réserve un peu d’espace pour la bulle "is typing" */
-      padding-bottom: 20px;
+      gap: 6px;
+      padding-bottom: 20px; /* espace pour typing */
     }
 
     .chat-messages::-webkit-scrollbar {
@@ -346,14 +342,6 @@
     .slide-fade-leave-to {
       opacity: 0;
       transform: translateY(8px) scale(0.98);
-    }
-
-    .message-fade-enter-active {
-      transition: all 0.25s ease;
-    }
-    .message-fade-enter-from {
-      opacity: 0;
-      transform: translateY(6px);
     }
   }
 </style>

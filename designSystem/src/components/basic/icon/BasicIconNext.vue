@@ -21,10 +21,95 @@
 
   export type IconNameNext = keyof typeof LucideIcons
 
+  export type IconColor =
+    | 'white'
+    | 'black'
+    | 'neutral-50'
+    | 'neutral-100'
+    | 'neutral-200'
+    | 'neutral-300'
+    | 'neutral-400'
+    | 'neutral-500'
+    | 'neutral-600'
+    | 'neutral-700'
+    | 'neutral-800'
+    | 'neutral-900'
+    | 'primary-50'
+    | 'primary-100'
+    | 'primary-200'
+    | 'primary-300'
+    | 'primary-400'
+    | 'primary-500'
+    | 'primary-600'
+    | 'primary-700'
+    | 'primary-800'
+    | 'primary-900'
+    | 'secondary-50'
+    | 'secondary-100'
+    | 'secondary-200'
+    | 'secondary-300'
+    | 'secondary-400'
+    | 'secondary-500'
+    | 'secondary-600'
+    | 'secondary-700'
+    | 'secondary-800'
+    | 'secondary-900'
+    | 'secondary-1000'
+    | 'pink-50'
+    | 'pink-100'
+    | 'pink-200'
+    | 'pink-300'
+    | 'pink-400'
+    | 'pink-500'
+    | 'pink-600'
+    | 'pink-700'
+    | 'pink-800'
+    | 'pink-900'
+    | 'danger-50'
+    | 'danger-100'
+    | 'danger-200'
+    | 'danger-300'
+    | 'danger-400'
+    | 'danger-500'
+    | 'danger-600'
+    | 'danger-700'
+    | 'danger-800'
+    | 'danger-900'
+    | 'success-50'
+    | 'success-100'
+    | 'success-200'
+    | 'success-300'
+    | 'success-400'
+    | 'success-500'
+    | 'success-600'
+    | 'success-700'
+    | 'success-800'
+    | 'success-900'
+    | 'warning-50'
+    | 'warning-100'
+    | 'warning-200'
+    | 'warning-300'
+    | 'warning-400'
+    | 'warning-500'
+    | 'warning-600'
+    | 'warning-700'
+    | 'warning-800'
+    | 'warning-900'
+    | 'info-50'
+    | 'info-100'
+    | 'info-200'
+    | 'info-300'
+    | 'info-400'
+    | 'info-500'
+    | 'info-600'
+    | 'info-700'
+    | 'info-800'
+    | 'info-900'
+
   interface IconNextProps {
     name: IconNameNext
     size?: number
-    color?: string
+    color?: IconColor | string
     strokeWidth?: number
     pointer?: boolean
     disabled?: boolean
@@ -45,14 +130,16 @@
     return (LucideIcons[props.name] as Component) || LucideIcons.HelpCircle
   })
 
-  // ✅ Props : toujours "outline", jamais rempli
-  const computedProps = computed(() => ({
-    size: props.size,
-    color: props.color.startsWith('#') ? props.color : 'currentColor',
-    'stroke-width': props.strokeWidth,
-    stroke: props.color,
-    // fill: 'none', // ❌ jamais rempli
-  }))
+  // ✅ Props Lucide dynamiques (jamais de "fill")
+  const computedProps = computed(() => {
+    const isHex = /^#|rgb|hsl/i.test(props.color)
+    return {
+      size: props.size,
+      stroke: isHex ? props.color : 'currentColor',
+      color: isHex ? props.color : 'currentColor',
+      'stroke-width': props.strokeWidth,
+    }
+  })
 
   // ✅ Classe dynamique pour tokens (primary-600, etc.)
   const colorClass = computed(() => {

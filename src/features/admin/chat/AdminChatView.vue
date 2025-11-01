@@ -29,7 +29,7 @@
       <ChatSidebar
         :conversations="conversations"
         :selected-id="selectedUserId"
-        :is-typing="isTyping"
+        :is-typing-by-user="isTypingByUser"
         @select="selectConversation"
       />
 
@@ -38,7 +38,7 @@
         v-if="selectedUserId"
         v-model:new-message="newMessage"
         :messages="messages"
-        :is-typing="isTyping"
+        :is-typing="!!isTypingByUser[selectedUserId]"
         :loading="isMessagesLoading"
         current-role="admin"
         :send-message="sendMessage"
@@ -66,18 +66,19 @@
 </template>
 
 <script setup lang="ts">
-  import ChatCore from '@/features/support/components/ChatCore.vue'
-  import ChatSidebar from '@/features/support/components/ChatSidebar.vue'
-  import { useAdminChat } from '@/features/support/composables/useAdminChat'
-  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
+  import { useAdminChat } from '@/features/admin/chat/composables/useAdminChat'
+  import { useChatNotifStore } from '@/features/admin/chat/stores/useChatNotifStore'
   import { computed } from 'vue'
+  import ChatCore from './components/ChatCore.vue'
+  import ChatSidebar from './components/ChatSidebar.vue'
 
+  /* ✅ Instance unique du chat admin */
   const {
     conversations,
     messages,
     selectedUserId,
     newMessage,
-    isTyping,
+    isTypingByUser,
     isMessagesLoading,
     selectConversation,
     sendMessage,
@@ -103,7 +104,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      color: @neutral-800;
 
       .header-left {
         display: flex;
@@ -131,13 +131,10 @@
       border: 1px solid @neutral-200;
       align-items: stretch;
       min-height: 600px;
-      overflow: visible;
 
-      /* 📱 Responsive mobile */
       @media (max-width: 1200px) {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
-        min-height: 100vh;
       }
     }
 

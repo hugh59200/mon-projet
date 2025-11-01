@@ -119,21 +119,16 @@
           v-model="sections.preferences"
         >
           <div class="profil__preferences">
-            <label>
-              <input
-                type="checkbox"
-                v-model="newsletter"
-              />
-              Recevoir les newsletters
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                v-model="smsAlerts"
-              />
-              Recevoir les alertes SMS
-            </label>
+            <BasicCheckbox
+              v-model="newsletter"
+              label="Recevoir les newsletters"
+            />
+            <BasicCheckbox
+              v-model="smsAlerts"
+              label="Recevoir les alertes SMS"
+            />
           </div>
+
           <BasicButton
             label="Sauvegarder mes préférences"
             type="secondary"
@@ -188,7 +183,7 @@
             label="Ouvrir la messagerie"
             type="secondary"
             variant="outlined"
-            @click="$router.push('/profil/messages')"
+            @click="chatStore.openChat"
           />
         </FilterSection>
       </div>
@@ -201,12 +196,14 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
+  import { useChatWidgetStore } from '../admin/chat/stores/useChatWidgetStore'
   import { useAuthStore } from '../auth/useAuthStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
   const auth = useAuthStore()
   const toast = useToastStore()
   const sections = useProfileSectionsStore()
+  const chatStore = useChatWidgetStore()
 
   const profile = ref<any | null>(null)
   const editableName = ref('')

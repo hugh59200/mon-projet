@@ -866,3 +866,60 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+CREATE POLICY "User can mark messages as read"
+  ON public.messages FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+  CREATE OR REPLACE FUNCTION public.sync_conversation_on_read()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.is_read = true AND (OLD.is_read IS DISTINCT FROM NEW.is_read) THEN
+    UPDATE public.conversations
+    SET last_read_message_id = NEW.id,
+        last_read_at = now()
+    WHERE user_id = NEW.user_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS tr_messages_sync_conversation ON public.messages;
+CREATE TRIGGER tr_messages_sync_conversation
+AFTER UPDATE OF is_read ON public.messages
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_conversation_on_read();
+
+CREATE OR REPLACE FUNCTION public.sync_conversation_on_read()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.is_read = true AND (OLD.is_read IS DISTINCT FROM NEW.is_read) THEN
+    NEW.read_at := now(); -- 💡 ajoute ceci
+    UPDATE public.conversations
+    SET last_read_message_id = NEW.id,
+        last_read_at = NEW.read_at
+    WHERE user_id = NEW.user_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.sync_conversation_on_admin_read()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.is_read = true AND NEW.sender_role = 'user' THEN
+    UPDATE public.conversations
+    SET last_admin_message_id = NEW.id,
+        last_admin_read_at = now()
+    WHERE user_id = NEW.user_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS tr_messages_sync_conversation_admin ON public.messages;
+CREATE TRIGGER tr_messages_sync_conversation_admin
+AFTER UPDATE OF is_read ON public.messages
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_conversation_on_admin_read();

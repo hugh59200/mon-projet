@@ -1,42 +1,15 @@
 <template>
   <aside class="chat-sidebar">
-    <!-- 🧭 En-tête : profil + statut -->
+    <!-- 🧭 En-tête -->
     <div class="chat-sidebar__status">
       <div class="status-left">
         <div class="avatar">
-          <img
-            v-if="profileAvatar"
-            :src="profileAvatar"
-            alt="Avatar"
-          />
-          <div
-            v-else
-            class="avatar-placeholder"
-          >
-            <BasicIconNext name="User" />
-          </div>
+          <BasicIconNext name="User" />
         </div>
-
         <div class="user-info">
-          <span class="user-name">{{ profileName }}</span>
-          <span class="user-role">
-            <span
-              class="status-dot"
-              :class="{ online: isOnline }"
-            />
-            {{ isOnline ? 'Connecté' : 'Hors ligne' }}
-            <span class="separator">•</span>
-            {{ auth.isAdmin ? 'Admin' : 'Utilisateur' }}
-          </span>
+          <span class="user-name">Support Fast Peptides</span>
+          <span class="user-role">Connecté • Admin</span>
         </div>
-      </div>
-
-      <div
-        class="status-right"
-        v-if="unreadTotal > 0"
-      >
-        <span class="badge">{{ unreadTotal }}</span>
-        <span class="badge-label">non lus</span>
       </div>
     </div>
 
@@ -66,23 +39,17 @@
       </button>
     </div>
 
-    <!-- 💬 Liste des conversations -->
+    <!-- 💬 Liste -->
     <div class="conversation-container">
-      <transition-group
-        name="fade"
-        tag="div"
-        class="conversation-list"
-      >
-        <ConversationItem
-          v-for="(conv, i) in filteredConversations"
-          :key="conv.user_id || 'conv-' + i"
-          :conversation="conv"
-          :active="conv.user_id === selectedId"
-          @select="$emit('select', conv.user_id)"
-        />
-      </transition-group>
+      <ConversationItem
+        v-for="conv in filteredConversations"
+        :key="conv.user_id"
+        :conversation="conv"
+        :active="conv.user_id === selectedId"
+        :is-typing-by-user="isTypingByUser"
+        @select="$emit('select', conv.user_id)"
+      />
 
-      <!-- 🚫 Aucun résultat -->
       <div
         v-if="!filteredConversations.length"
         class="no-conv"
@@ -100,23 +67,18 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { useChatNotifStore } from '@/features/support/stores/useChatNotifStore'
-  import type { ConversationOverview } from '@/features/support/types/chat'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import type { ConversationOverview } from '@/features/admin/chat/types/chat'
+  import { computed, ref } from 'vue'
   import ConversationItem from './ConversationItem.vue'
 
   const props = defineProps<{
     conversations: ConversationOverview[]
     selectedId?: string | null
-    isTyping?: boolean
+    isTypingByUser?: Record<string, boolean> // ✅ ajouté
   }>()
 
-  const emit = defineEmits<{
-    (e: 'select', userId: string): void
-  }>()
+  defineEmits<{ (e: 'select', userId: string): void }>()
 
-  /* 🔍 Recherche */
   const searchQuery = ref('')
   const filteredConversations = computed(() => {
     const q = searchQuery.value.trim().toLowerCase()
@@ -125,31 +87,6 @@
       (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
     )
   })
-
-  /* 👤 Auth info */
-  const auth = useAuthStore()
-  const profileName = computed(() => {
-    return auth.profile?.full_name || auth.profile?.email || auth.user?.email || 'Admin inconnu'
-  })
-  const profileAvatar = computed(() => auth.profile?.avatar_url || null)
-
-  /* 🌐 Statut en ligne */
-  const isOnline = ref(navigator.onLine)
-  const updateOnlineStatus = () => (isOnline.value = navigator.onLine)
-  onMounted(() => {
-    window.addEventListener('online', updateOnlineStatus)
-    window.addEventListener('offline', updateOnlineStatus)
-  })
-  onUnmounted(() => {
-    window.removeEventListener('online', updateOnlineStatus)
-    window.removeEventListener('offline', updateOnlineStatus)
-  })
-
-  /* 🔔 Compteur global non lus */
-  const notifStore = useChatNotifStore()
-  const unreadTotal = computed(() =>
-    Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
-  )
 </script>
 
 <style scoped lang="less">
