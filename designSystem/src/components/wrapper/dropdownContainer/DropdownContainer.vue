@@ -87,13 +87,21 @@
   const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } =
     useDropdownMenuHandler(props.items, props.keyId, props.keyLabel, props.keyIconName, dropdownRef)
 
-  const dynamicPlaceholder = computed(() =>
-    !computedItems.value.length
-      ? 'Aucun élément disponible'
-      : props.readonly
-        ? 'Sélection impossible (Lecture seule)'
-        : props.placeholder,
-  )
+  const dynamicPlaceholder = computed(() => {
+    if (props.readonly) {
+      return 'Sélection impossible (Lecture seule)'
+    }
+
+    if (computedItems.value.length === 0) {
+      return 'Aucun élément disponible'
+    }
+
+    if (!props.selectedLabel) {
+      return props.placeholder || 'Sélectionner une option'
+    }
+
+    return props.placeholder
+  })
 
   const canClear = computed(
     () =>

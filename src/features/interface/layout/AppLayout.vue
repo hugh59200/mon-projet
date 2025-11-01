@@ -166,6 +166,7 @@
    📄 CONTENU
 ============================ */
   .content {
+    min-width: 250px;
     flex: 1;
     padding: 2.5vw 4vw;
     color: @neutral-900;

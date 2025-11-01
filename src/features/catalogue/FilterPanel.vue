@@ -46,7 +46,6 @@
         :model-value="selectedCategories"
         @update:model-value="(val) => $emit('update:selectedCategories', val)"
         :items="categoryItems"
-        placeholder="Toutes les catégories"
         searchable
         deletable
         size="small"
