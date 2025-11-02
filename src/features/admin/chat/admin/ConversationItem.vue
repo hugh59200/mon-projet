@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { ConversationOverview } from '@/features/admin/chat/types/chat'
+  import type { ConversationOverview } from '@/features/admin/chat/shared/types/chat'
   import { computed } from 'vue'
 
   const props = defineProps<{

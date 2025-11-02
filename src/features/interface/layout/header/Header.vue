@@ -92,10 +92,6 @@
 
   const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
   const closeMenu = () => (isMenuOpen.value = false)
-  const goTo = (path: string) => {
-    closeMenu()
-    router.push(path)
-  }
 
   router.afterEach(() => closeMenu())
 

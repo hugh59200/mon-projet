@@ -24,7 +24,10 @@
             v-else
             class="profil__avatar-placeholder"
           >
-            🙂
+            <BasicIconNext
+              name="User"
+              :size="42"
+            />
           </div>
           <input
             type="file"
@@ -41,8 +44,23 @@
           >
             {{ editableName || 'Mon profil' }}
           </BasicText>
-          <p class="profil__email">{{ profile?.email }}</p>
-          <p class="profil__role">{{ profile?.role }}</p>
+
+          <div class="profil__meta">
+            <BasicText
+              size="body-m"
+              color="neutral-700"
+            >
+              {{ profile?.email || 'Adresse e-mail non renseignée' }}
+            </BasicText>
+            <BasicText
+              v-if="profile?.role"
+              size="body-s"
+              color="neutral-500"
+              class="profil__role"
+            >
+              • {{ profile.role }}
+            </BasicText>
+          </div>
         </div>
       </div>
 
@@ -128,7 +146,6 @@
               label="Recevoir les alertes SMS"
             />
           </div>
-
           <BasicButton
             label="Sauvegarder mes préférences"
             type="secondary"
@@ -196,7 +213,7 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
-  import { useChatWidgetStore } from '../admin/chat/stores/useChatWidgetStore'
+  import { useChatWidgetStore } from '../admin/chat/user/useChatWidgetStore'
   import { useAuthStore } from '../auth/useAuthStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
@@ -309,12 +326,14 @@
       position: relative;
       height: 240px;
       overflow: hidden;
+
       &-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         filter: brightness(0.8);
       }
+
       &-overlay {
         position: absolute;
         inset: 0;
@@ -324,7 +343,7 @@
 
     &__container {
       max-width: 900px;
-      margin: -70px auto 60px; // chevauche légèrement la cover
+      margin: -70px auto 60px;
       background: white;
       border-radius: 20px;
       padding: 40px;
@@ -348,11 +367,38 @@
       border-radius: 50%;
       overflow: hidden;
       background: fade(@neutral-100, 60%);
-      box-shadow: 0 4px 12px fade(@neutral-900, 10%);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.35s ease;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 12px fade(@neutral-900, 10%);
+
       &:hover {
         transform: scale(1.05);
+        border-color: fade(@primary-500, 45%);
+        animation: glow-border 2.8s infinite ease-in-out;
+      }
+
+      .profil__avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: @neutral-400;
+        background: fade(@neutral-100, 60%);
+      }
+    }
+
+    /* ✨ Glow border animée */
+    @keyframes glow-border {
+      0% {
+        box-shadow: 0 0 0 fade(@primary-500, 40%);
+      }
+      50% {
+        box-shadow: 0 0 18px fade(@primary-400, 60%);
+      }
+      100% {
+        box-shadow: 0 0 0 fade(@primary-500, 40%);
       }
     }
 
@@ -369,27 +415,35 @@
       cursor: pointer;
     }
 
+    &__header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 8px; // ✅ espace correct entre email et rôle
+      flex-wrap: wrap;
+    }
+
+    &__role {
+      font-style: italic;
+    }
+
     &__sections {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
 
-    /* 🧩 Style des FilterSection → effet carte claire */
     .filter-section {
       background: fade(@neutral-100, 60%);
       border: 1px solid fade(@neutral-200, 70%);
       border-radius: 12px;
       padding: 24px;
       box-shadow: 0 4px 10px fade(@neutral-900, 5%);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* Espacement harmonieux entre inputs, labels et boutons */
-    .basic-input {
-      margin-bottom: 8px;
     }
 
     .profil__actions {
@@ -402,38 +456,12 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
     }
 
     .profil__orders {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      .order-card {
-        border: 1px solid fade(@neutral-200, 50%);
-        border-radius: 10px;
-        padding: 12px 16px;
-        background: fade(@neutral-100, 50%);
-        box-shadow: 0 2px 6px fade(@neutral-900, 5%);
-        transition: all 0.25s ease;
-        &:hover {
-          transform: translateY(-2px);
-        }
-        &__header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 6px;
-        }
-      }
-    }
-
-    .profil__danger {
-      margin-top: 24px;
-      text-align: center;
     }
   }
 </style>

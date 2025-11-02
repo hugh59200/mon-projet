@@ -2,11 +2,7 @@
   <DialogComponent />
   <ToastContainer />
   <CGU />
-
-  <!-- 💬 Chat utilisateur (visible uniquement si connecté et pas admin) -->
   <ChatWidget v-if="auth.user && !auth.isAdmin" />
-
-  <!-- 🆕 Overlay CGU global -->
   <transition name="fade">
     <div
       v-if="cgu.overlayActive"
@@ -21,8 +17,8 @@
   import CGU from '@/features/interface/cgu/CGU.vue'
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
-  import ChatWidget from '@/features/admin/chat/ChatWidget.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
+  import ChatWidget from './features/admin/chat/user/ChatWidget.vue'
 
   /* -------------------------------------------------------------------------- */
   /*                                 INITIALISATION                             */

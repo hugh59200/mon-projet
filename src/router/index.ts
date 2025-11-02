@@ -1,4 +1,4 @@
-import AdminChatView from '@/features/admin/chat/AdminChatView.vue'
+import AdminChatView from '@/features/admin/chat/admin/AdminChatView.vue'
 import AdminNewsTable from '@/features/admin/news/AdminNewsTable.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsTable.vue'

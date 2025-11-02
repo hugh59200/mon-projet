@@ -9,7 +9,6 @@
       },
     ]"
   >
-    <!-- 🧩 Slot : permet d'insérer du contenu custom -->
     <slot>
       <BasicText
         class="badge__label"
@@ -21,8 +20,6 @@
         {{ label }}
       </BasicText>
     </slot>
-
-    <!-- ❌ Icône de suppression -->
     <BasicIcon
       v-if="deletable"
       name="close-square"
@@ -53,7 +50,6 @@
 <style lang="less">
   @import './BasicBadge.less';
 
-  /* Bonus : petite transition d’apparition */
   .badge {
     transition: all 0.2s ease-in-out;
 

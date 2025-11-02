@@ -1,5 +1,6 @@
 <template>
   <div class="chat-admin">
+    <!-- 🧭 En-tête -->
     <header class="chat-admin__header">
       <div class="header-left">
         <BasicIconNext
@@ -14,26 +15,28 @@
         </BasicText>
       </div>
 
-      <div
-        v-if="totalUnread > 0"
-        class="header-badge"
-      >
-        {{ totalUnread }} nouveau{{ totalUnread > 1 ? 'x' : '' }} message{{
-          totalUnread > 1 ? 's' : ''
-        }}
+      <!-- 🔍 Zone de recherche globale -->
+      <div class="header-actions">
+        <BasicInput
+          v-model="searchQuery"
+          placeholder="Rechercher une conversation..."
+          icon-name="Search"
+          clearable
+          size="small"
+          class="header-search"
+        />
       </div>
     </header>
 
+    <!-- 💬 Layout principal -->
     <div class="chat-admin__layout">
-      <!-- 📋 Sidebar -->
       <ChatSidebar
-        :conversations="conversations"
+        :conversations="filteredConversations"
         :selected-id="selectedUserId"
         :is-typing-by-user="isTypingByUser"
         @select="selectConversation"
       />
 
-      <!-- 💬 Zone de chat -->
       <ChatCore
         v-if="selectedUserId"
         v-model:new-message="newMessage"
@@ -46,7 +49,6 @@
         :height="600"
       />
 
-      <!-- 🕊 Placeholder -->
       <section
         v-else
         class="chat-admin__placeholder"
@@ -67,11 +69,10 @@
 </template>
 
 <script setup lang="ts">
-  import { useAdminChat } from '@/features/admin/chat/composables/useAdminChat'
-  import { useChatNotifStore } from '@/features/admin/chat/stores/useChatNotifStore'
-  import { computed } from 'vue'
-  import ChatCore from './components/ChatCore.vue'
-  import ChatSidebar from './components/ChatSidebar.vue'
+  import { computed, ref } from 'vue'
+  import ChatCore from '../shared/components/ChatCore.vue'
+  import ChatSidebar from './ChatSidebar.vue'
+  import { useAdminChat } from './useAdminChat'
 
   const {
     conversations,
@@ -85,10 +86,15 @@
     sendTyping,
   } = useAdminChat()
 
-  const notifStore = useChatNotifStore()
-  const totalUnread = computed(() =>
-    Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
-  )
+  // 🔍 Recherche globale (filtrage sur l’e-mail ou le dernier message)
+  const searchQuery = ref('')
+  const filteredConversations = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase()
+    if (!q) return conversations.value
+    return conversations.value.filter(
+      (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
+    )
+  })
 </script>
 
 <style scoped lang="less">
@@ -98,30 +104,43 @@
     gap: 16px;
     padding: 24px 32px;
     background: @neutral-50;
+    min-height: 100vh;
 
+    /* 🧭 Header */
     &__header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 16px;
 
       .header-left {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+
+        .basic-text {
+          color: @neutral-900;
+        }
       }
 
-      .header-badge {
-        background: @primary-600;
-        color: white;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 999px;
-        box-shadow: 0 2px 4px fade(@primary-600, 25%);
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .header-search {
+          width: 260px;
+
+          :deep(.basic-input) {
+            height: 36px;
+            display: flex;
+            align-items: center;
+          }
+        }
       }
     }
 
+    /* 💬 Layout principal */
     &__layout {
       display: grid;
       grid-template-columns: 300px 1fr;
@@ -138,6 +157,7 @@
       }
     }
 
+    /* 💤 Placeholder */
     &__placeholder {
       display: flex;
       flex-direction: column;
@@ -146,6 +166,7 @@
       color: @neutral-600;
       gap: 12px;
       min-height: 600px;
+      text-align: center;
     }
   }
 </style>

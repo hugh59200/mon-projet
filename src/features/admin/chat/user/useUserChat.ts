@@ -1,10 +1,10 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
-import { chatApi } from '../services/chatApi'
-import { useChatNotifStore } from '../stores/useChatNotifStore'
-import { useChatWidgetStore } from '../stores/useChatWidgetStore'
-import type { ChatRole, Message } from '../types/chat'
+import { chatApi } from '../shared/services/chatApi'
+import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+import type { ChatRole, Message } from '../shared/types/chat'
+import { useChatWidgetStore } from './useChatWidgetStore'
 
 export function useUserChat() {
   /* ------------------------------ Stores ------------------------------ */

@@ -1,14 +1,40 @@
 <template>
   <aside class="chat-sidebar">
-    <!-- 🧭 En-tête -->
+    <!-- 🧭 En-tête profil -->
     <div class="chat-sidebar__status">
       <div class="status-left">
         <div class="avatar">
-          <BasicIconNext name="User" />
+          <img
+            v-if="avatarUrl"
+            :src="avatarUrl"
+            alt="Avatar"
+          />
+          <div
+            v-else
+            class="avatar-placeholder"
+          >
+            <BasicIconNext
+              name="User"
+              :size="18"
+            />
+          </div>
         </div>
+
         <div class="user-info">
-          <span class="user-name">Support Fast Peptides</span>
-          <span class="user-role">Connecté • Admin</span>
+          <BasicText
+            size="body-m"
+            weight="semibold"
+            color="neutral-900"
+          >
+            {{ displayName }}
+          </BasicText>
+          <BasicText
+            size="body-s"
+            color="neutral-700"
+          >
+            <span class="status-dot online" />
+            Connecté • Admin
+          </BasicText>
         </div>
       </div>
     </div>
@@ -39,7 +65,7 @@
       </button>
     </div>
 
-    <!-- 💬 Liste -->
+    <!-- 💬 Liste des conversations -->
     <div class="conversation-container">
       <ConversationItem
         v-for="conv in filteredConversations"
@@ -58,18 +84,23 @@
           name="Inbox"
           :size="16"
         />
-        <span>
+        <BasicText
+          size="body-s"
+          color="neutral-500"
+        >
           {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune conversation pour le moment' }}
-        </span>
+        </BasicText>
       </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-  import { useChatNotifStore } from '@/features/admin/chat/stores/useChatNotifStore'
-  import type { ConversationOverview } from '@/features/admin/chat/types/chat'
-  import { computed, ref } from 'vue'
+  import { useChatNotifStore } from '@/features/admin/chat/shared/stores/useChatNotifStore'
+  import type { ConversationOverview } from '@/features/admin/chat/shared/types/chat'
+  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { computed, onMounted, ref } from 'vue'
   import ConversationItem from './ConversationItem.vue'
 
   const props = defineProps<{
@@ -81,7 +112,10 @@
   defineEmits<{ (e: 'select', userId: string): void }>()
 
   const notifStore = useChatNotifStore()
+  const auth = useAuthStore()
+
   const searchQuery = ref('')
+  const avatarUrl = ref<string | null>(null)
 
   const filteredConversations = computed(() => {
     const q = searchQuery.value.trim().toLowerCase()
@@ -98,6 +132,22 @@
       unread_count: notifStore.unreadByUser[conv.user_id] || 0,
     }))
   })
+
+  const displayName = computed(() => auth.user?.fullName || 'Support Fast Peptides')
+
+  // 🧩 Charge l’avatar depuis Supabase si présent
+  onMounted(async () => {
+    if (!auth.user?.id) return
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', auth.user.id)
+      .maybeSingle()
+    if (data?.avatar_url) {
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(data.avatar_url)
+      avatarUrl.value = pub.publicUrl
+    }
+  })
 </script>
 
 <style scoped lang="less">
@@ -106,7 +156,7 @@
     border-right: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
-    height: 100%; // ✅ pleine hauteur
+    height: 100%;
     overflow: hidden;
     scrollbar-width: thin;
 
@@ -118,7 +168,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
+      padding: 12px 16px;
       background: white;
       border-bottom: 1px solid @neutral-200;
       gap: 10px;
@@ -126,14 +176,16 @@
       .status-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
 
         .avatar {
-          width: 38px;
-          height: 38px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
+          border: 1px solid @neutral-200;
+          background: @neutral-100;
 
           img {
             width: 100%;
@@ -144,70 +196,38 @@
           .avatar-placeholder {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            border: 1px solid @neutral-200;
-            background: @neutral-100;
-            color: @neutral-500;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: @neutral-500;
           }
         }
 
         .user-info {
           display: flex;
           flex-direction: column;
-          line-height: 1.2;
+          line-height: 1.3;
 
-          .user-name {
-            font-weight: 600;
-            color: @neutral-900;
-            font-size: 14px;
-          }
+          /* ✅ Dot animé “en ligne” */
+          .status-dot {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: @success-500;
+            display: inline-block;
+            margin-right: 4px;
+            box-shadow: 0 0 5px fade(@success-500, 40%);
 
-          .user-role {
-            font-size: 12px;
-            color: @neutral-600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-
-            .status-dot {
-              width: 8px;
-              height: 8px;
+            &::after {
+              content: '';
+              position: absolute;
+              inset: 0;
               border-radius: 50%;
-              background: @neutral-400;
-
-              &.online {
-                background: @success-500;
-                box-shadow: 0 0 5px fade(@success-500, 60%);
-              }
-            }
-
-            .separator {
-              color: @neutral-400;
+              background: fade(@success-500, 35%);
+              animation: pulse-status 2s infinite ease-in-out;
             }
           }
-        }
-      }
-
-      .status-right {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        .badge {
-          background: @primary-600;
-          color: white;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 600;
-          padding: 2px 6px;
-        }
-
-        .badge-label {
-          font-size: 12px;
-          color: @neutral-500;
         }
       }
     }
@@ -215,7 +235,7 @@
     /* 🔍 Barre de recherche */
     &__search {
       position: sticky;
-      top: 62px;
+      top: 70px;
       z-index: 9;
       display: flex;
       align-items: center;
@@ -272,44 +292,31 @@
       background: @neutral-50;
     }
 
-    .conversation-list {
-      display: flex;
-      flex-direction: column;
-      padding: 8px;
-      gap: 4px;
-    }
-
     .no-conv {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: @neutral-500;
-      font-size: 14px;
       gap: 6px;
       padding: 16px;
       text-align: center;
     }
+  }
 
-    @media (max-width: 768px) {
-      border-right: none;
-      border-bottom: 1px solid @neutral-200;
-      height: auto;
-      max-height: 50vh; // facultatif : limite la hauteur si beaucoup de conversations
-      overflow-y: auto;
+  /* 💫 Animation halo de statut */
+  @keyframes pulse-status {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
     }
-
-    /* ✨ Transitions */
-    .fade-enter-active,
-    .fade-leave-active {
-      transition: all 0.25s ease;
+    50% {
+      transform: scale(1.8);
+      opacity: 0.1;
     }
-
-    .fade-enter-from,
-    .fade-leave-to {
+    100% {
+      transform: scale(1);
       opacity: 0;
-      transform: translateY(4px);
     }
   }
 </style>

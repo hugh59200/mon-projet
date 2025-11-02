@@ -1,7 +1,7 @@
 import { supabase } from '@/supabase/supabaseClient'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useUserChat } from '../composables/useUserChat'
+import { useUserChat } from '../../user/useUserChat'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
 

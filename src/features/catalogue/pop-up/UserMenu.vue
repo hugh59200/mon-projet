@@ -8,7 +8,7 @@
       class="user-menu"
       ref="menuRef"
     >
-      <!-- 👤 Icône profil dans un cercle -->
+      <!-- 👤 Icône profil + badge façon panier -->
       <div
         class="user-avatar"
         @click="toggleMenu"
@@ -18,6 +18,17 @@
           :size="22"
           class="avatar-icon"
         />
+        <div
+          v-if="totalUnread > 0"
+          class="user-badge"
+        >
+          <BasicText
+            size="body-s"
+            weight="bold"
+          >
+            {{ totalUnread }}
+          </BasicText>
+        </div>
       </div>
 
       <!-- 📋 Menu déroulant -->
@@ -42,7 +53,7 @@
             </BasicText>
           </div>
 
-          <div class="divider"></div>
+          <div class="divider" />
           <div @click="goToProfile">Mon profil</div>
           <div
             v-if="auth.isAdmin"
@@ -50,7 +61,7 @@
           >
             Espace Admin
           </div>
-          <div class="divider"></div>
+          <div class="divider" />
           <div @click="handleLogout">Se déconnecter</div>
         </div>
       </transition>
@@ -60,18 +71,25 @@
 
 <script setup lang="ts">
   import { vClickOutside } from '@/directives/vClickOutside'
+  import { useChatNotifStore } from '@/features/admin/chat/shared/stores/useChatNotifStore'
   import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
   import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   defineOptions({ directives: { clickOutside: vClickOutside } })
 
   const auth = useAuthStore()
   const adminTabStore = useAdminTabStore()
+  const notifStore = useChatNotifStore()
   const router = useRouter()
+
   const menuOpen = ref(false)
   const menuRef = ref<HTMLElement | null>(null)
+
+  const totalUnread = computed(() =>
+    Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
+  )
 
   function toggleMenu() {
     menuOpen.value = !menuOpen.value
@@ -102,8 +120,9 @@
     color: white;
   }
 
-  /* 🌟 Cercle autour de l’icône */
+  /* 🌟 Cercle autour de l’icône utilisateur */
   .user-avatar {
+    position: relative;
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -115,7 +134,6 @@
       background 0.25s ease,
       transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
       box-shadow 0.25s ease;
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
 
     &:hover {
       background: fade(white, 10%);
@@ -128,12 +146,35 @@
 
     .avatar-icon {
       color: white;
-      transition: opacity 0.25s ease;
       opacity: 0.9;
+      transition: opacity 0.25s ease;
     }
 
     &:hover .avatar-icon {
       opacity: 1;
+    }
+
+    /* 🟦 Badge façon panier */
+    .user-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: @primary-500; /* ✅ couleur pro */
+      color: white;
+      border-radius: 50%;
+      height: 14px;
+      width: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px @neutral-900; /* même effet que le panier */
+      font-size: 11px;
+      font-weight: 600;
+      transition: transform 0.25s ease;
+
+      &:hover {
+        transform: scale(1.12);
+      }
     }
   }
 
@@ -178,7 +219,7 @@
     }
   }
 
-  /* ✨ Animation rebond */
+  /* ✨ Animations */
   @keyframes bounceIn {
     0% {
       transform: scale(0.9);
@@ -193,7 +234,6 @@
     }
   }
 
-  /* 🌀 Transition d’apparition douce */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
     transition: all 0.25s ease;

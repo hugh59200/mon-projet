@@ -77,10 +77,9 @@
   import { supabase } from '@/supabase/supabaseClient'
   import type { IconColor } from '@designSystem/index'
   import { onMounted, onUnmounted, ref, watch } from 'vue'
-  import ChatCore from './components/ChatCore.vue'
-  import { useUserChat } from './composables/useUserChat'
-  import { useChatNotifStore } from './stores/useChatNotifStore'
-  import { useChatWidgetStore } from './stores/useChatWidgetStore'
+  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+  import { useChatWidgetStore } from './useChatWidgetStore'
+  import { useUserChat } from './useUserChat'
 
   /* ------------------------- Stores ------------------------- */
   const chatNotif = useChatNotifStore()

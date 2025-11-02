@@ -1,8 +1,8 @@
 import { supabase } from '@/supabase/supabaseClient'
 import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { chatApi } from '../services/chatApi'
-import { useChatNotifStore } from '../stores/useChatNotifStore'
-import type { ChatRole, ConversationOverview, Message } from '../types/chat'
+import { chatApi } from '../shared/services/chatApi'
+import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+import type { ChatRole, ConversationOverview, Message } from '../shared/types/chat'
 
 export function useAdminChat() {
   const role: ChatRole = 'admin'
