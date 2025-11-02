@@ -11,27 +11,32 @@
       :size="isSelected ? 'body-l' : 'body-m'"
       :weight="isSelected ? 'semibold' : 'regular'"
       class="tab__label"
-      :style="{ color: textColor }"
+      :color="computedTextColor"
     >
       {{ tabKey }}
     </BasicText>
+
     <slot
       name="tab-icon"
       :tabKey="tabKey"
       :tabState="tabState"
       :selected="isSelected"
     />
+
+    <!-- ✅ Couleur icône selon sélection -->
     <BasicIconNext
       v-if="!$slots['tab-icon'] && tabState"
       class="tab__icon"
       :name="tabState"
-      :color="iconColor"
+      :color="isSelected ? color : ('neutral-600' as IconColor)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue'
+  import type { IconColor } from '../icon'
+  import type { TextColor } from '../text'
   import type { TabProps } from './BasicTab.types'
 
   const props = defineProps<TabProps>()
@@ -45,17 +50,16 @@
     modelValue.value = props.routeName ?? props.tabKey
   }
 
-  const textColor = computed(() => (isSelected.value && props.color ? props.color : ''))
-
-  const iconColor = computed(
-    () => (isSelected.value ? props.color : '#9CA3AF'), // ✅ gris explicite
-  )
+  // ✅ Couleur du texte (normal / sélectionné)
+  const computedTextColor = computed<TextColor>(() => {
+    if (isSelected.value && props.color) return props.color
+    return 'neutral-400'
+  })
 </script>
 
 <style scoped lang="less">
   .tab {
-    position: relative;
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px 22px;
@@ -63,38 +67,40 @@
     border-radius: 10px 10px 0 0;
     cursor: pointer;
     transition: all 0.25s ease;
-    background-color: fade(@neutral-100, 50%);
-    color: @neutral-600;
+    background-color: @neutral-100;
     user-select: none;
 
-    &__icon {
-      transform: scale(0.9);
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-    }
-
+    /* ✅ Hover sur onglet non sélectionné */
     &:hover {
-      background-color: fade(@neutral-200, 80%);
-      color: @primary-700;
-      box-shadow: 0 1px 6px fade(@neutral-700, 10%);
+      background-color: @neutral-200;
+
+      &:not(.tab--selected) {
+        .tab__label {
+          color: @white !important;
+          transition: color 0.25s ease;
+        }
+
+        .tab__icon {
+          color: @white !important;
+          transition: color 0.25s ease;
+        }
+      }
     }
 
     &--selected {
       background-color: @white;
-      color: @primary-700;
-      font-weight: 600;
-      z-index: 3;
-      box-shadow: 0 -1px 8px fade(@primary-600, 25%);
-      .tab__icon {
-        opacity: 1;
-        fill: currentColor;
-        stroke: currentColor;
-      }
-    }
-
-    &--unselected {
-      color: @neutral-500;
-      box-shadow: inset 0 -2px 0 fade(@neutral-300, 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 22px;
+      box-shadow: inset 0 1px 3px fade(@primary-500, 12%);
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.25s ease,
+        color 0.25s ease,
+        opacity 0.18s ease;
     }
   }
 </style>

@@ -141,10 +141,10 @@
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
-  import BasicToolbar from '../../BasicToolbar.vue'
+  import BasicToolbar from '../../shared/components/BasicToolbar.vue'
   import AdminProductModal from '../modale/AdminProductModal.vue'
   import ProductCardMobileReadonly from './ProductCardMobileReadonly.vue'
 

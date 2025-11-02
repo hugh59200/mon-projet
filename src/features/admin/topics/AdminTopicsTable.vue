@@ -78,8 +78,8 @@
 
 <script setup lang="ts">
   import { deleteTopic } from '@/features/admin/api/topics'
-  import BasicToolbar from '@/features/admin/BasicToolbar.vue'
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import type { Tables } from '@/supabase/types/supabase'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'

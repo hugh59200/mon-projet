@@ -1,6 +1,7 @@
 import type { RouteName } from '@/router/route-name'
 import type { IconNameNext } from '../icon/BasicIconNext.vue'
 import type { TabsModel } from '../tabs/BasicTabs.types'
+import type { TextColor } from '../text'
 
 export type TabProps = {
   /** Nom de route unique (clé logique) */
@@ -13,5 +14,5 @@ export type TabProps = {
   tabState?: IconNameNext
 
   /** Couleur de l’icône ou de l’onglet */
-  color?: string
+  color?: TextColor
 }

@@ -151,8 +151,8 @@
 
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
-  import { useSortableTable } from '@/features/admin/shared/useSortableTable'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { updateOrderStatus } from '@/supabase/api/orders'
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
@@ -160,7 +160,7 @@
   import { getStatusClass } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
-  import BasicToolbar from '../BasicToolbar.vue'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
   import OrderCardMobile from './OrderCardMobile.vue'
 

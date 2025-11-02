@@ -187,14 +187,14 @@
 </template>
 
 <script setup lang="ts">
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { deleteProduct } from '@/supabase/api/products'
   import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency } from '@/utils/index'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref } from 'vue'
-  import BasicToolbar from '../BasicToolbar.vue'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
   import ProductCardMobileReadonly from './readonly/ProductCardMobileReadonly.vue'

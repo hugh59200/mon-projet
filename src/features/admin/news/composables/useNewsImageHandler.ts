@@ -1,5 +1,5 @@
 import { deleteNewsImage, uploadNewsImage } from '../../api/newsImages'
-import { useImageHandler } from '../../shared/useImageHandler'
+import { useImageHandler } from '../../shared/composables/useImageHandler'
 
 export function useNewsImageHandler(readonly: () => boolean) {
   return useImageHandler(readonly, {

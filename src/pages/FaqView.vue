@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-  import BasicToolbar from '@/features/admin/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
   type CatId = 'qualite' | 'stockage' | 'commande' | 'shipping' | 'conformite' | 'retour'

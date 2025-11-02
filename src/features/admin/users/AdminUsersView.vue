@@ -146,8 +146,8 @@
 
 <script setup lang="ts">
   import { ROLES } from '@/features/admin/constants/users'
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
-  import { useSortableTable } from '@/features/admin/shared/useSortableTable'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { deleteUser, updateUserRole } from '@/supabase/api/users'
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
@@ -155,7 +155,7 @@
   import { getRoleClass } from '@/utils/roles'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watch } from 'vue'
-  import BasicToolbar from '../BasicToolbar.vue'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import AdminUserDetailsModal from '../users/AdminUserDetailsModal.vue'
   import UserCardMobile from '../users/UserCardMobile.vue'
 

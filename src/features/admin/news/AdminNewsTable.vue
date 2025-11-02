@@ -100,14 +100,14 @@
 
 <script setup lang="ts">
   import { deleteNews } from '@/features/actualités/api/news'
-  import { useAdminTable } from '@/features/admin/shared/useAdminTable'
+  import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import type { Tables } from '@/supabase/types/supabase'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { ref } from 'vue'
-  import BasicToolbar from '../BasicToolbar.vue'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
 
   type NewsRow = Tables<'news'>

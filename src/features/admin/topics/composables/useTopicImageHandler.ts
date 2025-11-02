@@ -1,5 +1,5 @@
 import { deleteTopicImage, uploadTopicImage } from '../../api/topicImages'
-import { useImageHandler } from '../../shared/useImageHandler'
+import { useImageHandler } from '../../shared/composables/useImageHandler'
 
 export function useTopicImageHandler(readonly: () => boolean) {
   return useImageHandler(readonly, {

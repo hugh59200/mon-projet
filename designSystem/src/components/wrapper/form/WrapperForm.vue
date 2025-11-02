@@ -91,7 +91,7 @@
 
     &__main {
       flex: 1;
-      background-color: white;
+      background-color: @neutral-100; // ✅ même gris que les blocs du catalogue
       padding: @spacing-20 0;
       display: flex;
       flex-direction: column;
