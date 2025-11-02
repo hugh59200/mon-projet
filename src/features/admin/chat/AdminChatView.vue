@@ -46,6 +46,7 @@
         :height="600"
       />
 
+      <!-- 🕊 Placeholder -->
       <section
         v-else
         class="chat-admin__placeholder"
@@ -72,7 +73,6 @@
   import ChatCore from './components/ChatCore.vue'
   import ChatSidebar from './components/ChatSidebar.vue'
 
-  /* ✅ Instance unique du chat admin */
   const {
     conversations,
     messages,

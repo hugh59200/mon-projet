@@ -44,7 +44,7 @@
           @click="hideNewMessagesBtn"
         >
           <ChatMessage
-            v-for="(msg, i) in messages"
+            v-for="(msg, i) in orderedMessages"
             :key="msg.id || 'msg-' + i"
             :message="msg"
             :isMine="msg.sender_role === currentRole"
@@ -98,6 +98,15 @@
 
   const newMessage = defineModel<string>('newMessage', { default: '' })
 
+  /* ---------------------- Tri pour ordre chronologique ---------------------- */
+  const orderedMessages = computed(() =>
+    [...props.messages].sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
+      return dateA - dateB
+    }),
+  )
+
   /* ---------------------- Typing ---------------------- */
   const localIsTyping = ref(false)
   let typingTimeout: ReturnType<typeof setTimeout> | null = null
@@ -150,22 +159,24 @@
     return style
   })
 
-  /* ---------------------- Scroll & "nouveaux messages" ---------------------- */
+  /* ---------------------- Scroll ---------------------- */
   const msgList = ref<HTMLElement | null>(null)
   const showNewMessagesBtn = ref(false)
   const isNearBottom = ref(true)
   let autoHideTimer: ReturnType<typeof setTimeout> | null = null
 
-  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
+  function scrollToBottom(behavior: ScrollBehavior = 'auto') {
     const el = msgList.value
     if (!el) return
-    el.scrollTo({ top: el.scrollHeight, behavior })
+    el.scrollTop = el.scrollHeight
+    if (behavior === 'smooth') {
+      el.scrollTo({ top: el.scrollHeight, behavior })
+    }
     showNewMessagesBtn.value = false
     isNearBottom.value = true
     clearTimeout(autoHideTimer!)
   }
 
-  /* ✅ Version sans paramètre pour éviter l’erreur TS */
   const scrollToBottomSmooth = () => scrollToBottom('smooth')
 
   const hideNewMessagesBtn = () => {
@@ -175,7 +186,7 @@
     }
   }
 
-  const onScroll = () => {
+  function onScroll() {
     const el = msgList.value
     if (!el) return
     const near = el.scrollHeight - el.scrollTop - el.clientHeight < 20
@@ -187,47 +198,49 @@
     }
   }
 
-  /* ---------------------- Auto scroll sur nouveaux messages ---------------------- */
-  watch(
-    () => props.messages.length,
-    async (newLen, oldLen) => {
-      if (newLen <= oldLen) return
-      await nextTick()
+  /* ---------------------- Scroll instantané universel ---------------------- */
+  function scrollHardToBottom() {
+    const el = msgList.value
+    if (!el) return
 
-      const el = msgList.value
-      if (!el) return
+    const force = () => {
+      el.scrollTop = el.scrollHeight
+    }
 
-      const near = el.scrollHeight - el.scrollTop - el.clientHeight < 20
-      const lastMsg = props.messages.at(-1)
-      const isMine = lastMsg?.sender_role === props.currentRole
-
-      if (isMine || near) {
-        scrollToBottom('smooth')
-      } else {
-        showNewMessagesBtn.value = true
-        clearTimeout(autoHideTimer!)
-        autoHideTimer = setTimeout(() => {
-          if (showNewMessagesBtn.value) showNewMessagesBtn.value = false
-        }, 2500)
-      }
-    },
-  )
-
-  /* ---------------------- Groupement ---------------------- */
-  const isGroupedMessage = (index: number) => {
-    const msg = props.messages[index]
-    const prev = props.messages[index - 1]
-    return prev && prev.sender_role === msg?.sender_role
+    // 💪 Multi-frame: couvre tous les reflows, rendus async, etc.
+    for (let i = 0; i < 8; i++) {
+      requestAnimationFrame(force)
+      setTimeout(force, i * 30)
+    }
   }
 
   /* ---------------------- Lifecycle ---------------------- */
-  onMounted(() => {
-    nextTick(() => scrollToBottom('auto'))
+  onMounted(async () => {
+    await nextTick()
+    scrollHardToBottom()
   })
+
+  watch(
+    () => props.messages.map((m) => m.id),
+    async (newVal) => {
+      if (!newVal.length) return
+      await nextTick()
+      scrollHardToBottom()
+    },
+    { immediate: true },
+  )
+
   onUnmounted(() => {
     clearTimeout(autoHideTimer!)
     clearTimeout(typingTimeout!)
   })
+
+  /* ---------------------- Groupement ---------------------- */
+  const isGroupedMessage = (index: number) => {
+    const msg = orderedMessages.value[index]
+    const prev = orderedMessages.value[index - 1]
+    return prev && prev.sender_role === msg?.sender_role
+  }
 </script>
 
 <style scoped lang="less">
@@ -266,19 +279,18 @@
       min-height: 0;
     }
 
-    /* zone scrollable */
     .chat-messages {
       flex: 1;
       display: flex;
-      flex-direction: column; /* ✅ ordre naturel */
+      flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 12px;
       background: @neutral-50;
-      scroll-behavior: smooth;
+      scroll-behavior: auto; /* aucun smooth visible */
       min-height: 0;
       gap: 6px;
-      padding-bottom: 20px; /* espace pour typing */
+      padding-bottom: 20px;
     }
 
     .chat-messages::-webkit-scrollbar {
@@ -315,33 +327,6 @@
     @media (max-width: 768px) {
       height: auto;
       min-height: 50vh;
-    }
-
-    /* Animations */
-    .fade-scale-enter-active,
-    .fade-scale-leave-active {
-      transition: all 0.35s ease;
-    }
-    .fade-scale-enter-from {
-      opacity: 0;
-      transform: scale(0.97) translateY(8px);
-    }
-    .fade-scale-leave-to {
-      opacity: 0;
-      transform: scale(0.98) translateY(-8px);
-    }
-
-    .slide-fade-enter-active,
-    .slide-fade-leave-active {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .slide-fade-enter-from {
-      opacity: 0;
-      transform: translateY(12px) scale(0.98);
-    }
-    .slide-fade-leave-to {
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
     }
   }
 </style>
