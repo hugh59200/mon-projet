@@ -1,4 +1,4 @@
-import type { Product } from '@/features/catalogue/composables/useProducts'
+import type { Product } from '@/features/catalogue/types/product'
 import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
 import { CustomToast, CustomToastCompact } from '@designSystem/components'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

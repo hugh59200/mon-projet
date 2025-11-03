@@ -168,13 +168,14 @@
   import { useFilters } from '@/features/catalogue/composables/useFilters'
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
-  import { useProducts, type Product } from '@/features/catalogue/composables/useProducts'
+  import { useProducts } from '@/features/catalogue/composables/useProducts'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
+  import type { Product } from './types/product'
 
   const { isMobile } = useDeviceBreakpoint()
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()

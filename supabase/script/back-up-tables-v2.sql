@@ -548,10 +548,42 @@ VALUES
 ('a0dde032-184c-4770-8b9f-51d7a52f36b4','h.bogrand@gmail.com','admin','Hugo Bogrand'),
 ('f60d71db-f34d-4610-821e-c5a679d13ee5','emma.dupont@example.com','user','Emma Dupont');
 
--- Products
-INSERT INTO public.products (id,name,category,price,purity,stock,image,description,tags)
+-- ============================================================
+-- 🌱 PRODUCTS SEED COMPLET (restauré de la version précédente)
+-- ============================================================
+
+INSERT INTO public.products (name, category, price, purity, stock, image, description, tags)
 VALUES
-('9442a410-7f73-40a4-ae47-76e49dcdecde','DSIP','Bien-être',29.90,99.00,true,'/src/assets/products/dsip/peptide-dsip.png','Delta Sleep-Inducing Peptide, aide au sommeil.','{"nootropique","sommeil"}');
+('IGF-1 LR3', 'Performance', 59.90, 98.00, false,
+ '/src/assets/products/igf-1-lr3/peptide-igf-1-lr3.png',
+ 'Facteur de croissance insulinomimétique, variante LR3.',
+ '{"performance","croissance","98%"}'),
+
+('Semax', 'Bien-être', 27.90, 99.00, true,
+ '/src/assets/products/semax/peptide-semax.png',
+ 'Peptide neuroprotecteur et stimulant cognitif.',
+ '{"nootropique","bien-etre","99%"}'),
+
+('Retatrutide', 'Métabolisme', 54.90, 99.00, true,
+ '/src/assets/products/retatrutide/peptide-retatrutide.png',
+ 'Agoniste multiple étudié pour la perte de poids.',
+ '{"metabolisme","perte-de-poids","99%"}'),
+
+('Selank', 'Bien-être', 27.90, 99.00, true,
+ '/src/assets/products/selank/peptide-selank.png',
+ 'Peptide anxiolytique et nootropique.',
+ '{"anti-stress","nootropique","bien-etre"}'),
+
+('PT-141', 'Bien-être', 42.90, 99.00, true,
+ '/src/assets/products/pt-141/peptide-pt-141.png',
+ 'Bremelanotide ; applications libido et vitalité.',
+ '{"libido","vitalite","bien-etre"}'),
+
+('DSIP', 'Bien-être', 29.90, 99.00, true,
+ '/src/assets/products/dsip/peptide-dsip.png',
+ 'Delta Sleep-Inducing Peptide, aide au sommeil.',
+ '{"nootropique","sommeil","bien-etre"}');
+
 
 -- Messages (exemple)
 INSERT INTO public.messages (user_id,sender_role,content,is_read)
