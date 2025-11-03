@@ -80,13 +80,6 @@ export function useProducts() {
 
       priceRange.value.from = priceRange.value.min
       priceRange.value.to = priceRange.value.max
-
-      // ✅ Toast de succès optionnel
-      toast.show({
-        message: `${rows.length} produit${rows.length > 1 ? 's' : ''} chargé${rows.length > 1 ? 's' : ''} avec succès`,
-        type: 'success',
-        duration: 2500,
-      })
     } catch (err: any) {
       console.error(err)
       toast.show('Erreur lors du chargement du catalogue', 'danger')

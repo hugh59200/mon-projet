@@ -4,16 +4,11 @@
     :width="280"
     align="right"
     arrow-align="auto"
-    :auto-close-delay="0"
-    :close-delay="400"
+    :close-delay="1000"
   >
     <!-- 🛍️ Icône du panier -->
     <template #trigger>
-      <div
-        class="cart-icon"
-        @mouseenter="onHoverEnter"
-        @mouseleave="onHoverLeave"
-      >
+      <div class="cart-icon">
         <BasicIconNext
           class="shopping-icon"
           name="ShoppingCart"
@@ -32,69 +27,65 @@
         </div>
       </div>
     </template>
-    <transition name="cart-popup-fade">
-      <div class="cart-popup">
-        <div class="popup-list">
-          <div
-            v-for="item in cart.items.slice(0, 3)"
-            :key="item.id"
-            class="popup-item"
-          >
-            <img
-              :src="item.image || defaultImage"
-              alt=""
-              class="popup-img"
-            />
-            <div class="popup-info">
-              <BasicText
-                size="body-s"
-                weight="semibold"
-              >
-                {{ item.name }}
-              </BasicText>
-              <BasicText
-                size="body-s"
-                color="neutral-300"
-              >
-                {{ item.quantity }} × {{ formatPrice(item.price) }}
-              </BasicText>
-            </div>
-          </div>
-
-          <div
-            v-if="cart.items.length > 3"
-            class="popup-more"
-          >
-            +{{ cart.items.length - 3 }} autres articles...
-          </div>
-        </div>
-
-        <div class="popup-actions">
+    <div class="popup-list">
+      <div
+        v-for="item in cart.items.slice(0, 3)"
+        :key="item.id"
+        class="popup-item"
+      >
+        <img
+          :src="item.image || defaultImage"
+          alt=""
+          class="popup-img"
+        />
+        <div class="popup-info">
           <BasicText
             size="body-s"
-            color="primary-400"
             weight="semibold"
-            class="popup-total"
           >
-            Total : {{ formatPrice(cart.totalPrice) }}
+            {{ item.name }}
           </BasicText>
-          <div class="popup-btns">
-            <BasicButton
-              label="Voir le panier"
-              type="reverse"
-              size="small"
-              @click="goToCart"
-            />
-            <BasicButton
-              label="Paiement"
-              type="primary"
-              size="small"
-              @click="goToCheckout"
-            />
-          </div>
+          <BasicText
+            size="body-s"
+            color="neutral-300"
+          >
+            {{ item.quantity }} × {{ formatPrice(item.price) }}
+          </BasicText>
         </div>
       </div>
-    </transition>
+
+      <div
+        v-if="cart.items.length > 3"
+        class="popup-more"
+      >
+        +{{ cart.items.length - 3 }} autres articles...
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <BasicText
+        size="body-s"
+        color="primary-400"
+        weight="semibold"
+        class="popup-total"
+      >
+        Total : {{ formatPrice(cart.totalPrice) }}
+      </BasicText>
+      <div class="popup-btns">
+        <BasicButton
+          label="Voir le panier"
+          type="reverse"
+          size="small"
+          @click="goToCart"
+        />
+        <BasicButton
+          label="Paiement"
+          type="primary"
+          size="small"
+          @click="goToCheckout"
+        />
+      </div>
+    </div>
   </FloatingDropdownWrapper>
 </template>
 
@@ -175,72 +166,59 @@
     }
   }
 
-  .cart-popup {
-    background: @neutral-800;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-    min-width: 240px;
-    max-width: 280px;
-    padding: 10px 12px;
+  .popup-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    color: white;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
 
-    .popup-list {
+    .popup-item {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 240px;
-      overflow-y: auto;
+      align-items: center;
+      gap: 10px;
+    }
+  }
 
-      .popup-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+  .popup-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: fade(@neutral-700, 40%);
+  }
+
+  .popup-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .popup-more {
+    text-align: center;
+    font-size: 12px;
+    color: fade(white, 60%);
+    margin-top: 4px;
+  }
+
+  .popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .popup-total {
+      text-align: right;
+      margin-bottom: 6px;
     }
 
-    .popup-img {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: fade(@neutral-700, 40%);
-    }
-
-    .popup-info {
+    .popup-btns {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .popup-more {
-      text-align: center;
-      font-size: 12px;
-      color: fade(white, 60%);
-      margin-top: 4px;
-    }
-
-    .popup-actions {
-      display: flex;
-      flex-direction: column;
       gap: 6px;
 
-      .popup-total {
-        text-align: right;
-        margin-bottom: 6px;
-      }
-
-      .popup-btns {
-        display: flex;
-        gap: 6px;
-
-        button {
-          flex: 1;
-          font-size: 13px;
-          padding: 4px 0;
-        }
+      button {
+        flex: 1;
+        font-size: 13px;
+        padding: 4px 0;
       }
     }
   }

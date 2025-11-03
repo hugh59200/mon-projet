@@ -4,7 +4,7 @@
     :width="220"
     align="right"
     arrow-align="auto"
-    :close-delay="600"
+    :close-delay="1000"
   >
     <template #trigger>
       <div class="user-avatar">
@@ -26,7 +26,6 @@
         </div>
       </div>
     </template>
-
     <div class="user-menu-content">
       <template v-if="auth.user">
         <div class="user-header">
