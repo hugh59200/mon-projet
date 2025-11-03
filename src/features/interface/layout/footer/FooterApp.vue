@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <div class="footer__main">
-      <!-- 🔹 Bloc gauche : logo + disclaimer élargi -->
+      <!-- 🔹 Bloc gauche : logo + disclaimer large -->
       <div class="footer__brand">
         <img
           src="@/assets/logo-app.png"
@@ -15,7 +15,7 @@
             :size="22"
             class="footer__quote-icon"
           />
-          <div class="footer__disclaimer-text">
+          <div class="footer__disclaimer-grid">
             <p>
               <strong>Research Use Only :</strong>
               Tous nos produits sont exclusivement destinés à la recherche scientifique et
@@ -32,11 +32,15 @@
               L’acheteur est responsable du respect de la législation locale. Fast-Peptides décline
               toute responsabilité en cas de mauvaise utilisation.
             </p>
+            <p>
+              <strong>Conformité :</strong>
+              L’achat implique la compréhension et l’acceptation des termes de recherche uniquement.
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- 🔹 Bloc liens -->
+      <!-- 🔹 Liens -->
       <div class="footer__columns">
         <div class="footer__col">
           <BasicText
@@ -127,7 +131,6 @@
       >
         © 2025 Fast-Peptides. Tous droits réservés.
       </BasicText>
-
       <BasicText
         size="body-s"
         color="neutral-400"
@@ -142,9 +145,7 @@
 </template>
 
 <script setup lang="ts">
-  import 'md-editor-v3/lib/style.css'
   import { ref } from 'vue'
-
   const toggleModal = ref(false)
 </script>
 
@@ -158,7 +159,6 @@
     gap: 50px;
     font-family: 'Inter', sans-serif;
 
-    /* --- Structure principale --- */
     &__main {
       display: flex;
       flex-wrap: wrap;
@@ -166,49 +166,53 @@
       gap: 60px;
     }
 
-    /* --- Bloc logo + disclaimer grand format --- */
+    /* === Logo + Disclaimer === */
     &__brand {
       flex: 2;
       min-width: 420px;
       display: flex;
-      justify-content: space-evenly;
-      flex-wrap: wrap;
-      align-items: flex-start;
+      flex-direction: column;
       gap: 28px;
 
       .footer__logo {
-        width: 220px;
+        width: 240px;
         max-width: 260px;
+        margin: 0 auto;
         object-fit: contain;
         filter: brightness(1.1);
       }
 
       .footer__disclaimer {
         position: relative;
-        background: fade(white, 4%);
+        background: fade(white, 5%);
         border: 1px solid fade(white, 25%);
         border-radius: 12px;
-        padding: 28px 26px;
-        font-size: 14px;
-        line-height: 1.65;
+        padding: 30px;
         box-shadow: 0 4px 12px fade(black, 20%);
-        max-width: 100%;
         color: fade(white, 88%);
         overflow: hidden;
 
         .footer__quote-icon {
           position: absolute;
-          top: 16px;
-          left: 20px;
+          top: 18px;
+          left: 22px;
           opacity: 0.25;
         }
 
-        p + p {
-          margin-top: 10px;
-        }
+        .footer__disclaimer-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px 24px;
+          margin-left: 20px; /* pour ne pas chevaucher l’icône */
 
-        strong {
-          color: @primary-200;
+          p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            strong {
+              color: @primary-200;
+            }
+          }
         }
 
         &:before {
@@ -221,7 +225,7 @@
       }
     }
 
-    /* --- Liens --- */
+    /* === Colonnes === */
     &__columns {
       flex: 2;
       display: grid;
@@ -239,7 +243,7 @@
       }
     }
 
-    /* --- Newsletter --- */
+    /* === Newsletter === */
     &__newsletter {
       display: flex;
       margin-top: 10px;
@@ -249,7 +253,7 @@
       }
     }
 
-    /* --- Ligne basse --- */
+    /* === Ligne basse === */
     &__bottom {
       border-top: 1px solid fade(white, 18%);
       padding-top: 18px;
@@ -267,21 +271,10 @@
       }
     }
 
-    /* --- Responsive --- */
-    @media (max-width: 1024px) {
-      padding: 60px 6vw 25px;
-      &__main {
-        flex-direction: column;
-        align-items: center;
-        gap: 50px;
-      }
-      &__brand {
-        align-items: center;
-        text-align: center;
-        .footer__disclaimer {
-          text-align: left;
-          max-width: 600px;
-        }
+    /* === Responsive === */
+    @media (max-width: 900px) {
+      &__disclaimer-grid {
+        grid-template-columns: 1fr !important;
       }
     }
 
