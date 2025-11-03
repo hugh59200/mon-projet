@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, type Component } from 'vue'
+import { markRaw, ref, type Component } from 'vue'
 
 /** Types de toast disponibles */
 export type ToastType = 'success' | 'danger' | 'warning' | 'info'
@@ -54,7 +54,7 @@ export const useToastStore = defineStore('toast', () => {
         message: payload.message,
         type: payload.type ?? type,
         duration: payload.duration ?? duration,
-        component: payload.component,
+        component: payload.component ? markRaw(payload.component) : undefined, // ✅ ici
         props: payload.props,
       }
     }

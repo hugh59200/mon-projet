@@ -31,21 +31,22 @@
       <div class="cart__items">
         <div
           v-for="item in cart.items"
-          :key="item.id"
+          :key="item.cart_item_id!"
           class="cart__item"
         >
           <img
-            :src="item.image || defaultImage"
-            :alt="item.name"
+            :src="item.product_image || defaultImage"
+            :alt="item.product_name!"
             class="cart__item-img"
           />
+
           <div class="cart__item-info">
-            <BasicText weight="bold">{{ item.name }}</BasicText>
+            <BasicText weight="bold">{{ item.product_name }}</BasicText>
             <BasicText
               size="body-s"
               color="neutral-500"
             >
-              {{ item.price.toFixed(2) }} € / unité
+              {{ (item.product_price ?? 0).toFixed(2) }} € / unité
             </BasicText>
 
             <div class="cart__item-controls">
@@ -54,14 +55,19 @@
                 type="number"
                 min="1"
                 :value="item.quantity"
-                @input="cart.updateQuantity(item.id, +($event.target as HTMLInputElement).value)"
+                @input="
+                  cart.updateQuantity(
+                    item.product_id || '',
+                    +($event.target as HTMLInputElement).value,
+                  )
+                "
               />
               <BasicButton
                 label="Supprimer"
                 type="danger"
                 variant="ghost"
                 size="small"
-                @click="cart.removeFromCart(item.id)"
+                @click="cart.removeFromCart(item.product_id || '')"
               />
             </div>
           </div>
@@ -71,7 +77,7 @@
             weight="bold"
             class="cart__item-total"
           >
-            {{ (item.price * item.quantity).toFixed(2) }} €
+            {{ ((item.product_price ?? 0) * (item.quantity ?? 1)).toFixed(2) }} €
           </BasicText>
         </div>
       </div>

@@ -27,14 +27,14 @@
         </div>
       </div>
     </template>
+
     <div class="popup-list">
       <div
         v-for="item in cart.items.slice(0, 3)"
-        :key="item.id"
         class="popup-item"
       >
         <img
-          :src="item.image || defaultImage"
+          :src="item.product_image || defaultImage"
           alt=""
           class="popup-img"
         />
@@ -43,13 +43,13 @@
             size="body-s"
             weight="semibold"
           >
-            {{ item.name }}
+            {{ item.product_name }}
           </BasicText>
           <BasicText
             size="body-s"
             color="neutral-300"
           >
-            {{ item.quantity }} × {{ formatPrice(item.price) }}
+            {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
           </BasicText>
         </div>
       </div>
@@ -69,8 +69,9 @@
         weight="semibold"
         class="popup-total"
       >
-        Total : {{ formatPrice(cart.totalPrice) }}
+        Total : {{ formatCurrency(cart.totalPrice) }}
       </BasicText>
+
       <div class="popup-btns">
         <BasicButton
           label="Voir le panier"
@@ -92,46 +93,22 @@
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
   const cart = useCartStore()
-
   const isOpen = ref(false)
-  const contentMode = ref<'last' | 'preview' | null>(null)
-  let autoCloseTimer: ReturnType<typeof setTimeout> | null = null
-
-  // 🧩 Lors du hover, on passe en mode aperçu global
-  function onHoverEnter() {
-    if (autoCloseTimer) clearTimeout(autoCloseTimer)
-    contentMode.value = 'preview'
-    isOpen.value = true
-  }
-
-  function onHoverLeave() {
-    if (contentMode.value === 'preview') {
-      setTimeout(() => {
-        isOpen.value = false
-        contentMode.value = null
-      }, 400)
-    }
-  }
 
   function goToCart() {
     isOpen.value = false
-    contentMode.value = null
     router.push('/panier')
   }
 
   function goToCheckout() {
     isOpen.value = false
-    contentMode.value = null
     router.push('/checkout')
-  }
-
-  function formatPrice(value: number): string {
-    return `${value.toFixed(2).replace('.', ',')} €`
   }
 </script>
 

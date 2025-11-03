@@ -396,34 +396,47 @@ export type Database = {
           },
         ]
       }
-      user_cart: {
+      user_cart_items: {
         Row: {
-          items: Json
+          id: string
+          product_id: string
+          quantity: number
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          items?: Json
+          id?: string
+          product_id: string
+          quantity?: number
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          items?: Json
+          id?: string
+          product_id?: string
+          quantity?: number
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_cart_user_id_fkey"
+            foreignKeyName: "user_cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cart_items_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "conversation_overview"
             referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: "user_cart_user_id_fkey"
+            foreignKeyName: "user_cart_items_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -526,6 +539,43 @@ export type Database = {
           },
           {
             foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_cart_view: {
+        Row: {
+          cart_item_id: string | null
+          product_category: string | null
+          product_id: string | null
+          product_image: string | null
+          product_name: string | null
+          product_price: number | null
+          product_stock: boolean | null
+          quantity: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cart_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_cart_items_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

@@ -312,6 +312,38 @@ CREATE INDEX idx_cart_updated_at
   ON public.user_cart_items (updated_at DESC);
 
 -- ============================================================
+-- 🛍️ VIEW : USER_CART_VIEW (avec détails produits)
+-- ============================================================
+
+DROP VIEW IF EXISTS public.user_cart_view;
+
+CREATE OR REPLACE VIEW public.user_cart_view AS
+SELECT
+  c.id AS cart_item_id,
+  c.user_id,
+  c.product_id,
+  COALESCE(c.quantity, 1) AS quantity,
+  c.updated_at,
+  p.name AS product_name,
+  COALESCE(p.price, 0)::numeric(10,2) AS product_price,
+  COALESCE(p.image, '') AS product_image,
+  p.category AS product_category,
+  COALESCE(p.stock, true) AS product_stock
+FROM public.user_cart_items c
+JOIN public.products p ON p.id = c.product_id;
+
+-- Activer la sécurité sur la vue
+ALTER VIEW public.user_cart_view SET (security_invoker = true);
+
+-- Politiques d'accès identiques au panier
+ALTER VIEW public.user_cart_view OWNER TO postgres;
+
+-- RLS sur la vue (hérite de user_cart_items)
+GRANT SELECT ON public.user_cart_view TO authenticated;
+
+
+
+-- ============================================================
 -- 🧾 TABLE : ORDERS
 -- ============================================================
 
