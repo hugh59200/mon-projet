@@ -99,9 +99,9 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
-  import CartMenu from '@/features/catalogue/pop-up/CartMenu.vue'
-  import UserMenu from '@/features/catalogue/pop-up/UserMenu.vue'
+  import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import UserMenu from '@/features/user/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'

@@ -52,7 +52,7 @@
   import { vFeedbackAnimate } from '@/directives/vFeedbackAnimate'
   import { vFocusable } from '@/directives/vFocus'
   import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
-  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'

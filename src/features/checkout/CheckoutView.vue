@@ -158,7 +158,7 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
-  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import { type PaymentProvider } from '@/services/paymentService'
   import { supabase } from '@/supabase/supabaseClient'

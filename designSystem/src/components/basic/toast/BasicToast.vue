@@ -6,14 +6,15 @@
       :class="[`toast--${type}`]"
     >
       <div class="toast__content">
-        <BasicAlert
-          :alert-type="type"
-          :alert-label="message"
-          :has-bg="true"
-          :has-label="true"
-          alert-size="medium"
-        />
-
+        <slot>
+          <BasicAlert
+            :alert-type="type"
+            :alert-label="message"
+            :has-bg="true"
+            :has-label="true"
+            alert-size="medium"
+          />
+        </slot>
         <button
           class="toast__close"
           type="button"
@@ -79,37 +80,20 @@
       font-size: 14px;
       cursor: pointer;
       transition: color 0.1s;
-
       &:hover {
         color: @neutral-900;
       }
     }
-
-    &--danger .alert {
-      border-left: 4px solid @danger-600;
-    }
-    &--warning .alert {
-      border-left: 4px solid @warning-600;
-    }
-    &--success .alert {
-      border-left: 4px solid @success-600;
-    }
-    &--info .alert {
-      border-left: 4px solid @info-600;
-    }
   }
 
-  /* ✨ Animation slide + fade premium */
+  /* Animations */
   .slide-fade-enter-active {
-    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .slide-fade-leave-active {
-    transition: all 1s ease-in-out;
+    transition: all 0.4s ease-in-out;
   }
-  .slide-fade-enter-from {
-    opacity: 0;
-    transform: translateY(-25px);
-  }
+  .slide-fade-enter-from,
   .slide-fade-leave-to {
     opacity: 0;
     transform: translateY(-25px);

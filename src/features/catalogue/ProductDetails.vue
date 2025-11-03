@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
   import type { Tables } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

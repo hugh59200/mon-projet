@@ -47,11 +47,12 @@ export function useProducts() {
    */
   async function loadProducts() {
     loading.value = true
+
     try {
       const { data, error } = await supabase.from('products').select('*')
       if (error) throw error
 
-      // 🔧 Normalisation typée
+      // 🔧 Normalisation typée et sécurisée
       const rows: Product[] = (data || []).map((r) => ({
         ...r,
         price: typeof r.price === 'string' ? parseFloat(r.price) : (r.price as number),
@@ -81,8 +82,16 @@ export function useProducts() {
         priceRange.value.min = rawMin
         priceRange.value.max = rawMax
       }
+
       priceRange.value.from = priceRange.value.min
       priceRange.value.to = priceRange.value.max
+
+      // ✅ Toast de succès optionnel
+      toast.show({
+        message: `${rows.length} produit${rows.length > 1 ? 's' : ''} chargé${rows.length > 1 ? 's' : ''} avec succès`,
+        type: 'success',
+        duration: 2500,
+      })
     } catch (err: any) {
       console.error(err)
       toast.show('Erreur lors du chargement du catalogue', 'danger')
@@ -94,6 +103,7 @@ export function useProducts() {
 
   // 🧾 Infos dérivées (optionnelles)
   const nbProducts = computed(() => products.value.length)
+
   const averagePrice = computed(() =>
     products.value.length
       ? products.value.reduce((acc, p) => acc + (p.price ?? 0), 0) / products.value.length

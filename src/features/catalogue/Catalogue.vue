@@ -96,7 +96,7 @@
             class="catalogue__grid"
             v-responsive-animate.zoom.scroll.stagger="{ delay: 90, speed: 600 }"
           >
-            <ProductCard
+            <ProductCart
               v-for="product in paginatedProducts"
               :key="product.id"
               :product="product"
@@ -163,15 +163,15 @@
 </template>
 
 <script setup lang="ts">
-  import ProductCard from '@/features/catalogue/cart/ProductCart.vue'
-  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
+  import ProductCart from '@/features/catalogue/cart/ProductCart.vue'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useFilters } from '@/features/catalogue/composables/useFilters'
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
-  import { useProducts } from '@/features/catalogue/composables/useProducts'
+  import { useProducts, type Product } from '@/features/catalogue/composables/useProducts'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
@@ -197,7 +197,7 @@
 
   const router = useRouter()
   const cart = useCartStore()
-  const toast = useToastStore()
+  const { showAddToCartToast } = useSmartToast()
 
   const showFilters = ref(false)
 
@@ -215,11 +215,10 @@
     router.push(`/catalogue/${id}`)
   }
 
-  function addToCart(product: any, qty = 1) {
-    cart.addToCart({ ...product, quantity: qty })
-    toast.show(`✅ ${product.name} ajouté au panier`, 'success')
+  function addToCart(p: Product) {
+    cart.addToCart(p)
+    showAddToCartToast(p)
   }
-
   onMounted(loadProducts)
 </script>
 
