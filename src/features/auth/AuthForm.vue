@@ -29,7 +29,6 @@
         @input="clearMessages"
       />
 
-      <!-- Champ mot de passe -->
       <BasicInput
         v-if="mode !== 'reset' && !modeMagicLink"
         v-model="password"
@@ -43,7 +42,7 @@
         @input="clearMessages"
       />
 
-      <!-- Bouton principal -->
+      <!-- ✅ Bouton principal -->
       <BasicButton
         :label="labelBouton"
         type="primary"
@@ -55,14 +54,23 @@
         @click="handleSubmit"
       />
 
-      <!-- 🔁 Basculer entre Magic Link et mot de passe -->
-      <BasicButton
+      <!-- 🔁 Lien magique -->
+      <button
         v-if="mode === 'login'"
-        :label="modeMagicLink ? 'Connexion avec mot de passe 🔑' : 'Connexion par lien magique ✉️'"
-        width="full"
-        size="small"
+        class="auth__magic"
+        type="button"
         @click="toggleMagicLink"
-      />
+      >
+        {{ modeMagicLink ? 'Connexion avec mot de passe 🔑' : 'Connexion par lien magique ✉️' }}
+      </button>
+
+      <!-- 🌍 Séparateur -->
+      <div
+        v-if="mode === 'login'"
+        class="auth__divider"
+      >
+        <span>ou continuer avec</span>
+      </div>
 
       <!-- 🌍 Login via Provider -->
       <div
@@ -70,16 +78,16 @@
         class="auth__providers"
       >
         <BasicButton
-          label="Continuer avec Google"
-          variant="outlined"
+          label="Google"
+          variant="ghost"
           width="full"
           size="medium"
           icon="google"
           @click="auth.signInWithProvider('google')"
         />
         <BasicButton
-          label="Continuer avec GitHub"
-          variant="outlined"
+          label="GitHub"
+          variant="ghost"
           width="full"
           size="medium"
           icon="github"
@@ -119,6 +127,7 @@
       >
         Pas encore de compte ?
         <b>S’inscrire</b>
+        🎉
       </RouterLink>
       <RouterLink
         v-if="mode === 'register'"
@@ -149,8 +158,6 @@
 
   const auth = useAuthStore()
   const router = useRouter()
-
-  // Champs
   const email = ref('')
   const password = ref('')
   const error = ref('')
@@ -159,13 +166,13 @@
   const showPassword = ref(false)
   const modeMagicLink = ref(false)
 
-  // Libellés dynamiques
+  // 🧠 Textes dynamiques
   const titre = computed(() => {
     switch (props.mode) {
       case 'login':
         return 'Connexion'
       case 'register':
-        return 'Inscription'
+        return 'Inscription 🎉'
       case 'reset':
         return 'Réinitialiser le mot de passe'
     }
@@ -173,7 +180,7 @@
 
   const sousTitre = computed(() => {
     if (props.mode === 'login') return 'Bienvenue sur Fast Peptides 🔬'
-    if (props.mode === 'register') return 'Créez un compte pour commencer'
+    if (props.mode === 'register') return 'Créez votre compte pour rejoindre la communauté 🔗'
     if (props.mode === 'reset') return 'Entrez votre e-mail pour recevoir un lien'
     return ''
   })
@@ -181,11 +188,10 @@
   const labelBouton = computed(() => {
     if (props.mode === 'login')
       return modeMagicLink.value ? 'Recevoir un lien magique' : 'Se connecter'
-    if (props.mode === 'register') return 'S’inscrire'
+    if (props.mode === 'register') return 'Créer mon compte'
     return 'Envoyer le lien'
   })
 
-  // 🧩 Méthodes utilitaires
   function clearMessages() {
     error.value = ''
     message.value = ''
@@ -197,7 +203,6 @@
     clearMessages()
   }
 
-  // 🧠 Soumission du formulaire
   async function handleSubmit() {
     clearMessages()
     loading.value = true
@@ -212,29 +217,23 @@
       if (props.mode === 'login') {
         if (modeMagicLink.value) {
           const success = await auth.signInWithMagicLink(email.value)
-          if (success) {
-            message.value = 'Vérifiez votre boîte e-mail pour le lien magique ✨'
-          } else {
-            error.value = auth.error ?? 'Impossible d’envoyer le lien.'
-          }
+          message.value = success
+            ? 'Vérifiez votre boîte e-mail pour le lien magique ✨'
+            : (auth.error ?? 'Impossible d’envoyer le lien.')
         } else {
           const success = await auth.signIn(email.value, password.value)
           if (success) {
             const redirect = router.currentRoute.value.query.redirect as string
             router.push(redirect || '/')
-          } else {
-            error.value = auth.error ?? 'Email ou mot de passe incorrect.'
-          }
+          } else error.value = auth.error ?? 'Email ou mot de passe incorrect.'
         }
       }
 
       if (props.mode === 'register') {
         const success = await auth.signUp(email.value, password.value)
-        if (success) {
-          message.value = 'Vérifiez vos e-mails pour confirmer votre compte 📧'
-        } else {
-          error.value = auth.error ?? 'Inscription échouée.'
-        }
+        message.value = success
+          ? 'Vérifiez vos e-mails pour confirmer votre compte 📧'
+          : (auth.error ?? 'Inscription échouée.')
       }
 
       if (props.mode === 'reset') {
@@ -253,7 +252,6 @@
 <style scoped lang="less">
   .auth {
     max-width: 380px;
-    margin: 80px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -261,10 +259,12 @@
 
     &__title {
       margin-bottom: 8px;
+      font-weight: 700;
     }
 
     &__subtitle {
-      margin-bottom: 24px;
+      margin-bottom: 32px;
+      color: @neutral-500;
     }
 
     &__form {
@@ -272,48 +272,118 @@
       flex-direction: column;
       gap: 16px;
       width: 100%;
+      background: #fff;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    /* Animation douce des champs */
+    &__form > * {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeInUp 0.4s ease forwards;
+    }
+    &__form > *:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+    &__form > *:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    &__form > *:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    &__magic {
+      background: none;
+      border: none;
+      color: @primary-700;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: -2px;
+      transition: all 0.2s ease;
+      &:hover {
+        color: darken(@primary-700, 5%);
+        text-decoration: underline;
+      }
+    }
+
+    &__divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0 14px;
+      color: @neutral-400;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      &::before,
+      &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: @neutral-200;
+        margin: 0 10px;
+      }
     }
 
     &__providers {
-      margin-top: 12px;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: center;
+      gap: 14px;
+
+      button {
+        flex: 1;
+        border: 1px solid @neutral-200;
+        border-radius: 8px;
+        height: 40px;
+        background: #fafafa;
+        color: @neutral-700;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        &:hover {
+          background: #f0f0f0;
+          border-color: @neutral-300;
+        }
+      }
     }
 
-    &__error {
-      color: @danger-600;
-      margin-top: 10px;
-    }
-
+    &__error,
     &__message {
       margin-top: 10px;
     }
 
+    &__error {
+      color: @danger-600;
+      font-weight: 500;
+    }
+
+    &__message {
+      color: @primary-600;
+    }
+
     &__links {
-      margin-top: 24px;
+      margin-top: 28px;
       display: flex;
       flex-direction: column;
       gap: 6px;
       font-size: 14px;
+      color: @neutral-600;
 
       a {
         color: @primary-700;
         text-decoration: none;
+        transition: color 0.2s ease;
         &:hover {
           text-decoration: underline;
+          color: darken(@primary-700, 5%);
         }
       }
     }
-  }
-
-  /* Animations */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.2s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
   }
 </style>

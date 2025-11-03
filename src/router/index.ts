@@ -26,24 +26,27 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/auth',
-    component: () => import('@/features/auth/AuthWrapper.vue'),
+    component: () => import('@/features/auth/AuthLayout.vue'),
     children: [
       {
         path: 'login',
         name: 'login',
-        component: () => import('@/features/auth/LoginView.vue'),
+        component: () => import('@/features/auth/AuthForm.vue'),
+        props: { mode: 'login' },
         meta: { title: 'Connexion – Fast Peptides' },
       },
       {
         path: 'register',
         name: 'register',
-        component: () => import('@/features/auth/RegisterView.vue'),
+        component: () => import('@/features/auth/AuthForm.vue'),
+        props: { mode: 'register' },
         meta: { title: 'Inscription – Fast Peptides' },
       },
       {
         path: 'reset-password',
         name: 'reset-password',
-        component: () => import('@/features/auth/ResetPasswordView.vue'),
+        component: () => import('@/features/auth/AuthForm.vue'),
+        props: { mode: 'reset' },
         meta: { title: 'Mot de passe oublié – Fast Peptides' },
       },
     ],
@@ -94,7 +97,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'catalogue',
     component: () => import('@/features/catalogue/Catalogue.vue'),
     meta: {
-      requiresAuth: true,
       label: 'Catalogue',
       icon: 'Boxes',
       order: 2,
@@ -107,7 +109,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'product-detail',
     component: () => import('@/features/catalogue/ProductDetails.vue'),
     meta: {
-      requiresAuth: true,
       title: 'Produit – Fast Peptides',
       getDescription: (route) =>
         `Découvrez le peptide ${route.params.id as string} sur Fast Peptides.`,

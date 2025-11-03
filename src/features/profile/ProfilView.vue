@@ -39,7 +39,7 @@
 
         <div class="profil__header-info">
           <BasicText
-            size="h5"
+            size="h3"
             weight="bold"
           >
             {{ editableName || 'Mon profil' }}

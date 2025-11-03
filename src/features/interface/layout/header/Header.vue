@@ -1,9 +1,5 @@
 <template>
-  <nav
-    class="auth-navbar"
-    v-responsive-animate.fade.once
-  >
-    <!-- 🧭 Gauche -->
+  <nav class="auth-navbar">
     <div class="auth-navbar__left">
       <BasicButton
         @click="toggleMobileMenu"
@@ -32,16 +28,12 @@
         </BasicText>
       </div>
     </div>
-
-    <!-- 📚 Desktop links -->
     <div class="auth-navbar__center">
       <MainNavLinks />
     </div>
-
-    <!-- 🧩 Droite -->
     <div class="auth-navbar__right">
+      <CartMenu />
       <template v-if="auth.user">
-        <CartMenu />
         <UserMenu />
       </template>
       <template v-else>
@@ -60,15 +52,11 @@
         />
       </template>
     </div>
-
-    <!-- 📱 Drawer mobile -->
     <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
 
 <script setup lang="ts">
-  import { vClickOutside } from '@/directives/vClickOutside'
-  import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import CartMenu from '@/features/catalogue/pop-up/CartMenu.vue'
   import UserMenu from '@/features/catalogue/pop-up/UserMenu.vue'
@@ -77,13 +65,6 @@
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
   import MobileDrawer from './MobileDrawer.vue'
-
-  defineOptions({
-    directives: {
-      clickOutside: vClickOutside,
-      responsiveAnimate: vResponsiveAnimate,
-    },
-  })
 
   const router = useRouter()
   const auth = useAuthStore()
