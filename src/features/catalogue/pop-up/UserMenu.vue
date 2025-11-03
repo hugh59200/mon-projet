@@ -8,7 +8,7 @@
       class="user-menu"
       ref="menuRef"
     >
-      <!-- 👤 Icône profil + badge façon panier -->
+      <!-- 👤 Icône profil + badge -->
       <div
         class="user-avatar"
         @click="toggleMenu"
@@ -31,38 +31,45 @@
         </div>
       </div>
 
-      <!-- 📋 Menu déroulant -->
+      <!-- 📋 Dropdown -->
       <transition name="fade-slide">
         <div
           v-if="menuOpen"
           class="user-dropdown"
           v-click-outside="{ callback: () => (menuOpen = false), exclude: [menuRef] }"
         >
-          <div class="user-header">
-            <BasicText
-              weight="bold"
-              size="body-m"
-            >
-              {{ auth.user.fullName || 'Utilisateur' }}
-            </BasicText>
-            <BasicText
-              size="body-s"
-              color="neutral-300"
-            >
-              {{ auth.user.email }}
-            </BasicText>
-          </div>
+          <template v-if="auth.user">
+            <div class="user-header">
+              <BasicText
+                weight="bold"
+                size="body-m"
+              >
+                {{ auth.user.fullName || 'Utilisateur' }}
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-300"
+              >
+                {{ auth.user.email }}
+              </BasicText>
+            </div>
 
-          <div class="divider" />
-          <div @click="goToProfile">Mon profil</div>
-          <div
-            v-if="auth.isAdmin"
-            @click="goToAdmin"
-          >
-            Espace Admin
-          </div>
-          <div class="divider" />
-          <div @click="handleLogout">Se déconnecter</div>
+            <div class="divider" />
+            <div @click="goToProfile">Mon profil</div>
+            <div
+              v-if="auth.isAdmin"
+              @click="goToAdmin"
+            >
+              Espace Admin
+            </div>
+            <div class="divider" />
+            <div @click="handleLogout">Se déconnecter</div>
+          </template>
+
+          <template v-else>
+            <div @click="router.push('/auth/login')">Connexion</div>
+            <div @click="router.push('/auth/register')">Inscription</div>
+          </template>
         </div>
       </transition>
     </div>
@@ -120,7 +127,7 @@
     color: white;
   }
 
-  /* 🌟 Cercle autour de l’icône utilisateur */
+  /* 🌟 Avatar glow effect */
   .user-avatar {
     position: relative;
     width: 36px;
@@ -138,6 +145,7 @@
     &:hover {
       background: fade(white, 10%);
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+      animation: pulseGlow 1.6s infinite ease-in-out;
     }
 
     &:active {
@@ -154,12 +162,11 @@
       opacity: 1;
     }
 
-    /* 🟦 Badge façon panier */
     .user-badge {
       position: absolute;
       top: -2px;
       right: -2px;
-      background: @primary-500; /* ✅ couleur pro */
+      background: @primary-500;
       color: white;
       border-radius: 50%;
       height: 14px;
@@ -167,7 +174,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 2px @neutral-900; /* même effet que le panier */
+      box-shadow: 0 0 0 2px @neutral-900;
       font-size: 11px;
       font-weight: 600;
       transition: transform 0.25s ease;
@@ -178,7 +185,17 @@
     }
   }
 
-  /* 🔽 Menu déroulant */
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+    }
+    50% {
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  /* 🔽 Dropdown */
   .user-dropdown {
     position: absolute;
     top: 44px;
@@ -219,7 +236,6 @@
     }
   }
 
-  /* ✨ Animations */
   @keyframes bounceIn {
     0% {
       transform: scale(0.9);

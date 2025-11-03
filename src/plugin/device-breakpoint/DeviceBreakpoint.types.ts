@@ -4,8 +4,8 @@ import { getCurrentInstance, inject, readonly, ref, type App, type Ref } from 'v
 export const Breakpoint = ['mobile', 'tablet', 'desktop'] as const
 export type Breakpoint = (typeof Breakpoint)[number]
 
-export const MOBILE_MAX = 1000 as const
-export const TABLET_MAX = 1400 as const
+export const MOBILE_MAX = 750 as const
+export const TABLET_MAX = 1000 as const
 
 export type DeviceBreakpointData = {
   currentWindowsWidth: Ref<number>

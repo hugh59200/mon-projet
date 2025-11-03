@@ -12,15 +12,18 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
 }
 
 type TableName = keyof Database['public']['Tables'] & string
+
+// ✅ Pas de "public" ici : Tables prend directement la table
+type Row<T extends TableName> = Tables<T> extends infer R ? R : never
 type SearchFunction<T> = (row: T, query: string) => boolean
 
 interface UseAdminTableOptions<T extends TableName> {
   table: T
-  orderBy?: keyof Tables<T> & string
+  orderBy?: keyof Row<T> & string
   ascending?: boolean
   filters?: Record<string, any>
-  searchFn?: SearchFunction<Tables<T>>
-  limit?: number // 🧩 ajout pagination dynamique
+  searchFn?: SearchFunction<Row<T>>
+  limit?: number
 }
 
 export function useAdminTable<T extends TableName>(options: UseAdminTableOptions<T>) {
@@ -33,9 +36,8 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     limit = 20,
   } = options
 
-  // --- State
-  const data = ref<Tables<T>[]>([])
-  const filteredData = ref<Tables<T>[]>([])
+  const data = ref<Row<T>[]>([])
+  const filteredData = ref<Row<T>[]>([])
   const total = ref(0)
   const nbPages = ref(1)
   const page = ref(1)
@@ -46,7 +48,6 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
   const loading = ref(false)
   const hasLoaded = ref(false)
 
-  // --- Main fetch
   async function fetchData() {
     loading.value = true
     try {
@@ -59,7 +60,6 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
         .order(sortKey.value, { ascending: sortAsc.value })
         .range(from, to)
 
-      // Appliquer les filtres actifs
       for (const [key, value] of Object.entries(activeFilters.value)) {
         if (value && value !== 'all') query = query.eq(key, value)
       }
@@ -67,17 +67,17 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       const { data: rows, count, error } = await query
       if (error) throw error
 
-      const validRows = Array.isArray(rows) ? (rows as Tables<T>[]) : []
+      const validRows = Array.isArray(rows) ? (rows as Row<T>[]) : []
       data.value = validRows
       total.value = count ?? validRows.length
       nbPages.value = Math.ceil(total.value / limit) || 1
       hasLoaded.value = true
 
-      // Filtrage local (search)
       if (searchFn && search.value) {
         const q = search.value.toLowerCase().trim()
-        const safeSearch = searchFn as (r: any, q: string) => boolean
-        filteredData.value = validRows.filter((row) => safeSearch(row, q))
+        filteredData.value = validRows.filter((row) =>
+          (searchFn as (r: Row<T>, q: string) => boolean)(row, q),
+        )
       } else {
         filteredData.value = validRows
       }
@@ -88,16 +88,10 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     }
   }
 
-  // --- Debounce sur la recherche
   const debouncedFetch = debounce(fetchData, 400)
   watch(search, () => debouncedFetch())
+  watch([sortKey, sortAsc, activeFilters, page], () => fetchData())
 
-  // --- Rafraîchissement sur tri / filtres / pagination
-  watch([sortKey, sortAsc, activeFilters, page], () => {
-    fetchData()
-  })
-
-  // --- Reset complet
   function reset() {
     search.value = ''
     sortKey.value = orderBy
@@ -107,7 +101,6 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     fetchData()
   }
 
-  // --- Fetch initial
   onMounted(() => {
     fetchData()
   })

@@ -13,12 +13,11 @@
     >
       <BasicButton
         :label="item.label"
-        :iconName="item.icon"
+        :iconName="showIcon ? item.icon : undefined"
         type="reverse"
         variant="ghost"
         size="small"
-        :class="['main-nav__btn']"
-        :active="$route.path === item.path"
+        :class="['main-nav__btn', { active: $route.path === item.path }]"
       />
     </RouterLink>
   </nav>
@@ -26,10 +25,12 @@
 
 <script setup lang="ts">
   import { useSidebarStore } from '@/features/interface/layout/sideBar/useSidebarStore'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
 
   const { sidebarItems } = storeToRefs(useSidebarStore())
+  const { isDesktop, isMobile } = useDeviceBreakpoint()
 
   const props = defineProps({
     direction: {
@@ -37,8 +38,9 @@
       default: 'row',
     },
   })
-
   defineEmits(['navigate'])
+
+  const showIcon = computed(() => isMobile.value || isDesktop.value)
 
   const directionClass = computed(() =>
     props.direction === 'column' ? 'main-nav--vertical' : 'main-nav--horizontal',
@@ -49,24 +51,26 @@
   .main-nav {
     display: flex;
     align-items: center;
-    gap: 26px;
+    gap: 20px;
 
     &__item {
       text-decoration: none;
     }
 
     &__btn {
-      gap: 6px;
       padding: 6px 10px;
+      gap: 6px;
+      transition: all 0.25s ease;
 
       &:hover {
         background: fade(white, 10%);
-        color: white;
+        transform: translateY(-1px);
       }
 
-      &.is-active {
+      &.active {
         background: fade(@primary-500, 25%);
         color: white;
+        transform: translateY(-1px);
       }
     }
   }
@@ -76,20 +80,8 @@
     justify-content: center;
   }
 
-  /* --- VERTICAL (drawer mobile) --- */
   .main-nav--vertical {
-    margin-top: 15px;
     flex-direction: column;
-    align-items: flex-start;
     gap: 14px;
-
-    .main-nav__btn {
-      width: 200px;
-      display: flex;
-      justify-content: flex-start;
-      gap: 8px;
-      border-radius: 14px;
-      padding: 10px 12px;
-    }
   }
 </style>

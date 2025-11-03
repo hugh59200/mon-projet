@@ -1,14 +1,17 @@
 <template>
   <nav class="auth-navbar">
+    <!-- 🔹 GAUCHE -->
     <div class="auth-navbar__left">
+      <!-- Menu burger visible uniquement en mobile -->
       <BasicButton
+        v-if="isMobile"
         @click="toggleMobileMenu"
         aria-label="Ouvrir le menu"
         :icon-name="isMenuOpen ? 'X' : 'Menu'"
         size="small"
         type="reverse"
         variant="ghost"
-        class="burder"
+        class="burger"
       />
       <div
         class="logo"
@@ -22,34 +25,72 @@
         <BasicText
           size="body-l"
           weight="bold"
+          color="white"
           class="auth-navbar__logo"
         >
           Fast Peptides
         </BasicText>
       </div>
     </div>
-    <div class="auth-navbar__center">
+
+    <!-- 🔹 CENTRE -->
+    <div
+      v-if="!isMobile"
+      class="auth-navbar__center"
+    >
       <MainNavLinks />
     </div>
+
+    <!-- 🔹 DROITE -->
     <div class="auth-navbar__right">
       <CartMenu />
+
+      <!-- 👤 CONNECTÉ -->
       <template v-if="auth.user">
         <UserMenu />
       </template>
+
+      <!-- 🧾 INVITÉ -->
+      <template v-else-if="hasGuestCart">
+        <div class="guest-info">
+          <BasicText
+            size="body-s"
+            color="neutral-300"
+          >
+            Invité
+          </BasicText>
+          <BasicButton
+            label="Se connecter"
+            type="primary"
+            size="small"
+            @click="router.push('/auth/login')"
+          />
+        </div>
+      </template>
+      <!-- 🚪 VISITEUR -->
       <template v-else>
-        <BasicButton
-          label="Connexion"
-          type="primary"
-          size="small"
-          @click="router.push('/auth/login')"
-        />
-        <BasicButton
-          label="Inscription"
-          type="reverse"
-          variant="outlined"
-          size="small"
-          @click="router.push('/auth/register')"
-        />
+        <div
+          v-if="isDesktop"
+          class="auth-navbar__buttons"
+        >
+          <BasicButton
+            label="Connexion"
+            type="primary"
+            size="small"
+            @click="router.push('/auth/login')"
+          />
+          <BasicButton
+            label="Inscription"
+            type="reverse"
+            variant="outlined"
+            size="small"
+            @click="router.push('/auth/register')"
+          />
+        </div>
+
+        <div v-else>
+          <UserMenu />
+        </div>
       </template>
     </div>
     <MobileDrawer v-model="isMenuOpen" />
@@ -58,23 +99,26 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useCartStore } from '@/features/catalogue/cart/useCartStore'
   import CartMenu from '@/features/catalogue/pop-up/CartMenu.vue'
   import UserMenu from '@/features/catalogue/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { onUnmounted, ref, watch } from 'vue'
+  import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
   import MobileDrawer from './MobileDrawer.vue'
 
   const router = useRouter()
   const auth = useAuthStore()
-  const { isMobile } = useDeviceBreakpoint()
+  const cart = useCartStore()
+  const { isMobile, isDesktop } = useDeviceBreakpoint()
   const isMenuOpen = ref(false)
 
   const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
   const closeMenu = () => (isMenuOpen.value = false)
-
   router.afterEach(() => closeMenu())
+
+  const hasGuestCart = computed(() => !auth.user && cart.items.length > 0)
 
   const stopWatch = watch(isMobile, (mobile) => {
     if (!mobile) closeMenu()
@@ -90,7 +134,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 28px;
-    color: white;
     background: linear-gradient(90deg, @neutral-900, darken(@neutral-900, 5%));
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
@@ -98,20 +141,6 @@
       display: flex;
       align-items: center;
       gap: 16px;
-
-      .btn {
-        gap: 6px;
-
-        &:hover {
-          background: fade(white, 10%);
-          color: @white;
-        }
-
-        &.is-active {
-          background: fade(@primary-500, 25%);
-          color: @white;
-        }
-      }
     }
 
     &__center {
@@ -123,7 +152,14 @@
     &__right {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 20px;
+      overflow: visible;
+    }
+
+    &__buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   }
 
@@ -132,69 +168,40 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    caret-color: transparent;
+
     .logo-img {
       width: 38px;
       height: 38px;
       transition: transform 0.25s ease;
-      caret-color: transparent;
       &:hover {
         transform: scale(1.08);
       }
     }
   }
 
-  /* --- Burger button --- */
-  .burger-btn {
-    display: none;
-    background: transparent;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 4px;
-    transition: transform 0.2s ease;
-    &:hover {
-      transform: scale(1.1);
-    }
+  .guest-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 8px;
   }
 
-  /* --- Animation slide --- */
-  .slide-left-enter-active,
-  .slide-left-leave-active {
-    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .slide-left-enter-from {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-  .slide-left-leave-to {
-    opacity: 0;
-    transform: translateX(-80%); /* ✅ effet fermeture plus fluide */
-  }
-
-  /* --- Responsive --- */
   @media (max-width: 900px) {
     .auth-navbar {
       padding: 0 16px;
       height: 58px;
 
-      &__center {
-        display: none;
+      &__right {
+        gap: 14px;
       }
+    }
 
-      .burger-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-
+    .logo {
       .logo-img {
         width: 30px;
         height: 30px;
-      }
-
-      &__right {
-        gap: 20px;
       }
     }
   }

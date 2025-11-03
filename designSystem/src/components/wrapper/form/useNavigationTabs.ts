@@ -1,6 +1,6 @@
 import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore' // ✅ import du store
 import type { RouteName } from '@/router/route-name'
-import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
+import type { TextColor } from '@designSystem/components/basic'
 import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -18,8 +18,7 @@ export function useNavigationTabs() {
     return parent.children.map((child) => ({
       routeName: child.name as RouteName,
       tabKey: (child.meta?.label as TabsModel) || (child.name as string),
-      tabState: (child.meta?.icon as IconNameNext) ?? undefined,
-      color: (child.meta?.color as string) ?? '#9CA3AF', // couleur par défaut
+      color: (child.meta?.color as TextColor) ?? 'gray-400', // couleur par défaut
     }))
   })
 
