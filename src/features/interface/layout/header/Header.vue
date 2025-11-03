@@ -44,7 +44,6 @@
     <!-- 🔹 DROITE -->
     <div class="auth-navbar__right">
       <CartMenu />
-
       <!-- 👤 CONNECTÉ -->
       <template v-if="auth.user">
         <UserMenu />

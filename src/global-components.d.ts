@@ -45,6 +45,7 @@ declare module 'vue' {
     BasicTooltip: typeof import('./../designSystem/src/components/basic/tooltip/BasicTooltip.vue')['default']
     ClickOutside: typeof import('./../designSystem/src/components/basic/click-outside/ClickOutside.vue')['default']
     CustomToast: typeof import('./../designSystem/src/components/basic/toast/CustomToast.vue')['default']
+    CustomToastCompact: typeof import('./../designSystem/src/components/basic/toast/CustomToastCompact.vue')['default']
     DropdownContainer: typeof import('./../designSystem/src/components/wrapper/dropdownContainer/DropdownContainer.vue')['default']
     EmptyTablePlaceholder: typeof import('./../designSystem/src/components/basic/emptyTablePlaceholder/EmptyTablePlaceholder.vue')['default']
     FloatingDropdownWrapper: typeof import('./../designSystem/src/components/wrapper/pop-up/FloatingDropdownWrapper.vue')['default']

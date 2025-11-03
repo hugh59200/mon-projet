@@ -35,7 +35,7 @@
           class="cart__item"
         >
           <img
-            :src="item.image"
+            :src="item.image || defaultImage"
             :alt="item.name"
             class="cart__item-img"
           />
@@ -113,6 +113,7 @@
 </template>
 
 <script setup lang="ts">
+  import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   const cart = useCartStore()
 </script>

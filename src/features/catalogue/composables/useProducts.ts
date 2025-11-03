@@ -1,12 +1,7 @@
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables } from '@/supabase/types/supabase'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { computed, ref } from 'vue'
-
-/**
- * Type produit issu directement de Supabase (table 'products')
- */
-export type Product = Tables<'products'>
+import type { Product } from '../types/product'
 
 /**
  * Type pour la plage de prix (slider)

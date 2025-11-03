@@ -396,6 +396,39 @@ export type Database = {
           },
         ]
       }
+      user_cart: {
+        Row: {
+          items: Json
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          items?: Json
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          items?: Json
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_cart_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_cart_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       conversation_overview: {
