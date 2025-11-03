@@ -1,46 +1,60 @@
 <template>
   <footer class="footer">
     <div class="footer__main">
-      <!-- 🔹 Bloc gauche : logo + disclaimer large -->
-      <div class="footer__brand">
-        <img
-          src="@/assets/logo-app.png"
-          alt="Fast Peptides Logo"
-          class="footer__logo"
-        />
-
-        <div class="footer__disclaimer">
-          <BasicIconNext
-            name="Quote"
-            :size="22"
-            class="footer__quote-icon"
+      <!-- 🔹 Bloc logo + disclaimer (horizontal quand desktop) -->
+      <div
+        v-if="isDesktop"
+        class="footer__brand"
+      >
+        <div class="footer__brand-left">
+          <img
+            src="@/assets/logo-app.png"
+            alt="Fast Peptides Logo"
+            class="footer__logo"
           />
-          <div class="footer__disclaimer-grid">
-            <p>
-              <strong>Research Use Only :</strong>
-              Tous nos produits sont exclusivement destinés à la recherche scientifique et
-              analytique.
-              <br />
-              Ils ne sont pas destinés à un usage humain, thérapeutique ou médical.
-            </p>
-            <p>
-              <strong>Not Medical Products :</strong>
-              Aucune substance listée ici ne doit être utilisée ou présentée comme médicament.
-            </p>
-            <p>
-              <strong>Responsabilité :</strong>
-              L’acheteur est responsable du respect de la législation locale. Fast-Peptides décline
-              toute responsabilité en cas de mauvaise utilisation.
-            </p>
-            <p>
-              <strong>Conformité :</strong>
-              L’achat implique la compréhension et l’acceptation des termes de recherche uniquement.
-            </p>
+        </div>
+
+        <div class="footer__brand-right">
+          <div class="footer__disclaimer">
+            <BasicIconNext
+              name="Quote"
+              :size="22"
+              class="footer__quote-icon"
+            />
+            <div class="footer__disclaimer-grid">
+              <div class="footer__disclaimer-item">
+                <p>
+                  <strong>Research Use Only :</strong>
+                  Tous nos produits sont exclusivement destinés à la recherche scientifique et
+                  analytique. Ils ne sont pas destinés à un usage humain, thérapeutique ou médical.
+                </p>
+              </div>
+              <div class="footer__disclaimer-item">
+                <p>
+                  <strong>Not Medical Products :</strong>
+                  Aucune substance listée ici ne doit être utilisée ou présentée comme médicament.
+                </p>
+              </div>
+              <div class="footer__disclaimer-item">
+                <p>
+                  <strong>Responsabilité :</strong>
+                  L’acheteur est responsable du respect de la législation locale. Fast-Peptides
+                  décline toute responsabilité en cas de mauvaise utilisation.
+                </p>
+              </div>
+              <div class="footer__disclaimer-item">
+                <p>
+                  <strong>Conformité :</strong>
+                  L’achat implique la compréhension et l’acceptation des conditions “Research Use
+                  Only”.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 🔹 Liens -->
+      <!-- 🔹 Liens (centrés verticalement par rapport au bloc de gauche) -->
       <div class="footer__columns">
         <div class="footer__col">
           <BasicText
@@ -85,7 +99,7 @@
           <ul>
             <li><RouterLink to="/checkout">Paiement sécurisé</RouterLink></li>
             <li><RouterLink to="/profil/commandes">Suivi de commande</RouterLink></li>
-            <li><RouterLink to="/access-denied">Politique de confidentialité</RouterLink></li>
+            <li><RouterLink to="/access-denied">Confidentialité</RouterLink></li>
             <li><RouterLink to="/terms">CGU</RouterLink></li>
           </ul>
         </div>
@@ -104,7 +118,6 @@
           >
             Recevez nos nouveautés et mises à jour scientifiques.
           </BasicText>
-
           <div class="footer__newsletter">
             <BasicInput
               placeholder="Votre email"
@@ -123,19 +136,18 @@
       </div>
     </div>
 
-    <!-- 🔹 Ligne basse -->
+    <!-- 🔹 Bas de page -->
     <div class="footer__bottom">
       <BasicText
         size="body-s"
         color="neutral-300"
       >
-        © 2025 Fast-Peptides. Tous droits réservés.
+        © 2025 Fast-Peptides — Tous droits réservés.
       </BasicText>
       <BasicText
         size="body-s"
         color="neutral-400"
         class="footer__version"
-        @click="toggleModal = true"
         pointer
       >
         Version 1.0
@@ -145,57 +157,98 @@
 </template>
 
 <script setup lang="ts">
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { ref } from 'vue'
+  const { isDesktop } = useDeviceBreakpoint()
   const toggleModal = ref(false)
 </script>
 
 <style scoped lang="less">
   .footer {
+    position: relative;
+    z-index: 1;
     background: @neutral-800;
     color: white;
     display: flex;
     flex-direction: column;
     padding: 70px 8vw 25px;
-    gap: 50px;
+    gap: 60px;
     font-family: 'Inter', sans-serif;
 
+    /* === Zone principale === */
     &__main {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
+      align-items: flex-start; /* ✅ évite la contraction verticale */
       gap: 60px;
     }
 
-    /* === Logo + Disclaimer === */
+    /* === Bloc logo + disclaimer côte à côte === */
     &__brand {
       flex: 2;
-      min-width: 420px;
       display: flex;
-      flex-direction: column;
-      gap: 28px;
+      align-items: flex-start; /* ✅ empêche le disclaimer d'être centré verticalement */
+      justify-content: flex-start;
+      gap: 40px;
+      min-width: 420px;
+
+      .footer__brand-left {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
       .footer__logo {
-        width: 240px;
-        max-width: 260px;
-        margin: 0 auto;
+        width: clamp(140px, 18vw, 220px);
         object-fit: contain;
         filter: brightness(1.1);
       }
 
+      .footer__divider {
+        width: 1px;
+        height: 80%;
+        background: fade(white, 15%);
+        backdrop-filter: blur(2px);
+      }
+
+      .footer__brand-right {
+        flex: 1;
+        display: flex;
+        align-items: flex-start; /* ✅ alignement haut */
+        justify-content: flex-start;
+        min-width: 400px;
+        margin-right: 40px; /* 💡 espace avec les colonnes à droite */
+      }
+
+      /* === Bloc disclaimer === */
       .footer__disclaimer {
         position: relative;
-        background: fade(white, 5%);
-        border: 1px solid fade(white, 25%);
+        z-index: 0;
+        flex: 1;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: linear-gradient(145deg, fade(white, 7%), fade(black, 5%));
+        border: 1px solid fade(white, 18%);
         border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 12px fade(black, 20%);
+        padding: 28px 30px;
+        box-shadow: 0 4px 14px fade(black, 25%);
         color: fade(white, 88%);
         overflow: hidden;
+        width: 100%;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: linear-gradient(145deg, fade(white, 10%), fade(black, 7%));
+        }
 
         .footer__quote-icon {
           position: absolute;
-          top: 18px;
-          left: 22px;
+          top: 16px;
+          left: 20px;
           opacity: 0.25;
         }
 
@@ -203,24 +256,21 @@
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 16px 24px;
-          margin-left: 20px; /* pour ne pas chevaucher l’icône */
+          margin-left: 18px;
 
-          p {
-            font-size: 14px;
-            line-height: 1.6;
-            margin: 0;
-            strong {
-              color: @primary-200;
+          .footer__disclaimer-item {
+            display: flex;
+            align-items: flex-start;
+            p {
+              font-size: 14px;
+              line-height: 1.6;
+              margin: 0;
+              text-align: justify;
+              strong {
+                color: @primary-200;
+              }
             }
           }
-        }
-
-        &:before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, fade(@primary-500, 10%) 0%, fade(black, 5%) 100%);
-          pointer-events: none;
         }
       }
     }
@@ -230,7 +280,8 @@
       flex: 2;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 30px;
+      gap: 40px 30px;
+      align-items: flex-start;
     }
 
     a {
@@ -256,7 +307,7 @@
     /* === Ligne basse === */
     &__bottom {
       border-top: 1px solid fade(white, 18%);
-      padding-top: 18px;
+      padding-top: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -272,16 +323,58 @@
     }
 
     /* === Responsive === */
-    @media (max-width: 900px) {
-      &__disclaimer-grid {
-        grid-template-columns: 1fr !important;
+    @media (max-width: 1250px) {
+      &__brand {
+        gap: 28px;
+
+        .footer__disclaimer {
+          padding: 22px 24px;
+          .footer__disclaimer-grid {
+            grid-template-columns: 1fr;
+          }
+        }
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 950px) {
+      &__brand {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+
+        .footer__divider {
+          display: none;
+        }
+
+        .footer__disclaimer {
+          max-width: 600px;
+        }
+      }
+    }
+
+    @media (max-width: 700px) {
+      padding: 50px 6vw 20px;
+      gap: 40px;
       &__columns {
         grid-template-columns: 1fr;
       }
+      &__bottom {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+    }
+  }
+
+  @media (max-width: 1500px) {
+    .footer__brand-right {
+      display: none !important;
+    }
+
+    .footer__brand {
+      justify-content: center;
+      align-self: center;
+      flex: 1;
     }
   }
 </style>
