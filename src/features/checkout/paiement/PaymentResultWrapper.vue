@@ -4,9 +4,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  // Ce composant ne fait qu’encapsuler les vues success / cancel
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
   .payment-result-wrapper {

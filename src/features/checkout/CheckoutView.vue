@@ -20,30 +20,46 @@
 
       <div
         v-for="item in cart.items"
-        :key="item.id"
+        :key="item.cart_item_id!"
         class="checkout__item"
       >
         <div class="checkout__item-left">
           <img
-            :src="item.image || defaultImage"
-            :alt="item.name"
+            :src="item.product_image || defaultImage"
+            :alt="item.product_name!"
             class="checkout__item-img"
           />
-          <div>
-            <BasicText weight="bold">{{ item.name }}</BasicText>
-            <BasicText
-              size="body-s"
-              color="neutral-500"
+
+          <div class="checkout__item-info">
+            <div
+              class="product-name-wrapper"
+              @click="openProductModal(item.product_id!, $event)"
             >
-              {{ item.quantity }} × {{ item.price.toFixed(2) }} €
-            </BasicText>
+              <BasicText
+                weight="bold"
+                class="product-name clickable"
+              >
+                {{ item.product_name }}
+              </BasicText>
+              <BasicIconNext
+                name="Search"
+                :size="16"
+                class="product-search-icon"
+              />
+            </div>
+
+            <div class="product-line">
+              <span>{{ item.quantity ?? 1 }} ×</span>
+              <span class="product-price">{{ (item.product_price ?? 0).toFixed(2) }} €</span>
+            </div>
           </div>
         </div>
+
         <BasicText
           weight="bold"
           class="checkout__item-price"
         >
-          {{ (item.quantity * item.price).toFixed(2) }} €
+          {{ ((item.product_price ?? 0) * (item.quantity ?? 1)).toFixed(2) }} €
         </BasicText>
       </div>
 
@@ -153,6 +169,15 @@
       :disabled="cart.items.length === 0"
       @click="submitOrder"
     />
+
+    <!-- 🪟 Modale produit -->
+    <teleport to="#app">
+      <ProductModalCheckout
+        v-if="selectedProductId"
+        v-model="isModalVisible"
+        :product-id="selectedProductId"
+      />
+    </teleport>
   </div>
 </template>
 
@@ -160,13 +185,18 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import {
+    finalizeOrderAfterPayment,
+    processPayment,
+    type PaymentProvider,
+  } from '@/features/checkout/paiement/service/paymentService'
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
-  import { type PaymentProvider } from '@/services/paymentService'
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { Bitcoin, CreditCard, TestTube } from 'lucide-vue-next'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import ProductModalCheckout from './modale/ProductModalCheckout.vue'
 
   const auth = useAuthStore()
   const cart = useCartStore()
@@ -180,6 +210,10 @@
   const zip = ref('')
   const city = ref('')
   const country = ref('France')
+
+  // --- Modale produit
+  const isModalVisible = ref(false)
+  const selectedProductId = ref<string | null>(null)
 
   // --- Méthodes de paiement
   const paymentMethods = [
@@ -205,6 +239,25 @@
 
   const selectedPayment = ref<PaymentProvider>('simulation')
 
+  // 🌊 Effet ripple + ouverture modale
+  function openProductModal(productId?: string, event?: MouseEvent) {
+    if (!productId || !event) return
+    const target = event.currentTarget as HTMLElement
+    if (!target) return
+
+    const ripple = document.createElement('span')
+    ripple.className = 'ripple'
+    ripple.style.left = `${event.offsetX}px`
+    ripple.style.top = `${event.offsetY}px`
+    target.appendChild(ripple)
+    setTimeout(() => ripple.remove(), 600)
+
+    setTimeout(() => {
+      selectedProductId.value = productId
+      isModalVisible.value = true
+    }, 150)
+  }
+
   async function submitOrder() {
     await withSablier(async () => {
       if (!auth.user) {
@@ -219,44 +272,37 @@
       }
 
       try {
-        const payload = {
-          email: auth.user.email,
-          full_name: fullName.value,
-          address: address.value,
-          zip: zip.value,
-          city: city.value,
-          country: country.value,
-          payment_method: selectedPayment.value,
-          total_amount: cart.totalPrice,
-          items: cart.items,
-          status: 'pending',
-        }
-
         const { data: order, error: orderError } = await supabase
           .from('orders')
-          .insert({ user_id: auth.user.id, ...payload })
+          .insert({
+            user_id: auth.user.id,
+            email: auth.user.email,
+            full_name: fullName.value,
+            address: address.value,
+            zip: zip.value,
+            city: city.value,
+            country: country.value,
+            payment_method: selectedPayment.value,
+            total_amount: cart.totalPrice,
+            items: cart.items,
+            status: 'pending',
+          })
           .select()
           .single()
 
         if (orderError || !order) throw orderError
 
-        if (selectedPayment.value === 'stripe') {
-          const { data, error } = await supabase.functions.invoke('create-stripe-session', {
-            body: {
-              amount: cart.totalPrice,
-              email: auth.user.email,
-              orderId: order.id,
-            },
-          })
+        const payment = await processPayment(
+          cart.totalPrice,
+          selectedPayment.value,
+          auth.user.email,
+        )
+        if (selectedPayment.value === 'stripe') return
 
-          if (error || !data?.url)
-            throw new Error('Erreur lors de la création de la session Stripe.')
-          window.location.href = data.url
-        } else {
-          toast.show('Paiement non-Stripe simulé.', 'success')
-          cart.clearCart()
-          router.push('/profil/commandes')
-        }
+        await finalizeOrderAfterPayment(order.id, payment.id)
+        toast.show('Paiement validé ✅', 'success')
+        await cart.clearCart()
+        router.push('/profil/commandes')
       } catch (err: any) {
         console.error('❌ Erreur commande/paiement:', err)
         toast.show('Erreur lors du paiement ou de la commande ❌', 'danger')
@@ -284,41 +330,119 @@
     &__payment {
       background: white;
       border: 1px solid @neutral-200;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 18px;
+      box-shadow: 0 3px 10px fade(@neutral-300, 15%);
     }
 
-    /* --- Items du panier --- */
+    /* --- ITEMS --- */
     &__item {
+      position: relative;
+      overflow: hidden;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid @neutral-100;
-      padding: 10px 0;
+      padding: 12px 16px;
+      border-radius: 8px;
+      transition: all 0.25s ease;
 
       &-left {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
+        flex: 1;
+        min-width: 0;
       }
 
       &-img {
-        width: 50px;
-        height: 50px;
+        width: 58px;
+        height: 58px;
         object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid @neutral-200;
+        border-radius: 10px;
+        border: 1px solid fade(@neutral-300, 40%);
+        flex-shrink: 0;
+      }
+
+      &-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .product-name-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          position: relative;
+
+          .product-name.clickable {
+            color: @primary-700;
+            transition: color 0.2s ease;
+
+            &:hover {
+              color: @primary-600;
+              text-decoration: underline;
+            }
+          }
+
+          .product-search-icon {
+            color: fade(@primary-700, 70%);
+            transition: color 0.2s ease;
+          }
+
+          &:hover .product-search-icon {
+            color: @primary-600;
+          }
+        }
+
+        .product-line {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          color: fade(@neutral-600, 90%);
+        }
+
+        .product-price {
+          color: fade(@neutral-500, 80%);
+          font-size: 13px;
+        }
       }
 
       &-price {
-        margin-left: 16px; // espace entre le texte et le prix
-        white-space: nowrap;
+        width: 80px;
+        text-align: right;
+        font-weight: 600;
+        color: @neutral-900;
+        font-size: 14px;
       }
     }
 
+    /* 🌊 Effet ripple au clic */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: fade(@primary-500, 25%);
+      transform: scale(0);
+      animation: ripple 0.6s ease-out;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    /* --- TOTAL --- */
     &__total {
       display: flex;
       justify-content: space-between;
@@ -326,7 +450,7 @@
       padding-top: 8px;
     }
 
-    /* --- Formulaire adresse --- */
+    /* --- FORMULAIRE --- */
     &__form {
       display: flex;
       flex-direction: column;
@@ -336,9 +460,13 @@
     &__row {
       display: flex;
       gap: 12px;
+
+      @media (max-width: 700px) {
+        flex-direction: column;
+      }
     }
 
-    /* --- Méthodes de paiement --- */
+    /* --- MÉTHODES DE PAIEMENT --- */
     &__methods {
       display: flex;
       flex-direction: column;
@@ -351,23 +479,24 @@
       gap: 12px;
       border: 1px solid @neutral-200;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 12px 16px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
 
       &:hover {
         border-color: @primary-400;
-        background: @primary-50;
+        background: fade(@primary-50, 40%);
       }
 
       &.active {
         border-color: @primary-600;
-        background: @primary-100;
+        background: fade(@primary-100, 60%);
+        box-shadow: 0 2px 8px fade(@primary-400, 25%);
       }
 
       &-icon {
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -384,16 +513,59 @@
       &-info {
         display: flex;
         flex-direction: column;
+        line-height: 1.2;
       }
     }
 
+    /* --- BOUTON --- */
+    &__submit {
+      margin-top: 20px;
+      transition: all 0.25s ease-in-out;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px fade(@primary-400, 25%);
+      font-weight: 600;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px fade(@primary-500, 30%);
+      }
+
+      &:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 6px fade(@primary-500, 25%);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+    }
+
+    /* --- Responsive général --- */
     @media (max-width: 700px) {
-      &__row {
-        flex-direction: column;
+      &__cart,
+      &__infos,
+      &__payment {
+        padding: 18px;
+        gap: 14px;
+      }
+
+      &__item {
+        padding: 10px 12px;
+        &-img {
+          width: 52px;
+          height: 52px;
+        }
+
+        &-price {
+          font-size: 13px;
+        }
       }
 
       &__submit {
         padding: 12px 0;
+        font-size: 15px;
         box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.05);
       }
     }

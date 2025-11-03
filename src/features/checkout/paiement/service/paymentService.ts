@@ -6,6 +6,27 @@ import { supabase } from '@/supabase/supabaseClient'
  */
 export type PaymentProvider = 'simulation' | 'stripe' | 'crypto'
 
+/* -------------------------------------------------------------------------- */
+/* 🧾 4️⃣ Enregistrement / finalisation de la commande                        */
+/* -------------------------------------------------------------------------- */
+export async function finalizeOrderAfterPayment(orderId: string, paymentIntentId?: string) {
+  try {
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        status: 'paid',
+        payment_intent_id: paymentIntentId ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', orderId)
+
+    if (error) throw error
+    console.log('✅ Commande mise à jour comme "paid" pour', orderId)
+  } catch (err) {
+    console.error('💥 Erreur finalisation commande:', err)
+  }
+}
+
 /**
  * Structure normalisée d’un paiement
  */
