@@ -55,8 +55,6 @@
             />
           </div>
         </header>
-
-        <!-- 💭 Chat principal -->
         <ChatCore
           v-if="userId"
           v-model:new-message="newMessage"
@@ -66,7 +64,7 @@
           current-role="user"
           :send-message="sendMessage"
           :send-typing="sendTyping"
-          :height="600"
+          :height="400"
         />
       </div>
     </transition>
@@ -77,6 +75,7 @@
   import { supabase } from '@/supabase/supabaseClient'
   import type { IconColor } from '@designSystem/index'
   import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import ChatCore from '../shared/components/ChatCore.vue'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
   import { useUserChat } from './useUserChat'
@@ -99,58 +98,30 @@
     } = await supabase.auth.getUser()
     userId.value = user?.id ?? null
 
-    await initChat() // ✅ Initialise la session utilisateur
+    await initChat()
 
     chatNotif.setRole('user')
     chatNotif.listenRealtime()
 
-    // ✅ Récupère le vrai compteur de non-lus depuis la DB
+    // ✅ récupère les vrais non-lus depuis Supabase
     await chatNotif.fetchUnreadByUser()
 
-    // 🧠 Si localStorage a une valeur persistée → restaure-la
-    const saved = localStorage.getItem('user:unread-count')
-    if (saved && !isChatOpen.value && chatNotif.unreadCount === 0) {
-      chatNotif.unreadCount = parseInt(saved)
-    }
-
-    // 🔁 Met à jour le localStorage automatiquement
-    watch(
-      () => chatNotif.unreadCount,
-      (val) => localStorage.setItem('user:unread-count', String(val)),
-    )
-
-    // 🔁 Petit “refresh” 1s après pour fiabilité Supabase
+    // ✅ petit refresh pour fiabilité supabase
     setTimeout(() => chatNotif.fetchUnreadByUser(), 1000)
   })
 
   /* ------------------------- Toggle Chat ------------------------- */
   const toggleChat = async () => {
-    isChatOpen.value = !isChatOpen.value
-    chatStore.isOpen = isChatOpen.value
+    chatStore.toggleChat()
+    isChatOpen.value = chatStore.isOpen
 
-    if (isChatOpen.value) {
-      // ✅ Reset visuel
-      chatStore.resetUnread()
-
-      // ✅ Marque tout comme lu dans la DB
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      const uid = user?.id
-      if (uid) {
-        const lastMsg = messages.value.at(-1)
-        if (lastMsg) {
-          await chatNotif.markAsRead(uid, lastMsg.id)
-        }
-      }
+    if (chatStore.isOpen) {
+      const uid = userId.value
+      if (uid) await chatNotif.markAsRead(uid)
     }
   }
 
   /* ------------------------- Sync store ↔ composable ------------------------- */
-  watch(
-    () => chatStore.isOpen,
-    (val) => (isChatOpen.value = val),
-  )
   watch(isChatOpen, (val) => (chatStore.isOpen = val))
 
   /* ------------------------- Reset global ------------------------- */

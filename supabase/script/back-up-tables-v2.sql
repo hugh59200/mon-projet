@@ -481,6 +481,7 @@ CREATE POLICY "Admin full access topics"
 -- ============================================================
 -- 👀 VIEWS
 -- ============================================================
+DROP VIEW IF EXISTS public.conversation_overview;
 
 CREATE OR REPLACE VIEW public.conversation_overview AS
 SELECT
@@ -498,8 +499,8 @@ SELECT
     FROM public.messages mu
     WHERE mu.user_id = p.id
       AND mu.sender_role = 'user'
-      AND (c.last_read_message_id IS NULL OR mu.id > c.last_read_message_id)
-  ) AS unread_count
+      AND (c.last_admin_message_id IS NULL OR mu.id > c.last_admin_message_id)
+  ) AS unread_count_admin
 FROM public.profiles p
 LEFT JOIN public.conversations c ON c.user_id = p.id
 LEFT JOIN LATERAL (
@@ -509,6 +510,7 @@ LEFT JOIN LATERAL (
   ORDER BY created_at DESC
   LIMIT 1
 ) m ON TRUE;
+
 
 CREATE OR REPLACE VIEW public.messages_unread_view AS
 SELECT

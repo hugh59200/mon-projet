@@ -2,7 +2,7 @@
   <DialogComponent />
   <ToastContainer />
   <CGU />
-  <ChatWidget v-if="auth.user && !auth.isAdmin" />
+  <ChatWidget v-if="auth.user && !isAdmin" />
   <transition name="fade">
     <div
       v-if="cgu.overlayActive"
@@ -18,6 +18,7 @@
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
+  import { computed } from 'vue'
   import ChatWidget from './features/admin/chat/user/ChatWidget.vue'
 
   /* -------------------------------------------------------------------------- */
@@ -27,6 +28,8 @@
 
   const cgu = useAfficheCGUStore()
   const auth = useAuthStore()
+
+  const isAdmin = computed(() => auth.user?.role === 'admin')
 </script>
 
 <style lang="less">

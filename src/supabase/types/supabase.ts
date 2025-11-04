@@ -453,7 +453,7 @@ export type Database = {
           last_message_at: string | null
           last_read_at: string | null
           last_read_message_id: number | null
-          unread_count: number | null
+          unread_count_admin: number | null
           user_email: string | null
           user_id: string | null
         }
