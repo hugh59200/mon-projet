@@ -2,13 +2,11 @@
   <transition name="typing-fade">
     <div
       v-if="isTyping"
-      class="typing-bubble-wrapper"
+      class="typing-bubble"
     >
-      <div class="typing-bubble">
-        <span class="dot" />
-        <span class="dot" />
-        <span class="dot" />
-      </div>
+      <span class="dot" />
+      <span class="dot" />
+      <span class="dot" />
     </div>
   </transition>
 </template>
@@ -20,19 +18,15 @@
 </script>
 
 <style scoped lang="less">
-  .typing-bubble-wrapper {
+  .typing-bubble {
     position: absolute;
     bottom: 10px;
     left: 50px;
-    width: 100%;
     display: flex;
     align-items: center;
-    padding: 0 12px 8px;
-    background: @neutral-50;
+    background: @neutral-500;
     pointer-events: none;
-  }
-
-  .typing-bubble {
+    border-radius: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: space-around;

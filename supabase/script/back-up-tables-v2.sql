@@ -164,24 +164,56 @@ CREATE TABLE public.messages (
 
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admin full access messages"
+-- ✅ Admin full read
+CREATE POLICY "Admin can read all messages"
   ON public.messages
-  FOR ALL
+  FOR SELECT
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- ✅ Admin can send messages
+CREATE POLICY "Admin can insert messages"
+  ON public.messages
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_admin(auth.uid()));
+
+-- ✅ Admin can update any messages
+CREATE POLICY "Admin can update messages"
+  ON public.messages
+  FOR UPDATE
   TO authenticated
   USING (public.is_admin(auth.uid()))
   WITH CHECK (public.is_admin(auth.uid()));
 
+-- ✅ User can read all messages of their conversation
 CREATE POLICY "User can read own messages"
   ON public.messages
   FOR SELECT
   TO authenticated
   USING (auth.uid() = user_id);
 
+-- ✅ User can send messages
 CREATE POLICY "User can insert own messages"
   ON public.messages
   FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() = user_id);
+
+-- ✅ User can mark admin messages as read
+CREATE POLICY "User can update is_read on received messages"
+  ON public.messages
+  FOR UPDATE
+  TO authenticated
+  USING (
+    auth.uid() = user_id
+    AND sender_role = 'admin'
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+    AND sender_role = 'admin'
+  );
+
 
 -- ============================================================
 -- 💬 TABLE : CONVERSATIONS
@@ -688,3 +720,5 @@ RETURNS jsonb LANGUAGE sql STABLE AS $$
     'role', (SELECT role FROM public.profiles WHERE id = auth.uid())
   );
 $$;
+
+

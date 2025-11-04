@@ -1,6 +1,7 @@
 import router from '@/router'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Tables } from '@/supabase/types/supabase'
+import type { User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -8,7 +9,7 @@ export type Profile = Tables<'profiles'>
 type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<any | null>(null)
+  const user = ref<User | null>(null)
   const profile = ref<Profile | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)

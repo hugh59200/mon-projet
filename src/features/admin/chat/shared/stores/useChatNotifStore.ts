@@ -87,7 +87,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
 
           // ✅ chat ouvert → mark as read et aucun badge
           if (chatWidget.isOpen) {
-            await chatApi.markMessagesAsRead(msg.user_id, role.value === 'admin' ? 'user' : 'admin')
+            // await chatApi.markMessagesAsRead(msg.user_id, role.value === 'admin' ? 'user' : 'admin')
             return
           }
 

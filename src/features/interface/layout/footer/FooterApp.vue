@@ -100,7 +100,7 @@
             <li><RouterLink to="/checkout">Paiement sécurisé</RouterLink></li>
             <li><RouterLink to="/profil/commandes">Suivi de commande</RouterLink></li>
             <li><RouterLink to="/access-denied">Confidentialité</RouterLink></li>
-            <li><RouterLink to="/terms">CGU</RouterLink></li>
+            <!-- <li><RouterLink to="/terms">CGU</RouterLink></li> -->
           </ul>
         </div>
 

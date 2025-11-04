@@ -46,16 +46,25 @@ export function useAdminChat() {
 
   const sendTyping = () => {
     ensureTypingChannel()
+    if (!selectedUserId.value) return
+
     typingChannel!.send({
       type: 'broadcast',
       event: 'admin_typing',
-      payload: { isTyping: true },
+      payload: {
+        userId: selectedUserId.value,
+        isTyping: true,
+      },
     })
+
     setTimeout(() => {
       typingChannel!.send({
         type: 'broadcast',
         event: 'admin_typing',
-        payload: { isTyping: false },
+        payload: {
+          userId: selectedUserId.value,
+          isTyping: false,
+        },
       })
     }, 1200)
   }
@@ -65,7 +74,6 @@ export function useAdminChat() {
     isReady.value = false
     const { data, error } = await chatApi.fetchAllConversations()
     if (!error && data) {
-      // ✅ Toujours injecter unread_count = number
       conversations.value = data.map((c) => ({
         ...c,
         unread_count: c.unread_count_admin ?? 0,
@@ -77,27 +85,23 @@ export function useAdminChat() {
   /* ------------------------------ Messages ------------------------------ */
   const fetchMessages = async (userId: string) => {
     isMessagesLoading.value = true
-    const { data, error } = await chatApi.fetchMessages(userId)
+    const { data } = await chatApi.fetchMessages(userId)
 
-    if (!error && data) {
-      messages.value = data.sort(
-        (a, b) => new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime(),
-      )
-    } else {
-      messages.value = []
-    }
+    messages.value = data
+      ? data.sort(
+          (a, b) => new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime(),
+        )
+      : []
 
     isMessagesLoading.value = false
     await nextTick()
 
-    setTimeout(() => {
-      const el = document.querySelector('.chat-messages') as HTMLElement | null
-      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'auto' })
-    }, 100)
+    const el = document.querySelector('.chat-messages') as HTMLElement | null
+    if (el) el.scrollTo({ top: el.scrollHeight })
   }
 
   /* ------------------------------ Realtime ------------------------------ */
-  const subscribeRealtime = (userId: string) => {
+  const subscribeRealtime = (userId: string | null) => {
     if (msgChannel) supabase.removeChannel(msgChannel)
 
     msgChannel = supabase
@@ -108,40 +112,47 @@ export function useAdminChat() {
         async (payload) => {
           const msg = payload.new as Message
 
-          // ✅ message ne concerne PAS cette conversation → skip
+          /* ✅ Vue liste admin (aucune conversation ouverte) */
+          if (!userId) {
+            conversations.value = conversations.value
+              .map((c) =>
+                c.user_id === msg.user_id
+                  ? {
+                      ...c,
+                      last_message: msg.content,
+                      last_message_at: msg.created_at,
+                      unread_count:
+                        msg.sender_role === 'user'
+                          ? (chatNotif.unreadByUser[msg.user_id] ?? 0) + 1
+                          : c.unread_count,
+                    }
+                  : c,
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.last_message_at ?? 0).getTime() -
+                  new Date(a.last_message_at ?? 0).getTime(),
+              )
+
+            if (msg.sender_role === 'user' && msg.user_id) {
+              chatNotif.unreadByUser[msg.user_id] = (chatNotif.unreadByUser[msg.user_id] ?? 0) + 1
+            }
+
+            await nextTick()
+            return
+          }
+
+          /* ✅ Si une conversation est ouverte */
           if (msg.user_id !== userId) return
 
           const idx = messages.value.findIndex((m) => m.id === msg.id)
 
-          /* ✅ Nouveau message */
           if (payload.eventType === 'INSERT' && idx === -1) {
             messages.value.push(reactive(msg))
             await nextTick()
-
             scroll()
-
-            // ✅ Met à jour le dernier message côté sidebar
-            conversations.value = conversations.value.map((c) =>
-              c.user_id === userId
-                ? {
-                    ...c,
-                    last_message: msg.content,
-                    last_message_at: msg.created_at,
-                    unread_count:
-                      msg.sender_role === 'user' && selectedUserId.value !== userId
-                        ? (chatNotif.unreadByUser[userId] ?? 0) + 1
-                        : 0,
-                  }
-                : c,
-            )
-
-            // ✅ Si admin regarde → marquer lu
-            if (msg.sender_role === 'user' && selectedUserId.value === userId) {
-              await chatNotif.markAsRead(userId, msg.id)
-            }
           }
 
-          /* ✅ Update */
           if (payload.eventType === 'UPDATE' && idx !== -1) {
             Object.assign(messages.value[idx]!, msg)
           }
@@ -150,28 +161,22 @@ export function useAdminChat() {
       .subscribe()
   }
 
-  function scroll() {
+  const scroll = () => {
     const el = document.querySelector('.chat-messages') as HTMLElement | null
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
   }
 
-  /* ------------------------------ Sélection conversation ------------------------------ */
+  /* ------------------------------ Select conversation ------------------------------ */
   const selectConversation = async (uid: string) => {
     selectedUserId.value = uid
     await fetchMessages(uid)
     subscribeRealtime(uid)
 
     const lastUserMsg = messages.value.filter((m) => m.sender_role === 'user').at(-1)
-
-    if (lastUserMsg) {
-      await chatNotif.markAsRead(uid, lastUserMsg.id)
-    } else {
-      chatNotif.unreadByUser[uid] = 0
-    }
+    if (lastUserMsg) await chatNotif.markAsRead(uid, lastUserMsg.id)
 
     await chatNotif.fetchUnreadByUser()
 
-    // ✅ Remet à jour le compteur visible dans conversations
     conversations.value = conversations.value.map((c) =>
       c.user_id === uid
         ? { ...c, unread_count: 0 }
@@ -179,34 +184,15 @@ export function useAdminChat() {
     )
   }
 
-  /* ------------------------------ Envoi message ------------------------------ */
+  /* ------------------------------ Send message (NO DUPLICATE) ------------------------------ */
   const sendMessage = async () => {
     if (!newMessage.value.trim() || !selectedUserId.value) return
 
     const content = newMessage.value
     newMessage.value = ''
 
-    const { data, error } = await chatApi.sendMessage(selectedUserId.value, role, content)
-
-    if (!error && data) {
-      const msg: Message = data
-      messages.value.push(reactive(msg))
-      await nextTick()
-
-      const el = document.querySelector('.chat-messages') as HTMLElement | null
-      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-
-      // ✅ Mise à jour du dernier message
-      conversations.value = conversations.value.map((c) =>
-        c.user_id === selectedUserId.value
-          ? {
-              ...c,
-              last_message: msg.content,
-              last_message_at: msg.created_at,
-            }
-          : c,
-      )
-    }
+    // ✅ PAS de push local
+    await chatApi.sendMessage(selectedUserId.value, role, content)
   }
 
   /* ------------------------------ Lifecycle ------------------------------ */
@@ -215,6 +201,7 @@ export function useAdminChat() {
     ensureTypingChannel()
     chatNotif.fetchUnreadByUser()
     chatNotif.listenRealtime()
+    subscribeRealtime(null) // global
   })
 
   onUnmounted(() => {

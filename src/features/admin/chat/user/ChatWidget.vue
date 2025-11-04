@@ -72,9 +72,8 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/supabase/supabaseClient'
   import type { IconColor } from '@designSystem/index'
-  import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import { onMounted, onUnmounted, watch } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
@@ -83,21 +82,15 @@
   /* ------------------------- Stores ------------------------- */
   const chatNotif = useChatNotifStore()
   const chatStore = useChatWidgetStore()
+  const userChat = useUserChat()
 
   /* ------------------------- Composable ------------------------- */
-  const chat = useUserChat()
-  const { isChatOpen, messages, newMessage, isTyping, isReady, sendMessage, sendTyping, initChat } =
-    chat
+  const { sendMessage, sendTyping, initChat } = userChat
 
-  const userId = ref<string | null>(null)
+  const { userId, isChatOpen, messages, newMessage, isTyping, isReady } = userChat
 
   /* ------------------------- Lifecycle ------------------------- */
   onMounted(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    userId.value = user?.id ?? null
-
     await initChat()
 
     chatNotif.setRole('user')

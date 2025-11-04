@@ -7,28 +7,28 @@ import type { ChatRole, Message } from '../shared/types/chat'
 import { useChatWidgetStore } from './useChatWidgetStore'
 
 export function useUserChat() {
-  /* ------------------------------ Stores ------------------------------ */
+  /* ---------------- STORES ---------------- */
   const auth = useAuthStore()
   const notif = useChatNotifStore()
   const chatWidget = useChatWidgetStore()
 
-  /* ------------------------------ State ------------------------------ */
-  const userId = computed(() => auth.user?.id ?? null)
+  /* ---------------- STATE ---------------- */
+  const userId = computed(() => auth.user?.id!)
   const role: ChatRole = 'user'
-  const isChatOpen = ref(false)
   const messages = ref<Message[]>([])
   const newMessage = ref('')
   const isTyping = ref(false)
   const isReady = ref(false)
   const errorMessage = ref<string | null>(null)
+  const isChatOpen = ref(false)
 
-  /* ------------------------------ Internals ------------------------------ */
+  /* ---------------- INTERNALS ---------------- */
   let msgChannel: ReturnType<typeof supabase.channel> | null = null
   let typingChannel: ReturnType<typeof supabase.channel> | null = null
   let typingTimer: ReturnType<typeof setTimeout> | null = null
   let observer: MutationObserver | null = null
 
-  /* ------------------------------ Scroll ------------------------------ */
+  /* ---------------- SCROLL UTILS ---------------- */
   const getMessagesEl = () =>
     document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
 
@@ -51,16 +51,17 @@ export function useUserChat() {
     observer.observe(el, { childList: true, subtree: true })
   }
 
-  /* ------------------------------ Typing ------------------------------ */
+  /* ---------------- TYPING ---------------- */
   const ensureTypingChannel = () => {
     if (typingChannel) return
+
     typingChannel = supabase.channel('typing-status', {
       config: { broadcast: { self: false } },
     })
 
-    // ✅ L'utilisateur écoute l'admin
     typingChannel
       .on('broadcast', { event: 'admin_typing' }, (e) => {
+        if (e.payload.userId !== userId.value) return
         isTyping.value = e.payload.isTyping
       })
       .subscribe()
@@ -68,6 +69,7 @@ export function useUserChat() {
 
   const sendTyping = () => {
     ensureTypingChannel()
+
     typingChannel!.send({
       type: 'broadcast',
       event: 'user_typing',
@@ -84,10 +86,11 @@ export function useUserChat() {
     }, 1200)
   }
 
-  /* ------------------------------ Messages ------------------------------ */
+  /* ---------------- FETCH OLD MESSAGES ---------------- */
   const fetchMessages = async () => {
     isReady.value = false
     const { data, error } = await chatApi.fetchMessages(userId.value)
+
     if (error) {
       errorMessage.value = 'Erreur de chargement des messages.'
       isReady.value = true
@@ -103,17 +106,22 @@ export function useUserChat() {
     observeMessages()
     scrollToEnd(true)
 
-    // ✅ Marque tous les messages admin comme lus à l’ouverture
-    if (messages.value.some((m) => m.sender_role === 'admin' && !m.is_read)) {
-      const lastAdminMsg = messages.value.filter((m) => m.sender_role === 'admin').at(-1)
-      await notif.markAsRead(userId.value, lastAdminMsg?.id)
+    // ✅ Marque comme lus tous les messages admin non lus
+    const unread = messages.value.filter((m) => m.sender_role === 'admin' && !m.is_read)
+    if (unread.length > 0) {
+      const last = unread.at(-1)!
+      await notif.markAsRead(userId.value, last.id)
+
+      // ✅ Mise à jour instant UI
       messages.value.forEach((m) => {
         if (m.sender_role === 'admin') m.is_read = true
       })
+
+      chatWidget.resetUnread()
     }
   }
 
-  /* ------------------------------ Realtime ------------------------------ */
+  /* ---------------- REALTIME ---------------- */
   const subscribeRealtime = () => {
     if (msgChannel) supabase.removeChannel(msgChannel)
 
@@ -126,63 +134,53 @@ export function useUserChat() {
           const msg = payload.new as Message
           const idx = messages.value.findIndex((m) => m.id === msg.id)
 
-          // ➕ Nouveau message reçu
+          /* ✅ INSERT — ajoute seulement si pas déjà dedans */
           if (payload.eventType === 'INSERT' && idx === -1) {
             messages.value.push(reactive(msg))
             await nextTick()
-            scrollToEnd()
+            scrollToEnd(true)
 
-            // 👂 Si message vient de l’admin
+            // ✅ Si message venant de l’admin
             if (msg.sender_role === 'admin') {
               if (isChatOpen.value) {
-                // ✅ Chat ouvert → on marque lu direct
                 await notif.markAsRead(userId.value, msg.id)
                 msg.is_read = true
                 chatWidget.resetUnread()
               } else {
-                // 🚨 Chat fermé → incrémente le badge rouge local
                 chatWidget.incrementUnread()
               }
             }
           }
 
-          // 🔁 Mise à jour message
+          /* ✅ UPDATE — on met à jour sans doublon */
           if (payload.eventType === 'UPDATE' && idx !== -1) {
-            Object.assign(messages.value[idx] ?? {}, msg)
+            Object.assign(messages.value[idx]!, msg)
           }
         },
       )
       .subscribe()
   }
 
-  /* ------------------------------ Envoi message ------------------------------ */
+  /* ---------------- SEND MESSAGE — pas de doublons ---------------- */
   const sendMessage = async () => {
     if (!newMessage.value.trim()) return
     const content = newMessage.value
     newMessage.value = ''
 
-    const { data, error } = await chatApi.sendMessage(userId.value, role, content)
-    if (!error && data) {
-      messages.value.push(reactive(data))
-      await nextTick()
-      scrollToEnd(true)
-    }
+    // ✅ NE PAS PUSH — laisse Realtime gérer
+    await chatApi.sendMessage(userId.value, role, content)
   }
 
-  /* ------------------------------ Lifecycle ------------------------------ */
+  /* ---------------- INIT ---------------- */
   const initChat = async () => {
-    if (!userId.value) {
-      console.warn('[initChat] userId manquant')
-      return
-    }
+    if (!userId.value) return
     await fetchMessages()
     ensureTypingChannel()
     subscribeRealtime()
   }
 
-  onMounted(() => {
-    initChat()
-  })
+  /* ---------------- LIFECYCLE ---------------- */
+  onMounted(() => initChat())
 
   onUnmounted(() => {
     if (msgChannel) supabase.removeChannel(msgChannel)
@@ -191,7 +189,7 @@ export function useUserChat() {
     clearTimeout(typingTimer!)
   })
 
-  /* ------------------------------ Watchers ------------------------------ */
+  /* ---------------- WATCH ---------------- */
   watch(
     () => messages.value.length,
     async () => {
@@ -200,12 +198,12 @@ export function useUserChat() {
     },
   )
 
-  /* ------------------------------ Return ------------------------------ */
   return {
     messages,
     newMessage,
     isTyping,
     isReady,
+    userId,
     errorMessage,
     sendMessage,
     sendTyping,

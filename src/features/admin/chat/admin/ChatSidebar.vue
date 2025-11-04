@@ -26,7 +26,7 @@
             weight="semibold"
             color="neutral-900"
           >
-            {{ displayName }}
+            Support Fast Peptides
           </BasicText>
           <BasicText
             size="body-s"
@@ -132,8 +132,6 @@
       unread_count: notifStore.unreadByUser[conv.user_id] || 0,
     }))
   })
-
-  const displayName = computed(() => auth.user?.fullName || 'Support Fast Peptides')
 
   // 🧩 Charge l’avatar depuis Supabase si présent
   onMounted(async () => {
