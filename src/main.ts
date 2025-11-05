@@ -1,5 +1,5 @@
 import directives from '@/directives'
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
 import { RegistrationDSComponents } from '@/plugin/registration'
 import { createPinia } from 'pinia'

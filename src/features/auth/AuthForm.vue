@@ -20,36 +20,40 @@
 
     <!-- 🧩 FORMULAIRE -->
     <div class="auth__form">
-      <BasicInput
-        v-model="email"
+      <WrapperInput
+        v-model.trim="email"
         placeholder="Email"
-        input-type="form"
-        size="medium"
-        autocomplete="off"
+        inputmode="email"
+        label="Email"
+        required
+        :hint="hintEmail"
+        iconName="Mail"
+        :alertLabel="touched.email ? errors.email : ''"
         @input="clearMessages"
+        @blur="validateField('email')"
+        deletable
       />
 
-      <BasicInput
+      <WrapperInput
         v-if="mode !== 'reset' && !modeMagicLink"
         v-model="password"
         :type="showPassword ? 'text' : 'password'"
         placeholder="Mot de passe"
-        input-type="form"
-        size="medium"
-        autocomplete="off"
-        :suffix-icon="showPassword ? 'eye-off' : 'eye'"
-        @suffix-click="showPassword = !showPassword"
+        :hint="hintPassword"
+        label="Mot de passe"
+        required
+        :alertLabel="touched.password ? errors.password : ''"
         @input="clearMessages"
+        @blur="validateField('password')"
+        deletable
       />
-
       <!-- ✅ Bouton principal -->
       <BasicButton
         :label="labelBouton"
-        type="primary"
         variant="filled"
         width="full"
         size="medium"
-        :disabled="loading || !!message"
+        :disabled="loading"
         :loading="loading"
         @click="handleSubmit"
       />
@@ -64,38 +68,24 @@
         {{ modeMagicLink ? 'Connexion avec mot de passe 🔑' : 'Connexion par lien magique ✉️' }}
       </button>
 
-      <!-- 🌍 Séparateur -->
-      <div
-        v-if="mode === 'login'"
-        class="auth__divider"
-      >
-        <span>ou continuer avec</span>
-      </div>
+      <!-- 🌍 Providers -->
+      <template v-if="mode === 'login'">
+        <div class="auth__divider"><span>ou continuer avec</span></div>
+        <div class="auth__providers">
+          <BasicButton
+            v-for="provider in providers"
+            :key="provider.name"
+            :label="provider.label"
+            variant="ghost"
+            width="full"
+            size="medium"
+            :icon="provider.icon"
+            @click="auth.signInWithProvider(provider.name as Providers)"
+          />
+        </div>
+      </template>
 
-      <!-- 🌍 Login via Provider -->
-      <div
-        v-if="mode === 'login'"
-        class="auth__providers"
-      >
-        <BasicButton
-          label="Google"
-          variant="ghost"
-          width="full"
-          size="medium"
-          icon="google"
-          @click="auth.signInWithProvider('google')"
-        />
-        <BasicButton
-          label="GitHub"
-          variant="ghost"
-          width="full"
-          size="medium"
-          icon="github"
-          @click="auth.signInWithProvider('github')"
-        />
-      </div>
-
-      <!-- 💬 Messages -->
+      <!-- 💬 Messages globaux -->
       <transition name="fade">
         <BasicText
           v-if="error"
@@ -117,6 +107,10 @@
           {{ message }}
         </BasicText>
       </transition>
+
+      <!-- 🔍 Debug temporaire -->
+      <!-- <pre>{{ errors }}</pre> -->
+      <!-- <pre>{{ touched }}</pre> -->
     </div>
 
     <!-- 🔗 Liens contextuels -->
@@ -150,21 +144,29 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useAuthStore } from './useAuthStore'
+  import { useForm } from './composables/useForm'
+  import { useAuthStore, type Providers } from './stores/useAuthStore'
 
-  const props = defineProps<{
-    mode: 'login' | 'register' | 'reset'
-  }>()
+  type Mode = 'login' | 'register' | 'reset'
+  const props = defineProps<{ mode: Mode }>()
 
   const auth = useAuthStore()
   const router = useRouter()
-  const email = ref('')
-  const password = ref('')
+  const { email, password, errors, validate, validateField, touched, reset } = useForm()
+
+  const hintEmail = 'Format attendu : exemple@domaine.com'
+  const hintPassword = 'Le mot de passe doit contenir au moins 8 caractères'
+
   const error = ref('')
   const message = ref('')
   const loading = ref(false)
   const showPassword = ref(false)
   const modeMagicLink = ref(false)
+
+  const providers = [
+    { name: 'google', label: 'Google', icon: 'google' },
+    { name: 'github', label: 'GitHub', icon: 'github' },
+  ]
 
   // 🧠 Textes dynamiques
   const titre = computed(() => {
@@ -179,10 +181,16 @@
   })
 
   const sousTitre = computed(() => {
-    if (props.mode === 'login') return 'Bienvenue sur Fast Peptides 🔬'
-    if (props.mode === 'register') return 'Créez votre compte pour rejoindre la communauté 🔗'
-    if (props.mode === 'reset') return 'Entrez votre e-mail pour recevoir un lien'
-    return ''
+    switch (props.mode) {
+      case 'login':
+        return 'Bienvenue sur Fast Peptides 🔬'
+      case 'register':
+        return 'Créez votre compte pour rejoindre la communauté 🔗'
+      case 'reset':
+        return 'Entrez votre e-mail pour recevoir un lien'
+      default:
+        return ''
+    }
   })
 
   const labelBouton = computed(() => {
@@ -192,6 +200,7 @@
     return 'Envoyer le lien'
   })
 
+  // 🔧 Helpers
   function clearMessages() {
     error.value = ''
     message.value = ''
@@ -203,16 +212,19 @@
     clearMessages()
   }
 
+  // 🧩 Soumission
   async function handleSubmit() {
     clearMessages()
-    loading.value = true
 
-    if (!email.value.includes('@')) {
-      error.value = 'Adresse e-mail invalide.'
-      loading.value = false
+    const isValid = validate(props.mode)
+    if (!isValid) {
+      // Force l'affichage des erreurs
+      touched.value.email = true
+      touched.value.password = true
       return
     }
 
+    loading.value = true
     try {
       if (props.mode === 'login') {
         if (modeMagicLink.value) {
@@ -256,6 +268,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    animation: fadeIn 0.5s ease;
 
     &__title {
       margin-bottom: 8px;
@@ -268,31 +281,19 @@
     }
 
     &__form {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      width: 100%;
+      gap: 24px;
       background: #fff;
       animation: fadeInUp 0.4s ease forwards;
     }
 
-    /* Animation douce des champs */
-    &__form > * {
-      opacity: 0;
-      transform: translateY(8px);
-      animation: fadeInUp 0.4s ease forwards;
-    }
-    &__form > *:nth-child(1) {
-      animation-delay: 0.05s;
-    }
-    &__form > *:nth-child(2) {
-      animation-delay: 0.1s;
-    }
-    &__form > *:nth-child(3) {
-      animation-delay: 0.15s;
-    }
-
     @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
       to {
         opacity: 1;
         transform: translateY(0);
@@ -307,7 +308,7 @@
       font-weight: 500;
       cursor: pointer;
       margin-top: -2px;
-      transition: all 0.2s ease;
+      transition: color 0.2s ease;
       &:hover {
         color: darken(@primary-700, 5%);
         text-decoration: underline;
@@ -321,7 +322,6 @@
       margin: 20px 0 14px;
       color: @neutral-400;
       font-size: 13px;
-      letter-spacing: 0.2px;
       &::before,
       &::after {
         content: '';
@@ -334,7 +334,6 @@
 
     &__providers {
       display: flex;
-      justify-content: center;
       gap: 14px;
 
       button {
@@ -349,6 +348,7 @@
         &:hover {
           background: #f0f0f0;
           border-color: @neutral-300;
+          color: @neutral-600;
         }
       }
     }
@@ -356,15 +356,6 @@
     &__error,
     &__message {
       margin-top: 10px;
-    }
-
-    &__error {
-      color: @danger-600;
-      font-weight: 500;
-    }
-
-    &__message {
-      color: @primary-600;
     }
 
     &__links {
@@ -378,7 +369,6 @@
       a {
         color: @primary-700;
         text-decoration: none;
-        transition: color 0.2s ease;
         &:hover {
           text-decoration: underline;
           color: darken(@primary-700, 5%);

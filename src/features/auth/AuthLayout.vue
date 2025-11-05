@@ -7,14 +7,6 @@
       appear
     >
       <main class="auth-overlay__card">
-        <!-- ❌ Bouton fermer -->
-        <button
-          class="auth-close"
-          @click="$router.push('/')"
-        >
-          ✕
-        </button>
-
         <!-- 🧠 Logo commun -->
         <div
           class="auth-logo"

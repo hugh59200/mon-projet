@@ -15,7 +15,6 @@
           :key="tab.routeName"
           v-model="modelValue"
           :tabKey="tab.tabKey"
-          :tabState="tab.tabState"
           :routeName="tab.routeName"
           :color="tab.color"
           class="tabs__item"

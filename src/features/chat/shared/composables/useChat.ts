@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChatNotifStore } from '../stores/useChatNotifStore'
 import type { ChatRole } from '../types/chat'

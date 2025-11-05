@@ -49,6 +49,7 @@ declare module 'vue' {
     DropdownContainer: typeof import('./../designSystem/src/components/wrapper/dropdownContainer/DropdownContainer.vue')['default']
     EmptyTablePlaceholder: typeof import('./../designSystem/src/components/basic/emptyTablePlaceholder/EmptyTablePlaceholder.vue')['default']
     FloatingDropdownWrapper: typeof import('./../designSystem/src/components/wrapper/pop-up/FloatingDropdownWrapper.vue')['default']
+    FormContainer: typeof import('./../designSystem/src/components/wrapper/formContainer/FormContainer.vue')['default']
     InputContainer: typeof import('./../designSystem/src/components/wrapper/inputContainer/InputContainer.vue')['default']
     ToastContainer: typeof import('./../designSystem/src/components/basic/toast/ToastContainer.vue')['default']
     WrapperAutocomplete: typeof import('./../designSystem/src/components/wrapper/autocomplete/WrapperAutocomplete.vue')['default']

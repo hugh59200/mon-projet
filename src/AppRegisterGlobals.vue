@@ -2,7 +2,7 @@
   <DialogComponent />
   <ToastContainer />
   <CGU />
-  <ChatWidget v-if="role === 'user'" />
+  <ChatWidget v-if="isAuthenticated && role === 'user'" />
   <transition name="fade">
     <div
       v-if="cgu.overlayActive"
@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { registerPopupAutoCGU } from '@/features/interface/cgu'
   import CGU from '@/features/interface/cgu/CGU.vue'
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
@@ -29,7 +29,7 @@
   const cgu = useAfficheCGUStore()
   const auth = useAuthStore()
 
-  const { role } = storeToRefs(auth)
+  const { role, isAuthenticated } = storeToRefs(auth)
 </script>
 
 <style lang="less">

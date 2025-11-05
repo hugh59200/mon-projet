@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'

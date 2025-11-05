@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import UserMenu from '@/features/user/pop-up/UserMenu.vue'

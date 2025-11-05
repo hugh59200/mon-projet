@@ -7,7 +7,7 @@
 // ============================================================
 
 import defaultImage from '@/assets/products/default/default-product-image.png'
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Tables } from '@/supabase/types/supabase'
 import type { RealtimeChannel } from '@supabase/realtime-js'
@@ -89,7 +89,7 @@ export const useCartStore = defineStore('cart', () => {
     await loadCartFromSupabase()
   }
 
-  async function updateQuantity(productId: string , quantity: number) {
+  async function updateQuantity(productId: string, quantity: number) {
     const userId = auth.user?.id
     if (!userId) return
 

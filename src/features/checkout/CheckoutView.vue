@@ -183,7 +183,7 @@
 
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import {
     finalizeOrderAfterPayment,

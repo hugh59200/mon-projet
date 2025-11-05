@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import router from '@/router'
 import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 import { defineStore } from 'pinia'

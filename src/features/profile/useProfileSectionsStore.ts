@@ -1,7 +1,7 @@
 import { supabase } from '@/supabase/supabaseClient'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import { useAuthStore } from '../auth/useAuthStore'
+import { useAuthStore } from '../auth/stores/useAuthStore'
 
 export const useProfileSectionsStore = defineStore(
   'profileSections',

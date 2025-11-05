@@ -73,7 +73,7 @@
 <script setup lang="ts">
   import { vClickOutside } from '@/directives/vClickOutside'
   import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
 

@@ -1,4 +1,4 @@
-import { useAuthStore, type Profile } from '@/features/auth/useAuthStore'
+import { useAuthStore, type Profile } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
 import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/supabase/supabaseClient'

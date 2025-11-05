@@ -46,7 +46,7 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useAuthStore } from './useAuthStore'
+  import { useAuthStore } from './stores/useAuthStore'
 
   const router = useRouter()
   const route = useRoute()

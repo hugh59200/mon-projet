@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/features/auth/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { computed, ref } from 'vue'

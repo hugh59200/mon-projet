@@ -8,6 +8,8 @@ import { computed, ref } from 'vue'
 export type Profile = Tables<'profiles'>
 type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
 
+export type Providers = 'google' | 'github'
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const profile = ref<Profile | null>(null)
@@ -80,7 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
   // ======================================================
   // 🌍 OAUTH (Google, GitHub)
   // ======================================================
-  async function signInWithProvider(provider: 'google' | 'github') {
+  async function signInWithProvider(provider: Providers) {
     loading.value = true
     error.value = null
 

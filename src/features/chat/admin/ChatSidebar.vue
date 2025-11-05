@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { supabase } from '@/supabase/supabaseClient'
   import { computed, onMounted, ref } from 'vue'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'

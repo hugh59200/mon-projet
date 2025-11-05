@@ -19,15 +19,14 @@
     <slot
       name="tab-icon"
       :tabKey="tabKey"
-      :tabState="tabState"
       :selected="isSelected"
     />
 
     <!-- ✅ Couleur icône selon sélection -->
     <BasicIconNext
-      v-if="!$slots['tab-icon'] && tabState"
+      v-if="!$slots['tab-icon'] && icon"
       class="tab__icon"
-      :name="tabState"
+      :name="icon"
       :color="isSelected ? color : ('neutral-600' as IconColor)"
     />
   </div>

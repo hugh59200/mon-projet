@@ -112,7 +112,7 @@
 
 <script setup lang="ts">
   import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
-  import { useAuthStore } from '@/features/auth/useAuthStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, ref, watch } from 'vue'
