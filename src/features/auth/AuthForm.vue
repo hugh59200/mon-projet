@@ -34,18 +34,18 @@
         deletable
       />
 
-      <WrapperInput
+      <WrapperInputPassword
         v-if="mode !== 'reset' && !modeMagicLink"
         v-model="password"
-        :type="showPassword ? 'text' : 'password'"
-        placeholder="Mot de passe"
-        :hint="hintPassword"
         label="Mot de passe"
+        placeholder="••••••••"
         required
-        :alertLabel="touched.password ? errors.password : ''"
+        :hint="hintPassword"
+        :minStrength="mode === 'register' ? 'medium' : 'weak'"
+        :alertLabel="errors.password"
+        :touched="touched.password"
         @input="clearMessages"
         @blur="validateField('password')"
-        deletable
       />
       <!-- ✅ Bouton principal -->
       <BasicButton
@@ -154,13 +154,12 @@
   const router = useRouter()
   const { email, password, errors, validate, validateField, touched, reset } = useForm()
 
-  const hintEmail = 'Format attendu : exemple@domaine.com'
-  const hintPassword = 'Le mot de passe doit contenir au moins 8 caractères'
+  const hintEmail = 'exemple@domaine.com'
+  const hintPassword = '8 caractères minimum'
 
   const error = ref('')
   const message = ref('')
   const loading = ref(false)
-  const showPassword = ref(false)
   const modeMagicLink = ref(false)
 
   const providers = [

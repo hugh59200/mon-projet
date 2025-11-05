@@ -25,8 +25,6 @@
 </template>
 
 <script setup lang="ts">
-  import { BasicHint, BasicInputLabel } from '@designSystem/components'
-
   export interface WrapperLabelHintProps {
     label?: string
     required?: boolean

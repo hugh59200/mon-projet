@@ -4,67 +4,37 @@
   align-items: center;
   background: @white;
   border: 1px solid @neutral-200;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 
-  &--disabled,
-  &--readonly {
-    cursor: default;
-    opacity: 0.9;
-    border: 1px @neutral-200 solid;
-
-    svg {
-      fill: @neutral-400;
-      background: @neutral-100;
-
-      &:hover {
-        cursor: default;
-      }
-    }
+  /* --- Champs --- */
+  &__field {
+    flex: 1;
+    display: flex;
+    align-items: center;
   }
 
-  &--disabled {
-    background-color: @neutral-100;
-    opacity: 0.9;
-    svg {
-      background: @neutral-100;
-    }
+  /* --- Icônes droites (pile, œil, etc.) --- */
+  &__icons-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 6px;
+    margin-left: 4px;
   }
 
-  &--readonly {
-    background-color: @neutral-0;
-    svg {
-      background: @neutral-0;
-    }
+  /* --- Icône gauche --- */
+  &__icon-left {
+    margin-right: 6px;
+    margin-left: 4px;
   }
 
-  svg {
-    flex: none;
-    cursor: pointer;
-    // fill: @neutral-600;
+  /* --- Icône delete / close --- */
+  &__icon-delete {
+    margin-left: 4px;
   }
 
-  &--large {
-    padding: @spacing-10;
-    gap: @spacing-5;
-    svg {
-      transform: scale(0.8);
-    }
-  }
-
-  &--medium {
-    padding: 6px;
-    gap: 3px;
-    svg {
-      transform: scale(0.7);
-    }
-  }
-
-  &--small {
-    padding: 3px;
-    svg {
-      transform: scale(0.5);
-    }
-  }
-
+  /* --- Hover / Focus / Disabled --- */
   &:not(.input-container--disabled, .input-container--readonly):hover {
     border-color: @primary-600;
   }
@@ -76,7 +46,43 @@
       .input-container--readonly
     ):focus-within {
     box-shadow: @focus-global;
-    border-color: @success-600;
+    border-color: @primary-600;
+  }
+
+  &--disabled,
+  &--readonly {
+    cursor: default;
+    opacity: 0.9;
+    border: 1px @neutral-200 solid;
+
+    svg {
+      fill: @neutral-400;
+      background: @neutral-100;
+      pointer-events: none;
+    }
+  }
+
+  &--disabled {
+    background-color: @neutral-100;
+  }
+
+  &--readonly {
+    background-color: @neutral-0;
+  }
+
+  &--large {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  &--medium {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  &--small {
+    padding: 3px;
+    gap: 3px;
   }
 
   &--table {

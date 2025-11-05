@@ -13,7 +13,9 @@ export function useForm(live = true) {
     password: false,
   })
 
-  // ✅ Validation globale au submit
+  /**
+   * ✅ Validation globale du formulaire (submit)
+   */
   function validate(mode: 'login' | 'register' | 'reset') {
     errors.value = {}
 
@@ -28,7 +30,9 @@ export function useForm(live = true) {
     return Object.keys(errors.value).length === 0
   }
 
-  // ✅ Validation d’un champ (au blur)
+  /**
+   * ✅ Validation d’un champ individuel (blur)
+   */
   function validateField(field: 'email' | 'password') {
     touched.value[field] = true
 
@@ -43,6 +47,9 @@ export function useForm(live = true) {
     }
   }
 
+  /**
+   * 🔄 Réinitialisation du formulaire
+   */
   function reset() {
     email.value = ''
     password.value = ''
@@ -50,7 +57,9 @@ export function useForm(live = true) {
     touched.value = { email: false, password: false }
   }
 
-  // ✅ Validation douce pendant la frappe
+  /**
+   * 💨 Validation douce (live) pendant la frappe
+   */
   if (live) {
     watch(
       email,
