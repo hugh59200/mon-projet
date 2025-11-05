@@ -12,6 +12,7 @@ export function useChatMessages(
   userIdRef: () => string | null,
   selectedUserRef: () => string | null,
   onUnread?: (uid: string) => void,
+  getScrollEl?: () => HTMLElement | null, // 🚀 scroll déporté à la vue
 ) {
   const messages = ref<Message[]>([])
   const isMessagesLoading = ref(false)
@@ -20,43 +21,65 @@ export function useChatMessages(
 
   let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
 
-  const scrollEl = () =>
-    document.querySelector('.chat-messages, .messages-list') as HTMLElement | null
+  const getActiveUser = () => (role === 'admin' ? selectedUserRef() : userIdRef())
 
+  /** ✅ Scroll helpers */
   const scrollToEnd = async (instant = false) => {
     await nextTick()
-    scrollEl()?.scrollTo({
-      top: scrollEl()!.scrollHeight,
+    const el = getScrollEl?.()
+    if (!el) return
+
+    el.scrollTo({
+      top: el.scrollHeight,
       behavior: instant ? 'auto' : 'smooth',
     })
   }
 
-  const keepScrollOnPrepend = async (prev: number) => {
+  const keepScrollOnPrepend = async (prevHeight: number) => {
     await nextTick()
-    const el = scrollEl()
-    if (el) el.scrollTop = el.scrollHeight - prev
+    const el = getScrollEl?.()
+    if (el) el.scrollTop = el.scrollHeight - prevHeight
   }
 
+  /** ✅ Debounce markAsRead */
+  let readTimeout: number | undefined
+  const markVisibleAsRead = () => {
+    const target = getActiveUser()
+    if (!target) return
+
+    clearTimeout(readTimeout)
+
+    readTimeout = window.setTimeout(async () => {
+      const unreadFrom = role === 'admin' ? 'user' : 'admin'
+      await chatApi.markMessagesAsRead(target, unreadFrom)
+    }, 400)
+  }
+
+  /** ✅ Load initial */
   const fetchInitialMessages = async (uid: string) => {
     isMessagesLoading.value = true
-    const { data } = await chatApi.fetchMessages(uid, PAGE_SIZE)
 
+    const { data } = await chatApi.fetchMessages(uid, PAGE_SIZE)
     messages.value = (data ?? []).map((m) => reactive(m))
+
     hasMore.value = (data?.length ?? 0) === PAGE_SIZE
     oldestMessageDate.value = data?.[0]?.created_at ?? null
-    isMessagesLoading.value = false
 
+    isMessagesLoading.value = false
     await scrollToEnd(true)
+    markVisibleAsRead()
   }
 
+  /** ✅ Pagination */
   const loadOlderMessages = async () => {
     if (!hasMore.value || !oldestMessageDate.value || isMessagesLoading.value) return
 
-    const target = role === 'admin' ? selectedUserRef() : userIdRef()
+    const target = getActiveUser()
     if (!target) return
 
     isMessagesLoading.value = true
-    const prevHeight = scrollEl()?.scrollHeight ?? 0
+
+    const prevHeight = getScrollEl?.()?.scrollHeight ?? 0
     const { data } = await chatApi.fetchMessagesBefore(target, oldestMessageDate.value, PAGE_SIZE)
 
     if (!data?.length) {
@@ -75,51 +98,63 @@ export function useChatMessages(
     keepScrollOnPrepend(prevHeight)
   }
 
+  /** ✅ Send */
   const sendMessage = async (text: string) => {
-    const target = role === 'admin' ? selectedUserRef() : userIdRef()
+    const target = getActiveUser()
     if (!target || !text.trim()) return
-
     await chatApi.sendMessage(target, role, text.trim())
   }
 
+  /** ✅ Realtime */
   const subscribeRealtime = (currentTarget: string | null) => {
-    if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+    if (realtimeChannel) {
+      supabase.removeChannel(realtimeChannel)
+    }
 
-    realtimeChannel = supabase.channel(`chat-${role}`, {
+    const active = currentTarget || 'none'
+    realtimeChannel = supabase.channel(`chat-${role}-${active}`, {
       config: { broadcast: { self: false } },
     })
 
+    /** INSERT */
     realtimeChannel.on<MessageRow>(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
-      ({ new: msg }) => {
-        if (!msg) return
+      async ({ new: msg }) => {
+        if (!msg?.user_id) return
+        const activeUser = getActiveUser()
 
-        const uid = msg.user_id
-        const active = selectedUserRef()
-
-        /** ✅ USER côté client */
+        // ✅ USER → reçoit uniquement ses messages
         if (role === 'user') {
-          if (uid === currentTarget) {
+          if (msg.user_id === currentTarget) {
             messages.value.push(reactive(msg))
-            scrollToEnd(true)
+            await scrollToEnd(true)
+            markVisibleAsRead()
           }
           return
         }
 
-        /** ✅ ADMIN côté back-office */
+        // ✅ ADMIN
         if (role === 'admin') {
-          // ✅ message du user actuellement ouvert → affichage normal
-          if (uid === active) {
+          if (msg.user_id === activeUser) {
             messages.value.push(reactive(msg))
-            scrollToEnd(true)
-            return
+            await scrollToEnd(true)
+            markVisibleAsRead()
+          } else if (onUnread) {
+            onUnread(msg.user_id)
           }
+        }
+      },
+    )
 
-          // ✅ message d’un autre utilisateur → déclenche un non-lu
-          if (uid && onUnread) {
-            onUnread(uid)
-          }
+    /** UPDATE → read receipts */
+    realtimeChannel.on<MessageRow>(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'messages' },
+      ({ new: msg }) => {
+        const i = messages.value.findIndex((m) => m.id === msg.id)
+        if (i !== -1) {
+          messages.value[i] = reactive({ ...messages.value[i], ...msg })
         }
       },
     )
@@ -127,16 +162,22 @@ export function useChatMessages(
     realtimeChannel.subscribe()
   }
 
-  const cleanup = () => realtimeChannel && supabase.removeChannel(realtimeChannel)
+  /** ✅ Cleanup */
+  const cleanup = () => {
+    if (realtimeChannel) {
+      supabase.removeChannel(realtimeChannel)
+      realtimeChannel = null
+    }
+  }
 
   return {
     messages,
+    hasMore,
+    isMessagesLoading,
     sendMessage,
     loadOlderMessages,
     fetchInitialMessages,
     subscribeRealtime,
-    hasMore,
-    isMessagesLoading,
     cleanup,
   }
 }

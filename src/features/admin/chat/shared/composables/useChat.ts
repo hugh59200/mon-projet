@@ -12,19 +12,18 @@ export function useChat(role: ChatRole) {
 
   const isAdmin = role === 'admin'
   const userId = computed(() => (role === 'user' ? (auth.user?.id ?? null) : null))
+
   const selectedUserId = ref<string | null>(null)
   const newMessage = ref('')
   const isReady = ref(false)
 
-  /* ---- Modules ---- */
+  /** ✅ Modules */
   const msgs = useChatMessages(
     role,
     () => userId.value,
     () => selectedUserId.value,
-    (uid) => {
-      notif.unreadByUser[uid] = (notif.unreadByUser[uid] ?? 0) + 1
-      notif.unreadCount = Object.values(notif.unreadByUser).reduce((a, b) => a + b, 0)
-    },
+    (uid) => notif.incrementUserUnread(uid),
+    () => document.querySelector('.messages-list, .chat-messages') as HTMLElement | null,
   )
 
   const typing = useChatTyping(
@@ -32,19 +31,19 @@ export function useChat(role: ChatRole) {
     () => userId.value,
     () => selectedUserId.value,
   )
+
   const conv = isAdmin ? useChatConversations() : null
 
-  /* ---- ADMIN conversation pick ---- */
+  /** ✅ Admin choisit une conversation */
   const selectConversation = async (uid: string) => {
     selectedUserId.value = uid
-    notif.unreadByUser[uid] = 0
-    notif.unreadCount = Object.values(notif.unreadByUser).reduce((a, b) => a + b, 0)
+    notif.clearUserUnread(uid)
 
     await msgs.fetchInitialMessages(uid)
     msgs.subscribeRealtime(uid)
   }
 
-  /* ---- INIT ---- */
+  /** ✅ Init User */
   const initUser = async () => {
     if (!userId.value) return
     await msgs.fetchInitialMessages(userId.value)
@@ -53,13 +52,16 @@ export function useChat(role: ChatRole) {
     isReady.value = true
   }
 
+  /** ✅ Init Admin */
   const initAdmin = async () => {
     await conv?.fetchConversations()
     msgs.subscribeRealtime(null)
+
+    // ✅ absolument obligatoire
     typing.setupTypingChannel()
+
     isReady.value = true
   }
-
   onMounted(() => {
     isAdmin ? initAdmin() : initUser()
   })
@@ -69,6 +71,7 @@ export function useChat(role: ChatRole) {
     typing.cleanup()
   })
 
+  /** ✅ Envoi */
   const sendMessage = () => {
     const text = newMessage.value.trim()
     if (!text) return
@@ -77,20 +80,25 @@ export function useChat(role: ChatRole) {
   }
 
   return {
-    /* shared */
     role,
     userId,
     isReady,
+
+    // messages
     messages: msgs.messages,
     hasMore: msgs.hasMore,
     isMessagesLoading: msgs.isMessagesLoading,
     loadOlderMessages: msgs.loadOlderMessages,
 
+    // input & typing
     newMessage,
     sendMessage,
-    ...typing,
+    sendTyping: typing.sendTyping,
+    isTypingByUser: typing.isTypingByUser,
+    isTyping: typing.isTyping, // pour le côté client
+    setupTypingChannel: typing.setupTypingChannel,
 
-    /* admin */
+    // admin specific
     conversations: conv?.conversations,
     fetchConversations: conv?.fetchConversations,
     selectedUserId,

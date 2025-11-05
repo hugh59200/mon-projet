@@ -5,7 +5,6 @@
     role="region"
     aria-label="Zone de conversation"
   >
-    <!-- 🔌 Offline banner -->
     <transition name="fade-scale">
       <div
         v-if="!isOnline"
@@ -15,7 +14,6 @@
       </div>
     </transition>
 
-    <!-- 🔄 Loader -->
     <transition
       name="fade-scale"
       mode="out-in"
@@ -31,7 +29,6 @@
         <span>Chargement des messages...</span>
       </div>
 
-      <!-- 💬 Zone des messages -->
       <div
         v-else
         class="chat-content"
@@ -51,11 +48,11 @@
             :isGrouped="isGroupedMessage(i)"
           />
         </div>
+
         <ChatTypingIndicator :isTyping="localIsTyping" />
       </div>
     </transition>
 
-    <!-- 🔔 Bouton "nouveaux messages" -->
     <transition name="slide-fade">
       <button
         v-if="showNewMessagesBtn"
@@ -82,7 +79,6 @@
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
 
-  /* ---------------------- Props ---------------------- */
   const props = defineProps<{
     messages: Message[]
     isTyping: boolean
@@ -98,7 +94,6 @@
 
   const newMessage = defineModel<string>('newMessage', { default: '' })
 
-  /* ---------------------- Tri pour ordre chronologique ---------------------- */
   const orderedMessages = computed(() =>
     [...props.messages].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
@@ -107,35 +102,41 @@
     }),
   )
 
-  /* ---------------------- Typing ---------------------- */
   const localIsTyping = ref(false)
   let typingTimeout: ReturnType<typeof setTimeout> | null = null
+
   watch(
     () => props.isTyping,
     (val) => {
+      console.log('[typing] ChatCore props.isTyping =>', val)
       if (val) {
         localIsTyping.value = true
         clearTimeout(typingTimeout!)
       } else {
-        typingTimeout = setTimeout(() => (localIsTyping.value = false), 600)
+        typingTimeout = setTimeout(() => {
+          localIsTyping.value = false
+          console.log('[typing] ChatCore localIsTyping=false (timeout)')
+        }, 600)
       }
     },
+    { immediate: true },
   )
 
-  /* ---------------------- Online / Offline ---------------------- */
   const isOnline = ref(true)
   const handleOnlineChange = () => (isOnline.value = navigator.onLine)
+
   onMounted(() => {
     isOnline.value = navigator.onLine
     window.addEventListener('online', handleOnlineChange)
     window.addEventListener('offline', handleOnlineChange)
+    console.log('[typing] ChatCore mounted; role=', props.currentRole)
   })
+
   onUnmounted(() => {
     window.removeEventListener('online', handleOnlineChange)
     window.removeEventListener('offline', handleOnlineChange)
   })
 
-  /* ---------------------- Style dynamique ---------------------- */
   const computedStyle = computed(() => {
     const style: Record<string, string> = {
       display: 'flex',
@@ -144,7 +145,6 @@
       background: 'white',
       position: 'relative',
     }
-
     if (props.height)
       style.height = typeof props.height === 'number' ? `${props.height}px` : props.height
     else style.flex = '1'
@@ -155,11 +155,9 @@
     if (props.minHeight)
       style.minHeight =
         typeof props.minHeight === 'number' ? `${props.minHeight}px` : props.minHeight
-
     return style
   })
 
-  /* ---------------------- Scroll ---------------------- */
   const msgList = ref<HTMLElement | null>(null)
   const showNewMessagesBtn = ref(false)
   const isNearBottom = ref(true)
@@ -177,9 +175,11 @@
     clearTimeout(autoHideTimer!)
   }
 
-  const scrollToBottomSmooth = () => scrollToBottom('smooth')
+  function scrollToBottomSmooth() {
+    scrollToBottom('smooth')
+  }
 
-  const hideNewMessagesBtn = () => {
+  function hideNewMessagesBtn() {
     if (showNewMessagesBtn.value) {
       showNewMessagesBtn.value = false
       clearTimeout(autoHideTimer!)
@@ -198,7 +198,6 @@
     }
   }
 
-  /* ---------------------- Scroll instantané universel ---------------------- */
   function scrollHardToBottom() {
     const el = msgList.value
     if (!el) return
@@ -207,14 +206,12 @@
       el.scrollTop = el.scrollHeight
     }
 
-    // 💪 Multi-frame: couvre tous les reflows, rendus async, etc.
     for (let i = 0; i < 8; i++) {
       requestAnimationFrame(force)
       setTimeout(force, i * 30)
     }
   }
 
-  /* ---------------------- Lifecycle ---------------------- */
   onMounted(async () => {
     await nextTick()
     scrollHardToBottom()
@@ -222,8 +219,7 @@
 
   watch(
     () => props.messages.map((m) => m.id),
-    async (newVal) => {
-      if (!newVal.length) return
+    async () => {
       await nextTick()
       scrollHardToBottom()
     },
@@ -235,14 +231,12 @@
     clearTimeout(typingTimeout!)
   })
 
-  /* ---------------------- Groupement ---------------------- */
-  const isGroupedMessage = (index: number) => {
+  function isGroupedMessage(index: number) {
     const msg = orderedMessages.value[index]
     const prev = orderedMessages.value[index - 1]
     return prev && prev.sender_role === msg?.sender_role
   }
 </script>
-
 <style scoped lang="less">
   .chat-core {
     border-top: 1px solid @neutral-200;

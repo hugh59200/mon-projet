@@ -15,7 +15,6 @@
         </BasicText>
       </div>
 
-      <!-- Recherche globale -->
       <div class="header-actions">
         <BasicInput
           v-model="searchQuery"
@@ -28,12 +27,11 @@
       </div>
     </header>
 
-    <!-- Layout principal -->
     <div class="chat-admin__layout">
       <ChatSidebar
         :conversations="filteredConversations"
         :selected-id="selectedUserId"
-        :is-typing-by-user="isTypingByUser"
+        :is-typing-by-user="typingRecord"
         @select="selectConversation"
       />
 
@@ -41,7 +39,7 @@
         v-if="selectedUserId"
         v-model:new-message="newMessage"
         :messages="messages"
-        :is-typing="!!isTypingByUser[selectedUserId]"
+        :is-typing="isCurrentTyping"
         :loading="isMessagesLoading"
         current-role="admin"
         :send-message="sendMessage"
@@ -69,14 +67,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
   import { useChat } from '../shared/composables/useChat'
+  import { useChatConversations } from '../shared/composables/useChatConversations'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import ChatSidebar from './ChatSidebar.vue'
 
   const {
-    conversations,
     messages,
     selectedUserId,
     newMessage,
@@ -87,23 +85,44 @@
     sendTyping,
   } = useChat('admin')
 
-  const chatNotif = useChatNotifStore()
-  const searchQuery = ref('')
+  const conv = useChatConversations()
 
-  /** ✅ filtrage global côté admin */
-  const filteredConversations = computed(() => {
-    const q = searchQuery.value.trim().toLowerCase()
-    if (!q) return conversations?.value ?? []
-    return (
-      conversations?.value?.filter(
-        (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
-      ) ?? []
-    )
+  const chatNotif = useChatNotifStore()
+
+  const typingRecord = computed(() => {
+    return isTypingByUser.value // ✅ directement, réactif
   })
 
-  /** ✅ Lecture auto quand admin ouvre une conversation */
+  const isCurrentTyping = computed(() => {
+    const uid = selectedUserId.value
+    const v = uid ? typingRecord.value[uid] : false
+    console.log('[typing] isCurrentTyping =>', { uid, v })
+    return !!v
+  })
+  onMounted(async () => {
+    await conv.fetchConversations()
+    conv.setupPresence()
+    conv.listenRealtimeConversations()
+  })
+
+  const searchQuery = ref('')
+  const filteredConversations = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase()
+    let base = conv.conversations.value
+    if (q) {
+      base = base.filter(
+        (c) =>
+          c.user_email?.toLowerCase().includes(q) || c.last_message_short.toLowerCase().includes(q),
+      )
+    }
+    return base
+  })
+
   watch(selectedUserId, async (uid) => {
-    if (uid) await chatNotif.markAsRead(uid)
+    if (uid) {
+      await chatNotif.markAsRead(uid)
+      await conv.refreshUnreadCount()
+    }
   })
 </script>
 
@@ -116,41 +135,17 @@
     background: @neutral-50;
     min-height: 100vh;
 
-    /* 🧭 Header */
     &__header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
 
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        .basic-text {
-          color: @neutral-900;
-        }
-      }
-
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .header-search {
-          width: 260px;
-
-          :deep(.basic-input) {
-            height: 36px;
-            display: flex;
-            align-items: center;
-          }
-        }
+      .header-search {
+        width: 260px;
       }
     }
 
-    /* 💬 Layout principal */
     &__layout {
       display: grid;
       grid-template-columns: 300px 1fr;
@@ -160,14 +155,8 @@
       border: 1px solid @neutral-200;
       align-items: stretch;
       min-height: 600px;
-
-      @media (max-width: 1200px) {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-      }
     }
 
-    /* 💤 Placeholder */
     &__placeholder {
       display: flex;
       flex-direction: column;

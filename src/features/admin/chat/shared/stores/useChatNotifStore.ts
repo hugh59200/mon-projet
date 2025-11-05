@@ -10,38 +10,37 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
   const auth = useAuthStore()
   const chatWidget = useChatWidgetStore()
 
-  /** Rôle actuel (admin ou user) */
   const role = ref<ChatRole>('admin')
-
-  /** Non-lus totaux (affichés sur badge) */
-  const unreadCount = ref(0)
-
-  /** Pour admin : non-lus par user */
   const unreadByUser = ref<Record<string, number>>({})
 
-  let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
+  const unreadCount = computed(() => Object.values(unreadByUser.value).reduce((a, b) => a + b, 0))
 
   const isAdmin = computed(() => role.value === 'admin')
 
   const setRole = (r: ChatRole) => (role.value = r)
 
-  const computeTotal = () =>
-    (unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0))
+  const incrementUserUnread = (uid: string) => {
+    unreadByUser.value[uid] = (unreadByUser.value[uid] ?? 0) + 1
+  }
 
-  /** Charge état des non lus */
+  const clearUserUnread = (uid: string) => {
+    unreadByUser.value[uid] = 0
+  }
+
+  const resetUnread = () => {
+    unreadByUser.value = {}
+  }
+
+  /** Récupération initiale */
   const fetchUnreadByUser = async () => {
     if (isAdmin.value) {
       const { data } = await supabase.from('messages_unread_view').select('*')
-
       unreadByUser.value = Object.fromEntries(
         (data ?? []).map((row) => [row.user_id, Number(row.count)]),
       )
-
-      computeTotal()
       return
     }
 
-    /** Pour un user */
     const uid = auth.user?.id
     if (!uid) return
 
@@ -52,11 +51,9 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       .eq('sender_role', 'admin')
       .eq('is_read', false)
 
-    unreadCount.value = count ?? 0
-    unreadByUser.value = {}
+    unreadByUser.value = { [uid]: count ?? 0 }
   }
 
-  /** Marquer une conversation comme lue */
   const markAsRead = async (userId: string, lastMessageId?: number) => {
     const senderRoleToMark = isAdmin.value ? 'user' : 'admin'
 
@@ -65,15 +62,11 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       chatApi.markConversationRead(userId, lastMessageId),
     ])
 
-    if (isAdmin.value) {
-      unreadByUser.value[userId] = 0
-      computeTotal()
-    } else {
-      unreadCount.value = 0
-    }
+    clearUserUnread(userId)
   }
 
-  /** Temps réel — nouveaux messages */
+  let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
+
   const listenRealtime = () => {
     if (realtimeChannel) return
 
@@ -84,35 +77,27 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     realtimeChannel.on<Message>(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
-      (payload) => {
-        const msg = payload.new
-        if (!msg.user_id || msg.is_read) return
+      ({ new: msg }) => {
+        if (!msg?.user_id || msg.is_read) return
 
-        /** USER → message admin */
+        /** user reçoit un message admin */
         if (!isAdmin.value && msg.sender_role === 'admin') {
-          if (!chatWidget.isOpen) unreadCount.value++
+          if (!chatWidget.isOpen) unreadByUser.value[msg.user_id] = 1
           return
         }
 
-        /** ADMIN → message user */
+        /** admin reçoit un message user */
         if (isAdmin.value && msg.sender_role === 'user') {
           const uid = msg.user_id
 
-          // si admin a la fenêtre ouverte sur ce user → pas de badge
           if (chatWidget.isOpen && chatWidget.currentUserId === uid) return
 
-          unreadByUser.value[uid] = (unreadByUser.value[uid] ?? 0) + 1
-          computeTotal()
+          incrementUserUnread(uid)
         }
       },
     )
 
     realtimeChannel.subscribe()
-  }
-
-  const resetUnread = () => {
-    unreadCount.value = 0
-    unreadByUser.value = {}
   }
 
   return {
@@ -126,5 +111,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     listenRealtime,
     markAsRead,
     resetUnread,
+    incrementUserUnread,
+    clearUserUnread,
   }
 })

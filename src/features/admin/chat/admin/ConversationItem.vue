@@ -1,7 +1,7 @@
 <template>
   <div
     class="conversation-item"
-    :class="{ active }"
+    :class="{ active, 'new-message': isNew }"
     @click="$emit('select', conversation.user_id)"
   >
     <div class="conversation-avatar">
@@ -67,6 +67,10 @@
   /** ✅ typing live */
   const isTyping = computed(() => !!props.isTypingByUser?.[props.conversation.user_id])
 
+  const isNew = computed(() => {
+    return (props.conversation.unread_count ?? 0) > 0
+  })
+
   /** ✅ format heure FR */
   const formattedTime = computed(() => {
     const date = props.conversation.last_message_at
@@ -77,6 +81,23 @@
 </script>
 
 <style scoped lang="less">
+  .conversation-item.new-message {
+    animation: flash 0.8s ease-out;
+    border-color: @primary-600;
+    box-shadow: 0 0 6px fade(@primary-600, 40%);
+  }
+
+  @keyframes flash {
+    0% {
+      background: fade(@primary-600, 35%);
+    }
+    50% {
+      background: fade(@primary-600, 10%);
+    }
+    100% {
+      background: transparent;
+    }
+  }
   .conversation-item {
     display: flex;
     align-items: flex-start;
