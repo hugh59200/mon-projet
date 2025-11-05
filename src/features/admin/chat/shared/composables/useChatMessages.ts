@@ -15,6 +15,15 @@ interface UseChatMessagesOptions {
   scroll?: ReturnType<typeof useScrollMessages>
 }
 
+// Typage léger pour les payloads realtime
+type RealtimeMessageRow = {
+  id: string | number
+  user_id: string | null
+  content: string | null
+  created_at: string | null
+  sender_role: ChatRole
+}
+
 export function useChatMessages({
   role,
   getActiveUser,
@@ -33,6 +42,9 @@ export function useChatMessages({
   // Supporte id number | string selon DB, mais uniformisé en string
   const seenIds = new Set<string>()
   const keyOf = (id: unknown) => String(id)
+
+  // anti-race sur fetchInitialMessages
+  let lastFetchTarget: string | null = null
 
   const ingest = (m: Message) => {
     if (!m?.id) return
@@ -57,15 +69,19 @@ export function useChatMessages({
       const unreadFrom: ChatRole = role === 'admin' ? 'user' : 'admin'
       await chatApi.markMessagesAsRead(uid, unreadFrom)
       await onMarkedRead?.()
-    }, 300)
+    }, 800) // debounce un poil plus long pour réduire les hits API
   }
 
   /** Charger les 30 derniers (ordre chronologique) */
   const fetchInitialMessages = async (uid: string) => {
+    lastFetchTarget = uid
     isMessagesLoading.value = true
     try {
       const { data, error } = await chatApi.fetchMessages(uid, PAGE_SIZE)
       if (error) throw error
+
+      // si l'utilisateur a basculé de thread entre temps -> on abandonne l'applique
+      if (getActiveUser() !== uid || lastFetchTarget !== uid) return
 
       const list = (data ?? [])
         .slice()
@@ -79,12 +95,12 @@ export function useChatMessages({
 
       hasMore.value = list.length === PAGE_SIZE
       oldest.value = list[0]?.created_at ?? null
-    } finally {
-      isMessagesLoading.value = false
-    }
 
-    await scroll?.scrollToEnd(true)
-    markRead()
+      await scroll?.scrollToEnd(true)
+      markRead()
+    } finally {
+      if (lastFetchTarget === uid) isMessagesLoading.value = false
+    }
   }
 
   /** Pagination (prépend en conservant l'ordre) */
@@ -154,19 +170,22 @@ export function useChatMessages({
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages', filter: 'sender_role=eq.user' },
       (payload) => {
-        const msg = payload.new as Message
+        const msg = payload.new as RealtimeMessageRow
         const active = getActiveUser()
         if (msg?.user_id && msg.user_id !== active) onUnread(msg.user_id)
       },
     )
 
-    unreadChannel.subscribe()
+    unreadChannel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') console.warn('admin unread channel error')
+      if (status === 'CLOSED') console.info('admin unread channel closed')
+    })
   }
 
   /** Realtime propre (filtré par user_id) */
-  const subscribeRealtime = (target: string | null) => {
+  const subscribeRealtime = async (target: string | null) => {
     if (channel) {
-      void supabase.removeChannel(channel)
+      await supabase.removeChannel(channel)
       channel = null
     }
 
@@ -183,9 +202,9 @@ export function useChatMessages({
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages', filter },
       async (payload) => {
-        const msg: Message = payload.new as Message
+        const msg = payload.new as RealtimeMessageRow
         if (!msg?.user_id) return
-        ingest(msg)
+        ingest(msg as unknown as Message)
         await scroll?.scrollToEnd(true)
         markRead()
       },
@@ -195,13 +214,16 @@ export function useChatMessages({
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'messages', filter },
       (payload) => {
-        const updated: Message = payload.new as Message
-        const idx = messages.value.findIndex((m) => m.id === updated.id)
-        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...updated }
+        const updated = payload.new as RealtimeMessageRow
+        const idx = messages.value.findIndex((m) => m.id === (updated as any).id)
+        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...(updated as any) }
       },
     )
 
-    channel.subscribe()
+    channel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') console.warn('messages channel error')
+      if (status === 'CLOSED') console.info('messages channel closed')
+    })
   }
 
   const cleanup = () => {

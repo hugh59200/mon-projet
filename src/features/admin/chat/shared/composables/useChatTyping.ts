@@ -66,7 +66,10 @@ export function useChatTyping({ role, getActiveUser }: UseChatTypingOptions) {
       }
     })
 
-    chan.subscribe()
+    chan.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') console.warn('typing channel error')
+      if (status === 'CLOSED') console.info('typing channel closed')
+    })
   }
 
   const sendTyping = () => {

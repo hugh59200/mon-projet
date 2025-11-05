@@ -24,7 +24,8 @@ export function useChatConversations() {
   /** Format helpers */
   const formatMessage = (content: string | null) => {
     if (!content) return ''
-    return content.length <= 30 ? content : content.slice(0, 27) + '...'
+    const flat = content.replace(/\s+/g, ' ') // évite les retours ligne dans l'aperçu
+    return flat.length <= 30 ? flat : flat.slice(0, 27) + '...'
   }
 
   const toTs = (d?: string | null) => (d ? Date.parse(d) || 0 : 0)
@@ -36,6 +37,7 @@ export function useChatConversations() {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Paris',
   })
   const formatDate = (date: string | null) => (date ? dtf.format(new Date(toTs(date))) : '')
 
@@ -82,9 +84,9 @@ export function useChatConversations() {
     })
 
     presenceChannel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        presenceChannel!.track({ role: 'admin' })
-      }
+      if (status === 'SUBSCRIBED') presenceChannel!.track({ role: 'admin' })
+      if (status === 'CHANNEL_ERROR') console.warn('presence channel error')
+      if (status === 'CLOSED') console.info('presence channel closed')
     })
   }
 
@@ -130,7 +132,10 @@ export function useChatConversations() {
       },
     )
 
-    messagesChannel.subscribe()
+    messagesChannel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') console.warn('messages channel error')
+      if (status === 'CLOSED') console.info('messages channel closed')
+    })
   }
 
   /** Unread update après markAsRead */

@@ -62,7 +62,7 @@ export function useChat(role: ChatRole) {
         msgs.subscribeUnreadForAdmin?.()
       } else if (userId.value) {
         await msgs.fetchInitialMessages(userId.value)
-        msgs.subscribeRealtime(userId.value)
+        await msgs.subscribeRealtime(userId.value) // attendre la (ré)subscription propre
       }
 
       typing.setup()
@@ -88,7 +88,8 @@ export function useChat(role: ChatRole) {
       newMessage.value = ''
     } catch (e) {
       console.error(e)
-      // Option: notif.toast('Envoi impossible. Réessaie.')
+      // Option UX
+      ;(notif as any)?.toast?.('Envoi impossible. Réessaie.')
     }
   }
 
@@ -107,7 +108,7 @@ export function useChat(role: ChatRole) {
     try {
       notif.clearUserUnread(uid)
       await msgs.fetchInitialMessages(uid)
-      msgs.subscribeRealtime(uid) // écoute filtrée
+      await msgs.subscribeRealtime(uid) // écoute filtrée (attendre l'unsubscribe précédent)
       await conv?.refreshUnreadCount()
     } catch (e) {
       console.error(e)
