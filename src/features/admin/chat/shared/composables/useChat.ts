@@ -14,49 +14,68 @@ export function useChat(role: ChatRole) {
   const userId = computed(() => auth.user?.id ?? null)
   const selectedUserId = ref<string | null>(null)
 
+  // expose l'user actif (UI friendly)
+  const activeUserId = computed<string | null>(() =>
+    role === 'admin' ? selectedUserId.value : userId.value,
+  )
+
   const isReady = ref(false)
   const newMessage = ref('')
 
-  const scroll = useScrollMessages(
-    () => document.querySelector('.messages-list, .chat-messages') as HTMLElement | null,
-  )
+  // SSR-safe: évite d'accéder à document côté serveur
+  const scroll = useScrollMessages(() => {
+    if (typeof window === 'undefined') return null
+    return document.querySelector('.messages-list, .chat-messages') as HTMLElement | null
+  })
+
+  // conversations doit être initialisé avant useChatMessages pour onMarkedRead
+  const conv = role === 'admin' ? useChatConversations() : null
 
   const msgs = useChatMessages({
     role,
-    getActiveUser: () => (role === 'admin' ? selectedUserId.value : userId.value),
+    getActiveUser: () => activeUserId.value,
     onUnread: (uid) => notif.incrementUserUnread(uid),
+    onMarkedRead: async () => {
+      if (role === 'admin') await conv?.refreshUnreadCount()
+    },
     scroll,
   })
 
   const typing = useChatTyping({
     role,
-    getActiveUser: () => (role === 'admin' ? selectedUserId.value : userId.value),
+    getActiveUser: () => activeUserId.value,
   })
 
-  const conv = role === 'admin' ? useChatConversations() : null
-
+  let initialized = false
   const init = async () => {
-    if (role === 'admin') {
-      await conv!.fetchConversations()
-      conv!.setupPresence()
-      conv!.listenRealtimeConversations()
-      // Flux léger pour les notifications globales (sans ouvrir un thread)
-      msgs.subscribeUnreadForAdmin?.()
-    } else if (userId.value) {
-      await msgs.fetchInitialMessages(userId.value)
-      msgs.subscribeRealtime(userId.value)
-    }
+    if (initialized) return
+    initialized = true
+    try {
+      if (role === 'admin') {
+        await conv!.fetchConversations()
+        conv!.setupPresence()
+        // passe l'user actif pour éviter le flicker des unread
+        conv!.listenRealtimeConversations(() => activeUserId.value)
+        // Flux léger pour les notifications globales (sans ouvrir un thread)
+        msgs.subscribeUnreadForAdmin?.()
+      } else if (userId.value) {
+        await msgs.fetchInitialMessages(userId.value)
+        msgs.subscribeRealtime(userId.value)
+      }
 
-    typing.setup()
-    isReady.value = true
+      typing.setup()
+      isReady.value = true
+    } catch (e) {
+      // permet un retry si un appel a échoué (ex: réseau)
+      initialized = false
+      console.error(e)
+    }
   }
 
-  const selectConversation = async (uid: string) => {
+  // Sélection conversation (la watch ci-dessous fait le reste)
+  const selectConversation = (uid: string) => {
     selectedUserId.value = uid
     notif.clearUserUnread(uid)
-
-    await msgs.fetchInitialMessages(uid)
-    msgs.subscribeRealtime(uid) // écoute filtrée
   }
 
   const sendMessage = () => {
@@ -74,6 +93,19 @@ export function useChat(role: ChatRole) {
     if (role === 'user' && id && !isReady.value) init()
   })
 
+  // Réagit à tout changement de thread sélectionné (navigation, actions externes)
+  watch(selectedUserId, async (uid, old) => {
+    if (!uid || uid === old) return
+    try {
+      notif.clearUserUnread(uid)
+      await msgs.fetchInitialMessages(uid)
+      msgs.subscribeRealtime(uid) // écoute filtrée
+      await conv?.refreshUnreadCount()
+    } catch (e) {
+      console.error(e)
+    }
+  })
+
   onUnmounted(() => {
     msgs.cleanup()
     typing.cleanup()
@@ -84,6 +116,7 @@ export function useChat(role: ChatRole) {
     role,
     userId,
     selectedUserId,
+    activeUserId,
     newMessage,
 
     isReady,

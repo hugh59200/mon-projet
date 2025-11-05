@@ -27,14 +27,15 @@ export function useChatConversations() {
     return content.length <= 30 ? content : content.slice(0, 27) + '...'
   }
 
-  const formatDate = (date: string | null) => {
-    if (!date) return ''
-    const d = new Date(date)
-    return d.toLocaleDateString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+  // Instance unique pour éviter des variations
+  const dtf = new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const formatDate = (date: string | null) => (date ? dtf.format(new Date(date)) : '')
 
   /** ✅ Fetch initial list, sorted newest first */
   const fetchConversations = async () => {
@@ -57,7 +58,7 @@ export function useChatConversations() {
     }))
   }
 
-  /** ✅ Presence realtime → online / offline badge */
+  /** ✅ Presence realtime → online / offline badge (ne compte que les users) */
   const setupPresence = () => {
     if (presenceChannel) return
 
@@ -68,8 +69,12 @@ export function useChatConversations() {
     })
 
     presenceChannel.on('presence', { event: 'sync' }, () => {
-      const state = presenceChannel!.presenceState()
-      const online = new Set(Object.keys(state))
+      const state = presenceChannel!.presenceState() as Record<string, any[]>
+      const online = new Set(
+        Object.entries(state)
+          .filter(([, metas]) => Array.isArray(metas) && metas.some((m: any) => m?.role === 'user'))
+          .map(([key]) => key),
+      )
       onlineUsers.value = online
 
       conversations.value = conversations.value.map((c) => ({
@@ -85,8 +90,11 @@ export function useChatConversations() {
     })
   }
 
-  /** ✅ Listen realtime messages → update last message + unread + re-sort */
-  const listenRealtimeConversations = () => {
+  /**
+   * ✅ Listen realtime messages → update last message + unread + re-sort
+   * getActiveUserId? : injection légère pour éviter d'incrémenter le badge si le thread est déjà ouvert
+   */
+  const listenRealtimeConversations = (getActiveUserId?: () => string | null) => {
     if (messagesChannel) return
 
     messagesChannel = supabase.channel('chat-conv', {
@@ -97,18 +105,20 @@ export function useChatConversations() {
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
       ({ new: msg }) => {
-        const uid = msg.user_id
+        const uid = (msg as any).user_id as string | null
         if (!uid) return
 
         const item = conversations.value.find((c) => c.user_id === uid)
 
         if (item) {
-          item.last_message = msg.content
-          item.last_message_short = formatMessage(msg.content)
-          item.last_message_at = msg.created_at
-          item.last_message_date = formatDate(msg.created_at)
+          item.last_message = (msg as any).content
+          item.last_message_short = formatMessage((msg as any).content)
+          item.last_message_at = (msg as any).created_at
+          item.last_message_date = formatDate((msg as any).created_at)
 
-          if (msg.sender_role === 'user') {
+          const isUserMsg = (msg as any).sender_role === 'user'
+          const isActive = getActiveUserId?.() === uid
+          if (isUserMsg && !isActive) {
             item.unread_count = (item.unread_count ?? 0) + 1
           }
         } else {
@@ -117,7 +127,8 @@ export function useChatConversations() {
         }
 
         conversations.value = [...conversations.value].sort(
-          (a, b) => new Date(b.last_message_at!).getTime() - new Date(a.last_message_at!).getTime(),
+          (a, b) =>
+            new Date(b.last_message_at ?? 0).getTime() - new Date(a.last_message_at ?? 0).getTime(),
         )
       },
     )

@@ -11,10 +11,17 @@ interface UseChatMessagesOptions {
   role: ChatRole
   getActiveUser: () => string | null
   onUnread?: (userId: string) => void
+  onMarkedRead?: () => void | Promise<void>
   scroll?: ReturnType<typeof useScrollMessages>
 }
 
-export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseChatMessagesOptions) {
+export function useChatMessages({
+  role,
+  getActiveUser,
+  onUnread,
+  onMarkedRead,
+  scroll,
+}: UseChatMessagesOptions) {
   const messages = ref<Message[]>([])
   const isMessagesLoading = ref(false)
   const hasMore = ref(true)
@@ -23,29 +30,52 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
   let channel: RealtimeChannel | null = null
   let unreadChannel: RealtimeChannel | null = null
 
+  // Supporte id number | string selon DB
+  const seenIds = new Set<number | string>()
+
+  const ingest = (m: Message) => {
+    if (!m?.id) return
+    const key = m.id as unknown as number | string
+    if (seenIds.has(key)) {
+      const idx = messages.value.findIndex((x) => x.id === m.id)
+      if (idx !== -1) messages.value[idx] = reactive({ ...messages.value[idx], ...m })
+      return
+    }
+    seenIds.add(key)
+    messages.value.push(reactive(m))
+  }
+
   /** ✅ Marquer comme lus (avec senderRole obligatoire) */
-  let readTimeout: number | undefined
+  let readTimeout: ReturnType<typeof setTimeout> | undefined
   const markRead = () => {
     const uid = getActiveUser()
     if (!uid) return
 
     if (readTimeout) clearTimeout(readTimeout)
-    readTimeout = window.setTimeout(() => {
+    readTimeout = setTimeout(async () => {
       const unreadFrom: ChatRole = role === 'admin' ? 'user' : 'admin'
-      chatApi.markMessagesAsRead(uid, unreadFrom)
+      await chatApi.markMessagesAsRead(uid, unreadFrom)
+      await onMarkedRead?.()
     }, 300)
   }
 
-  /** ✅ Charger les 30 derniers */
+  /** ✅ Charger les 30 derniers (ordre chronologique) */
   const fetchInitialMessages = async (uid: string) => {
     isMessagesLoading.value = true
     try {
       const { data, error } = await chatApi.fetchMessages(uid, PAGE_SIZE)
       if (error) throw error
 
-      messages.value = (data ?? []).map((m) => reactive(m))
-      hasMore.value = (data?.length ?? 0) === PAGE_SIZE
-      oldest.value = data?.[0]?.created_at ?? null
+      const list = (data ?? []).slice().sort(
+        (a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime(),
+      )
+
+      messages.value = []
+      seenIds.clear()
+      list.forEach((m) => ingest(m as Message))
+
+      hasMore.value = list.length === PAGE_SIZE
+      oldest.value = list[0]?.created_at ?? null
     } finally {
       isMessagesLoading.value = false
     }
@@ -54,7 +84,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     markRead()
   }
 
-  /** ✅ Pagination */
+  /** ✅ Pagination (prépend en conservant l'ordre) */
   const loadOlderMessages = async () => {
     if (!hasMore.value || !oldest.value || isMessagesLoading.value) return
 
@@ -68,13 +98,31 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
       const { data, error } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
       if (error) throw error
 
-      if (!data?.length) {
+      const batch = (data ?? [])
+      if (!batch.length) {
         hasMore.value = false
         return
       }
 
-      messages.value.unshift(...data.map((m) => reactive(m)))
-      oldest.value = data[0]?.created_at ?? null
+      const toPrepend = batch
+        .slice()
+        .sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateA - dateB;
+        })
+        .map((m) => reactive(m as Message))
+
+      // insère en tête dans l'ordre (évite le reverse dû aux unshift successifs)
+      // et enregistre dans seenIds
+      toPrepend.forEach((m: any) => {
+        const key = m.id as number | string
+        if (!seenIds.has(key)) seenIds.add(key)
+      })
+      messages.value.splice(0, 0, ...toPrepend)
+
+      oldest.value = toPrepend[0]?.created_at ?? oldest.value
+      hasMore.value = batch.length === PAGE_SIZE
     } finally {
       isMessagesLoading.value = false
       scroll?.keepScrollOnPrepend(prevHeight)
@@ -85,13 +133,15 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
   const sendMessage = async (text: string) => {
     const uid = getActiveUser()
     if (!uid || !text.trim()) return
-
     await chatApi.sendMessage(uid, role, text.trim())
   }
 
   /** ✅ Abonnement unread global (admin) — léger */
   const subscribeUnreadForAdmin = () => {
-    if (unreadChannel) supabase.removeChannel(unreadChannel)
+    if (unreadChannel) {
+      supabase.removeChannel(unreadChannel)
+      unreadChannel = null
+    }
     if (role !== 'admin' || !onUnread) return
 
     unreadChannel = supabase.channel('chat-admin-unread', {
@@ -113,7 +163,10 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
 
   /** ✅ Realtime propre (filtré par user_id) */
   const subscribeRealtime = (target: string | null) => {
-    if (channel) supabase.removeChannel(channel)
+    if (channel) {
+      supabase.removeChannel(channel)
+      channel = null
+    }
 
     // pas d'abonnement si pas de cible (ex: admin sans thread sélectionné)
     if (!target) return
@@ -130,7 +183,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
       async (payload) => {
         const msg: Message = payload.new as Message
         if (!msg?.user_id) return
-        messages.value.push(reactive(msg))
+        ingest(msg)
         await scroll?.scrollToEnd(true)
         markRead()
       },
@@ -155,6 +208,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     if (unreadChannel) supabase.removeChannel(unreadChannel)
     channel = null
     unreadChannel = null
+    seenIds.clear()
   }
 
   return {
