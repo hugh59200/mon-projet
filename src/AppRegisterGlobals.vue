@@ -19,7 +19,7 @@
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
   import { storeToRefs } from 'pinia'
-  import ChatWidget from './features/admin/chat/user/ChatWidget.vue'
+  import ChatWidget from './features/chat/user/ChatWidget.vue'
 
   /* -------------------------------------------------------------------------- */
   /*                                 INITIALISATION                             */

@@ -1,10 +1,10 @@
-import AdminChatView from '@/features/admin/chat/admin/AdminChatView.vue'
 import AdminNewsTable from '@/features/admin/news/AdminNewsTable.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsTable.vue'
-import AdminStatsView from '@/features/admin/stats/AdminStatsView.vue'
 import AdminTopicsTable from '@/features/admin/topics/AdminTopicsTable.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
+import AdminChatView from '@/features/chat/admin/AdminChatView.vue'
+import AdminStatsView from '@/features/stats/AdminStatsView.vue'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
@@ -24,6 +24,8 @@ const routes: Array<RouteRecordRaw> = [
         'Découvrez Fast Peptides, la référence européenne pour les peptides de recherche certifiés et livrés rapidement.',
     },
   },
+
+  // AUTHENTIFICATION
   {
     path: '/auth',
     component: () => import('@/features/auth/AuthLayout.vue'),
@@ -51,6 +53,7 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+
   {
     path: '/update-password',
     name: 'update-password',
@@ -92,6 +95,35 @@ const routes: Array<RouteRecordRaw> = [
         'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
     },
   },
+  // ✅ ADMIN - vues hors onglets
+  {
+    path: '/admin/messagerie',
+    name: 'AdminMessagerie',
+    component: AdminChatView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      label: 'Messagerie',
+      icon: 'MessageSquare',
+      color: '#3B82F6',
+      title: 'Messagerie – Fast Peptides',
+      description: 'Discutez avec les utilisateurs ou le support via la messagerie interne.',
+    },
+  },
+  {
+    path: '/admin/statistiques',
+    name: 'AdminStats',
+    component: AdminStatsView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      label: 'Statistiques',
+      icon: 'BarChart3',
+      color: '#10B981',
+      title: 'Statistiques – Fast Peptides',
+      description: 'Consultez les statistiques globales du site Fast Peptides.',
+    },
+  },
   {
     path: '/catalogue',
     name: 'catalogue',
@@ -120,8 +152,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/actualités/ActualitesView.vue'),
     meta: {
       label: 'Actualités',
-      icon: 'Newspaper', // ou un autre nom d’icône présent dans ton design system
-      order: 3, // pour qu’elle s’affiche après Catalogue
+      icon: 'Newspaper',
+      order: 3,
       title: 'Actualités – Fast Peptides',
       description:
         'Découvrez les dernières actualités, études et innovations dans le domaine des peptides sur Fast Peptides.',
@@ -136,7 +168,6 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
     },
   },
-
   {
     path: '/panier',
     name: 'cart',
@@ -201,28 +232,8 @@ const routes: Array<RouteRecordRaw> = [
       description:
         'Gérez les produits, utilisateurs, commandes, statistiques et actualités du site Fast Peptides.',
     },
-    redirect: { name: 'AdminMessagerie' },
+    redirect: { name: 'AdminUsers' },
     children: [
-      {
-        path: 'messagerie',
-        name: 'AdminMessagerie',
-        component: AdminChatView,
-        meta: {
-          label: 'Messagerie',
-          icon: 'MessageSquare',
-          color: '#3B82F6', // 🔵 Bleu
-        },
-      },
-      {
-        path: 'stats',
-        name: 'AdminStats',
-        component: AdminStatsView,
-        meta: {
-          label: 'Statistiques',
-          icon: 'BarChart3',
-          color: '#10B981', // 🟢 Vert
-        },
-      },
       {
         path: 'utilisateurs',
         name: 'AdminUsers',
@@ -230,7 +241,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Utilisateurs',
           icon: 'Users',
-          color: '#F59E0B', // 🟠 Orange
+          color: '#F59E0B',
         },
       },
       {
@@ -240,7 +251,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Commandes',
           icon: 'ShoppingCart',
-          color: '#EF4444', // 🔴 Rouge
+          color: '#EF4444',
         },
       },
       {
@@ -250,7 +261,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Produits',
           icon: 'PackageSearch',
-          color: '#8B5CF6', // 🟣 Violet
+          color: '#8B5CF6',
         },
       },
       {
@@ -260,7 +271,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Actualités',
           icon: 'Newspaper',
-          color: '#F97316', // 🟧 Orange clair
+          color: '#F97316',
         },
       },
       {
@@ -270,11 +281,13 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           label: 'Catégories',
           icon: 'FolderTree',
-          color: '#06B6D4', // 🩵 Cyan
+          color: '#06B6D4',
         },
       },
     ],
   },
+
+  // FAQ
   {
     path: '/faq',
     name: 'faq',

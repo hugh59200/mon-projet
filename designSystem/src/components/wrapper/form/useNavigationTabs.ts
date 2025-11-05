@@ -1,8 +1,9 @@
-import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore' // ✅ import du store
+import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
 import type { RouteName } from '@/router/route-name'
-import type { TextColor } from '@designSystem/components/basic'
+import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
-import { computed, watch } from 'vue'
+import type { TextColor } from '@designSystem/components/basic/text'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export function useNavigationTabs() {
@@ -10,7 +11,7 @@ export function useNavigationTabs() {
   const route = useRoute()
   const adminTabStore = useAdminTabStore()
 
-  // 🔹 Récupère tous les onglets enfants du parent courant (ex: /admin)
+  // 🔹 Récupère les routes enfants du parent (ex: /admin)
   const tabsRoutes = computed<TabProps[]>(() => {
     const parent = route.matched[0]
     if (!parent?.children) return []
@@ -18,28 +19,26 @@ export function useNavigationTabs() {
     return parent.children.map((child) => ({
       routeName: child.name as RouteName,
       tabKey: (child.meta?.label as TabsModel) || (child.name as string),
-      color: (child.meta?.color as TextColor) ?? 'gray-400', // couleur par défaut
+      color: (child.meta?.color as TextColor) ?? 'neutral-300',
+      icon: child.meta?.icon as IconNameNext,
     }))
   })
 
-  const tabs = computed(() => tabsRoutes.value)
-
-  // 🔁 Synchronisation route ↔ store (mise à jour à chaque navigation)
-  watch(
-    () => route.name,
-    (newName) => {
-      if (newName?.toString().startsWith('Admin')) {
-        adminTabStore.setLastTab(newName.toString())
-      }
-    },
-    { immediate: true },
+  // ✅ Liste finale typée : TabProps[]
+  const tabs = computed<TabProps[]>(() =>
+    tabsRoutes.value.map((t) => ({
+      routeName: t.routeName,
+      tabKey: t.tabKey,
+      icon: t.icon,
+      color: t.color,
+    })),
   )
 
-  // 🚀 Fonction de navigation + mise à jour store
+  // 🚀 Navigation + stockage de l’onglet actif
   const goToTab = (name: RouteName) => {
     const target = tabsRoutes.value.find((t) => t.routeName === name)
     if (target) {
-      adminTabStore.setLastTab(name.toString()) // ✅ persisté
+      adminTabStore.setLastTab(name.toString())
       router.push({ name: target.routeName })
     }
   }

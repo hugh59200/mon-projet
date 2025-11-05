@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
-import type { RealtimeChannel } from '@supabase/supabase-js'
+import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { computed, ref } from 'vue'
 import { chatApi } from '../services/chatApi'
-import type { ConversationOverview } from '../types/chat'
+import type { ConversationOverview, Message } from '../types/chat'
 
 interface ExtendedConversation extends ConversationOverview {
   last_message_short: string
@@ -21,16 +21,15 @@ export function useChatConversations() {
   let presenceChannel: RealtimeChannel | null = null
   let messagesChannel: RealtimeChannel | null = null
 
-  /** Format helpers */
-  const formatMessage = (content: string | null) => {
+  /** --- 🔧 Format helpers --- **/
+  const formatMessage = (content: string | null): string => {
     if (!content) return ''
-    const flat = content.replace(/\s+/g, ' ') // évite les retours ligne dans l'aperçu
+    const flat = content.replace(/\s+/g, ' ') // supprime les sauts de ligne
     return flat.length <= 30 ? flat : flat.slice(0, 27) + '...'
   }
 
-  const toTs = (d?: string | null) => (d ? Date.parse(d) || 0 : 0)
+  const toTs = (d?: string | null): number => (d ? Date.parse(d) || 0 : 0)
 
-  // Instance unique pour éviter des variations
   const dtf = new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',
     month: '2-digit',
@@ -39,10 +38,11 @@ export function useChatConversations() {
     minute: '2-digit',
     timeZone: 'Europe/Paris',
   })
-  const formatDate = (date: string | null) => (date ? dtf.format(new Date(toTs(date))) : '')
 
-  /** Fetch initial list, sorted newest first */
-  const fetchConversations = async () => {
+  const formatDate = (date: string | null): string => (date ? dtf.format(new Date(toTs(date))) : '')
+
+  /** --- 📥 Fetch initial list --- **/
+  const fetchConversations = async (): Promise<void> => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? [])
       .filter((c) => c.user_id !== null)
@@ -53,13 +53,13 @@ export function useChatConversations() {
       user_id: c.user_id as string,
       last_message_short: formatMessage(c.last_message ?? ''),
       last_message_date: formatDate(c.last_message_at),
-      is_online: onlineUsers.value.has(c.user_id!),
+      is_online: onlineUsers.value.has(c.user_id as string),
       unread_count: c.unread_count_admin ?? 0,
     }))
   }
 
-  /** Presence realtime → online / offline badge (ne compte que les users) */
-  const setupPresence = () => {
+  /** --- 🟢 Presence realtime --- **/
+  const setupPresence = (): void => {
     if (presenceChannel) return
 
     const presenceKey = auth.user?.id ?? 'anon-admin'
@@ -69,12 +69,13 @@ export function useChatConversations() {
     })
 
     presenceChannel.on('presence', { event: 'sync' }, () => {
-      const state = presenceChannel!.presenceState() as Record<string, any[]>
+      const state = presenceChannel!.presenceState() as Record<string, Array<{ role: string }>>
       const online = new Set(
         Object.entries(state)
-          .filter(([, metas]) => Array.isArray(metas) && metas.some((m: any) => m?.role === 'user'))
+          .filter(([, metas]) => metas.some((m) => m.role === 'user'))
           .map(([key]) => key),
-      ) as Set<string>
+      )
+
       onlineUsers.value = online
 
       conversations.value = conversations.value.map((c) => ({
@@ -90,11 +91,8 @@ export function useChatConversations() {
     })
   }
 
-  /**
-   * Listen realtime messages → update last message + unread + re-sort
-   * getActiveUserId? : injection légère pour éviter d'incrémenter le badge si le thread est déjà ouvert
-   */
-  const listenRealtimeConversations = (getActiveUserId?: () => string | null) => {
+  /** --- 💬 Realtime messages --- **/
+  const listenRealtimeConversations = (getActiveUserId?: () => string | null): void => {
     if (messagesChannel) return
 
     messagesChannel = supabase.channel('chat-conv', {
@@ -104,25 +102,27 @@ export function useChatConversations() {
     messagesChannel.on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
-      ({ new: msg }) => {
-        const uid = (msg as any).user_id as string | null
+      (payload: RealtimePostgresInsertPayload<Message>) => {
+        const msg = payload.new
+        const uid = msg.user_id
         if (!uid) return
 
         const item = conversations.value.find((c) => c.user_id === uid)
 
         if (item) {
-          item.last_message = (msg as any).content
-          item.last_message_short = formatMessage((msg as any).content ?? '')
-          item.last_message_at = (msg as any).created_at
-          item.last_message_date = formatDate((msg as any).created_at)
+          item.last_message = msg.content
+          item.last_message_short = formatMessage(msg.content ?? '')
+          item.last_message_at = msg.created_at
+          item.last_message_date = formatDate(msg.created_at)
 
-          const isUserMsg = (msg as any).sender_role === 'user'
+          const isUserMsg = msg.sender_role === 'user'
           const isActive = getActiveUserId?.() === uid
+
           if (isUserMsg && !isActive) {
             item.unread_count = (item.unread_count ?? 0) + 1
           }
         } else {
-          // Nouvelle conversation
+          // Nouvelle conversation détectée → on recharge
           void fetchConversations()
         }
 
@@ -138,8 +138,8 @@ export function useChatConversations() {
     })
   }
 
-  /** Unread update après markAsRead */
-  const refreshUnreadCount = async () => {
+  /** --- 🔄 Refresh unread count --- **/
+  const refreshUnreadCount = async (): Promise<void> => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? []).filter((c) => c.user_id !== null)
 
@@ -148,15 +148,15 @@ export function useChatConversations() {
       user_id: c.user_id as string,
       last_message_short: formatMessage(c.last_message ?? ''),
       last_message_date: formatDate(c.last_message_at),
-      is_online: onlineUsers.value.has(c.user_id!),
+      is_online: onlineUsers.value.has(c.user_id as string),
       unread_count: c.unread_count_admin ?? 0,
     }))
 
     conversations.value = mapped.sort((a, b) => toTs(b.last_message_at) - toTs(a.last_message_at))
   }
 
-  /** Cleanup */
-  const cleanup = () => {
+  /** --- 🧹 Cleanup channels --- **/
+  const cleanup = (): void => {
     if (presenceChannel) {
       void supabase.removeChannel(presenceChannel)
       presenceChannel = null
@@ -167,6 +167,7 @@ export function useChatConversations() {
     }
   }
 
+  /** --- 🧾 Return composable API --- **/
   return {
     conversations: computed(() => conversations.value),
     fetchConversations,

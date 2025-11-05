@@ -10,8 +10,8 @@ export type TabProps = {
   /** Libellé lisible affiché dans l’onglet */
   tabKey: TabsModel
 
-  /** Icône optionnelle associée à l’onglet */
-  tabState?: IconNameNext
+  /** Icône associée à l’onglet */
+  icon?: IconNameNext
 
   /** Couleur de l’icône ou de l’onglet */
   color?: TextColor

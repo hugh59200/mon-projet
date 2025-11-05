@@ -213,8 +213,8 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
-  import { useChatWidgetStore } from '../admin/chat/user/useChatWidgetStore'
   import { useAuthStore } from '../auth/useAuthStore'
+  import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
   const auth = useAuthStore()

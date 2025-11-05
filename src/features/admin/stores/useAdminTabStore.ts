@@ -8,8 +8,16 @@ export const useAdminTabStore = defineStore(
 
     const setLastTab = (tab: string) => (lastTab.value = tab)
     const clearLastTab = () => (lastTab.value = null)
-    const getRedirectRoute = () =>
-      lastTab.value ? { name: lastTab.value } : { name: 'AdminMessagerie' }
+
+    // ✅ Redirection auto : admin → onglets admin, sinon → statistiques
+    const getRedirectRoute = (isAdmin = false) => {
+      if (isAdmin) {
+        return lastTab.value && lastTab.value.startsWith('Admin')
+          ? { name: lastTab.value }
+          : { name: 'AdminUsers' }
+      }
+      return { name: 'AdminStats' } // route stats utilisateur
+    }
 
     return { lastTab, setLastTab, clearLastTab, getRedirectRoute }
   },
@@ -17,7 +25,7 @@ export const useAdminTabStore = defineStore(
     persist: {
       key: 'admin:last-tab',
       storage: localStorage,
-      pick: ['lastTab'], // ✅ nouvelle syntaxe v4
+      pick: ['lastTab'],
     },
   },
 )
