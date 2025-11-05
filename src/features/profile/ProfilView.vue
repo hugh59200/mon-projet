@@ -209,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-  import FilterSection from '@/components/FilterSection.vue'
+  import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'

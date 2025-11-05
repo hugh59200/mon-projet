@@ -154,7 +154,7 @@
         `,
         )
         .eq('id', orderId)
-        .eq('email', auth.user?.email)
+        .eq('email', auth.user?.email!)
         .single()
 
       if (error) {

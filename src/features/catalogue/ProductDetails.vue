@@ -111,7 +111,10 @@
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
-  type ProductRow = Tables<'products'>
+  type ProductRow = Tables<'products'> & { quantity?: number; stock: boolean }
+
+  // Define the cart item type that includes quantity
+  type CartItem = ProductRow & { quantity: number }
 
   const route = useRoute()
   const cart = useCartStore()
@@ -148,15 +151,13 @@
 
     loading.value = false
   })
-
-  // 🛒 Fonction d'ajout au panier
-  function addToCart(p: ProductRow) {
+  const addToCart = (p: ProductRow) => {
     cart.addToCart({
       ...p,
       image: p.image || '/default-product-image.jpg',
       stock: p.stock ?? false,
       quantity: 0,
-    })
+    } as CartItem)
     toast.show(`✅ ${p.name} ajouté au panier`, 'success')
   }
 </script>

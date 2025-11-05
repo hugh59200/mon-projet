@@ -1,6 +1,6 @@
 <template>
   <div class="chat-admin">
-    <!-- 🧭 En-tête -->
+    <!-- Header -->
     <header class="chat-admin__header">
       <div class="header-left">
         <BasicIconNext
@@ -15,7 +15,7 @@
         </BasicText>
       </div>
 
-      <!-- 🔍 Zone de recherche globale -->
+      <!-- Recherche globale -->
       <div class="header-actions">
         <BasicInput
           v-model="searchQuery"
@@ -28,7 +28,7 @@
       </div>
     </header>
 
-    <!-- 💬 Layout principal -->
+    <!-- Layout principal -->
     <div class="chat-admin__layout">
       <ChatSidebar
         :conversations="filteredConversations"
@@ -69,10 +69,11 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
+  import { useChat } from '../shared/composables/useChat'
+  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import ChatSidebar from './ChatSidebar.vue'
-  import { useAdminChat } from './useAdminChat'
 
   const {
     conversations,
@@ -84,16 +85,25 @@
     selectConversation,
     sendMessage,
     sendTyping,
-  } = useAdminChat()
+  } = useChat('admin')
 
-  // 🔍 Recherche globale (filtrage sur l’e-mail ou le dernier message)
+  const chatNotif = useChatNotifStore()
   const searchQuery = ref('')
+
+  /** ✅ filtrage global côté admin */
   const filteredConversations = computed(() => {
     const q = searchQuery.value.trim().toLowerCase()
-    if (!q) return conversations.value
-    return conversations.value.filter(
-      (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
+    if (!q) return conversations?.value ?? []
+    return (
+      conversations?.value?.filter(
+        (c) => c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
+      ) ?? []
     )
+  })
+
+  /** ✅ Lecture auto quand admin ouvre une conversation */
+  watch(selectedUserId, async (uid) => {
+    if (uid) await chatNotif.markAsRead(uid)
   })
 </script>
 

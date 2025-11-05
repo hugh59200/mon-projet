@@ -1,6 +1,6 @@
 <template>
   <aside class="chat-sidebar">
-    <!-- 🧭 En-tête profil -->
+    <!-- Profil Admin -->
     <div class="chat-sidebar__status">
       <div class="status-left">
         <div class="avatar">
@@ -39,36 +39,10 @@
       </div>
     </div>
 
-    <!-- 🔍 Barre de recherche -->
-    <div class="chat-sidebar__search">
-      <BasicIconNext
-        name="Search"
-        :size="16"
-        class="search-icon"
-      />
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Rechercher un client..."
-        aria-label="Rechercher une conversation"
-      />
-      <button
-        v-if="searchQuery"
-        class="clear-btn"
-        @click="searchQuery = ''"
-        aria-label="Effacer la recherche"
-      >
-        <BasicIconNext
-          name="X"
-          :size="14"
-        />
-      </button>
-    </div>
-
-    <!-- 💬 Liste des conversations -->
+    <!-- Liste des conversations -->
     <div class="conversation-container">
       <ConversationItem
-        v-for="conv in filteredConversations"
+        v-for="conv in enrichedConversations"
         :key="conv.user_id"
         :conversation="conv"
         :active="conv.user_id === selectedId"
@@ -77,7 +51,7 @@
       />
 
       <div
-        v-if="!filteredConversations.length"
+        v-if="!enrichedConversations.length"
         class="no-conv"
       >
         <BasicIconNext
@@ -88,7 +62,7 @@
           size="body-s"
           color="neutral-500"
         >
-          {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune conversation pour le moment' }}
+          Aucune conversation
         </BasicText>
       </div>
     </div>
@@ -96,11 +70,11 @@
 </template>
 
 <script setup lang="ts">
-  import { useChatNotifStore } from '@/features/admin/chat/shared/stores/useChatNotifStore'
-  import type { ConversationOverview } from '@/features/admin/chat/shared/types/chat'
   import { useAuthStore } from '@/features/auth/useAuthStore'
   import { supabase } from '@/supabase/supabaseClient'
   import { computed, onMounted, ref } from 'vue'
+  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+  import type { ConversationOverview } from '../shared/types/chat'
   import ConversationItem from './ConversationItem.vue'
 
   const props = defineProps<{
@@ -111,29 +85,31 @@
 
   defineEmits<{ (e: 'select', userId: string): void }>()
 
-  const notifStore = useChatNotifStore()
   const auth = useAuthStore()
-
-  const searchQuery = ref('')
+  const notifStore = useChatNotifStore()
   const avatarUrl = ref<string | null>(null)
 
-  const filteredConversations = computed(() => {
-    const q = searchQuery.value.trim().toLowerCase()
-    const base = q
-      ? props.conversations.filter(
-          (c) =>
-            c.user_email?.toLowerCase().includes(q) || c.last_message?.toLowerCase().includes(q),
+  /**
+   * ✅ injecte unread_count directement
+   * ✅ tri par non-lus puis date
+   */
+  const enrichedConversations = computed(() =>
+    props.conversations
+      .map((c) => ({
+        ...c,
+        unread_count: notifStore.unreadByUser[c.user_id] ?? 0,
+      }))
+      .sort((a, b) => {
+        if (a.unread_count && !b.unread_count) return -1
+        if (!a.unread_count && b.unread_count) return 1
+
+        return (
+          new Date(b.last_message_at ?? 0).getTime() - new Date(a.last_message_at ?? 0).getTime()
         )
-      : props.conversations
+      }),
+  )
 
-    // 🧠 Injection du compteur live venant du store
-    return base.map((conv) => ({
-      ...conv,
-      unread_count: notifStore.unreadByUser[conv.user_id] || 0,
-    }))
-  })
-
-  // 🧩 Charge l’avatar depuis Supabase si présent
+  /** ✅ Avatar admin */
   onMounted(async () => {
     if (!auth.user?.id) return
     const { data } = await supabase
@@ -141,6 +117,7 @@
       .select('avatar_url')
       .eq('id', auth.user.id)
       .maybeSingle()
+
     if (data?.avatar_url) {
       const { data: pub } = supabase.storage.from('avatars').getPublicUrl(data.avatar_url)
       avatarUrl.value = pub.publicUrl

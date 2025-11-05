@@ -158,9 +158,7 @@
 
 <script setup lang="ts">
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { ref } from 'vue'
   const { isDesktop } = useDeviceBreakpoint()
-  const toggleModal = ref(false)
 </script>
 
 <style scoped lang="less">

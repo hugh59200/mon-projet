@@ -7,6 +7,9 @@ export const useChatWidgetStore = defineStore(
     const isOpen = ref(false)
     const unreadCount = ref(0)
 
+    // ✅ nouveau : conversation ouverte côté admin
+    const currentUserId = ref<string | null>(null)
+
     const openChat = () => {
       isOpen.value = true
       resetUnread()
@@ -14,6 +17,7 @@ export const useChatWidgetStore = defineStore(
 
     const closeChat = () => {
       isOpen.value = false
+      currentUserId.value = null
     }
 
     const toggleChat = () => {
@@ -32,6 +36,7 @@ export const useChatWidgetStore = defineStore(
     return {
       isOpen,
       unreadCount,
+      currentUserId, // ✅ exposé ici
       openChat,
       closeChat,
       toggleChat,
@@ -40,11 +45,10 @@ export const useChatWidgetStore = defineStore(
     }
   },
   {
-    /* ✅ persistance PAR utilisateur */
     persist: {
-      key: 'chat-widget', // ✅ string uniquement
+      key: 'chat-widget',
       storage: localStorage,
-      pick: ['isOpen', 'unreadCount'],
+      pick: ['isOpen', 'unreadCount', 'currentUserId'],
     },
   },
 )

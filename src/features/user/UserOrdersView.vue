@@ -98,7 +98,7 @@
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .eq('email', auth.user.email)
+        .eq('email', auth.user.email!)
         .order('created_at', { ascending: false })
 
       if (error) throw error

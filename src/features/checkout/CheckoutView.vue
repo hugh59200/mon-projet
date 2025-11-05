@@ -275,15 +275,14 @@
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
-            user_id: auth.user.id,
-            email: auth.user.email,
-            full_name: fullName.value,
-            address: address.value,
-            zip: zip.value,
-            city: city.value,
-            country: country.value,
+            email: auth.user.email ?? '',
+            full_name: fullName.value || '',
+            address: address.value || '',
+            zip: zip.value || '',
+            city: city.value || '',
+            country: country.value || '',
             payment_method: selectedPayment.value,
-            total_amount: cart.totalPrice,
+            total: cart.totalPrice,
             items: cart.items,
             status: 'pending',
           })

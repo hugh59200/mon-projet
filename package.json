@@ -12,7 +12,8 @@
     "format": "prettier --write \"src/**/*.{ts,vue,less,json}\""
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.75.0",
+    "@supabase/realtime-js": "^2.79.0",
+    "@supabase/supabase-js": "^2.79.0",
     "@vuepic/vue-datepicker": "^11.0.2",
     "@vueuse/motion": "^3.0.3",
     "axios": "^1.12.2",

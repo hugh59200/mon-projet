@@ -33,7 +33,7 @@
             weight="bold"
             size="body-m"
           >
-            {{ auth.user.fullName || 'Utilisateur' }}
+            {{ auth.user.email || 'Utilisateur' }}
           </BasicText>
           <BasicText
             size="body-s"

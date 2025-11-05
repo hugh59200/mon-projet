@@ -1,9 +1,9 @@
 <template>
   <div
     class="chat-widget"
-    :class="{ open: isChatOpen }"
+    :class="{ open: chatStore.isOpen }"
   >
-    <!-- 🟢 Bouton principal -->
+    <!-- bouton -->
     <button
       class="chat-toggle"
       @click="toggleChat"
@@ -21,13 +21,12 @@
       </div>
     </button>
 
-    <!-- 💬 Fenêtre de chat -->
+    <!-- fenêtre -->
     <transition name="fade-scale">
       <div
-        v-if="isChatOpen"
+        v-if="chatStore.isOpen"
         class="chat-window"
       >
-        <!-- 🌟 Header modernisé -->
         <header class="chat-header">
           <div class="chat-header-left">
             <div class="chat-header-icon">
@@ -46,7 +45,6 @@
           <div
             class="chat-header-close"
             @click="toggleChat"
-            aria-label="Fermer le chat"
           >
             <BasicIconNext
               name="X"
@@ -55,6 +53,7 @@
             />
           </div>
         </header>
+
         <ChatCore
           v-if="userId"
           v-model:new-message="newMessage"
@@ -70,43 +69,28 @@
     </transition>
   </div>
 </template>
-
 <script setup lang="ts">
   import type { IconColor } from '@designSystem/index'
-  import { onMounted, onUnmounted, watch } from 'vue'
+  import { onMounted, onUnmounted } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
+  import { useChat } from '../shared/composables/useChat'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
-  import { useUserChat } from './useUserChat'
 
-  /* ------------------------- Stores ------------------------- */
   const chatNotif = useChatNotifStore()
   const chatStore = useChatWidgetStore()
-  const userChat = useUserChat()
+  const userChat = useChat('user')
 
-  /* ------------------------- Composable ------------------------- */
-  const { sendMessage, sendTyping, initChat } = userChat
+  const { sendMessage, sendTyping, userId, messages, newMessage, isTyping, isReady } = userChat
 
-  const { userId, isChatOpen, messages, newMessage, isTyping, isReady } = userChat
-
-  /* ------------------------- Lifecycle ------------------------- */
   onMounted(async () => {
-    await initChat()
-
     chatNotif.setRole('user')
     chatNotif.listenRealtime()
-
-    // ✅ récupère les vrais non-lus depuis Supabase
     await chatNotif.fetchUnreadByUser()
-
-    // ✅ petit refresh pour fiabilité supabase
-    setTimeout(() => chatNotif.fetchUnreadByUser(), 1000)
   })
 
-  /* ------------------------- Toggle Chat ------------------------- */
   const toggleChat = async () => {
     chatStore.toggleChat()
-    isChatOpen.value = chatStore.isOpen
 
     if (chatStore.isOpen) {
       const uid = userId.value
@@ -114,13 +98,12 @@
     }
   }
 
-  /* ------------------------- Sync store ↔ composable ------------------------- */
-  watch(isChatOpen, (val) => (chatStore.isOpen = val))
+  onUnmounted(() => {
+    document.removeEventListener('click', handleClickAnywhere)
+  })
 
-  /* ------------------------- Reset global ------------------------- */
   const handleClickAnywhere = () => chatStore.resetUnread()
   document.addEventListener('click', handleClickAnywhere)
-  onUnmounted(() => document.removeEventListener('click', handleClickAnywhere))
 </script>
 
 <style scoped lang="less">

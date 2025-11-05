@@ -16,8 +16,8 @@
       <div class="conversation-footer">
         <div class="preview-wrapper">
           <small
-            class="preview"
             v-show="!isTyping"
+            class="preview"
           >
             {{ conversation.last_message || 'Aucun message' }}
           </small>
@@ -39,6 +39,7 @@
           >
             {{ formattedTime }}
           </span>
+
           <div
             v-if="conversation.unread_count"
             class="badge"
@@ -52,28 +53,26 @@
 </template>
 
 <script setup lang="ts">
-  import type { ConversationOverview } from '@/features/admin/chat/shared/types/chat'
   import { computed } from 'vue'
+  import type { ConversationOverview } from '../shared/types/chat'
 
   const props = defineProps<{
     conversation: ConversationOverview
     active?: boolean
-    isTypingByUser?: Record<string, boolean> // ✅ ajouté
+    isTypingByUser?: Record<string, boolean>
   }>()
 
   defineEmits<{ (e: 'select', userId: string): void }>()
 
-  const isTyping = computed(() => {
-    return !!props.isTypingByUser?.[props.conversation.user_id]
-  })
+  /** ✅ typing live */
+  const isTyping = computed(() => !!props.isTypingByUser?.[props.conversation.user_id])
 
+  /** ✅ format heure FR */
   const formattedTime = computed(() => {
     const date = props.conversation.last_message_at
-    if (!date) return ''
-    return new Date(date).toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return date
+      ? new Date(date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+      : ''
   })
 </script>
 

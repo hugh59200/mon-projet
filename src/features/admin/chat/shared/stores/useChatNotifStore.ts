@@ -1,119 +1,130 @@
-import { useChatWidgetStore } from '@/features/admin/chat/user/useChatWidgetStore'
 import { useAuthStore } from '@/features/auth/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useChatWidgetStore } from '../../user/useChatWidgetStore'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
 
 export const useChatNotifStore = defineStore('chatNotif', () => {
-  const role = ref<ChatRole>('admin')
   const auth = useAuthStore()
   const chatWidget = useChatWidgetStore()
 
-  const unreadCount = ref<number>(0)
+  /** Rôle actuel (admin ou user) */
+  const role = ref<ChatRole>('admin')
+
+  /** Non-lus totaux (affichés sur badge) */
+  const unreadCount = ref(0)
+
+  /** Pour admin : non-lus par user */
   const unreadByUser = ref<Record<string, number>>({})
-  const lastReadByUser = ref<Record<string, number | null>>({})
-  let isRealtimeListening = false
 
-  const setRole = (newRole: ChatRole) => {
-    role.value = newRole
-  }
+  let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
 
-  /* --------------------- Load unread from DB --------------------- */
+  const isAdmin = computed(() => role.value === 'admin')
+
+  const setRole = (r: ChatRole) => (role.value = r)
+
+  const computeTotal = () =>
+    (unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0))
+
+  /** Charge état des non lus */
   const fetchUnreadByUser = async () => {
-    if (role.value === 'admin') {
+    if (isAdmin.value) {
       const { data } = await supabase.from('messages_unread_view').select('*')
+
       unreadByUser.value = Object.fromEntries(
         (data ?? []).map((row) => [row.user_id, Number(row.count)]),
       )
-      unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
+
+      computeTotal()
+      return
     }
 
-    if (role.value === 'user') {
-      const uid = auth.user?.id
-      if (!uid) return
+    /** Pour un user */
+    const uid = auth.user?.id
+    if (!uid) return
 
-      const { data } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact' })
-        .eq('user_id', uid)
-        .eq('sender_role', 'admin')
-        .eq('is_read', false)
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', uid)
+      .eq('sender_role', 'admin')
+      .eq('is_read', false)
 
-      unreadCount.value = data?.length ?? 0
-      unreadByUser.value = {}
-    }
+    unreadCount.value = count ?? 0
+    unreadByUser.value = {}
   }
 
-  /* --------------------- Mark messages read --------------------- */
+  /** Marquer une conversation comme lue */
   const markAsRead = async (userId: string, lastMessageId?: number) => {
-    if (!userId) return
-
-    const senderRoleToMark = role.value === 'admin' ? 'user' : 'admin'
-    unreadByUser.value[userId] = 0
-    unreadCount.value =
-      role.value === 'admin' ? Object.values(unreadByUser.value).reduce((a, b) => a + b, 0) : 0
+    const senderRoleToMark = isAdmin.value ? 'user' : 'admin'
 
     await Promise.all([
       chatApi.markMessagesAsRead(userId, senderRoleToMark),
       chatApi.markConversationRead(userId, lastMessageId),
     ])
 
-    if (role.value === 'admin') {
-      await fetchUnreadByUser()
+    if (isAdmin.value) {
+      unreadByUser.value[userId] = 0
+      computeTotal()
+    } else {
+      unreadCount.value = 0
     }
   }
 
-  /* --------------------- Realtime NEW messages --------------------- */
+  /** Temps réel — nouveaux messages */
   const listenRealtime = () => {
-    if (isRealtimeListening) return
-    isRealtimeListening = true
+    if (realtimeChannel) return
 
-    supabase
-      .channel('messages-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        async (payload) => {
-          const msg = payload.new as Message
-          if (!msg.user_id || msg.is_read) return
+    realtimeChannel = supabase.channel('chat-notifications', {
+      config: { broadcast: { self: false } },
+    })
 
-          const shouldCount =
-            (role.value === 'admin' && msg.sender_role === 'user') ||
-            (role.value === 'user' && msg.sender_role === 'admin')
+    realtimeChannel.on<Message>(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
+      (payload) => {
+        const msg = payload.new
+        if (!msg.user_id || msg.is_read) return
 
-          if (!shouldCount) return
+        /** USER → message admin */
+        if (!isAdmin.value && msg.sender_role === 'admin') {
+          if (!chatWidget.isOpen) unreadCount.value++
+          return
+        }
 
-          // ✅ chat ouvert → mark as read et aucun badge
-          if (chatWidget.isOpen) {
-            // await chatApi.markMessagesAsRead(msg.user_id, role.value === 'admin' ? 'user' : 'admin')
-            return
-          }
+        /** ADMIN → message user */
+        if (isAdmin.value && msg.sender_role === 'user') {
+          const uid = msg.user_id
 
-          // ✅ chat fermé → badge
-          unreadByUser.value[msg.user_id] = (unreadByUser.value[msg.user_id] || 0) + 1
-          unreadCount.value = Object.values(unreadByUser.value).reduce((a, b) => a + b, 0)
-        },
-      )
-      .subscribe()
+          // si admin a la fenêtre ouverte sur ce user → pas de badge
+          if (chatWidget.isOpen && chatWidget.currentUserId === uid) return
+
+          unreadByUser.value[uid] = (unreadByUser.value[uid] ?? 0) + 1
+          computeTotal()
+        }
+      },
+    )
+
+    realtimeChannel.subscribe()
   }
 
   const resetUnread = () => {
     unreadCount.value = 0
     unreadByUser.value = {}
-    lastReadByUser.value = {}
   }
 
   return {
     role,
-    setRole,
+    isAdmin,
     unreadCount,
     unreadByUser,
-    lastReadByUser,
+
+    setRole,
     fetchUnreadByUser,
-    markAsRead,
     listenRealtime,
+    markAsRead,
     resetUnread,
   }
 })
