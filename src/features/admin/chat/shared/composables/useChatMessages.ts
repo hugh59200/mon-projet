@@ -21,6 +21,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
   const oldest = ref<string | null>(null)
 
   let channel: RealtimeChannel | null = null
+  let unreadChannel: RealtimeChannel | null = null
 
   /** ✅ Marquer comme lus (avec senderRole obligatoire) */
   let readTimeout: number | undefined
@@ -28,7 +29,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     const uid = getActiveUser()
     if (!uid) return
 
-    clearTimeout(readTimeout)
+    if (readTimeout) clearTimeout(readTimeout)
     readTimeout = window.setTimeout(() => {
       const unreadFrom: ChatRole = role === 'admin' ? 'user' : 'admin'
       chatApi.markMessagesAsRead(uid, unreadFrom)
@@ -38,12 +39,16 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
   /** ✅ Charger les 30 derniers */
   const fetchInitialMessages = async (uid: string) => {
     isMessagesLoading.value = true
-    const { data } = await chatApi.fetchMessages(uid, PAGE_SIZE)
+    try {
+      const { data, error } = await chatApi.fetchMessages(uid, PAGE_SIZE)
+      if (error) throw error
 
-    messages.value = (data ?? []).map((m) => reactive(m))
-    hasMore.value = (data?.length ?? 0) === PAGE_SIZE
-    oldest.value = data?.[0]?.created_at ?? null
-    isMessagesLoading.value = false
+      messages.value = (data ?? []).map((m) => reactive(m))
+      hasMore.value = (data?.length ?? 0) === PAGE_SIZE
+      oldest.value = data?.[0]?.created_at ?? null
+    } finally {
+      isMessagesLoading.value = false
+    }
 
     await scroll?.scrollToEnd(true)
     markRead()
@@ -59,19 +64,21 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     isMessagesLoading.value = true
     const prevHeight = scroll?.getScrollEl()?.scrollHeight ?? 0
 
-    const { data } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
+    try {
+      const { data, error } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
+      if (error) throw error
 
-    if (!data?.length) {
-      hasMore.value = false
+      if (!data?.length) {
+        hasMore.value = false
+        return
+      }
+
+      messages.value.unshift(...data.map((m) => reactive(m)))
+      oldest.value = data[0]?.created_at ?? null
+    } finally {
       isMessagesLoading.value = false
-      return
+      scroll?.keepScrollOnPrepend(prevHeight)
     }
-
-    messages.value.unshift(...data.map((m) => reactive(m)))
-    oldest.value = data[0]?.created_at ?? null
-
-    isMessagesLoading.value = false
-    scroll?.keepScrollOnPrepend(prevHeight)
   }
 
   /** ✅ Envoi message (role requis) */
@@ -82,40 +89,56 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     await chatApi.sendMessage(uid, role, text.trim())
   }
 
-  /** ✅ Realtime propre ✅ */
-  const subscribeRealtime = (target: string | null) => {
-    if (channel) supabase.removeChannel(channel)
+  /** ✅ Abonnement unread global (admin) — léger */
+  const subscribeUnreadForAdmin = () => {
+    if (unreadChannel) supabase.removeChannel(unreadChannel)
+    if (role !== 'admin' || !onUnread) return
 
-    channel = supabase.channel(`chat-${role}-${target ?? 'none'}`, {
+    unreadChannel = supabase.channel('chat-admin-unread', {
       config: { broadcast: { self: false } },
     })
 
-    // ✅ Nouvelle syntaxe Supabase TS
+    unreadChannel.on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages', filter: 'sender_role=eq.user' },
+      (payload) => {
+        const msg = payload.new as Message
+        const active = getActiveUser()
+        if (msg?.user_id && msg.user_id !== active) onUnread(msg.user_id)
+      },
+    )
+
+    unreadChannel.subscribe()
+  }
+
+  /** ✅ Realtime propre (filtré par user_id) */
+  const subscribeRealtime = (target: string | null) => {
+    if (channel) supabase.removeChannel(channel)
+
+    // pas d'abonnement si pas de cible (ex: admin sans thread sélectionné)
+    if (!target) return
+
+    const filter = `user_id=eq.${target}`
+
+    channel = supabase.channel(`chat-${role}-${target}`, {
+      config: { broadcast: { self: false } },
+    })
+
     channel.on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages' },
+      { event: 'INSERT', schema: 'public', table: 'messages', filter },
       async (payload) => {
         const msg: Message = payload.new as Message
         if (!msg?.user_id) return
-
-        const active = getActiveUser()
-
-        // ✅ si message du user actif → push + scroll
-        if (msg.user_id === active) {
-          messages.value.push(reactive(msg))
-          await scroll?.scrollToEnd(true)
-          markRead()
-        }
-        // ✅ sinon → notifier unread admin
-        else if (onUnread) {
-          onUnread(msg.user_id)
-        }
+        messages.value.push(reactive(msg))
+        await scroll?.scrollToEnd(true)
+        markRead()
       },
     )
 
     channel.on(
       'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'messages' },
+      { event: 'UPDATE', schema: 'public', table: 'messages', filter },
       (payload) => {
         const updated: Message = payload.new as Message
         const idx = messages.value.findIndex((m) => m.id === updated.id)
@@ -127,8 +150,11 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
   }
 
   const cleanup = () => {
+    if (readTimeout) clearTimeout(readTimeout)
     if (channel) supabase.removeChannel(channel)
+    if (unreadChannel) supabase.removeChannel(unreadChannel)
     channel = null
+    unreadChannel = null
   }
 
   return {
@@ -139,6 +165,7 @@ export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseCh
     loadOlderMessages,
     sendMessage,
     subscribeRealtime,
+    subscribeUnreadForAdmin,
     cleanup,
   }
 }

@@ -1,6 +1,5 @@
-// useChat.ts
 import { useAuthStore } from '@/features/auth/useAuthStore'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChatNotifStore } from '../stores/useChatNotifStore'
 import type { ChatRole } from '../types/chat'
 import { useChatConversations } from './useChatConversations'
@@ -25,9 +24,10 @@ export function useChat(role: ChatRole) {
   const msgs = useChatMessages({
     role,
     getActiveUser: () => (role === 'admin' ? selectedUserId.value : userId.value),
-    onUnread: notif.incrementUserUnread,
+    onUnread: (uid) => notif.incrementUserUnread(uid),
     scroll,
   })
+
   const typing = useChatTyping({
     role,
     getActiveUser: () => (role === 'admin' ? selectedUserId.value : userId.value),
@@ -40,7 +40,8 @@ export function useChat(role: ChatRole) {
       await conv!.fetchConversations()
       conv!.setupPresence()
       conv!.listenRealtimeConversations()
-      msgs.subscribeRealtime(null)
+      // Flux léger pour les notifications globales (sans ouvrir un thread)
+      msgs.subscribeUnreadForAdmin?.()
     } else if (userId.value) {
       await msgs.fetchInitialMessages(userId.value)
       msgs.subscribeRealtime(userId.value)
@@ -55,7 +56,7 @@ export function useChat(role: ChatRole) {
     notif.clearUserUnread(uid)
 
     await msgs.fetchInitialMessages(uid)
-    msgs.subscribeRealtime(uid)
+    msgs.subscribeRealtime(uid) // écoute filtrée
   }
 
   const sendMessage = () => {
@@ -64,7 +65,15 @@ export function useChat(role: ChatRole) {
     newMessage.value = ''
   }
 
-  onMounted(init)
+  onMounted(() => {
+    init()
+  })
+
+  // Si l'auth arrive après le mount (cas fréquent), relance l'init côté user
+  watch(userId, (id) => {
+    if (role === 'user' && id && !isReady.value) init()
+  })
+
   onUnmounted(() => {
     msgs.cleanup()
     typing.cleanup()

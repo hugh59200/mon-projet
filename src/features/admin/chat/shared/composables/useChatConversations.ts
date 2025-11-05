@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { computed, ref } from 'vue'
@@ -13,6 +14,7 @@ interface ExtendedConversation extends ConversationOverview {
 }
 
 export function useChatConversations() {
+  const auth = useAuthStore()
   const conversations = ref<ExtendedConversation[]>([])
   const onlineUsers = ref<Set<string>>(new Set())
 
@@ -47,7 +49,7 @@ export function useChatConversations() {
 
     conversations.value = rows.map((c) => ({
       ...c,
-      user_id: c.user_id as string, // ✅ TS ok
+      user_id: c.user_id as string,
       last_message_short: formatMessage(c.last_message),
       last_message_date: formatDate(c.last_message_at),
       is_online: onlineUsers.value.has(c.user_id!),
@@ -59,8 +61,10 @@ export function useChatConversations() {
   const setupPresence = () => {
     if (presenceChannel) return
 
+    const presenceKey = auth.user?.id ?? 'anon-admin'
+
     presenceChannel = supabase.channel('chat-presence', {
-      config: { presence: { key: 'admin' } },
+      config: { presence: { key: presenceKey } },
     })
 
     presenceChannel.on('presence', { event: 'sync' }, () => {
@@ -74,9 +78,9 @@ export function useChatConversations() {
       }))
     })
 
-    presenceChannel.subscribe(async (status) => {
+    presenceChannel.subscribe((status) => {
       if (status === 'SUBSCRIBED') {
-        await presenceChannel!.track({ role: 'admin' })
+        presenceChannel!.track({ role: 'admin' })
       }
     })
   }
@@ -99,13 +103,11 @@ export function useChatConversations() {
         const item = conversations.value.find((c) => c.user_id === uid)
 
         if (item) {
-          // Mise à jour du dernier message
           item.last_message = msg.content
           item.last_message_short = formatMessage(msg.content)
           item.last_message_at = msg.created_at
           item.last_message_date = formatDate(msg.created_at)
 
-          // Si c'est un user → unread++
           if (msg.sender_role === 'user') {
             item.unread_count = (item.unread_count ?? 0) + 1
           }
@@ -114,7 +116,6 @@ export function useChatConversations() {
           fetchConversations()
         }
 
-        // ✅ Re-sort
         conversations.value = [...conversations.value].sort(
           (a, b) => new Date(b.last_message_at!).getTime() - new Date(a.last_message_at!).getTime(),
         )
