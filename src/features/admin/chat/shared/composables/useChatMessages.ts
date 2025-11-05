@@ -1,86 +1,65 @@
 import { supabase } from '@/supabase/supabaseClient'
-import type { Database } from '@/supabase/types/supabase'
-import { nextTick, reactive, ref } from 'vue'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+import { reactive, ref } from 'vue'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
+import type { useScrollMessages } from './useScrollMessages'
 
-type MessageRow = Database['public']['Tables']['messages']['Row']
 const PAGE_SIZE = 30
 
-export function useChatMessages(
-  role: ChatRole,
-  userIdRef: () => string | null,
-  selectedUserRef: () => string | null,
-  onUnread?: (uid: string) => void,
-  getScrollEl?: () => HTMLElement | null, // 🚀 scroll déporté à la vue
-) {
+interface UseChatMessagesOptions {
+  role: ChatRole
+  getActiveUser: () => string | null
+  onUnread?: (userId: string) => void
+  scroll?: ReturnType<typeof useScrollMessages>
+}
+
+export function useChatMessages({ role, getActiveUser, onUnread, scroll }: UseChatMessagesOptions) {
   const messages = ref<Message[]>([])
   const isMessagesLoading = ref(false)
-  const oldestMessageDate = ref<string | null>(null)
   const hasMore = ref(true)
+  const oldest = ref<string | null>(null)
 
-  let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
+  let channel: RealtimeChannel | null = null
 
-  const getActiveUser = () => (role === 'admin' ? selectedUserRef() : userIdRef())
-
-  /** ✅ Scroll helpers */
-  const scrollToEnd = async (instant = false) => {
-    await nextTick()
-    const el = getScrollEl?.()
-    if (!el) return
-
-    el.scrollTo({
-      top: el.scrollHeight,
-      behavior: instant ? 'auto' : 'smooth',
-    })
-  }
-
-  const keepScrollOnPrepend = async (prevHeight: number) => {
-    await nextTick()
-    const el = getScrollEl?.()
-    if (el) el.scrollTop = el.scrollHeight - prevHeight
-  }
-
-  /** ✅ Debounce markAsRead */
+  /** ✅ Marquer comme lus (avec senderRole obligatoire) */
   let readTimeout: number | undefined
-  const markVisibleAsRead = () => {
-    const target = getActiveUser()
-    if (!target) return
+  const markRead = () => {
+    const uid = getActiveUser()
+    if (!uid) return
 
     clearTimeout(readTimeout)
-
-    readTimeout = window.setTimeout(async () => {
-      const unreadFrom = role === 'admin' ? 'user' : 'admin'
-      await chatApi.markMessagesAsRead(target, unreadFrom)
-    }, 400)
+    readTimeout = window.setTimeout(() => {
+      const unreadFrom: ChatRole = role === 'admin' ? 'user' : 'admin'
+      chatApi.markMessagesAsRead(uid, unreadFrom)
+    }, 300)
   }
 
-  /** ✅ Load initial */
+  /** ✅ Charger les 30 derniers */
   const fetchInitialMessages = async (uid: string) => {
     isMessagesLoading.value = true
-
     const { data } = await chatApi.fetchMessages(uid, PAGE_SIZE)
+
     messages.value = (data ?? []).map((m) => reactive(m))
-
     hasMore.value = (data?.length ?? 0) === PAGE_SIZE
-    oldestMessageDate.value = data?.[0]?.created_at ?? null
-
+    oldest.value = data?.[0]?.created_at ?? null
     isMessagesLoading.value = false
-    await scrollToEnd(true)
-    markVisibleAsRead()
+
+    await scroll?.scrollToEnd(true)
+    markRead()
   }
 
   /** ✅ Pagination */
   const loadOlderMessages = async () => {
-    if (!hasMore.value || !oldestMessageDate.value || isMessagesLoading.value) return
+    if (!hasMore.value || !oldest.value || isMessagesLoading.value) return
 
-    const target = getActiveUser()
-    if (!target) return
+    const uid = getActiveUser()
+    if (!uid) return
 
     isMessagesLoading.value = true
+    const prevHeight = scroll?.getScrollEl()?.scrollHeight ?? 0
 
-    const prevHeight = getScrollEl?.()?.scrollHeight ?? 0
-    const { data } = await chatApi.fetchMessagesBefore(target, oldestMessageDate.value, PAGE_SIZE)
+    const { data } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
 
     if (!data?.length) {
       hasMore.value = false
@@ -88,95 +67,77 @@ export function useChatMessages(
       return
     }
 
-    const existing = new Set(messages.value.map((m) => m.id))
-    const newOnes = data.filter((m) => !existing.has(m.id))
-
-    messages.value.unshift(...newOnes.map((m) => reactive(m)))
-    oldestMessageDate.value = data[0]?.created_at ?? oldestMessageDate.value
+    messages.value.unshift(...data.map((m) => reactive(m)))
+    oldest.value = data[0]?.created_at ?? null
 
     isMessagesLoading.value = false
-    keepScrollOnPrepend(prevHeight)
+    scroll?.keepScrollOnPrepend(prevHeight)
   }
 
-  /** ✅ Send */
+  /** ✅ Envoi message (role requis) */
   const sendMessage = async (text: string) => {
-    const target = getActiveUser()
-    if (!target || !text.trim()) return
-    await chatApi.sendMessage(target, role, text.trim())
+    const uid = getActiveUser()
+    if (!uid || !text.trim()) return
+
+    await chatApi.sendMessage(uid, role, text.trim())
   }
 
-  /** ✅ Realtime */
-  const subscribeRealtime = (currentTarget: string | null) => {
-    if (realtimeChannel) {
-      supabase.removeChannel(realtimeChannel)
-    }
+  /** ✅ Realtime propre ✅ */
+  const subscribeRealtime = (target: string | null) => {
+    if (channel) supabase.removeChannel(channel)
 
-    const active = currentTarget || 'none'
-    realtimeChannel = supabase.channel(`chat-${role}-${active}`, {
+    channel = supabase.channel(`chat-${role}-${target ?? 'none'}`, {
       config: { broadcast: { self: false } },
     })
 
-    /** INSERT */
-    realtimeChannel.on<MessageRow>(
+    // ✅ Nouvelle syntaxe Supabase TS
+    channel.on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
-      async ({ new: msg }) => {
+      async (payload) => {
+        const msg: Message = payload.new as Message
         if (!msg?.user_id) return
-        const activeUser = getActiveUser()
 
-        // ✅ USER → reçoit uniquement ses messages
-        if (role === 'user') {
-          if (msg.user_id === currentTarget) {
-            messages.value.push(reactive(msg))
-            await scrollToEnd(true)
-            markVisibleAsRead()
-          }
-          return
+        const active = getActiveUser()
+
+        // ✅ si message du user actif → push + scroll
+        if (msg.user_id === active) {
+          messages.value.push(reactive(msg))
+          await scroll?.scrollToEnd(true)
+          markRead()
         }
-
-        // ✅ ADMIN
-        if (role === 'admin') {
-          if (msg.user_id === activeUser) {
-            messages.value.push(reactive(msg))
-            await scrollToEnd(true)
-            markVisibleAsRead()
-          } else if (onUnread) {
-            onUnread(msg.user_id)
-          }
+        // ✅ sinon → notifier unread admin
+        else if (onUnread) {
+          onUnread(msg.user_id)
         }
       },
     )
 
-    /** UPDATE → read receipts */
-    realtimeChannel.on<MessageRow>(
+    channel.on(
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'messages' },
-      ({ new: msg }) => {
-        const i = messages.value.findIndex((m) => m.id === msg.id)
-        if (i !== -1) {
-          messages.value[i] = reactive({ ...messages.value[i], ...msg })
-        }
+      (payload) => {
+        const updated: Message = payload.new as Message
+        const idx = messages.value.findIndex((m) => m.id === updated.id)
+        if (idx !== -1) messages.value[idx] = reactive({ ...messages.value[idx], ...updated })
       },
     )
 
-    realtimeChannel.subscribe()
+    channel.subscribe()
   }
 
-  /** ✅ Cleanup */
   const cleanup = () => {
-    if (realtimeChannel) {
-      supabase.removeChannel(realtimeChannel)
-      realtimeChannel = null
-    }
+    if (channel) supabase.removeChannel(channel)
+    channel = null
   }
 
   return {
     messages,
     hasMore,
     isMessagesLoading,
-    sendMessage,
-    loadOlderMessages,
     fetchInitialMessages,
+    loadOlderMessages,
+    sendMessage,
     subscribeRealtime,
     cleanup,
   }

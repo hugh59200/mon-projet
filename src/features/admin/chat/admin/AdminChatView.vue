@@ -96,7 +96,6 @@
   const isCurrentTyping = computed(() => {
     const uid = selectedUserId.value
     const v = uid ? typingRecord.value[uid] : false
-    console.log('[typing] isCurrentTyping =>', { uid, v })
     return !!v
   })
   onMounted(async () => {
