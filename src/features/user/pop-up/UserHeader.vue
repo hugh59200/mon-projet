@@ -93,22 +93,25 @@
           </div>
 
           <div class="user-mobile-texts">
-            <BasicText
-              size="body-s"
-              weight="bold"
-              color="white"
-              wrap
-            >
-              {{ auth.user?.email || 'Utilisateur' }}
-            </BasicText>
+            <div class="user-email-row">
+              <BasicText
+                size="body-s"
+                weight="bold"
+                color="white"
+                class="user-email"
+                wrap
+              >
+                {{ auth.user?.email || 'Utilisateur' }}
+              </BasicText>
 
-            <BasicBadge
-              v-if="auth.isAdmin"
-              type="success"
-              size="small"
-              label="Admin"
-              class="user-badge"
-            />
+              <BasicBadge
+                v-if="auth.isAdmin"
+                type="success"
+                size="small"
+                label="Admin"
+                class="user-badge"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -174,6 +177,7 @@
         }
       }
 
+      /* ---------------------- 💻 Desktop ---------------------- */
       &--desktop {
         .user-main {
           display: flex;
@@ -235,11 +239,11 @@
         }
       }
 
+      /* ---------------------- 📱 Mobile / Tablette ---------------------- */
       &--mobile {
         .user-main {
           display: flex;
           align-items: center;
-          justify-content: space-between;
           gap: 10px;
         }
 
@@ -252,6 +256,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
 
           .avatar-image-small {
             width: 100%;
@@ -273,11 +278,32 @@
         .user-mobile-texts {
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
-          gap: 2px;
+          justify-content: center;
+          flex: 1;
+          min-width: 0;
+
+          .user-email-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            min-width: 0;
+          }
+
+          .user-email {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+          }
 
           .user-badge {
-            margin-top: 2px;
+            flex-shrink: 0;
           }
         }
       }
@@ -289,22 +315,18 @@
   .fade-slide-leave-active {
     transition: all 0.35s ease;
   }
-
   .fade-slide-enter-from {
     opacity: 0;
     transform: translateY(-6px);
   }
-
   .fade-slide-enter-to {
     opacity: 1;
     transform: translateY(0);
   }
-
   .fade-slide-leave-from {
     opacity: 1;
     transform: translateY(0);
   }
-
   .fade-slide-leave-to {
     opacity: 0;
     transform: translateY(-6px);

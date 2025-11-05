@@ -2,15 +2,16 @@
   <div
     class="floating-wrapper"
     ref="triggerRef"
-    @mouseenter="onEnter"
-    @mouseleave="onLeave"
+    @mouseenter="triggerMode === 'hover' ? onEnter() : null"
+    @mouseleave="triggerMode === 'hover' ? onLeave() : null"
+    @click="triggerMode === 'click' ? toggleDropdown() : null"
   >
     <!-- 🎯 Déclencheur -->
     <slot name="trigger" />
 
     <!-- 🧊 Zone tampon invisible (anti flicker entre trigger et dropdown) -->
     <div
-      v-if="model"
+      v-if="model && triggerMode === 'hover'"
       class="hover-grace-zone"
       :style="graceZoneStyle"
     />
@@ -22,8 +23,8 @@
         class="floating-dropdown"
         :style="dropdownStyle"
         v-click-outside="{ callback: () => (model = false), exclude: [triggerRef] }"
-        @mouseenter="onEnter"
-        @mouseleave="onLeave"
+        @mouseenter="triggerMode === 'hover' ? onEnter() : null"
+        @mouseleave="triggerMode === 'hover' ? onLeave() : null"
       >
         <div
           class="dropdown-arrow"
@@ -42,10 +43,11 @@
 
   defineOptions({ directives: { clickOutside: vClickOutside } })
 
-  // 🧠 Modèle réactif
+  /* ---------------------------------------------------------- */
+  /*                     ⚙️ Props et modèles                    */
+  /* ---------------------------------------------------------- */
   const model = defineModel<boolean>({ default: false })
 
-  // 🧭 Props configurables
   const props = defineProps({
     offset: { type: Number, default: 8 },
     hoverDelay: { type: Number, default: 250 },
@@ -58,86 +60,75 @@
       type: String as PropType<'auto' | 'center' | 'start' | 'end'>,
       default: 'auto',
     },
+    /** 🔥 Contrôle le mode d'ouverture : "hover" ou "click" */
+    triggerMode: {
+      type: String as PropType<'hover' | 'click'>,
+      default: 'hover',
+    },
   })
 
-  // 🌍 Manager global pour empêcher plusieurs dropdowns ouverts
+  /* ---------------------------------------------------------- */
+  /*                      🔗 Dropdown logic                      */
+  /* ---------------------------------------------------------- */
   const id = Math.random().toString(36).substring(2, 9)
   const { open, close, onChange } = useDropdownManager(id)
 
-  // 🔗 Références
   const triggerRef = ref<HTMLElement | null>(null)
   const dropdownTop = ref<number>(0)
   const dropdownLeft = ref<number | undefined>(undefined)
-  const dropdownRight = ref<number | undefined>(undefined)
   const triggerCenter = ref<number>(0)
 
-  // ⏱ Timers
   let hoverTimer: number | null = null
   let closeTimer: number | null = null
   let autoCloseTimer: number | null = null
 
-  /* --- 🧭 Positionnement dynamique --- */
   function updatePosition() {
     nextTick(() => {
       const el = triggerRef.value
       if (!el) return
-
       const rect = el.getBoundingClientRect()
       dropdownTop.value = rect.bottom + props.offset
       triggerCenter.value = rect.left + rect.width / 2
 
-      if (props.align === 'left') {
-        dropdownLeft.value = rect.left
-        dropdownRight.value = undefined
-      } else if (props.align === 'center') {
-        const center = rect.left + rect.width / 2
-        dropdownLeft.value = center - props.width / 2
-        dropdownRight.value = undefined
-      } else if (props.align === 'right') {
-        dropdownLeft.value = rect.right - props.width
-        dropdownRight.value = undefined
-      }
+      if (props.align === 'left') dropdownLeft.value = rect.left
+      else if (props.align === 'center') dropdownLeft.value = triggerCenter.value - props.width / 2
+      else if (props.align === 'right') dropdownLeft.value = rect.right - props.width
     })
   }
 
-  /* --- 💅 Styles dynamiques --- */
+  /* ---------------------------------------------------------- */
+  /*                        💅 Styles dynamiques                 */
+  /* ---------------------------------------------------------- */
   const dropdownStyle = computed(() => ({
     top: dropdownTop.value + 'px',
-    left: dropdownLeft.value !== undefined ? dropdownLeft.value + 'px' : undefined,
+    left: dropdownLeft.value + 'px',
     minWidth: props.width ? props.width + 'px' : undefined,
   }))
 
-  /* --- 🧩 Zone de tolérance --- */
   const graceZoneStyle = computed(() => ({
     top: dropdownTop.value - 10 + 'px',
-    left: dropdownLeft.value !== undefined ? dropdownLeft.value + 'px' : undefined,
+    left: dropdownLeft.value + 'px',
     width: props.width ? props.width + 'px' : 'auto',
   }))
 
-  /* --- 🎯 Flèche dynamique --- */
   const arrowStyle = computed(() => {
-    const style: Record<string, string | undefined> = {
-      transform: 'rotate(45deg)',
-    }
-
+    const style: Record<string, string | undefined> = { transform: 'rotate(45deg)' }
     if (props.arrowAlign === 'center') {
       style.left = '50%'
       style.transform = 'translateX(-50%) rotate(45deg)'
-    } else if (props.arrowAlign === 'start') {
-      style.left = props.arrowOffset + 'px'
-    } else if (props.arrowAlign === 'end') {
-      style.right = props.arrowOffset + 'px'
-    } else {
-      const dropdownLeftValue = dropdownLeft.value ?? 0
-      const centerInDropdown = triggerCenter.value - dropdownLeftValue
-      style.left = `${centerInDropdown}px`
+    } else if (props.arrowAlign === 'start') style.left = props.arrowOffset + 'px'
+    else if (props.arrowAlign === 'end') style.right = props.arrowOffset + 'px'
+    else {
+      const left = triggerCenter.value - (dropdownLeft.value ?? 0)
+      style.left = `${left}px`
       style.transform = 'translateX(-50%) rotate(45deg)'
     }
-
     return style
   })
 
-  /* --- 🪄 Hover automatique --- */
+  /* ---------------------------------------------------------- */
+  /*                 🪄 Gestion hover & click                    */
+  /* ---------------------------------------------------------- */
   function onEnter() {
     if (hoverTimer) clearTimeout(hoverTimer)
     if (closeTimer) clearTimeout(closeTimer)
@@ -156,11 +147,18 @@
     }, props.closeDelay)
   }
 
-  /* --- ⏱️ Fermeture auto optionnelle --- */
+  function toggleDropdown() {
+    model.value = !model.value
+    if (model.value) open()
+    else close()
+  }
+
+  /* ---------------------------------------------------------- */
+  /*              ⏱️ Fermeture auto & sync globale              */
+  /* ---------------------------------------------------------- */
   watch(model, (val) => {
     if (val) {
       updatePosition()
-      open()
       if (props.autoCloseDelay > 0) {
         if (autoCloseTimer) clearTimeout(autoCloseTimer)
         autoCloseTimer = window.setTimeout(() => {
@@ -171,24 +169,19 @@
     }
   })
 
-  /* --- 🔒 Ferme quand un autre dropdown s'ouvre --- */
   onChange((active) => {
     if (!active && model.value) model.value = false
   })
 
-  /* --- 📦 Lifecycle --- */
-  onMounted(async () => {
-    await nextTick()
-    setTimeout(updatePosition, 50)
+  onMounted(() => {
+    setTimeout(updatePosition, 100)
     window.addEventListener('resize', updatePosition)
     window.addEventListener('scroll', updatePosition, { passive: true })
   })
   onUnmounted(() => {
     window.removeEventListener('resize', updatePosition)
     window.removeEventListener('scroll', updatePosition)
-    if (autoCloseTimer) clearTimeout(autoCloseTimer)
-    if (hoverTimer) clearTimeout(hoverTimer)
-    if (closeTimer) clearTimeout(closeTimer)
+    ;[hoverTimer, closeTimer, autoCloseTimer].forEach((t) => t && clearTimeout(t))
   })
 </script>
 
@@ -201,7 +194,6 @@
     user-select: none;
   }
 
-  /* --- Zone de tolérance invisible --- */
   .hover-grace-zone {
     position: fixed;
     height: 12px;
@@ -217,7 +209,7 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     color: white;
     z-index: 2000;
-    animation: bounceIn 0.35s ease;
+    animation: bounceIn 0.3s ease;
     padding: 14px 12px 10px;
   }
 
@@ -231,7 +223,6 @@
     box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
   }
 
-  /* 💫 Animations */
   @keyframes bounceIn {
     0% {
       transform: scale(0.9);
