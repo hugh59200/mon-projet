@@ -47,8 +47,10 @@ export function useChat(role: ChatRole) {
   })
 
   let initialized = false
+  let disposed = false
+
   const init = async () => {
-    if (initialized) return
+    if (initialized || disposed) return
     initialized = true
     try {
       if (role === 'admin') {
@@ -64,7 +66,7 @@ export function useChat(role: ChatRole) {
       }
 
       typing.setup()
-      isReady.value = true
+      if (!disposed) isReady.value = true
     } catch (e) {
       // permet un retry si un appel a échoué (ex: réseau)
       initialized = false
@@ -75,13 +77,19 @@ export function useChat(role: ChatRole) {
   // Sélection conversation (la watch ci-dessous fait le reste)
   const selectConversation = (uid: string) => {
     selectedUserId.value = uid
-    notif.clearUserUnread(uid)
+    // plus de clear ici; la watch gère le clear, y compris pour les changements externes
   }
 
-  const sendMessage = () => {
-    if (!newMessage.value.trim()) return
-    msgs.sendMessage(newMessage.value.trim())
-    newMessage.value = ''
+  const sendMessage = async () => {
+    const text = newMessage.value.trim()
+    if (!text) return
+    try {
+      await msgs.sendMessage(text)
+      newMessage.value = ''
+    } catch (e) {
+      console.error(e)
+      // Option: notif.toast('Envoi impossible. Réessaie.')
+    }
   }
 
   onMounted(() => {
@@ -107,6 +115,7 @@ export function useChat(role: ChatRole) {
   })
 
   onUnmounted(() => {
+    disposed = true
     msgs.cleanup()
     typing.cleanup()
     conv?.cleanup()

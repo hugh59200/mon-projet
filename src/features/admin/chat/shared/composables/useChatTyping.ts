@@ -95,7 +95,7 @@ export function useChatTyping({ role, getActiveUser }: UseChatTypingOptions) {
   const cleanup = () => {
     timers.forEach((t) => clearTimeout(t))
     timers.clear()
-    if (chan) supabase.removeChannel(chan)
+    if (chan) void supabase.removeChannel(chan)
     chan = null
   }
 

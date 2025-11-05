@@ -1,6 +1,6 @@
 import { supabase } from '@/supabase/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { chatApi } from '../services/chatApi'
 import type { ChatRole, Message } from '../types/chat'
 import type { useScrollMessages } from './useScrollMessages'
@@ -30,22 +30,23 @@ export function useChatMessages({
   let channel: RealtimeChannel | null = null
   let unreadChannel: RealtimeChannel | null = null
 
-  // Supporte id number | string selon DB
-  const seenIds = new Set<number | string>()
+  // Supporte id number | string selon DB, mais uniformisé en string
+  const seenIds = new Set<string>()
+  const keyOf = (id: unknown) => String(id)
 
   const ingest = (m: Message) => {
     if (!m?.id) return
-    const key = m.id as unknown as number | string
+    const key = keyOf(m.id)
     if (seenIds.has(key)) {
       const idx = messages.value.findIndex((x) => x.id === m.id)
-      if (idx !== -1) messages.value[idx] = reactive({ ...messages.value[idx], ...m })
+      if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...m }
       return
     }
     seenIds.add(key)
-    messages.value.push(reactive(m))
+    messages.value.push(m)
   }
 
-  /** ✅ Marquer comme lus (avec senderRole obligatoire) */
+  /** Marquer comme lus (avec senderRole obligatoire) */
   let readTimeout: ReturnType<typeof setTimeout> | undefined
   const markRead = () => {
     const uid = getActiveUser()
@@ -59,16 +60,18 @@ export function useChatMessages({
     }, 300)
   }
 
-  /** ✅ Charger les 30 derniers (ordre chronologique) */
+  /** Charger les 30 derniers (ordre chronologique) */
   const fetchInitialMessages = async (uid: string) => {
     isMessagesLoading.value = true
     try {
       const { data, error } = await chatApi.fetchMessages(uid, PAGE_SIZE)
       if (error) throw error
 
-      const list = (data ?? []).slice().sort(
-        (a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime(),
-      )
+      const list = (data ?? [])
+        .slice()
+        .sort(
+          (a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime(),
+        )
 
       messages.value = []
       seenIds.clear()
@@ -84,7 +87,7 @@ export function useChatMessages({
     markRead()
   }
 
-  /** ✅ Pagination (prépend en conservant l'ordre) */
+  /** Pagination (prépend en conservant l'ordre) */
   const loadOlderMessages = async () => {
     if (!hasMore.value || !oldest.value || isMessagesLoading.value) return
 
@@ -98,7 +101,7 @@ export function useChatMessages({
       const { data, error } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
       if (error) throw error
 
-      const batch = (data ?? [])
+      const batch = data ?? []
       if (!batch.length) {
         hasMore.value = false
         return
@@ -107,16 +110,15 @@ export function useChatMessages({
       const toPrepend = batch
         .slice()
         .sort((a, b) => {
-          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-          return dateA - dateB;
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
+          return dateA - dateB
         })
-        .map((m) => reactive(m as Message))
+        .map((m) => m as Message)
 
-      // insère en tête dans l'ordre (évite le reverse dû aux unshift successifs)
-      // et enregistre dans seenIds
+      // insère en tête dans l'ordre et enregistre dans seenIds
       toPrepend.forEach((m: any) => {
-        const key = m.id as number | string
+        const key = keyOf(m.id)
         if (!seenIds.has(key)) seenIds.add(key)
       })
       messages.value.splice(0, 0, ...toPrepend)
@@ -129,17 +131,17 @@ export function useChatMessages({
     }
   }
 
-  /** ✅ Envoi message (role requis) */
+  /** Envoi message (role requis) */
   const sendMessage = async (text: string) => {
     const uid = getActiveUser()
     if (!uid || !text.trim()) return
     await chatApi.sendMessage(uid, role, text.trim())
   }
 
-  /** ✅ Abonnement unread global (admin) — léger */
+  /** Abonnement unread global (admin) — léger */
   const subscribeUnreadForAdmin = () => {
     if (unreadChannel) {
-      supabase.removeChannel(unreadChannel)
+      void supabase.removeChannel(unreadChannel)
       unreadChannel = null
     }
     if (role !== 'admin' || !onUnread) return
@@ -161,10 +163,10 @@ export function useChatMessages({
     unreadChannel.subscribe()
   }
 
-  /** ✅ Realtime propre (filtré par user_id) */
+  /** Realtime propre (filtré par user_id) */
   const subscribeRealtime = (target: string | null) => {
     if (channel) {
-      supabase.removeChannel(channel)
+      void supabase.removeChannel(channel)
       channel = null
     }
 
@@ -195,7 +197,7 @@ export function useChatMessages({
       (payload) => {
         const updated: Message = payload.new as Message
         const idx = messages.value.findIndex((m) => m.id === updated.id)
-        if (idx !== -1) messages.value[idx] = reactive({ ...messages.value[idx], ...updated })
+        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...updated }
       },
     )
 
@@ -204,8 +206,8 @@ export function useChatMessages({
 
   const cleanup = () => {
     if (readTimeout) clearTimeout(readTimeout)
-    if (channel) supabase.removeChannel(channel)
-    if (unreadChannel) supabase.removeChannel(unreadChannel)
+    if (channel) void supabase.removeChannel(channel)
+    if (unreadChannel) void supabase.removeChannel(unreadChannel)
     channel = null
     unreadChannel = null
     seenIds.clear()

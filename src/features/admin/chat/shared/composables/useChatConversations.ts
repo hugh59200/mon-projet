@@ -21,11 +21,13 @@ export function useChatConversations() {
   let presenceChannel: RealtimeChannel | null = null
   let messagesChannel: RealtimeChannel | null = null
 
-  /** ✅ Format helpers */
+  /** Format helpers */
   const formatMessage = (content: string | null) => {
     if (!content) return ''
     return content.length <= 30 ? content : content.slice(0, 27) + '...'
   }
+
+  const toTs = (d?: string | null) => (d ? Date.parse(d) || 0 : 0)
 
   // Instance unique pour éviter des variations
   const dtf = new Intl.DateTimeFormat('fr-FR', {
@@ -35,30 +37,26 @@ export function useChatConversations() {
     hour: '2-digit',
     minute: '2-digit',
   })
-  const formatDate = (date: string | null) => (date ? dtf.format(new Date(date)) : '')
+  const formatDate = (date: string | null) => (date ? dtf.format(new Date(toTs(date))) : '')
 
-  /** ✅ Fetch initial list, sorted newest first */
+  /** Fetch initial list, sorted newest first */
   const fetchConversations = async () => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? [])
       .filter((c) => c.user_id !== null)
-      .sort((a, b) => {
-        const da = a.last_message_at ? new Date(a.last_message_at).getTime() : 0
-        const db = b.last_message_at ? new Date(b.last_message_at).getTime() : 0
-        return db - da
-      })
+      .sort((a, b) => toTs(b.last_message_at) - toTs(a.last_message_at))
 
     conversations.value = rows.map((c) => ({
       ...c,
       user_id: c.user_id as string,
-      last_message_short: formatMessage(c.last_message),
+      last_message_short: formatMessage(c.last_message ?? ''),
       last_message_date: formatDate(c.last_message_at),
       is_online: onlineUsers.value.has(c.user_id!),
       unread_count: c.unread_count_admin ?? 0,
     }))
   }
 
-  /** ✅ Presence realtime → online / offline badge (ne compte que les users) */
+  /** Presence realtime → online / offline badge (ne compte que les users) */
   const setupPresence = () => {
     if (presenceChannel) return
 
@@ -74,7 +72,7 @@ export function useChatConversations() {
         Object.entries(state)
           .filter(([, metas]) => Array.isArray(metas) && metas.some((m: any) => m?.role === 'user'))
           .map(([key]) => key),
-      )
+      ) as Set<string>
       onlineUsers.value = online
 
       conversations.value = conversations.value.map((c) => ({
@@ -91,7 +89,7 @@ export function useChatConversations() {
   }
 
   /**
-   * ✅ Listen realtime messages → update last message + unread + re-sort
+   * Listen realtime messages → update last message + unread + re-sort
    * getActiveUserId? : injection légère pour éviter d'incrémenter le badge si le thread est déjà ouvert
    */
   const listenRealtimeConversations = (getActiveUserId?: () => string | null) => {
@@ -112,7 +110,7 @@ export function useChatConversations() {
 
         if (item) {
           item.last_message = (msg as any).content
-          item.last_message_short = formatMessage((msg as any).content)
+          item.last_message_short = formatMessage((msg as any).content ?? '')
           item.last_message_at = (msg as any).created_at
           item.last_message_date = formatDate((msg as any).created_at)
 
@@ -123,12 +121,11 @@ export function useChatConversations() {
           }
         } else {
           // Nouvelle conversation
-          fetchConversations()
+          void fetchConversations()
         }
 
         conversations.value = [...conversations.value].sort(
-          (a, b) =>
-            new Date(b.last_message_at ?? 0).getTime() - new Date(a.last_message_at ?? 0).getTime(),
+          (a, b) => toTs(b.last_message_at) - toTs(a.last_message_at),
         )
       },
     )
@@ -136,7 +133,7 @@ export function useChatConversations() {
     messagesChannel.subscribe()
   }
 
-  /** ✅ Unread update après markAsRead */
+  /** Unread update après markAsRead */
   const refreshUnreadCount = async () => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? []).filter((c) => c.user_id !== null)
@@ -150,20 +147,17 @@ export function useChatConversations() {
       unread_count: c.unread_count_admin ?? 0,
     }))
 
-    conversations.value = mapped.sort(
-      (a, b) =>
-        new Date(b.last_message_at ?? 0).getTime() - new Date(a.last_message_at ?? 0).getTime(),
-    )
+    conversations.value = mapped.sort((a, b) => toTs(b.last_message_at) - toTs(a.last_message_at))
   }
 
-  /** ✅ Cleanup */
+  /** Cleanup */
   const cleanup = () => {
     if (presenceChannel) {
-      supabase.removeChannel(presenceChannel)
+      void supabase.removeChannel(presenceChannel)
       presenceChannel = null
     }
     if (messagesChannel) {
-      supabase.removeChannel(messagesChannel)
+      void supabase.removeChannel(messagesChannel)
       messagesChannel = null
     }
   }
