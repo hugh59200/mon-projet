@@ -169,7 +169,7 @@
     color: white;
     display: flex;
     flex-direction: column;
-    padding: 70px 8vw 25px;
+    padding: 20px;
     gap: 60px;
     font-family: 'Inter', sans-serif;
 

@@ -1,17 +1,25 @@
 <template>
   <div class="user-orders">
     <!-- 🧾 Titre -->
-    <BasicText
-      size="h3"
-      weight="bold"
-      class="user-orders__title"
+    <div
+      class="user-orders__title-wrapper"
       v-motion="{
-        initial: { opacity: 0, y: -15 },
+        initial: { opacity: 0, y: -20 },
         enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
       }"
     >
-      Mes commandes
-    </BasicText>
+      <BasicText
+        size="h3"
+        weight="bold"
+        class="user-orders__title"
+      >
+        Mes
+        <span>commandes</span>
+      </BasicText>
+      <div class="user-orders__subtitle">
+        Retrouvez ici l’historique de toutes vos commandes passées 🧾
+      </div>
+    </div>
 
     <!-- 🔄 Loader -->
     <WrapperLoader
@@ -71,27 +79,29 @@
         :key="index"
         class="order-card"
         v-motion="{
-          initial: { opacity: 0, y: 30, scale: 0.98 },
+          initial: { opacity: 0, y: 40, scale: 0.97 },
           enter: {
             opacity: 1,
             y: 0,
             scale: 1,
-            transition: { delay: index * 0.1, type: 'spring', stiffness: 100 },
+            transition: { delay: index * 0.1, type: 'spring', stiffness: 90 },
           },
         }"
       >
         <!-- 🏷️ En-tête -->
         <div class="order-card__header">
-          <div>
+          <div class="order-card__header-left">
             <BasicText
               size="body-l"
               weight="bold"
+              class="order-card__date"
             >
               Commande du {{ formatDate(order.created_at) }}
             </BasicText>
             <BasicText
               size="body-s"
               color="neutral-600"
+              class="order-card__number"
             >
               N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
             </BasicText>
@@ -106,7 +116,7 @@
         <FilterSection
           title="Produits"
           :model-value="openSections[safeId(order)]?.items"
-          @update:model-value="(v) => setSection(order, 'items', v)"
+          @update:model-value="(v: boolean) => setSection(order, 'items', v)"
         >
           <div
             v-motion="{
@@ -165,7 +175,7 @@
         <FilterSection
           title="Résumé"
           :model-value="openSections[safeId(order)]?.summary"
-          @update:model-value="(v) => setSection(order, 'summary', v)"
+          @update:model-value="(v: boolean) => setSection(order, 'summary', v)"
         >
           <div
             v-motion="{
@@ -230,7 +240,7 @@
         <FilterSection
           title="Suivi"
           :model-value="openSections[safeId(order)]?.tracking"
-          @update:model-value="(v) => setSection(order, 'tracking', v)"
+          @update:model-value="(v: boolean) => setSection(order, 'tracking', v)"
         >
           <div
             v-motion="{
@@ -431,50 +441,69 @@
 <style scoped lang="less">
   .user-orders {
     max-width: 950px;
-    margin: 50px auto;
     padding: 0 20px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+
+    &__title-wrapper {
+      text-align: center;
+    }
 
     &__title {
-      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: @neutral-900;
+      margin-bottom: 6px;
+
+      span {
+        background: linear-gradient(90deg, @primary-600, @primary-400);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    &__subtitle {
+      font-size: 15px;
+      color: @neutral-600;
     }
 
     &__empty {
       text-align: center;
-      padding: 60px 20px;
+      padding: 70px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
       align-items: center;
     }
 
     &__list {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 26px;
     }
 
     .orders-controls {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .order-card {
       background: white;
       border: 1px solid @neutral-200;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 2px 6px fade(@neutral-400, 8%);
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 3px 8px fade(@neutral-400, 8%);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
       transition: all 0.25s ease;
 
       &:hover {
-        box-shadow: 0 4px 12px fade(@neutral-400, 15%);
+        box-shadow: 0 6px 14px fade(@neutral-400, 15%);
+        transform: translateY(-2px);
       }
 
       &__header {
@@ -482,14 +511,24 @@
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid fade(@neutral-200, 70%);
+      }
+
+      &__date {
+        color: @neutral-900;
+      }
+
+      &__number {
+        font-size: 13px;
       }
 
       &__items {
         display: flex;
         flex-direction: column;
         gap: 14px;
-        padding: 4px 0;
+        padding: 6px 0;
       }
 
       .order-item {
@@ -531,7 +570,7 @@
       &__summary {
         background: fade(@neutral-50, 80%);
         border-radius: 10px;
-        padding: 14px 16px;
+        padding: 16px 18px;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -594,34 +633,40 @@
         justify-content: flex-end;
         gap: 10px;
         flex-wrap: wrap;
+        margin-top: 6px;
       }
     }
 
     @media (max-width: 768px) {
       .order-card {
-        padding: 16px;
-      }
+        padding: 18px;
 
-      .order-item {
-        flex-wrap: wrap;
-
-        &__img {
-          width: 48px;
-          height: 48px;
+        &__header {
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        &__meta {
-          justify-content: flex-start;
-          gap: 16px;
+        .order-item {
+          flex-wrap: wrap;
+
+          &__img {
+            width: 48px;
+            height: 48px;
+          }
+
+          &__meta {
+            justify-content: flex-start;
+            gap: 16px;
+          }
         }
-      }
 
-      .order-card__actions {
-        flex-direction: column;
-        align-items: stretch;
+        &__actions {
+          flex-direction: column;
+          align-items: stretch;
 
-        button {
-          width: 100%;
+          button {
+            width: 100%;
+          }
         }
       }
     }

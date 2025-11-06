@@ -82,8 +82,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/profil/commandes',
-    name: 'user-orders',
-    component: () => import('@/features/user/UserOrdersView.vue'),
+    name: 'orders',
+    component: () => import('@/features/order/OrdersView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Mes commandes – Fast Peptides',
@@ -92,8 +92,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/profil/commandes/:id',
-    name: 'user-order-detail',
-    component: () => import('@/features/user/UserOrderDetailView.vue'),
+    name: 'order-detail',
+    component: () => import('@/features/order/OrderDetailView.vue'),
     meta: {
       requiresAuth: true,
       getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,

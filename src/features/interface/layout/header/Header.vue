@@ -100,7 +100,7 @@
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import UserMenu from '@/features/user/pop-up/UserMenu.vue'
+  import UserMenu from '@/features/interface/layout/header/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'

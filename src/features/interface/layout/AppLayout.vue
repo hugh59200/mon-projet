@@ -150,6 +150,7 @@
   .content {
     min-width: 250px;
     flex: 1;
+    min-height: 100vh;
     padding: 2.5vw 4vw;
     color: @neutral-900;
     transition: padding 0.3s ease;
@@ -160,12 +161,6 @@
     @media (min-width: 1400px) {
       padding: 50px 80px;
     }
-  }
-
-  .footer {
-    z-index: 950;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
   }
 
   .fade-slide-enter-active,

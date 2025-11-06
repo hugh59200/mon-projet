@@ -17,6 +17,8 @@ export type RouteName =
   'faq' |
   'home' |
   'login' |
+  'order-detail' |
+  'orders' |
   'payment-cancel' |
   'payment-success' |
   'product-detail' |
@@ -24,6 +26,4 @@ export type RouteName =
   'register' |
   'reset-password' |
   'update-password' |
-  'update-password-success' |
-  'user-order-detail' |
-  'user-orders'
+  'update-password-success'
