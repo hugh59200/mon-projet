@@ -4,39 +4,26 @@ import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Router } from 'vue-router'
 
-/**
- * 🧠 Guard global :
- * - Vérifie session et profil
- * - Bloque si email non confirmé
- * - Déclenche popup CGU si nécessaire
- * - Gère les accès protégés (auth / admin / panier)
- */
 export function registerBaseGuard(router: Router) {
-  let isShowingCGU = false // 🔒 évite popup multiple
+  let isShowingCGU = false
 
   router.beforeEach(async (to) => {
     const auth = useAuthStore()
     const cart = useCartStore()
 
-    // ================================
-    // 1️⃣ Initialisation session
-    // ================================
+    // 1️⃣ Init session si absente
     if (!auth.user) {
       await auth.initAuth()
     }
 
-    // ================================
-    // 2️⃣ Vérifie confirmation email
-    // ================================
+    // 2️⃣ Email non confirmé
     if (auth.user && !auth.user.email_confirmed_at) {
       console.warn('[Guard] Email non confirmé → déconnexion forcée')
       await supabase.auth.signOut()
       return '/auth/login'
     }
 
-    // ================================
-    // 3️⃣ Recharge le profil si besoin
-    // ================================
+    // 3️⃣ Profil manquant
     if (auth.isAuthenticated && !auth.profile) {
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -47,7 +34,6 @@ export function registerBaseGuard(router: Router) {
       if (error) console.warn('[Guard] Erreur chargement profil:', error)
 
       if (!profile || !profile.email) {
-        console.warn('[Guard] Aucun profil lié → déconnexion forcée')
         await supabase.auth.signOut()
         return '/auth/login'
       }
@@ -64,11 +50,8 @@ export function registerBaseGuard(router: Router) {
       } as Profile
     }
 
-    // ================================
-    // 4️⃣ CGU obligatoires
-    // ================================
+    // 4️⃣ CGU popup obligatoire
     const publicRoutes = ['/auth/login', '/auth/register', '/auth/reset-password']
-
     if (auth.isAuthenticated && !publicRoutes.includes(to.path) && !isShowingCGU) {
       try {
         const { data, error } = await supabase
@@ -80,12 +63,10 @@ export function registerBaseGuard(router: Router) {
         if (error) throw error
 
         if (data && data.cgu_accepted === false) {
-          console.info('[Guard] CGU non acceptées → affichage popup.')
+          console.info('[Guard] CGU non acceptées → popup')
           isShowingCGU = true
-
           const dialog = useAfficheCGUStore()
           await dialog.showDialog({ validationObligatoire: true })
-
           await supabase
             .from('profiles')
             .update({
@@ -93,41 +74,39 @@ export function registerBaseGuard(router: Router) {
               cgu_accepted_at: new Date().toISOString(),
             })
             .eq('id', auth.user!.id)
-
           isShowingCGU = false
         }
       } catch (err) {
-        console.warn('[Guard] Erreur vérification CGU :', err)
+        console.warn('[Guard] Erreur CGU:', err)
       }
     }
 
-    // ================================
-    // 5️⃣ Règles d’accès (auth, admin, panier)
-    // ================================
+    // 5️⃣ Vérif accès
     const requiresAuth = to.meta.requiresAuth
     const requiresAdmin = to.meta.requiresAdmin
     const requiresCart = to.meta.requiresCart
 
-    // 🧱 Accès protégé
     if (requiresAuth && !auth.isAuthenticated) {
-      console.warn('[Guard] Accès protégé sans session → /auth/login')
-      // ✅ On garde la page cible pour redirection post-login
+      console.warn('[Guard] Accès protégé → login')
       return { path: '/auth/login', query: { redirect: to.fullPath } }
     }
 
-    // 🧱 Accès admin
     if (requiresAdmin && (!auth.isAuthenticated || auth.profile?.role !== 'admin')) {
-      console.warn('[Guard] Accès admin refusé → /access-denied')
       return '/access-denied'
     }
 
-    // 🧱 Panier requis
     if (requiresCart && cart.items.length === 0) {
-      console.warn('[Guard] Panier vide requis → /panier')
       return '/panier'
     }
 
-    // ✅ Tout est bon
+    if (
+      auth.isAuthenticated &&
+      to.path.startsWith('/auth/') &&
+      !['/auth/callback'].includes(to.path)
+    ) {
+      return '/profil'
+    }
+
     return true
   })
 }

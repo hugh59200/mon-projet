@@ -11,6 +11,9 @@ import './RouteMeta'
 import { registerBaseGuard } from './registerBaseGuard'
 
 const routes: Array<RouteRecordRaw> = [
+  /* -------------------------------------------------------------------------- */
+  /* 🏠 PUBLIC                                                                 */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/',
     name: 'home',
@@ -25,35 +28,81 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 
-  // AUTHENTIFICATION
+  /* -------------------------------------------------------------------------- */
+  /* 🔐 AUTH (overlay complet)                                                  */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/auth',
-    component: () => import('@/features/auth/AuthLayout.vue'),
+    component: () => import('@/features/auth/AuthOverlay.vue'),
     children: [
       {
         path: 'login',
         name: 'login',
         component: () => import('@/features/auth/AuthForm.vue'),
         props: { mode: 'login' },
-        meta: { title: 'Connexion – Fast Peptides' },
       },
       {
         path: 'register',
         name: 'register',
         component: () => import('@/features/auth/AuthForm.vue'),
         props: { mode: 'register' },
-        meta: { title: 'Inscription – Fast Peptides' },
       },
       {
         path: 'reset-password',
         name: 'reset-password',
         component: () => import('@/features/auth/AuthForm.vue'),
         props: { mode: 'reset' },
-        meta: { title: 'Mot de passe oublié – Fast Peptides' },
       },
+      // 👇 plus besoin de callback séparée :
+      // c’est géré directement dans AuthOverlay.vue
     ],
   },
+  {
+    path: '/auth/callback',
+    name: 'auth-callback',
+    component: () => import('@/features/auth/AuthOverlay.vue'),
+    meta: {
+      title: 'Connexion en cours – Fast Peptides',
+      description: 'Connexion via un fournisseur externe (OAuth).',
+    },
+  },
+  /* -------------------------------------------------------------------------- */
+  /* 🧭 PROFIL & COMPTE                                                         */
+  /* -------------------------------------------------------------------------- */
+  {
+    path: '/profil',
+    name: 'profil',
+    component: () => import('@/features/profile/ProfilView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Mon profil – Fast Peptides',
+      description:
+        'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
+    },
+  },
+  {
+    path: '/profil/commandes',
+    name: 'user-orders',
+    component: () => import('@/features/user/UserOrdersView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Mes commandes – Fast Peptides',
+      description: 'Retrouvez toutes vos commandes précédentes sur Fast Peptides.',
+    },
+  },
+  {
+    path: '/profil/commandes/:id',
+    name: 'user-order-detail',
+    component: () => import('@/features/user/UserOrderDetailView.vue'),
+    meta: {
+      requiresAuth: true,
+      getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
+    },
+  },
 
+  /* -------------------------------------------------------------------------- */
+  /* 🧾 AUTRES ROUTES AUTH                                                     */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/update-password',
     name: 'update-password',
@@ -73,57 +122,15 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/auth/callback',
-    name: 'auth-callback',
-    component: () => import('@/features/auth/AuthCallbackView.vue'),
-    meta: { title: 'Connexion en cours – Fast Peptides' },
-  },
-  {
     path: '/access-denied',
     name: 'access-denied',
     component: () => import('@/features/auth/AccessDeniedView.vue'),
     meta: { title: 'Accès refusé – Fast Peptides' },
   },
-  {
-    path: '/profil',
-    name: 'profil',
-    component: () => import('@/features/profile/ProfilView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Mon profil – Fast Peptides',
-      description:
-        'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
-    },
-  },
-  // ✅ ADMIN - vues hors onglets
-  {
-    path: '/admin/messagerie',
-    name: 'AdminMessagerie',
-    component: AdminChatView,
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      label: 'Messagerie',
-      icon: 'MessageSquare',
-      color: '#3B82F6',
-      title: 'Messagerie – Fast Peptides',
-      description: 'Discutez avec les utilisateurs ou le support via la messagerie interne.',
-    },
-  },
-  {
-    path: '/admin/statistiques',
-    name: 'AdminStats',
-    component: AdminStatsView,
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      label: 'Statistiques',
-      icon: 'BarChart3',
-      color: '#10B981',
-      title: 'Statistiques – Fast Peptides',
-      description: 'Consultez les statistiques globales du site Fast Peptides.',
-    },
-  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 🧪 CATALOGUE                                                              */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/catalogue',
     name: 'catalogue',
@@ -146,6 +153,10 @@ const routes: Array<RouteRecordRaw> = [
         `Découvrez le peptide ${route.params.id as string} sur Fast Peptides.`,
     },
   },
+
+  /* -------------------------------------------------------------------------- */
+  /* 📰 ACTUALITÉS                                                             */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/actualites',
     name: 'actualites',
@@ -168,6 +179,10 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
     },
   },
+
+  /* -------------------------------------------------------------------------- */
+  /* 🛒 PANIER & PAIEMENT                                                      */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/panier',
     name: 'cart',
@@ -222,6 +237,10 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+
+  /* -------------------------------------------------------------------------- */
+  /* 🧑‍💼 ADMIN                                                                */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/admin',
     component: () => import('@/features/admin/AdminTabsView.vue'),
@@ -238,56 +257,62 @@ const routes: Array<RouteRecordRaw> = [
         path: 'utilisateurs',
         name: 'AdminUsers',
         component: AdminUsersView,
-        meta: {
-          label: 'Utilisateurs',
-          icon: 'Users',
-          color: '#F59E0B',
-        },
+        meta: { label: 'Utilisateurs', icon: 'Users', color: '#F59E0B' },
       },
       {
         path: 'commandes',
         name: 'AdminOrders',
         component: AdminOrdersView,
-        meta: {
-          label: 'Commandes',
-          icon: 'ShoppingCart',
-          color: '#EF4444',
-        },
+        meta: { label: 'Commandes', icon: 'ShoppingCart', color: '#EF4444' },
       },
       {
         path: 'produits',
         name: 'AdminProducts',
         component: AdminProductsTable,
-        meta: {
-          label: 'Produits',
-          icon: 'PackageSearch',
-          color: '#8B5CF6',
-        },
+        meta: { label: 'Produits', icon: 'PackageSearch', color: '#8B5CF6' },
       },
       {
         path: 'actualites',
         name: 'AdminNews',
         component: AdminNewsTable,
-        meta: {
-          label: 'Actualités',
-          icon: 'Newspaper',
-          color: '#F97316',
-        },
+        meta: { label: 'Actualités', icon: 'Newspaper', color: '#F97316' },
       },
       {
         path: 'topics',
         name: 'AdminTopics',
         component: AdminTopicsTable,
+        meta: { label: 'Catégories', icon: 'FolderTree', color: '#06B6D4' },
+      },
+      {
+        path: 'messagerie',
+        name: 'AdminMessagerie',
+        component: AdminChatView,
         meta: {
-          label: 'Catégories',
-          icon: 'FolderTree',
-          color: '#06B6D4',
+          label: 'Messagerie',
+          icon: 'MessageSquare',
+          color: '#3B82F6',
+          requiresAuth: true,
+          requiresAdmin: true,
+        },
+      },
+      {
+        path: 'statistiques',
+        name: 'AdminStats',
+        component: AdminStatsView,
+        meta: {
+          label: 'Statistiques',
+          icon: 'BarChart3',
+          color: '#10B981',
+          requiresAuth: true,
+          requiresAdmin: true,
         },
       },
     ],
   },
 
-  // FAQ
+  /* -------------------------------------------------------------------------- */
+  /* ❓ FAQ                                                                     */
+  /* -------------------------------------------------------------------------- */
   {
     path: '/faq',
     name: 'faq',
@@ -301,25 +326,6 @@ const routes: Array<RouteRecordRaw> = [
         'Questions fréquentes sur la qualité, la manipulation, l’expédition et la conformité (RUO) des peptides.',
     },
   },
-  {
-    path: '/profil/commandes',
-    name: 'user-orders',
-    component: () => import('@/features/user/UserOrdersView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Mes commandes – Fast Peptides',
-      description: 'Retrouvez toutes vos commandes précédentes sur Fast Peptides.',
-    },
-  },
-  {
-    path: '/profil/commandes/:id',
-    name: 'user-order-detail',
-    component: () => import('@/features/user/UserOrderDetailView.vue'),
-    meta: {
-      requiresAuth: true,
-      getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
-    },
-  },
 ]
 
 const router = createRouter({
@@ -331,5 +337,4 @@ const router = createRouter({
 })
 
 registerBaseGuard(router)
-
 export default router

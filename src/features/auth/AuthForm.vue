@@ -47,6 +47,7 @@
         @input="clearMessages"
         @blur="validateField('password')"
       />
+
       <!-- ✅ Bouton principal -->
       <BasicButton
         :label="labelBouton"
@@ -80,7 +81,7 @@
             width="full"
             size="medium"
             :icon="provider.icon"
-            @click="auth.signInWithProvider(provider.name as Providers)"
+            @click="handleProviderLogin(provider.name as Providers)"
           />
         </div>
       </template>
@@ -107,10 +108,6 @@
           {{ message }}
         </BasicText>
       </transition>
-
-      <!-- 🔍 Debug temporaire -->
-      <!-- <pre>{{ errors }}</pre> -->
-      <!-- <pre>{{ touched }}</pre> -->
     </div>
 
     <!-- 🔗 Liens contextuels -->
@@ -152,7 +149,7 @@
 
   const auth = useAuthStore()
   const router = useRouter()
-  const { email, password, errors, validate, validateField, touched, reset } = useForm()
+  const { email, password, errors, validate, validateField, touched } = useForm()
 
   const hintEmail = 'exemple@domaine.com'
   const hintPassword = '8 caractères minimum'
@@ -211,13 +208,28 @@
     clearMessages()
   }
 
-  // 🧩 Soumission
+  // ✅ Login via provider
+  async function handleProviderLogin(provider: Providers) {
+    clearMessages()
+    loading.value = true
+    try {
+      await auth.signInWithProvider(provider)
+      if (!auth.error) {
+        // on force un "refresh" du watcher en changeant la query
+        await router.replace({ path: '/auth/login', query: { success: Date.now().toString() } })
+      } else {
+        error.value = auth.error ?? 'Connexion échouée.'
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 🧩 Soumission classique
   async function handleSubmit() {
     clearMessages()
-
     const isValid = validate(props.mode)
     if (!isValid) {
-      // Force l'affichage des erreurs
       touched.value.email = true
       touched.value.password = true
       return
@@ -234,9 +246,10 @@
         } else {
           const success = await auth.signIn(email.value, password.value)
           if (success) {
-            const redirect = router.currentRoute.value.query.redirect as string
-            router.push(redirect || '/')
-          } else error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+            await router.replace({ path: '/auth/login', query: { success: Date.now().toString() } })
+          } else {
+            error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+          }
         }
       }
 

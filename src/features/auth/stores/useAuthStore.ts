@@ -6,9 +6,9 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 export type Profile = Tables<'profiles'>
-type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
-
 export type Providers = 'google' | 'github'
+
+type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -21,9 +21,6 @@ export const useAuthStore = defineStore('auth', () => {
   const isAdmin = computed(() => profile.value?.role === 'admin')
   const role = computed<UserRole>(() => (profile.value?.role as UserRole) || 'user')
 
-  /* -------------------------------------------------------------------------- */
-  /*                               FETCH PROFILE                                */
-  /* -------------------------------------------------------------------------- */
   async function fetchProfile() {
     if (!user.value) return
     const { data, error: err } = await supabase
@@ -31,23 +28,31 @@ export const useAuthStore = defineStore('auth', () => {
       .select('*')
       .eq('id', user.value.id)
       .maybeSingle()
-
-    if (err) {
-      console.warn('Erreur profil (non bloquante):', err)
-      return
-    }
-
+    if (err) console.warn('Erreur chargement profil:', err)
     if (data) profile.value = data
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                AUTH LOGIC                                  */
-  /* -------------------------------------------------------------------------- */
   async function refreshSession() {
     const { data, error: err } = await supabase.auth.getSession()
     if (err || !data.session?.user) return false
     user.value = data.session.user
     return true
+  }
+
+  async function initAuth() {
+    loading.value = true
+    const { data, error } = await supabase.auth.getSession()
+    if (error) console.warn('Erreur récupération session Supabase', error)
+    const session = data.session
+    if (session?.user) {
+      user.value = session.user
+      await fetchProfile()
+      startAutoRefresh()
+    } else {
+      user.value = null
+      profile.value = null
+    }
+    loading.value = false
   }
 
   async function signIn(email: string, password: string): Promise<boolean> {
@@ -72,52 +77,11 @@ export const useAuthStore = defineStore('auth', () => {
     await fetchProfile()
     startAutoRefresh()
 
-    // 🚀 Redirection post-login automatique
+    // ✅ Unifié : redirige vers /auth/callback
     const redirect = router.currentRoute.value.query.redirect as string | undefined
-    router.push(redirect || '/')
+    sessionStorage.setItem('redirectAfterOAuth', redirect || '')
+    router.push('/auth/callback')
 
-    return true
-  }
-
-  // ======================================================
-  // 🌍 OAUTH (Google, GitHub)
-  // ======================================================
-  async function signInWithProvider(provider: Providers) {
-    loading.value = true
-    error.value = null
-
-    try {
-      const redirect = router.currentRoute.value.query.redirect as string | undefined
-      if (redirect) sessionStorage.setItem('redirectAfterOAuth', redirect)
-      else sessionStorage.removeItem('redirectAfterOAuth')
-
-      const { error: err } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
-      })
-      if (err) error.value = err.message
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // ======================================================
-  // ✉️ MAGIC LINK (connexion sans mot de passe)
-  // ======================================================
-  async function signInWithMagicLink(email: string): Promise<boolean> {
-    loading.value = true
-    error.value = null
-
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
-    loading.value = false
-
-    if (err) {
-      error.value = err.message
-      return false
-    }
     return true
   }
 
@@ -132,9 +96,29 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    user.value = null
-    profile.value = null
+    // ✅ Redirection vers succès "email envoyé"
+    router.push({ path: '/auth/callback', query: { mode: 'signup' } })
     return true
+  }
+
+  async function signInWithProvider(provider: Providers) {
+    loading.value = true
+    error.value = null
+    try {
+      const redirect = router.currentRoute.value.query.redirect as string | undefined
+      if (redirect) sessionStorage.setItem('redirectAfterOAuth', redirect)
+      else sessionStorage.removeItem('redirectAfterOAuth')
+
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (err) error.value = err.message
+    } finally {
+      loading.value = false
+    }
   }
 
   async function signOut(redirect = true) {
@@ -143,22 +127,6 @@ export const useAuthStore = defineStore('auth', () => {
     profile.value = null
     stopAutoRefresh()
     if (redirect) router.push('/auth/login')
-  }
-
-  async function initAuth() {
-    loading.value = true
-    const { data, error } = await supabase.auth.getSession()
-    if (error) console.warn('Erreur récupération session Supabase', error)
-    const session = data.session
-    if (session?.user) {
-      user.value = session.user
-      await fetchProfile()
-      startAutoRefresh()
-    } else {
-      user.value = null
-      profile.value = null
-    }
-    loading.value = false
   }
 
   function startAutoRefresh() {
@@ -178,43 +146,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                               EVENT LISTENER                               */
-  /* -------------------------------------------------------------------------- */
   supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = session?.user ?? null
-
     if (session?.user) {
-      if (!session.user.email_confirmed_at) {
-        await signOut(true)
-        return
-      }
       fetchProfile()
       startAutoRefresh()
     }
-
-    if (event === 'SIGNED_IN' && router.currentRoute.value.name === 'auth-callback') {
-      const redirect = sessionStorage.getItem('redirectAfterOAuth') || '/'
-      sessionStorage.removeItem('redirectAfterOAuth')
-      router.push(redirect)
-    }
-
     if (event === 'SIGNED_OUT') router.push('/auth/login')
   })
 
   return {
     user,
     profile,
-    role,
     loading,
     error,
+    role,
     isAuthenticated,
     isAdmin,
-    signUp,
-    signIn,
-    signInWithProvider,
-    signInWithMagicLink,
-    signOut,
     initAuth,
+    fetchProfile,
+    signIn,
+    signUp,
+    signInWithProvider,
+    signOut,
   }
 })
