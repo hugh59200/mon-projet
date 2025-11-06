@@ -27,10 +27,7 @@
   import type { AlertInputProps, InputModel, WrapperInputProps } from '@designSystem/components'
   import { ref, watch } from 'vue'
 
-  /**
-   * ✅ Props : wrapper générique + options spécifiques au mot de passe
-   */
-  const props = withDefaults(
+  withDefaults(
     defineProps<
       WrapperInputProps &
         AlertInputProps & {

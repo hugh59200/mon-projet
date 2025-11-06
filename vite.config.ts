@@ -5,12 +5,12 @@ import path from 'path'
 import { defineConfig, type BuildEnvironmentOptions } from 'vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import svgLoader from 'vite-svg-loader'
-import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer'
+import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer.ts'
 import {
   generateGlobalComponents,
   generateIconsList,
   generateRouteNamesUnion,
-} from './vite/generator'
+} from './vite/generator.ts'
 
 const outDir = 'dist' // Output directory for the build
 const config = {

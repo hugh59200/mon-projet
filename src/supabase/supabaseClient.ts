@@ -1,6 +1,5 @@
-import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
-import type { Database } from '@/supabase/types/supabase'
 import { createClient } from '@supabase/supabase-js'
+import { Database } from './types/supabase.ts'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -26,7 +25,7 @@ export const supabase = new Proxy(baseClient, {
 
     // 🎯 Interception des requêtes principales : from(), rpc()
     if (prop === 'from' || prop === 'rpc') {
-      return (...args: any[]) => {
+      return (...args: [string, ...unknown[]]) => {
         const query = value.apply(target, args)
 
         // Proxy interne pour intercepter uniquement les méthodes finales (async)
@@ -47,7 +46,7 @@ export const supabase = new Proxy(baseClient, {
 
             // 🔚 Gestion du sablier uniquement sur les appels finaux
             if (finalMethods.includes(qProp.toString())) {
-              return (...opArgs: any[]) => {
+              return (...opArgs: unknown[]) => {
                 sablier.debutSablier()
                 const start = performance.now()
                 const result = qValue.apply(qTarget, opArgs)

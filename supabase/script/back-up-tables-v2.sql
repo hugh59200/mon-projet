@@ -722,3 +722,76 @@ RETURNS jsonb LANGUAGE sql STABLE AS $$
 $$;
 
 
+-- ============================================================
+-- 📧 TABLE : EMAILS_SENT (Historique des e-mails envoyés)
+-- ============================================================
+
+-- =========================================================
+-- 📨 TABLE : emails_sent
+-- Historique complet des e-mails envoyés aux clients
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS public.emails_sent (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Lié à une commande (facultatif)
+  order_id uuid REFERENCES public.orders(id) ON DELETE SET NULL,
+
+  -- Métadonnées e-mail
+  to_email text NOT NULL,
+  subject text NOT NULL,
+  body_html text NOT NULL,
+
+  -- Type d'e-mail envoyé (utile pour filtrer / analyser)
+  type text CHECK (
+    type IN (
+      'confirmation',
+      'status_update',
+      'shipping',
+      'cancelation',
+      'payment',
+      'custom'
+    )
+  ) NOT NULL DEFAULT 'custom',
+
+  -- Statut d’envoi (succès ou erreur)
+  status text CHECK (status IN ('sent', 'error')) DEFAULT 'sent',
+
+  -- Réponse brute du provider (Resend, etc.)
+  provider_response jsonb,
+
+  -- Date d’envoi
+  sent_at timestamptz DEFAULT now()
+);
+
+-- =========================================================
+-- ⚡ Index pour recherches rapides
+-- =========================================================
+CREATE INDEX IF NOT EXISTS idx_emails_sent_order_id ON public.emails_sent(order_id);
+CREATE INDEX IF NOT EXISTS idx_emails_sent_to_email ON public.emails_sent(to_email);
+CREATE INDEX IF NOT EXISTS idx_emails_sent_type ON public.emails_sent(type);
+CREATE INDEX IF NOT EXISTS idx_emails_sent_status ON public.emails_sent(status);
+
+-- =========================================================
+-- 🔒 RLS & Politiques de sécurité
+-- =========================================================
+ALTER TABLE public.emails_sent ENABLE ROW LEVEL SECURITY;
+
+-- Seuls les administrateurs peuvent lire
+CREATE POLICY "Admins can read emails_sent"
+ON public.emails_sent
+FOR SELECT
+TO authenticated
+USING (auth.role() = 'admin');
+
+-- Service Role (Edge Functions) peut insérer
+CREATE POLICY "Service role can insert emails_sent"
+ON public.emails_sent
+FOR INSERT
+TO service_role
+WITH CHECK (true);
+
+-- =========================================================
+-- 📡 Publication Realtime (optionnelle)
+-- =========================================================
+ALTER PUBLICATION supabase_realtime ADD TABLE public.emails_sent;

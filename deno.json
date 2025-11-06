@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.ns", "deno.unstable", "dom"]
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "semiColons": false
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "tasks": {
+    "start": "deno task start"
+  }
+}

@@ -79,7 +79,8 @@ serve(async (req) => {
     })
   } catch (err) {
     console.error('💥 Erreur retrieve-stripe-session :', err)
-    return new Response(JSON.stringify({ error: err.message }), {
+    const error = err as Error
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: corsHeaders,
     })

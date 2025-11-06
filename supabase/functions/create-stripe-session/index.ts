@@ -80,11 +80,11 @@ serve(async (req) => {
       }),
       { status: 200, headers: corsHeaders },
     )
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('💥 Erreur création session Stripe :', err)
     return new Response(
       JSON.stringify({
-        error: err?.message || 'Erreur interne du serveur',
+        error: err instanceof Error ? err.message : 'Erreur interne du serveur',
       }),
       { status: 500, headers: corsHeaders },
     )
