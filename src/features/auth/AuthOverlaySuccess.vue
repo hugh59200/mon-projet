@@ -23,14 +23,14 @@
       Vous pouvez continuer vos analyses dès maintenant !
     </p>
 
-    <AuthProgressBar color="success" />
+    <ProgressBar color="success" />
   </div>
 </template>
 
 <script setup lang="ts">
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
-  import AuthProgressBar from './AuthProgressBar.vue'
+  import ProgressBar from '../shared/ProgressBar.vue'
   import { useAuthSound } from './composables/useAuthSound'
   const { success } = useAuthSound()
 

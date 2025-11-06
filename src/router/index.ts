@@ -209,21 +209,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/checkout/paiement/PaymentResultWrapper.vue'),
     children: [
       {
-        path: 'result',
-        name: 'payment-result',
-        component: () => import('@/features/checkout/paiement/PaymentResultView.vue'),
-        meta: {
-          title: 'Vérification du paiement – Fast Peptides',
-          description: 'Vérification de l’état du paiement en cours.',
-        },
-      },
-      {
         path: 'success',
         name: 'payment-success',
         component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
         meta: {
           title: 'Paiement réussi – Fast Peptides',
-          description: 'Votre paiement a été traité avec succès.',
+          description: 'Votre paiement a été validé avec succès. Merci pour votre commande !',
         },
       },
       {
@@ -232,12 +223,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
         meta: {
           title: 'Paiement annulé – Fast Peptides',
-          description: 'Votre paiement a été annulé.',
+          description: 'Votre paiement a été interrompu ou annulé.',
         },
       },
     ],
   },
-
   /* -------------------------------------------------------------------------- */
   /* 🧑‍💼 ADMIN                                                                */
   /* -------------------------------------------------------------------------- */

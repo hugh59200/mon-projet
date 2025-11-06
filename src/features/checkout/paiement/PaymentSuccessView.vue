@@ -1,197 +1,127 @@
 <template>
-  <div class="payment-success">
-    <h1>✅ Paiement réussi</h1>
-    <p>Merci pour votre commande 🎉</p>
-
-    <!-- ✅ Détails du paiement -->
-    <div
-      v-if="order"
-      class="summary"
-    >
-      <h2>Détails de votre paiement</h2>
-      <ul>
-        <li>
-          <strong>Email :</strong>
-          {{ order.customer_email }}
-        </li>
-        <li>
-          <strong>Montant :</strong>
-          {{ (order.amount_total / 100).toFixed(2) }} €
-        </li>
-        <li>
-          <strong>Statut :</strong>
-          <span class="status success">
-            {{ order.payment_status === 'paid' ? 'Payé' : order.payment_status }}
-          </span>
-        </li>
-        <li>
-          <strong>ID Session :</strong>
-          {{ sessionId }}
-        </li>
-        <li>
-          <strong>ID PaymentIntent :</strong>
-          {{ order.payment_intent }}
-        </li>
-      </ul>
-
-      <RouterLink
-        to="/profil/commandes"
-        class="btn"
-      >
-        Voir mes commandes
-      </RouterLink>
+  <div
+    v-motion="{
+      initial: { opacity: 0, y: 20 },
+      enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
+    }"
+    class="payment-success"
+  >
+    <!-- ✅ Icône animée -->
+    <div class="payment-success__icon-wrapper">
+      <BasicIconNext
+        name="CheckCircle2"
+        color="success-600"
+        :size="72"
+        class="payment-success__icon"
+      />
     </div>
 
-    <!-- ❌ Erreur (affichée uniquement si on a fini le chargement ET rien trouvé) -->
-    <div
-      v-else-if="hasLoaded"
-      class="error"
-    >
-      <p>❌ Impossible de récupérer les détails de votre paiement.</p>
-      <p
-        v-if="errorMessage"
-        class="error-detail"
-      >
-        {{ errorMessage }}
-      </p>
+    <h1 class="payment-success__title">Paiement réussi 🎉</h1>
 
-      <RouterLink
-        to="/"
-        class="btn btn-secondary"
-      >
-        Retour à l’accueil
-      </RouterLink>
-    </div>
+    <p class="payment-success__subtitle">
+      Merci pour votre commande sur
+      <strong>Fast Peptides</strong>
+      !
+      <br />
+      Votre paiement a bien été validé et votre commande est en préparation.
+    </p>
+
+    <!-- Barre de progression -->
+    <ProgressBar color="success" />
+
+    <!-- CTA -->
+    <BasicButton
+      label="Voir mes commandes"
+      type="primary"
+      color="success"
+      size="large"
+      class="payment-success__cta"
+      @click="$router.push('/profil/commandes')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { supabase } from '@/supabase/supabaseClient'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref } from 'vue'
-  import { RouterLink, useRoute } from 'vue-router'
+  import { useAuthSound } from '@/features/auth/composables/useAuthSound'
+  import ProgressBar from '@/features/shared/ProgressBar.vue'
+  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+  import { onMounted } from 'vue'
 
-  const route = useRoute()
-  const cart = useCartStore()
-  const toast = useToastStore()
+  const { success } = useAuthSound()
 
-  const sessionId = route.query.session_id as string
-  const order = ref<any>(null)
-  const errorMessage = ref('')
-  const hasLoaded = ref(false) // 👈 flag de fin de chargement logique
-
-  cart.clearCart() // 🧹 Vide le panier après paiement
-
-  async function loadPaymentDetails() {
-    console.group('[PaymentSuccess]')
-    console.log('Session ID trouvée dans URL →', sessionId)
-
-    if (!sessionId) {
-      errorMessage.value = 'Aucun identifiant de session trouvé.'
-      console.warn('⚠️ Aucun session_id dans l’URL.')
-      hasLoaded.value = true
-      return
-    }
-
-    try {
-      const { data, error: sessionError } = await supabase.auth.getSession()
-      if (sessionError) throw sessionError
-
-      const accessToken = data.session?.access_token
-      if (!accessToken) throw new Error('Aucun token utilisateur trouvé.')
-
-      const { data: stripeData, error } = await supabase.functions.invoke(
-        'retrieve-stripe-session',
-        { body: { sessionId } },
-      )
-
-      if (error) throw error
-      if (!stripeData) throw new Error('Réponse vide de retrieve-stripe-session')
-
-      order.value = stripeData
-    } catch (err: any) {
-      console.error('💥 Erreur récupération session Stripe:', err)
-      errorMessage.value = err.message || 'Erreur inconnue lors de la récupération du paiement.'
-      toast.show('Erreur lors du chargement du paiement', 'danger')
-    } finally {
-      hasLoaded.value = true // ✅ marquer la fin du chargement
-      console.groupEnd()
-    }
-  }
-
-  onMounted(async () => {
-    await loadPaymentDetails()
+  onMounted(() => {
+    success() // 🔊 Petit son de confirmation
   })
 </script>
 
-<style scoped>
+<style scoped lang="less">
   .payment-success {
-    max-width: 700px;
-    margin: 80px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  }
+    margin-top: 40px;
 
-  h1 {
-    color: #16a34a;
-    font-size: 2rem;
-    margin-bottom: 12px;
-  }
+    &__icon-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      animation:
+        popin 0.4s ease-out forwards,
+        bounce-end 3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
 
-  h2 {
-    margin-top: 24px;
-    font-size: 1.4rem;
-  }
+    &__title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: @success-700;
+    }
 
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 16px 0 24px;
-  }
+    &__subtitle {
+      font-size: 15px;
+      color: @neutral-600;
+      line-height: 1.6;
+      margin-bottom: 28px;
 
-  li {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-  }
+      strong {
+        color: @neutral-800;
+        font-weight: 600;
+      }
+    }
 
-  .status.success {
-    color: #16a34a;
-    font-weight: 600;
-  }
+    &__cta {
+      margin-top: 24px;
+    }
 
-  .btn {
-    display: inline-block;
-    background: #16a34a;
-    color: white;
-    padding: 10px 22px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s ease;
-  }
+    /* --- Animations --- */
+    @keyframes popin {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
 
-  .btn:hover {
-    background: #15803d;
-  }
-
-  .error {
-    color: #b91c1c;
-    margin-top: 20px;
-  }
-
-  .error-detail {
-    color: #991b1b;
-    font-size: 0.9rem;
-    margin-top: 8px;
-  }
-
-  .btn-secondary {
-    background: #ccc;
-    color: #222;
+    @keyframes bounce-end {
+      0%,
+      90% {
+        transform: scale(1);
+      }
+      95% {
+        transform: scale(1.15);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
   }
 </style>

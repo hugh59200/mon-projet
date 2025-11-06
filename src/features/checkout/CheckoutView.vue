@@ -282,7 +282,7 @@
             city: city.value || '',
             country: country.value || '',
             payment_method: selectedPayment.value,
-            total: cart.totalPrice,
+            total_amount: cart.totalPrice,
             items: cart.items,
             status: 'pending',
           })

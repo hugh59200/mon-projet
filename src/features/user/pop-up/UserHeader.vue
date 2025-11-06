@@ -4,18 +4,15 @@
     appear
   >
     <div class="user-header">
-      <!-- 💻 Desktop -->
       <div
-        v-if="!isMobile && !isTablet"
         class="user-info user-info--desktop clickable"
         @click="goToProfile"
       >
         <div class="user-main">
-          <!-- Avatar -->
           <div class="user-avatar-inline">
             <img
-              v-if="avatarUrl"
-              :src="avatarUrl"
+              v-if="avatarPreview"
+              :src="avatarPreview"
               alt="Avatar"
               class="avatar-image"
             />
@@ -24,7 +21,7 @@
               class="avatar-fallback"
             >
               <BasicText
-                size="body-s"
+                size="body-xl"
                 weight="bold"
                 color="white"
               >
@@ -32,8 +29,6 @@
               </BasicText>
             </div>
           </div>
-
-          <!-- Informations -->
           <div class="user-texts">
             <div class="user-header-row">
               <BasicText
@@ -52,66 +47,6 @@
                 class="user-badge"
               />
             </div>
-
-            <BasicText
-              size="body-s"
-              color="neutral-300"
-              class="user-role"
-            >
-              {{ auth.isAdmin ? 'Espace administrateur' : 'Mon espace personnel' }}
-            </BasicText>
-          </div>
-        </div>
-      </div>
-
-      <!-- 📱 Mobile / tablette -->
-      <div
-        v-else
-        class="user-info user-info--mobile clickable"
-        @click="goToProfile"
-      >
-        <div class="user-main">
-          <div class="user-avatar-small">
-            <img
-              v-if="avatarUrl"
-              :src="avatarUrl"
-              alt="Avatar"
-              class="avatar-image-small"
-            />
-            <div
-              v-else
-              class="avatar-fallback-small"
-            >
-              <BasicText
-                size="body-s"
-                weight="bold"
-                color="white"
-              >
-                {{ initials }}
-              </BasicText>
-            </div>
-          </div>
-
-          <div class="user-mobile-texts">
-            <div class="user-email-row">
-              <BasicText
-                size="body-s"
-                weight="bold"
-                color="white"
-                class="user-email"
-                wrap
-              >
-                {{ auth.user?.email || 'Utilisateur' }}
-              </BasicText>
-
-              <BasicBadge
-                v-if="auth.isAdmin"
-                type="success"
-                size="small"
-                label="Admin"
-                class="user-badge"
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -121,20 +56,31 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { computed } from 'vue'
+  import { supabase } from '@/supabase/supabaseClient'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
+  const avatarPreview = ref<string | null>(null)
   const router = useRouter()
   const auth = useAuthStore()
-  const { isMobile, isTablet } = useDeviceBreakpoint()
 
-  // ✅ Avatar dynamique (Supabase ou profil custom)
-  const avatarUrl = computed(() => {
-    return auth.user?.user_metadata?.avatar_url || auth.profile?.avatar_url || null
-  })
+  async function loadProfile() {
+    if (!auth.user) return
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', auth.user.id)
+      .maybeSingle()
+    if (data) {
+      avatarPreview.value = data.avatar_url ? getPublicUrl(data.avatar_url) : null
+    }
+  }
 
-  // ✅ Initiales fallback
+  function getPublicUrl(path: string) {
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+    return data.publicUrl
+  }
+
   const initials = computed(() => {
     const email = auth.user?.email || ''
     const base = email.split('@')[0] || ''
@@ -143,10 +89,13 @@
     return base.slice(0, 2).toUpperCase()
   })
 
-  // ✅ Navigation vers le profil
   function goToProfile() {
     router.push('/profil')
   }
+
+  onMounted(async () => {
+    await loadProfile()
+  })
 </script>
 
 <style scoped lang="less">
@@ -235,75 +184,6 @@
 
           .user-role {
             margin-top: 2px;
-          }
-        }
-      }
-
-      /* ---------------------- 📱 Mobile / Tablette ---------------------- */
-      &--mobile {
-        .user-main {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .user-avatar-small {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          overflow: hidden;
-          background: fade(white, 8%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-
-          .avatar-image-small {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-
-          .avatar-fallback-small {
-            background: @primary-600;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-        }
-
-        .user-mobile-texts {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          flex: 1;
-          min-width: 0;
-
-          .user-email-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: nowrap;
-            overflow: hidden;
-            min-width: 0;
-          }
-
-          .user-email {
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            min-width: 0;
-          }
-
-          .user-badge {
-            flex-shrink: 0;
           }
         }
       }

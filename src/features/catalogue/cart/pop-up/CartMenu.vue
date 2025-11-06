@@ -4,7 +4,7 @@
     :width="280"
     align="right"
     arrow-align="auto"
-    :close-delay="1000"
+    :close-delay="800"
   >
     <!-- 🛍️ Icône du panier -->
     <template #trigger>
@@ -28,63 +28,104 @@
       </div>
     </template>
 
-    <div class="popup-list">
+    <!-- 🧾 Contenu du menu déroulant -->
+    <div class="cart-content">
+      <!-- 🧺 PANIER VIDE -->
       <div
-        v-for="item in cart.items.slice(0, 3)"
-        class="popup-item"
+        v-if="cart.items.length === 0"
+        class="cart-empty"
       >
-        <img
-          :src="item.product_image || defaultImage"
-          alt=""
-          class="popup-img"
+        <BasicIconNext
+          name="ShoppingBag"
+          :size="40"
+          color="neutral-400"
         />
-        <div class="popup-info">
-          <BasicText
-            size="body-s"
-            weight="semibold"
-          >
-            {{ item.product_name }}
-          </BasicText>
-          <BasicText
-            size="body-s"
-            color="neutral-300"
-          >
-            {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
-          </BasicText>
-        </div>
-      </div>
-
-      <div
-        v-if="cart.items.length > 3"
-        class="popup-more"
-      >
-        +{{ cart.items.length - 3 }} autres articles...
-      </div>
-    </div>
-
-    <div class="popup-actions">
-      <BasicText
-        size="body-s"
-        color="primary-400"
-        weight="semibold"
-        class="popup-total"
-      >
-        Total : {{ formatCurrency(cart.totalPrice) }}
-      </BasicText>
-
-      <div class="popup-btns">
+        <BasicText
+          size="body-m"
+          weight="semibold"
+          color="neutral-200"
+          class="cart-empty-title"
+        >
+          Votre panier est vide
+        </BasicText>
+        <BasicText
+          size="body-s"
+          color="neutral-400"
+          class="cart-empty-sub"
+        >
+          Découvrez nos peptides et complétez votre panier.
+        </BasicText>
         <BasicButton
-          label="Voir le panier"
-          type="reverse"
-          size="small"
-          @click="goToCart"
-        />
-        <BasicButton
-          label="Paiement"
+          label="Voir les produits"
           type="primary"
           size="small"
-          @click="goToCheckout"
+          class="cart-empty-btn"
+          @click="goToProducts"
         />
+      </div>
+
+      <!-- 🧃 PANIER REMPLI -->
+      <div
+        v-else
+        class="popup-list"
+      >
+        <div
+          v-for="item in cart.items.slice(0, 3)"
+          class="popup-item"
+        >
+          <img
+            :src="item.product_image || defaultImage"
+            alt=""
+            class="popup-img"
+          />
+          <div class="popup-info">
+            <BasicText
+              size="body-s"
+              weight="semibold"
+            >
+              {{ item.product_name }}
+            </BasicText>
+            <BasicText
+              size="body-s"
+              color="neutral-300"
+            >
+              {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
+            </BasicText>
+          </div>
+        </div>
+
+        <div
+          v-if="cart.items.length > 3"
+          class="popup-more"
+        >
+          +{{ cart.items.length - 3 }} autres articles...
+        </div>
+
+        <div class="popup-actions">
+          <BasicText
+            size="body-s"
+            color="primary-400"
+            weight="semibold"
+            class="popup-total"
+          >
+            Total : {{ formatCurrency(cart.totalPrice) }}
+          </BasicText>
+
+          <div class="popup-btns">
+            <BasicButton
+              label="Voir le panier"
+              type="reverse"
+              size="small"
+              @click="goToCart"
+            />
+            <BasicButton
+              label="Paiement"
+              type="primary"
+              size="small"
+              @click="goToCheckout"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </FloatingDropdownWrapper>
@@ -109,6 +150,11 @@
   function goToCheckout() {
     isOpen.value = false
     router.push('/checkout')
+  }
+
+  function goToProducts() {
+    isOpen.value = false
+    router.push('/catalogue')
   }
 </script>
 
@@ -143,6 +189,33 @@
     }
   }
 
+  /* 🧺 PANIER VIDE */
+  .cart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px 20px;
+    gap: 8px;
+    color: fade(white, 70%);
+
+    .cart-empty-title {
+      margin-top: 8px;
+    }
+
+    .cart-empty-sub {
+      font-size: 0.85rem;
+      line-height: 1.3;
+    }
+
+    .cart-empty-btn {
+      margin-top: 12px;
+      width: 100%;
+    }
+  }
+
+  /* 🧾 PANIER NON VIDE */
   .popup-list {
     display: flex;
     flex-direction: column;
@@ -198,15 +271,5 @@
         padding: 4px 0;
       }
     }
-  }
-
-  .cart-popup-fade-enter-active,
-  .cart-popup-fade-leave-active {
-    transition: all 0.3s ease;
-  }
-  .cart-popup-fade-enter-from,
-  .cart-popup-fade-leave-to {
-    opacity: 0;
-    transform: translateY(-6px);
   }
 </style>

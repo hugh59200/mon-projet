@@ -309,7 +309,6 @@
   }
 
   onMounted(async () => {
-    await auth.initAuth()
     await sections.loadFromSupabase()
     await loadProfile()
     await loadLastOrders()
