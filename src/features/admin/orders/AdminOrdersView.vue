@@ -95,21 +95,14 @@
               {{ formatDate(order.created_at) }}
             </BasicCell>
 
-            <BasicCell
+            <BasicCellDropdown
+              v-model="localStatuses[order.id]"
+              :items="STATUSES"
               center
               :span="8"
-            >
-              <BasicDropdown
-                v-model="localStatuses[order.id]"
-                :items="STATUSES"
-                size="small"
-                dropdown-type="table"
-                force-value
-                :item-class="(s: { id: string }) => getStatusClass(s.id)"
-                @update:model-value="(v) => v && handleStatusChange(order, v)"
-              />
-            </BasicCell>
-
+              dropdown-type="table"
+              size="small"
+            />
             <BasicCellActionIcon
               icon-name="eye"
               tooltip="Voir la commande"
@@ -126,7 +119,8 @@
         <OrderCardMobile
           v-for="order in filteredData"
           :key="order.id"
-          v-model:status="localStatuses[order.id]!"
+          :status="localStatuses[order.id] ?? 'pending'"
+          @update:status="(newStatus) => (localStatuses[order.id] = newStatus)"
           :status-label="STATUSES.find((s) => s.id === localStatuses[order.id])?.label || '—'"
           :order="order"
           :statuses="STATUSES"
@@ -157,7 +151,6 @@
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils/index'
-  import { getStatusClass } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
@@ -199,7 +192,7 @@
 
   watchEffect(() => {
     const statuses: Record<string, OrderStatus> = {}
-    const validStatuses: OrderStatus[] = [
+    const newStatusidStatuses: OrderStatus[] = [
       'pending',
       'confirmed',
       'shipped',
@@ -209,7 +202,7 @@
 
     for (const o of filteredData.value) {
       const status = (o.status as OrderStatus) ?? 'pending'
-      statuses[o.id] = validStatuses.includes(status) ? status : 'pending'
+      statuses[o.id] = newStatusidStatuses.includes(status) ? status : 'pending'
     }
 
     localStatuses.value = statuses

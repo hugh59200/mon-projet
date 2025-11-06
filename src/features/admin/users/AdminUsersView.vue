@@ -76,20 +76,14 @@
             <BasicCell :span="10">{{ user.email }}</BasicCell>
             <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
 
-            <BasicCell
+            <BasicCellDropdown
+              v-model="localRoles[user.id]"
+              :items="ROLES"
               center
               :span="6"
-            >
-              <BasicDropdown
-                v-model="localRoles[user.id]"
-                :items="ROLES"
-                size="small"
-                dropdown-type="table"
-                force-value
-                :item-class="(r: { id: string }) => getRoleClass(r.id)"
-                @update:model-value="(v) => v && handleRoleChange(user, v)"
-              />
-            </BasicCell>
+              dropdown-type="table"
+              size="small"
+            />
 
             <BasicCell
               center
@@ -122,7 +116,8 @@
         <UserCardMobile
           v-for="user in filteredData"
           :key="user.id"
-          v-model:role="localRoles[user.id]!"
+          :role="localRoles[user.id] ?? 'user'"
+          @update:role="(newRole) => (localRoles[user.id] = newRole)"
           :user="user"
           :roles="ROLES"
           :format-date="formatDate"
@@ -152,7 +147,6 @@
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
-  import { getRoleClass } from '@/utils/roles'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
@@ -186,7 +180,6 @@
 
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
-  // ✅ Typage fort avec vérification des rôles valides
   const localRoles = ref<Record<string, Role>>({})
 
   watch(
@@ -207,7 +200,7 @@
     try {
       await updateUserRole(user.id, newRole)
       toast.show('Rôle mis à jour ✅', 'success')
-    } catch (err: any) {
+    } catch (err) {
       toast.show(`Erreur : ${(err as Error).message}`, 'danger')
     }
   }
