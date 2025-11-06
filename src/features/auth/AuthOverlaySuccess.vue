@@ -23,7 +23,7 @@
       Vous pouvez continuer vos analyses dès maintenant !
     </p>
 
-    <AuthProgressBar />
+    <AuthProgressBar color="success" />
   </div>
 </template>
 
