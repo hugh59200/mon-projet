@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { useSablierStore } from '../features/interface/sablier/useSablierStore.ts'
 import { Database } from './types/supabase.ts'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL

@@ -1,5 +1,5 @@
 import { onMounted, onUnmounted } from 'vue'
-import { useSablierStore } from './useSablierStore'
+import { useSablierStore } from './useSablierStore.ts'
 
 /**
  * 🧠 useAutoSablier — active automatiquement le sablier

@@ -36,7 +36,7 @@ export const useSablierStore = defineStore('sablier', () => {
         clearTimeout(timeoutId)
         timeoutId = null
       }
-      timeoutId = window.setTimeout(() => {
+      timeoutId = setTimeout(() => {
         estVisible.value = false
       }, 200)
     }
