@@ -89,8 +89,9 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import type { Orders } from '@/supabase/api/orders'
+  import type { Users } from '@/supabase/api/users'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency, formatDate } from '@/utils/index'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
@@ -99,11 +100,8 @@
   const visible = defineModel<boolean>()
   const props = defineProps<{ userId: string }>()
 
-  type UserRow = Tables<'profiles'>
-  type OrderRow = Tables<'orders'>
-
-  const user = ref<UserRow | null>(null)
-  const orders = ref<OrderRow[]>([])
+  const user = ref<Users | null>(null)
+  const orders = ref<Orders[]>([])
 
   async function loadUser() {
     const { data } = await supabase.from('profiles').select('*').eq('id', props.userId).single()

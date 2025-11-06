@@ -795,3 +795,42 @@ WITH CHECK (true);
 -- 📡 Publication Realtime (optionnelle)
 -- =========================================================
 ALTER PUBLICATION supabase_realtime ADD TABLE public.emails_sent;
+
+
+DROP VIEW IF EXISTS public.orders_detailed_view;
+
+CREATE OR REPLACE VIEW public.orders_detailed_view AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+  o.email,
+  o.full_name,
+  o.address,
+  o.city,
+  o.country,
+  o.status,
+  o.created_at,
+  o.total_amount,
+  o.payment_method,
+  o.tracking_number,
+  o.carrier,
+  o.shipped_at,
+  o.updated_at,
+  -- 🔹 items enrichis
+  jsonb_agg(
+    jsonb_build_object(
+      'product_id', p.id,
+      'name', p.name,
+      'category', p.category,
+      'price', p.price,
+      'purity', p.purity,
+      'stock', p.stock,
+      'image', p.image,
+      'quantity', (item ->> 'quantity')::int,
+      'subtotal', ((item ->> 'quantity')::numeric * p.price)
+    )
+  ) AS detailed_items
+FROM public.orders o
+LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item ON TRUE
+LEFT JOIN public.products p ON p.id::text = item->>'product_id'
+GROUP BY o.id;

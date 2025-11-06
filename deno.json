@@ -1,21 +1,14 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "lib": ["deno.ns", "deno.unstable", "dom"]
+    "strict": false,
+    "lib": ["deno.ns", "dom"],
+    "types": [
+      "https://esm.sh/v135/@supabase/supabase-js@2/dist/module/types.d.ts"
+    ]
   },
-  "fmt": {
-    "useTabs": false,
-    "lineWidth": 100,
-    "indentWidth": 2,
-    "singleQuote": true,
-    "semiColons": false
-  },
-  "lint": {
-    "rules": {
-      "tags": ["recommended"]
-    }
-  },
+  "importMap": "./import_map.json",
   "tasks": {
-    "start": "deno task start"
+    "serve": "supabase login",
+    "deploy": "supabase functions deploy create-stripe-session && supabase functions deploy stripe-webhook --no-verify-jwt && supabase functions deploy order-status-update && supabase functions deploy retrieve-stripe-session && supabase functions deploy order-confirmation"
   }
 }

@@ -84,6 +84,57 @@ export type Database = {
           },
         ]
       }
+      emails_sent: {
+        Row: {
+          body_html: string
+          id: string
+          order_id: string | null
+          provider_response: Json | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+          to_email: string
+          type: string
+        }
+        Insert: {
+          body_html: string
+          id?: string
+          order_id?: string | null
+          provider_response?: Json | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          to_email: string
+          type?: string
+        }
+        Update: {
+          body_html?: string
+          id?: string
+          order_id?: string | null
+          provider_response?: Json | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          to_email?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emails_sent_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_sent_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_detailed_view"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -539,6 +590,42 @@ export type Database = {
           },
           {
             foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders_detailed_view: {
+        Row: {
+          address: string | null
+          carrier: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          detailed_items: Json | null
+          email: string | null
+          full_name: string | null
+          order_id: string | null
+          payment_method: string | null
+          shipped_at: string | null
+          status: string | null
+          total_amount: number | null
+          tracking_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

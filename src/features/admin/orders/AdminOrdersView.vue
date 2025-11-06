@@ -147,8 +147,7 @@
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
-  import { updateOrderStatus } from '@/supabase/api/orders'
-  import type { Tables } from '@/supabase/types/supabase'
+  import { updateOrderStatus, type Orders } from '@/supabase/api/orders'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -158,7 +157,7 @@
   import OrderCardMobile from './OrderCardMobile.vue'
 
   type OrderRow = Pick<
-    Tables<'orders'>,
+    Orders,
     'id' | 'status' | 'full_name' | 'email' | 'total_amount' | 'created_at'
   >
 

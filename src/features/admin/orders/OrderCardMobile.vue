@@ -54,20 +54,19 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { Orders } from '@/supabase/api/orders'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import MobileCard from '../mobile/MobileCard.vue'
 
-  type OrderRow = Tables<'orders'>
   type StatusOption = { id: OrderStatus; label: string }
 
   defineProps<{
-    order: OrderRow
+    order: Orders
     statusLabel: string
     statuses: StatusOption[]
     formatDate: (d: string | null) => string
     formatCurrency: (a: number | null) => string
-    handleStatusChange: (order: OrderRow, status: OrderStatus) => void
+    handleStatusChange: (order: Orders, status: OrderStatus) => void
     openOrderModal: (id: string) => void
   }>()
 

@@ -2,19 +2,19 @@ import { supabase } from '../supabaseClient'
 import type { Tables } from '../types/supabase'
 import type { OrderStatus } from '../types/supabase.types'
 
-type OrderRow = Tables<'orders'>
+export type Orders = Tables<'orders'>
 
 /**
  * 🔹 Récupère toutes les commandes
  */
-export async function getOrders(): Promise<OrderRow[]> {
+export async function getOrders(): Promise<Orders[]> {
   const { data, error } = await supabase
     .from('orders')
     .select('*')
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return data as OrderRow[]
+  return data as Orders[]
 }
 
 /**

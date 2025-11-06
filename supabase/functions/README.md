@@ -2,16 +2,24 @@
 
 ## 1️⃣ S’assurer d’être connecté à ton projet Supabase
 
-./supabase.exe login
+supabase login
 
-## 3️⃣ Déployer la fonction
+## 3️⃣ Déployer la fonction create-stripe-session
 
-./supabase.exe functions deploy create-stripe-session
+supabase functions deploy create-stripe-session
 
-## 3️⃣ Déployer la fonction
+## 3️⃣ Déployer la fonction stripe-webhook
 
-./supabase.exe functions deploy stripe-webhook --no-verify-jwt
+supabase functions deploy stripe-webhook --no-verify-jwt
 
-## ou tout déployer
+## 3️⃣ Déployer la fonction order-status-update
 
-./supabase.exe functions deploy --all
+supabase functions deploy order-status-update
+
+## 3️⃣ Déployer la fonction retrieve-stripe-session
+
+supabase functions deploy retrieve-stripe-session
+
+## 3️⃣ Déployer la fonction order-confirmation
+
+supabase functions deploy order-confirmation

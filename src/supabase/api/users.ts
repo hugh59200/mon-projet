@@ -2,19 +2,19 @@ import { supabase } from '../supabaseClient'
 import type { Tables } from '../types/supabase'
 import type { Role } from '../types/supabase.types'
 
-type UserRow = Tables<'profiles'>
+export type Users = Tables<'profiles'>
 
 /**
  * 🔹 Récupère la liste des utilisateurs
  */
-export async function getUsers(): Promise<UserRow[]> {
+export async function getUsers(): Promise<Users[]> {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return data as UserRow[]
+  return data as Users[]
 }
 
 /**
