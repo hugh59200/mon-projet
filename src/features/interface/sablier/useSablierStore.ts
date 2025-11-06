@@ -4,8 +4,8 @@ import { computed, ref } from 'vue'
 export const useSablierStore = defineStore('sablier', () => {
   const compteur = ref(0)
   const estVisible = ref(false)
-  let timeoutId: number | null = null
-  let graceDelayId: number | null = null
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+  let graceDelayId: ReturnType<typeof setTimeout> | number | null = null
 
   /** 🔥 Lance le sablier (avec délai d'affichage UX-friendly) */
   function debutSablier() {

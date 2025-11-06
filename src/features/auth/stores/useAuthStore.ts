@@ -121,6 +121,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // ======================================================
+  // ✉️ MAGIC LINK (connexion sans mot de passe)
+  // ======================================================
+  async function signInWithMagicLink(email: string): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
+    loading.value = false
+
+    if (err) {
+      error.value = err.message
+      return false
+    }
+
+    return true
+  }
+
   async function signOut(redirect = true) {
     await supabase.auth.signOut()
     user.value = null
@@ -168,6 +189,7 @@ export const useAuthStore = defineStore('auth', () => {
     signIn,
     signUp,
     signInWithProvider,
+    signInWithMagicLink,
     signOut,
   }
 })
