@@ -275,6 +275,7 @@
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
+            user_id: auth.user.id, // ✅ obligatoire pour passer la policy
             email: auth.user.email ?? '',
             full_name: fullName.value || '',
             address: address.value || '',

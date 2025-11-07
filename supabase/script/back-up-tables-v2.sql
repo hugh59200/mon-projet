@@ -834,3 +834,142 @@ FROM public.orders o
 LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item ON TRUE
 LEFT JOIN public.products p ON p.id::text = item->>'product_id'
 GROUP BY o.id;
+
+
+DROP VIEW IF EXISTS public.orders_full_view;
+
+CREATE OR REPLACE VIEW public.orders_full_view AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+  p.email AS user_email,
+  p.full_name AS user_full_name,
+  p.address AS user_address,
+  p.country AS user_country,
+  o.full_name AS shipping_name,
+  o.email AS shipping_email,
+  o.address AS shipping_address,
+  o.city AS shipping_city,
+  o.zip AS shipping_zip,
+  o.country AS shipping_country,
+  o.status,
+  o.payment_method,
+  o.total_amount,
+  o.carrier,
+  o.tracking_number,
+  o.created_at,
+  o.shipped_at,
+  o.updated_at,
+
+  -- 📦 détail complet produits (json agrégé)
+  odv.detailed_items,
+
+  -- ✉️ nombre d’e-mails envoyés liés à cette commande
+  (
+    SELECT COUNT(*)
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+  ) AS emails_count,
+
+  -- 📨 date du dernier e-mail
+  (
+    SELECT MAX(sent_at)
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+  ) AS last_email_sent_at,
+
+  -- 🧾 types d’e-mails envoyés
+  (
+    SELECT jsonb_agg(DISTINCT e.type)
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+  ) AS email_types,
+
+  -- 👤 infos du profil client
+  jsonb_build_object(
+    'id', p.id,
+    'email', p.email,
+    'full_name', p.full_name,
+    'role', p.role,
+    'created_at', p.created_at
+  ) AS profile_info
+
+FROM public.orders o
+LEFT JOIN public.profiles p ON p.id = o.user_id
+LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
+
+ALTER VIEW public.orders_full_view SET (security_invoker = true);
+
+GRANT SELECT ON public.orders_full_view TO authenticated;
+
+-- ============================================================
+-- 🧾 VUE ADMIN : orders_overview_for_admin
+-- ------------------------------------------------------------
+-- Vue légère, performante et filtrable pour le dashboard admin.
+-- Chaque ligne = 1 commande.
+-- Données clés : client, total, statut, date, nombre d'e-mails, etc.
+-- ============================================================
+
+DROP VIEW IF EXISTS public.orders_overview_for_admin;
+
+CREATE OR REPLACE VIEW public.orders_overview_for_admin AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+  p.full_name AS customer_name,
+  p.email AS customer_email,
+  o.full_name AS shipping_name,
+  o.email AS shipping_email,
+  o.status,
+  o.total_amount,
+  o.payment_method,
+  o.created_at,
+  o.updated_at,
+  o.carrier,
+  o.tracking_number,
+  o.shipped_at,
+
+  -- 💌 Nombre d’e-mails liés à la commande
+  (
+    SELECT COUNT(*)
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+  ) AS emails_count,
+
+  -- 🕓 Date du dernier e-mail envoyé
+  (
+    SELECT MAX(e.sent_at)
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+  ) AS last_email_sent_at,
+
+  -- 📬 Type du dernier e-mail
+  (
+    SELECT e.type
+    FROM public.emails_sent e
+    WHERE e.order_id = o.id
+    ORDER BY e.sent_at DESC
+    LIMIT 1
+  ) AS last_email_type
+
+FROM public.orders o
+LEFT JOIN public.profiles p ON p.id = o.user_id;
+
+-- 🔒 Sécurité
+ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
+
+-- 📜 Accès lecture admin
+GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
+
+CREATE POLICY "User can insert own orders"
+  ON public.orders
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+  CREATE POLICY "User can update own orders"
+  ON public.orders
+  FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);

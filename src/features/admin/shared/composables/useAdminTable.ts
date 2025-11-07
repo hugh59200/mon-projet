@@ -11,9 +11,8 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
   }
 }
 
-type TableName = keyof Database['public']['Tables'] & string
-
-// ✅ Pas de "public" ici : Tables prend directement la table
+// ✅ inclut les Tables ET Views
+type TableName = keyof (Database['public']['Tables'] & Database['public']['Views']) & string
 type Row<T extends TableName> = Tables<T> extends infer R ? R : never
 type SearchFunction<T> = (row: T, query: string) => boolean
 
@@ -24,6 +23,26 @@ interface UseAdminTableOptions<T extends TableName> {
   filters?: Record<string, any>
   searchFn?: SearchFunction<Row<T>>
   limit?: number
+}
+
+/** ⚙️ Helper typé : gère les surcharges .from() Tables / Views */
+function fromRelation<T extends TableName>(table: T) {
+  if (
+    [
+      'conversation_overview',
+      'messages_by_conversation_view',
+      'messages_unread_view',
+      'orders_detailed_view',
+      'orders_full_view',
+      'orders_overview_for_admin',
+      'user_cart_view',
+      'user_overview',
+    ].includes(table)
+  ) {
+    return supabase.from(table as keyof Database['public']['Views'])
+  } else {
+    return supabase.from(table as keyof Database['public']['Tables'])
+  }
 }
 
 export function useAdminTable<T extends TableName>(options: UseAdminTableOptions<T>) {
@@ -54,8 +73,8 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       const from = (page.value - 1) * limit
       const to = page.value * limit - 1
 
-      let query = supabase
-        .from(table)
+      // ✅ on utilise le helper ici
+      let query = fromRelation(table)
         .select('*', { count: 'exact' })
         .order(sortKey.value, { ascending: sortAsc.value })
         .range(from, to)
@@ -101,9 +120,7 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     fetchData()
   }
 
-  onMounted(() => {
-    fetchData()
-  })
+  onMounted(fetchData)
 
   return {
     data,

@@ -133,6 +133,20 @@ export type Database = {
             referencedRelation: "orders_detailed_view"
             referencedColumns: ["order_id"]
           },
+          {
+            foreignKeyName: "emails_sent_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_full_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "emails_sent_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_overview_for_admin"
+            referencedColumns: ["order_id"]
+          },
         ]
       }
       messages: {
@@ -610,6 +624,88 @@ export type Database = {
           order_id: string | null
           payment_method: string | null
           shipped_at: string | null
+          status: string | null
+          total_amount: number | null
+          tracking_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders_full_view: {
+        Row: {
+          carrier: string | null
+          created_at: string | null
+          detailed_items: Json | null
+          email_types: Json | null
+          emails_count: number | null
+          last_email_sent_at: string | null
+          order_id: string | null
+          payment_method: string | null
+          profile_info: Json | null
+          shipped_at: string | null
+          shipping_address: string | null
+          shipping_city: string | null
+          shipping_country: string | null
+          shipping_email: string | null
+          shipping_name: string | null
+          shipping_zip: string | null
+          status: string | null
+          total_amount: number | null
+          tracking_number: string | null
+          updated_at: string | null
+          user_address: string | null
+          user_country: string | null
+          user_email: string | null
+          user_full_name: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders_overview_for_admin: {
+        Row: {
+          carrier: string | null
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          emails_count: number | null
+          last_email_sent_at: string | null
+          last_email_type: string | null
+          order_id: string | null
+          payment_method: string | null
+          shipped_at: string | null
+          shipping_email: string | null
+          shipping_name: string | null
           status: string | null
           total_amount: number | null
           tracking_number: string | null

@@ -10,7 +10,7 @@ supabase functions deploy create-stripe-session
 
 ## 3️⃣ Déployer la fonction stripe-webhook
 
-supabase functions deploy stripe-webhook --no-verify-jwt
+supabase functions deploy stripe-webhook
 
 ## 3️⃣ Déployer la fonction order-status-update
 
