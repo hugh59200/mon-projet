@@ -5,7 +5,7 @@
     align="right"
     arrow-align="auto"
     :close-delay="800"
-    :trigger-mode="isDesktop ? 'hover' : 'click'"
+    :trigger-mode="!isMobile ? 'hover' : 'click'"
   >
     <!-- ✅ Avatar utilisateur dans la barre -->
     <template #trigger>
@@ -125,7 +125,7 @@
   const adminTabStore = useAdminTabStore()
   const isOpen = ref(false)
 
-  const { isDesktop } = useDeviceBreakpoint()
+  const { isDesktop, isMobile } = useDeviceBreakpoint()
 
   const totalUnread = computed(() =>
     Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
@@ -167,18 +167,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition:
-      background 0.25s ease,
-      box-shadow 0.25s ease;
 
     &:hover {
       background: fade(white, 10%);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
     }
 
     .avatar-icon {
       color: white;
-      opacity: 0.9;
     }
 
     .user-badge {
@@ -193,7 +188,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 2px @neutral-900;
       font-size: 11px;
     }
   }
@@ -226,7 +220,6 @@
       text-align: left;
       width: 100%;
       color: white;
-      opacity: 0.9;
       border-radius: 6px;
       padding: 6px 8px;
       transition: all 0.2s ease;

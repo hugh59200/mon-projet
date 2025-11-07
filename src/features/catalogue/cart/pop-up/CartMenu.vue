@@ -5,6 +5,7 @@
     align="right"
     arrow-align="auto"
     :close-delay="800"
+    :trigger-mode="!isMobile ? 'hover' : 'click'"
   >
     <!-- 🛍️ Icône du panier -->
     <template #trigger>
@@ -134,12 +135,15 @@
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
   const cart = useCartStore()
+  const { isMobile } = useDeviceBreakpoint()
+
   const isOpen = ref(false)
 
   function goToCart() {

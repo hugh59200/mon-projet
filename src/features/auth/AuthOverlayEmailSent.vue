@@ -28,15 +28,7 @@
 
 <script setup lang="ts">
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import { onMounted } from 'vue'
   import AuthProgressBar from '../shared/ProgressBar.vue'
-  import { useAuthSound } from './composables/useAuthSound'
-
-  const { email } = useAuthSound()
-
-  onMounted(() => {
-    email()
-  })
 </script>
 <style scoped lang="less">
   .auth-email {

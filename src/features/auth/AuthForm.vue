@@ -72,17 +72,43 @@
       <!-- 🌍 Providers -->
       <template v-if="mode === 'login'">
         <div class="auth__divider"><span>ou continuer avec</span></div>
+
         <div class="auth__providers">
-          <BasicButton
-            v-for="provider in providers"
-            :key="provider.name"
-            :label="provider.label"
-            variant="ghost"
-            width="full"
-            size="medium"
-            :icon="provider.icon"
-            @click="handleProviderLogin(provider.name as Providers)"
-          />
+          <!-- ✅ Bouton Google -->
+          <div class="provider-wrapper">
+            <GoogleSignInButton
+              :one-tap="false"
+              type="standard"
+              theme="filled_blue"
+              size="large"
+              text="signin_with"
+              shape="pill"
+              logo-alignment="center"
+              locale="fr"
+              @success="handleGoogle"
+              @error="handleGoogleError"
+            />
+          </div>
+
+          <!-- ✅ Bouton GitHub Pro -->
+          <button
+            class="github-btn"
+            :disabled="loading"
+            @click="handleProviderLogin('github')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="github-icon"
+            >
+              <path
+                fill="currentColor"
+                d="M12 .297a12 12 0 0 0-3.797 23.406c.6.111.82-.258.82-.577v-2.17c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.84 1.236 1.84 1.236 1.07 1.835 2.807 1.304 3.492.997.108-.775.417-1.305.76-1.605-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23a11.53 11.53 0 0 1 6.003 0c2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.236 1.911 1.236 3.221 0 4.61-2.806 5.624-5.479 5.921.43.372.813 1.103.813 2.224v3.293c0 .323.218.694.825.576A12 12 0 0 0 12 .297z"
+              />
+            </svg>
+
+            <span v-if="!loading">Se connecter avec GitHub</span>
+            <span v-else>Chargement...</span>
+          </button>
         </div>
       </template>
 
@@ -120,6 +146,7 @@
         <b>S’inscrire</b>
         🎉
       </RouterLink>
+
       <RouterLink
         v-if="mode === 'register'"
         to="/auth/login"
@@ -127,6 +154,7 @@
         Déjà inscrit ?
         <b>Se connecter</b>
       </RouterLink>
+
       <RouterLink
         v-if="mode === 'login'"
         to="/auth/reset-password"
@@ -141,6 +169,7 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { GoogleSignInButton } from 'vue3-google-signin'
   import { useForm } from './composables/useForm'
   import { useAuthStore, type Providers } from './stores/useAuthStore'
 
@@ -159,12 +188,9 @@
   const loading = ref(false)
   const modeMagicLink = ref(false)
 
-  const providers = [
-    { name: 'google', label: 'Google', icon: 'google' },
-    { name: 'github', label: 'GitHub', icon: 'github' },
-  ]
+  const providers = [{ name: 'github', label: 'GitHub', icon: 'github' }]
 
-  // 🧠 Textes dynamiques
+  // 🧠 Textes
   const titre = computed(() => {
     switch (props.mode) {
       case 'login':
@@ -189,14 +215,16 @@
     }
   })
 
-  const labelBouton = computed(() => {
-    if (props.mode === 'login')
-      return modeMagicLink.value ? 'Recevoir un lien magique' : 'Se connecter'
-    if (props.mode === 'register') return 'Créer mon compte'
-    return 'Envoyer le lien'
-  })
+  const labelBouton = computed(() =>
+    props.mode === 'login'
+      ? modeMagicLink.value
+        ? 'Recevoir un lien magique'
+        : 'Se connecter'
+      : props.mode === 'register'
+        ? 'Créer mon compte'
+        : 'Envoyer le lien',
+  )
 
-  // 🔧 Helpers
   function clearMessages() {
     error.value = ''
     message.value = ''
@@ -208,14 +236,22 @@
     clearMessages()
   }
 
-  // ✅ Login via provider
+  // ✅ Google
+  async function handleGoogle(response: any) {
+    const success = await auth.signInWithGoogleIdToken(response.credential)
+    if (!success) error.value = auth.error ?? 'Connexion Google échouée'
+  }
+  function handleGoogleError() {
+    error.value = 'Erreur Google, réessayez.'
+  }
+
+  // ✅ Provider GitHub
   async function handleProviderLogin(provider: Providers) {
     clearMessages()
     loading.value = true
     try {
       await auth.signInWithProvider(provider)
       if (!auth.error) {
-        // on force un "refresh" du watcher en changeant la query
         await router.replace({ path: '/auth/login', query: { success: Date.now().toString() } })
       } else {
         error.value = auth.error ?? 'Connexion échouée.'
@@ -225,7 +261,7 @@
     }
   }
 
-  // 🧩 Soumission classique
+  // ✅ Soumission classique
   async function handleSubmit() {
     clearMessages()
     const isValid = validate(props.mode)
@@ -297,7 +333,6 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
-      background: #fff;
       animation: fadeInUp 0.4s ease forwards;
     }
 
@@ -346,28 +381,8 @@
 
     &__providers {
       display: flex;
+      flex-direction: column;
       gap: 14px;
-
-      button {
-        flex: 1;
-        border: 1px solid @neutral-200;
-        border-radius: 8px;
-        height: 40px;
-        background: #fafafa;
-        color: @neutral-700;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        &:hover {
-          background: #f0f0f0;
-          border-color: @neutral-300;
-          color: @neutral-600;
-        }
-      }
-    }
-
-    &__error,
-    &__message {
-      margin-top: 10px;
     }
 
     &__links {
@@ -386,6 +401,62 @@
           color: darken(@primary-700, 5%);
         }
       }
+    }
+
+    &__error,
+    &__message {
+      margin-top: 10px;
+    }
+  }
+
+  /* ✅ Google wrapper */
+  .provider-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* ✅ Bouton GitHub PRO */
+  .github-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+    padding: 12px 20px;
+
+    background: #24292f;
+    color: #fff;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition:
+      background 0.2s,
+      box-shadow 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #1c1f24;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #0969da;
+      outline-offset: 2px;
+    }
+
+    .github-icon {
+      width: 20px;
+      height: 20px;
     }
   }
 </style>

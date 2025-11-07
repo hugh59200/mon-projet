@@ -35,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthSound } from '@/features/auth/composables/useAuthSound'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
@@ -43,10 +42,8 @@
 
   const emit = defineEmits(['finished'])
   const router = useRouter()
-  const { error } = useAuthSound()
 
   onMounted(() => {
-    error()
     setTimeout(() => {
       emit('finished')
       router.push('/panier')

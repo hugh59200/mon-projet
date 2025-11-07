@@ -6,6 +6,7 @@ import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
+import Vue3GoogleOauth from 'vue3-google-signin'
 import App from './App.vue'
 import router from './router'
 
@@ -17,6 +18,9 @@ app.use(router)
 app.use(MotionPlugin)
 app.use(RegistrationDSComponents)
 app.use(deviceBreakpointPlugin)
+app.use(Vue3GoogleOauth, {
+  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+})
 pinia.use(piniaPluginPersistedstate)
 app.use(directives)
 const auth = useAuthStore()

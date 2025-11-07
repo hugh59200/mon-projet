@@ -16,10 +16,11 @@
 </template>
 
 <script setup lang="ts">
+  import type { IconName } from '@designSystem/fondation/icons/iconsList'
   import * as LucideIcons from 'lucide-vue-next'
   import { computed, type Component } from 'vue'
 
-  export type IconNameNext = keyof typeof LucideIcons
+  export type IconNameNext = keyof typeof LucideIcons | IconName
 
   export type IconColor =
     | 'white'
@@ -127,7 +128,11 @@
 
   // ✅ Sélection dynamique de l’icône Lucide
   const iconComponent = computed(() => {
-    return (LucideIcons[props.name] as Component) || LucideIcons.HelpCircle
+    const capitalizedName = props.name.charAt(0).toUpperCase() + props.name.slice(1)
+    return (
+      (LucideIcons[capitalizedName as keyof typeof LucideIcons] as Component) ||
+      LucideIcons.HelpCircle
+    )
   })
 
   // ✅ Props Lucide dynamiques (jamais de "fill")

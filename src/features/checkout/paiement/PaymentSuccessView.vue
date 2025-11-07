@@ -42,7 +42,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthSound } from '@/features/auth/composables/useAuthSound'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
@@ -53,14 +52,11 @@
 
   const emit = defineEmits(['finished'])
 
-  const { success } = useAuthSound()
   const route = useRoute()
   const router = useRouter()
   const cart = useCartStore()
 
   onMounted(async () => {
-    success()
-
     const sessionId = route.query.session_id as string
     if (!sessionId) return setTimeout(() => emit('finished'), 4000)
 
@@ -87,7 +83,7 @@
       setTimeout(() => {
         emit('finished')
         router.push('/profil/commandes')
-      }, 4000)
+      }, 3000)
     }
   })
 </script>

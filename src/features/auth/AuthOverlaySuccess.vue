@@ -29,14 +29,7 @@
 
 <script setup lang="ts">
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import { onMounted } from 'vue'
   import ProgressBar from '../shared/ProgressBar.vue'
-  import { useAuthSound } from './composables/useAuthSound'
-  const { success } = useAuthSound()
-
-  onMounted(() => {
-    success()
-  })
 </script>
 
 <style scoped lang="less">

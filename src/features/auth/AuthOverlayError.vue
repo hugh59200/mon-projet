@@ -36,13 +36,6 @@
 <script setup lang="ts">
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import { onMounted } from 'vue'
-  import { useAuthSound } from './composables/useAuthSound'
-  const { error } = useAuthSound()
-
-  onMounted(() => {
-    error()
-  })
 </script>
 <style scoped lang="less">
   .auth-error {

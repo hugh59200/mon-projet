@@ -30,23 +30,21 @@
             </div>
           </div>
           <div class="user-texts">
-            <div class="user-header-row">
-              <BasicText
-                size="body-m"
-                weight="bold"
-                color="white"
-                class="user-email"
-              >
-                {{ auth.user?.email || 'Utilisateur' }}
-              </BasicText>
-              <BasicBadge
-                v-if="auth.isAdmin"
-                type="success"
-                size="small"
-                label="Admin"
-                class="user-badge"
-              />
-            </div>
+            <BasicText
+              size="body-m"
+              weight="bold"
+              color="white"
+              class="user-email"
+            >
+              {{ auth.user?.email || 'Utilisateur' }}
+            </BasicText>
+            <BasicBadge
+              v-if="auth.isAdmin"
+              type="success"
+              size="small"
+              label="Admin"
+              class="user-badge"
+            />
           </div>
         </div>
       </div>
@@ -113,17 +111,6 @@
         cursor: pointer;
         border-radius: 8px;
         padding: 6px 8px;
-        transition: all 0.25s ease;
-
-        &:hover {
-          background: fade(white, 6%);
-          transform: translateY(-1px);
-        }
-
-        &:active {
-          background: fade(white, 10%);
-          transform: scale(0.98);
-        }
       }
 
       /* ---------------------- 💻 Desktop ---------------------- */
@@ -139,7 +126,6 @@
           height: 42px;
           border-radius: 50%;
           overflow: hidden;
-          background: fade(white, 8%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -164,23 +150,9 @@
         .user-texts {
           display: flex;
           flex-direction: column;
+          gap: 6px;
           flex: 1;
           min-width: 0;
-
-          .user-header-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-
-            .user-email {
-              word-break: break-all;
-            }
-
-            .user-badge {
-              margin-top: -2px;
-            }
-          }
 
           .user-role {
             margin-top: 2px;
@@ -188,27 +160,5 @@
         }
       }
     }
-  }
-
-  /* 🌫️ Animation d’apparition fluide */
-  .fade-slide-enter-active,
-  .fade-slide-leave-active {
-    transition: all 0.35s ease;
-  }
-  .fade-slide-enter-from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  .fade-slide-enter-to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .fade-slide-leave-from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .fade-slide-leave-to {
-    opacity: 0;
-    transform: translateY(-6px);
   }
 </style>

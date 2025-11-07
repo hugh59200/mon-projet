@@ -9,61 +9,55 @@
     >
       <div class="auth-overlay__backdrop" />
 
-      <transition
-        name="fade-scale"
-        mode="out-in"
-        appear
+      <main
+        class="auth-overlay__container"
+        key="main"
       >
-        <main
-          class="auth-overlay__container"
-          key="main"
-        >
-          <section class="auth-overlay__left">
-            <div class="auth-brand">
-              <div class="auth-brand__header">
-                <img
-                  src="@/assets/logo-app.png"
-                  alt="Logo Fast Peptides"
-                  class="auth-brand__logo"
-                />
-                <h1 class="auth-brand__title">Fast Peptides</h1>
-              </div>
-              <p class="auth-brand__subtitle">
-                Accélérez la recherche biomoléculaire
-                <br />
-                avec précision et élégance 🔬
-              </p>
-              <div class="auth-brand__illustration">
-                <img
-                  src="@/assets/lab-illustration.jpg"
-                  alt="Illustration laboratoire"
-                  class="auth-brand__image"
-                />
-              </div>
+        <section class="auth-overlay__left">
+          <div class="auth-brand">
+            <div class="auth-brand__header">
+              <img
+                src="@/assets/logo-app.png"
+                alt="Logo Fast Peptides"
+                class="auth-brand__logo"
+              />
+              <h1 class="auth-brand__title">Fast Peptides</h1>
             </div>
-          </section>
+            <p class="auth-brand__subtitle">
+              Accélérez la recherche biomoléculaire
+              <br />
+              avec précision et élégance 🔬
+            </p>
+            <div class="auth-brand__illustration">
+              <img
+                src="@/assets/lab-illustration.jpg"
+                alt="Illustration laboratoire"
+                class="auth-brand__image"
+              />
+            </div>
+          </div>
+        </section>
 
-          <section class="auth-overlay__right">
-            <transition
-              name="fade-scale"
-              mode="out-in"
-            >
-              <AuthOverlaySuccess
-                v-if="mode === 'success'"
-                key="success"
-              />
-              <AuthOverlayEmailSent
-                v-else-if="mode === 'signup'"
-                key="signup"
-              />
-              <RouterView
-                v-else
-                key="form"
-              />
-            </transition>
-          </section>
-        </main>
-      </transition>
+        <section class="auth-overlay__right">
+          <AuthOverlaySuccess
+            v-if="mode === 'success'"
+            key="success"
+          />
+
+          <AuthOverlayEmailSent
+            v-else-if="mode === 'signup'"
+            key="signup"
+          />
+
+          <RouterView
+            v-else
+            v-slot="{ Component }"
+            key="form"
+          >
+            <component :is="Component" />
+          </RouterView>
+        </section>
+      </main>
     </div>
   </transition>
 </template>
