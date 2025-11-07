@@ -973,3 +973,7 @@ CREATE POLICY "User can insert own orders"
   TO authenticated
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
+
+  ALTER VIEW public.orders_full_view SET (security_invoker = true);
+GRANT SELECT ON public.orders_full_view TO authenticated;
+

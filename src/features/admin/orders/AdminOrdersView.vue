@@ -142,13 +142,13 @@
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import { updateOrderStatus } from '@/supabase/api/orders'
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
 
+  import { updateOrderStatus } from '@/supabase/api/orders'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
   import OrderCardMobile from './OrderCardMobile.vue'
@@ -186,7 +186,9 @@
     if (!id) return // sécurité
     try {
       localStatuses.value[id] = newStatus
+      console.log(localStatuses.value[id])
       await updateOrderStatus(id, newStatus)
+      console.log('aprés')
       toast.show('Statut mis à jour ✅', 'success')
     } catch (err: any) {
       toast.show(`Erreur : ${err.message}`, 'danger')

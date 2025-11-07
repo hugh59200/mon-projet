@@ -73,7 +73,6 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       const from = (page.value - 1) * limit
       const to = page.value * limit - 1
 
-      // ✅ on utilise le helper ici
       let query = fromRelation(table)
         .select('*', { count: 'exact' })
         .order(sortKey.value, { ascending: sortAsc.value })
@@ -90,7 +89,6 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       data.value = validRows
       total.value = count ?? validRows.length
       nbPages.value = Math.ceil(total.value / limit) || 1
-      hasLoaded.value = true
 
       if (searchFn && search.value) {
         const q = search.value.toLowerCase().trim()
@@ -102,7 +100,9 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       }
     } catch (err) {
       console.error('Erreur fetchData:', err)
+      filteredData.value = [] // ✅ évite que ça reste undefined
     } finally {
+      hasLoaded.value = true // ✅ toujours exécuté, succès ou erreur
       loading.value = false
     }
   }

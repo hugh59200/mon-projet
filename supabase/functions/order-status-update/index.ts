@@ -1,9 +1,21 @@
+// ============================================================
+// 🔧 Chargement des variables d'environnement AVANT TOUT
+// ============================================================
+import { load } from 'https://deno.land/std@0.224.0/dotenv/mod.ts'
+await load({ envPath: new URL('./.env', import.meta.url).pathname })
+
+// ============================================================
+// 📦 Imports des dépendances
+// ============================================================
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getStatusMessage } from '../../utils/getStatusMessage.ts'
 import { logEmail } from '../../utils/logEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
+// ============================================================
+// 🧾 Types
+// ============================================================
 type OrderStatusPayload = {
   order_id: string
   status: string
@@ -13,6 +25,9 @@ type OrderStatusPayload = {
   tracking_number?: string
 }
 
+// ============================================================
+// 🌍 CORS
+// ============================================================
 function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
@@ -21,16 +36,34 @@ function corsHeaders() {
   }
 }
 
+// ============================================================
+// 🚀 Serveur Deno local
+// ============================================================
+console.log('🚀 Listening on http://localhost:8000')
+console.log('🔑 ENV LOADED:', {
+  RESEND_API_KEY: Deno.env.get('RESEND_API_KEY') ? '✅' : '❌',
+  // RESEND_API_KEY: Deno.env.get('RESEND_API_KEY') ? '✅' : '❌',
+  SUPABASE_URL: Deno.env.get('SUPABASE_URL') ? '✅' : '❌',
+  SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ? '✅' : '❌',
+  ENV: Deno.env.get('ENV'),
+})
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders() })
 
   try {
+    // ✅ Récupération des variables d’environnement
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     const env = Deno.env.get('ENV') || 'development'
 
+    if (!resendApiKey) throw new Error('RESEND_API_KEY is missing')
+    if (!supabaseUrl) throw new Error('SUPABASE_URL is required')
+    if (!supabaseKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is required')
+
     const supabase = createClient(supabaseUrl, supabaseKey)
+
     const { order_id, status, email, full_name, carrier, tracking_number }: OrderStatusPayload =
       await req.json()
 
@@ -38,6 +71,7 @@ serve(async (req) => {
     const html = renderEmailTemplate('status_update', { full_name, message, status })
 
     const fromEmail = env === 'production' ? 'contact@peptidestore.com' : 'onboarding@resend.dev'
+
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -54,6 +88,9 @@ serve(async (req) => {
 
     const providerResponse = await resendRes.json()
 
+    console.log('📤 Resend response:', providerResponse)
+    console.log('📤 resendApiKey:', resendApiKey)
+
     await logEmail({
       order_id,
       to_email: email,
@@ -64,7 +101,6 @@ serve(async (req) => {
       status: resendRes.ok ? 'sent' : 'error',
     })
 
-    // 🪵 (optionnel) log interne Supabase
     await supabase.from('order_status_logs').insert({
       order_id,
       status,

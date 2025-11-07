@@ -163,13 +163,23 @@
   async function loadOrder() {
     if (!props.orderId) return
     const { data, error } = await supabase
-      .from('orders')
+      .from('orders_full_view')
       .select('*')
-      .eq('id', props.orderId)
+      .eq('order_id', props.orderId)
       .single()
-    if (error) return toast.show('Erreur de chargement', 'danger')
+
+    if (error) {
+      console.error('Erreur loadOrder:', error)
+      toast.show('Erreur de chargement', 'danger')
+      return
+    }
+
     order.value = data
-    if (typeof order.value.items === 'string') order.value.items = JSON.parse(order.value.items)
+    if (typeof order.value.detailed_items === 'string') {
+      order.value.items = JSON.parse(order.value.detailed_items)
+    } else {
+      order.value.items = order.value.detailed_items
+    }
     selectedStatus.value = order.value.status
   }
 
@@ -177,7 +187,7 @@
     const { error } = await supabase
       .from('orders')
       .update({ status: selectedStatus.value })
-      .eq('id', order.value.id)
+      .eq('id', order.value.order_id ?? order.value.id)
     if (error) toast.show('Erreur ⚠️', 'danger')
     else toast.show('Statut mis à jour ✅', 'success')
   }

@@ -39,12 +39,18 @@
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
 
+  const emit = defineEmits(['finished'])
+  const router = useRouter()
   const { error } = useAuthSound()
 
   onMounted(() => {
-    // 🔊 petit son d’erreur (optionnel, cohérent avec AuthError)
     error()
+    setTimeout(() => {
+      emit('finished')
+      router.push('/panier')
+    }, 4000)
   })
 </script>
 

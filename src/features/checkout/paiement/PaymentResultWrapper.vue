@@ -18,7 +18,7 @@
           class="payment-overlay__container"
           key="main"
         >
-          <!-- Partie gauche : illustration -->
+          <!-- Partie gauche -->
           <section class="payment-overlay__left">
             <div class="payment-brand">
               <div class="payment-brand__header">
@@ -30,11 +30,7 @@
                 <h1 class="payment-brand__title">Fast Peptides</h1>
               </div>
 
-              <p class="payment-brand__subtitle">
-                Paiement sécurisé et vérifié par Stripe 🔒
-                <br />
-                Vos transactions sont 100 % chiffrées.
-              </p>
+              <p class="payment-brand__subtitle">Paiement sécurisé et vérifié par Stripe 🔒</p>
 
               <div class="payment-brand__illustration">
                 <img
@@ -46,25 +42,18 @@
             </div>
           </section>
 
-          <!-- Partie droite : contenu dynamique -->
           <section class="payment-overlay__right">
-            <transition
-              name="fade-scale"
-              mode="out-in"
-            >
-              <PaymentSuccessView
-                v-if="mode === 'success'"
-                key="success"
-              />
-              <PaymentCancelView
-                v-else-if="mode === 'cancel'"
-                key="cancel"
-              />
-              <RouterView
-                v-else
-                key="fallback"
-              />
-            </transition>
+            <router-view v-slot="{ Component }">
+              <transition
+                name="fade-scale"
+                mode="out-in"
+              >
+                <component
+                  :is="Component"
+                  @finished="handleFinish"
+                />
+              </transition>
+            </router-view>
           </section>
         </main>
       </transition>
@@ -73,29 +62,17 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import PaymentCancelView from './PaymentCancelView.vue'
-  import PaymentSuccessView from './PaymentSuccessView.vue'
+  import { ref } from 'vue'
 
-  const route = useRoute()
   const visible = ref(true)
-  const mode = ref<'pending' | 'success' | 'cancel'>('pending')
 
-  onMounted(() => {
-    // Détermine le mode selon la route
-    switch (route.name) {
-      case 'PaymentSuccess':
-        mode.value = 'success'
-        setTimeout(() => (visible.value = false), 4000)
-        break
-      case 'PaymentCancel':
-        mode.value = 'cancel'
-        break
-      default:
-        mode.value = 'pending'
-    }
-  })
+  /**
+   * Événement émis par les pages enfants (success/cancel)
+   * quand le flux de paiement est terminé.
+   */
+  function handleFinish() {
+    setTimeout(() => (visible.value = false), 500) // animation de sortie douce
+  }
 </script>
 
 <style scoped lang="less">

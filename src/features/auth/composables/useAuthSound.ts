@@ -1,23 +1,39 @@
-// Petit hook pour générer des sons avec Web Audio API
+// ✅ Hook audio compatible Chrome / Safari 2025
+let ctx: AudioContext | null = null
+
+function getContext() {
+  if (!ctx) ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+  if (ctx.state === 'suspended') ctx.resume()
+  return ctx
+}
+
 export function useAuthSound() {
+  // 🔹 Initialise le contexte audio après un clic utilisateur
+  if (typeof window !== 'undefined') {
+    document.addEventListener(
+      'click',
+      () => {
+        if (!ctx) getContext()
+      },
+      { once: true },
+    )
+  }
+
   const playTone = (frequency: number, duration = 0.3, type: OscillatorType = 'sine') => {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+      const audio = getContext()
+      const osc = audio.createOscillator()
+      const gain = audio.createGain()
 
       osc.type = type
       osc.frequency.value = frequency
       gain.gain.value = 0.08 // volume doux
 
       osc.connect(gain)
-      gain.connect(ctx.destination)
+      gain.connect(audio.destination)
 
       osc.start()
-      osc.stop(ctx.currentTime + duration)
-
-      // auto-close
-      osc.onended = () => ctx.close()
+      osc.stop(audio.currentTime + duration)
     } catch (e) {
       console.warn('Audio playback failed:', e)
     }

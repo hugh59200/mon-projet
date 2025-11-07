@@ -43,15 +43,52 @@
 
 <script setup lang="ts">
   import { useAuthSound } from '@/features/auth/composables/useAuthSound'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import ProgressBar from '@/features/shared/ProgressBar.vue'
+  import { supabase } from '@/supabase/supabaseClient'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+
+  const emit = defineEmits(['finished'])
 
   const { success } = useAuthSound()
+  const route = useRoute()
+  const router = useRouter()
+  const cart = useCartStore()
 
-  onMounted(() => {
-    success() // 🔊 Petit son de confirmation
+  onMounted(async () => {
+    success()
+
+    const sessionId = route.query.session_id as string
+    if (!sessionId) return setTimeout(() => emit('finished'), 4000)
+
+    try {
+      const { data: order } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('stripe_session_id', sessionId)
+        .maybeSingle()
+
+      if (order) {
+        const mail = fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-confirmation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify(order),
+        })
+
+        await Promise.allSettled([mail, cart.clearCart()])
+      }
+    } finally {
+      setTimeout(() => {
+        emit('finished')
+        router.push('/profil/commandes')
+      }, 4000)
+    }
   })
 </script>
 

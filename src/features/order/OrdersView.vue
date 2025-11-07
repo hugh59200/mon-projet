@@ -440,6 +440,7 @@
 
 <style scoped lang="less">
   .user-orders {
+    margin: 0 auto;
     max-width: 950px;
     padding: 0 20px;
     display: flex;

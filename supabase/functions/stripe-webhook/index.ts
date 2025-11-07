@@ -16,13 +16,8 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2025-09-30.clover' })
 const resend = new Resend(RESEND_API_KEY)
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-  global: {
-    headers: { Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
-  },
+  auth: { persistSession: false, autoRefreshToken: false },
+  global: { headers: { Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
 })
 
 // =========================================================
@@ -30,7 +25,6 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 // =========================================================
 async function sendAndLogEmail(to: string, amount: number, sessionId: string, orderId?: string) {
   const html = renderEmailTemplate('payment', { amount, sessionId })
-
   const response = await resend.emails.send({
     from: 'Fast Peptides <no-reply@fastpeptides.com>',
     to,
@@ -38,7 +32,6 @@ async function sendAndLogEmail(to: string, amount: number, sessionId: string, or
     html,
   })
 
-  // Log dans emails_sent
   await logEmail({
     order_id: orderId,
     to_email: to,
@@ -48,6 +41,8 @@ async function sendAndLogEmail(to: string, amount: number, sessionId: string, or
     provider_response: response,
     status: 'sent',
   })
+
+  console.log(`📨 Email loggé : ${to} (payment)`)
 }
 
 // =========================================================
@@ -60,12 +55,17 @@ serve(async (req) => {
       return new Response('❌ Signature manquante', { status: 400 })
     }
 
-    const rawBody = await req.text()
+    // ✅ Fix Stripe : utiliser le RAW body
+    const rawBody = await req.arrayBuffer()
+    const payload = new TextDecoder().decode(rawBody)
+
     const event = await stripe.webhooks.constructEventAsync(
-      rawBody,
+      payload,
       signature,
       STRIPE_WEBHOOK_SECRET,
     )
+
+    console.log(`🔥 Webhook Stripe reçu : ${event.type}`)
 
     if (event.type !== 'checkout.session.completed') {
       return new Response('✅ Ignored non-checkout event', { status: 200 })
@@ -89,7 +89,6 @@ serve(async (req) => {
     if (selectError) throw new Error(`Erreur SELECT : ${selectError.message}`)
 
     if (existingOrder) {
-      // ✅ Mise à jour de la commande existante
       console.log('🔁 Update commande existante...')
       const { error: updateError } = await supabase
         .from('orders')
@@ -99,10 +98,8 @@ serve(async (req) => {
           updated_at: new Date().toISOString(),
         })
         .eq('stripe_session_id', sessionId)
-
       if (updateError) throw new Error(`Erreur UPDATE : ${updateError.message}`)
     } else {
-      // 🆕 Création d’une nouvelle commande
       console.log('🆕 Insertion nouvelle commande...')
       const { error: insertError } = await supabase.from('orders').insert({
         stripe_session_id: sessionId,
@@ -113,14 +110,10 @@ serve(async (req) => {
         full_name: fullName,
         payment_method: 'stripe',
       })
-
       if (insertError) throw new Error(`Erreur INSERT : ${insertError.message}`)
     }
 
-    // Envoi e-mail
-    if (email) {
-      await sendAndLogEmail(email, totalAmount, sessionId, existingOrder?.id)
-    }
+    if (email) await sendAndLogEmail(email, totalAmount, sessionId, existingOrder?.id)
 
     console.log('✅ Paiement traité avec succès !')
     return new Response('OK', { status: 200 })
