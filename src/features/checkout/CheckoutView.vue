@@ -275,13 +275,13 @@
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
-            user_id: auth.user.id, // ✅ obligatoire pour passer la policy
+            user_id: auth.user.id,
             email: auth.user.email ?? '',
             full_name: fullName.value || '',
-            address: address.value || '',
-            zip: zip.value || '',
-            city: city.value || '',
-            country: country.value || '',
+            address: address.value,
+            zip: zip.value,
+            city: city.value,
+            country: country.value,
             payment_method: selectedPayment.value,
             total_amount: cart.totalPrice,
             items: cart.items,
@@ -292,10 +292,12 @@
 
         if (orderError || !order) throw orderError
 
+        // ✅ envoi orderId à Stripe
         const payment = await processPayment(
           cart.totalPrice,
           selectedPayment.value,
           auth.user.email,
+          order.id,
         )
         if (selectedPayment.value === 'stripe') return
 

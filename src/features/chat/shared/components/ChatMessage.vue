@@ -48,15 +48,15 @@
 </template>
 
 <script setup lang="ts">
+  import type { Messages } from '@/supabase/types/supabase.types'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import type { IconColor } from '@designSystem/index'
   import { computed, watchEffect } from 'vue'
-  import type { Message } from '../types/chat'
 
   /* ---------------------- Props ---------------------- */
   const props = defineProps<{
-    message: Message
+    message: Messages
     isMine: boolean
     isGrouped?: boolean
   }>()

@@ -6,7 +6,6 @@
     }"
     class="payment-success"
   >
-    <!-- ✅ Icône animée -->
     <div class="payment-success__icon-wrapper">
       <BasicIconNext
         name="CheckCircle2"
@@ -23,13 +22,11 @@
       <strong>Fast Peptides</strong>
       !
       <br />
-      Votre paiement a bien été validé et votre commande est en préparation.
+      Votre paiement est validé et votre commande est en préparation.
     </p>
 
-    <!-- Barre de progression -->
     <ProgressBar color="success" />
 
-    <!-- CTA -->
     <BasicButton
       label="Voir mes commandes"
       type="primary"
@@ -45,46 +42,111 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
+  import type { TablesUpdate } from '@/supabase/types/supabase'
+  import type { Orders } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const emit = defineEmits(['finished'])
-
   const route = useRoute()
   const router = useRouter()
   const cart = useCartStore()
 
   onMounted(async () => {
+    console.log('✅ PaymentSuccess mounted')
+
     const sessionId = route.query.session_id as string
-    if (!sessionId) return setTimeout(() => emit('finished'), 4000)
+    console.log('🔍 session_id trouvé :', sessionId)
+
+    if (!sessionId) {
+      console.warn('❌ Aucun session_id dans URL')
+      return setTimeout(() => emit('finished'), 4000)
+    }
 
     try {
-      const { data: order } = await supabase
+      console.log('🛠 SELECT commande where stripe_session_id =', sessionId)
+
+      const { data: order, error } = await supabase
         .from('orders')
         .select('*')
         .eq('stripe_session_id', sessionId)
-        .maybeSingle()
+        .maybeSingle<Orders>()
 
-      if (order) {
-        const mail = fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-confirmation`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify(order),
-        })
+      console.log('🔎 Résultat SELECT orders:', { order, error })
 
-        await Promise.allSettled([mail, cart.clearCart()])
+      // ✅ CAS 1 — Ke webhook n'est pas encore passé
+      if (!order) {
+        console.warn(
+          '⏳ Aucun order trouvé — webhook lent ? On vérifie en cherchant un order pending sans session_id',
+        )
+
+        const { data: fallbackOrder } = await supabase
+          .from('orders')
+          .select('*')
+          .is('stripe_session_id', null)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle<Orders>()
+
+        if (fallbackOrder) {
+          console.log('✅ Fallback trouvé :', fallbackOrder)
+
+          // ✅ On complète la session Stripe
+          await supabase
+            .from('orders')
+            .update({
+              stripe_session_id: sessionId,
+              status: 'paid',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', fallbackOrder.id)
+
+          console.log('✅ Session attachée + statut paid')
+        }
       }
-    } finally {
-      setTimeout(() => {
-        emit('finished')
-        router.push('/profil/commandes')
-      }, 3000)
+
+      // ✅ CAS 2 — Order trouvé mais pas encore "paid"
+      if (order && order.status === 'pending') {
+        console.log('⚠️ Order trouvé mais encore pending, on corrige')
+
+        await supabase
+          .from('orders')
+          .update<TablesUpdate<'orders'>>({
+            status: 'paid',
+            stripe_session_id: sessionId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', order.id)
+
+        console.log('✅ Statut corrigé → paid')
+      }
+
+      // ✅ Clear cart + email
+      console.log('📨 Envoi email & clear cart...')
+      const mail = fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-confirmation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify(order),
+      })
+
+      const clear = cart.clearCart()
+      await Promise.allSettled([mail, clear])
+      console.log('✅ Email + Clear cart terminés')
+    } catch (err) {
+      console.error('💥 Erreur PaymentSuccess :', err)
     }
+
+    console.log('🔁 Redirection dans 3s...')
+    setTimeout(() => {
+      emit('finished')
+      router.push('/profil/commandes')
+    }, 3000)
   })
 </script>
 

@@ -73,14 +73,15 @@
 </template>
 
 <script setup lang="ts">
+  import type { Messages } from '@/supabase/types/supabase.types'
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-  import type { ChatRole, Message } from '../types/chat'
+  import type { ChatRole } from '../types/chat'
   import ChatInput from './ChatInput.vue'
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
 
   const props = defineProps<{
-    messages: Message[]
+    messages: Messages[]
     isTyping: boolean
     loading?: boolean
     currentRole: ChatRole

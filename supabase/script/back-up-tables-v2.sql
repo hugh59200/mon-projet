@@ -977,3 +977,5 @@ CREATE POLICY "User can insert own orders"
   ALTER VIEW public.orders_full_view SET (security_invoker = true);
 GRANT SELECT ON public.orders_full_view TO authenticated;
 
+ALTER TABLE orders
+ADD CONSTRAINT unique_stripe_session UNIQUE (stripe_session_id);

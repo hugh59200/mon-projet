@@ -1,15 +1,12 @@
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables } from '@/supabase/types/supabase'
-
-export type NewsArticle = Tables<'news'>
-export type NewsTopic = Tables<'news_topics'>
+import type { News, NewsTopics } from '@/supabase/types/supabase.types'
 
 /**
  * 📦 Récupère toutes les actualités avec leur topic
  */
 export async function fetchNews(
   topicId?: string,
-): Promise<(NewsArticle & { topic: NewsTopic | null })[]> {
+): Promise<(News & { topic: NewsTopics | null })[]> {
   let query = supabase
     .from('news')
     .select('*, topic:news_topics(*)')
@@ -27,7 +24,7 @@ export async function fetchNews(
  */
 export async function fetchNewsBySlug(
   slug: string,
-): Promise<(NewsArticle & { topic: NewsTopic | null }) | null> {
+): Promise<(News & { topic: NewsTopics | null }) | null> {
   const { data, error } = await supabase
     .from('news')
     .select('*, topic:news_topics(*)')
@@ -41,7 +38,7 @@ export async function fetchNewsBySlug(
 /**
  * 📚 Récupère la liste des topics disponibles
  */
-export async function fetchNewsTopics(): Promise<NewsTopic[]> {
+export async function fetchNewsTopics(): Promise<NewsTopics[]> {
   const { data, error } = await supabase.from('news_topics').select('*').order('id')
   if (error) throw error
   return data

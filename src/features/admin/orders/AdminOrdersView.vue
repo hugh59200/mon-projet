@@ -142,8 +142,7 @@
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import type { Tables } from '@/supabase/types/supabase'
-  import type { OrderStatus } from '@/supabase/types/supabase.types'
+  import type { OrdersOverviewForAdmin, OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
@@ -178,10 +177,7 @@
   })
 
   // 🧩 Mise à jour du statut
-  async function handleStatusChange(
-    order: Tables<'orders_overview_for_admin'>,
-    newStatus: OrderStatus,
-  ) {
+  async function handleStatusChange(order: OrdersOverviewForAdmin, newStatus: OrderStatus) {
     const id = order.order_id ?? ''
     if (!id) return // sécurité
     try {

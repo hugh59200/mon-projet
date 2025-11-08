@@ -100,8 +100,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { NewsArticle } from '@/features/actualités/api/news'
   import { fetchNews, fetchNewsBySlug } from '@/features/actualités/api/news'
+  import type { News } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
   import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
@@ -110,8 +110,8 @@
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
-  const article = ref<NewsArticle | null>(null)
-  const relatedArticles = ref<NewsArticle[]>([])
+  const article = ref<News | null>(null)
+  const relatedArticles = ref<News[]>([])
   const route = useRoute()
 
   const parsedContent = computed(() =>

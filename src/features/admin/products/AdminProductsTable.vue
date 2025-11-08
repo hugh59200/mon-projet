@@ -189,7 +189,7 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { deleteProduct } from '@/supabase/api/products'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { Products } from '@/supabase/types/supabase.types'
   import { formatCurrency } from '@/utils/index'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -198,8 +198,6 @@
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
   import ProductCardMobileReadonly from './readonly/ProductCardMobileReadonly.vue'
-
-  type ProductRow = Tables<'products'>
 
   const props = defineProps<{ readonly?: boolean }>()
 
@@ -215,7 +213,7 @@
         (p.category?.toLowerCase()?.includes(q) ?? false),
     })
 
-  async function handleDelete(product: ProductRow) {
+  async function handleDelete(product: Products) {
     if (props.readonly) return
     if (!confirm(`Supprimer ${product.name} ?`)) return
     try {

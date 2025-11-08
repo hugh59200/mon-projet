@@ -1,18 +1,17 @@
 import router from '@/router'
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables } from '@/supabase/types/supabase'
+import type { Profiles } from '@/supabase/types/supabase.types'
 import type { User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-export type Profile = Tables<'profiles'>
 export type Providers = 'google' | 'github' | 'facebook'
 
-type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
+type UserRole = NonNullable<Profiles['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
-  const profile = ref<Profile | null>(null)
+  const profile = ref<Profiles | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
   let refreshInterval: number | null = null

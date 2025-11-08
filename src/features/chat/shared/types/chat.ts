@@ -2,8 +2,6 @@
 /* 🧠  Types centraux du module "Support Chat"                                */
 /* -------------------------------------------------------------------------- */
 
-import type { Tables } from '@/supabase/types/supabase'
-
 /* -------------------------------------------------------------------------- */
 /* 🎭 Rôles et événements                                                     */
 /* -------------------------------------------------------------------------- */
@@ -19,18 +17,6 @@ export const TypingEventMap: Record<ChatRole, TypingEvent> = {
   admin: 'admin_typing',
   user: 'user_typing',
 }
-
-/* -------------------------------------------------------------------------- */
-/* 💬 Messages et conversations                                               */
-/* -------------------------------------------------------------------------- */
-
-/**
- * ✅ Type généré automatiquement depuis la table Supabase `messages`
- * (utile pour éviter les erreurs de schéma)
- */
-export type Message = Tables<'messages'>
-
-export type Conversation = Tables<'conversations'>
 
 /** Vue SQL : conversation_overview */
 export type ConversationOverview = {

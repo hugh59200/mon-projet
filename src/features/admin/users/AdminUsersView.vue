@@ -143,8 +143,8 @@
   import { ROLES } from '@/features/admin/constants/users'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
-  import { deleteUser, updateUserRole, type Users } from '@/supabase/api/users'
-  import type { Role } from '@/supabase/types/supabase.types'
+  import { deleteUser, updateUserRole } from '@/supabase/api/users'
+  import type { Profiles, Role } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watch } from 'vue'
@@ -194,7 +194,7 @@
     { immediate: true },
   )
 
-  async function handleRoleChange(user: Users, newRole: Role) {
+  async function handleRoleChange(user: Profiles, newRole: Role) {
     try {
       await updateUserRole(user.id, newRole)
       toast.show('Rôle mis à jour ✅', 'success')
@@ -203,7 +203,7 @@
     }
   }
 
-  async function handleDelete(user: Users) {
+  async function handleDelete(user: Profiles) {
     if (!confirm(`Supprimer ${user.email} ?`)) return
     try {
       await deleteUser(user.id)

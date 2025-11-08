@@ -80,7 +80,7 @@
   import { deleteTopic } from '@/features/admin/api/topics'
   import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { NewsTopics } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -90,7 +90,6 @@
   import AdminTopicModal from './modale/AdminTopicModal.vue'
 
   const toast = useToastStore()
-  type NewsTopic = Tables<'news_topics'>
 
   const { filteredData, loading, hasLoaded, fetchData, reset, search } =
     useAdminTable<'news_topics'>({
@@ -100,7 +99,7 @@
       searchFn: (t, q) => t.label?.toLowerCase()?.includes(q) ?? false,
     })
 
-  async function handleDelete(topic: NewsTopic) {
+  async function handleDelete(topic: NewsTopics) {
     if (!confirm(`Supprimer le topic "${topic.label}" ?`)) return
     try {
       if (topic.image) {

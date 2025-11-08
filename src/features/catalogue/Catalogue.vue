@@ -171,11 +171,11 @@
   import { useProducts } from '@/features/catalogue/composables/useProducts'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import type { Products } from '@/supabase/types/supabase.types'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
-  import type { Product } from './types/product'
 
   const { isMobile } = useDeviceBreakpoint()
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
@@ -216,7 +216,7 @@
     router.push(`/catalogue/${id}`)
   }
 
-  function addToCart(p: Product) {
+  function addToCart(p: Products) {
     cart.addToCart(p)
     showAddToCartToast(p)
   }

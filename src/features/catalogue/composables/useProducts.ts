@@ -1,7 +1,7 @@
 import { supabase } from '@/supabase/supabaseClient'
+import type { Products } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { computed, ref } from 'vue'
-import type { Product } from '../types/product'
 
 /**
  * Type pour la plage de prix (slider)
@@ -24,7 +24,7 @@ export function useProducts() {
   const toast = useToastStore()
 
   // 🌐 Données
-  const products = ref<Product[]>([])
+  const products = ref<Products[]>([])
   const loading = ref(false)
   const hasLoaded = ref(false)
 
@@ -48,7 +48,7 @@ export function useProducts() {
       if (error) throw error
 
       // 🔧 Normalisation typée et sécurisée
-      const rows: Product[] = (data || []).map((r) => ({
+      const rows: Products[] = (data || []).map((r) => ({
         ...r,
         price: typeof r.price === 'string' ? parseFloat(r.price) : (r.price as number),
         purity:

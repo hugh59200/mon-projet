@@ -78,17 +78,15 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { Products } from '@/supabase/types/supabase.types'
   import MobileCard from '../../mobile/MobileCard.vue'
 
-  type ProductRow = Tables<'products'>
-
   defineProps<{
-    product: ProductRow
+    product: Products
     formatCurrency: (a: number | null) => string
     openProductModal: (id: string) => void
     editProduct: (id: string) => void
-    handleDelete: (p: ProductRow) => void
+    handleDelete: (p: Products) => void
   }>()
 </script>
 

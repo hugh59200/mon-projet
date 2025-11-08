@@ -1,10 +1,9 @@
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables, TablesInsert } from '@/supabase/types/supabase'
-
-export type NewsTopic = Tables<'news_topics'>
+import type { TablesInsert } from '@/supabase/types/supabase'
+import type { NewsTopics } from '@/supabase/types/supabase.types'
 
 /** 📦 Liste des topics */
-export async function fetchTopics(): Promise<NewsTopic[]> {
+export async function fetchTopics(): Promise<NewsTopics[]> {
   const { data, error } = await supabase
     .from('news_topics')
     .select('*')
@@ -14,14 +13,16 @@ export async function fetchTopics(): Promise<NewsTopic[]> {
 }
 
 /** 🔎 Topic par ID */
-export async function fetchTopicById(id: string): Promise<NewsTopic | null> {
+export async function fetchTopicById(id: string): Promise<NewsTopics | null> {
   const { data, error } = await supabase.from('news_topics').select('*').eq('id', id).maybeSingle()
   if (error) throw new Error(`Erreur Supabase : ${error.message}`)
   return data
 }
 
 /** ➕ Création d’un topic */
-export async function createTopic(topic: Partial<TablesInsert<'news_topics'>>): Promise<NewsTopic> {
+export async function createTopic(
+  topic: Partial<TablesInsert<'news_topics'>>,
+): Promise<NewsTopics> {
   if (!topic.label) throw new Error('Le champ "label" est obligatoire pour créer un topic')
 
   const slug = topic.label

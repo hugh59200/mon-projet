@@ -1,8 +1,9 @@
 import { supabase } from '@/supabase/supabaseClient'
+import type { Messages } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { ref } from 'vue'
 import { chatApi } from '../services/chatApi'
-import type { ChatRole, Message } from '../types/chat'
+import type { ChatRole } from '../types/chat'
 import type { useScrollMessages } from './useScrollMessages'
 
 const PAGE_SIZE = 30
@@ -31,7 +32,7 @@ export function useChatMessages({
   onMarkedRead,
   scroll,
 }: UseChatMessagesOptions) {
-  const messages = ref<Message[]>([])
+  const messages = ref<Messages[]>([])
   const isMessagesLoading = ref(false)
   const hasMore = ref(true)
   const oldest = ref<string | null>(null)
@@ -46,7 +47,7 @@ export function useChatMessages({
   // anti-race sur fetchInitialMessages
   let lastFetchTarget: string | null = null
 
-  const ingest = (m: Message) => {
+  const ingest = (m: Messages) => {
     if (!m?.id) return
     const key = keyOf(m.id)
     if (seenIds.has(key)) {
@@ -91,7 +92,7 @@ export function useChatMessages({
 
       messages.value = []
       seenIds.clear()
-      list.forEach((m) => ingest(m as Message))
+      list.forEach((m) => ingest(m as Messages))
 
       hasMore.value = list.length === PAGE_SIZE
       oldest.value = list[0]?.created_at ?? null
@@ -130,7 +131,7 @@ export function useChatMessages({
           const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
           return dateA - dateB
         })
-        .map((m) => m as Message)
+        .map((m) => m as Messages)
 
       // insère en tête dans l'ordre et enregistre dans seenIds
       toPrepend.forEach((m: any) => {
@@ -204,7 +205,7 @@ export function useChatMessages({
       async (payload) => {
         const msg = payload.new as RealtimeMessageRow
         if (!msg?.user_id) return
-        ingest(msg as unknown as Message)
+        ingest(msg as unknown as Messages)
         await scroll?.scrollToEnd(true)
         markRead()
       },

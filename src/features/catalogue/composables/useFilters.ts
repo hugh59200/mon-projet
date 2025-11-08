@@ -1,7 +1,5 @@
-import type { Tables } from '@/supabase/types/supabase'
+import type { Products } from '@/supabase/types/supabase.types'
 import { computed, ref, type Ref } from 'vue'
-
-type Product = Tables<'products'>
 
 type Range = {
   min: number
@@ -14,7 +12,7 @@ type Range = {
 /**
  * Gère les filtres dynamiques du catalogue (prix, stock, tags, catégories)
  */
-export function useFilters(products: Ref<Product[]>, priceRange: Ref<Range>) {
+export function useFilters(products: Ref<Products[]>, priceRange: Ref<Range>) {
   // 🧭 États des filtres
   const selectedCategories = ref<string[]>([])
   const inStockOnly = ref(false)
@@ -61,7 +59,7 @@ export function useFilters(products: Ref<Product[]>, priceRange: Ref<Range>) {
   const stockCount = computed(() => priceFiltered.value.filter((p) => !!p.stock).length)
 
   // 🧮 Filtrage combiné
-  const filteredProducts = computed<Product[]>(() => {
+  const filteredProducts = computed<Products[]>(() => {
     return priceFiltered.value.filter((p) => {
       const catOk =
         selectedCategories.value.length === 0 || selectedCategories.value.includes(p.category ?? '')

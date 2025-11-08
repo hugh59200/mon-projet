@@ -1,9 +1,9 @@
 // src/features/actualités/api/news.ts
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables, TablesInsert } from '@/supabase/types/supabase'
+import type { TablesInsert } from '@/supabase/types/supabase'
+import type { News, NewsTopics } from '@/supabase/types/supabase.types'
 
-export type NewsArticle = Tables<'news'>
-export type NewsWithTopic = NewsArticle & { topic?: Tables<'news_topics'> | null }
+export type NewsWithTopic = News & { topic?: NewsTopics | null }
 
 /**
  * 📦 Récupère toutes les actualités, éventuellement filtrées par topic_id
@@ -52,7 +52,7 @@ export async function fetchNewsById(id: string): Promise<NewsWithTopic | null> {
 /**
  * ➕ Crée une nouvelle actualité
  */
-export async function createNews(article: TablesInsert<'news'>): Promise<NewsArticle> {
+export async function createNews(article: TablesInsert<'news'>): Promise<News> {
   const { data, error } = await supabase.from('news').insert(article).select().single()
   if (error) throw new Error(`Erreur création actualité : ${error.message}`)
   return data
@@ -61,7 +61,7 @@ export async function createNews(article: TablesInsert<'news'>): Promise<NewsArt
 /**
  * ✏️ Met à jour une actualité
  */
-export async function updateNews(id: string, updates: Partial<NewsArticle>): Promise<boolean> {
+export async function updateNews(id: string, updates: Partial<News>): Promise<boolean> {
   const { error } = await supabase.from('news').update(updates).eq('id', id)
   if (error) throw new Error(`Erreur mise à jour actualité : ${error.message}`)
   return true

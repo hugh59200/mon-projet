@@ -1,7 +1,8 @@
-import { useAuthStore, type Profile } from '@/features/auth/stores/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
 import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/supabase/supabaseClient'
+import type { Profiles } from '@/supabase/types/supabase.types'
 import type { Router } from 'vue-router'
 
 export function registerBaseGuard(router: Router) {
@@ -47,7 +48,7 @@ export function registerBaseGuard(router: Router) {
         cgu_accepted: profile.cgu_accepted || false,
         cgu_accepted_at: profile.cgu_accepted_at || null,
         created_at: profile.created_at || null,
-      } as Profile
+      } as Profiles
     }
 
     // 4️⃣ CGU popup obligatoire

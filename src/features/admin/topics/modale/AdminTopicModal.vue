@@ -85,7 +85,7 @@
   import { createTopic, fetchTopicById, updateTopic } from '@/features/admin/api/topics'
   import { useTopicImageHandler } from '@/features/admin/topics/composables/useTopicImageHandler'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { NewsTopics } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -100,8 +100,7 @@
   const toast = useToastStore()
   const loading = ref(false)
 
-  // 🧾 Formulaire typé selon la table Supabase
-  const form = ref<Pick<Tables<'news_topics'>, 'label' | 'image'>>({
+  const form = ref<Pick<NewsTopics, 'label' | 'image'>>({
     label: '',
     image: null,
   })

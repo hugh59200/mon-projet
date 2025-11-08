@@ -1,9 +1,10 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
+import type { Messages } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { computed, ref } from 'vue'
 import { chatApi } from '../services/chatApi'
-import type { ConversationOverview, Message } from '../types/chat'
+import type { ConversationOverview } from '../types/chat'
 
 interface ExtendedConversation extends ConversationOverview {
   last_message_short: string
@@ -102,7 +103,7 @@ export function useChatConversations() {
     messagesChannel.on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
-      (payload: RealtimePostgresInsertPayload<Message>) => {
+      (payload: RealtimePostgresInsertPayload<Messages>) => {
         const msg = payload.new
         const uid = msg.user_id
         if (!uid) return

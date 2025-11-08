@@ -9,15 +9,10 @@
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
-import type { Tables } from '@/supabase/types/supabase'
+import type { CartItems, CartView, Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-
-// Typage automatique généré par Supabase
-type CartItem = Tables<'user_cart_view'>
-type CartRow = Tables<'user_cart_items'>
-type Product = Tables<'products'>
 
 export const useCartStore = defineStore('cart', () => {
   const auth = useAuthStore()
@@ -25,7 +20,7 @@ export const useCartStore = defineStore('cart', () => {
   // ============================================================
   // 💾 État
   // ============================================================
-  const items = ref<CartItem[]>([])
+  const items = ref<CartView[]>([])
   const isSyncing = ref(false)
   let channel: RealtimeChannel | null = null
 
@@ -68,7 +63,7 @@ export const useCartStore = defineStore('cart', () => {
   // ============================================================
   // 📤 Synchronisation (insert / update / delete)
   // ============================================================
-  async function addToCart(product: Product) {
+  async function addToCart(product: Products) {
     const userId = auth.user?.id
     if (!userId) return
 
@@ -78,7 +73,7 @@ export const useCartStore = defineStore('cart', () => {
       return
     }
 
-    const payload: Omit<CartRow, 'id' | 'updated_at'> = {
+    const payload: Omit<CartItems, 'id' | 'updated_at'> = {
       user_id: userId,
       product_id: product.id,
       quantity: 1,

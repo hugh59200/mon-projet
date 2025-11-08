@@ -1,8 +1,5 @@
 import { supabase } from '../supabaseClient'
-import type { Tables } from '../types/supabase'
-import type { OrderStatus } from '../types/supabase.types'
-
-export type Orders = Tables<'orders'>
+import type { Orders, OrderStatus } from '../types/supabase.types'
 
 /**
  * 🔹 Récupère toutes les commandes

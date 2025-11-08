@@ -54,8 +54,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/supabase/types/supabase'
-  import type { OrderStatus } from '@/supabase/types/supabase.types'
+  import type { OrdersOverviewForAdmin, OrderStatus } from '@/supabase/types/supabase.types'
   import { defineModel } from 'vue'
   import MobileCard from '../mobile/MobileCard.vue'
 
@@ -72,12 +71,12 @@
    */
 
   defineProps<{
-    order: Tables<'orders_overview_for_admin'>
+    order: OrdersOverviewForAdmin
     statusLabel: string
     statuses: readonly StatusOption[]
     formatDate: (d: string | null) => string
     formatCurrency: (a: number | null) => string
-    handleStatusChange: (order: Tables<'orders_overview_for_admin'>, status: OrderStatus) => void
+    handleStatusChange: (order: OrdersOverviewForAdmin, status: OrderStatus) => void
     openOrderModal: (id: string) => void
   }>()
 

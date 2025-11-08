@@ -23,3 +23,7 @@ supabase functions deploy retrieve-stripe-session
 ## 3️⃣ Déployer la fonction order-confirmation
 
 supabase functions deploy order-confirmation
+
+## 3️⃣ Déployer toutes les fontions
+
+supabase tasks deploy

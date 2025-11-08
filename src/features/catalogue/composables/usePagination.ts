@@ -1,13 +1,11 @@
-import type { Tables } from '@/supabase/types/supabase'
+import type { Products } from '@/supabase/types/supabase.types'
 import type { DropdownItem } from '@designSystem/components/basic/dropdown/BasicDropdown.types'
 import { computed, ref, watch, type Ref } from 'vue'
-
-type Product = Tables<'products'>
 
 /**
  * Gère la recherche, le tri et la pagination
  */
-export function usePagination(baseProducts: Ref<Product[]>) {
+export function usePagination(baseProducts: Ref<Products[]>) {
   const searchTerm = ref('')
   const sortBy = ref<'default' | 'price-asc' | 'price-desc' | 'new'>('default')
   const page = ref(1)
@@ -27,7 +25,7 @@ export function usePagination(baseProducts: Ref<Product[]>) {
   ]
 
   // 🔍 Recherche
-  const searchFiltered = computed<Product[]>(() => {
+  const searchFiltered = computed<Products[]>(() => {
     const q = searchTerm.value.trim().toLowerCase()
     if (!q) return baseProducts.value
     return baseProducts.value.filter((p) => {
@@ -42,7 +40,7 @@ export function usePagination(baseProducts: Ref<Product[]>) {
   })
 
   // ↕️ Tri
-  const sortedProducts = computed<Product[]>(() => {
+  const sortedProducts = computed<Products[]>(() => {
     const arr = [...searchFiltered.value]
     switch (sortBy.value) {
       case 'price-asc':
@@ -63,7 +61,7 @@ export function usePagination(baseProducts: Ref<Product[]>) {
     Math.max(1, Math.ceil(sortedProducts.value.length / pageSize.value)),
   )
 
-  const paginatedProducts = computed<Product[]>(() => {
+  const paginatedProducts = computed<Products[]>(() => {
     page.value = Math.min(page.value, nbPages.value)
     const start = (page.value - 1) * pageSize.value
     return sortedProducts.value.slice(start, start + pageSize.value)

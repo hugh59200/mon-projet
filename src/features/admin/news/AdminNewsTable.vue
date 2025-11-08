@@ -101,7 +101,7 @@
 <script setup lang="ts">
   import { deleteNews } from '@/features/actualités/api/news'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { News } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -109,8 +109,6 @@
   import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
-
-  type NewsRow = Tables<'news'>
 
   const props = defineProps<{ readonly?: boolean }>()
   const toast = useToastStore()
@@ -127,7 +125,7 @@
   // 🖼️ Image de fallback
   const fallbackImage = '/images/placeholder-news.png'
 
-  async function handleDelete(article: NewsRow) {
+  async function handleDelete(article: News) {
     if (props.readonly) return
     if (!confirm(`Supprimer "${article.title}" ?`)) return
     try {

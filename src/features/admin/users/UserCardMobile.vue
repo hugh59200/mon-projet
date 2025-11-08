@@ -54,20 +54,18 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/supabase/types/supabase'
-  import type { Role } from '@/supabase/types/supabase.types' // ✅ on importe Role
+  import type { Profiles, Role } from '@/supabase/types/supabase.types' // ✅ on importe Role
   import MobileCard from '../mobile/MobileCard.vue'
 
-  type UserRow = Tables<'profiles'>
   type RoleOption = { id: Role; label: string }
 
   defineProps<{
-    user: UserRow
+    user: Profiles
     roles: RoleOption[]
     formatDate: (d: string | null) => string
-    handleRoleChange: (user: UserRow, role: Role) => void
+    handleRoleChange: (user: Profiles, role: Role) => void
     openUserModal: (id: string) => void
-    handleDelete: (user: UserRow) => void
+    handleDelete: (user: Profiles) => void
   }>()
 
   const modelValue = defineModel<Role>('role', { required: true })

@@ -105,15 +105,14 @@
 <script setup lang="ts">
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { Products } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
 
-  type ProductRow = Tables<'products'> & { quantity?: number; stock: boolean }
+  type ProductRow = Products & { quantity?: number; stock: boolean }
 
-  // Define the cart item type that includes quantity
   type CartItem = ProductRow & { quantity: number }
 
   const route = useRoute()

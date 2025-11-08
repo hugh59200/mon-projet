@@ -1,7 +1,6 @@
-import type { Tables } from '@/supabase/types/supabase'
-import type { OrderStatus } from '@/supabase/types/supabase.types'
+import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
 
-export type SortOption = { id: keyof Tables<'orders'> & string; label: string }
+export type SortOption = { id: keyof Orders & string; label: string }
 
 export type StatusOption = {
   id: OrderStatus

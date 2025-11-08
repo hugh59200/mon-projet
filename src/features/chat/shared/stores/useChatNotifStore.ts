@@ -1,10 +1,11 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
+import type { Messages } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useChatWidgetStore } from '../../user/useChatWidgetStore'
 import { chatApi } from '../services/chatApi'
-import type { ChatRole, Message } from '../types/chat'
+import type { ChatRole } from '../types/chat'
 
 export const useChatNotifStore = defineStore('chatNotif', () => {
   const auth = useAuthStore()
@@ -74,7 +75,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
       config: { broadcast: { self: false } },
     })
 
-    realtimeChannel.on<Message>(
+    realtimeChannel.on<Messages>(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
       ({ new: msg }) => {

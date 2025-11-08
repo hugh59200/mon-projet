@@ -102,8 +102,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { NewsArticle, NewsTopic } from '@/features/actualités/api/news'
   import { fetchNews, fetchNewsTopics } from '@/features/actualités/api/news'
+  import type { News, NewsTopics } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
   import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
@@ -112,8 +112,8 @@
   import { useRoute } from 'vue-router'
 
   const route = useRoute()
-  const articles = ref<(NewsArticle & { topic: NewsTopic | null })[]>([])
-  const topics = ref<NewsTopic[]>([])
+  const articles = ref<(News & { topic: NewsTopics | null })[]>([])
+  const topics = ref<NewsTopics[]>([])
   const activeCategory = computed(() => route.query.categorie as string | undefined)
   const activeTopicLabel = computed(
     () => topics.value.find((t) => t.id === activeCategory.value)?.label || null,
