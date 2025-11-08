@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 🔍 Barre de recherche + bouton -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un topic..."
@@ -17,7 +16,6 @@
       </template>
     </BasicToolbar>
 
-    <!-- 💾 Loader + Liste -->
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -25,13 +23,13 @@
       message="Chargement des topics..."
       empty-message="Aucun topic pour le moment 🧩"
     >
-      <div class="topic-list">
+      <!-- ✅ DESKTOP LIST -->
+      <div class="topics--desktop">
         <div
           v-for="topic in filteredData"
           :key="topic.id"
           class="topic-item"
         >
-          <!-- 🧱 Bloc gauche : image + infos -->
           <div class="topic-info">
             <img
               v-if="topic.image"
@@ -45,26 +43,34 @@
             </div>
           </div>
 
-          <!-- 🧰 Actions -->
           <div class="actions">
-            <BasicIconNext
-              name="Edit"
+            <BasicCellActionIcon
+              icon-name="edit"
               tooltip="Modifier"
-              class="action-icon"
               @click="openTopicModal(topic.id)"
             />
-            <BasicIconNext
-              name="Trash2"
+            <BasicCellActionIcon
+              icon-name="trash"
               tooltip="Supprimer"
-              class="action-icon action-icon--delete"
+              danger
               @click="handleDelete(topic)"
             />
           </div>
         </div>
       </div>
+
+      <!-- ✅ MOBILE CARDS -->
+      <div class="mobile-cards-list">
+        <TopicCardMobile
+          v-for="topic in filteredData"
+          :key="topic.id"
+          :topic="topic"
+          @open="openTopicModal"
+          @delete="handleDelete"
+        />
+      </div>
     </WrapperLoader>
 
-    <!-- 🪟 Modal -->
     <teleport to="#app">
       <AdminTopicModal
         v-if="isModalVisible"
@@ -82,11 +88,12 @@
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+  import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { ref, watch } from 'vue'
   import { deleteTopicImage } from '../api/topicImages'
+  import TopicCardMobile from './mobile/TopicCardMobile.vue'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
 
   const toast = useToastStore()
@@ -105,16 +112,13 @@
       if (topic.image) {
         try {
           await deleteTopicImage(topic.image)
-          console.log(`🗑️ Image supprimée : ${topic.image}`)
-        } catch (imgErr: any) {
-          console.warn('Erreur suppression image (non bloquante) :', imgErr)
-        }
+        } catch {}
       }
       await deleteTopic(topic.id)
       toast.show('Topic supprimé ✅', 'success')
       fetchData()
     } catch (err: any) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
+      toast.show(`Erreur : ${err.message}`, 'danger')
     }
   }
 
@@ -203,6 +207,28 @@
       &--delete {
         color: @danger-600;
       }
+    }
+  }
+
+  .topics--desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-cards-list {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  @media (max-width: 1000px) {
+    .topics--desktop {
+      display: none;
+    }
+
+    .mobile-cards-list {
+      display: flex;
     }
   }
 </style>

@@ -1,7 +1,7 @@
-import AdminNewsTable from '@/features/admin/news/AdminNewsTable.vue'
+import AdminNewsTable from '@/features/admin/news/AdminNewsView.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
-import AdminProductsTable from '@/features/admin/products/AdminProductsTable.vue'
-import AdminTopicsTable from '@/features/admin/topics/AdminTopicsTable.vue'
+import AdminProductsTable from '@/features/admin/products/AdminProductsView.vue'
+import AdminTopicsTable from '@/features/admin/topics/AdminTopicsView.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import AdminChatView from '@/features/chat/admin/AdminChatView.vue'
 import AdminStatsView from '@/features/stats/AdminStatsView.vue'
@@ -317,6 +317,11 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 ]
+
+routes.push({
+  path: '/:pathMatch(.*)*',
+  redirect: '/',
+})
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

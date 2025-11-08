@@ -39,112 +39,81 @@
 </template>
 
 <script setup lang="ts">
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { TablesUpdate } from '@/supabase/types/supabase'
-  import type { Orders } from '@/supabase/types/supabase.types'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import { onMounted } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
-  const emit = defineEmits(['finished'])
   const route = useRoute()
   const router = useRouter()
+  const auth = useAuthStore()
   const cart = useCartStore()
+
+  const loading = ref(true)
+  const success = ref(false)
+  const order = ref<any>(null)
 
   onMounted(async () => {
     console.log('✅ PaymentSuccess mounted')
 
     const sessionId = route.query.session_id as string
-    console.log('🔍 session_id trouvé :', sessionId)
-
     if (!sessionId) {
-      console.warn('❌ Aucun session_id dans URL')
-      return setTimeout(() => emit('finished'), 4000)
+      console.error('❌ Pas de session_id dans l’URL')
+      loading.value = false
+      return
     }
 
-    try {
-      console.log('🛠 SELECT commande where stripe_session_id =', sessionId)
+    console.log('🔎 Recherche commande en base…', sessionId)
 
-      const { data: order, error } = await supabase
+    // ✅ On récupère la commande liée à la session Stripe
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('stripe_session_id', sessionId)
+      .maybeSingle()
+
+    if (error) {
+      console.error('❌ Erreur SELECT:', error)
+      loading.value = false
+      return
+    }
+
+    order.value = data
+
+    if (!order.value) {
+      console.warn('⚠️ Aucune commande liée à cette session, fallback user + last order')
+      const fallback = await supabase
         .from('orders')
         .select('*')
-        .eq('stripe_session_id', sessionId)
-        .maybeSingle<Orders>()
+        .eq('user_id', auth.user?.id!)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
 
-      console.log('🔎 Résultat SELECT orders:', { order, error })
-
-      // ✅ CAS 1 — Ke webhook n'est pas encore passé
-      if (!order) {
-        console.warn(
-          '⏳ Aucun order trouvé — webhook lent ? On vérifie en cherchant un order pending sans session_id',
-        )
-
-        const { data: fallbackOrder } = await supabase
-          .from('orders')
-          .select('*')
-          .is('stripe_session_id', null)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle<Orders>()
-
-        if (fallbackOrder) {
-          console.log('✅ Fallback trouvé :', fallbackOrder)
-
-          // ✅ On complète la session Stripe
-          await supabase
-            .from('orders')
-            .update({
-              stripe_session_id: sessionId,
-              status: 'paid',
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', fallbackOrder.id)
-
-          console.log('✅ Session attachée + statut paid')
-        }
+      if (fallback.data) {
+        order.value = fallback.data
+        console.log('✅ Fallback trouvé :', fallback.data)
       }
-
-      // ✅ CAS 2 — Order trouvé mais pas encore "paid"
-      if (order && order.status === 'pending') {
-        console.log('⚠️ Order trouvé mais encore pending, on corrige')
-
-        await supabase
-          .from('orders')
-          .update<TablesUpdate<'orders'>>({
-            status: 'paid',
-            stripe_session_id: sessionId,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', order.id)
-
-        console.log('✅ Statut corrigé → paid')
-      }
-
-      // ✅ Clear cart + email
-      console.log('📨 Envoi email & clear cart...')
-      const mail = fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-confirmation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(order),
-      })
-
-      const clear = cart.clearCart()
-      await Promise.allSettled([mail, clear])
-      console.log('✅ Email + Clear cart terminés')
-    } catch (err) {
-      console.error('💥 Erreur PaymentSuccess :', err)
     }
 
-    console.log('🔁 Redirection dans 3s...')
+    if (!order.value) {
+      console.error('❌ Toujours aucune commande trouvée')
+      loading.value = false
+      return
+    }
+
+    console.log('✅ Commande récupérée :', order.value)
+
+    // ✅ On ne gère plus l’email ici — c’est Stripe Webhook qui envoie
+    await cart.clearCart()
+    console.log('🧹 Panier vidé après succès')
+
+    success.value = true
+    loading.value = false
+
+    // ✅ Redirection
     setTimeout(() => {
-      emit('finished')
       router.push('/profil/commandes')
     }, 3000)
   })

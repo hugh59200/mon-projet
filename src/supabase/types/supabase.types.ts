@@ -20,12 +20,12 @@ export type NewsInsert = TablesInsert<'news'>
 export type NewsUpdate = TablesUpdate<'news'>
 
 export type Products = Tables<'products'>
-export type ProductInsert = TablesInsert<'products'>
-export type ProductUpdate = TablesUpdate<'products'>
+export type ProductsInsert = TablesInsert<'products'>
+export type ProductsUpdate = TablesUpdate<'products'>
 
 export type NewsTopics = Tables<'news_topics'>
-export type NewsTopicInsert = TablesInsert<'news_topics'>
-export type NewsTopicUpdate = TablesUpdate<'news_topics'>
+export type NewsTopicsInsert = TablesInsert<'news_topics'>
+export type NewsTopicsUpdate = TablesUpdate<'news_topics'>
 
 export type CartView = Tables<'user_cart_view'>
 export type CartItems = Tables<'user_cart_items'>

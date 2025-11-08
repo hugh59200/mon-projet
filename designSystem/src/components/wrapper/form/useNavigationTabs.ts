@@ -16,14 +16,15 @@ export function useNavigationTabs() {
     const parent = route.matched[0]
     if (!parent?.children) return []
 
-    return parent.children.map((child) => ({
-      routeName: child.name as RouteName,
-      tabKey: (child.meta?.label as TabsModel) || (child.name as string),
-      color: (child.meta?.color as TextColor) ?? 'neutral-300',
-      icon: child.meta?.icon as IconNameNext,
-    }))
+    return parent.children
+      .filter((child) => !['AdminMessagerie', 'AdminStats'].includes(child.name as string))
+      .map((child) => ({
+        routeName: child.name as RouteName,
+        tabKey: (child.meta?.label as TabsModel) || (child.name as string),
+        color: (child.meta?.color as TextColor) ?? 'neutral-300',
+        icon: child.meta?.icon as IconNameNext,
+      }))
   })
-
   // ✅ Liste finale typée : TabProps[]
   const tabs = computed<TabProps[]>(() =>
     tabsRoutes.value.map((t) => ({

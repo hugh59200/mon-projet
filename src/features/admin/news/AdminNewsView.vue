@@ -20,28 +20,26 @@
       </template>
     </BasicToolbar>
 
-    <!-- 💾 Loader + Liste -->
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
       :is-empty="hasLoaded && filteredData.length === 0"
       message="Chargement des actualités..."
-      empty-message="Aucune actualité pour le moment 📰"
+      empty-message="Aucune actualité 📰"
     >
-      <div class="news-list">
+      <!-- ✅ DESKTOP LIST -->
+      <div class="news--desktop">
         <div
           v-for="article in filteredData"
           :key="article.id"
           class="news-item"
         >
-          <!-- 🧱 Bloc gauche : image + texte -->
           <div class="news-info">
             <div class="thumb-container">
               <img
                 :src="article.image || fallbackImage"
-                alt="Image de l’actualité"
                 class="news-thumb"
-                loading="lazy"
+                alt=""
               />
             </div>
 
@@ -49,44 +47,51 @@
               <h3>{{ article.title }}</h3>
               <p class="excerpt">{{ article.excerpt || '—' }}</p>
               <p class="date">
-                Publié le
-                {{ new Date(article.published_at!).toLocaleDateString() }}
+                Publié le {{ new Date(article.published_at!).toLocaleDateString() }}
               </p>
             </div>
           </div>
 
-          <!-- 🧰 Actions -->
           <div
             v-if="!readonly"
             class="actions"
           >
-            <BasicIconNext
-              name="Eye"
+            <BasicCellActionIcon
+              icon-name="eye"
               tooltip="Voir / Modifier"
-              class="action-icon"
               @click="openNewsModal(article.id)"
             />
-            <BasicIconNext
-              name="Trash2"
+            <BasicCellActionIcon
+              icon-name="trash"
               tooltip="Supprimer"
-              class="action-icon action-icon--delete"
+              danger
               @click="handleDelete(article)"
             />
           </div>
         </div>
       </div>
+
+      <!-- ✅ MOBILE CARDS -->
+      <div class="mobile-cards-list">
+        <NewsCardMobile
+          v-for="article in filteredData"
+          :key="article.id"
+          :article="article"
+          :fallback-image="fallbackImage"
+          :readonly="readonly"
+          @open="openNewsModal"
+          @delete="handleDelete"
+        />
+      </div>
     </WrapperLoader>
 
-    <!-- 🪟 Modales -->
     <teleport to="#app">
-      <!-- ➕ Création -->
       <AdminNewsModal
         v-if="!readonly"
         v-model="isCreateModalVisible"
         @saved="fetchData"
       />
 
-      <!-- 🔍 Lecture / Édition -->
       <AdminNewsModal
         v-if="selectedNewsId"
         v-model="isModalVisible"
@@ -103,11 +108,11 @@
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import type { News } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import NewsCardMobile from './mobile/NewsCardMobile.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
 
   const props = defineProps<{ readonly?: boolean }>()
@@ -234,6 +239,28 @@
       &--delete {
         color: @danger-600;
       }
+    }
+  }
+
+  .news--desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mobile-cards-list {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  @media (max-width: 1000px) {
+    .news--desktop {
+      display: none;
+    }
+
+    .mobile-cards-list {
+      display: flex;
     }
   }
 </style>

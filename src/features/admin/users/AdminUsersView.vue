@@ -149,8 +149,8 @@
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
-  import AdminUserDetailsModal from '../users/AdminUserDetailsModal.vue'
-  import UserCardMobile from '../users/UserCardMobile.vue'
+  import UserCardMobile from './mobile/UserCardMobile.vue'
+  import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
 
   const toast = useToastStore()
 

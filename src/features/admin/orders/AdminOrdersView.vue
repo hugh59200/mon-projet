@@ -57,15 +57,15 @@
 
         <div
           v-for="order in filteredData"
-          :key="order.order_id ?? ''"
+          :key="order.id"
           class="gridElemWrapper"
         >
           <div class="cardLayoutWrapper">
             <!-- 🧍 Client -->
             <BasicCell :span="10">
               <div class="client-info">
-                <span class="client-name">{{ order.customer_name }}</span>
-                <span class="client-email">{{ order.customer_email }}</span>
+                <span class="client-name">{{ order.full_name }}</span>
+                <span class="client-email">{{ order.email }}</span>
               </div>
             </BasicCell>
 
@@ -87,7 +87,7 @@
 
             <!-- 🏷️ Statut -->
             <BasicCellDropdown
-              v-model="localStatuses[order.order_id ?? '']"
+              v-model="localStatuses[order.id ?? '']"
               :items="[...STATUSES]"
               center
               :span="8"
@@ -101,8 +101,16 @@
               icon-name="eye"
               tooltip="Voir la commande"
               center
-              :span="6"
-              @click="openOrderModal(order.order_id ?? '')"
+              :span="3"
+              @click="openOrderModal(order.id ?? '')"
+            />
+            <BasicCellActionIcon
+              icon-name="trash"
+              tooltip="Supprimer"
+              center
+              danger
+              :span="3"
+              @click="handleDelete(order)"
             />
           </div>
         </div>
@@ -112,18 +120,17 @@
       <div class="mobile-cards-list">
         <OrderCardMobile
           v-for="order in filteredData"
-          :key="order.order_id ?? ''"
-          :status="localStatuses[order.order_id ?? ''] ?? 'pending'"
+          :key="order.id ?? ''"
+          :status="localStatuses[order.id ?? ''] ?? 'pending'"
           @update:status="(newStatus) => handleStatusChange(order, newStatus)"
-          :status-label="
-            STATUSES.find((s) => s.id === localStatuses[order.order_id ?? ''])?.label || '—'
-          "
+          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id ?? ''])?.label || '—'"
           :order="order"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
           :handle-status-change="handleStatusChange"
           :open-order-modal="openOrderModal"
+          :handle-delete="handleDelete"
         />
       </div>
     </WrapperLoader>
@@ -142,43 +149,54 @@
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import type { OrdersOverviewForAdmin, OrderStatus } from '@/supabase/types/supabase.types'
+  import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
 
-  import { updateOrderStatus } from '@/supabase/api/orders'
+  import { deleteOrder, updateOrderStatus } from '@/supabase/api/orders'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
-  import AdminOrderDetailsModal from './AdminOrderDetailsModal.vue'
-  import OrderCardMobile from './OrderCardMobile.vue'
+  import OrderCardMobile from './mobile/OrderCardMobile.vue'
+  import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
   const toast = useToastStore()
 
   // ✅ Données depuis la vue typée
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, reset, fetchData } =
-    useAdminTable<'orders_overview_for_admin'>({
-      table: 'orders_overview_for_admin',
+    useAdminTable<'orders'>({
+      table: 'orders',
       orderBy: 'created_at',
       ascending: false,
       searchFn: (o, q) =>
-        (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
-        (o.customer_email?.toLowerCase()?.includes(q) ?? false),
+        (o.full_name?.toLowerCase()?.includes(q) ?? false) ||
+        (o.email?.toLowerCase()?.includes(q) ?? false),
     })
 
-  // 🌀 Statuts locaux (synchro)
+  // 🌀 Statuts locaux (synchronisation)
   const localStatuses = ref<Record<string, OrderStatus>>({})
   watchEffect(() => {
     const statuses: Record<string, OrderStatus> = {}
     for (const o of filteredData.value) {
-      const id = o.order_id ?? ''
+      const id = o.id ?? ''
       statuses[id] = (o.status as OrderStatus) ?? 'pending'
     }
     localStatuses.value = statuses
   })
 
+  async function handleDelete(order: Orders) {
+    if (!confirm(`Supprimer la commande #${order.id} ?`)) return
+    try {
+      await deleteOrder(order.id)
+      toast.show('Commande supprimée ✅', 'success')
+      fetchData()
+    } catch (err: any) {
+      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
+    }
+  }
+
   // 🧩 Mise à jour du statut
-  async function handleStatusChange(order: OrdersOverviewForAdmin, newStatus: OrderStatus) {
-    const id = order.order_id ?? ''
+  async function handleStatusChange(order: Orders, newStatus: OrderStatus) {
+    const id = order.id ?? ''
     if (!id) return // sécurité
     try {
       localStatuses.value[id] = newStatus

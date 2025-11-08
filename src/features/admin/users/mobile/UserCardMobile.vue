@@ -54,8 +54,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { Profiles, Role } from '@/supabase/types/supabase.types' // ✅ on importe Role
-  import MobileCard from '../mobile/MobileCard.vue'
+  import type { Profiles, Role } from '@/supabase/types/supabase.types'
+  import MobileCard from '../../mobile/MobileCard.vue'
 
   type RoleOption = { id: Role; label: string }
 

@@ -25,7 +25,7 @@ export async function finalizeOrderAfterPayment(orderId: string, paymentIntentId
       .eq('id', orderId)
 
     if (error) throw error
-    console.log('✅ Commande mise à jour "paid"', orderId)
+    console.log('✅ Commande mise à jour en "paid" -', orderId)
   } catch (err) {
     console.error('❌ Erreur finalisation commande:', err)
   }
@@ -51,6 +51,7 @@ export async function processPayment(
 
 async function simulatePayment(amount: number): Promise<PaymentIntent> {
   await new Promise((r) => setTimeout(r, 1000))
+
   return {
     id: `sim_${Math.random().toString(36).slice(2)}`,
     amount,
@@ -72,6 +73,7 @@ async function createStripeCheckout(
 
   if (error || !data) throw new Error(error?.message || 'Erreur création session Stripe')
 
+  // ✅ Redirection
   if (data.url) window.location.href = data.url
 
   return {

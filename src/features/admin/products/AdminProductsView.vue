@@ -153,14 +153,14 @@
       </div>
       <!-- 📱 VERSION MOBILE -->
       <div class="mobile-cards-list">
-        <component
-          :is="readonly ? ProductCardMobileReadonly : ProductCardMobile"
+        <ProductCardMobile
           v-for="product in filteredData"
           :key="product.id"
           :product="product"
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
-          v-bind="!readonly ? { editProduct: openEditProduct, handleDelete } : {}"
+          :edit-product="openEditProduct"
+          :handle-delete="handleDelete"
         />
       </div>
     </WrapperLoader>
@@ -197,7 +197,6 @@
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
-  import ProductCardMobileReadonly from './readonly/ProductCardMobileReadonly.vue'
 
   const props = defineProps<{ readonly?: boolean }>()
 
