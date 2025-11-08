@@ -19,8 +19,9 @@
   import type { IconName } from '@designSystem/fondation/icons/iconsList'
   import * as LucideIcons from 'lucide-vue-next'
   import { computed, type Component } from 'vue'
+  import { customIcons, type CustomIconName } from './customIcons'
 
-  export type IconNameNext = keyof typeof LucideIcons | IconName
+  export type IconNameNext = keyof typeof LucideIcons | IconName | CustomIconName
 
   export type IconColor =
     | 'white'
@@ -128,6 +129,12 @@
 
   // ✅ Sélection dynamique de l’icône Lucide
   const iconComponent = computed(() => {
+    // ✅ icône custom ?
+    if (props.name in customIcons) {
+      return customIcons[props.name as CustomIconName]
+    }
+
+    // ✅ icône Lucide
     const capitalizedName = props.name.charAt(0).toUpperCase() + props.name.slice(1)
     return (
       (LucideIcons[capitalizedName as keyof typeof LucideIcons] as Component) ||

@@ -64,19 +64,6 @@
     .addLinkColors(@neutral-900, @neutral-700);
   }
 
-  /* --- Soulignement progressif --- */
-  /* On applique la ligne à tout le contenu du lien */
-  &:after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 28px; /* espace avant le texte (ajuste selon la taille de l'icône) */
-    width: 0;
-    height: 1.5px;
-    background-color: currentColor;
-    transition: width 0.25s ease;
-  }
-
   &:hover:after {
     width: calc(100% - 34px); /* prend la largeur du texte seulement */
   }

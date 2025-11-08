@@ -29,6 +29,7 @@
       class="btn__label"
       :size="textSizeMapping[size]"
       nb-max-lines="2"
+      :color="textColor"
     >
       {{ label }}
     </BasicText>
@@ -36,9 +37,9 @@
 </template>
 
 <script setup lang="ts">
-  import type { ButtonProps, ButtonSize, TextSize } from '@designSystem/components'
+  import type { ButtonProps, ButtonSize, TextColor, TextSize } from '@designSystem/components'
 
-  withDefaults(defineProps<ButtonProps>(), {
+  withDefaults(defineProps<ButtonProps & { textColor?: TextColor }>(), {
     type: 'primary',
     size: 'medium',
     variant: 'filled',

@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 export type Profile = Tables<'profiles'>
-export type Providers = 'google' | 'github'
+export type Providers = 'google' | 'github' | 'facebook'
 
 type UserRole = NonNullable<Profile['role']> extends string ? 'admin' | 'user' : 'user'
 
@@ -121,33 +121,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function signInWithGoogleIdToken(idToken: string) {
-    loading.value = true
-    error.value = null
-
-    const { data, error: err } = await supabase.auth.signInWithIdToken({
-      provider: 'google',
-      token: idToken,
-    })
-
-    loading.value = false
-
-    if (err) {
-      error.value = err.message
-      return false
-    }
-
-    user.value = data.user
-    await fetchProfile()
-    startAutoRefresh()
-
-    // ✅ Redirection unifiée
-    const redirect = sessionStorage.getItem('redirectAfterOAuth')
-    router.push(redirect || '/auth/callback')
-
-    return true
-  }
-
   // ======================================================
   // ✉️ MAGIC LINK (connexion sans mot de passe)
   // ======================================================
@@ -211,7 +184,6 @@ export const useAuthStore = defineStore('auth', () => {
     role,
     isAuthenticated,
     isAdmin,
-    signInWithGoogleIdToken,
     initAuth,
     fetchProfile,
     signIn,
