@@ -8,17 +8,12 @@
       show-role
       @reset="reset()"
     >
-      <template
-        v-if="!readonly"
-        #actions
-      >
-        <BasicButton
-          label="+ Ajouter un produit"
-          type="primary"
-          size="small"
-          @click="isCreateModalVisible = true"
-        />
-      </template>
+      <BasicButton
+        label="+ Ajouter un produit"
+        type="primary"
+        size="small"
+        @click="isCreateModalVisible = true"
+      />
     </BasicToolbar>
 
     <!-- 📄 Pagination -->
@@ -68,7 +63,6 @@
             text="Stock"
           />
           <BasicCell
-            v-if="!readonly"
             center
             :span="6"
             text="Actions"
@@ -146,7 +140,7 @@
               center
               danger
               :span="3"
-              @click="handleDelete(product)"
+              @click="deleteProduct(product)"
             />
           </div>
         </div>
@@ -160,7 +154,7 @@
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
           :edit-product="openEditProduct"
-          :handle-delete="handleDelete"
+          :handle-delete="deleteProduct"
         />
       </div>
     </WrapperLoader>
@@ -169,7 +163,6 @@
     <teleport to="#app">
       <!-- ➕ Création -->
       <AdminProductModal
-        v-if="!readonly"
         v-model="isCreateModalVisible"
         @saved="fetchData"
       />
@@ -179,7 +172,6 @@
         v-if="selectedProductId"
         v-model="isModalVisible"
         :product-id="selectedProductId"
-        :readonly="readonly"
         @saved="fetchData"
       />
     </teleport>
@@ -188,19 +180,13 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import { deleteProduct } from '@/supabase/api/products'
-  import type { Products } from '@/supabase/types/supabase.types'
+  import { useProductActions } from '@/supabase/services/useProductActions'
   import { formatCurrency } from '@/utils/index'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
-
-  const props = defineProps<{ readonly?: boolean }>()
-
-  const toast = useToastStore()
 
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, fetchData, reset } =
     useAdminTable<'products'>({
@@ -212,17 +198,7 @@
         (p.category?.toLowerCase()?.includes(q) ?? false),
     })
 
-  async function handleDelete(product: Products) {
-    if (props.readonly) return
-    if (!confirm(`Supprimer ${product.name} ?`)) return
-    try {
-      await deleteProduct(product.id)
-      toast.show('Produit supprimé ✅', 'success')
-      fetchData()
-    } catch (err: any) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
-    }
-  }
+  const { deleteProduct } = useProductActions(fetchData)
 
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)

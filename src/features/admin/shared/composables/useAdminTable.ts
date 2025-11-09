@@ -1,6 +1,6 @@
 import { supabase } from '@/supabase/supabaseClient'
 import type { Database, Tables } from '@/supabase/types/supabase'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, type Ref } from 'vue'
 
 /** 🕐 Utilitaire de debounce pour les recherches */
 function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
@@ -55,8 +55,8 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     limit = 20,
   } = options
 
-  const data = ref<Row<T>[]>([])
-  const filteredData = ref<Row<T>[]>([])
+  const data = ref([]) as Ref<Row<T>[]>
+  const filteredData = ref([]) as Ref<Row<T>[]>
   const total = ref(0)
   const nbPages = ref(1)
   const page = ref(1)

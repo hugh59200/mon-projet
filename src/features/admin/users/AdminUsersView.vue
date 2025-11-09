@@ -105,7 +105,7 @@
               center
               danger
               :span="3"
-              @click="handleDelete(user)"
+              @click="deleteUser(user)"
             />
           </div>
         </div>
@@ -117,13 +117,13 @@
           v-for="user in filteredData"
           :key="user.id"
           :role="localRoles[user.id] ?? 'user'"
-          @update:role="(newRole) => (localRoles[user.id] = newRole)"
+          @update:role="(newRole: Role) => (localRoles[user.id] = newRole)"
           :user="user"
           :roles="ROLES"
           :format-date="formatDate"
-          :handle-role-change="handleRoleChange"
+          :handle-role-change="changeUserRole"
           :open-user-modal="openUserModal"
-          :handle-delete="handleDelete"
+          :handle-delete="deleteUser"
         />
       </div>
     </WrapperLoader>
@@ -143,16 +143,12 @@
   import { ROLES } from '@/features/admin/constants/users'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
-  import { deleteUser, updateUserRole } from '@/supabase/api/users'
-  import type { Profiles, Role } from '@/supabase/types/supabase.types'
-  import { formatDate } from '@/utils/index'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import { useUserActions } from '@/supabase/services/useUserActions'
+  import type { Role } from '@/supabase/types/supabase.types'
+  import { formatDate } from '@/utils'
   import { ref, watch } from 'vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
-
-  const toast = useToastStore()
 
   const {
     filteredData,
@@ -176,6 +172,8 @@
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
+  const { deleteUser, changeUserRole } = useUserActions(fetchData)
+
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
   const localRoles = ref<Record<string, Role>>({})
@@ -194,33 +192,13 @@
     { immediate: true },
   )
 
-  async function handleRoleChange(user: Profiles, newRole: Role) {
-    try {
-      await updateUserRole(user.id, newRole)
-      toast.show('Rôle mis à jour ✅', 'success')
-    } catch (err) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
-    }
-  }
-
-  async function handleDelete(user: Profiles) {
-    if (!confirm(`Supprimer ${user.email} ?`)) return
-    try {
-      await deleteUser(user.id)
-      toast.show('Utilisateur supprimé ✅', 'success')
-      fetchData()
-    } catch (err: any) {
-      toast.show(`Erreur suppression : ${(err as Error).message}`, 'danger')
-    }
-  }
-
-  /* Modal */
-  const isModalVisible = ref(false)
-  const selectedUserId = ref<string | null>(null)
   function openUserModal(id: string) {
     selectedUserId.value = id
     isModalVisible.value = true
   }
+
+  const isModalVisible = ref(false)
+  const selectedUserId = ref<string | null>(null)
 </script>
 
 <style scoped lang="less">

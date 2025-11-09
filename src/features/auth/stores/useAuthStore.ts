@@ -3,15 +3,15 @@ import { supabase } from '@/supabase/supabaseClient'
 import type { Profiles } from '@/supabase/types/supabase.types'
 import type { User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 
 export type Providers = 'google' | 'github' | 'facebook'
 
 type UserRole = NonNullable<Profiles['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
-  const profile = ref<Profiles | null>(null)
+  const user = ref(null) as Ref<User | null>
+  const profile = ref(null) as Ref<Profiles | null>
   const loading = ref(false)
   const error = ref<string | null>(null)
   let refreshInterval: number | null = null

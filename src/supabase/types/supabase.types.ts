@@ -35,5 +35,3 @@ export type OrdersOverviewForAdmin = Tables<'orders_overview_for_admin'>
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
-
-

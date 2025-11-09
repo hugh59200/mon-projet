@@ -93,7 +93,7 @@
               :span="8"
               dropdown-type="table"
               size="small"
-              @update:model-value="(v) => handleStatusChange(order, v as OrderStatus)"
+              @update:model-value="(v) => changeOrderStatus(order, v as OrderStatus)"
             />
 
             <!-- 👁️ Détails -->
@@ -110,7 +110,7 @@
               center
               danger
               :span="3"
-              @click="handleDelete(order)"
+              @click="deleteOrder(order)"
             />
           </div>
         </div>
@@ -122,15 +122,15 @@
           v-for="order in filteredData"
           :key="order.id ?? ''"
           :status="localStatuses[order.id ?? ''] ?? 'pending'"
-          @update:status="(newStatus) => handleStatusChange(order, newStatus)"
+          @update:status="(newStatus) => changeOrderStatus(order, newStatus)"
           :status-label="STATUSES.find((s) => s.id === localStatuses[order.id ?? ''])?.label || '—'"
           :order="order"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
-          :handle-status-change="handleStatusChange"
+          :handle-status-change="changeOrderStatus"
           :open-order-modal="openOrderModal"
-          :handle-delete="handleDelete"
+          :handle-delete="deleteOrder"
         />
       </div>
     </WrapperLoader>
@@ -149,19 +149,14 @@
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
+  import { useOrderActions } from '@/supabase/services/useOrderActions'
+  import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { ref, watchEffect } from 'vue'
-
-  import { deleteOrder, updateOrderStatus } from '@/supabase/api/orders'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
-  const toast = useToastStore()
-
-  // ✅ Données depuis la vue typée
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, reset, fetchData } =
     useAdminTable<'orders'>({
       table: 'orders',
@@ -172,44 +167,18 @@
         (o.email?.toLowerCase()?.includes(q) ?? false),
     })
 
-  // 🌀 Statuts locaux (synchronisation)
+  const { deleteOrder, changeOrderStatus } = useOrderActions(fetchData)
+
   const localStatuses = ref<Record<string, OrderStatus>>({})
   watchEffect(() => {
-    const statuses: Record<string, OrderStatus> = {}
+    const map: Record<string, OrderStatus> = {}
     for (const o of filteredData.value) {
       const id = o.id ?? ''
-      statuses[id] = (o.status as OrderStatus) ?? 'pending'
+      map[id] = (o.status as OrderStatus) ?? 'pending'
     }
-    localStatuses.value = statuses
+    localStatuses.value = map
   })
 
-  async function handleDelete(order: Orders) {
-    if (!confirm(`Supprimer la commande #${order.id} ?`)) return
-    try {
-      await deleteOrder(order.id)
-      toast.show('Commande supprimée ✅', 'success')
-      fetchData()
-    } catch (err: any) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
-    }
-  }
-
-  // 🧩 Mise à jour du statut
-  async function handleStatusChange(order: Orders, newStatus: OrderStatus) {
-    const id = order.id ?? ''
-    if (!id) return // sécurité
-    try {
-      localStatuses.value[id] = newStatus
-      console.log(localStatuses.value[id])
-      await updateOrderStatus(id, newStatus)
-      console.log('aprés')
-      toast.show('Statut mis à jour ✅', 'success')
-    } catch (err: any) {
-      toast.show(`Erreur : ${err.message}`, 'danger')
-    }
-  }
-
-  // 🪟 Modal
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
   function openOrderModal(id: string) {

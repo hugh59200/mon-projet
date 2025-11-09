@@ -16,7 +16,6 @@
           v-model="form.name"
           label="Nom"
           placeholder="Ex : IGF-1 LR3"
-          :readonly="readonly"
           required
         />
 
@@ -25,7 +24,6 @@
           v-model="form.category"
           label="Catégorie"
           placeholder="Ex : Bien-être"
-          :readonly="readonly"
         />
 
         <!-- 💰 Prix -->
@@ -35,7 +33,6 @@
           label="Prix (€)"
           placeholder="0.00"
           input-type="form"
-          :readonly="readonly"
         />
 
         <!-- ⚗️ Pureté -->
@@ -44,7 +41,6 @@
           @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
           label="Pureté (%)"
           placeholder="Ex : 99"
-          :readonly="readonly"
         />
 
         <!-- 📝 Description -->
@@ -54,7 +50,6 @@
             rows="3"
             placeholder="Description du produit..."
             class="custom-textarea"
-            :readonly="readonly"
           />
         </WrapperFormElements>
 
@@ -64,7 +59,7 @@
             readonly
             placeholder="Sélectionner une image..."
             icon-name="Upload"
-            @click="!readonly && openFilePicker()"
+            @click="openFilePicker()"
             :value="selectedFile?.name || extractFileName(form.image) || ''"
           />
 
@@ -73,7 +68,6 @@
             type="file"
             accept="image/*"
             class="hidden-input"
-            :disabled="readonly"
             @change="handleFileChange"
           />
 
@@ -87,7 +81,6 @@
             />
 
             <BasicButton
-              v-if="!readonly"
               label="Supprimer"
               type="secondary"
               variant="outlined"
@@ -97,38 +90,12 @@
           </div>
         </WrapperFormElements>
 
-        <template v-if="!readonly">
-          <WrapperCheckbox
-            v-model="form.stock"
-            label="Disponible en stock"
-            :readonly="readonly"
-            :disabled="readonly"
-          />
-        </template>
+        <WrapperCheckbox
+          v-model="form.stock"
+          label="Disponible en stock"
+        />
 
-        <template v-else>
-          <WrapperFormElements label="Stock">
-            <div
-              class="stock-status"
-              :class="form.stock ? 'stock-status--in' : 'stock-status--out'"
-            >
-              <BasicIconNext
-                :name="form.stock ? 'CheckCircle' : 'XCircle'"
-                :color="form.stock ? 'success-600' : 'danger-600'"
-              />
-              <BasicText
-                :color="form.stock ? 'success-600' : 'danger-600'"
-                weight="semibold"
-              >
-                {{ form.stock ? 'En stock' : 'Rupture de stock' }}
-              </BasicText>
-            </div>
-          </WrapperFormElements>
-        </template>
-
-        <!-- 🚀 Bouton création / édition -->
         <BasicButton
-          v-if="!readonly"
           :label="isEditMode ? 'Mettre à jour le produit' : 'Créer le produit'"
           type="primary"
           :disabled="loading"
@@ -141,6 +108,7 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { useProductActions } from '@/supabase/services/useProductActions'
   import { supabase } from '@/supabase/supabaseClient'
   import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -148,13 +116,16 @@
 
   /* Props et modèle */
   const visible = defineModel<boolean>()
+
   const props = defineProps<{
     productId?: string | null
-    readonly?: boolean
   }>()
 
   const emit = defineEmits(['saved'])
+
   const toast = useToastStore()
+
+  const { createProduct, updateProduct } = useProductActions(() => emit('saved'))
 
   /* État */
   const loading = ref(false)
@@ -175,18 +146,13 @@
   })
 
   const isEditMode = computed(() => !!props.productId)
-  const readonly = computed(() => !!props.readonly)
   const headerTitle = computed(() =>
-    readonly.value
-      ? 'Détails du produit'
-      : isEditMode.value
-        ? 'Modifier le produit'
-        : 'Ajouter un produit',
+    isEditMode.value ? 'Modifier le produit' : 'Ajouter un produit',
   )
 
   /* 🖱️ Sélecteur fichier */
   function openFilePicker() {
-    if (!readonly.value) fileInputRef.value?.click()
+    fileInputRef.value?.click()
   }
 
   /* 📤 Sélection fichier */
@@ -225,7 +191,6 @@
 
   /* ❌ Supprimer image */
   async function removeImage() {
-    if (readonly.value) return
     try {
       if (form.value.image) {
         const path = form.value.image.split('/product-images/')[1]
@@ -287,24 +252,19 @@
 
     loading.value = true
     try {
+      // Upload image si nécessaire
       if (selectedFile.value) {
         const uploadedUrl = await uploadImage()
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
-      let error
       if (isEditMode.value && props.productId) {
-        ;({ error } = await supabase.from('products').update(form.value).eq('id', props.productId))
+        await updateProduct(props.productId, form.value)
       } else {
-        ;({ error } = await supabase.from('products').insert(form.value))
+        await createProduct(form.value)
       }
 
-      if (error) throw error
-      toast.show(isEditMode.value ? 'Produit mis à jour ✅' : 'Produit créé ✅', 'success')
-      emit('saved')
       visible.value = false
-    } catch (err: any) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
     } finally {
       loading.value = false
     }

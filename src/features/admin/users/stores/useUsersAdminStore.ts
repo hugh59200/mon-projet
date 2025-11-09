@@ -1,10 +1,12 @@
-import { deleteUserById, updateUserRole, type UserProfile } from '@/services/userService'
+import { deleteUserById, updateUserRole } from '@/supabase/api/userApi'
+import { supabase } from '@/supabase/supabaseClient'
+import type { Profiles, Role } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 export const useUsersAdminStore = defineStore('users-admin', () => {
-  const users = ref<UserProfile[]>([])
+  const users = ref([]) as Ref<Profiles[]>
   const loading = ref(false)
   const search = ref('')
   const page = ref(1)
@@ -20,15 +22,7 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
       const { data, count, error } = await fetchUsersWithCount(search.value, limit, offset)
       if (error) throw error
 
-      users.value =
-        data?.map((user) => ({
-          id: user.id,
-          email: user.email ?? '',
-          full_name: user.full_name,
-          role: user.role as 'admin' | 'user',
-          created_at: user.created_at ?? '',
-          avatar_url: user.avatar_url,
-        })) ?? []
+      users.value = data ?? []
       totalResults.value = count ?? 0
       totalPages.value = Math.ceil(totalResults.value / limit)
     } catch (err) {
@@ -38,16 +32,16 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
     }
   }
 
-  async function changeRole(user: UserProfile) {
+  async function changeRole(user: Profiles) {
     try {
-      await updateUserRole(user.id, user.role)
+      await updateUserRole(user.id, (user.role ?? 'user') as Role)
       toast.show(`Rôle de ${user.email} mis à jour ✅`, 'success')
     } catch {
       toast.show('Erreur lors de la mise à jour du rôle', 'danger')
     }
   }
 
-  async function deleteUser(user: UserProfile) {
+  async function deleteUser(user: Profiles) {
     if (!confirm(`Supprimer ${user.email} ?`)) return
     try {
       await deleteUserById(user.id)
@@ -71,9 +65,6 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
     deleteUser,
   }
 })
-
-// helper (ajoute dans le même fichier ou dans ton service)
-import { supabase } from '@/supabase/supabaseClient'
 
 async function fetchUsersWithCount(search = '', limit = 10, offset = 0) {
   let query = supabase
