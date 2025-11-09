@@ -31,7 +31,7 @@
 
     <!-- ✅ Contenu du menu déroulant -->
     <div class="user-menu-content">
-      <template v-if="auth.user">
+      <template v-if="user">
         <!-- 👤 En-tête utilisateur (clic = accès au profil) -->
         <UserHeader />
 
@@ -60,7 +60,7 @@
           />
 
           <BasicButton
-            v-if="auth.isAdmin"
+            v-if="isAdmin"
             label="Espace Admin"
             iconName="Settings"
             variant="ghost"
@@ -120,7 +120,7 @@
   import UserHeader from './UserHeader.vue'
 
   const router = useRouter()
-  const auth = useAuthStore()
+  const { user, isAdmin, signOut } = useAuthStore()
   const notifStore = useChatNotifStore()
   const adminTabStore = useAdminTabStore()
   const isOpen = ref(false)
@@ -145,7 +145,7 @@
   async function handleLogout() {
     isOpen.value = false
     adminTabStore.clearLastTab()
-    await auth.signOut()
+    await signOut()
   }
 
   watch(isDesktop, (now, old) => {

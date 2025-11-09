@@ -1,5 +1,5 @@
 .auth {
-  max-width: 380px;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,11 +27,9 @@
 
   /* Zone où les messages d’erreur / succès restent fixes */
   &__feedback {
-    height: 20px;
+    height: 40px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    margin-top: -8px;
   }
 
   &__error,
@@ -64,7 +62,6 @@
   }
 
   &__links {
-    margin-top: 24px;
     display: flex;
     flex-direction: column;
     gap: 6px;

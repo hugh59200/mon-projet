@@ -12,7 +12,6 @@
       },
     ]"
   >
-    <!-- 👈 Icône gauche -->
     <BasicIconNext
       v-if="iconState === 'iconLeft' && iconName && inputType === 'form'"
       :name="iconName"
@@ -20,21 +19,9 @@
       :pointer="pointer"
       class="input-container__icon-left"
     />
-
-    <!-- 🧾 Champ principal -->
     <div class="input-container__field">
       <slot></slot>
     </div>
-
-    <!-- 🧩 Icônes droites empilables -->
-    <div
-      v-if="$slots['icon-right'] || showRightIcons"
-      class="input-container__icons-right"
-    >
-      <slot name="icon-right"></slot>
-    </div>
-
-    <!-- ⚠️ Alerte inline (si mode table) -->
     <BasicAlert
       v-if="inputType === 'table' && alertLabel"
       :class="[`input-container--${inputType}--alert`]"
@@ -46,8 +33,6 @@
       :has-label="false"
       :hasBg="false"
     />
-
-    <!-- ❌ Icône “close” (suppression) -->
     <BasicIconNext
       v-if="deletable && !readonly && !disabled && modelValue"
       name="X"
@@ -56,8 +41,9 @@
       @click="modelValue = null"
       class="input-container__icon-delete"
     />
-
-    <!-- 👉 Icône droite par défaut (fallback) -->
+    <div v-if="$slots['icon-right'] || showRightIcons">
+      <slot name="icon-right"></slot>
+    </div>
     <BasicIconNext
       v-if="!$slots['icon-right'] && inputType === 'form' && iconState === 'iconRight' && iconName"
       :name="iconName"

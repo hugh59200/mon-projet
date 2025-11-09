@@ -22,7 +22,7 @@
         label="Email"
         placeholder="exemple@domaine.com"
         inputmode="email"
-        iconName="Mail"
+        iconName="email"
         required
         :alertLabel="touched.email ? errors.email : ''"
         @input="clear"
@@ -35,9 +35,9 @@
         label="Mot de passe"
         placeholder="••••••••"
         required
-        minStrength="weak"
         :alertLabel="errors.password"
         :touched="touched.password"
+        deletable
         @input="clear"
         @blur="validateField('password')"
       />

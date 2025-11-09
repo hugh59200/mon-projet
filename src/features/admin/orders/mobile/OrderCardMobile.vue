@@ -64,7 +64,6 @@
 
 <script setup lang="ts">
   import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
-  import { defineModel } from 'vue'
   import MobileCard from '../../mobile/MobileCard.vue'
 
   type StatusOption = {

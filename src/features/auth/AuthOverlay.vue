@@ -15,10 +15,8 @@
             <div class="auth-brand__header">
               <img
                 src="@/assets/logo-app.png"
-                alt="Logo Fast Peptides"
                 class="auth-brand__logo"
               />
-
               <BasicText
                 size="h1"
                 weight="bold"
@@ -42,7 +40,6 @@
             <div class="auth-brand__illustration">
               <img
                 src="@/assets/lab-illustration.jpg"
-                alt="Illustration laboratoire"
                 class="auth-brand__image"
               />
             </div>
@@ -62,10 +59,8 @@
             />
           </div>
 
-          <AuthOverlayEmailSent v-if="mode === 'signup'" />
-          <AuthOverlaySuccess v-else-if="mode === 'success'" />
-
-          <RouterView v-else />
+          <!-- ✅ On laisse le routeur afficher la bonne page -->
+          <RouterView />
         </section>
       </main>
     </div>
@@ -76,48 +71,43 @@
   import { supabase } from '@/supabase/supabaseClient'
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import AuthOverlayEmailSent from './AuthOverlayEmailSent.vue'
-  import AuthOverlaySuccess from './AuthOverlaySuccess.vue'
   import { useAuthStore } from './stores/useAuthStore'
 
+  const visible = ref(true)
   const router = useRouter()
   const route = useRoute()
   const auth = useAuthStore()
 
-  const visible = ref(true)
-  const mode = ref<'form' | 'signup' | 'success'>('form')
-
   function skip() {
     visible.value = false
-    setTimeout(() => router.replace('/'), 200)
+    setTimeout(() => router.replace('/'), 220)
   }
 
   onMounted(async () => {
+    // ✅ Si ce n’est pas le callback → rien à faire
     if (route.path !== '/auth/callback') return
-
-    if (route.query.mode === 'signup') {
-      mode.value = 'signup'
-      setTimeout(() => (visible.value = false), 2500)
-      return
-    }
 
     const { data } = await supabase.auth.getSession()
     const session = data.session
 
-    if (session?.user) {
-      auth.user = session.user
-      await auth.fetchProfile?.()
-      mode.value = 'success'
-
-      setTimeout(() => (visible.value = false), 2500)
-      setTimeout(() => {
-        router.replace(auth.isAdmin ? '/admin' : '/profil')
-      }, 3000)
-    } else {
+    if (!session?.user) {
+      // pas de session → retour au login
       router.replace('/auth/login')
+      return
     }
+
+    // ✅ User connecté → mise à jour
+    auth.user = session.user
+    await auth.fetchProfile?.()
+
+    // ✅ Fermeture douce puis redirection
+    setTimeout(() => (visible.value = false), 2500)
+    setTimeout(() => {
+      router.replace(auth.isAdmin ? '/admin' : '/profil')
+    }, 2900)
   })
 </script>
+
 <style scoped lang="less">
   .auth-overlay {
     position: fixed;
@@ -133,6 +123,13 @@
     );
     backdrop-filter: blur(14px) saturate(130%);
     animation: fadeIn 0.25s ease forwards;
+
+    &__skip {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      z-index: 5;
+    }
 
     &__container {
       display: flex;
@@ -159,9 +156,10 @@
     }
 
     &__right {
+      position: relative;
       flex: 1;
       background: #fff;
-      padding: 48px 52px 56px;
+      padding: 50px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;

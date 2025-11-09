@@ -1,8 +1,6 @@
 <template>
   <nav class="auth-navbar">
-    <!-- 🔹 GAUCHE -->
     <div class="auth-navbar__left">
-      <!-- Menu burger visible uniquement en mobile -->
       <BasicButton
         v-if="isMobile"
         @click="toggleMobileMenu"
@@ -32,24 +30,17 @@
         </BasicText>
       </div>
     </div>
-
-    <!-- 🔹 CENTRE -->
     <div
       v-if="!isMobile"
       class="auth-navbar__center"
     >
       <MainNavLinks />
     </div>
-
-    <!-- 🔹 DROITE -->
     <div class="auth-navbar__right">
       <CartMenu />
-      <!-- 👤 CONNECTÉ -->
       <template v-if="auth.user">
         <UserMenu />
       </template>
-
-      <!-- 🧾 INVITÉ -->
       <template v-else-if="hasGuestCart">
         <div class="guest-info">
           <BasicText
@@ -66,7 +57,6 @@
           />
         </div>
       </template>
-      <!-- 🚪 VISITEUR -->
       <template v-else>
         <div
           v-if="isDesktop"
@@ -86,7 +76,6 @@
             @click="router.push('/auth/register')"
           />
         </div>
-
         <div v-else>
           <UserMenu />
         </div>

@@ -11,19 +11,19 @@ export type RouteName =
   'actualite-detail' |
   'actualites' |
   'auth-callback' |
+  'auth-login' |
+  'auth-register' |
+  'auth-reset' |
   'cart' |
   'catalogue' |
   'checkout' |
   'faq' |
   'home' |
-  'login' |
   'order-detail' |
   'orders' |
   'payment-cancel' |
   'payment-success' |
   'product-detail' |
   'profil' |
-  'register' |
-  'reset-password' |
   'update-password' |
   'update-password-success'

@@ -18,6 +18,7 @@
       :minStrength
       :autoValidate
       :touched
+      :deletable
       @strength-change="onStrengthChange"
     />
   </WrapperFormElements>

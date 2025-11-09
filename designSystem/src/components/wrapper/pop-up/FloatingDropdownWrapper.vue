@@ -7,7 +7,9 @@
     @click="triggerMode === 'click' ? toggleDropdown() : null"
   >
     <!-- 🎯 Déclencheur -->
-    <slot name="trigger" />
+    <div @click="toggleDropdown()">
+      <slot name="trigger" />
+    </div>
 
     <!-- 🧊 Zone tampon invisible (anti flicker entre trigger et dropdown) -->
     <div
