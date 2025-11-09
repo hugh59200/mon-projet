@@ -43,13 +43,22 @@ export async function signInWithPassword(email: string, password: string): Promi
 }
 
 export async function signUp(email: string, password: string): Promise<AuthResult> {
+  // ✅ Vérification AMONT : email déjà utilisé ?
+  const exists = await emailExists(email)
+  if (exists) {
+    return {
+      success: false,
+      message: 'Un compte existe déjà avec cet e-mail.',
+    }
+  }
+
+  // ✅ sinon on tente la création Supabase
   const { error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
     return { success: false, message: mapAuthError(error) }
   }
 
-  // ✅ Pour un signup, on n'a pas de user immédiatement tant que l'email n'est pas confirmé
   return { success: true, user: null }
 }
 

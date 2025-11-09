@@ -7,10 +7,10 @@ import { computed, ref, type Ref } from 'vue'
 
 // ✅ On importe notre service propre
 import {
-  signInWithPassword,
-  signUp as serviceSignUp,
   signInWithMagicLink as serviceMagicLink,
   signInWithProvider as serviceProviderLogin,
+  signUp as serviceSignUp,
+  signInWithPassword,
 } from '@/features/auth/services/authService'
 
 export type Providers = 'google' | 'github' | 'facebook'
@@ -99,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
+    // ✅ UNIQUEMENT si success → redirige
     router.push({ path: '/auth/callback', query: { mode: 'signup' } })
     return true
   }

@@ -37,24 +37,19 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: 'login',
-        name: 'login',
-        component: () => import('@/features/auth/AuthForm.vue'),
-        props: { mode: 'login' },
+        name: 'auth-login',
+        component: () => import('@/features/auth/AuthLogin.vue'),
       },
       {
         path: 'register',
-        name: 'register',
-        component: () => import('@/features/auth/AuthForm.vue'),
-        props: { mode: 'register' },
+        name: 'auth-register',
+        component: () => import('@/features/auth/AuthRegister.vue'),
       },
       {
         path: 'reset-password',
-        name: 'reset-password',
-        component: () => import('@/features/auth/AuthForm.vue'),
-        props: { mode: 'reset' },
+        name: 'auth-reset',
+        component: () => import('@/features/auth/AuthReset.vue'),
       },
-      // 👇 plus besoin de callback séparée :
-      // c’est géré directement dans AuthOverlay.vue
     ],
   },
   {

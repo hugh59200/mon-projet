@@ -9,10 +9,7 @@
     >
       <div class="auth-overlay__backdrop" />
 
-      <main
-        class="auth-overlay__container"
-        key="main"
-      >
+      <main class="auth-overlay__container">
         <section class="auth-overlay__left">
           <div class="auth-brand">
             <div class="auth-brand__header">
@@ -22,7 +19,6 @@
                 class="auth-brand__logo"
               />
 
-              <!-- ✅ h1 → BasicText -->
               <BasicText
                 size="h1"
                 weight="bold"
@@ -33,7 +29,6 @@
               </BasicText>
             </div>
 
-            <!-- ✅ p → BasicText -->
             <BasicText
               size="body-m"
               color="white"
@@ -53,8 +48,8 @@
             </div>
           </div>
         </section>
+
         <section class="auth-overlay__right">
-          <!-- ✅ BOUTON DE REDIRECTION ICI -->
           <div class="auth-overlay__skip">
             <BasicButton
               label="Continuer sans compte"
@@ -66,25 +61,11 @@
               @click="skip"
             />
           </div>
-          <!-- ✅ FIN AJOUT -->
 
-          <AuthOverlaySuccess
-            v-if="mode === 'success'"
-            key="success"
-          />
+          <AuthOverlayEmailSent v-if="mode === 'signup'" />
+          <AuthOverlaySuccess v-else-if="mode === 'success'" />
 
-          <AuthOverlayEmailSent
-            v-else-if="mode === 'signup'"
-            key="signup"
-          />
-
-          <RouterView
-            v-else
-            v-slot="{ Component }"
-            key="form"
-          >
-            <component :is="Component" />
-          </RouterView>
+          <RouterView v-else />
         </section>
       </main>
     </div>
@@ -103,8 +84,8 @@
   const route = useRoute()
   const auth = useAuthStore()
 
-  const mode = ref<'form' | 'success' | 'signup'>('form')
   const visible = ref(true)
+  const mode = ref<'form' | 'signup' | 'success'>('form')
 
   function skip() {
     visible.value = false
@@ -112,34 +93,28 @@
   }
 
   onMounted(async () => {
-    if (route.path === '/auth/callback') {
-      if (route.query.mode === 'signup') {
-        mode.value = 'signup'
-        // Fermeture douce après 3s
-        setTimeout(() => (visible.value = false), 2800)
-        return
-      }
+    if (route.path !== '/auth/callback') return
 
-      const { data, error } = await supabase.auth.getSession()
-      if (error) return console.error('Erreur récupération session:', error)
-      const session = data.session
+    if (route.query.mode === 'signup') {
+      mode.value = 'signup'
+      setTimeout(() => (visible.value = false), 2500)
+      return
+    }
 
-      if (session?.user) {
-        auth.user = session.user
-        await auth.fetchProfile?.()
-        mode.value = 'success'
+    const { data } = await supabase.auth.getSession()
+    const session = data.session
 
-        // ✅ Fermeture overlay + redirection fluide
-        setTimeout(() => (visible.value = false), 2800)
-        setTimeout(() => {
-          const storedRedirect = sessionStorage.getItem('redirectAfterOAuth')
-          const redirect = storedRedirect || (auth.isAdmin ? '/admin' : '/profil')
-          sessionStorage.removeItem('redirectAfterOAuth')
-          router.replace(redirect)
-        }, 3200)
-      } else {
-        router.replace('/auth/login')
-      }
+    if (session?.user) {
+      auth.user = session.user
+      await auth.fetchProfile?.()
+      mode.value = 'success'
+
+      setTimeout(() => (visible.value = false), 2500)
+      setTimeout(() => {
+        router.replace(auth.isAdmin ? '/admin' : '/profil')
+      }, 3000)
+    } else {
+      router.replace('/auth/login')
     }
   })
 </script>

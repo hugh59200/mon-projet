@@ -1,0 +1,107 @@
+.auth {
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+
+  &__title {
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    margin-bottom: 32px;
+    color: @neutral-500;
+  }
+
+  &__form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: #fff;
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  /* Zone où les messages d’erreur / succès restent fixes */
+  &__feedback {
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: -8px;
+  }
+
+  &__error,
+  &__message {
+    margin-top: 6px;
+  }
+
+  &__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 14px 0;
+    color: @neutral-400;
+    font-size: 13px;
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: @neutral-200;
+      margin: 0 10px;
+    }
+  }
+
+  &__providers {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 14px;
+  }
+
+  &__links {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    color: @neutral-600;
+
+    a {
+      color: @primary-700;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: darken(@primary-700, 5%);
+      }
+    }
+  }
+}
+
+/* 🌫 Animation d’apparition */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ Transition douce pour fade messages */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
