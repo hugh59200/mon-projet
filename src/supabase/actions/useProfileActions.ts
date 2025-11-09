@@ -1,4 +1,3 @@
-// ✅ src/supabase/services/useProfileActions.ts
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import {
@@ -7,7 +6,7 @@ import {
   getProfile,
   updatePasswordApi,
   updateProfileInfo,
-  uploadAvatar,
+  uploadAvatar, // ✅ Manquait ici
 } from '../api/profilesApi'
 
 export function useProfileActions() {
@@ -54,7 +53,7 @@ export function useProfileActions() {
 
   async function updatePassword(newPassword: string) {
     try {
-      await updatePasswordApi(newPassword)
+      await updatePasswordApi(newPassword) // ✅ Manquait l'import
       toast.show('Mot de passe mis à jour ✅', 'success')
     } catch (err: any) {
       toast.show(err.message, 'danger')
@@ -66,7 +65,6 @@ export function useProfileActions() {
       await deleteAccountApi()
       toast.show('Compte supprimé ✅', 'success')
 
-      // ✅ logout + redirection
       await auth.signOut()
       window.location.href = '/'
     } catch (err: any) {

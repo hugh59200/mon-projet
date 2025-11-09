@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.vue src",
     "lint:fix": "eslint --ext .ts,.vue src --fix",
-    "format": "prettier --write \"src/**/*.{ts,vue,less,json}\""
+    "format": "prettier --write \"src/**/*.{ts,vue,less,json}\"",
+    "deploy:functions": "supabase functions deploy create-stripe-session stripe-webhook order-status-update retrieve-stripe-session order-confirmation delete-account",
+    "gen:types": "mkdir -p src/supabase/types && npx supabase gen types typescript --project-id dwomsbawthlktapmtmqu --schema public > src/supabase/types/supabase.ts"
   },
   "dependencies": {
     "@supabase/realtime-js": "^2.79.0",

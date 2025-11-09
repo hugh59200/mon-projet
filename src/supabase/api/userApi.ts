@@ -1,10 +1,7 @@
-// src/services/userService.ts
-import { supabase } from '@/supabase/supabaseClient'
-import type { Role } from '@/supabase/types/supabase.types'
+import { supabase } from '../supabaseClient'
+import type { Role } from '../types/supabase.types'
+import { handleMutation } from './helpers/HandleError'
 
-/**
- * ✅ Récupère les utilisateurs avec pagination et count
- */
 export async function fetchUsersWithCount(search = '', limit = 20, offset = 0) {
   let query = supabase
     .from('profiles')
@@ -16,22 +13,17 @@ export async function fetchUsersWithCount(search = '', limit = 20, offset = 0) {
     query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`)
   }
 
-  return query
+  const res = await query
+  handleMutation(res.error)
+  return res
 }
 
-/**
- * ✅ Supprime un utilisateur
- */
 export async function deleteUserById(id: string) {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
-  if (error) throw new Error(error.message)
+  handleMutation(error)
 }
 
-/**
- * ✅ Met à jour le rôle
- */
 export async function updateUserRole(id: string, role: Role) {
   const { error } = await supabase.from('profiles').update({ role }).eq('id', id)
-
-  if (error) throw new Error(error.message)
+  handleMutation(error)
 }

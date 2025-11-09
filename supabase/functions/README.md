@@ -26,4 +26,10 @@ supabase functions deploy order-confirmation
 
 ## 3️⃣ Déployer toutes les fontions
 
-supabase tasks deploy
+supabase functions deploy \
+ create-stripe-session \
+ stripe-webhook \
+ order-status-update \
+ retrieve-stripe-session \
+ order-confirmation \
+ delete-account

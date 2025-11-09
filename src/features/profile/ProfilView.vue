@@ -194,7 +194,7 @@
               label="Supprimer mon compte"
               type="danger"
               variant="outlined"
-              @click="deleteAccountAction"
+              @click="onDeleteAccountClick"
             />
           </div>
         </FilterSection>
@@ -224,11 +224,13 @@
   import { onMounted, ref, type Ref } from 'vue'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
+  import { useDialog } from '../interface/dialog'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
+  const { showDialog } = useDialog()
 
   const {
     loadProfile,
@@ -236,7 +238,7 @@
     changeAvatar,
     loadLastOrdersAction,
     updatePassword,
-    deleteAccount: deleteAccountAction,
+    deleteAccount,
   } = useProfileActions()
 
   const profile = ref<Profiles | null>(null)
@@ -302,6 +304,23 @@
 
     await updatePassword(newPassword.value)
     passwordLoading.value = false
+  }
+
+  async function onDeleteAccountClick() {
+    const result = await showDialog({
+      type: 'YesNo',
+      title: 'Supprimer mon compte',
+      message: [
+        'Cette action est définitive.',
+        'Toutes vos données liées à ce compte seront supprimées.',
+        'Confirmez-vous ?',
+      ],
+      closable: false,
+    })
+
+    if (result === 'Yes') {
+      await deleteAccount()
+    }
   }
 
   function savePreferences() {

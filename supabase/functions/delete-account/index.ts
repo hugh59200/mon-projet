@@ -1,60 +1,64 @@
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Authorization, apikey, Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // ✅ Preflight CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('OK', { headers: corsHeaders })
+  }
+
   try {
-    // ✅ Auth obligatoire
-    const authHeader = req.headers.get('Authorization') || ''
-    const token = authHeader.replace('Bearer ', '')
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      { auth: { autoRefreshToken: false, persistSession: false } },
+    )
 
+    const token = req.headers.get('Authorization')?.replace('Bearer ', '')
     if (!token) {
-      return new Response(JSON.stringify({ error: 'No auth token' }), {
+      return new Response(JSON.stringify({ success: false, error: 'No token provided' }), {
         status: 401,
+        headers: corsHeaders,
       })
     }
 
-    // ✅ Supabase client (avec RLS bypass car service role)
-    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
+    const {
+      data: { user },
+      error: userErr,
+    } = await supabase.auth.getUser(token)
 
-    // ✅ Récupération de l’utilisateur authentifié
-    const { data: user, error: userError } = await supabase.auth.getUser(token)
-
-    if (userError || !user?.user) {
-      return new Response(JSON.stringify({ error: 'Invalid user' }), {
+    if (userErr || !user) {
+      return new Response(JSON.stringify({ success: false, error: 'User not authenticated' }), {
         status: 401,
+        headers: corsHeaders,
       })
     }
 
-    const userId = user.user.id
+    // ✅ delete profile
+    await supabase.from('profiles').delete().eq('id', user.id)
 
-    // ✅ On supprime l’avatar s’il existe
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('id', userId)
-      .maybeSingle()
-
-    if (profile?.avatar_url) {
-      await supabase.storage.from('avatars').remove([profile.avatar_url])
-    }
-
-    // ✅ Supprimer l’utilisateur (cascade fait le reste)
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId)
-
+    // ✅ delete from auth
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
     if (deleteError) {
-      return new Response(JSON.stringify({ error: deleteError.message }), {
+      return new Response(JSON.stringify({ success: false, error: deleteError.message }), {
         status: 500,
+        headers: corsHeaders,
       })
     }
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 })
-  } catch (err) {
-    console.error('❌ delete-account error:', err)
-    return new Response(JSON.stringify({ error: `${err}` }), {
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: corsHeaders,
+    })
+  } catch (e) {
+    return new Response(JSON.stringify({ success: false, error: e.message }), {
       status: 500,
+      headers: corsHeaders,
     })
   }
 })
