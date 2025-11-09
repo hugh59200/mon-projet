@@ -3,7 +3,7 @@
     :label
     :required
     :hint
-    :alertLabel="touched ? alertLabel : ''"
+    :alertLabel="touched ? internalAlertLabel || alertLabel : ''"
     :alertType="alertType"
     :help
   >
@@ -47,37 +47,42 @@
 
   const modelValue = defineModel<InputModel>()
 
-  const alertLabel = ref('')
+  const internalAlertLabel = ref('')
   const alertType = ref<'danger' | 'warning' | 'success' | 'info'>('danger')
 
   function onStrengthChange({ level, valid }: { level: string; valid: boolean }) {
-    // Si champ vide => reset complet
     if (!modelValue.value || modelValue.value.toString().trim() === '') {
-      alertLabel.value = ''
-      alertType.value = 'danger'
+      internalAlertLabel.value = ''
       return
     }
 
-    // Si mot de passe valide
+    // ✅ si weak, ne rien afficher
+    if (level === 'weak') {
+      internalAlertLabel.value = ''
+      return
+    }
+
     if (valid) {
-      alertLabel.value = ''
+      internalAlertLabel.value = ''
       alertType.value = 'success'
     } else {
-      // Messages adaptés selon la force
-      const messages: Record<string, string> = {
-        weak: 'Mot de passe trop faible',
-        medium: 'Mot de passe à renforcer',
-        strong: '',
+      // ✅ Si faible → aucune alerte
+      if (level === 'weak') {
+        internalAlertLabel.value = ''
+        return
       }
 
-      alertLabel.value = messages[level] || 'Mot de passe trop faible'
-      alertType.value = level === 'medium' ? 'warning' : 'danger'
+      // ✅ Moyen → petit warning
+      if (level === 'medium') {
+        internalAlertLabel.value = 'Mot de passe à renforcer'
+        alertType.value = 'warning'
+      }
     }
   }
 
   watch(modelValue, (val) => {
     if (!val || val.toString().trim() === '') {
-      alertLabel.value = ''
+      internalAlertLabel.value = ''
       alertType.value = 'danger'
     }
   })

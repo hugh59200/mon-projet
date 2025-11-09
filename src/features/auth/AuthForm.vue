@@ -50,8 +50,6 @@
       <BasicButton
         :label="labelBouton"
         variant="filled"
-        width="full"
-        size="medium"
         :disabled="loading"
         :loading="loading"
         @click="handleSubmit"
@@ -144,7 +142,7 @@
 
   const auth = useAuthStore()
   const router = useRouter()
-  const { email, password, errors, validate, validateField, touched } = useForm()
+  const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
 
   const hintEmail = 'exemple@domaine.com'
   const hintPassword = '8 caractères minimum'
@@ -220,8 +218,15 @@
     clearMessages()
     const isValid = validate(props.mode)
     if (!isValid) {
+      console.log('pas valide...pk ?')
       touched.value.email = true
       touched.value.password = true
+
+      // ✅ Si mot de passe vide = message clair
+      if (!password.value || password.value.trim() === '') {
+        errors.value.password = 'Mot de passe requis'
+      }
+
       return
     }
 

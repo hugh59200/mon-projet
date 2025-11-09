@@ -1,13 +1,11 @@
 import router from '@/router'
 import { supabase } from '@/supabase/supabaseClient'
-import type { Profiles } from '@/supabase/types/supabase.types'
+import type { Profiles, Role } from '@/supabase/types/supabase.types'
 import type { User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 
 export type Providers = 'google' | 'github' | 'facebook'
-
-type UserRole = NonNullable<Profiles['role']> extends string ? 'admin' | 'user' : 'user'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null) as Ref<User | null>
@@ -18,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => profile.value?.role === 'admin')
-  const role = computed<UserRole>(() => (profile.value?.role as UserRole) || 'user')
+  const role = computed<Role>(() => (profile.value?.role as Role) || 'user')
 
   async function fetchProfile() {
     if (!user.value) return

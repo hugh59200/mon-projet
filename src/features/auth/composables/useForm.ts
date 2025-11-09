@@ -2,7 +2,7 @@ import { debounce } from '@/utils/debounce'
 import { ref, watch } from 'vue'
 import { useValidation } from './useValidation'
 
-export function useForm(live = true) {
+export function useForm(live = true, minStrength: 'weak' | 'medium' | 'strong' = 'weak') {
   const { validateEmail, validatePassword } = useValidation()
 
   const email = ref('')
@@ -23,7 +23,7 @@ export function useForm(live = true) {
     if (emailError) errors.value.email = emailError
 
     if (mode !== 'reset') {
-      const passError = validatePassword(password.value)
+      const passError = validatePassword(password.value, minStrength)
       if (passError) errors.value.password = passError
     }
 
@@ -43,7 +43,7 @@ export function useForm(live = true) {
 
     if (field === 'password') {
       const val = password.value
-      errors.value.password = val ? (validatePassword(val) ?? undefined) : undefined
+      errors.value.password = val ? (validatePassword(val, minStrength) ?? undefined) : undefined
     }
   }
 

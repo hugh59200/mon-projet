@@ -29,7 +29,7 @@
         <!-- 🔋 Indicateur de force -->
         <transition name="fade">
           <BasicTooltip
-            v-if="showStrength && modelValue"
+            v-if="showStrength && modelValue && strengthLevel !== 'weak'"
             :label="strengthLabel"
             position="top"
           >
@@ -89,7 +89,11 @@
   )
 
   const validationState = computed(() => {
-    if (!props.touched) return undefined // 🧠 ne rien afficher si pas encore touché
+    if (!props.touched) return undefined
+
+    // ✅ On n’affiche l’erreur que si niveau = medium mais pas assez fort
+    if (strengthLevel.value === 'weak') return undefined
+
     return !valid.value ? 'error' : undefined
   })
 
@@ -139,31 +143,31 @@
 
   /* --- Calcul de la force du mot de passe --- */
   function getPasswordStrength(password: string) {
-    if (!password) return { percent: 0, label: '', level: 'weak' as const }
-
-    if (password.length < 8) {
-      const percent = Math.min((password.length / 8) * 100, 100)
-      return { percent, label: 'Trop court', level: 'weak' as const }
+    if (!password) {
+      return { percent: 0, label: '', level: 'weak' as const }
     }
+
+    // ✅ toujours calculer un pourcentage, mais sans message bloquant
+    const percent = Math.min((password.length / 12) * 100, 100)
 
     let score = 0
-    if (/[A-Z]/.test(password)) score += 1
-    if (/[a-z]/.test(password)) score += 1
-    if (/[0-9]/.test(password)) score += 1
-    if (/[^A-Za-z0-9]/.test(password)) score += 1
+    if (/[A-Z]/.test(password)) score++
+    if (/[a-z]/.test(password)) score++
+    if (/[0-9]/.test(password)) score++
+    if (/[^A-Za-z0-9]/.test(password)) score++
 
-    const percent = (score / 4) * 100
-    let label = 'Faible ⚠️'
     let level: 'weak' | 'medium' | 'strong' = 'weak'
+    let label = ''
 
-    if (score >= 4) {
-      label = 'Fort 💪'
+    if (score >= 4 && password.length >= 10) {
       level = 'strong'
-    } else if (score === 2 || score === 3) {
-      label = 'Moyen ⚖️'
+      label = 'Fort 💪'
+    } else if (score >= 2 && password.length >= 8) {
       level = 'medium'
+      label = 'Moyen ⚖️'
     }
 
+    // ✅ si faible : label vide → aucune alerte bloquante
     return { percent, label, level }
   }
 
