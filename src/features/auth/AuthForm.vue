@@ -81,27 +81,28 @@
           />
         </div>
       </template>
-      <transition name="fade">
-        <BasicText
-          v-if="error"
-          class="auth__error"
-          size="body-s"
-          color="danger-400"
-        >
-          {{ error }}
-        </BasicText>
-      </transition>
-
-      <transition name="fade">
-        <BasicText
-          v-if="message"
-          class="auth__message"
-          size="body-s"
-          color="primary-600"
-        >
-          {{ message }}
-        </BasicText>
-      </transition>
+      <div class="auth__feedback">
+        <transition name="fade">
+          <BasicText
+            v-if="error"
+            class="auth__error"
+            size="body-m"
+            color="danger-400"
+          >
+            {{ error }}
+          </BasicText>
+        </transition>
+        <transition name="fade">
+          <BasicText
+            v-if="message"
+            class="auth__message"
+            size="body-m"
+            color="primary-600"
+          >
+            {{ message }}
+          </BasicText>
+        </transition>
+      </div>
     </div>
     <div class="auth__links">
       <RouterLink
@@ -296,7 +297,13 @@
       animation: fadeInUp 0.4s ease forwards;
     }
 
-    &magic-wrapper {
+    &__feedback {
+      height: 20px; /* assure la place, même si vide */
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__magic-wrapper {
       display: flex;
       justify-content: center;
 

@@ -21,13 +21,29 @@
                 alt="Logo Fast Peptides"
                 class="auth-brand__logo"
               />
-              <h1 class="auth-brand__title">Fast Peptides</h1>
+
+              <!-- ✅ h1 → BasicText -->
+              <BasicText
+                size="h1"
+                weight="bold"
+                color="white"
+                class="auth-brand__title"
+              >
+                Fast Peptides
+              </BasicText>
             </div>
-            <p class="auth-brand__subtitle">
+
+            <!-- ✅ p → BasicText -->
+            <BasicText
+              size="body-m"
+              color="white"
+              class="auth-brand__subtitle"
+            >
               Accélérez la recherche biomoléculaire
               <br />
               avec précision et élégance 🔬
-            </p>
+            </BasicText>
+
             <div class="auth-brand__illustration">
               <img
                 src="@/assets/lab-illustration.jpg"
@@ -37,8 +53,21 @@
             </div>
           </div>
         </section>
-
         <section class="auth-overlay__right">
+          <!-- ✅ BOUTON DE REDIRECTION ICI -->
+          <div class="auth-overlay__skip">
+            <BasicButton
+              label="Continuer sans compte"
+              type="secondary"
+              variant="ghost"
+              size="small"
+              iconName="ArrowRight"
+              iconRight
+              @click="skip"
+            />
+          </div>
+          <!-- ✅ FIN AJOUT -->
+
           <AuthOverlaySuccess
             v-if="mode === 'success'"
             key="success"
@@ -76,6 +105,11 @@
 
   const mode = ref<'form' | 'success' | 'signup'>('form')
   const visible = ref(true)
+
+  function skip() {
+    visible.value = false
+    setTimeout(() => router.replace('/'), 200)
+  }
 
   onMounted(async () => {
     if (route.path === '/auth/callback') {

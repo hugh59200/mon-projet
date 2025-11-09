@@ -979,3 +979,20 @@ GRANT SELECT ON public.orders_full_view TO authenticated;
 
 ALTER TABLE orders
 ADD CONSTRAINT unique_stripe_session UNIQUE (stripe_session_id);
+
+
+-- ✅ Vérification d'un email dans auth.users (RLS-safe + sécurisé)
+CREATE OR REPLACE FUNCTION public.user_exists_by_email(p_email text)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+  SELECT EXISTS(
+    SELECT 1 FROM auth.users WHERE email = p_email
+  );
+$$;
+
+-- ✅ Empêche toute fuite : seule exécution, pas de lecture
+REVOKE ALL ON FUNCTION public.user_exists_by_email(text) FROM public;
+GRANT EXECUTE ON FUNCTION public.user_exists_by_email(text) TO anon, authenticated;

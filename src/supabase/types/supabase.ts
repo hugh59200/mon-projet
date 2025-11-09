@@ -833,6 +833,7 @@ export type Database = {
           }
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
+      user_exists_by_email: { Args: { p_email: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
