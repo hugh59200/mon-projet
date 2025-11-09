@@ -180,7 +180,7 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import { useProductActions } from '@/supabase/services/useProductActions'
+  import { useProductActions } from '@/supabase/actions/useProductActions'
   import { formatCurrency } from '@/utils/index'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { ref } from 'vue'

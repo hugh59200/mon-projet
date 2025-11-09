@@ -4,8 +4,8 @@ export type Role = 'admin' | 'user'
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'canceled'
 
 export type Profiles = Tables<'profiles'>
-export type UserInsert = TablesInsert<'profiles'>
-export type UserUpdate = TablesUpdate<'profiles'>
+export type ProfilesInsert = TablesInsert<'profiles'>
+export type ProfilesUpdate = TablesUpdate<'profiles'>
 
 export type Orders = Tables<'orders'>
 export type OrderInsert = TablesInsert<'orders'>

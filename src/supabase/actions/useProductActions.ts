@@ -1,7 +1,7 @@
 // src/supabase/services/useProductActions.ts
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import type { Products, ProductsInsert, ProductsUpdate } from '@/supabase/types/supabase.types'
-import { deleteProductById, updateProductInDB, createProductInDB } from '../api/products'
+import { deleteProductById, updateProductInDB, createProductInDB } from '../api/productsApi'
 
 export function useProductActions(fetchData?: () => void) {
   const toast = useToastStore()

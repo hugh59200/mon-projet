@@ -143,7 +143,7 @@
   import { ROLES } from '@/features/admin/constants/users'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
-  import { useUserActions } from '@/supabase/services/useUserActions'
+  import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils'
   import { ref, watch } from 'vue'

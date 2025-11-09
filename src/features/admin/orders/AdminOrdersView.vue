@@ -149,7 +149,7 @@
 <script setup lang="ts">
   import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
-  import { useOrderActions } from '@/supabase/services/useOrderActions'
+  import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { ref, watchEffect } from 'vue'

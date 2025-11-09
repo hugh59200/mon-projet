@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { useProductActions } from '@/supabase/services/useProductActions'
+  import { useProductActions } from '@/supabase/actions/useProductActions'
   import { supabase } from '@/supabase/supabaseClient'
   import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

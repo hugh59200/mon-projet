@@ -34,7 +34,7 @@
           showStrength?: boolean
           minStrength?: 'weak' | 'medium' | 'strong'
           autoValidate?: boolean
-          touched?: boolean // 👈 nouvelle prop
+          touched?: boolean
         }
     >(),
     {
@@ -45,20 +45,11 @@
     },
   )
 
-  /**
-   * 🔗 v-model du mot de passe
-   */
   const modelValue = defineModel<InputModel>()
 
-  /**
-   * 💬 Gestion dynamique des alertes
-   */
   const alertLabel = ref('')
   const alertType = ref<'danger' | 'warning' | 'success' | 'info'>('danger')
 
-  /**
-   * 🧠 Réception des changements de force
-   */
   function onStrengthChange({ level, valid }: { level: string; valid: boolean }) {
     // Si champ vide => reset complet
     if (!modelValue.value || modelValue.value.toString().trim() === '') {
@@ -84,9 +75,6 @@
     }
   }
 
-  /**
-   * 👀 Watch : si l’utilisateur efface le champ manuellement
-   */
   watch(modelValue, (val) => {
     if (!val || val.toString().trim() === '') {
       alertLabel.value = ''

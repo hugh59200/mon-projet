@@ -41,7 +41,7 @@
         placeholder="••••••••"
         required
         :hint="hintPassword"
-        :minStrength="mode === 'register' ? 'medium' : 'weak'"
+        minStrength="weak"
         :alertLabel="errors.password"
         :touched="touched.password"
         @input="clearMessages"

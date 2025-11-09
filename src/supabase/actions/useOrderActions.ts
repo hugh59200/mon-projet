@@ -1,4 +1,4 @@
-import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/orders'
+import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi'
 import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 

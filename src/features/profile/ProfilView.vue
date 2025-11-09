@@ -20,6 +20,7 @@
             class="profil__avatar-img"
             alt="Avatar"
           />
+
           <div
             v-else
             class="profil__avatar-placeholder"
@@ -29,6 +30,7 @@
               :size="42"
             />
           </div>
+
           <input
             type="file"
             accept="image/*"
@@ -52,6 +54,7 @@
             >
               {{ profile?.email || 'Adresse e-mail non renseignée' }}
             </BasicText>
+
             <BasicText
               v-if="profile?.role"
               size="body-s"
@@ -89,13 +92,14 @@
             placeholder="12 rue du Peptide"
             input-type="form"
           />
+
           <div class="profil__actions">
             <BasicButton
               label="Enregistrer les modifications"
               type="primary"
               variant="filled"
               :disabled="loading"
-              @click="updateProfile"
+              @click="updateProfileForm"
             />
           </div>
         </FilterSection>
@@ -113,16 +117,18 @@
               class="order-card"
             >
               <div class="order-card__header">
-                <strong>Commande #{{ order.id.slice(0, 8) }}</strong>
+                <strong>Commande #{{ order?.id?.slice(0, 8) }}</strong>
                 <span :class="['status', order.status]">{{ order.status }}</span>
               </div>
               <div class="order-card__body">
                 <p>Total : {{ order.total_amount }} €</p>
-                <p>Date : {{ new Date(order.created_at).toLocaleDateString() }}</p>
+                <p>Date : {{ formatOrderDate(order.created_at!) }}</p>
               </div>
             </div>
+
             <p v-else>Aucune commande récente.</p>
           </div>
+
           <BasicButton
             label="Voir toutes mes commandes"
             type="secondary"
@@ -146,6 +152,7 @@
               label="Recevoir les alertes SMS"
             />
           </div>
+
           <BasicButton
             label="Sauvegarder mes préférences"
             type="secondary"
@@ -171,21 +178,23 @@
             placeholder="Confirmez le mot de passe"
             input-type="form"
           />
+
           <div class="profil__actions">
             <BasicButton
               label="Mettre à jour le mot de passe"
               type="primary"
               variant="filled"
               :disabled="passwordLoading"
-              @click="updatePassword"
+              @click="updatePasswordAction"
             />
           </div>
+
           <div class="profil__danger">
             <BasicButton
               label="Supprimer mon compte"
               type="danger"
               variant="outlined"
-              @click="deleteAccount"
+              @click="deleteAccountAction"
             />
           </div>
         </FilterSection>
@@ -210,108 +219,98 @@
 
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
-  import { supabase } from '@/supabase/supabaseClient'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref } from 'vue'
+  import { useProfileActions } from '@/supabase/actions/useProfileActions'
+  import type { Orders, Profiles } from '@/supabase/types/supabase.types'
+  import { onMounted, ref, type Ref } from 'vue'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
   const auth = useAuthStore()
-  const toast = useToastStore()
-  const sections = useProfileSectionsStore()
   const chatStore = useChatWidgetStore()
+  const sections = useProfileSectionsStore()
 
-  const profile = ref<any | null>(null)
+  const {
+    loadProfile,
+    updateProfile,
+    changeAvatar,
+    loadLastOrdersAction,
+    updatePassword,
+    deleteAccount: deleteAccountAction,
+  } = useProfileActions()
+
+  const profile = ref<Profiles | null>(null)
+  const lastOrders = ref([]) as Ref<Partial<Orders>[]>
+
   const editableName = ref('')
   const avatarPreview = ref<string | null>(null)
   const phone = ref('')
   const address = ref('')
+
   const newsletter = ref(false)
   const smsAlerts = ref(false)
+
   const loading = ref(false)
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
-  const lastOrders = ref<any[]>([])
 
-  async function loadProfile() {
-    if (!auth.user) return
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', auth.user.id)
-      .maybeSingle()
-    if (data) {
-      profile.value = data
-      editableName.value = data.full_name ?? ''
-      avatarPreview.value = data.avatar_url ? getPublicUrl(data.avatar_url) : null
-      phone.value = data.phone ?? ''
-      address.value = data.address ?? ''
-    }
+  function formatOrderDate(date: string) {
+    return new Date(date).toLocaleDateString()
   }
 
-  async function loadLastOrders() {
+  async function fetchProfileData() {
     if (!auth.user) return
-    const { data } = await supabase
-      .from('orders')
-      .select('id, total_amount, created_at, status')
-      .eq('user_id', auth.user.id)
-      .order('created_at', { ascending: false })
-      .limit(3)
-    if (data) lastOrders.value = data
-  }
 
-  function getPublicUrl(path: string) {
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-    return data.publicUrl
+    const data = await loadProfile(auth.user.id)
+    if (!data) return
+
+    profile.value = data
+    editableName.value = data.full_name ?? ''
+    avatarPreview.value = data.avatar_url ? data.avatar_url : null
+    phone.value = data.phone ?? ''
+    address.value = data.address ?? ''
+
+    lastOrders.value = await loadLastOrdersAction(auth.user.id)
   }
 
   async function handleAvatarSelect(e: Event) {
     const target = e.target as HTMLInputElement
-    if (!target.files?.length || !auth.user) return
-    const file = target.files[0]
-    if (!file) return
-    const ext = file.name.split('.').pop()
-    const path = `${auth.user.id}-${Date.now()}.${ext}`
+    const file = target.files?.[0]
+    if (!file || !auth.user) return
 
-    await supabase.storage.from('avatars').upload(path, file, { upsert: true })
-    await supabase.from('profiles').update({ avatar_url: path }).eq('id', auth.user.id)
-    avatarPreview.value = getPublicUrl(path)
-    toast.show('Avatar mis à jour 🎨', 'success')
+    const publicUrl = await changeAvatar(auth.user.id, file)
+    if (publicUrl) avatarPreview.value = publicUrl
   }
 
-  async function updateProfile() {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ full_name: editableName.value, phone: phone.value, address: address.value })
-      .eq('id', profile.value.id)
-    if (error) toast.show('Erreur de mise à jour', 'danger')
-    else toast.show('Profil mis à jour ✅', 'success')
+  async function updateProfileForm() {
+    if (!auth.user) return
+    loading.value = true
+
+    await updateProfile(auth.user.id, {
+      full_name: editableName.value,
+      phone: phone.value,
+      address: address.value,
+    })
+
+    loading.value = false
   }
 
-  async function updatePassword() {
-    if (newPassword.value !== confirmPassword.value) {
-      toast.show('Les mots de passe ne correspondent pas ❌', 'danger')
-      return
-    }
-    const { error } = await supabase.auth.updateUser({ password: newPassword.value })
-    if (error) toast.show(error.message, 'danger')
-    else toast.show('Mot de passe mis à jour ✅', 'success')
+  async function updatePasswordAction() {
+    if (newPassword.value !== confirmPassword.value) return
+    passwordLoading.value = true
+
+    await updatePassword(newPassword.value)
+    passwordLoading.value = false
   }
 
   function savePreferences() {
-    toast.show('Préférences enregistrées ✅', 'success')
-  }
-
-  async function deleteAccount() {
-    toast.show('Suppression du compte non disponible côté client', 'warning')
+    // si stockage en DB → appeler API
   }
 
   onMounted(async () => {
     await sections.loadFromSupabase()
-    await loadProfile()
-    await loadLastOrders()
+    await fetchProfileData()
   })
 </script>
 
