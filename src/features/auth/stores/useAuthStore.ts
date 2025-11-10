@@ -95,12 +95,10 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = false
 
     if (!result.success) {
-      error.value = result.message
+      error.value = result.message!
       return false
     }
-
-    // ✅ UNIQUEMENT si success → redirige
-    router.push({ path: '/auth/callback', query: { mode: 'signup' } })
+    // router.push({ path: '/auth/callback' })
     return true
   }
 

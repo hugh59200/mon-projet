@@ -10,7 +10,7 @@
     "lint": "eslint --ext .ts,.vue src",
     "lint:fix": "eslint --ext .ts,.vue src --fix",
     "format": "prettier --write \"src/**/*.{ts,vue,less,json}\"",
-    "deploy:functions": "supabase functions deploy create-stripe-session stripe-webhook order-status-update retrieve-stripe-session order-confirmation delete-account",
+    "deploy:functions": "supabase functions deploy create-stripe-session stripe-webhook order-status-update retrieve-stripe-session order-confirmation delete-account auth-email-hook --no-verify-jwt",
     "gen:types": "mkdir -p src/supabase/types && npx supabase gen types typescript --project-id dwomsbawthlktapmtmqu --schema public > src/supabase/types/supabase.ts"
   },
   "dependencies": {
