@@ -1,3 +1,4 @@
+// utils/sendEmail.ts
 import { resend } from './clients.ts'
 import { logEmail } from './logEmail.ts'
 
@@ -16,7 +17,7 @@ export async function sendEmail({
   type?: string
   order_id?: string
 }) {
-  console.log('📧 Sending email to:', to)
+  console.log(`📧 Sending email to ${to} | Subject: ${subject}`)
 
   const result = await resend.emails.send({
     from: FROM,
@@ -25,7 +26,7 @@ export async function sendEmail({
     html,
   })
 
-  console.log('📦 Resend response:', JSON.stringify(result))
+  console.log('✅ Resend response:', result)
 
   await logEmail({
     to_email: to,

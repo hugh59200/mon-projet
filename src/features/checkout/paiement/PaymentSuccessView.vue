@@ -41,6 +41,7 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'

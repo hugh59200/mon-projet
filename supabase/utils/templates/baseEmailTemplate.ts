@@ -10,13 +10,12 @@ export function baseEmailTemplate({
   ctaUrl?: string
 }) {
   const primary = '#00796B'
-
-  const logoUrl = 'https://mon-projet-perso.pages.dev/logo-app.png'
+  const logoUrl = 'https://fast-peptides.com/logo.png'
 
   const ctaBlock =
     ctaLabel && ctaUrl
       ? `
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;">
+      <table role="presentation" width="100%" style="margin:28px 0;">
         <tr>
           <td align="center">
             <a href="${ctaUrl}"
@@ -32,37 +31,22 @@ export function baseEmailTemplate({
             </a>
           </td>
         </tr>
-      </table>
-    `
+      </table>`
       : ''
 
   return `
   <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-    <center style="width:100%;background:#f5f5f5;padding:20px 0;">
-      <div style="max-width:600px;margin:0 auto;">
-
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-          style="background:#fff;border-radius:10px;overflow:hidden;
-                 box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-
-          <!-- ✅ Header -->
+    <center style="width:100%;padding:20px 0;">
+      <div style="max-width:600px;margin:auto;">
+        <table width="100%" style="background:#fff;border-radius:10px;overflow:hidden;">
           <tr>
-            <td align="center" style="background:${primary};padding:25px;color:#fff;">
-              <img
-                src="${logoUrl}"
-                width="60"
-                alt="Fast Peptides"
-                style="display:block;margin:0 auto 8px;"
-              />
-              <h2 style="margin:0;font-size:22px;color:#fff;">
-                ${title}
-              </h2>
+            <td align="center" style="background:${primary};padding:25px;color:#fff;">             
+              <h2 style="margin:0;font-size:22px;">${title}</h2>
             </td>
           </tr>
 
-          <!-- ✅ Content -->
           <tr>
-            <td style="padding:24px;color:#222;line-height:1.5;font-size:15px;">
+            <td style="padding:24px;color:#222;font-size:15px;line-height:1.5;">
               ${bodyHTML}
               ${ctaBlock}
 
@@ -70,16 +54,13 @@ export function baseEmailTemplate({
 
               <p style="font-size:13px;color:#777;text-align:center;">
                 L’équipe Fast Peptides 🧬<br/>
-                <a href="https://fastpeptides.com" style="color:${primary};text-decoration:none;">
-                  fastpeptides.com
-                </a>
+                <a href="https://fast-peptides.com"
+                  style="color:${primary};text-decoration:none;">fast-peptides.com</a>
               </p>
             </td>
           </tr>
-
         </table>
       </div>
     </center>
-  </body>
-  `
+  </body>`
 }

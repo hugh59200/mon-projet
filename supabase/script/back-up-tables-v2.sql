@@ -996,3 +996,85 @@ $$;
 -- ✅ Empêche toute fuite : seule exécution, pas de lecture
 REVOKE ALL ON FUNCTION public.user_exists_by_email(text) FROM public;
 GRANT EXECUTE ON FUNCTION public.user_exists_by_email(text) TO anon, authenticated;
+
+ALTER TABLE orders ADD COLUMN order_number TEXT UNIQUE;
+
+CREATE OR REPLACE FUNCTION public.generate_order_number()
+RETURNS TRIGGER AS $$
+DECLARE
+  next_number INTEGER;
+  formatted TEXT;
+BEGIN
+  SELECT COALESCE(MAX(id), 0) + 1 INTO next_number FROM orders;
+
+  formatted := 'FP-' || TO_CHAR(NOW(), 'YYYY') || '-' || LPAD(next_number::TEXT, 6, '0');
+
+  NEW.order_number := formatted;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_order_number ON orders;
+
+CREATE TRIGGER set_order_number
+BEFORE INSERT ON orders
+FOR EACH ROW
+WHEN (NEW.order_number IS NULL)
+EXECUTE FUNCTION generate_order_number();
+
+-- ✅ Force RLS sur orders_full_view et orders_overview_for_admin
+ALTER VIEW public.orders_full_view SET (security_invoker = true);
+ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
+
+-- ✅ Donner accès admin à orders_overview_for_admin
+GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
+
+-- ✅ Autoriser insertion de commandes par utilisateur authentifié
+CREATE POLICY "User can insert own orders"
+ON public.orders
+FOR INSERT
+TO authenticated
+WITH CHECK (auth.uid() = user_id);
+
+-- ✅ Autoriser utilisateur à mettre à jour sa propre commande
+CREATE POLICY "User can update own orders"
+ON public.orders
+FOR UPDATE
+TO authenticated
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+
+-- ✅ Force RLS sur orders_full_view et orders_overview_for_admin
+ALTER VIEW public.orders_full_view SET (security_invoker = true);
+ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
+
+-- ✅ Donner accès admin à orders_overview_for_admin
+GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
+
+DROP FUNCTION IF EXISTS public.generate_order_number CASCADE;
+DROP TRIGGER IF EXISTS set_order_number ON public.orders;
+
+-- compteur auto incrémenté
+CREATE SEQUENCE IF NOT EXISTS orders_seq START 1;
+
+CREATE OR REPLACE FUNCTION public.generate_order_number()
+RETURNS TRIGGER AS $$
+DECLARE
+  next_number INTEGER;
+  formatted TEXT;
+BEGIN
+  SELECT nextval('orders_seq') INTO next_number;
+
+  formatted := 'FP-' || TO_CHAR(NOW(), 'YYYY') || '-' || LPAD(next_number::TEXT, 6, '0');
+
+  NEW.order_number := formatted;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_order_number
+BEFORE INSERT ON public.orders
+FOR EACH ROW
+WHEN (NEW.order_number IS NULL)
+EXECUTE FUNCTION public.generate_order_number();

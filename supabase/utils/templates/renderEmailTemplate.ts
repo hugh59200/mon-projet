@@ -1,38 +1,42 @@
+import { emailChangeTemplate } from './emailChangeTemplate.ts'
 import { genericTemplate } from './genericTemplate.ts'
-import { orderConfirmationTemplate } from './orderConfirmation.ts'
-import { signupConfirmationTemplate } from './signupConfirmation.ts'
+import { orderConfirmationTemplate } from './orderConfirmationTemplate.ts'
+import { recoveryTemplate } from './recoveryTemplate.ts'
+import { shippingTemplate } from './shippingTemplate.ts'
+import { signupConfirmationTemplate } from './signupConfirmationTemplate.ts'
 
 export function renderEmailTemplate(type: string, data: any) {
   switch (type) {
     case 'confirmation':
       return orderConfirmationTemplate(data)
 
-    case 'signup':
-      return signupConfirmationTemplate(data)
-
     case 'payment':
       return genericTemplate({
         title: 'Paiement confirmé ✅',
-        message: `Votre paiement de ${data.amount}€ a bien été reçu.`,
+        message: `Votre paiement de ${(Number(data.amount) || 0).toFixed(2)}€ a bien été reçu.`,
+        ctaLabel: 'Voir ma commande',
+        ctaUrl: `https://fast-peptides.com/compte/commande/${data.order_id}`,
       })
+
+    case 'shipping':
+      return shippingTemplate(data)
 
     case 'status_update':
       return genericTemplate({
         title: 'Mise à jour de votre commande 🔔',
         message: data.message ?? 'Votre commande a été mise à jour.',
+        ctaLabel: data.ctaLabel,
+        ctaUrl: data.ctaUrl,
       })
+
+    case 'signup':
+      return signupConfirmationTemplate(data)
 
     case 'recovery':
-      return genericTemplate({
-        title: 'Réinitialisation du mot de passe 🔐',
-        message: `Cliquez ici pour réinitialiser : <a href="${data.url}">${data.url}</a>`,
-      })
+      return recoveryTemplate(data)
 
     case 'email_change':
-      return genericTemplate({
-        title: 'Confirmez votre nouvelle adresse email 📫',
-        message: `<a href="${data.url}">${data.url}</a>`,
-      })
+      return emailChangeTemplate(data)
 
     default:
       return genericTemplate({
