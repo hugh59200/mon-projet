@@ -150,7 +150,6 @@ CREATE TABLE public.orders (
   country text,
   payment_method text,
   total_amount numeric(10,2),
-  items jsonb,
   status text DEFAULT 'pending',
   internal_notes text DEFAULT '',
   carrier text,
@@ -710,7 +709,6 @@ LEFT JOIN public.profiles p ON u.id = p.id;
 -- ============================================================
 -- 🧾 orders_detailed_view
 -- ============================================================
-
 CREATE OR REPLACE VIEW public.orders_detailed_view AS
 SELECT
   o.id AS order_id,
@@ -732,14 +730,12 @@ SELECT
   jsonb_agg(
     jsonb_build_object(
       'product_id', p.id,
-      'name', p.name,
-      'category', p.category,
-      'price', p.price,
-      'purity', p.purity,
-      'stock', p.stock,
-      'image', p.image,
+      'product_name', p.name,
+      'product_price', oi.price,
+      'product_image', p.image,
+      'product_stock', p.stock,
       'quantity', oi.quantity,
-      'subtotal', (oi.price * oi.quantity)
+      'total', (oi.price * oi.quantity)
     )
   ) AS detailed_items
 
@@ -926,3 +922,127 @@ ALTER PUBLICATION supabase_realtime ADD TABLE
   public.conversations,
   public.user_cart_items,
   public.emails_sent;
+
+  -- ============================================================
+-- ✅ Transaction : create_order_with_items
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
+  p_user_id uuid,
+  p_email text,
+  p_full_name text,
+  p_address text,
+  p_zip text,
+  p_city text,
+  p_country text,
+  p_payment_method text,
+  p_total_amount numeric,
+  p_items jsonb
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_order_id uuid;
+  item jsonb;
+  result jsonb;
+BEGIN
+  -- ✅ 1 — création de la commande
+  INSERT INTO public.orders (
+    user_id, email, full_name, address, zip, city, country,
+    payment_method, total_amount, status
+  )
+  VALUES (
+    p_user_id, p_email, p_full_name, p_address, p_zip, p_city, p_country,
+    p_payment_method, p_total_amount, 'pending'
+  )
+  RETURNING id INTO new_order_id;
+
+  -- ✅ 2 — insertion des produits
+  FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    INSERT INTO public.order_items (order_id, product_id, quantity, price)
+    VALUES (
+      new_order_id,
+      (item->>'product_id')::uuid,
+      COALESCE((item->>'quantity')::integer, 1),
+      COALESCE((item->>'product_price')::numeric, 0)
+    );
+  END LOOP;
+
+  -- ✅ 3 — récupération de l'ordre complet
+  SELECT to_jsonb(ofv.*) INTO result
+  FROM public.orders_full_view ofv
+  WHERE ofv.order_id = new_order_id;
+
+  RETURN result;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_order_with_items_full TO authenticated;
+
+
+-- ✅ Autoriser l’insertion dans order_items via RPC / backend
+CREATE POLICY "Allow insert from RPC" ON public.order_items
+FOR INSERT
+WITH CHECK (auth.role() = 'authenticated' OR auth.role() = 'service_role');
+
+
+GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
+ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
+
+-- ============================================================
+-- ✅ RPC : admin_update_order_status
+-- - Vérifie que l'utilisateur est admin
+-- - Met à jour le statut
+-- - Ajoute un email dans emails_sent (optionnel)
+-- - Retourne la commande mise à jour
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.admin_update_order_status(
+  p_order_id uuid,
+  p_new_status text,
+  p_send_email boolean DEFAULT true
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  updated_order jsonb;
+BEGIN
+  -- ✅ check admin
+  IF NOT public.is_admin(auth.uid()) THEN
+    RAISE EXCEPTION 'Only admins can update order status';
+  END IF;
+
+  -- ✅ update statut
+  UPDATE public.orders
+  SET status = p_new_status,
+      updated_at = now()
+  WHERE id = p_order_id;
+
+  -- ✅ envoyer email
+  IF p_send_email THEN
+    INSERT INTO public.emails_sent(order_id, to_email, subject, body_html, type, status)
+    SELECT
+      o.id,
+      o.email,
+      'Mise à jour commande',
+      '<p>Statut mis à jour : ' || p_new_status || '</p>',
+      'status_update',
+      'sent'
+    FROM public.orders o
+    WHERE o.id = p_order_id;
+  END IF;
+
+  -- ✅ récupérer commande complète
+  SELECT to_jsonb(ofv.*)
+  INTO updated_order
+  FROM public.orders_full_view ofv
+  WHERE ofv.order_id = p_order_id;
+
+  RETURN updated_order;
+END
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_update_order_status(uuid, text, boolean) TO authenticated;

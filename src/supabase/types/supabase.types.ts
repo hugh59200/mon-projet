@@ -31,8 +31,19 @@ export type CartView = Tables<'user_cart_view'>
 export type CartItems = Tables<'user_cart_items'>
 
 export type OrdersOverviewForAdmin = Tables<'orders_overview_for_admin'>
-export type OrderFull = Tables<'orders_full_view'>
+export type OrdersFullView = Tables<'orders_full_view'>
 
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
+
+export type DetailedItem = {
+  cart_item_id: string
+  product_id: string
+  product_name: string
+  product_image: string
+  product_price: number
+  quantity: number
+  product_stock: boolean
+  product_category: string
+}

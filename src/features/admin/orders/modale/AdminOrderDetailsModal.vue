@@ -29,11 +29,11 @@
           <div class="info-row">
             <BasicText>
               <b>Client :</b>
-              {{ order.profile_info.full_name }}
+              {{ order.profile_info?.full_name }}
             </BasicText>
             <BasicText>
               <b>Email :</b>
-              {{ order.profile_info.email }}
+              {{ order.profile_info?.email }}
             </BasicText>
           </div>
 
@@ -85,9 +85,7 @@
             Adresse de livraison
           </BasicText>
 
-          <BasicText v-if="shippingAddress">
-            {{ shippingAddress }}
-          </BasicText>
+          <BasicText v-if="shippingAddress">{{ shippingAddress }}</BasicText>
 
           <BasicText
             v-else
@@ -158,6 +156,7 @@
             v-model="trackingNumber"
             placeholder="Numéro ou lien"
           />
+
           <BasicButton
             label="Enregistrer"
             size="small"
@@ -250,14 +249,12 @@
               <BasicCell :span="10">
                 <BasicText>{{ mail.type }}</BasicText>
               </BasicCell>
-
               <BasicCell
                 :span="6"
                 center
               >
                 <BasicText>{{ formatDate(mail.sent_at) }}</BasicText>
               </BasicCell>
-
               <BasicCell
                 :span="4"
                 center
@@ -274,7 +271,7 @@
 
         <!-- ✅ Produits commandés -->
         <div
-          v-if="order?.items?.length"
+          v-if="order?.detailed_items"
           class="order-products"
         >
           <BasicText
@@ -309,13 +306,12 @@
           </div>
 
           <div
-            v-for="item in order.items"
-            :key="item.id"
+            v-for="item in detailedItems"
             class="gridElemWrapper"
           >
             <div class="cardLayoutWrapper">
               <BasicCell :span="10">
-                <BasicText>{{ item.name }}</BasicText>
+                <BasicText>{{ item.product_name }}</BasicText>
               </BasicCell>
 
               <BasicCell
@@ -329,7 +325,7 @@
                 :span="5"
                 center
               >
-                <BasicText>{{ Number(item.price || 0).toFixed(2) }}€</BasicText>
+                <BasicText>{{ Number(item.product_price || 0).toFixed(2) }}€</BasicText>
               </BasicCell>
 
               <BasicCell
@@ -337,7 +333,7 @@
                 center
               >
                 <BasicText>
-                  {{ (Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2) }}€
+                  {{ (Number(item.product_price || 0) * Number(item.quantity || 0)).toFixed(2) }}€
                 </BasicText>
               </BasicCell>
             </div>
@@ -351,11 +347,21 @@
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { supabase } from '@/supabase/supabaseClient'
-  import { type EmailSent, type OrderFull } from '@/supabase/types/supabase.types'
+  import type { Tables } from '@/supabase/types/supabase'
+  import { type DetailedItem, type EmailSent } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { BadgeType } from '@designSystem/index'
   import { computed, onMounted, ref, watch, type Ref } from 'vue'
+
+  export type OrderFull = Tables<'orders_full_view'> & {
+    profile_info: {
+      full_name: string
+      email: string
+    } | null
+
+    detailed_items: DetailedItem[]
+  }
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
@@ -367,7 +373,8 @@
   const trackingNumber = ref('')
   const selectedStatus = ref('')
 
-  // ✅ Liste statuts
+  const detailedItems = computed<DetailedItem[]>(() => order.value?.detailed_items ?? [])
+
   const STATUSES = [
     { value: 'pending', label: 'En attente', color: 'warning' },
     { value: 'confirmed', label: 'Confirmée', color: 'success' },
@@ -376,14 +383,12 @@
     { value: 'canceled', label: 'Annulée', color: 'danger' },
   ]
 
-  // ✅ Stripe link
   const stripeLink = computed(() =>
     order.value?.stripe_session_id
       ? `https://dashboard.stripe.com/payments/${order.value.stripe_session_id}`
       : null,
   )
 
-  // ✅ Adresse formatée (correcte pour orders_full_view)
   const shippingAddress = computed(() => {
     const o = order.value
     if (!o) return null
@@ -393,7 +398,6 @@
     return parts.length ? parts.join(', ') : null
   })
 
-  // ✅ Helpers
   function getStatusLabel(v: string) {
     return STATUSES.find((s) => s.value === v)?.label || v
   }
@@ -410,7 +414,6 @@
     }
   }
 
-  // ✅ Load Order (TYPE SAFE)
   async function loadOrder() {
     const { data, error } = await supabase
       .from('orders_full_view')
@@ -423,15 +426,17 @@
       return
     }
 
-    order.value = data as OrderFull
+    order.value = {
+      ...data,
+      profile_info:
+        typeof data.profile_info === 'object' && data.profile_info !== null
+          ? (data.profile_info as { full_name: string; email: string })
+          : { full_name: 'Inconnu', email: '-' },
 
-    // ✅ items est nullable => on le sécurise
-    order.value.items = (Array.isArray(order.value.items) ? order.value.items : []) as {
-      id?: string
-      name: string
-      quantity: number
-      price: number
-    }[]
+      detailed_items: Array.isArray(data.detailed_items)
+        ? (data.detailed_items as DetailedItem[])
+        : [],
+    }
 
     selectedStatus.value = order.value.status || 'pending'
   }
@@ -485,7 +490,6 @@
     error ? toast.show('Erreur email', 'danger') : toast.show('Email renvoyé ✅', 'success')
   }
 
-  // ✅ Download invoice
   async function downloadInvoice() {
     if (!order.value) return
 
@@ -503,7 +507,6 @@
     toast.show('Facture téléchargée ✅', 'success')
   }
 
-  // ✅ refresh on prop change
   watch(
     () => props.orderId,
     () => {
@@ -537,11 +540,6 @@
   .info-row {
     display: flex;
     justify-content: space-between;
-  }
-
-  .text-link {
-    color: @primary-600;
-    text-decoration: underline;
   }
 
   .order-products {

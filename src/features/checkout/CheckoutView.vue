@@ -261,53 +261,55 @@
   async function submitOrder() {
     await withSablier(async () => {
       if (!auth.user) {
-        toast.show('Veuillez vous connecter pour finaliser la commande.', 'danger')
+        toast.show('Veuillez vous connecter.', 'danger')
         router.push('/auth/login')
         return
       }
 
-      if (cart.items.length === 0) {
+      if (!cart.items.length) {
         toast.show('Votre panier est vide.', 'warning')
         return
       }
 
       try {
-        const { data: order, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            user_id: auth.user.id,
-            email: auth.user.email ?? '',
-            full_name: fullName.value || '',
-            address: address.value,
-            zip: zip.value,
-            city: city.value,
-            country: country.value,
-            payment_method: selectedPayment.value,
-            total_amount: cart.totalPrice,
-            items: cart.items,
-            status: 'pending',
-          })
-          .select()
-          .single()
+        // ✅ On appelle la fonction SQL transactionnelle
+        const { data, error } = await supabase.rpc('create_order_with_items', {
+          p_user_id: auth.user.id,
+          p_email: auth.user.email ?? '',
+          p_full_name: fullName.value || '',
+          p_address: address.value,
+          p_zip: zip.value,
+          p_city: city.value,
+          p_country: country.value,
+          p_payment_method: selectedPayment.value,
+          p_total_amount: cart.totalPrice,
+          p_items: cart.items,
+        })
 
-        if (orderError || !order) throw orderError
+        if (error || !data) throw error
+        const orderId = data
 
-        // ✅ envoi orderId à Stripe
         const payment = await processPayment(
           cart.totalPrice,
           selectedPayment.value,
           auth.user.email,
-          order.id,
+          orderId,
         )
-        if (selectedPayment.value === 'stripe') return
 
-        await finalizeOrderAfterPayment(order.id, payment.id)
+        // ✅ Si Stripe → redirection checkout
+        if (selectedPayment.value === 'stripe') {
+          return
+        }
+
+        // ✅ Sinon → paiement simulé / crypto
+        await finalizeOrderAfterPayment(orderId, payment.id)
         toast.show('Paiement validé ✅', 'success')
+
         await cart.clearCart()
         router.push('/profil/commandes')
-      } catch (err: any) {
-        console.error('❌ Erreur commande/paiement:', err)
-        toast.show('Erreur lors du paiement ou de la commande ❌', 'danger')
+      } catch (err) {
+        console.error(err)
+        toast.show('Erreur de commande ❌', 'danger')
       }
     })
   }

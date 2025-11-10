@@ -3,8 +3,8 @@
     <!-- 🧾 TITRE -->
     <template #title>
       <div class="order-client">
-        <div class="order-name">{{ order.full_name }}</div>
-        <div class="order-email">{{ order.email }}</div>
+        <div class="order-name">{{ order.customer_name }}</div>
+        <div class="order-email">{{ order.customer_email }}</div>
       </div>
     </template>
 
@@ -34,7 +34,7 @@
     <template #actions>
       <BasicDropdown
         v-model="modelValue"
-        :items="[...statuses]"
+        :items="statuses.slice()"
         size="small"
         dropdown-type="table"
         force-value
@@ -47,10 +47,9 @@
         size="small"
         variant="outlined"
         block
-        @click="openOrderModal(order.id)"
+        @click="openOrderModal(order.order_id || '')"
       />
 
-      <!-- ✅ Bouton suppression -->
       <BasicButton
         label="Supprimer"
         type="danger"
@@ -63,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
+  import type { OrdersOverviewForAdmin, OrderStatus } from '@/supabase/types/supabase.types'
   import MobileCard from '../../mobile/MobileCard.vue'
 
   type StatusOption = {
@@ -72,14 +71,14 @@
   }
 
   defineProps<{
-    order: Orders
+    order: OrdersOverviewForAdmin
     statusLabel: string
     statuses: readonly StatusOption[]
     formatDate: (d: string | null) => string
     formatCurrency: (a: number | null) => string
-    handleStatusChange: (order: Orders, status: OrderStatus) => void
+    handleStatusChange: (order: OrdersOverviewForAdmin, status: OrderStatus) => void
     openOrderModal: (id: string) => void
-    handleDelete: (o: Orders) => void
+    handleDelete: (o: OrdersOverviewForAdmin) => void
   }>()
 
   const modelValue = defineModel<OrderStatus>('status', { required: true })

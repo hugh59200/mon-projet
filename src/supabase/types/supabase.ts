@@ -198,6 +198,7 @@ export type Database = {
         Row: {
           author_id: string | null
           content: string | null
+          created_at: string | null
           excerpt: string | null
           id: string
           image: string | null
@@ -209,6 +210,7 @@ export type Database = {
         Insert: {
           author_id?: string | null
           content?: string | null
+          created_at?: string | null
           excerpt?: string | null
           id?: string
           image?: string | null
@@ -220,6 +222,7 @@ export type Database = {
         Update: {
           author_id?: string | null
           content?: string | null
+          created_at?: string | null
           excerpt?: string | null
           id?: string
           image?: string | null
@@ -259,7 +262,7 @@ export type Database = {
           id: string
           image: string | null
           label: string
-          slug: string | null
+          slug: string
         }
         Insert: {
           created_at?: string | null
@@ -267,7 +270,7 @@ export type Database = {
           id?: string
           image?: string | null
           label: string
-          slug?: string | null
+          slug: string
         }
         Update: {
           created_at?: string | null
@@ -275,7 +278,7 @@ export type Database = {
           id?: string
           image?: string | null
           label?: string
-          slug?: string | null
+          slug?: string
         }
         Relationships: []
       }
@@ -353,7 +356,6 @@ export type Database = {
           full_name: string
           id: string
           internal_notes: string | null
-          items: Json | null
           order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
@@ -376,7 +378,6 @@ export type Database = {
           full_name: string
           id?: string
           internal_notes?: string | null
-          items?: Json | null
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
@@ -399,7 +400,6 @@ export type Database = {
           full_name?: string
           id?: string
           internal_notes?: string | null
-          items?: Json | null
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
@@ -577,7 +577,6 @@ export type Database = {
     Views: {
       conversation_overview: {
         Row: {
-          full_name: string | null
           last_admin_message_id: number | null
           last_admin_read_at: string | null
           last_message: string | null
@@ -587,6 +586,7 @@ export type Database = {
           unread_count_admin: number | null
           user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Relationships: [
           {
@@ -717,11 +717,12 @@ export type Database = {
         Row: {
           carrier: string | null
           created_at: string | null
+          detailed_items: Json | null
           email_types: Json | null
           emails_count: number | null
-          items: Json | null
           last_email_sent_at: string | null
           order_id: string | null
+          order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
           profile_info: Json | null
@@ -770,10 +771,9 @@ export type Database = {
           last_email_sent_at: string | null
           last_email_type: string | null
           order_id: string | null
+          order_number: string | null
           payment_method: string | null
           shipped_at: string | null
-          shipping_email: string | null
-          shipping_name: string | null
           status: string | null
           total_amount: number | null
           tracking_number: string | null
@@ -849,6 +849,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_update_order_status: {
+        Args: {
+          p_new_status: string
+          p_order_id: string
+          p_send_email?: boolean
+        }
+        Returns: Json
+      }
       create_full_order:
         | {
             Args: {
@@ -899,6 +907,36 @@ export type Database = {
             }
             Returns: string
           }
+      create_order_with_items: {
+        Args: {
+          p_address: string
+          p_city: string
+          p_country: string
+          p_email: string
+          p_full_name: string
+          p_items: Json
+          p_payment_method: string
+          p_total_amount: number
+          p_user_id: string
+          p_zip: string
+        }
+        Returns: string
+      }
+      create_order_with_items_full: {
+        Args: {
+          p_address: string
+          p_city: string
+          p_country: string
+          p_email: string
+          p_full_name: string
+          p_items: Json
+          p_payment_method: string
+          p_total_amount: number
+          p_user_id: string
+          p_zip: string
+        }
+        Returns: Json
+      }
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
       user_exists_by_email: { Args: { p_email: string }; Returns: boolean }

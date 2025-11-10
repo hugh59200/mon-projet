@@ -57,15 +57,14 @@
 
         <div
           v-for="order in filteredData"
-          :key="order.id"
           class="gridElemWrapper"
         >
           <div class="cardLayoutWrapper">
             <!-- 🧍 Client -->
             <BasicCell :span="10">
               <div class="client-info">
-                <span class="client-name">{{ order.full_name }}</span>
-                <span class="client-email">{{ order.email }}</span>
+                <span class="client-name">{{ order.customer_name }}</span>
+                <span class="client-email">{{ order.customer_email }}</span>
               </div>
             </BasicCell>
 
@@ -85,9 +84,8 @@
               {{ formatDate(order.created_at) }}
             </BasicCell>
 
-            <!-- 🏷️ Statut -->
             <BasicCellDropdown
-              v-model="localStatuses[order.id ?? '']"
+              v-model="localStatuses[order.order_id!]"
               :items="[...STATUSES]"
               center
               :span="8"
@@ -102,7 +100,7 @@
               tooltip="Voir la commande"
               center
               :span="3"
-              @click="openOrderModal(order.id ?? '')"
+              @click="openOrderModal(order.order_id || '')"
             />
             <BasicCellActionIcon
               icon-name="trash"
@@ -120,10 +118,11 @@
       <div class="mobile-cards-list">
         <OrderCardMobile
           v-for="order in filteredData"
-          :key="order.id ?? ''"
-          :status="localStatuses[order.id ?? ''] ?? 'pending'"
+          :status="localStatuses[order.order_id || ''] || 'pending'"
           @update:status="(newStatus) => changeOrderStatus(order, newStatus)"
-          :status-label="STATUSES.find((s) => s.id === localStatuses[order.id ?? ''])?.label || '—'"
+          :status-label="
+            STATUSES.find((s) => s.id === localStatuses[order.order_id || ''])?.label || '—'
+          "
           :order="order"
           :statuses="STATUSES"
           :format-date="formatDate"
@@ -153,32 +152,33 @@
   import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { ref, watchEffect } from 'vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
+import BasicToolbar from '../shared/components/BasicToolbar.vue'
 
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, reset, fetchData } =
-    useAdminTable<'orders'>({
-      table: 'orders',
+    useAdminTable<'orders_overview_for_admin'>({
+      table: 'orders_overview_for_admin',
       orderBy: 'created_at',
       ascending: false,
       searchFn: (o, q) =>
-        (o.full_name?.toLowerCase()?.includes(q) ?? false) ||
-        (o.email?.toLowerCase()?.includes(q) ?? false),
+        (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
+        (o.customer_email?.toLowerCase()?.includes(q) ?? false),
     })
 
   const { deleteOrder, changeOrderStatus } = useOrderActions(fetchData)
 
   const localStatuses = ref<Record<string, OrderStatus>>({})
+
   watchEffect(() => {
     const map: Record<string, OrderStatus> = {}
     for (const o of filteredData.value) {
-      const id = o.id ?? ''
-      map[id] = (o.status as OrderStatus) ?? 'pending'
+      if (o.order_id) {
+        map[o.order_id] = (o.status as OrderStatus) ?? 'pending'
+      }
     }
     localStatuses.value = map
   })
-
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
   function openOrderModal(id: string) {

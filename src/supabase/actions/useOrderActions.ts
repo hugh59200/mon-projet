@@ -1,14 +1,22 @@
 import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi'
-import type { Orders, OrderStatus } from '@/supabase/types/supabase.types'
+import type { OrderStatus } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+
+type MinimalOrder = {
+  order_id?: string | null
+  id?: string | null
+}
 
 export function useOrderActions(fetchData?: () => void) {
   const toast = useToastStore()
 
-  async function deleteOrder(order: Orders) {
-    if (!confirm(`Supprimer la commande #${order.id} ?`)) return
+  async function deleteOrder(order: MinimalOrder) {
+    const id = order.order_id ?? order.id
+    if (!id) return
+
+    if (!confirm(`Supprimer la commande #${id} ?`)) return
     try {
-      await deleteOrderById(order.id)
+      await deleteOrderById(id)
       toast.show('Commande supprimée ✅', 'success')
       fetchData?.()
     } catch (err: any) {
@@ -16,25 +24,24 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  async function changeOrderStatus(order: Orders, status: OrderStatus) {
+  async function changeOrderStatus(order: MinimalOrder, status: OrderStatus) {
+    const id = order.order_id ?? order.id
+    if (!id) return
+
     try {
-      const updated = await updateOrderStatusInDB(order.id, status)
+      const updated = await updateOrderStatusInDB(id, status)
 
-      // Optionnel : notif email via edge function
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-      await fetch(`${supabaseUrl}/functions/v1/order-status-update`, {
+      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${anonKey}`,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          order_id: order.id,
+          order_id: id,
           status,
-          email: updated.email,
-          full_name: updated.full_name,
+          email: updated.shipping_email,
+          full_name: updated.shipping_name,
         }),
       })
 

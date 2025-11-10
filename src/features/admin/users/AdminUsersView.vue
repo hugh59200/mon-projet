@@ -149,6 +149,7 @@
   import { ref, watch } from 'vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
+import BasicToolbar from '../shared/components/BasicToolbar.vue'
 
   const {
     filteredData,
