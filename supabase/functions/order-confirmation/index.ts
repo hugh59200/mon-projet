@@ -1,0 +1,45 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { supabase } from '../../utils/clients.ts'
+import { sendEmail } from '../../utils/sendEmail.ts'
+import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
+
+serve(async (req: Request) => {
+  try {
+    const { order_id } = await req.json()
+    if (!order_id)
+      return new Response(JSON.stringify({ success: false, error: 'Missing order_id' }), {
+        status: 400,
+      })
+
+    const { data: order, error } = await supabase
+      .from('orders_full_view')
+      .select('*')
+      .eq('order_id', order_id)
+      .maybeSingle()
+
+    if (error || !order)
+      return new Response(JSON.stringify({ success: false, error: 'Order not found' }), {
+        status: 404,
+      })
+
+    const html = renderEmailTemplate('confirmation', {
+      order_id,
+      items: order.detailed_items,
+      total_amount: order.total_amount,
+      full_name: order.shipping_name,
+      created_at: order.created_at,
+    })
+
+    await sendEmail({
+      to: order.shipping_email,
+      subject: `Confirmation commande #${order_id}`,
+      html,
+      type: 'confirmation',
+      order_id,
+    })
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 })
+  } catch (err) {
+    return new Response(JSON.stringify({ success: false, error: String(err) }), { status: 500 })
+  }
+})

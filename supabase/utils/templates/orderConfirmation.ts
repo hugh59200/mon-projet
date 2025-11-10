@@ -5,25 +5,33 @@ export function orderConfirmationTemplate({
   order_id,
   full_name,
   total_amount,
-  items,
+  items = [],
   created_at,
 }: {
   order_id: string
   full_name?: string
-  total_amount: number
-  items: { name: string; quantity: number; price: number }[]
+  total_amount: number | string | null
+  items: { name: string; quantity: number; price: number | string | null }[] | null
   created_at: string
 }) {
-  const productRows = items
-    .map(
-      (i) => `
-        <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #eee;">${i.name}</td>
-          <td style="text-align:center;padding:8px 12px;">${i.quantity}</td>
-          <td style="text-align:right;padding:8px 12px;">${(i.price * i.quantity).toFixed(2)} €</td>
-        </tr>`,
-    )
-    .join('')
+  const safeTotal = Number(total_amount) || 0
+
+  const productRows =
+    items
+      ?.map((i) => {
+        const qty = Number(i.quantity) || 0
+        const price = Number(i.price) || 0
+        const lineTotal = (qty * price).toFixed(2)
+
+        return `
+          <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;">${i.name}</td>
+            <td style="text-align:center;padding:8px 12px;">${qty}</td>
+            <td style="text-align:right;padding:8px 12px;">${lineTotal} €</td>
+          </tr>
+        `
+      })
+      .join('') || ''
 
   const bodyHTML = `
     <p>Bonjour ${full_name || 'cher client'},</p>
@@ -46,7 +54,7 @@ export function orderConfirmationTemplate({
     </table>
 
     <p style="text-align:right;margin-top:16px;font-size:16px;">
-      <b>Total : ${total_amount.toFixed(2)} €</b>
+      <b>Total : ${safeTotal.toFixed(2)} €</b>
     </p>
 
     <p style="margin-top:24px;">Nous vous tiendrons informé dès que votre commande sera expédiée 🚚</p>

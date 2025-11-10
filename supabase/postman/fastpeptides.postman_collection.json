@@ -1,0 +1,77 @@
+{
+  "info": {
+    "name": "FastPeptides – Supabase Edge",
+    "_postman_id": "fastpeptides-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "✅ Create Stripe Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" }
+        ],
+        "url": "{{SUPABASE_URL}}/functions/v1/create-stripe-session",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 99.99,\n  \"email\": \"client@test.com\",\n  \"orderId\": \"ORDER123\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "📦 Send Order Update",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{SUPABASE_URL}}/functions/v1/send-order-update",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORDER123\",\n  \"status\": \"shipped\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "✅ Order Confirmation",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{SUPABASE_URL}}/functions/v1/order-confirmation",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORDER123\",\n  \"email\": \"client@test.com\" \n}"
+        }
+      }
+    },
+
+    {
+      "name": "🗑 Delete Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{USER_ACCESS_TOKEN}}" }
+        ],
+        "url": "{{SUPABASE_URL}}/functions/v1/delete-account"
+      }
+    },
+
+    {
+      "name": "💰 Stripe Webhook",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "stripe-signature", "value": "{{STRIPE_WEBHOOK_SIGNATURE}}" }
+        ],
+        "url": "{{SUPABASE_URL}}/functions/v1/stripe-webhook",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n \"type\": \"checkout.session.completed\",\n \"data\": {\n   \"object\": {\n     \"id\": \"cs_test_123\",\n     \"metadata\": {\"order_id\": \"ORDER123\"},\n     \"customer_details\": {\"email\": \"client@test.com\"},\n     \"amount_total\": 9999\n   }\n }\n}"
+        }
+      }
+    }
+  ]
+}

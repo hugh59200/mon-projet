@@ -1,9 +1,7 @@
-import { Resend } from 'https://esm.sh/resend@3.2.0'
+import { resend } from './clients.ts'
 import { logEmail } from './logEmail.ts'
 
-const resend = new Resend(Deno.env.get('RESEND_API_KEY'))
-
-const FROM = 'Fast Peptides <contact@fastpeptides.com>'
+const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
 
 export async function sendEmail({
   to,
@@ -15,11 +13,10 @@ export async function sendEmail({
   to: string
   subject: string
   html: string
-  type?: 'signup' | 'recovery' | 'email_change' | 'confirmation' | 'payment' | 'custom'
+  type?: string
   order_id?: string
 }) {
-  console.log(`📤 Preparing to send email to ${to}`)
-  console.log(`🧬 From: ${FROM}`)
+  console.log('📧 Sending email to:', to)
 
   const result = await resend.emails.send({
     from: FROM,
@@ -28,7 +25,7 @@ export async function sendEmail({
     html,
   })
 
-  console.log('📦 Resend response:', result)
+  console.log('📦 Resend response:', JSON.stringify(result))
 
   await logEmail({
     to_email: to,

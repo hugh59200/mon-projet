@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { supabase } from '../utils/clients.ts'
+import { supabase } from '../../utils/clients.ts'
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -7,7 +7,7 @@ const cors = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('OK', { headers: cors })
 
   try {
@@ -18,6 +18,7 @@ serve(async (req) => {
       data: { user },
       error,
     } = await supabase.auth.getUser(token)
+
     if (error || !user) return new Response('Unauthorized', { status: 401, headers: cors })
 
     await supabase.from('profiles').delete().eq('id', user.id)

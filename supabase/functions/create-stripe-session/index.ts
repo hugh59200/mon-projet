@@ -1,24 +1,20 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { stripe, supabase } from '../utils/clients.ts'
+import { stripe, supabase } from '../../utils/clients.ts'
+import { corsHeaders, handleCors } from '../../utils/cors.ts'
 
 const ENV = Deno.env.get('ENV') || 'development'
 
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Apikey, x-client-info',
-  'Content-Type': 'application/json',
-}
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
+serve(async (req: Request) => {
+  const cors = handleCors(req)
+  if (cors) return cors
 
   try {
     const { amount, email, orderId } = await req.json()
+
     if (!amount || !email || !orderId) {
-      return new Response(JSON.stringify({ error: 'amount, email et orderId requis' }), {
+      return new Response(JSON.stringify({ error: 'Missing fields' }), {
         status: 400,
-        headers: cors,
+        headers: corsHeaders,
       })
     }
 
@@ -29,7 +25,6 @@ serve(async (req) => {
       customer_email: email,
       success_url: `${base}/paiement/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${base}/paiement/cancel`,
-      payment_method_options: { card: { request_three_d_secure: 'any' } },
       metadata: { order_id: orderId },
       line_items: [
         {
@@ -54,9 +49,12 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ sessionId: session.id, url: session.url }), {
       status: 200,
-      headers: cors,
+      headers: corsHeaders,
     })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: cors })
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: corsHeaders,
+    })
   }
 })
