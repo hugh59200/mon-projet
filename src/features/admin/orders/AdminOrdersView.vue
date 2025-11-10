@@ -1,14 +1,11 @@
 <template>
   <div>
-    <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une commande..."
       :show-reset="true"
       @reset="reset"
     />
-
-    <!-- 📄 Pagination -->
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -17,8 +14,6 @@
       :auto-fetch="fetchData"
       @change="page = $event"
     />
-
-    <!-- 🌀 Loader + Données -->
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -26,7 +21,6 @@
       message="Chargement des commandes..."
       empty-message="Aucune commande trouvée 😅"
     >
-      <!-- 💻 TABLEAU DESKTOP -->
       <div class="orders--desktop">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
@@ -54,76 +48,25 @@
             text="Détails"
           />
         </div>
-
-        <div
-          v-for="order in filteredData"
-          class="gridElemWrapper"
-        >
-          <div class="cardLayoutWrapper">
-            <!-- 🧍 Client -->
-            <BasicCell :span="10">
-              <div class="client-info">
-                <span class="client-name">{{ order.customer_name }}</span>
-                <span class="client-email">{{ order.customer_email }}</span>
-              </div>
-            </BasicCell>
-
-            <!-- 💰 Total -->
-            <BasicCell
-              center
-              :span="6"
-            >
-              {{ formatCurrency(order.total_amount) }}
-            </BasicCell>
-
-            <!-- 🕒 Date -->
-            <BasicCell
-              center
-              :span="6"
-            >
-              {{ formatDate(order.created_at) }}
-            </BasicCell>
-
-            <BasicCellDropdown
-              v-model="localStatuses[order.order_id!]"
-              :items="[...STATUSES]"
-              center
-              :span="8"
-              dropdown-type="table"
-              size="small"
-              @update:model-value="(v) => changeOrderStatus(order, v as OrderStatus)"
-            />
-
-            <!-- 👁️ Détails -->
-            <BasicCellActionIcon
-              icon-name="eye"
-              tooltip="Voir la commande"
-              center
-              :span="3"
-              @click="openOrderModal(order.order_id || '')"
-            />
-            <BasicCellActionIcon
-              icon-name="trash"
-              tooltip="Supprimer"
-              center
-              danger
-              :span="3"
-              @click="deleteOrder(order)"
-            />
-          </div>
-        </div>
+        <OrderRow
+          v-for="o in filteredData"
+          :order="o"
+          :status="statusProxy(o.order_id).value"
+          @update:status="(v) => (statusProxy(o.order_id).value = v)"
+          :statuses="STATUSES"
+          :format-date="formatDate"
+          :format-currency="formatCurrency"
+          :handle-status="changeOrderStatus"
+          :remove="deleteOrder"
+          :open="openOrderModal"
+        />
       </div>
-
-      <!-- 📱 CARTES MOBILES -->
       <div class="mobile-cards-list">
         <OrderCardMobile
-          v-for="order in filteredData"
-          :status="localStatuses[order.order_id || ''] || 'pending'"
-          @update:status="(newStatus) => changeOrderStatus(order, newStatus)"
-          :status-label="
-            STATUSES.find((s) => s.id === localStatuses[order.order_id || ''])?.label || '—'
-          "
-          :order="order"
+          v-for="o in filteredData"
+          :order="o"
+          :status="statusProxy(o.order_id).value"
+          @update:status="(v) => (statusProxy(o.order_id).value = v)"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
@@ -133,8 +76,6 @@
         />
       </div>
     </WrapperLoader>
-
-    <!-- 🪟 MODAL DÉTAIL -->
     <teleport to="#app">
       <AdminOrderDetailsModal
         v-if="selectedOrderId"
@@ -146,15 +87,17 @@
 </template>
 
 <script setup lang="ts">
-  import { STATUSES } from '@/features/admin/constants/orders'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
-  import type { OrderStatus } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
-  import { ref, watchEffect } from 'vue'
+  import type { OrderStatus } from '@/utils/status'
+  import { STATUSES } from '@/utils/status'
+  import { computed, ref, watchEffect } from 'vue'
+
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import OrderRow from './OrderRow.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
-import BasicToolbar from '../shared/components/BasicToolbar.vue'
 
   const { filteredData, total, nbPages, page, search, loading, hasLoaded, reset, fetchData } =
     useAdminTable<'orders_overview_for_admin'>({
@@ -173,14 +116,21 @@ import BasicToolbar from '../shared/components/BasicToolbar.vue'
   watchEffect(() => {
     const map: Record<string, OrderStatus> = {}
     for (const o of filteredData.value) {
-      if (o.order_id) {
-        map[o.order_id] = (o.status as OrderStatus) ?? 'pending'
-      }
+      if (o.order_id && o.status) map[o.order_id] = o.status as OrderStatus
     }
     localStatuses.value = map
   })
+
+  function statusProxy(id: string | null) {
+    return computed<OrderStatus>({
+      get: () => (id ? (localStatuses.value[id] ?? 'pending') : 'pending'),
+      set: (v) => id && (localStatuses.value[id] = v),
+    })
+  }
+
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
+
   function openOrderModal(id: string) {
     selectedOrderId.value = id
     isModalVisible.value = true

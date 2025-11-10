@@ -139,6 +139,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS uniq_cart_user_product
   ON public.user_cart_items (user_id, product_id);
 
 -- 🧾 ORDERS
+-- ✅ ENUM pour statuts commande
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
+    CREATE TYPE order_status AS ENUM (
+      'pending',
+      'processing',
+      'paid',
+      'confirmed',
+      'shipped',
+      'completed',
+      'canceled',
+      'refunded',
+      'failed'
+    );
+  END IF;
+END $$;
+
+
+-- 🧾 ORDERS
 CREATE TABLE public.orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -150,7 +170,10 @@ CREATE TABLE public.orders (
   country text,
   payment_method text,
   total_amount numeric(10,2),
-  status text DEFAULT 'pending',
+
+  -- ✅ colonne typée ENUM, default propre
+  status order_status NOT NULL DEFAULT 'pending',
+
   internal_notes text DEFAULT '',
   carrier text,
   tracking_number text,
@@ -161,6 +184,7 @@ CREATE TABLE public.orders (
   stripe_session_id text,
   order_number text UNIQUE
 );
+
 
 -- 🧾 ORDER ITEMS (dépend de orders + products)
 CREATE TABLE public.order_items (
@@ -1016,10 +1040,10 @@ BEGIN
   END IF;
 
   -- ✅ update statut
-  UPDATE public.orders
-  SET status = p_new_status,
-      updated_at = now()
-  WHERE id = p_order_id;
+UPDATE public.orders
+SET status = p_new_status::order_status,
+    updated_at = now()
+WHERE id = p_order_id;
 
   -- ✅ envoyer email
   IF p_send_email THEN

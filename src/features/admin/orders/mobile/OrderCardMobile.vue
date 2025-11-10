@@ -1,150 +1,86 @@
 <template>
-  <MobileCard hoverable>
-    <!-- 🧾 TITRE -->
-    <template #title>
-      <div class="order-client">
-        <div class="order-name">{{ order.customer_name }}</div>
-        <div class="order-email">{{ order.customer_email }}</div>
-      </div>
-    </template>
+  <div class="mobile-card">
+    <div class="row">
+      <BasicText weight="bold">{{ order.customer_name }}</BasicText>
+      <BasicText size="body-s">{{ formatDate(order.created_at!) }}</BasicText>
+    </div>
 
-    <!-- 🏷️ BADGE DE STATUT -->
-    <template #badge>
-      <span
-        class="status-chip"
-        :class="`status-chip--${modelValue}`"
-      >
-        {{ statusLabel }}
-      </span>
-    </template>
+    <div class="row">
+      <BasicText>{{ formatCurrency(order.total_amount!) }}</BasicText>
 
-    <!-- 💰 INFOS -->
-    <template #info>
-      <div class="line">
-        <span class="label">Montant :</span>
-        <span class="value">{{ formatCurrency(order.total_amount) }}</span>
-      </div>
-      <div class="line">
-        <span class="label">Date :</span>
-        <span class="value">{{ formatDate(order.created_at) }}</span>
-      </div>
-    </template>
-
-    <!-- ⚙️ ACTIONS -->
-    <template #actions>
       <BasicDropdown
-        v-model="modelValue"
-        :items="statuses.slice()"
-        size="small"
+        v-model="localStatus"
+        :items="statuses"
         dropdown-type="table"
-        force-value
-        @update:model-value="(v) => handleStatusChange(order, v as OrderStatus)"
       />
+    </div>
 
+    <div class="actions">
       <BasicButton
-        label="Voir les détails"
         type="secondary"
         size="small"
-        variant="outlined"
-        block
-        @click="openOrderModal(order.order_id || '')"
+        icon-name="Eye"
+        @click="openOrderModal(order.order_id!)"
       />
-
       <BasicButton
-        label="Supprimer"
         type="danger"
         size="small"
-        block
+        icon-name="Trash"
         @click="handleDelete(order)"
       />
-    </template>
-  </MobileCard>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import type { OrdersOverviewForAdmin, OrderStatus } from '@/supabase/types/supabase.types'
-  import MobileCard from '../../mobile/MobileCard.vue'
+  import type { Tables } from '@/supabase/types/supabase'
+  import type { OrderStatus } from '@/utils/status'
+  import { computed } from 'vue'
 
-  type StatusOption = {
-    value: OrderStatus
-    label: string
-  }
-
-  defineProps<{
-    order: OrdersOverviewForAdmin
-    statusLabel: string
-    statuses: readonly StatusOption[]
-    formatDate: (d: string | null) => string
-    formatCurrency: (a: number | null) => string
-    handleStatusChange: (order: OrdersOverviewForAdmin, status: OrderStatus) => void
+  const props = defineProps<{
+    order: Tables<'orders_overview_for_admin'>
+    status: OrderStatus
+    statuses: { id: OrderStatus; label: string; value: OrderStatus }[]
+    formatDate: (v: string) => string
+    formatCurrency: (v: number) => string
+    handleStatusChange: (o: any, s: OrderStatus) => void
     openOrderModal: (id: string) => void
-    handleDelete: (o: OrdersOverviewForAdmin) => void
+    handleDelete: (o: any) => void
   }>()
 
-  const modelValue = defineModel<OrderStatus>('status', { required: true })
+  const emit = defineEmits<{
+    'update:status': [OrderStatus]
+  }>()
+
+  /* Proxy v-model */
+  const localStatus = computed({
+    get: () => props.status,
+    set: (v: OrderStatus) => {
+      emit('update:status', v)
+      props.handleStatusChange(props.order, v)
+    },
+  })
 </script>
 
-<style scoped lang="less">
-  .order-client {
+<style scoped>
+  .mobile-card {
+    padding: 14px;
+    border-radius: 8px;
+    background: var(--neutral-100);
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
   }
 
-  .order-name {
-    font-weight: 600;
-    color: @primary-950;
-  }
-
-  .order-email {
-    font-size: @font-size-body-m;
-    color: @neutral-500;
-  }
-
-  .status-chip {
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: @font-size-body-s;
-    font-weight: 600;
-    text-transform: capitalize;
-
-    &--pending {
-      background: fade(@warning-400, 15%);
-      color: @warning-700;
-    }
-
-    &--confirmed {
-      background: fade(@primary-400, 15%);
-      color: @primary-700;
-    }
-
-    &--shipped {
-      background: fade(@indigo-400, 15%);
-      color: @indigo-700;
-    }
-
-    &--completed {
-      background: fade(@success-400, 15%);
-      color: @success-700;
-    }
-
-    &--canceled {
-      background: fade(@danger-400, 15%);
-      color: @danger-700;
-    }
-  }
-
-  .line {
+  .row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2px 0;
+  }
 
-    .label {
-      color: @neutral-500;
-    }
-    .value {
-      color: @primary-900;
-    }
+  .actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
   }
 </style>

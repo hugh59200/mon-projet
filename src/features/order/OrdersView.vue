@@ -106,10 +106,11 @@
               N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
             </BasicText>
           </div>
-          <BasicBadge
-            :label="statusLabel(order.status)"
-            :color="statusColor(order.status)"
-          />
+          <!-- <BasicBadge
+            :label="getStatusLabel(order.status)"
+            :type="getStatusBadge(order.status)"
+            size="small"
+          /> -->
         </div>
 
         <!-- 🔽 Produits -->
@@ -259,7 +260,7 @@
               v-for="step in orderSteps"
               :key="step.key"
               class="timeline-step"
-              :class="{ active: step.key === mapStatus(order.status) }"
+              :class="{ active: step.key === order.status }"
             >
               <div class="dot"></div>
               <BasicText
@@ -302,6 +303,7 @@
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import { formatDate } from '@/utils/index'
+  // import { getStatusLabel, getStatusBadge } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
 
@@ -387,40 +389,6 @@
   }
 
   onMounted(loadUserOrders)
-
-  function statusLabel(status: string | null) {
-    const map: Record<string, string> = {
-      pending: 'En attente',
-      paid: 'Payée',
-      shipped: 'Expédiée',
-      completed: 'Terminée',
-      canceled: 'Annulée',
-    }
-    return map[status ?? ''] || '—'
-  }
-
-  function statusColor(status: string | null) {
-    switch (status) {
-      case 'pending':
-        return 'warning'
-      case 'paid':
-        return 'info'
-      case 'shipped':
-        return 'primary'
-      case 'completed':
-        return 'success'
-      case 'canceled':
-        return 'danger'
-      default:
-        return 'neutral'
-    }
-  }
-
-  function mapStatus(status: string | null) {
-    if (!status) return 'pending'
-    if (['pending', 'paid'].includes(status)) return 'paid'
-    return status
-  }
 
   const orderSteps = [
     { key: 'paid', label: 'Payée' },

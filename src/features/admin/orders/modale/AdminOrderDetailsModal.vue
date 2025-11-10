@@ -51,8 +51,8 @@
           <div class="info-row">
             <BasicText><b>Statut :</b></BasicText>
             <BasicBadge
-              :label="getStatusLabel(order.status!)"
-              :type="getStatusColor(order.status!)"
+              :label="getLabel(order.status)"
+              :type="getBadge(order.status)"
               size="small"
             />
           </div>
@@ -86,7 +86,6 @@
           </BasicText>
 
           <BasicText v-if="shippingAddress">{{ shippingAddress }}</BasicText>
-
           <BasicText
             v-else
             color="neutral-600"
@@ -95,8 +94,6 @@
             Aucune adresse renseignée
           </BasicText>
         </div>
-
-        <!-- ✅ Paiement Stripe -->
         <div
           v-if="order"
           class="order-info-card"
@@ -107,7 +104,6 @@
           >
             Paiement Stripe
           </BasicText>
-
           <div class="info-row">
             <BasicText><b>Session :</b></BasicText>
             <template v-if="order.stripe_session_id">
@@ -120,7 +116,6 @@
             </template>
             <span v-else>—</span>
           </div>
-
           <div class="info-row">
             <BasicText>
               <b>Payment Intent :</b>
@@ -135,8 +130,6 @@
             @click="resendConfirmation"
           />
         </div>
-
-        <!-- ✅ Suivi Livraison -->
         <div
           v-if="order"
           class="order-info-card"
@@ -147,7 +140,6 @@
           >
             Suivi livraison
           </BasicText>
-
           <BasicInput
             v-model="carrier"
             placeholder="Transporteur"
@@ -156,14 +148,12 @@
             v-model="trackingNumber"
             placeholder="Numéro ou lien"
           />
-
           <BasicButton
             label="Enregistrer"
             size="small"
             type="primary"
             @click="handleAddTracking"
           />
-
           <div
             v-if="order.tracking_number"
             class="tracking-line"
@@ -181,8 +171,6 @@
             </BasicText>
           </div>
         </div>
-
-        <!-- ✅ Modifier statut -->
         <div
           v-if="order"
           class="order-info-card"
@@ -193,13 +181,11 @@
           >
             Modifier le statut
           </BasicText>
-
           <BasicDropdown
             v-model="selectedStatus"
             :items="STATUSES"
             dropdown-type="table"
           />
-
           <BasicButton
             label="Mettre à jour"
             size="small"
@@ -208,8 +194,6 @@
             @click="handleUpdateStatus"
           />
         </div>
-
-        <!-- ✅ Historique des e-mails -->
         <div
           v-if="emails.length"
           class="order-info-card"
@@ -220,56 +204,52 @@
           >
             Historique des e-mails
           </BasicText>
-
           <div class="gridElemWrapper">
             <div class="cardLayoutWrapper cardLayoutWrapper--header">
               <BasicCell
-                :span="10"
+                :span="12"
                 text="Type"
               />
               <BasicCell
-                :span="6"
+                :span="12"
                 text="Date"
                 center
               />
               <BasicCell
-                :span="4"
+                :span="12"
                 text="Statut"
                 center
               />
             </div>
           </div>
-
           <div
             v-for="mail in emails"
             :key="mail.id"
             class="gridElemWrapper"
           >
             <div class="cardLayoutWrapper">
-              <BasicCell :span="10">
-                <BasicText>{{ mail.type }}</BasicText>
+              <BasicCell :span="12">
+                <BasicText>{{ getLabel(mail.type) }}</BasicText>
               </BasicCell>
               <BasicCell
-                :span="6"
+                :span="12"
                 center
               >
                 <BasicText>{{ formatDate(mail.sent_at) }}</BasicText>
               </BasicCell>
               <BasicCell
-                :span="4"
+                :span="12"
                 center
               >
                 <BasicBadge
-                  :type="mail.status === 'sent' ? 'success' : ('danger' as BadgeType)"
+                  :label="getLabel(mail.status)"
+                  :type="getBadge(mail.status)"
                   size="small"
-                  :label="mail.status!"
                 />
               </BasicCell>
             </div>
           </div>
         </div>
-
-        <!-- ✅ Produits commandés -->
         <div
           v-if="order?.detailed_items"
           class="order-products"
@@ -280,56 +260,52 @@
           >
             Produits commandés
           </BasicText>
-
           <div class="gridElemWrapper">
             <div class="cardLayoutWrapper cardLayoutWrapper--header">
               <BasicCell
-                :span="10"
+                :span="14"
                 text="Produit"
               />
               <BasicCell
-                :span="4"
+                :span="6"
                 center
                 text="Qté"
               />
               <BasicCell
-                :span="5"
+                :span="8"
                 center
                 text="Prix"
               />
               <BasicCell
-                :span="5"
+                :span="8"
                 center
                 text="Total"
               />
             </div>
           </div>
-
           <div
             v-for="item in detailedItems"
             class="gridElemWrapper"
           >
             <div class="cardLayoutWrapper">
-              <BasicCell :span="10">
+              <BasicCell :span="14">
                 <BasicText>{{ item.product_name }}</BasicText>
               </BasicCell>
 
               <BasicCell
-                :span="4"
+                :span="6"
                 center
               >
                 <BasicText>{{ item.quantity }}</BasicText>
               </BasicCell>
-
               <BasicCell
-                :span="5"
+                :span="8"
                 center
               >
                 <BasicText>{{ Number(item.product_price || 0).toFixed(2) }}€</BasicText>
               </BasicCell>
-
               <BasicCell
-                :span="5"
+                :span="8"
                 center
               >
                 <BasicText>
@@ -350,8 +326,8 @@
   import type { Tables } from '@/supabase/types/supabase'
   import { type DetailedItem, type EmailSent } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
+  import { getBadge, getLabel, STATUSES, type OrderStatus } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import type { BadgeType } from '@designSystem/index'
   import { computed, onMounted, ref, watch, type Ref } from 'vue'
 
   export type OrderFull = Tables<'orders_full_view'> & {
@@ -365,23 +341,15 @@
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
-
   const toast = useToastStore()
+
   const order = ref(null) as Ref<OrderFull | null>
   const emails = ref<EmailSent[]>([])
   const carrier = ref('')
   const trackingNumber = ref('')
-  const selectedStatus = ref('')
+  const selectedStatus = ref<OrderStatus>('pending')
 
   const detailedItems = computed<DetailedItem[]>(() => order.value?.detailed_items ?? [])
-
-  const STATUSES = [
-    { value: 'pending', label: 'En attente', color: 'warning' },
-    { value: 'confirmed', label: 'Confirmée', color: 'success' },
-    { value: 'shipped', label: 'Expédiée', color: 'info' },
-    { value: 'completed', label: 'Terminée', color: 'neutral' },
-    { value: 'canceled', label: 'Annulée', color: 'danger' },
-  ]
 
   const stripeLink = computed(() =>
     order.value?.stripe_session_id
@@ -397,13 +365,6 @@
     )
     return parts.length ? parts.join(', ') : null
   })
-
-  function getStatusLabel(v: string) {
-    return STATUSES.find((s) => s.value === v)?.label || v
-  }
-  function getStatusColor(v: string): BadgeType {
-    return (STATUSES.find((s) => s.value === v)?.color || 'neutral') as BadgeType
-  }
 
   function isURL(v: string) {
     try {
@@ -438,7 +399,7 @@
         : [],
     }
 
-    selectedStatus.value = order.value.status || 'pending'
+    selectedStatus.value = (order.value.status ?? 'pending') as OrderStatus
   }
 
   async function loadEmails() {
@@ -453,6 +414,7 @@
 
   async function handleUpdateStatus() {
     if (!order.value) return
+
     const { error } = await supabase
       .from('orders')
       .update({ status: selectedStatus.value })

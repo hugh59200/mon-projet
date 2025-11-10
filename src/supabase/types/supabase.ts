@@ -360,7 +360,7 @@ export type Database = {
           payment_intent_id: string | null
           payment_method: string | null
           shipped_at: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["order_status"]
           stripe_session_id: string | null
           total_amount: number | null
           tracking_number: string | null
@@ -382,7 +382,7 @@ export type Database = {
           payment_intent_id?: string | null
           payment_method?: string | null
           shipped_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
           total_amount?: number | null
           tracking_number?: string | null
@@ -404,7 +404,7 @@ export type Database = {
           payment_intent_id?: string | null
           payment_method?: string | null
           shipped_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
           total_amount?: number | null
           tracking_number?: string | null
@@ -690,7 +690,7 @@ export type Database = {
           order_id: string | null
           payment_method: string | null
           shipped_at: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
           total_amount: number | null
           tracking_number: string | null
           updated_at: string | null
@@ -733,7 +733,7 @@ export type Database = {
           shipping_email: string | null
           shipping_name: string | null
           shipping_zip: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
           stripe_session_id: string | null
           total_amount: number | null
           tracking_number: string | null
@@ -774,7 +774,7 @@ export type Database = {
           order_number: string | null
           payment_method: string | null
           shipped_at: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
           total_amount: number | null
           tracking_number: string | null
           updated_at: string | null
@@ -942,7 +942,16 @@ export type Database = {
       user_exists_by_email: { Args: { p_email: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      order_status:
+        | "pending"
+        | "processing"
+        | "paid"
+        | "confirmed"
+        | "shipped"
+        | "completed"
+        | "canceled"
+        | "refunded"
+        | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1069,6 +1078,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      order_status: [
+        "pending",
+        "processing",
+        "paid",
+        "confirmed",
+        "shipped",
+        "completed",
+        "canceled",
+        "refunded",
+        "failed",
+      ],
+    },
   },
 } as const

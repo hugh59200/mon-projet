@@ -66,7 +66,6 @@
             text="Actions"
           />
         </div>
-
         <div
           v-for="user in filteredData"
           :key="user.id"
@@ -75,7 +74,6 @@
           <div class="cardLayoutWrapper">
             <BasicCell :span="10">{{ user.email }}</BasicCell>
             <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
-
             <BasicCellDropdown
               v-model="localRoles[user.id]"
               :items="ROLES"
@@ -84,14 +82,12 @@
               dropdown-type="table"
               size="small"
             />
-
             <BasicCell
               center
               :span="6"
             >
               {{ formatDate(user.created_at) }}
             </BasicCell>
-
             <BasicCellActionIcon
               icon-name="eye"
               tooltip="Voir"

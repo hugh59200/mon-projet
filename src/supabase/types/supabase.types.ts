@@ -1,7 +1,7 @@
 import type { Tables, TablesInsert, TablesUpdate } from './supabase'
 
 export type Role = 'admin' | 'user'
-export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'canceled'
+
 
 export type Profiles = Tables<'profiles'>
 export type ProfilesInsert = TablesInsert<'profiles'>
