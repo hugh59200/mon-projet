@@ -15,7 +15,7 @@ export function orderStatusTemplate({
 }): string {
   const message = getStatusMessage(status, carrier, tracking_number)
 
-  const body = `
+  const bodyHTML = `
     <p>Bonjour ${full_name || 'cher client'},</p>
     <p>${message}</p>
     <p style="margin-top:32px;">Merci pour votre confiance 🙌</p>
@@ -23,6 +23,6 @@ export function orderStatusTemplate({
 
   return baseEmailTemplate({
     title: 'Mise à jour de votre commande 🧬',
-    bodyHTML: body,
+    bodyHTML,
   })
 }

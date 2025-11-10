@@ -1,3 +1,4 @@
+// utils/templates/renderEmailTemplate.ts
 import { orderConfirmationTemplate } from './orderConfirmation.ts'
 import { orderStatusTemplate } from './orderStatus.ts'
 import { paymentConfirmationTemplate } from './paymentConfirmation.ts'

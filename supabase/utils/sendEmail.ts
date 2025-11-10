@@ -3,7 +3,6 @@ import { logEmail } from './logEmail.ts'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
 
-// Adresse d’envoi unique, valable en dev & prod ✅
 const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
 
 export async function sendEmail({

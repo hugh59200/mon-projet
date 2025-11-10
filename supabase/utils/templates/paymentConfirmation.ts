@@ -4,9 +4,11 @@ import { baseEmailTemplate } from './baseEmailTemplate.ts'
 export function paymentConfirmationTemplate({
   amount,
   sessionId,
+  order_id,
 }: {
   amount: number
   sessionId: string
+  order_id?: string
 }) {
   const bodyHTML = `
     <p>Merci pour votre commande 🙏</p>
@@ -18,5 +20,7 @@ export function paymentConfirmationTemplate({
   return baseEmailTemplate({
     title: 'Paiement confirmé 💳',
     bodyHTML,
+    ctaLabel: order_id ? 'Voir ma commande' : undefined,
+    ctaUrl: order_id ? `https://fastpeptides.com/compte/commande/${order_id}` : undefined,
   })
 }

@@ -1,3 +1,4 @@
+// utils/templates/orderConfirmation.ts
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 
 export function orderConfirmationTemplate({
@@ -27,7 +28,7 @@ export function orderConfirmationTemplate({
   const bodyHTML = `
     <p>Bonjour ${full_name || 'cher client'},</p>
     <p>
-      Nous avons bien reçu votre commande <strong>#${order_id}</strong> 
+      Nous avons bien reçu votre commande <strong>#${order_id}</strong>
       le ${new Date(created_at).toLocaleDateString('fr-FR')}.
     </p>
 

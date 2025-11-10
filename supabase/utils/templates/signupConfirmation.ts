@@ -1,3 +1,4 @@
+// utils/templates/signupConfirmation.ts
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 
 export function signupConfirmationTemplate({
@@ -10,22 +11,14 @@ export function signupConfirmationTemplate({
   const bodyHTML = `
     <p>Bonjour ${full_name},</p>
     <p>Merci de votre inscription sur Fast Peptides 🧬</p>
-
-    <p>Pour activer votre compte, cliquez ici :</p>
-
-    <div style="text-align:center;margin:30px 0;">
-      <a href="${confirmation_url}"
-         style="background:#00796B;color:white;padding:14px 22px;
-         border-radius:6px;font-size:16px;text-decoration:none;">
-         ✅ Confirmer mon email
-      </a>
-    </div>
-
+    <p>Pour activer votre compte, cliquez ci-dessous :</p>
     <p>Ce lien est valide pendant une durée limitée.</p>
   `
 
   return baseEmailTemplate({
     title: 'Confirmez votre inscription 🎉',
     bodyHTML,
+    ctaLabel: '✅ Confirmer mon email',
+    ctaUrl: confirmation_url,
   })
 }

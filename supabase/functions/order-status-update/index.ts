@@ -64,10 +64,8 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    const { order_id, status, full_name, carrier, tracking_number }: OrderStatusPayload =
+    const { order_id, status, full_name, email, carrier, tracking_number }: OrderStatusPayload =
       await req.json()
-
-    const email = 'hugo.bogrand-ext@akto.fr'
 
     const message = getStatusMessage(status, carrier, tracking_number)
     const html = renderEmailTemplate('status_update', { full_name, message, status })
