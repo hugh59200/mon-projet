@@ -2,7 +2,6 @@ import type { Tables, TablesInsert, TablesUpdate } from './supabase'
 
 export type Role = 'admin' | 'user'
 
-
 export type Profiles = Tables<'profiles'>
 export type ProfilesInsert = TablesInsert<'profiles'>
 export type ProfilesUpdate = TablesUpdate<'profiles'>
@@ -37,13 +36,4 @@ export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
 
-export type DetailedItem = {
-  cart_item_id: string
-  product_id: string
-  product_name: string
-  product_image: string
-  product_price: number
-  quantity: number
-  product_stock: boolean
-  product_category: string
-}
+export type OrderItem = Tables<'order_items'>

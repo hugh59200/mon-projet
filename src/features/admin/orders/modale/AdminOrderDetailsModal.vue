@@ -284,7 +284,7 @@
             </div>
           </div>
           <div
-            v-for="item in detailedItems"
+            v-for="item in order?.detailed_items"
             class="gridElemWrapper"
           >
             <div class="cardLayoutWrapper">
@@ -323,33 +323,21 @@
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { Tables } from '@/supabase/types/supabase'
-  import { type DetailedItem, type EmailSent } from '@/supabase/types/supabase.types'
+  import { type EmailSent, type OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { getBadge, getLabel, STATUSES, type OrderStatus } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch, type Ref } from 'vue'
 
-  export type OrderFull = Tables<'orders_full_view'> & {
-    profile_info: {
-      full_name: string
-      email: string
-    } | null
-
-    detailed_items: DetailedItem[]
-  }
-
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
 
-  const order = ref(null) as Ref<OrderFull | null>
+  const order = ref(null) as Ref<OrdersFullView | null>
   const emails = ref<EmailSent[]>([])
   const carrier = ref('')
   const trackingNumber = ref('')
   const selectedStatus = ref<OrderStatus>('pending')
-
-  const detailedItems = computed<DetailedItem[]>(() => order.value?.detailed_items ?? [])
 
   const stripeLink = computed(() =>
     order.value?.stripe_session_id
@@ -395,7 +383,7 @@
           : { full_name: 'Inconnu', email: '-' },
 
       detailed_items: Array.isArray(data.detailed_items)
-        ? (data.detailed_items as DetailedItem[])
+        ? (data.detailed_items as OrderItem[])
         : [],
     }
 
