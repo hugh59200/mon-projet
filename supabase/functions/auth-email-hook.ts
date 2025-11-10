@@ -8,22 +8,12 @@ const secret = rawSecret.replace('v1,whsec_', '')
 const wh = new Webhook(secret)
 
 serve(async (req) => {
-  if (req.method !== 'POST') {
-    return new Response('not allowed', { status: 405 })
-  }
+  if (req.method !== 'POST') return new Response('not allowed', { status: 405 })
 
   try {
     const payloadText = await req.text()
     const headers = Object.fromEntries(req.headers)
-
-    const { user, email_data } = wh.verify(payloadText, headers) as {
-      user: { email: string; user_metadata?: any }
-      email_data: {
-        token: string
-        email_action_type: string
-        site_url: string
-      }
-    }
+    const { user, email_data } = wh.verify(payloadText, headers)
 
     const email = user.email
     const type = email_data.email_action_type
@@ -40,33 +30,28 @@ serve(async (req) => {
           confirmation_url: confirmationUrl,
         })
         break
+
       case 'recovery':
         subject = 'Réinitialisation du mot de passe'
         html = renderEmailTemplate('custom', {
           body: `<p>Réinitialisez votre mot de passe :</p><a href="${confirmationUrl}">${confirmationUrl}</a>`,
         })
         break
+
       case 'email_change':
         subject = 'Confirmez votre nouvelle adresse email'
         html = renderEmailTemplate('custom', {
           body: `<p>Confirmez votre nouvelle adresse email :</p><a href="${confirmationUrl}">${confirmationUrl}</a>`,
         })
         break
+
       default:
         return new Response('Ignored', { status: 200 })
     }
 
-    const result = await sendEmail({
-      to: email,
-      subject,
-      html,
-      type: 'confirmation',
-    })
-
+    const result = await sendEmail({ to: email, subject, html, type: 'confirmation' })
     return new Response(JSON.stringify({ success: true, result }), { status: 200 })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err), success: false }), {
-      status: 401,
-    })
+    return new Response(JSON.stringify({ error: String(err), success: false }), { status: 401 })
   }
 })

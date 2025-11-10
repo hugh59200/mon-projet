@@ -1,14 +1,7 @@
 // /supabase/functions/send-order-update/index.ts
 import { serve } from 'https://deno.land/std/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js'
-import { Resend } from 'npm:resend'
+import { supabase } from '../utils/clients.ts'
 import { sendEmail } from '../utils/sendEmail.ts'
-
-// ✅ Cloudflare/Turbo: pas de secrets hardcodés
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const resend = new Resend(RESEND_API_KEY)
-
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_KEY')!)
 
 serve(async (req) => {
   const payload = await req.json()
@@ -16,19 +9,17 @@ serve(async (req) => {
 
   if (!order_id || !status) return new Response('Missing order_id or status', { status: 400 })
 
-  // ✅ Récupération de la commande complète
-  const { data: order, error } = await supabase
+  const { data: order } = await supabase
     .from('orders_full_view')
     .select('*')
     .eq('order_id', order_id)
     .maybeSingle()
 
-  if (error || !order) return new Response('Order not found', { status: 404 })
+  if (!order) return new Response('Order not found', { status: 404 })
 
   const email = order.shipping_email
   const name = order.shipping_name
 
-  // ✅ Choix template selon le statut
   const subject = buildSubject(status)
   const html = buildTemplate({
     title: subject,
@@ -40,14 +31,8 @@ serve(async (req) => {
     carrier: order.carrier,
   })
 
-  // ✅ Envoi via Resend
-  const sent = await sendEmail({
-    to: email,
-    subject,
-    html,
-  })
+  const sent = await sendEmail({ to: email, subject, html })
 
-  // ✅ Log en base (emails_sent)
   await supabase.from('emails_sent').insert({
     order_id,
     to_email: email,

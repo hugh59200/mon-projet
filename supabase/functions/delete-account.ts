@@ -1,62 +1,33 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { supabase } from '../utils/clients.ts'
 
-const corsHeaders = {
+const cors = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Authorization, apikey, Content-Type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('OK', { headers: corsHeaders })
-  }
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('OK', { headers: cors })
 
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    })
-
     const token = req.headers.get('Authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return new Response(JSON.stringify({ success: false, error: 'No token provided' }), {
-        status: 401,
-        headers: corsHeaders,
-      })
-    }
+    if (!token) return new Response('Missing token', { status: 401, headers: cors })
 
     const {
       data: { user },
-      error: userErr,
+      error,
     } = await supabase.auth.getUser(token)
-
-    if (userErr || !user) {
-      return new Response(JSON.stringify({ success: false, error: 'User not authenticated' }), {
-        status: 401,
-        headers: corsHeaders,
-      })
-    }
+    if (error || !user) return new Response('Unauthorized', { status: 401, headers: cors })
 
     await supabase.from('profiles').delete().eq('id', user.id)
+    await supabase.auth.admin.deleteUser(user.id)
 
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
-    if (deleteError) {
-      return new Response(JSON.stringify({ success: false, error: deleteError.message }), {
-        status: 500,
-        headers: corsHeaders,
-      })
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: corsHeaders,
-    })
-  } catch (e) {
-    return new Response(JSON.stringify({ success: false, error: e.message }), {
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers: cors })
+  } catch (err) {
+    return new Response(JSON.stringify({ success: false, error: String(err) }), {
       status: 500,
-      headers: corsHeaders,
+      headers: cors,
     })
   }
 })
