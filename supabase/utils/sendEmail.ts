@@ -1,9 +1,9 @@
 import { Resend } from 'https://esm.sh/resend@3.2.0'
 import { logEmail } from './logEmail.ts'
 
-const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'))
 
-const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
+const FROM = 'Fast Peptides <contact@fastpeptides.com>'
 
 export async function sendEmail({
   to,

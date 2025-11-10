@@ -27,15 +27,15 @@ export async function logEmail({
   status = 'sent',
 }: LogEmailPayload) {
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       console.warn('⚠️ Impossible de logger l’email : Supabase env vars manquantes')
       return
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     const { error } = await supabase.from('emails_sent').insert([
       {

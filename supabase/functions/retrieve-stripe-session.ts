@@ -2,11 +2,13 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@13.5.0?target=deno'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
+const stripe = new Stripe(STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
 })
 
-// ✅ CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -20,7 +22,6 @@ serve(async (req) => {
   }
 
   try {
-    // 🧠 Authentification Supabase via le header Authorization
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing Authorization header' }), {
@@ -29,13 +30,10 @@ serve(async (req) => {
       })
     }
 
-    const supabaseUrl = Deno.env.get('PROJECT_URL')!
-    const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       global: { headers: { Authorization: authHeader } },
     })
 
-    // 🧾 Lecture du corps JSON
     const rawBody = await req.text()
     if (!rawBody) {
       return new Response(JSON.stringify({ error: 'Corps JSON manquant' }), {
@@ -52,13 +50,8 @@ serve(async (req) => {
       })
     }
 
-    console.log('🔍 Session Stripe demandée :', sessionId)
-
-    // ✅ Récupération de la session Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId)
-    console.log('✅ Session Stripe récupérée :', session.id)
 
-    // 🪵 Log facultatif dans Supabase
     await supabase.from('logs').insert([
       {
         type: 'retrieve_stripe_session',
@@ -72,7 +65,6 @@ serve(async (req) => {
       },
     ])
 
-    // ✅ Réponse au frontend
     return new Response(JSON.stringify(session), {
       status: 200,
       headers: corsHeaders,

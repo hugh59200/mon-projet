@@ -6,18 +6,18 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
 Deno.serve(async (req) => {
-  // ✅ Preflight CORS
   if (req.method === 'OPTIONS') {
     return new Response('OK', { headers: corsHeaders })
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-      { auth: { autoRefreshToken: false, persistSession: false } },
-    )
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
 
     const token = req.headers.get('Authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -39,10 +39,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    // ✅ delete profile
     await supabase.from('profiles').delete().eq('id', user.id)
 
-    // ✅ delete from auth
     const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
     if (deleteError) {
       return new Response(JSON.stringify({ success: false, error: deleteError.message }), {

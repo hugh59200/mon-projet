@@ -3,11 +3,15 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@13.5.0?target=deno'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
+const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const ENV = Deno.env.get('ENV') || 'development'
+
+const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-09-30.clover',
 })
-
-const supabase = createClient(Deno.env.get('PROJECT_URL')!, Deno.env.get('SERVICE_ROLE_KEY')!)
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,8 +19,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, Apikey, x-client-info',
   'Content-Type': 'application/json',
 }
-
-const ENV = Deno.env.get('ENV') || 'development'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { status: 200, headers: corsHeaders })
@@ -48,7 +50,7 @@ serve(async (req) => {
 
       payment_method_options: {
         card: {
-          request_three_d_secure: 'any', // ✅ bloque auto-validation
+          request_three_d_secure: 'any',
         },
       },
 
@@ -68,7 +70,6 @@ serve(async (req) => {
         },
       ],
     })
-    // ✅ Mise à jour de la commande immédiatement
     await supabase
       .from('orders')
       .update({
