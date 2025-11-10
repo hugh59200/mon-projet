@@ -123,14 +123,14 @@
             >
               <BasicText size="body-s">
                 <b>Suivi :</b>
-                <a
+                <BasicLink
                   v-if="isURL(order.tracking_number)"
                   :href="order.tracking_number"
                   target="_blank"
                   class="text-link"
                 >
                   {{ order.tracking_number }}
-                </a>
+                </BasicLink>
                 <span v-else>{{ order.tracking_number }}</span>
               </BasicText>
             </div>
@@ -162,6 +162,7 @@
         >
           <BasicLoader />
         </div>
+        <!-- ✅ Produits commandés (version style tableau Admin) -->
         <div
           v-if="order?.items?.length"
           class="order-products"
@@ -172,27 +173,65 @@
           >
             Produits commandés
           </BasicText>
-          <table>
-            <thead>
-              <tr>
-                <th>Produit</th>
-                <th>Qté</th>
-                <th>Prix</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="item in order.items"
-                :key="item.id"
+
+          <!-- ✅ En-tête -->
+          <div class="gridElemWrapper">
+            <div class="cardLayoutWrapper cardLayoutWrapper--header">
+              <BasicCell
+                :span="10"
+                text="Produit"
+              />
+              <BasicCell
+                :span="4"
+                center
+                text="Qté"
+              />
+              <BasicCell
+                :span="5"
+                center
+                text="Prix"
+              />
+              <BasicCell
+                :span="5"
+                center
+                text="Total"
+              />
+            </div>
+          </div>
+
+          <!-- ✅ Lignes produits -->
+          <div
+            v-for="item in order.items"
+            :key="item.id"
+            class="gridElemWrapper"
+          >
+            <div class="cardLayoutWrapper">
+              <BasicCell :span="10">
+                <BasicText>{{ item.name }}</BasicText>
+              </BasicCell>
+
+              <BasicCell
+                :span="4"
+                center
               >
-                <td>{{ item.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.price.toFixed(2) }}€</td>
-                <td>{{ (item.price * item.quantity).toFixed(2) }}€</td>
-              </tr>
-            </tbody>
-          </table>
+                <BasicText>{{ item.quantity }}</BasicText>
+              </BasicCell>
+
+              <BasicCell
+                :span="5"
+                center
+              >
+                <BasicText>{{ item.price.toFixed(2) }}€</BasicText>
+              </BasicCell>
+
+              <BasicCell
+                :span="5"
+                center
+              >
+                <BasicText>{{ (item.price * item.quantity).toFixed(2) }}€</BasicText>
+              </BasicCell>
+            </div>
+          </div>
         </div>
       </div>
     </template>
