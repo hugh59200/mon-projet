@@ -279,6 +279,69 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id: string
+          price: number
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          price?: number
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_detailed_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_full_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_overview_for_admin"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address: string | null
@@ -291,6 +354,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           items: Json | null
+          order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
           shipped_at: string | null
@@ -313,6 +377,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           items?: Json | null
+          order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
           shipped_at?: string | null
@@ -335,6 +400,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           items?: Json | null
+          order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
           shipped_at?: string | null
@@ -651,11 +717,12 @@ export type Database = {
         Row: {
           carrier: string | null
           created_at: string | null
-          detailed_items: Json | null
           email_types: Json | null
           emails_count: number | null
+          items: Json | null
           last_email_sent_at: string | null
           order_id: string | null
+          payment_intent_id: string | null
           payment_method: string | null
           profile_info: Json | null
           shipped_at: string | null
@@ -666,6 +733,7 @@ export type Database = {
           shipping_name: string | null
           shipping_zip: string | null
           status: string | null
+          stripe_session_id: string | null
           total_amount: number | null
           tracking_number: string | null
           updated_at: string | null
