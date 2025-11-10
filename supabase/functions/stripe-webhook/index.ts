@@ -6,17 +6,17 @@ import Stripe from 'https://esm.sh/stripe@13.5.0?target=deno'
 import { logEmail } from '../../utils/logEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
+// ✅ ENV vars
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
 const SUPABASE_URL = Deno.env.get('PROJECT_URL')!
 const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY')!
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 
-const ENV = Deno.env.get('ENV') || 'development'
-const FROM_DEV = Deno.env.get('RESEND_FROM_DEV') || 'Fast Peptides <onboarding@resend.dev>'
-const FROM_PROD = Deno.env.get('RESEND_FROM_PROD') || 'Fast Peptides <no-reply@fastpeptides.com>'
-const FROM = ENV === 'development' ? FROM_DEV : FROM_PROD
+// ✅ From unique (domaine validé → ok en dev + prod)
+const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
 
+// ✅ Clients
 const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2025-09-30.clover' })
 const resend = new Resend(RESEND_API_KEY)
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
@@ -24,9 +24,9 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 serve(async (req) => {
   try {
     const signature = req.headers.get('stripe-signature')
-    if (!signature) return new Response('no signature', { status: 400 })
+    if (!signature) return new Response('Missing signature', { status: 400 })
 
-    // ✅ raw body
+    // ✅ Raw payload
     const rawBody = await req.arrayBuffer()
     const payloadString = new TextDecoder().decode(rawBody)
 
@@ -39,16 +39,19 @@ serve(async (req) => {
     console.log(`🔥 Webhook reçu : ${event.type}`)
 
     if (event.type !== 'checkout.session.completed') {
-      return new Response('OK', { status: 200 })
+      return new Response('Ignored', { status: 200 })
     }
 
     const session = event.data.object as any
-
     const orderId = session.metadata?.order_id
-    if (!orderId) return new Response('OK', { status: 200 })
+
+    if (!orderId) {
+      console.warn('⚠ Aucun order_id, on ignore')
+      return new Response('Ignored', { status: 200 })
+    }
 
     const email = session.customer_details?.email
-    const total = (session.amount_total ?? 0) / 100 // ✅ vrai montant en €
+    const total = (session.amount_total ?? 0) / 100
 
     // ✅ MAJ commande
     await supabase
@@ -64,17 +67,17 @@ serve(async (req) => {
 
     console.log(`✅ Order ${orderId} set to PAID`)
 
-    // ✅ email uniquement ici
+    // ✅ Envoi email
     if (email) {
       const html = renderEmailTemplate('payment', {
-        amount: total, // ✅ ne PAS rediviser
+        amount: total,
         sessionId: session.id,
       })
 
       const mailResult = await resend.emails.send({
         from: FROM,
         to: email,
-        subject: 'Confirmation de commande',
+        subject: 'Confirmation de commande ✅',
         html,
       })
 
@@ -87,7 +90,7 @@ serve(async (req) => {
         body_html: html,
         type: 'payment',
         provider_response: mailResult,
-        status: 'sent',
+        status: mailResult?.id ? 'sent' : 'error',
       })
     }
 

@@ -2,11 +2,9 @@ import { Resend } from 'https://esm.sh/resend@3.2.0'
 import { logEmail } from './logEmail.ts'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
-const ENV = Deno.env.get('ENV') || 'development'
-const FROM =
-  ENV === 'development'
-    ? Deno.env.get('RESEND_FROM_DEV') || 'Fast Peptides <onboarding@resend.dev>'
-    : Deno.env.get('RESEND_FROM_PROD') || 'Fast Peptides <no-reply@fastpeptides.com>'
+
+// Adresse d’envoi unique, valable en dev & prod ✅
+const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
 
 export async function sendEmail({
   to,
@@ -22,11 +20,14 @@ export async function sendEmail({
   order_id?: string
 }) {
   console.log(`📤 Preparing to send email to ${to}`)
-  console.log(`🧾 Subject: ${subject}`)
-  console.log(`🔖 Type: ${type}`)
   console.log(`🧬 From: ${FROM}`)
 
-  const result = await resend.emails.send({ from: FROM, to, subject, html })
+  const result = await resend.emails.send({
+    from: FROM,
+    to,
+    subject,
+    html,
+  })
 
   console.log('📦 Resend response:', result)
 
@@ -42,4 +43,3 @@ export async function sendEmail({
 
   return result
 }
-
