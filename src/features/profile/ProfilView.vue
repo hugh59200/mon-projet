@@ -220,6 +220,7 @@
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { useProfileActions } from '@/supabase/actions/useProfileActions'
+  import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { onMounted, ref, type Ref } from 'vue'
   import { useAuthStore } from '../auth/stores/useAuthStore'
@@ -232,14 +233,9 @@
   const sections = useProfileSectionsStore()
   const { showDialog } = useDialog()
 
-  const {
-    loadProfile,
-    updateProfile,
-    changeAvatar,
-    loadLastOrdersAction,
-    updatePassword,
-    deleteAccount,
-  } = useProfileActions()
+  const { loadProfile, updateProfile, changeAvatar, loadLastOrdersAction, updatePassword } =
+    useProfileActions()
+  const { deleteOwnAccount } = useUserActions()
 
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
@@ -319,7 +315,7 @@
     })
 
     if (result === 'Yes') {
-      await deleteAccount()
+      await deleteOwnAccount()
     }
   }
 

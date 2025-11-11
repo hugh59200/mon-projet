@@ -1,3 +1,4 @@
+import { accountDeletedTemplate } from './accountDeletedTemplate.ts'
 import { emailChangeTemplate } from './emailChangeTemplate.ts'
 import { genericTemplate } from './genericTemplate.ts'
 import { orderConfirmationTemplate } from './orderConfirmationTemplate.ts'
@@ -37,6 +38,9 @@ export function renderEmailTemplate(type: string, data: any) {
 
     case 'email_change':
       return emailChangeTemplate(data)
+
+    case 'account_deleted':
+      return accountDeletedTemplate(data)
 
     default:
       return genericTemplate({

@@ -1,38 +1,31 @@
-// supabase/functions/order-confirmation/index.ts
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { supabase } from '../../utils/clients.ts'
+import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
-serve(async (req: Request) => {
-  try {
-    const { order_id } = await req.json()
+interface OrderConfirmationBody {
+  order_id: string
+}
 
-    if (!order_id) {
-      return new Response(JSON.stringify({ success: false, error: 'Missing order_id' }), {
-        status: 400,
-      })
-    }
+Deno.serve(
+  createHandler<OrderConfirmationBody>(async (_req, body) => {
+    const { order_id } = body
+    if (!order_id) throw new Error('Missing order_id')
 
-    const { data: order, error } = await supabase
+    const { data: order } = await supabase
       .from('orders_full_view')
       .select('*')
       .eq('order_id', order_id)
       .maybeSingle()
 
-    if (error || !order) {
-      return new Response(JSON.stringify({ success: false, error: 'Order not found' }), {
-        status: 404,
-      })
-    }
+    if (!order) throw new Error('Order not found')
 
     const orderNumber = order.order_number ?? order_id
-    const email = order.shipping_email
 
     const html = renderEmailTemplate('confirmation', {
       order_id,
       order_number: orderNumber,
-      items: order.detailed_items || [],
+      items: order.detailed_items ?? [],
       total_amount: order.total_amount,
       full_name: order.shipping_name,
       created_at: order.created_at,
@@ -41,17 +34,13 @@ serve(async (req: Request) => {
     })
 
     await sendEmail({
-      to: email,
+      to: order.shipping_email,
       subject: `Confirmation commande #${orderNumber}`,
       html,
       type: 'confirmation',
       order_id,
     })
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 })
-  } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: String(err) }), {
-      status: 500,
-    })
-  }
-})
+    return { email_sent: order.shipping_email, order_number: orderNumber }
+  }),
+)

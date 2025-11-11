@@ -1,14 +1,9 @@
 {
   "compilerOptions": {
-    "strict": false,
-    "lib": ["deno.ns", "dom"],
-    "types": [
-      "https://esm.sh/v135/@supabase/supabase-js@2/dist/module/types.d.ts"
-    ]
+    "strict": true
   },
   "importMap": "./import_map.json",
   "tasks": {
-    "serve": "supabase login",
-    "deploy": "supabase functions deploy create-stripe-session && supabase functions deploy stripe-webhook --no-verify-jwt && supabase functions deploy order-status-update && supabase functions deploy retrieve-stripe-session && supabase functions deploy order-confirmation"
+    "check": "deno check supabase/functions/**/*.ts"
   }
 }

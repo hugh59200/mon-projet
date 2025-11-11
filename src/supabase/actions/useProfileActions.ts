@@ -1,12 +1,11 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import {
-  deleteAccountApi,
   getLastOrders,
   getProfile,
   updatePasswordApi,
   updateProfileInfo,
-  uploadAvatar, // ✅ Manquait ici
+  uploadAvatar,
 } from '../api/profilesApi'
 
 export function useProfileActions() {
@@ -60,24 +59,11 @@ export function useProfileActions() {
     }
   }
 
-  async function deleteAccount() {
-    try {
-      await deleteAccountApi()
-      toast.show('Compte supprimé ✅', 'success')
-
-      await auth.signOut()
-      window.location.href = '/'
-    } catch (err: any) {
-      toast.show(err.message, 'danger')
-    }
-  }
-
   return {
     loadProfile,
     updateProfile,
     changeAvatar,
     loadLastOrdersAction,
     updatePassword,
-    deleteAccount,
   }
 }

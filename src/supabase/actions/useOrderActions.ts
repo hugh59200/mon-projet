@@ -1,7 +1,6 @@
 import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi'
 import type { OrderStatus } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { supabase } from '../supabaseClient'
 
 type MinimalOrder = {
   order_id?: string | null
@@ -30,13 +29,12 @@ export function useOrderActions(fetchData?: () => void) {
     if (!id) return
     try {
       await updateOrderStatusInDB(id, status)
-      const session = await supabase.auth.getSession()
+      console.log('invoking...')
       await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-order-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${session.data.session?.access_token}`,
         },
         body: JSON.stringify({ order_id: id, status }),
       })
