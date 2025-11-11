@@ -23,7 +23,7 @@
       :items="statuses"
       dropdown-type="table"
       center
-      :span="6"
+      :span="8"
       size="small"
     />
 

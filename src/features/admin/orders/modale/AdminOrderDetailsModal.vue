@@ -392,7 +392,12 @@
 
   const handleUpdateStatus = async () => {
     if (!order.value) return
+
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
+
+    toast.show('Statut mis à jour ✅', 'success')
+
+    await loadOrder()
     await loadEmails()
   }
 
@@ -412,29 +417,47 @@
       })
       .eq('id', order.value.order_id!)
 
-    error ? toast.show('Erreur suivi', 'danger') : toast.show('Suivi ajouté ✅', 'success')
+    if (error) {
+      toast.show('Erreur suivi ❌', 'danger')
+    } else {
+      toast.show('Suivi ajouté ✅', 'success')
+      await loadOrder()
+      await loadEmails()
+    }
   }
 
   const resendConfirmation = async () => {
     if (!order.value) return
+
     const { error } = await supabase.functions.invoke('order-confirmation', {
       body: { order_id: order.value.order_id },
     })
-    error ? toast.show('Erreur email', 'danger') : toast.show('Email renvoyé ✅', 'success')
+
+    if (error) {
+      toast.show('Erreur email ❌', 'danger')
+    } else {
+      toast.show('Email renvoyé ✅', 'success')
+      await loadEmails()
+    }
   }
 
   const downloadInvoice = async () => {
     if (!order.value) return
+
     const { data, error } = await supabase.functions.invoke('order-invoice', {
       body: { order_id: order.value.order_id },
     })
-    if (error || !data?.pdf_base64) return toast.show('Erreur facture', 'danger')
+
+    if (error || !data?.pdf_base64) return toast.show('Erreur facture ❌', 'danger')
 
     const link = document.createElement('a')
     link.href = `data:application/pdf;base64,${data.pdf_base64}`
     link.download = `facture_${order.value.order_id}.pdf`
     link.click()
+
     toast.show('Facture téléchargée ✅', 'success')
+
+    await loadEmails()
   }
 
   watch(
