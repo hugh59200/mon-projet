@@ -8,7 +8,6 @@
       class="auth-overlay"
     >
       <div class="auth-overlay__backdrop" />
-
       <main class="auth-overlay__container">
         <section class="auth-overlay__left">
           <div class="auth-brand">
@@ -26,7 +25,6 @@
                 Fast Peptides
               </BasicText>
             </div>
-
             <BasicText
               size="body-m"
               color="white"
@@ -36,7 +34,6 @@
               <br />
               avec précision et élégance 🔬
             </BasicText>
-
             <div class="auth-brand__illustration">
               <img
                 src="@/assets/lab-illustration.jpg"
@@ -45,7 +42,6 @@
             </div>
           </div>
         </section>
-
         <section class="auth-overlay__right">
           <div class="auth-overlay__skip">
             <BasicButton
@@ -58,8 +54,6 @@
               @click="skip"
             />
           </div>
-
-          <!-- ✅ On laisse le routeur afficher la bonne page -->
           <RouterView />
         </section>
       </main>
@@ -77,6 +71,9 @@
   const router = useRouter()
   const route = useRoute()
   const auth = useAuthStore()
+  const loading = ref(true)
+  const error = ref('')
+  const message = ref('')
 
   function skip() {
     visible.value = false
@@ -84,27 +81,65 @@
   }
 
   onMounted(async () => {
-    // ✅ Si ce n’est pas le callback → rien à faire
     if (route.path !== '/auth/callback') return
 
-    const { data } = await supabase.auth.getSession()
-    const session = data.session
+    const token = route.query.token as string | undefined
+    const type = route.query.type as 'signup' | 'recovery' | 'email_change' | undefined
 
-    if (!session?.user) {
-      // pas de session → retour au login
-      router.replace('/auth/login')
+    if (!token || !type) {
+      error.value = 'Lien de vérification invalide.'
+      loading.value = false
       return
     }
 
-    // ✅ User connecté → mise à jour
-    auth.user = session.user
-    await auth.fetchProfile?.()
+    // ✅ 1. Verify OTP
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type,
+    })
 
-    // ✅ Fermeture douce puis redirection
-    setTimeout(() => (visible.value = false), 2500)
+    if (verifyError) {
+      error.value =
+        type === 'signup'
+          ? "Ce lien d'inscription est invalide ou expiré."
+          : type === 'recovery'
+            ? "Ce lien de réinitialisation n'est plus valide."
+            : 'Lien invalide.'
+      loading.value = false
+      return
+    }
+
+    // ✅ 2. Get session
+    let { data: sessionData } = await supabase.auth.getSession()
+
+    // ✅ 2b. Si pas de session → forcer login silencieux
+    if (!sessionData.session) {
+      const email = route.query.email as string
+
+      if (email) {
+        await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        })
+
+        // récupère à nouveau la session
+        ;({ data: sessionData } = await supabase.auth.getSession())
+      }
+    }
+
+    auth.user = sessionData.session?.user ?? null
+
+    if (auth.user) {
+      await auth.fetchProfile()
+      message.value = '✅ Compte confirmé ! Bienvenue 👋, redirection...'
+    }
+
+    loading.value = false
+
     setTimeout(() => {
+      visible.value = false
       router.replace(auth.isAdmin ? '/admin' : '/profil')
-    }, 2900)
+    }, 1500)
   })
 </script>
 

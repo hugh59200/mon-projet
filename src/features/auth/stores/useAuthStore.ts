@@ -163,6 +163,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (event === 'SIGNED_OUT') router.push('/auth/login')
   })
 
+  function clearError() {
+    error.value = null
+  }
+
   return {
     user,
     profile,
@@ -178,5 +182,6 @@ export const useAuthStore = defineStore('auth', () => {
     signInWithProvider,
     signInWithMagicLink,
     signOut,
+    clearError,
   }
 })

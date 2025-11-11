@@ -7,7 +7,6 @@
     >
       Inscription 🎉
     </BasicText>
-
     <BasicText
       size="body-s"
       color="neutral-500"
@@ -15,7 +14,6 @@
     >
       Créez votre compte pour rejoindre la communauté 🔗
     </BasicText>
-
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
@@ -29,7 +27,6 @@
         @blur="validateField('email')"
         deletable
       />
-
       <WrapperInputPassword
         v-model="password"
         label="Mot de passe"
@@ -41,7 +38,6 @@
         @input="clear"
         @blur="validateField('password')"
       />
-
       <BasicButton
         label="Créer mon compte"
         variant="filled"
@@ -49,7 +45,6 @@
         :loading="loading"
         @click="submit"
       />
-
       <div class="auth__feedback">
         <BasicText
           v-if="error"
@@ -59,7 +54,6 @@
         >
           {{ error }}
         </BasicText>
-
         <BasicText
           v-if="message"
           size="body-m"
@@ -70,7 +64,6 @@
         </BasicText>
       </div>
     </div>
-
     <div class="auth__links">
       <RouterLink to="/auth/login">
         Déjà inscrit ?
@@ -96,7 +89,7 @@
   function clear() {
     error.value = ''
     message.value = ''
-    auth.error = null
+    auth.clearError()
   }
 
   async function submit() {
@@ -107,7 +100,6 @@
     loading.value = false
 
     if (!success) {
-      // ✅ reste sur la page
       error.value = auth.error ?? 'Inscription échouée.'
       return
     }

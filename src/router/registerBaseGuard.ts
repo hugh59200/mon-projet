@@ -17,12 +17,11 @@ export function registerBaseGuard(router: Router) {
     }
 
     // 2️⃣ Email non confirmé
-    if (auth.user && !auth.user.email_confirmed_at) {
-      console.warn('[Guard] Email non confirmé → déconnexion forcée')
+    if (to.path !== '/auth/callback' && auth.user && !auth.user.email_confirmed_at) {
       await supabase.auth.signOut()
       return '/auth/login'
     }
-
+    
     // 3️⃣ Profil manquant
     if (auth.isAuthenticated && !auth.profile) {
       const { data: profile, error } = await supabase

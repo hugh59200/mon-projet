@@ -14,7 +14,12 @@ const TITLES = {
 } as const
 
 serve(async (req: Request) => {
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   try {
     const payload = await req.text()
@@ -29,7 +34,8 @@ serve(async (req: Request) => {
       }
     }
 
-    const confirmation_url = `${email_data.site_url}/verify?token=${email_data.token}`
+    const confirmation_url = `${email_data.site_url}/auth/callback?type=${email_data.email_action_type}&token=${email_data.token}&email=${user.email}`
+
     const subject = TITLES[email_data.email_action_type]
 
     const html = renderEmailTemplate(email_data.email_action_type, {
@@ -40,8 +46,14 @@ serve(async (req: Request) => {
 
     const result = await sendEmail({ to: user.email, subject, html })
 
-    return new Response(JSON.stringify({ success: true, result }), { status: 200 })
+    return new Response(JSON.stringify({ success: true, result }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: String(err) }), { status: 400 })
+    return new Response(JSON.stringify({ success: false, error: String(err) }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 })
