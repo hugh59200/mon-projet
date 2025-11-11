@@ -7,6 +7,8 @@ const rawSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET')!
 const secret = rawSecret.replace('v1,whsec_', '')
 const wh = new Webhook(secret)
 
+const FRONT_URL = 'https://localhost:5278'
+
 const TITLES = {
   signup: 'Confirmez votre inscription ✅',
   recovery: 'Réinitialisation du mot de passe',
@@ -27,16 +29,10 @@ serve(async (req: Request) => {
 
     const { user, email_data } = wh.verify(payload, headers) as {
       user: { email: string; user_metadata?: { full_name?: string } }
-      email_data: {
-        site_url: string
-        token: string
-        email_action_type: keyof typeof TITLES
-      }
+      email_data: { token: string; email_action_type: keyof typeof TITLES }
     }
 
-    const confirmation_url = `${email_data.site_url}/auth/callback?type=${email_data.email_action_type}&token=${email_data.token}&email=${user.email}`
-
-    const subject = TITLES[email_data.email_action_type]
+    const confirmation_url = `${FRONT_URL}/auth/callback?token=${encodeURIComponent(email_data.token)}&type=${encodeURIComponent(email_data.email_action_type)}&email=${encodeURIComponent(user.email)}`
 
     const html = renderEmailTemplate(email_data.email_action_type, {
       full_name: user.user_metadata?.full_name ?? '',
@@ -44,7 +40,11 @@ serve(async (req: Request) => {
       url: confirmation_url,
     })
 
-    const result = await sendEmail({ to: user.email, subject, html })
+    const result = await sendEmail({
+      to: user.email,
+      subject: TITLES[email_data.email_action_type],
+      html,
+    })
 
     return new Response(JSON.stringify({ success: true, result }), {
       status: 200,

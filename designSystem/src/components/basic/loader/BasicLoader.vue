@@ -1,13 +1,16 @@
 <template>
-  <div
-    class="loader"
-    :style="{
-      width: sizeMap[size],
-      height: sizeMap[size],
-      borderColor: `${colorMap[color]}40`,
-      borderTopColor: colorMap[color],
-    }"
-  ></div>
+  <div class="loader-wrapper">
+    <div
+      class="loader"
+      :style="{
+        width: sizeMap[size],
+        height: sizeMap[size],
+        borderWidth: borderWidthMap[size],
+        borderColor: `${colorMap[color]}33`,
+        borderTopColor: colorMap[color],
+      }"
+    ></div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -23,23 +26,37 @@
   )
 
   const sizeMap = {
-    small: '20px',
-    medium: '28px',
-    large: '40px',
+    small: '18px',
+    medium: '26px',
+    large: '36px',
+  }
+
+  const borderWidthMap = {
+    small: '2px',
+    medium: '3px',
+    large: '4px',
   }
 
   const colorMap = {
-    primary: '#00796b',
+    primary: '#00a48b',
     neutral: '#999',
     danger: '#d32f2f',
   }
 </script>
 
-<style lang="less">
+<style scoped lang="less">
+  /* ✅ Toujours centré proprement */
+  .loader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
   .loader {
-    border: 3px solid transparent;
-    border-top: 3px solid #00796b;
     border-radius: 50%;
+    border-style: solid;
+    border-color: transparent;
     animation: spin 0.9s linear infinite;
   }
 

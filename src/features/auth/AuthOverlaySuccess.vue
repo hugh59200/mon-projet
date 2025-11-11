@@ -6,7 +6,6 @@
     }"
     class="auth-success"
   >
-    <!-- ✅ Icône animée -->
     <div class="auth-success__icon-wrapper">
       <BasicIconNext
         name="CheckCircle2"

@@ -17,6 +17,7 @@ export type RouteName =
   'cart' |
   'catalogue' |
   'checkout' |
+  'email-sent' |
   'faq' |
   'home' |
   'order-detail' |
@@ -24,6 +25,5 @@ export type RouteName =
   'payment-cancel' |
   'payment-success' |
   'product-detail' |
-  'profil' |
   'update-password' |
   'update-password-success'

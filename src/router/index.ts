@@ -36,6 +36,23 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/auth/AuthOverlay.vue'),
     children: [
       {
+        path: 'callback',
+        name: 'auth-callback',
+        component: () => import('@/features/auth/AuthCallback.vue'),
+        meta: {
+          title: 'Connexion en cours – Fast Peptides',
+        },
+      },
+    ],
+  },
+  /* -------------------------------------------------------------------------- */
+  /* 🧭 PROFIL & COMPTE                                                         */
+  /* -------------------------------------------------------------------------- */
+  {
+    path: '/auth',
+    component: () => import('@/features/auth/AuthOverlay.vue'),
+    children: [
+      {
         path: 'login',
         name: 'auth-login',
         component: () => import('@/features/auth/AuthLogin.vue'),
@@ -50,31 +67,22 @@ const routes: Array<RouteRecordRaw> = [
         name: 'auth-reset',
         component: () => import('@/features/auth/AuthReset.vue'),
       },
+      {
+        path: 'email-sent',
+        name: 'email-sent',
+        component: () => import('@/features/auth/AuthEmailSent.vue'),
+      },
+      {
+        path: 'callback',
+        name: 'auth-callback',
+        component: () => import('@/features/auth/AuthCallback.vue'),
+        meta: {
+          title: 'Connexion en cours – Fast Peptides',
+        },
+      },
     ],
   },
-  {
-    path: '/auth/callback',
-    name: 'auth-callback',
-    component: () => import('@/features/auth/AuthOverlay.vue'),
-    meta: {
-      title: 'Connexion en cours – Fast Peptides',
-      description: 'Connexion via un fournisseur externe (OAuth).',
-    },
-  },
-  /* -------------------------------------------------------------------------- */
-  /* 🧭 PROFIL & COMPTE                                                         */
-  /* -------------------------------------------------------------------------- */
-  {
-    path: '/profil',
-    name: 'profil',
-    component: () => import('@/features/profile/ProfilView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Mon profil – Fast Peptides',
-      description:
-        'Gérez vos informations personnelles et votre historique de commandes sur Fast Peptides.',
-    },
-  },
+
   {
     path: '/profil/commandes',
     name: 'orders',

@@ -1,38 +1,38 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Router } from 'vue-router'
 
 export function registerBaseGuard(router: Router) {
-  let isShowingCGU = false
-
   router.beforeEach(async (to) => {
     const auth = useAuthStore()
     const cart = useCartStore()
 
-    // 1️⃣ Init session si absente
+    // ✅ Laisser passer callback
+    if (to.path === '/auth/callback') return true
+
+    // ✅ Initialiser session
     if (!auth.user) {
       await auth.initAuth()
     }
 
-    // 2️⃣ Email non confirmé
-    if (to.path !== '/auth/callback' && auth.user && !auth.user.email_confirmed_at) {
-      await supabase.auth.signOut()
-      return '/auth/login'
+    // ✅ ✅ ✅ FIX : Détection fiable de l’email vérifié sur Supabase V2
+    const isEmailVerified =
+      auth.user?.email_confirmed_at || auth.user?.identities?.[0]?.identity_data?.email_verified
+
+    if (auth.user && !isEmailVerified) {
+      return '/auth/callback'
     }
-    
-    // 3️⃣ Profil manquant
+
+    // ✅ Charger le profil manquant
     if (auth.isAuthenticated && !auth.profile) {
-      const { data: profile, error } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', auth.user!.id)
         .maybeSingle()
 
-      if (error) console.warn('[Guard] Erreur chargement profil:', error)
-
-      if (!profile || !profile.email) {
+      if (!profile) {
         await supabase.auth.signOut()
         return '/auth/login'
       }
@@ -40,60 +40,23 @@ export function registerBaseGuard(router: Router) {
       auth.profile = profile
     }
 
-    // 4️⃣ CGU popup obligatoire
-    const publicRoutes = ['/auth/login', '/auth/register', '/auth/reset-password']
-    if (auth.isAuthenticated && !publicRoutes.includes(to.path) && !isShowingCGU) {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('cgu_accepted')
-          .eq('id', auth.user!.id)
-          .maybeSingle()
-
-        if (error) throw error
-
-        if (data && data.cgu_accepted === false) {
-          console.info('[Guard] CGU non acceptées → popup')
-          isShowingCGU = true
-          const dialog = useAfficheCGUStore()
-          await dialog.showDialog({ validationObligatoire: true })
-          await supabase
-            .from('profiles')
-            .update({
-              cgu_accepted: true,
-              cgu_accepted_at: new Date().toISOString(),
-            })
-            .eq('id', auth.user!.id)
-          isShowingCGU = false
-        }
-      } catch (err) {
-        console.warn('[Guard] Erreur CGU:', err)
-      }
-    }
-
-    // 5️⃣ Vérif accès
-    const requiresAuth = to.meta.requiresAuth
-    const requiresAdmin = to.meta.requiresAdmin
-    const requiresCart = to.meta.requiresCart
-
-    if (requiresAuth && !auth.isAuthenticated) {
-      console.warn('[Guard] Accès protégé → login')
+    // ✅ Routes protégées
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
       return { path: '/auth/login', query: { redirect: to.fullPath } }
     }
 
-    if (requiresAdmin && (!auth.isAuthenticated || auth.profile?.role !== 'admin')) {
+    // ✅ Admin
+    if (to.meta.requiresAdmin && auth.profile?.role !== 'admin') {
       return '/access-denied'
     }
 
-    if (requiresCart && cart.items.length === 0) {
+    // ✅ Panier obligatoire
+    if (to.meta.requiresCart && cart.items.length === 0) {
       return '/panier'
     }
 
-    if (
-      auth.isAuthenticated &&
-      to.path.startsWith('/auth/') &&
-      !['/auth/callback'].includes(to.path)
-    ) {
+    // ✅ Si connecté → empêche retour sur /auth (sauf callback)
+    if (auth.isAuthenticated && to.path.startsWith('/auth/') && to.path !== '/auth/callback') {
       return '/profil'
     }
 

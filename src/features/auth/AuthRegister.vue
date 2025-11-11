@@ -75,10 +75,12 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useForm } from './composables/useForm'
   import { useAuthStore } from './stores/useAuthStore'
 
   const auth = useAuthStore()
+  const router = useRouter()
 
   const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
 
@@ -104,7 +106,7 @@
       return
     }
 
-    message.value = 'Vérifiez vos e-mails pour confirmer votre compte 📧'
+    router.push('/auth/email-sent')
   }
 </script>
 

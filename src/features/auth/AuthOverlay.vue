@@ -193,12 +193,10 @@
     &__right {
       position: relative;
       flex: 1;
-      background: #fff;
-      padding: 50px;
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
+      justify-content: center;
     }
 
     @media (max-width: 860px) {

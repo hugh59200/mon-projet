@@ -1,7 +1,7 @@
 <template>
   <DialogComponent />
   <ToastContainer />
-  <CGU />
+  <!-- <CGU /> -->
   <ChatWidget v-if="isAuthenticated && role === 'user'" />
   <transition name="fade">
     <div
@@ -14,7 +14,7 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { registerPopupAutoCGU } from '@/features/interface/cgu'
-  import CGU from '@/features/interface/cgu/CGU.vue'
+  // import CGU from '@/features/interface/cgu/CGU.vue'
   import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
