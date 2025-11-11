@@ -1,6 +1,7 @@
 import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi'
-import type { OrderStatus } from '@/supabase/types/supabase.types'
+import type { OrderStatus } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+import { supabase } from '../supabaseClient'
 
 type MinimalOrder = {
   order_id?: string | null
@@ -27,24 +28,18 @@ export function useOrderActions(fetchData?: () => void) {
   async function changeOrderStatus(order: MinimalOrder, status: OrderStatus) {
     const id = order.order_id ?? order.id
     if (!id) return
-
     try {
-      const updated = await updateOrderStatusInDB(id, status)
-
-      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`, {
+      await updateOrderStatusInDB(id, status)
+      const session = await supabase.auth.getSession()
+      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-order-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${session.data.session?.access_token}`,
         },
-        body: JSON.stringify({
-          order_id: id,
-          status,
-          email: updated.shipping_email,
-          full_name: updated.shipping_name,
-        }),
+        body: JSON.stringify({ order_id: id, status }),
       })
-
       toast.show('Statut mis à jour ✅', 'success')
       fetchData?.()
     } catch (err: any) {

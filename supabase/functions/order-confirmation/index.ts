@@ -14,7 +14,6 @@ serve(async (req: Request) => {
       })
     }
 
-    // ✅ Récupération complète de la commande
     const { data: order, error } = await supabase
       .from('orders_full_view')
       .select('*')
@@ -30,7 +29,6 @@ serve(async (req: Request) => {
     const orderNumber = order.order_number ?? order_id
     const email = order.shipping_email
 
-    // ✅ Mail HTML via template
     const html = renderEmailTemplate('confirmation', {
       order_id,
       order_number: orderNumber,
@@ -42,7 +40,6 @@ serve(async (req: Request) => {
       ctaUrl: `https://fast-peptides.com/compte/commandes/${orderNumber}`,
     })
 
-    // ✅ Envoi mail + log
     await sendEmail({
       to: email,
       subject: `Confirmation commande #${orderNumber}`,

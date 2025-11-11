@@ -1,5 +1,6 @@
+import type { OrderStatus } from '@/utils'
 import { supabase } from '../supabaseClient'
-import type { OrdersFullView, OrderStatus } from '../types/supabase.types'
+import type { OrdersFullView } from '../types/supabase.types'
 import { handleApi, handleMutation } from './helpers/HandleError'
 
 /** ✅ Récupère toutes les commandes */

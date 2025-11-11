@@ -195,7 +195,7 @@
           />
         </div>
         <div
-          v-if="emails.length"
+          v-if="emails"
           class="order-info-card"
         >
           <BasicText
@@ -322,8 +322,13 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import { supabase } from '@/supabase/supabaseClient'
-  import { type EmailSent, type OrdersFullView } from '@/supabase/types/supabase.types'
+  import {
+    type EmailSent,
+    type OrderItem,
+    type OrdersFullView,
+  } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
   import { getBadge, getLabel, STATUSES, type OrderStatus } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -332,6 +337,8 @@
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
+
+  const { changeOrderStatus } = useOrderActions()
 
   const order = ref(null) as Ref<OrdersFullView | null>
   const emails = ref<EmailSent[]>([])
@@ -403,12 +410,10 @@
   async function handleUpdateStatus() {
     if (!order.value) return
 
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: selectedStatus.value })
-      .eq('id', order.value.order_id!)
+    // ✅ On utilise ton action centralisée
+    await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
 
-    error ? toast.show('Erreur ⚠️', 'danger') : toast.show('Statut mis à jour ✅', 'success')
+    await loadEmails() // rafraîchit l’historique
   }
 
   async function handleAddTracking() {

@@ -1,10 +1,14 @@
 <template>
   <div class="callback-wrapper">
-    <div class="callback-card">
+    <div
+      class="callback-card"
+      v-motion="cardMotion"
+    >
       <!-- ✅ LOADING -->
       <div
         v-if="state === 'loading'"
         class="state-block"
+        v-motion="fadeIn"
       >
         <BasicLoader
           size="large"
@@ -18,7 +22,6 @@
         >
           Connexion sécurisée 🔐
         </BasicText>
-
         <BasicText
           size="body-m"
           color="neutral-600"
@@ -31,15 +34,15 @@
 
       <!-- ✅ SUCCESS -->
       <div
-        v-if="state === 'success'"
+        v-else-if="state === 'success'"
         class="state-block"
+        v-motion="fadeInPop"
       >
         <BasicIconNext
           name="CheckCircle2"
-          :size="80"
+          :size="82"
           color="success-600"
         />
-
         <BasicText
           size="h4"
           weight="bold"
@@ -47,7 +50,6 @@
         >
           Compte vérifié ✅
         </BasicText>
-
         <BasicText
           size="body-m"
           color="neutral-600"
@@ -60,15 +62,15 @@
 
       <!-- ✅ ERROR -->
       <div
-        v-if="state === 'error'"
+        v-else
         class="state-block"
+        v-motion="fadeIn"
       >
         <BasicIconNext
           name="AlertTriangle"
           :size="74"
           color="danger-600"
         />
-
         <BasicText
           size="h4"
           weight="bold"
@@ -76,7 +78,6 @@
         >
           Vérification impossible ❌
         </BasicText>
-
         <BasicText
           size="body-m"
           color="neutral-600"
@@ -117,14 +118,39 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useAuthStore } from './stores/useAuthStore'
 
+  // ✅ UI state
   const state = ref<'loading' | 'success' | 'error'>('loading')
   const errorMessage = ref('')
   const email = ref<string | null>(null)
 
+  // ✅ Router/Auth
   const route = useRoute()
   const router = useRouter()
   const auth = useAuthStore()
 
+  /* --- Motions --- */
+  const fadeIn = {
+    initial: { opacity: 0, y: 12 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.28 } },
+  }
+  const fadeInPop = {
+    initial: { opacity: 0, scale: 0.6 },
+    enter: {
+      opacity: 1,
+      scale: 1,
+      transition: { type: 'spring', stiffness: 120 },
+    },
+  }
+  const cardMotion = {
+    initial: { opacity: 0, scale: 0.94 },
+    enter: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.25 },
+    },
+  }
+
+  /* --- Helper d’erreurs --- */
   function mapOtpError(error: any): string {
     const msg = (error.message || '').toLowerCase()
     if (msg.includes('expired')) return 'Ce lien a expiré.'
@@ -133,22 +159,21 @@
     return 'Impossible de vérifier votre compte.'
   }
 
+  /* --- Renvoi email de confirmation --- */
   async function resendEmail() {
     if (!email.value) return
-
     const { error } = await supabase.auth.signInWithOtp({
       email: email.value,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
-
     errorMessage.value = error ? mapOtpError(error) : '✅ Un nouvel e-mail vient d’être envoyé.'
   }
 
+  /* --- Vérification OTP --- */
   onMounted(async () => {
     const token = route.query.token as string | null
     const type = route.query.type as EmailOtpType | null
     const mail = route.query.email as string | null
-
     email.value = mail
 
     if (!token || !type || !mail) {
@@ -157,19 +182,13 @@
       return
     }
 
-    const { error: otpError } = await supabase.auth.verifyOtp({
-      token,
-      type,
-      email: mail,
-    })
-
+    const { error: otpError } = await supabase.auth.verifyOtp({ token, type, email: mail })
     if (otpError) {
       state.value = 'error'
       errorMessage.value = mapOtpError(otpError)
       return
     }
 
-    // ✅ IMPORTANT : mise à jour utilisateur
     const { data: refreshed } = await supabase.auth.getUser()
     if (!refreshed.user) {
       state.value = 'error'
@@ -184,8 +203,8 @@
 
     await nextTick()
     setTimeout(() => {
-      router.replace(auth.isAdmin ? '/admin' : '/profil') // ✅ IMPORTANT
-    }, 1200)
+      router.replace(auth.isAdmin ? '/admin' : '/profil')
+    }, 1100)
   })
 </script>
 
@@ -211,7 +230,6 @@
     flex-direction: column;
     align-items: center;
     gap: 22px;
-    animation: fadeSmooth 0.3s ease forwards;
   }
 
   .error-message {
@@ -219,16 +237,5 @@
     margin: 0 auto;
     line-height: 1.45;
     margin-bottom: 6px;
-  }
-
-  @keyframes fadeSmooth {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 </style>

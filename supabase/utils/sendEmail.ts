@@ -19,24 +19,41 @@ export async function sendEmail({
 }) {
   console.log(`📧 Sending email to ${to} | Subject: ${subject}`)
 
-  const result = await resend.emails.send({
-    from: FROM,
-    to,
-    subject,
-    html,
-  })
+  try {
+    const result = await resend.emails.send({
+      from: FROM,
+      to,
+      subject,
+      html,
+    })
 
-  console.log('✅ Resend response:', result)
+    console.log('✅ Resend response:', result)
 
-  await logEmail({
-    to_email: to,
-    subject,
-    body_html: html,
-    type,
-    order_id,
-    provider_response: result,
-    status: result?.id ? 'sent' : 'error',
-  })
+    // ✅ Statut toujours SENT si pas d'erreur JS
+    await logEmail({
+      to_email: to,
+      subject,
+      body_html: html,
+      type,
+      order_id,
+      provider_response: result,
+      status: 'sent',
+    })
 
-  return result
+    return result
+  } catch (error) {
+    console.error('❌ Error sending email:', error)
+
+    await logEmail({
+      to_email: to,
+      subject,
+      body_html: html,
+      type,
+      order_id,
+      provider_response: error,
+      status: 'error',
+    })
+
+    throw error
+  }
 }

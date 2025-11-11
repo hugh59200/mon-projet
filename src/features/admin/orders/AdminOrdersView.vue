@@ -51,8 +51,8 @@
         <OrderRow
           v-for="o in filteredData"
           :order="o"
-          :status="statusProxy(o.order_id).value"
-          @update:status="(v) => (statusProxy(o.order_id).value = v)"
+          :status="localStatuses[o.order_id ?? ''] ?? 'pending'"
+          @update:status="(v) => changeOrderStatus(o, v)"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
@@ -65,8 +65,8 @@
         <OrderCardMobile
           v-for="o in filteredData"
           :order="o"
-          :status="statusProxy(o.order_id).value"
-          @update:status="(v) => (statusProxy(o.order_id).value = v)"
+          :status="localStatuses[o.order_id ?? ''] ?? 'pending'"
+          @update:status="(v) => changeOrderStatus(o, v)"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
@@ -92,7 +92,7 @@
   import { formatCurrency, formatDate } from '@/utils'
   import type { OrderStatus } from '@/utils/status'
   import { STATUSES } from '@/utils/status'
-  import { computed, ref, watchEffect } from 'vue'
+  import { ref, watchEffect } from 'vue'
 
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderRow from './OrderRow.vue'
@@ -120,13 +120,6 @@
     }
     localStatuses.value = map
   })
-
-  function statusProxy(id: string | null) {
-    return computed<OrderStatus>({
-      get: () => (id ? (localStatuses.value[id] ?? 'pending') : 'pending'),
-      set: (v) => id && (localStatuses.value[id] = v),
-    })
-  }
 
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
