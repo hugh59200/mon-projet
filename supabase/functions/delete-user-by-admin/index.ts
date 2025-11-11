@@ -8,8 +8,8 @@ interface AdminDeleteBody {
 }
 
 Deno.serve(
-  createHandler(async (_req, body: AdminDeleteBody) => {
-    const { user_id } = body
+  createHandler<AdminDeleteBody>(async (_req, body) => {
+    const user_id = body?.user_id
     if (!user_id) throw new Error('Missing user_id')
 
     const { data: targetUser, error: getUserErr } = await supabase.auth.admin.getUserById(user_id)
@@ -17,7 +17,8 @@ Deno.serve(
 
     const email = targetUser.user.email
 
-    await supabase.from('profiles').delete().eq('id', user_id)
+    const { error: profileErr } = await supabase.from('profiles').delete().eq('id', user_id)
+    if (profileErr) throw new Error(`Profile delete failed: ${profileErr.message}`)
 
     const { error: deleteError } = await supabase.auth.admin.deleteUser(user_id)
     if (deleteError) throw new Error(`Auth delete failed: ${deleteError.message}`)
@@ -33,6 +34,6 @@ Deno.serve(
       })
     }
 
-    return { success: true, deleted_user: user_id }
+    return { deleted_user: user_id }
   }),
 )

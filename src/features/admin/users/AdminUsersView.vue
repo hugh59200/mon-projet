@@ -6,7 +6,6 @@
       :show-reset="true"
       @reset="reset()"
     />
-
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -15,7 +14,6 @@
       :auto-fetch="fetchData"
       @change="page = $event"
     />
-
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -23,7 +21,6 @@
       message="Chargement des utilisateurs..."
       empty-message="Aucun utilisateur trouvé 😅"
     >
-      <!-- 💻 TABLEAU DESKTOP -->
       <div class="users--desktop">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
@@ -106,8 +103,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 📱 CARTES MOBILES -->
       <div class="mobile-cards-list">
         <UserCardMobile
           v-for="user in filteredData"
@@ -123,8 +118,6 @@
         />
       </div>
     </WrapperLoader>
-
-    <!-- 🪟 MODAL -->
     <teleport to="#app">
       <AdminUserDetailsModal
         v-if="selectedUserId"
@@ -143,9 +136,9 @@
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils'
   import { ref, watch } from 'vue'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
-import BasicToolbar from '../shared/components/BasicToolbar.vue'
 
   const {
     filteredData,

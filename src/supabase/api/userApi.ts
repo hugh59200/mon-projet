@@ -27,14 +27,17 @@ export async function deleteUserById(id: string) {
     throw new Error('Missing session token')
   }
 
-  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user-by-admin`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.access_token}`,
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user-by-admin`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ user_id: id }),
     },
-    body: JSON.stringify({ user_id: id }),
-  })
+  )
 
   if (!res.ok) {
     const txt = await res.text()
@@ -51,7 +54,7 @@ export async function deleteUserSelf() {
     throw new Error('Missing session token')
   }
 
-  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user-self`, {
+  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account-self`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

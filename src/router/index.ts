@@ -82,6 +82,16 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/profil',
+    name: 'profil',
+    component: () => import('@/features/profile/ProfilView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Mon profil – Fast Peptides',
+      description: 'Gérez vos informations personnelles, préférences et sécurité de votre compte.',
+    },
+  },
 
   {
     path: '/profil/commandes',

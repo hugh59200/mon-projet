@@ -40,6 +40,15 @@
         <!-- ✅ Liens rapides -->
         <div class="menu-list">
           <BasicButton
+            label="Mon profil"
+            iconName="UserCog"
+            variant="ghost"
+            type="reverse"
+            size="small"
+            class="menu-btn"
+            @click="goTo('/profil')"
+          />
+          <BasicButton
             label="Messagerie"
             iconName="MessageSquare"
             variant="ghost"
@@ -48,7 +57,6 @@
             class="menu-btn"
             @click="goTo('/admin/messagerie')"
           />
-
           <BasicButton
             label="Statistiques"
             iconName="BarChart3"
@@ -58,7 +66,6 @@
             class="menu-btn"
             @click="goTo('/admin/statistiques')"
           />
-
           <BasicButton
             v-if="isAdmin"
             label="Espace Admin"
