@@ -8,31 +8,25 @@ Deno.serve(
     const token = req.headers.get('Authorization')?.replace('Bearer ', '')
     if (!token) throw new Error('Missing token')
 
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token)
+    const { data, error } = await supabase.auth.getUser(token)
+    if (error || !data?.user) throw new Error('Unauthorized')
 
-    if (error || !user) throw new Error('Unauthorized')
-
-    const email = user.email
+    const user = data.user
 
     await supabase.from('profiles').delete().eq('id', user.id)
+    const { error: delErr } = await supabase.auth.admin.deleteUser(user.id)
+    if (delErr) throw new Error(`Auth delete failed: ${delErr.message}`)
 
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
-    if (deleteError) throw new Error(`Auth delete failed: ${deleteError.message}`)
-
-    if (email) {
-      const html = renderEmailTemplate('account_deleted', { email })
-
+    if (user.email) {
       await sendEmail({
-        to: email,
-        subject: 'Votre compte a bien été supprimé ✅',
-        html,
+        to: user.email,
+        subject: 'Compte supprimé ✅',
+        html: renderEmailTemplate('account_deleted', { email: user.email }),
         type: 'account_deleted',
       })
     }
 
-    return { success: true, deleted_user: user.id }
+    console.log(`✅ [SELF] Deleted user: ${user.id}`)
+    return { deleted_user: user.id }
   }),
 )

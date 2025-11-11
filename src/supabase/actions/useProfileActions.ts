@@ -1,4 +1,3 @@
-import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import {
   getLastOrders,
@@ -10,7 +9,6 @@ import {
 
 export function useProfileActions() {
   const toast = useToastStore()
-  const auth = useAuthStore()
 
   async function loadProfile(id: string) {
     try {

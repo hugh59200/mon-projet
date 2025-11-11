@@ -29,11 +29,11 @@
           <div class="info-row">
             <BasicText>
               <b>Client :</b>
-              {{ order.profile_info?.full_name }}
+              {{ safeProfile.full_name }}
             </BasicText>
             <BasicText>
               <b>Email :</b>
-              {{ order.profile_info?.email }}
+              {{ safeProfile.email }}
             </BasicText>
           </div>
 
@@ -73,7 +73,7 @@
           />
         </div>
 
-        <!-- ✅ Adresse de livraison -->
+        <!-- ✅ Adresse -->
         <div
           v-if="order"
           class="order-info-card"
@@ -94,6 +94,8 @@
             Aucune adresse renseignée
           </BasicText>
         </div>
+
+        <!-- ✅ Paiement -->
         <div
           v-if="order"
           class="order-info-card"
@@ -104,6 +106,7 @@
           >
             Paiement Stripe
           </BasicText>
+
           <div class="info-row">
             <BasicText><b>Session :</b></BasicText>
             <template v-if="order.stripe_session_id">
@@ -116,6 +119,7 @@
             </template>
             <span v-else>—</span>
           </div>
+
           <div class="info-row">
             <BasicText>
               <b>Payment Intent :</b>
@@ -130,6 +134,8 @@
             @click="resendConfirmation"
           />
         </div>
+
+        <!-- ✅ Suivi -->
         <div
           v-if="order"
           class="order-info-card"
@@ -140,6 +146,7 @@
           >
             Suivi livraison
           </BasicText>
+
           <BasicInput
             v-model="carrier"
             placeholder="Transporteur"
@@ -148,12 +155,14 @@
             v-model="trackingNumber"
             placeholder="Numéro ou lien"
           />
+
           <BasicButton
             label="Enregistrer"
             size="small"
             type="primary"
             @click="handleAddTracking"
           />
+
           <div
             v-if="order.tracking_number"
             class="tracking-line"
@@ -161,16 +170,16 @@
             <BasicText size="body-s">
               <b>Suivi :</b>
               <BasicLink
-                v-if="isURL(order.tracking_number)"
                 :href="order.tracking_number"
                 target="_blank"
               >
                 {{ order.tracking_number }}
               </BasicLink>
-              <span v-else>{{ order.tracking_number }}</span>
             </BasicText>
           </div>
         </div>
+
+        <!-- ✅ Status -->
         <div
           v-if="order"
           class="order-info-card"
@@ -181,11 +190,13 @@
           >
             Modifier le statut
           </BasicText>
+
           <BasicDropdown
             v-model="selectedStatus"
             :items="STATUSES"
             dropdown-type="table"
           />
+
           <BasicButton
             label="Mettre à jour"
             size="small"
@@ -194,64 +205,10 @@
             @click="handleUpdateStatus"
           />
         </div>
+
+        <!-- ✅ Produits commandés -->
         <div
-          v-if="emails"
-          class="order-info-card"
-        >
-          <BasicText
-            size="h5"
-            weight="bold"
-          >
-            Historique des e-mails
-          </BasicText>
-          <div class="gridElemWrapper">
-            <div class="cardLayoutWrapper cardLayoutWrapper--header">
-              <BasicCell
-                :span="12"
-                text="Type"
-              />
-              <BasicCell
-                :span="12"
-                text="Date"
-                center
-              />
-              <BasicCell
-                :span="12"
-                text="Statut"
-                center
-              />
-            </div>
-          </div>
-          <div
-            v-for="mail in emails"
-            :key="mail.id"
-            class="gridElemWrapper"
-          >
-            <div class="cardLayoutWrapper">
-              <BasicCell :span="12">
-                <BasicText>{{ getLabel(mail.type) }}</BasicText>
-              </BasicCell>
-              <BasicCell
-                :span="12"
-                center
-              >
-                <BasicText>{{ formatDate(mail.sent_at) }}</BasicText>
-              </BasicCell>
-              <BasicCell
-                :span="12"
-                center
-              >
-                <BasicBadge
-                  :label="getLabel(mail.status)"
-                  :type="getBadge(mail.status)"
-                  size="small"
-                />
-              </BasicCell>
-            </div>
-          </div>
-        </div>
-        <div
-          v-if="order?.detailed_items"
+          v-if="order"
           class="order-products"
         >
           <BasicText
@@ -260,6 +217,7 @@
           >
             Produits commandés
           </BasicText>
+
           <div class="gridElemWrapper">
             <div class="cardLayoutWrapper cardLayoutWrapper--header">
               <BasicCell
@@ -268,30 +226,31 @@
               />
               <BasicCell
                 :span="6"
-                center
                 text="Qté"
+                center
               />
               <BasicCell
                 :span="8"
-                center
                 text="Prix"
+                center
               />
               <BasicCell
                 :span="8"
-                center
                 text="Total"
+                center
               />
             </div>
           </div>
+
           <div
-            v-for="item in order?.detailed_items"
+            v-for="item in order.detailed_items"
+            :key="item.product_id"
             class="gridElemWrapper"
           >
             <div class="cardLayoutWrapper">
               <BasicCell :span="14">
                 <BasicText>{{ item.product_name }}</BasicText>
               </BasicCell>
-
               <BasicCell
                 :span="6"
                 center
@@ -302,15 +261,13 @@
                 :span="8"
                 center
               >
-                <BasicText>{{ Number(item.product_price || 0).toFixed(2) }}€</BasicText>
+                <BasicText>{{ Number(item.product_price).toFixed(2) }}€</BasicText>
               </BasicCell>
               <BasicCell
                 :span="8"
                 center
               >
-                <BasicText>
-                  {{ (Number(item.product_price || 0) * Number(item.quantity || 0)).toFixed(2) }}€
-                </BasicText>
+                <BasicText>{{ (item.product_price * item.quantity).toFixed(2) }}€</BasicText>
               </BasicCell>
             </div>
           </div>
@@ -324,27 +281,48 @@
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import { supabase } from '@/supabase/supabaseClient'
-  import {
-    type EmailSent,
-    type OrderItem,
-    type OrdersFullView,
-  } from '@/supabase/types/supabase.types'
+
+  import type { EmailSent, OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
-  import { getBadge, getLabel, STATUSES, type OrderStatus } from '@/utils/status'
+  import { getBadge, getLabel, type OrderStatus, STATUSES } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, watch, type Ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
+
+  type ProfileInfoSafe = {
+    full_name: string
+    email: string
+  }
+
+  type OrderItemSafe = {
+    product_id: string
+    product_name: string
+    product_price: number
+    quantity: number
+  }
+
+  type OrdersFullViewSafe = Omit<OrdersFullView, 'profile_info' | 'detailed_items'> & {
+    profile_info: ProfileInfoSafe
+    detailed_items: OrderItemSafe[]
+  }
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
-
   const { changeOrderStatus } = useOrderActions()
 
-  const order = ref(null) as Ref<OrdersFullView | null>
+  const order = ref<OrdersFullViewSafe | null>(null)
   const emails = ref<EmailSent[]>([])
   const carrier = ref('')
   const trackingNumber = ref('')
   const selectedStatus = ref<OrderStatus>('pending')
+
+  const safeProfile = computed<ProfileInfoSafe>(() => {
+    const p = order.value?.profile_info
+    return {
+      full_name: p?.full_name || 'Inconnu',
+      email: p?.email || '-',
+    }
+  })
 
   const stripeLink = computed(() =>
     order.value?.stripe_session_id
@@ -353,22 +331,15 @@
   )
 
   const shippingAddress = computed(() => {
-    const o = order.value
-    if (!o) return null
-    const parts = [o.shipping_address, o.shipping_zip, o.shipping_city, o.shipping_country].filter(
-      Boolean,
-    )
-    return parts.length ? parts.join(', ') : null
+    if (!order.value) return null
+    const p = [
+      order.value.shipping_address,
+      order.value.shipping_zip,
+      order.value.shipping_city,
+      order.value.shipping_country,
+    ].filter(Boolean)
+    return p.length ? p.join(', ') : null
   })
-
-  function isURL(v: string) {
-    try {
-      new URL(v)
-      return true
-    } catch {
-      return false
-    }
-  }
 
   async function loadOrder() {
     const { data, error } = await supabase
@@ -377,24 +348,36 @@
       .eq('order_id', props.orderId)
       .single()
 
-    if (error || !data) {
-      toast.show('Erreur de chargement', 'danger')
-      return
-    }
+    if (error || !data) return
 
     order.value = {
       ...data,
-      profile_info:
-        typeof data.profile_info === 'object' && data.profile_info !== null
-          ? (data.profile_info as { full_name: string; email: string })
-          : { full_name: 'Inconnu', email: '-' },
+      profile_info: toProfileInfo(data.profile_info),
+      detailed_items: toDetailedItems(data.detailed_items),
+    } as OrdersFullViewSafe
+  }
 
-      detailed_items: Array.isArray(data.detailed_items)
-        ? (data.detailed_items as OrderItem[])
-        : [],
+  function toProfileInfo(json: unknown): ProfileInfoSafe {
+    if (json && typeof json === 'object') {
+      const obj = json as Record<string, unknown>
+      return {
+        full_name: typeof obj.full_name === 'string' ? obj.full_name : 'Inconnu',
+        email: typeof obj.email === 'string' ? obj.email : '-',
+      }
     }
+    return { full_name: 'Inconnu', email: '-' }
+  }
 
-    selectedStatus.value = (order.value.status ?? 'pending') as OrderStatus
+  function toDetailedItems(json: unknown): OrderItemSafe[] {
+    if (Array.isArray(json)) {
+      return json.map((i) => ({
+        product_id: String(i.product_id ?? ''),
+        product_name: String(i.product_name ?? ''),
+        product_price: Number(i.product_price ?? 0),
+        quantity: Number(i.quantity ?? 0),
+      }))
+    }
+    return []
   }
 
   async function loadEmails() {
@@ -404,19 +387,16 @@
       .eq('order_id', props.orderId)
       .order('sent_at', { ascending: false })
 
-    emails.value = (data || []) as EmailSent[]
+    emails.value = data ?? []
   }
 
-  async function handleUpdateStatus() {
+  const handleUpdateStatus = async () => {
     if (!order.value) return
-
-    // ✅ On utilise ton action centralisée
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
-
-    await loadEmails() // rafraîchit l’historique
+    await loadEmails()
   }
 
-  async function handleAddTracking() {
+  const handleAddTracking = async () => {
     if (!carrier.value || !trackingNumber.value)
       return toast.show('Transporteur et suivi requis', 'warning')
 
@@ -435,30 +415,25 @@
     error ? toast.show('Erreur suivi', 'danger') : toast.show('Suivi ajouté ✅', 'success')
   }
 
-  async function resendConfirmation() {
+  const resendConfirmation = async () => {
     if (!order.value) return
-
     const { error } = await supabase.functions.invoke('order-confirmation', {
       body: { order_id: order.value.order_id },
     })
-
     error ? toast.show('Erreur email', 'danger') : toast.show('Email renvoyé ✅', 'success')
   }
 
-  async function downloadInvoice() {
+  const downloadInvoice = async () => {
     if (!order.value) return
-
     const { data, error } = await supabase.functions.invoke('order-invoice', {
       body: { order_id: order.value.order_id },
     })
-
     if (error || !data?.pdf_base64) return toast.show('Erreur facture', 'danger')
 
     const link = document.createElement('a')
     link.href = `data:application/pdf;base64,${data.pdf_base64}`
     link.download = `facture_${order.value.order_id}.pdf`
     link.click()
-
     toast.show('Facture téléchargée ✅', 'success')
   }
 
@@ -482,7 +457,6 @@
     flex-direction: column;
     gap: 20px;
   }
-
   .order-info-card {
     background: @neutral-100;
     padding: 18px;
@@ -491,12 +465,10 @@
     flex-direction: column;
     gap: 10px;
   }
-
   .info-row {
     display: flex;
     justify-content: space-between;
   }
-
   .order-products {
     margin-top: 10px;
   }

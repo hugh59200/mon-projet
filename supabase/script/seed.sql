@@ -4,15 +4,32 @@
 -- policies, triggers et vues
 -- =========================================
 
--- ============================
--- ✅ SEED — PROFILES
--- ============================
 INSERT INTO public.profiles (id, email, full_name, role)
 VALUES
-('04fd0dc1-601e-4e3d-91ca-f7c7f7062dd9','lucas.martin@example.com','Lucas Martin','user'),
-('53b4ae6b-8339-4a20-8947-84b77f5ae5a4','maxime.riviere@example.com','Maxime Rivière','admin'),
-('a0dde032-184c-4770-8b9f-51d7a52f36b4','h.bogrand@gmail.com','Hugo Bogrand','admin'),
-('f60d71db-f34d-4610-821e-c5a679d13ee5','emma.dupont@example.com','Emma Dupont','user')
+(
+    (SELECT id FROM auth.users WHERE email = 'lucas.martin@example.com'),
+    'lucas.martin@example.com',
+    'Lucas Martin',
+    'user'
+),
+(
+    (SELECT id FROM auth.users WHERE email = 'maxime.riviere@example.com'),
+    'maxime.riviere@example.com',
+    'Maxime Rivière',
+    'user'
+),
+(
+    (SELECT id FROM auth.users WHERE email = 'h.bogrand@gmail.com'),
+    'h.bogrand@gmail.com',
+    'Hugo Bogrand',
+    'admin'
+),
+(
+    (SELECT id FROM auth.users WHERE email = 'emma.dupont@example.com'),
+    'emma.dupont@example.com',
+    'Emma Dupont',
+    'user'
+)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================
@@ -193,55 +210,3 @@ VALUES
  NOW(), NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91')
 ON CONFLICT (id) DO NOTHING;
 
--- ============================
--- ✅ SEED — MESSAGES
--- ============================
-INSERT INTO public.messages (user_id, sender_role, content, is_read)
-VALUES ('04fd0dc1-601e-4e3d-91ca-f7c7f7062dd9','user','Bonjour, IGF-1 LR3 est toujours en stock ?', false)
-ON CONFLICT DO NOTHING;
-
--- ✅ SAMPLE ORDER
-INSERT INTO public.orders (
-  id,
-  user_id,
-  full_name,
-  email,
-  address,
-  zip,
-  city,
-  country,
-  payment_method,
-  total_amount
-)
-VALUES (
-  '5dd77ff4-a246-41bb-bede-e94bba981426',
-  'a0dde032-184c-4770-8b9f-51d7a52f36b4',
-  'Hugo Bogrand',
-  'h.bogrand@gmail.com',
-  '10 rue du Soleil',
-  '75001',
-  'Paris',
-  'France',
-  'card',
-  29.90
-);
-
--- ✅ ORDER ITEMS
-INSERT INTO public.order_items (order_id, product_id, quantity, price)
-VALUES (
-  '5dd77ff4-a246-41bb-bede-e94bba981426',
-  (SELECT id FROM public.products WHERE name = 'DSIP'),
-  1,
-  29.90
-);
-
--- ✅ EMAIL SENT SEED
-INSERT INTO public.emails_sent (order_id, to_email, subject, body_html, type, status)
-VALUES (
-  '5dd77ff4-a246-41bb-bede-e94bba981426',
-  'h.bogrand@gmail.com',
-  'Confirmation de commande',
-  '<p>Merci pour votre commande.</p>',
-  'confirmation',
-  'sent'
-);

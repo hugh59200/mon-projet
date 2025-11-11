@@ -783,13 +783,7 @@ SELECT
   o.payment_intent_id,
   o.order_number,
 
-  -- Profil
-  p.email AS user_email,
-  p.full_name AS user_full_name,
-  p.address AS user_address,
-  p.country AS user_country,
-
-  -- Livraison
+  -- Livraison (adresse de commande)
   o.full_name AS shipping_name,
   o.email AS shipping_email,
   o.address AS shipping_address,
@@ -807,7 +801,6 @@ SELECT
   o.shipped_at,
   o.updated_at,
 
-  -- Produits détaillés
   odv.detailed_items,
 
   -- Emails envoyés
@@ -815,18 +808,19 @@ SELECT
   (SELECT MAX(sent_at) FROM public.emails_sent e WHERE e.order_id = o.id) AS last_email_sent_at,
   (SELECT jsonb_agg(DISTINCT e.type) FROM public.emails_sent e WHERE e.order_id = o.id) AS email_types,
 
-  -- Profil JSON
+  -- ✅ Profil utilisateur avec fallback si user_id = NULL
   jsonb_build_object(
-    'id', p.id,
-    'email', p.email,
-    'full_name', p.full_name,
-    'role', p.role,
+    'id',        COALESCE(p.id, o.user_id),
+    'email',     COALESCE(p.email, o.email),
+    'full_name', COALESCE(p.full_name, o.full_name),
+    'role',      COALESCE(p.role, 'user'),
     'created_at', p.created_at
   ) AS profile_info
 
 FROM public.orders o
 LEFT JOIN public.profiles p ON p.id = o.user_id
 LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
+
 
 ALTER VIEW public.orders_full_view SET (security_invoker = true);
 GRANT SELECT ON public.orders_full_view TO authenticated;
@@ -1070,3 +1064,5 @@ END
 $$;
 
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status(uuid, text, boolean) TO authenticated;
+
+

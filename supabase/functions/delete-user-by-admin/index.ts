@@ -3,37 +3,29 @@ import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
-interface AdminDeleteBody {
-  user_id: string
-}
-
 Deno.serve(
-  createHandler<AdminDeleteBody>(async (_req, body) => {
-    const user_id = body?.user_id
+  createHandler(async (_req, { user_id }: { user_id?: string }) => {
     if (!user_id) throw new Error('Missing user_id')
 
-    const { data: targetUser, error: getUserErr } = await supabase.auth.admin.getUserById(user_id)
-    if (getUserErr || !targetUser?.user) throw new Error('User not found')
+    const { data, error } = await supabase.auth.admin.getUserById(user_id)
+    if (error || !data?.user) throw new Error('User not found')
 
-    const email = targetUser.user.email
+    const email = data.user.email
 
-    const { error: profileErr } = await supabase.from('profiles').delete().eq('id', user_id)
-    if (profileErr) throw new Error(`Profile delete failed: ${profileErr.message}`)
-
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(user_id)
-    if (deleteError) throw new Error(`Auth delete failed: ${deleteError.message}`)
+    await supabase.from('profiles').delete().eq('id', user_id)
+    const { error: deleteErr } = await supabase.auth.admin.deleteUser(user_id)
+    if (deleteErr) throw new Error(`Auth delete failed: ${deleteErr.message}`)
 
     if (email) {
-      const html = renderEmailTemplate('account_deleted', { email })
-
       await sendEmail({
         to: email,
-        subject: 'Votre compte a été supprimé ✅',
-        html,
+        subject: 'Compte supprimé ✅',
+        html: renderEmailTemplate('account_deleted', { email }),
         type: 'account_deleted',
       })
     }
 
+    console.log(`✅ [ADMIN] Deleted user: ${user_id}`)
     return { deleted_user: user_id }
   }),
 )
