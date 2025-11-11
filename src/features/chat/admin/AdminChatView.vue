@@ -1,6 +1,5 @@
 <template>
   <div class="chat-admin">
-    <!-- Header -->
     <header class="chat-admin__header">
       <div class="header-left">
         <BasicIconNext
@@ -14,7 +13,6 @@
           Messages clients
         </BasicText>
       </div>
-
       <div class="header-actions">
         <BasicInput
           v-model="searchQuery"
@@ -26,7 +24,6 @@
         />
       </div>
     </header>
-
     <div class="chat-admin__layout">
       <ChatSidebar
         :conversations="filteredConversations"
@@ -34,7 +31,6 @@
         :is-typing-by-user="typingRecord"
         @select="selectConversation"
       />
-
       <ChatCore
         v-if="selectedUserId"
         v-model:new-message="newMessage"
@@ -46,7 +42,6 @@
         :send-typing="sendTyping"
         :height="600"
       />
-
       <section
         v-else
         class="chat-admin__placeholder"

@@ -43,11 +43,10 @@
     <div class="conversation-container">
       <ConversationItem
         v-for="conv in enrichedConversations"
-        :key="conv.user_id"
         :conversation="conv"
         :active="conv.user_id === selectedId"
         :is-typing-by-user="isTypingByUser"
-        @select="$emit('select', conv.user_id)"
+        @select="$emit('select', conv.user_id!)"
       />
 
       <div
@@ -72,9 +71,9 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { supabase } from '@/supabase/supabaseClient'
+  import type { ConversationOverview } from '@/supabase/types/supabase.types'
   import { computed, onMounted, ref } from 'vue'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
-  import type { ConversationOverview } from '../shared/types/chat'
   import ConversationItem from './ConversationItem.vue'
 
   const props = defineProps<{
@@ -97,7 +96,7 @@
     props.conversations
       .map((c) => ({
         ...c,
-        unread_count: notifStore.unreadByUser[c.user_id] ?? 0,
+        unread_count: notifStore.unreadByUser[c.user_id!] ?? 0,
       }))
       .sort((a, b) => {
         if (a.unread_count && !b.unread_count) return -1

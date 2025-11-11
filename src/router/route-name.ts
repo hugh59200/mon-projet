@@ -25,5 +25,6 @@ export type RouteName =
   'payment-cancel' |
   'payment-success' |
   'product-detail' |
+  'profil' |
   'update-password' |
   'update-password-success'

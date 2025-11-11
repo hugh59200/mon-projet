@@ -1,6 +1,5 @@
 <template>
   <div class="checkout">
-    <!-- 🔹 Titre -->
     <BasicText
       size="h4"
       weight="bold"
@@ -8,8 +7,6 @@
     >
       Paiement de votre commande
     </BasicText>
-
-    <!-- 🧾 Résumé du panier -->
     <div class="checkout__cart">
       <BasicText
         size="h5"
@@ -17,7 +14,6 @@
       >
         Résumé du panier
       </BasicText>
-
       <div
         v-for="item in cart.items"
         :key="item.cart_item_id!"
@@ -29,7 +25,6 @@
             :alt="item.product_name!"
             class="checkout__item-img"
           />
-
           <div class="checkout__item-info">
             <div
               class="product-name-wrapper"
@@ -47,14 +42,12 @@
                 class="product-search-icon"
               />
             </div>
-
             <div class="product-line">
               <span>{{ item.quantity ?? 1 }} ×</span>
               <span class="product-price">{{ (item.product_price ?? 0).toFixed(2) }} €</span>
             </div>
           </div>
         </div>
-
         <BasicText
           weight="bold"
           class="checkout__item-price"
@@ -62,7 +55,6 @@
           {{ ((item.product_price ?? 0) * (item.quantity ?? 1)).toFixed(2) }} €
         </BasicText>
       </div>
-
       <div class="checkout__total">
         <BasicText
           size="h5"
@@ -79,8 +71,6 @@
         </BasicText>
       </div>
     </div>
-
-    <!-- 🏠 Adresse de livraison -->
     <div class="checkout__infos">
       <BasicText
         size="h5"
@@ -124,8 +114,6 @@
         />
       </div>
     </div>
-
-    <!-- 💳 Méthode de paiement -->
     <div class="checkout__payment">
       <BasicText
         size="h5"
@@ -157,8 +145,6 @@
         </div>
       </div>
     </div>
-
-    <!-- ✅ Bouton final -->
     <BasicButton
       label="Valider la commande"
       type="primary"
@@ -169,8 +155,6 @@
       :disabled="cart.items.length === 0"
       @click="submitOrder"
     />
-
-    <!-- 🪟 Modale produit -->
     <teleport to="#app">
       <ProductModalCheckout
         v-if="selectedProductId"
@@ -204,18 +188,15 @@
   const router = useRouter()
   const { withSablier } = useManualSablier()
 
-  // --- Champs adresse
   const fullName = ref(auth.profile?.full_name || '')
   const address = ref('')
   const zip = ref('')
   const city = ref('')
   const country = ref('France')
 
-  // --- Modale produit
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)
 
-  // --- Méthodes de paiement
   const paymentMethods = [
     {
       label: 'Carte bancaire (Stripe)',
@@ -239,7 +220,6 @@
 
   const selectedPayment = ref<PaymentProvider>('simulation')
 
-  // 🌊 Effet ripple + ouverture modale
   function openProductModal(productId?: string, event?: MouseEvent) {
     if (!productId || !event) return
     const target = event.currentTarget as HTMLElement
@@ -272,7 +252,6 @@
       }
 
       try {
-        // ✅ On appelle la fonction SQL transactionnelle
         const { data, error } = await supabase.rpc('create_order_with_items', {
           p_user_id: auth.user.id,
           p_email: auth.user.email ?? '',
@@ -296,12 +275,10 @@
           orderId,
         )
 
-        // ✅ Si Stripe → redirection checkout
         if (selectedPayment.value === 'stripe') {
           return
         }
 
-        // ✅ Sinon → paiement simulé / crypto
         await finalizeOrderAfterPayment(orderId, payment.id)
         toast.show('Paiement validé ✅', 'success')
 

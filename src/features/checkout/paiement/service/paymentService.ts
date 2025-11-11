@@ -48,7 +48,6 @@ export async function processPayment(
       throw new Error('Mode de paiement non supporté')
   }
 }
-
 async function simulatePayment(amount: number): Promise<PaymentIntent> {
   await new Promise((r) => setTimeout(r, 1000))
 
@@ -62,6 +61,12 @@ async function simulatePayment(amount: number): Promise<PaymentIntent> {
   }
 }
 
+type StripeSessionResponse = {
+  url: string
+  sessionId: string
+  payment_intent_id: string | null
+}
+
 async function createStripeCheckout(
   amount: number,
   email?: string,
@@ -71,18 +76,24 @@ async function createStripeCheckout(
     body: { amount, currency: 'eur', email, orderId },
   })
 
-  if (error || !data) throw new Error(error?.message || 'Erreur création session Stripe')
+  if (error) throw new Error(error.message)
 
-  // ✅ Redirection
-  if (data.url) window.location.href = data.url
+  const result = data?.data as StripeSessionResponse
+
+  if (!result?.url) {
+    console.error('❌ Pas d’URL Stripe reçue', result)
+    throw new Error('No Stripe checkout URL returned')
+  }
+
+  window.location.assign(result.url)
 
   return {
-    id: data.sessionId,
+    id: result.sessionId,
     amount,
     currency: 'EUR',
     status: 'pending',
     provider: 'stripe',
-    checkout_url: data.url,
+    checkout_url: result.url,
     created_at: new Date().toISOString(),
   }
 }

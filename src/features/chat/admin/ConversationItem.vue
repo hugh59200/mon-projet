@@ -2,7 +2,7 @@
   <div
     class="conversation-item"
     :class="{ active, 'new-message': isNew }"
-    @click="$emit('select', conversation.user_id)"
+    @click="conversation.user_id && $emit('select', conversation.user_id)"
   >
     <div class="conversation-avatar">
       <BasicIconNext name="User" />
@@ -41,10 +41,10 @@
           </span>
 
           <div
-            v-if="conversation.unread_count"
+            v-if="conversation.unread_count_admin"
             class="badge"
           >
-            {{ conversation.unread_count }}
+            {{ conversation.unread_count_admin }}
           </div>
         </div>
       </div>
@@ -53,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
+  import type { ConversationOverview } from '@/supabase/types/supabase.types'
   import { computed } from 'vue'
-  import type { ConversationOverview } from '../shared/types/chat'
 
   const props = defineProps<{
     conversation: ConversationOverview
@@ -64,14 +64,15 @@
 
   defineEmits<{ (e: 'select', userId: string): void }>()
 
-  /** ✅ typing live */
-  const isTyping = computed(() => !!props.isTypingByUser?.[props.conversation.user_id])
-
-  const isNew = computed(() => {
-    return (props.conversation.unread_count ?? 0) > 0
+  const isTyping = computed(() => {
+    const userId = props.conversation.user_id
+    return userId ? !!props.isTypingByUser?.[userId] : false
   })
 
-  /** ✅ format heure FR */
+  const isNew = computed(() => {
+    return (props.conversation.unread_count_admin ?? 0) > 0
+  })
+
   const formattedTime = computed(() => {
     const date = props.conversation.last_message_at
     return date

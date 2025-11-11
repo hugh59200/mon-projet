@@ -1,42 +1,40 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { stripe, supabase } from '../../utils/clients.ts'
+import Stripe from 'https://esm.sh/stripe@14.21.0'
+import { stripe, STRIPE_WEBHOOK_SECRET, supabase } from '../../utils/clients.ts'
+import { createWebhookHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
-const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
-
-serve(async (req) => {
-  try {
+export default Deno.serve(
+  createWebhookHandler(async (rawBody, req) => {
     const signature = req.headers.get('stripe-signature')
-    if (!signature) {
-      console.error('❌ Missing signature')
-      return new Response('Missing signature', { status: 400 })
-    }
+    if (!signature) throw new Error('Missing Stripe signature')
 
-    // ✅ lire le body RAW comme Stripe le demande
-    const buf = await req.arrayBuffer()
-    const rawBody = new TextDecoder().decode(buf)
-
-    // ✅ construire l’événement Stripe
     const event = await stripe.webhooks.constructEventAsync(
-      rawBody, // ✅ STRING obligatoire
-      signature!, // ✅ signature requise
+      rawBody,
+      signature,
       STRIPE_WEBHOOK_SECRET,
     )
 
-    console.log(`🚀 Stripe webhook reçu : ${event.type}`)
-
     if (event.type !== 'checkout.session.completed') {
-      return new Response('ignored', { status: 200 })
+      return { ignored: event.type }
     }
 
-    const session: any = event.data.object
-
+    const session = event.data.object as Stripe.Checkout.Session
     const orderId = session.metadata?.order_id
-    const email = session.customer_details?.email
-    const total = (session.amount_total ?? 0) / 100
 
-    // ✅ Mise à jour DB
+    if (!orderId) throw new Error('Missing order_id')
+
+    const { data: existing } = await supabase
+      .from('orders')
+      .select('status')
+      .eq('id', orderId)
+      .maybeSingle()
+
+    if (existing?.status === 'paid') {
+      console.log(`✅ Order ${orderId} already paid (ignored)`)
+      return { status: 'already_paid' }
+    }
+
     await supabase
       .from('orders')
       .update({
@@ -46,26 +44,24 @@ serve(async (req) => {
       })
       .eq('id', orderId)
 
-    console.log('✅ commande mise en PAID')
+    console.log(`✅ Order ${orderId} marked PAID`)
 
-    // ✅ envoyer mail
-    if (email) {
-      const html = renderEmailTemplate('payment', { amount: total })
+    if (session.customer_details?.email) {
+      const html = renderEmailTemplate('payment', {
+        amount: (session.amount_total ?? 0) / 100,
+      })
 
       await sendEmail({
-        to: email,
+        to: session.customer_details.email,
         subject: 'Paiement confirmé ✅',
         html,
         type: 'payment',
         order_id: orderId,
       })
 
-      console.log('📤 Email envoyé')
+      console.log(`📤 Email envoyé à ${session.customer_details.email}`)
     }
 
-    return new Response('OK', { status: 200 })
-  } catch (err) {
-    console.error('❌ Webhook error:', err)
-    return new Response('Webhook error', { status: 400 })
-  }
-})
+    return { status: 'success', orderId }
+  }),
+)

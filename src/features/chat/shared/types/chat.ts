@@ -18,20 +18,6 @@ export const TypingEventMap: Record<ChatRole, TypingEvent> = {
   user: 'user_typing',
 }
 
-/** Vue SQL : conversation_overview */
-export type ConversationOverview = {
-  user_id: string
-  user_email: string | null
-  full_name: string | null
-  last_read_message_id: number | null
-  last_read_at: string | null
-  last_admin_message_id: number | null
-  last_admin_read_at: string | null
-  last_message: string | null
-  last_message_at: string | null
-  unread_count: number
-}
-
 /* -------------------------------------------------------------------------- */
 /* 📡 Realtime / Broadcast payloads                                           */
 /* -------------------------------------------------------------------------- */
