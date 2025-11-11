@@ -86,7 +86,9 @@
   import { deleteTopic } from '@/features/admin/api/topics'
   import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useDialog } from '@/features/interface/dialog'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
+  import { sanitizeHTML } from '@/utils/sanitize'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -95,7 +97,7 @@
   import { deleteTopicImage } from '../api/topicImages'
   import TopicCardMobile from './mobile/TopicCardMobile.vue'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
-
+  
   const toast = useToastStore()
 
   const { filteredData, loading, hasLoaded, fetchData, reset, search } =
@@ -106,14 +108,40 @@
       searchFn: (t, q) => t.label?.toLowerCase()?.includes(q) ?? false,
     })
 
+  const { showDialog } = useDialog()
+
   async function handleDelete(topic: NewsTopics) {
-    if (!confirm(`Supprimer le topic "${topic.label}" ?`)) return
+    const safeLabel = sanitizeHTML(topic.label ?? '')
+
+    const result = await showDialog({
+      type: 'YesNo',
+      title: 'Supprimer ce topic ?',
+      message: [
+        `
+      <p style="margin:0 0 12px;">Voulez-vous vraiment supprimer ce topic ?</p>
+
+      <p style="margin:0 0 12px;">
+        <strong>Topic :</strong> ${safeLabel}
+      </p>
+
+      <p style="margin:0;">
+        <strong>Confirmez-vous ?</strong>
+      </p>
+    `,
+      ],
+      isHtml: true,
+      closable: false,
+    })
+
+    if (result !== 'Yes') return
+
     try {
       if (topic.image) {
         try {
           await deleteTopicImage(topic.image)
         } catch {}
       }
+
       await deleteTopic(topic.id)
       toast.show('Topic supprimé ✅', 'success')
       fetchData()

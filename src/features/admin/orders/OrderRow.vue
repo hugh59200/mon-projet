@@ -24,6 +24,7 @@
       dropdown-type="table"
       center
       :span="8"
+      force-value
       size="small"
     />
 

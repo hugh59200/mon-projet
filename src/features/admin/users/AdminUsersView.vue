@@ -76,6 +76,7 @@
               :items="ROLES"
               center
               :span="6"
+              force-value
               dropdown-type="table"
               size="small"
             />

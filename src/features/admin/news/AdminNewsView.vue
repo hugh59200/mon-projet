@@ -106,7 +106,9 @@
 <script setup lang="ts">
   import { deleteNews } from '@/features/actualités/api/news'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useDialog } from '@/features/interface/dialog'
   import type { News } from '@/supabase/types/supabase.types'
+  import { sanitizeHTML } from '@/utils/sanitize'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
@@ -130,15 +132,43 @@
   // 🖼️ Image de fallback
   const fallbackImage = '/images/placeholder-news.png'
 
+  const { showDialog } = useDialog()
+
   async function handleDelete(article: News) {
     if (props.readonly) return
-    if (!confirm(`Supprimer "${article.title}" ?`)) return
+
+    const safeTitle = sanitizeHTML(article.title ?? '')
+
+    const result = await showDialog({
+      type: 'YesNo',
+      title: 'Supprimer cette actualité ?',
+      message: [
+        `
+      <p style="margin:0 0 12px;">
+        Voulez-vous vraiment supprimer cette actualité ?
+      </p>
+
+      <p style="margin:0 0 12px;">
+        <strong>Titre :</strong> ${safeTitle}
+      </p>
+
+      <p style="margin:0;">
+        <strong>Confirmez-vous ?</strong>
+      </p>
+    `,
+      ],
+      isHtml: true,
+      closable: false,
+    })
+
+    if (result !== 'Yes') return
+
     try {
       await deleteNews(article.id)
       toast.show('Actualité supprimée ✅', 'success')
       fetchData()
     } catch (err: any) {
-      toast.show(`Erreur : ${(err as Error).message}`, 'danger')
+      toast.show(`Erreur : ${err.message}`, 'danger')
     }
   }
 
