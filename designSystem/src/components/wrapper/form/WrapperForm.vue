@@ -91,7 +91,7 @@
 
     &__main {
       flex: 1;
-      background-color: @neutral-100; // ✅ même gris que les blocs du catalogue
+      background-color: @neutral-100;
       padding: @spacing-20 0;
       display: flex;
       flex-direction: column;
@@ -113,7 +113,7 @@
     .scroll-container {
       flex: 1;
       margin-right: @spacing-5;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     @media (max-width: 1000px) {

@@ -19,7 +19,7 @@
       <BasicText>{{ formatDate(order.created_at!) }}</BasicText>
     </BasicCell>
     <BasicCellDropdown
-      v-model="localStatus"
+      v-model="status"
       :items="statuses"
       dropdown-type="table"
       center
@@ -49,32 +49,17 @@
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/utils/status'
-  import { computed } from 'vue'
 
-  /* Props */
-  const props = defineProps<{
+  defineProps<{
     order: Tables<'orders_overview_for_admin'>
-    status: OrderStatus
     statuses: { id: OrderStatus; label: string; value: OrderStatus }[]
     formatDate: (v: string) => string
     formatCurrency: (v: number) => string
-    handleStatus: (o: any, s: OrderStatus) => void
     remove: (o: any) => void
     open: (id: string) => void
   }>()
 
-  /* v-model:status */
-  const emit = defineEmits<{
-    'update:status': [OrderStatus]
-  }>()
-
-  const localStatus = computed({
-    get: () => props.status,
-    set: (v: OrderStatus) => {
-      emit('update:status', v)
-      props.handleStatus(props.order, v)
-    },
-  })
+  const status = defineModel<OrderStatus>()
 </script>
 
 <style scoped>

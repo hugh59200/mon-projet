@@ -9,7 +9,7 @@
       <BasicText>{{ formatCurrency(order.total_amount!) }}</BasicText>
 
       <BasicDropdown
-        v-model="localStatus"
+        v-model="status"
         :items="statuses"
         dropdown-type="table"
       />
@@ -35,31 +35,17 @@
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/utils/status'
-  import { computed } from 'vue'
 
-  const props = defineProps<{
+  defineProps<{
     order: Tables<'orders_overview_for_admin'>
-    status: OrderStatus
     statuses: { id: OrderStatus; label: string; value: OrderStatus }[]
     formatDate: (v: string) => string
     formatCurrency: (v: number) => string
-    handleStatusChange: (o: any, s: OrderStatus) => void
     openOrderModal: (id: string) => void
     handleDelete: (o: any) => void
   }>()
 
-  const emit = defineEmits<{
-    'update:status': [OrderStatus]
-  }>()
-
-  /* Proxy v-model */
-  const localStatus = computed({
-    get: () => props.status,
-    set: (v: OrderStatus) => {
-      emit('update:status', v)
-      props.handleStatusChange(props.order, v)
-    },
-  })
+  const status = defineModel<OrderStatus>()
 </script>
 
 <style scoped>

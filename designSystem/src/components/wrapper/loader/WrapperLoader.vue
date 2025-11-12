@@ -5,7 +5,6 @@
     :duration="1"
   >
     <template v-if="loading && !hasLoaded">
-      <!-- 🌀 PREMIER CHARGEMENT -->
       <div
         key="first-loading"
         class="wrapper-loader__state"
@@ -17,9 +16,7 @@
         <p v-if="message">{{ message }}</p>
       </div>
     </template>
-
     <template v-else-if="hasLoaded && isEmpty">
-      <!-- 🌿 EMPTY -->
       <div
         key="empty"
         class="wrapper-loader__state"
@@ -31,14 +28,11 @@
         </slot>
       </div>
     </template>
-
     <template v-else>
-      <!-- 📦 DATA -->
       <div
         key="data"
         class="wrapper-loader__content"
       >
-        <!-- 🔁 petit overlay pendant reload -->
         <div
           v-if="loading && hasLoaded"
           class="loader-overlay"
@@ -48,7 +42,6 @@
             color="primary"
           />
         </div>
-
         <slot />
       </div>
     </template>

@@ -89,10 +89,8 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 
   watch(isOpen, async (open) => {
     if (open) {
-      // on cherche un root scrollable… mais on accepte qu’il n’y en ait pas
       const el = dropdownRef?.value ?? null
-      scrollRoot.value = el?.closest?.('.content') ?? null
-
+      scrollRoot.value = el?.closest?.('.content, .wrapper-loader__content') ?? null
       await nextTick()
       updateDropdownVisibilityAndDirection()
       await attach()
