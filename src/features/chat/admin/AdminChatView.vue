@@ -93,10 +93,12 @@
     const v = uid ? typingRecord.value[uid] : false
     return !!v
   })
+
   onMounted(async () => {
     await conv.fetchConversations()
     conv.setupPresence()
     conv.listenRealtimeConversations()
+    await chatNotif.fetchUnreadByUser()
   })
 
   const searchQuery = ref('')

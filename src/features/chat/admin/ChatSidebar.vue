@@ -1,6 +1,5 @@
 <template>
   <aside class="chat-sidebar">
-    <!-- Profil Admin -->
     <div class="chat-sidebar__status">
       <div class="status-left">
         <div class="avatar">
@@ -38,17 +37,15 @@
         </div>
       </div>
     </div>
-
-    <!-- Liste des conversations -->
     <div class="conversation-container">
       <ConversationItem
         v-for="conv in enrichedConversations"
         :conversation="conv"
+        :unread="conv.unread_count"
         :active="conv.user_id === selectedId"
         :is-typing-by-user="isTypingByUser"
         @select="$emit('select', conv.user_id!)"
       />
-
       <div
         v-if="!enrichedConversations.length"
         class="no-conv"
@@ -88,27 +85,24 @@
   const notifStore = useChatNotifStore()
   const avatarUrl = ref<string | null>(null)
 
-  /**
-   * ✅ injecte unread_count directement
-   * ✅ tri par non-lus puis date
-   */
-  const enrichedConversations = computed(() =>
-    props.conversations
+  const enrichedConversations = computed(() => {
+    // on lit explicitement notifStore.unreadByUser pour rendre la dépendance réactive
+    const unread = notifStore.unreadByUser
+
+    return props.conversations
       .map((c) => ({
         ...c,
-        unread_count: notifStore.unreadByUser[c.user_id!] ?? 0,
+        unread_count: unread[c.user_id!] ?? 0,
       }))
       .sort((a, b) => {
         if (a.unread_count && !b.unread_count) return -1
         if (!a.unread_count && b.unread_count) return 1
-
         return (
           new Date(b.last_message_at ?? 0).getTime() - new Date(a.last_message_at ?? 0).getTime()
         )
-      }),
-  )
+      })
+  })
 
-  /** ✅ Avatar admin */
   onMounted(async () => {
     if (!auth.user?.id) return
     const { data } = await supabase
@@ -134,7 +128,6 @@
     overflow: hidden;
     scrollbar-width: thin;
 
-    /* 🧭 Profil + statut */
     &__status {
       position: sticky;
       top: 0;
@@ -182,7 +175,6 @@
           flex-direction: column;
           line-height: 1.3;
 
-          /* ✅ Dot animé “en ligne” */
           .status-dot {
             position: relative;
             width: 8px;
@@ -206,7 +198,6 @@
       }
     }
 
-    /* 🔍 Barre de recherche */
     &__search {
       position: sticky;
       top: 70px;
@@ -255,7 +246,6 @@
       }
     }
 
-    /* 💬 Liste des conversations */
     .conversation-container {
       flex: 1;
       display: flex;
@@ -278,7 +268,6 @@
     }
   }
 
-  /* 💫 Animation halo de statut */
   @keyframes pulse-status {
     0% {
       transform: scale(1);

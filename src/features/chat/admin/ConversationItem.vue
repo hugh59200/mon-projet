@@ -41,10 +41,10 @@
           </span>
 
           <div
-            v-if="conversation.unread_count_admin"
+            v-if="unread"
             class="badge"
           >
-            {{ conversation.unread_count_admin }}
+            {{ unread }}
           </div>
         </div>
       </div>
@@ -58,10 +58,10 @@
 
   const props = defineProps<{
     conversation: ConversationOverview
+    unread?: number
     active?: boolean
     isTypingByUser?: Record<string, boolean>
   }>()
-
   defineEmits<{ (e: 'select', userId: string): void }>()
 
   const isTyping = computed(() => {

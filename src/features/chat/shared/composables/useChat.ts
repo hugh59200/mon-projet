@@ -14,7 +14,6 @@ export function useChat(role: ChatRole) {
   const userId = computed(() => auth.user?.id ?? null)
   const selectedUserId = ref<string | null>(null)
 
-  // expose l'user actif (UI friendly)
   const activeUserId = computed<string | null>(() =>
     role === 'admin' ? selectedUserId.value : userId.value,
   )
@@ -22,13 +21,11 @@ export function useChat(role: ChatRole) {
   const isReady = ref(false)
   const newMessage = ref('')
 
-  // SSR-safe: évite d'accéder à document côté serveur
   const scroll = useScrollMessages(() => {
     if (typeof window === 'undefined') return null
     return document.querySelector('.messages-list, .chat-messages') as HTMLElement | null
   })
 
-  // conversations doit être initialisé avant useChatMessages pour onMarkedRead
   const conv = role === 'admin' ? useChatConversations() : null
 
   const msgs = useChatMessages({
@@ -56,9 +53,7 @@ export function useChat(role: ChatRole) {
       if (role === 'admin') {
         await conv!.fetchConversations()
         conv!.setupPresence()
-        // passe l'user actif pour éviter le flicker des unread
-        conv!.listenRealtimeConversations(() => activeUserId.value)
-        // Flux léger pour les notifications globales (sans ouvrir un thread)
+        conv!.listenRealtimeConversations()
         msgs.subscribeUnreadForAdmin?.()
       } else if (userId.value) {
         await msgs.fetchInitialMessages(userId.value)
@@ -68,16 +63,13 @@ export function useChat(role: ChatRole) {
       typing.setup()
       if (!disposed) isReady.value = true
     } catch (e) {
-      // permet un retry si un appel a échoué (ex: réseau)
       initialized = false
       console.error(e)
     }
   }
 
-  // Sélection conversation (la watch ci-dessous fait le reste)
   const selectConversation = (uid: string) => {
     selectedUserId.value = uid
-    // plus de clear ici; la watch gère le clear, y compris pour les changements externes
   }
 
   const sendMessage = async () => {
@@ -88,7 +80,6 @@ export function useChat(role: ChatRole) {
       newMessage.value = ''
     } catch (e) {
       console.error(e)
-      // Option UX
       ;(notif as any)?.toast?.('Envoi impossible. Réessaie.')
     }
   }
@@ -97,12 +88,10 @@ export function useChat(role: ChatRole) {
     init()
   })
 
-  // Si l'auth arrive après le mount (cas fréquent), relance l'init côté user
   watch(userId, (id) => {
     if (role === 'user' && id && !isReady.value) init()
   })
 
-  // Réagit à tout changement de thread sélectionné (navigation, actions externes)
   watch(selectedUserId, async (uid, old) => {
     if (!uid || uid === old) return
     try {

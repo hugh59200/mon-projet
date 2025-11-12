@@ -24,7 +24,6 @@ export function useChatConversations() {
   let presenceChannel: RealtimeChannel | null = null
   let messagesChannel: RealtimeChannel | null = null
 
-  /* ✅ Formatters */
   const formatMessage = (content: string | null): string => {
     if (!content) return ''
     const flat = content.replace(/\s+/g, ' ')
@@ -53,7 +52,6 @@ export function useChatConversations() {
     unread_count: c.unread_count_admin ?? 0,
   })
 
-  /** ✅ Fetch initial */
   const fetchConversations = async (): Promise<void> => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? [])
@@ -63,7 +61,6 @@ export function useChatConversations() {
     conversations.value = rows.map(mapConv)
   }
 
-  /** ✅ Presence realtime */
   const setupPresence = (): void => {
     if (presenceChannel) return
 
@@ -91,8 +88,7 @@ export function useChatConversations() {
     })
   }
 
-  /** ✅ Realtime new messages */
-  const listenRealtimeConversations = (getActiveUserId?: () => string | null): void => {
+  const listenRealtimeConversations = (): void => {
     if (messagesChannel) return
 
     messagesChannel = supabase.channel('chat-conv', {
@@ -114,13 +110,6 @@ export function useChatConversations() {
           item.last_message_short = formatMessage(msg.content)
           item.last_message_at = msg.created_at
           item.last_message_date = formatDate(msg.created_at)
-
-          const isUserMsg = msg.sender_role === 'user'
-          const isActive = getActiveUserId?.() === uid
-
-          if (isUserMsg && !isActive) {
-            item.unread_count = (item.unread_count ?? 0) + 1
-          }
         } else {
           void fetchConversations()
         }
@@ -132,7 +121,6 @@ export function useChatConversations() {
     )
   }
 
-  /** ✅ Refresh unread counts */
   const refreshUnreadCount = async (): Promise<void> => {
     const { data } = await chatApi.fetchAllConversations()
     const rows = (data ?? []).filter((c) => c.user_id !== null)
@@ -142,7 +130,6 @@ export function useChatConversations() {
       .sort((a, b) => toTs(b.last_message_at) - toTs(a.last_message_at))
   }
 
-  /** ✅ Cleanup */
   const cleanup = (): void => {
     if (presenceChannel) {
       void supabase.removeChannel(presenceChannel)
