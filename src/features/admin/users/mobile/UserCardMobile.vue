@@ -60,13 +60,6 @@
     transition:
       background 0.2s ease,
       transform 0.2s ease;
-
-    &:hover {
-      background: @neutral-200;
-    }
-    &:active {
-      transform: scale(0.98);
-    }
   }
 
   .row {

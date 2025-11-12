@@ -1,9 +1,7 @@
 <template>
   <div :class="classes">
-    <span v-if="text">{{ text }}</span>
+    <BasicText v-if="text">{{ text }}</BasicText>
     <slot v-else />
-
-    <!-- 🔽 Icône dynamique -->
     <BasicIconNext
       v-if="iconName && resolvedIcon"
       :name="resolvedIcon"

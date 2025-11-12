@@ -1,11 +1,14 @@
 <template>
   <div>
+    <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une commande..."
       :show-reset="true"
       @reset="reset"
     />
+
+    <!-- 📄 Pagination -->
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -21,7 +24,7 @@
       message="Chargement des commandes..."
       empty-message="Aucune commande trouvée 😅"
     >
-      <div class="orders--desktop">
+      <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
             :span="10"
@@ -42,21 +45,56 @@
             :span="8"
             text="Statut"
           />
+          <BasicCell :span="3" />
         </div>
-        <OrderRow
+        <div
           v-for="order in filteredData"
-          v-model="localStatuses[order.order_id ?? '']"
-          @update:modelValue="(v: string) => changeOrderStatus(order, v as OrderStatus)"
-          :order="order"
-          :statuses="STATUSES"
-          :format-date="formatDate"
-          :format-currency="formatCurrency"
-          :remove="deleteOrder"
-          :open="openOrderModal"
           class="gridElemWrapper"
-        />
-      </div>
-      <div class="mobile-cards-list">
+        >
+          <div
+            class="cardLayoutWrapper list"
+            @click="openOrderModal(order.order_id!)"
+          >
+            <BasicCell :span="10">
+              <div class="list__client-info">
+                <span class="list__name">{{ order.customer_name }}</span>
+                <span class="list__subtext">{{ order.customer_email }}</span>
+              </div>
+            </BasicCell>
+            <BasicCell
+              :span="6"
+              center
+            >
+              <BasicText>{{ formatCurrency(order.total_amount!) }}</BasicText>
+            </BasicCell>
+            <BasicCell
+              :span="8"
+              center
+            >
+              <BasicText>{{ formatDate(order.created_at!) }}</BasicText>
+            </BasicCell>
+            <BasicCell
+              :span="8"
+              center
+            >
+              <BasicBadge
+                :label="getLabelBadge(order.status)"
+                :type="getTypeBadge(order.status)"
+                size="small"
+              />
+            </BasicCell>
+            <BasicCellActionIcon
+              icon-name="trash"
+              tooltip="Supprimer"
+              center
+              danger
+              :span="3"
+              @click.stop="deleteOrder(order)"
+            />
+          </div>
+        </div>
+      </template>
+      <template v-else>
         <OrderCardMobile
           v-for="order in filteredData"
           v-model="localStatuses[order.order_id ?? '']"
@@ -67,9 +105,9 @@
           :format-currency="formatCurrency"
           :open-order-modal="openOrderModal"
           :handle-delete="deleteOrder"
-          class="gridElemWrapper"
+          class="gridElemWrapper list list--mobile"
         />
-      </div>
+      </template>
     </WrapperLoader>
     <teleport to="#app">
       <AdminOrderDetailsModal
@@ -83,13 +121,14 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
-  import { formatCurrency, formatDate } from '@/utils'
+  import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import type { OrderStatus } from '@/utils/mappingBadge'
   import { STATUSES } from '@/utils/mappingBadge'
   import { ref, watchEffect } from 'vue'
+
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
-  import OrderRow from './OrderRow.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
@@ -103,6 +142,7 @@
         (o.customer_email?.toLowerCase()?.includes(q) ?? false),
     })
 
+  const { isTablet, isDesktop } = useDeviceBreakpoint()
   const { deleteOrder, changeOrderStatus } = useOrderActions(fetchData)
 
   const localStatuses = ref<Record<string, OrderStatus>>({})
@@ -125,36 +165,13 @@
 </script>
 
 <style scoped lang="less">
-  .client-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+  @import '../shared/style/list-base.less';
 
-  .client-name {
-    font-weight: 600;
-    color: @neutral-900;
-  }
-
-  .client-email {
-    color: @neutral-600;
-    font-size: 0.85rem;
-    word-break: break-word;
-  }
-
-  .mobile-cards-list {
-    display: none;
-  }
-
-  @media (max-width: 800px) {
-    .orders--desktop {
-      display: none;
-    }
-
-    .mobile-cards-list {
+  .list {
+    &__client-info {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 2px;
     }
   }
 </style>

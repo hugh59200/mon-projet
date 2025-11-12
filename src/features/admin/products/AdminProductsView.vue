@@ -4,7 +4,7 @@
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
       :show-reset="true"
-      @reset="reset()"
+      @reset="reset"
     />
     <BasicPagination
       :current-page="page"
@@ -14,7 +14,6 @@
       :auto-fetch="fetchData"
       @change="page = $event"
     />
-
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -22,7 +21,7 @@
       message="Chargement des produits..."
       empty-message="Aucun produit trouvé 😅"
     >
-      <div class="products--desktop">
+      <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
             :span="10"
@@ -48,6 +47,7 @@
             :span="6"
             text="Stock"
           />
+          <BasicCell :span="3" />
         </div>
         <div
           v-for="product in filteredData"
@@ -55,41 +55,41 @@
           class="gridElemWrapper"
         >
           <div
-            class="cardLayoutWrapper product-row"
+            class="cardLayoutWrapper list"
             @click="openProductModal(product.id)"
           >
             <BasicCell :span="10">
-              <div class="product-name-cell">
+              <div class="list__product-info">
                 <img
                   v-if="product.image"
                   :src="product.image"
-                  alt="Image"
-                  class="product-thumb"
+                  alt="Image du produit"
+                  class="list__product-thumb"
                 />
                 <span>{{ product.name || '—' }}</span>
               </div>
             </BasicCell>
             <BasicCell
-              center
               :span="8"
+              center
             >
               <BasicText>{{ product.category || '—' }}</BasicText>
             </BasicCell>
             <BasicCell
-              center
               :span="4"
+              center
             >
               <BasicText>{{ formatCurrency(product.price) }}</BasicText>
             </BasicCell>
             <BasicCell
-              center
               :span="4"
+              center
             >
               <BasicText>{{ product.purity ? product.purity + '%' : '—' }}</BasicText>
             </BasicCell>
             <BasicCell
-              center
               :span="6"
+              center
             >
               <BasicBadge
                 :label="getLabelBadge(product.stock)"
@@ -107,8 +107,8 @@
             />
           </div>
         </div>
-      </div>
-      <div class="mobile-cards-list">
+      </template>
+      <template v-else>
         <ProductCardMobile
           v-for="product in filteredData"
           :key="product.id"
@@ -116,9 +116,9 @@
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
           :handle-delete="deleteProduct"
-          class="gridElemWrapper"
+          class="gridElemWrapper list list--mobile"
         />
-      </div>
+      </template>
     </WrapperLoader>
     <teleport to="#app">
       <AdminProductModal
@@ -133,9 +133,11 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useProductActions } from '@/supabase/actions/useProductActions'
   import { formatCurrency, getLabelBadge, getTypeBadge } from '@/utils'
   import { ref } from 'vue'
+
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
@@ -150,6 +152,7 @@
         (p.category?.toLowerCase()?.includes(q) ?? false),
     })
 
+  const { isTablet, isDesktop } = useDeviceBreakpoint()
   const { deleteProduct } = useProductActions(fetchData)
 
   const isModalVisible = ref(false)
@@ -162,50 +165,21 @@
 </script>
 
 <style scoped lang="less">
-  .product-row {
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      transform 0.1s ease;
-    &:hover {
-      background: @neutral-100;
-    }
-    &:active {
-      transform: scale(0.995);
-    }
-  }
+  @import '../shared/style/list-base.less';
 
-  .product-name-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .list {
+    &__product-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-    .product-thumb {
+    &__product-thumb {
       width: 48px;
       height: 48px;
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
-    }
-  }
-
-  .products--desktop {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mobile-cards-list {
-    display: none;
-  }
-
-  @media (max-width: 1024px) {
-    .products--desktop {
-      display: none;
-    }
-    .mobile-cards-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
   }
 </style>

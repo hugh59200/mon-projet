@@ -2,9 +2,9 @@
   <div>
     <BasicToolbar
       v-model:search="search"
-      :search-placeholder="'Rechercher un utilisateur...'"
+      search-placeholder="Rechercher un utilisateur..."
       :show-reset="true"
-      @reset="reset()"
+      @reset="reset"
     />
     <BasicPagination
       :current-page="page"
@@ -21,10 +21,10 @@
       message="Chargement des utilisateurs..."
       empty-message="Aucun utilisateur trouvé 😅"
     >
-      <div class="users--desktop">
+      <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
-            :span="10"
+            :span="8"
             text="Email"
             icon-name="ArrowUpDown"
             :is-active="sortKey === 'email'"
@@ -32,7 +32,7 @@
             :on-icon-click="() => toggleSort('email')"
           />
           <BasicCell
-            :span="8"
+            :span="10"
             text="Nom"
             icon-name="ArrowUpDown"
             :is-active="sortKey === 'full_name'"
@@ -40,7 +40,6 @@
             :on-icon-click="() => toggleSort('full_name')"
           />
           <BasicCell
-            center
             :span="6"
             text="Rôle"
             icon-name="ArrowUpDown"
@@ -49,7 +48,6 @@
             :on-icon-click="() => toggleSort('role')"
           />
           <BasicCell
-            center
             :span="8"
             text="Créé le"
             icon-name="ArrowUpDown"
@@ -57,27 +55,25 @@
             :icon-color="getSortColor('created_at')"
             :on-icon-click="() => toggleSort('created_at')"
           />
+          <BasicCell :span="4" />
         </div>
         <div
           v-for="user in filteredData"
-          :key="user.id"
           class="gridElemWrapper"
         >
           <div
-            class="cardLayoutWrapper user-row"
+            class="cardLayoutWrapper list"
             @click="openUserModal(user.id)"
           >
-            <BasicCell :span="10">
-              <BasicText>{{ user.email }}</BasicText>
-            </BasicCell>
-
-            <BasicCell :span="8">
-              <BasicText>{{ user.full_name || '—' }}</BasicText>
-            </BasicCell>
             <BasicCell
-              :span="6"
-              center
-            >
+              :span="8"
+              :text="user.full_name || '—'"
+            />
+            <BasicCell
+              :span="10"
+              :text="user.email || '—'"
+            />
+            <BasicCell :span="6">
               <BasicBadge
                 :label="getLabelBadge(user.role as Role)"
                 :type="getTypeBadge(user.role as Role)"
@@ -86,22 +82,20 @@
             </BasicCell>
             <BasicCell
               :span="8"
-              center
-            >
-              <BasicText>{{ formatDate(user.created_at) }}</BasicText>
-            </BasicCell>
+              :text="formatDate(user.created_at)"
+            />
             <BasicCellActionIcon
               icon-name="trash"
               tooltip="Supprimer"
               center
               danger
-              :span="3"
+              :span="4"
               @click.stop="deleteUser(user)"
             />
           </div>
         </div>
-      </div>
-      <div class="mobile-cards-list">
+      </template>
+      <template v-else>
         <UserCardMobile
           v-for="user in filteredData"
           :key="user.id"
@@ -113,9 +107,9 @@
           :handle-role-change="changeUserRole"
           :open-user-modal="openUserModal"
           :handle-delete="deleteUser"
-          class="gridElemWrapper"
+          class="gridElemWrapper list list--mobile"
         />
-      </div>
+      </template>
     </WrapperLoader>
     <teleport to="#app">
       <AdminUserDetailsModal
@@ -131,6 +125,7 @@
   import { ROLES } from '@/features/admin/constants/users'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
@@ -161,8 +156,9 @@
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
-  const { deleteUser, changeUserRole } = useUserActions(fetchData)
+  const { isTablet, isDesktop } = useDeviceBreakpoint()
 
+  const { deleteUser, changeUserRole } = useUserActions(fetchData)
   const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
 
   const localRoles = ref<Record<string, Role>>({})
@@ -181,45 +177,14 @@
     { immediate: true },
   )
 
+  const isModalVisible = ref(false)
+  const selectedUserId = ref<string | null>(null)
+
   function openUserModal(id: string) {
     selectedUserId.value = id
     isModalVisible.value = true
   }
-
-  const isModalVisible = ref(false)
-  const selectedUserId = ref<string | null>(null)
 </script>
-
 <style scoped lang="less">
-  .users--mobile {
-    display: none;
-  }
-  .mobile-cards-list {
-    display: none;
-  }
-
-  .user-row {
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      transform 0.1s ease;
-
-    &:hover {
-      background: @neutral-100;
-    }
-    &:active {
-      transform: scale(0.995);
-    }
-  }
-
-  @media (max-width: 1000px) {
-    .users--desktop {
-      display: none;
-    }
-    .mobile-cards-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-  }
+  @import '../shared/style/list-base.less';
 </style>
