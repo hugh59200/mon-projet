@@ -16,8 +16,8 @@
         Pureté : {{ product.purity ? product.purity + '%' : '—' }}
       </BasicText>
       <BasicBadge
-        :label="getStockLabel(product.stock)"
-        :type="getStockBadge(product.stock)"
+        :label="getLabelBadge(product.stock)"
+        :type="getTypeBadge(product.stock)"
         size="small"
       />
     </div>
@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
   import type { Products } from '@/supabase/types/supabase.types'
-  import { getStockBadge, getStockLabel } from '@/utils'
+  import { getLabelBadge, getTypeBadge } from '@/utils'
 
   defineProps<{
     product: Products

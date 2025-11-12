@@ -92,8 +92,8 @@
               :span="6"
             >
               <BasicBadge
-                :label="getStockLabel(product.stock)"
-                :type="getStockBadge(product.stock)"
+                :label="getLabelBadge(product.stock)"
+                :type="getTypeBadge(product.stock)"
                 size="small"
               />
             </BasicCell>
@@ -134,7 +134,7 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useProductActions } from '@/supabase/actions/useProductActions'
-  import { formatCurrency, getStockBadge, getStockLabel } from '@/utils'
+  import { formatCurrency, getLabelBadge, getTypeBadge } from '@/utils'
   import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'

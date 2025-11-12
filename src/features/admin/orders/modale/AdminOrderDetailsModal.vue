@@ -2,6 +2,7 @@
   <ModalComponent
     v-model="visible"
     :closable="true"
+    :loading="isLoading"
   >
     <template #header>
       <BasicText
@@ -46,8 +47,8 @@
           <div class="info-row">
             <BasicText><b>Statut :</b></BasicText>
             <BasicBadge
-              :label="getLabel(order.status)"
-              :type="getBadge(order.status)"
+              :label="getLabelBadge(order.status)"
+              :type="getTypeBadge(order.status)"
               size="small"
             />
           </div>
@@ -258,7 +259,7 @@
   import { supabase } from '@/supabase/supabaseClient'
   import type { EmailSent, OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
-  import { getBadge, getLabel, type OrderStatus, STATUSES } from '@/utils/mappingBadge'
+  import { getLabelBadge, getTypeBadge, type OrderStatus, STATUSES } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -442,9 +443,12 @@
     },
   )
 
-  onMounted(() => {
-    loadOrder()
-    loadEmails()
+  const isLoading = ref(true)
+
+  onMounted(async () => {
+    await loadOrder()
+    await loadEmails()
+    isLoading.value = false
   })
 </script>
 

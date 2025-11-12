@@ -35,6 +35,18 @@ export type OrdersFullView = Tables<'orders_full_view'>
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
-export type ConversationOverview  = Tables<'conversation_overview'>
+export type ConversationOverview = Tables<'conversation_overview'>
 
 export type OrderItem = Tables<'order_items'>
+
+export type OrderItemDetailed = {
+  id?: string
+  name: string
+  price: number
+  quantity: number
+  image?: string | null
+}
+
+export type OrderDetailedView = Omit<Tables<'orders_detailed_view'>, 'detailed_items'> & {
+  detailed_items: OrderItemDetailed[] | null
+}

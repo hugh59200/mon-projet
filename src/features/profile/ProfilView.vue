@@ -104,25 +104,60 @@
               v-for="order in lastOrders"
               :key="order.id"
               class="order-card"
+              @click="goToOrder(order.id)"
             >
               <div class="order-card__header">
-                <strong>Commande #{{ order?.id?.slice(0, 8) }}</strong>
-                <span :class="['status', order.status]">{{ order.status }}</span>
+                <BasicText
+                  size="body-l"
+                  weight="bold"
+                >
+                  Commande #{{ order?.id?.slice(0, 8) }}
+                </BasicText>
+                <BasicBadge
+                  :label="getLabelBadge(order.status)"
+                  :type="getTypeBadge(order.status)"
+                  size="small"
+                />
               </div>
+
               <div class="order-card__body">
-                <p>Total : {{ order.total_amount }} €</p>
-                <p>Date : {{ formatOrderDate(order.created_at!) }}</p>
+                <BasicText
+                  size="body-m"
+                  color="neutral-700"
+                >
+                  Total :
+                  <strong>{{ order.total_amount }} €</strong>
+                </BasicText>
+                <BasicText
+                  size="body-m"
+                  color="neutral-500"
+                >
+                  Date : {{ formatOrderDate(order.created_at!) }}
+                </BasicText>
               </div>
             </div>
-            <p v-else>Aucune commande récente.</p>
+
+            <BasicText
+              v-else
+              size="body-m"
+              color="neutral-500"
+              align="center"
+            >
+              Aucune commande récente.
+            </BasicText>
           </div>
-          <BasicButton
-            label="Voir toutes mes commandes"
-            type="secondary"
-            variant="outlined"
-            @click="$router.push('/profil/commandes')"
-          />
+
+          <div class="profil__orders-footer">
+            <BasicButton
+              label="Voir toutes mes commandes"
+              type="secondary"
+              variant="outlined"
+              block
+              @click="$router.push('/profil/commandes')"
+            />
+          </div>
         </FilterSection>
+
         <FilterSection
           title="Préférences"
           v-model="sections.preferences"
@@ -200,6 +235,7 @@
   import { useProfileActions } from '@/supabase/actions/useProfileActions'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
+  import { getLabelBadge, getTypeBadge } from '@/utils'
   import { onMounted, ref, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '../auth/stores/useAuthStore'
@@ -233,6 +269,11 @@
 
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
+  }
+
+  function goToOrder(id?: string) {
+    if (!id) return
+    router.push(`/profil/commandes/${id}`)
   }
 
   async function fetchProfileData() {
@@ -443,7 +484,45 @@
     .profil__orders {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+
+      .order-card {
+        background: fade(@white, 80%);
+        border: 1px solid fade(@neutral-300, 60%);
+        border-radius: 10px;
+        padding: 14px 18px;
+        box-shadow: 0 2px 6px fade(@neutral-900, 5%);
+        transition: all 0.25s ease;
+        cursor: pointer; // 👈
+        user-select: none;
+
+        &:hover {
+          background: fade(@secondary-50, 80%);
+          border-color: fade(@secondary-400, 60%);
+          box-shadow: 0 4px 10px fade(@neutral-900, 10%);
+          transform: translateY(-1px);
+        }
+
+        &__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+
+        &__body {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding-left: 2px;
+        }
+      }
+
+      &-footer {
+        margin-top: 14px;
+        display: flex;
+        justify-content: center;
+      }
     }
   }
 </style>

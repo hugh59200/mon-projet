@@ -6,10 +6,13 @@
     <div
       class="modal__dialog"
       ref="modal"
+      v-motion="containerMotion"
     >
+      <!-- 🧩 HEADER -->
       <div
-        v-if="$slots.header"
+        v-if="hasHeader"
         class="modal__header"
+        v-motion="fadeInHeader"
       >
         <BasicText
           weight="bold"
@@ -27,19 +30,40 @@
         />
       </div>
 
-      <div class="modal__content">
+      <!-- 🧩 CONTENT -->
+      <div
+        class="modal__content"
+        v-motion="fadeInContent"
+      >
+        <!-- Bouton de fermeture si pas de header -->
         <BasicIconNext
-          v-if="closable && !$slots.header"
+          v-if="closable && !hasHeader"
           name="X"
           @click="closeModal"
           pointer
+          class="modal__close-icon"
         />
-        <slot name="content"></slot>
+
+        <!-- 🌀 SQUELETON -->
+        <SmartModalSkeleton
+          v-if="loading"
+          :show-header="false"
+          :show-actions="hasActions"
+          :blocks="autoBlocks"
+        />
+
+        <!-- ✅ CONTENU RÉEL -->
+        <slot
+          v-else
+          name="content"
+        ></slot>
       </div>
 
+      <!-- 🧩 ACTIONS -->
       <div
-        v-if="$slots.actions"
+        v-if="hasActions"
         class="modal__actions"
+        v-motion="fadeInActions"
       >
         <slot name="actions"></slot>
       </div>
@@ -49,44 +73,104 @@
 
 <script setup lang="ts">
   import { useHandleClickOutside } from '@/features/interface/composables/useHandleClickOutside'
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { SmartModalSkeleton } from '@designSystem/index'
+  import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
 
   interface ModalProps {
     closable?: boolean
+    loading?: boolean
+    skeletonBlocks?: number
   }
 
   const props = withDefaults(defineProps<ModalProps>(), {
     closable: true,
+    loading: false,
+    skeletonBlocks: undefined,
   })
 
-  const modal = ref()
   const modalVisible = defineModel<boolean>()
+  const modal = ref()
   const emit = defineEmits(['close'])
+  const slots = useSlots()
 
+  /* -----------------------------
+     🧠 LOGIQUE DU SQUELETON
+  ----------------------------- */
+  const hasHeader = computed(() => !!slots.header)
+  const hasActions = computed(() => !!slots.actions)
+
+  const autoBlocks = computed(() => {
+    let base = 3
+    if (hasActions.value) base += 1
+    return props.skeletonBlocks ?? base
+  })
+
+  /* -----------------------------
+     🧩 FERMETURE DE LA MODALE
+  ----------------------------- */
   function closeModal() {
-    if (props.closable !== false) {
+    if (props.closable) {
       modalVisible.value = false
       emit('close')
     }
   }
 
-  useHandleClickOutside(modal, () => closeModal())
+  useHandleClickOutside(modal, closeModal)
 
   function handleEscapeKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && modalVisible.value && props.closable) {
-      closeModal()
-    }
+    if (event.key === 'Escape' && modalVisible.value && props.closable) closeModal()
   }
 
-  onMounted(() => {
-    window.addEventListener('keydown', handleEscapeKeydown)
-  })
+  onMounted(() => window.addEventListener('keydown', handleEscapeKeydown))
+  onUnmounted(() => window.removeEventListener('keydown', handleEscapeKeydown))
 
-  onUnmounted(() => {
-    window.removeEventListener('keydown', handleEscapeKeydown)
-  })
+  /* -----------------------------
+     🌀 MOTIONS
+  ----------------------------- */
+  const containerMotion = {
+    initial: { opacity: 0, scale: 0.96, y: 10 },
+    enter: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25 } },
+    leave: { opacity: 0, scale: 0.96, y: -10, transition: { duration: 0.2 } },
+  }
+
+  const fadeInHeader = {
+    initial: { opacity: 0, y: -6 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  }
+
+  const fadeInContent = {
+    initial: { opacity: 0, y: 10 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  }
+
+  const fadeInActions = {
+    initial: { opacity: 0, y: 6 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  }
 </script>
 
-<style scoped>
+<style scoped lang="less">
   @import './ModalComponent.less';
+
+  .modal__dialog {
+    transform-origin: center center;
+    will-change: opacity, transform;
+  }
+
+  .modal__content {
+    position: relative;
+    min-height: 120px;
+  }
+
+  .modal__close-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 </style>

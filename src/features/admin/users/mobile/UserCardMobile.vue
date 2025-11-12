@@ -9,8 +9,8 @@
         <BasicText size="body-s">{{ user.email }}</BasicText>
       </div>
       <BasicBadge
-        :label="getRoleLabel(role)"
-        :type="getRoleBadge(role)"
+        :label="getLabelBadge(role)"
+        :type="getTypeBadge(role)"
         size="small"
       />
     </div>
@@ -23,7 +23,7 @@
       >
         <BasicIconNext
           name="Trash2"
-          :size="18"
+          :size="20"
           color="danger-600"
           pointer
           @click="handleDelete(user)"
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
   import type { Profiles, Role } from '@/supabase/types/supabase.types'
-  import { getRoleBadge, getRoleLabel } from '@/utils'
+  import { getLabelBadge, getTypeBadge } from '@/utils'
 
   defineProps<{
     user: Profiles

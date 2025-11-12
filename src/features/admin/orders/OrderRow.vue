@@ -29,8 +29,8 @@
       center
     >
       <BasicBadge
-        :label="getLabel(order.status)"
-        :type="getBadge(order.status)"
+        :label="getLabelBadge(order.status)"
+        :type="getTypeBadge(order.status)"
         size="small"
       />
     </BasicCell>
@@ -50,7 +50,7 @@
 <script setup lang="ts">
   import type { Tables } from '@/supabase/types/supabase'
   import type { OrderStatus } from '@/utils/mappingBadge'
-  import { getBadge, getLabel } from '@/utils/mappingBadge'
+  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
 
   defineProps<{
     order: Tables<'orders_overview_for_admin'>

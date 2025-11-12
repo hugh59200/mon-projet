@@ -21,7 +21,7 @@
     >
       <BasicIconNext
         :name="role === 'admin' ? 'ShieldCheck' : 'User'"
-        :size="14"
+        :size="18"
         class="role-icon"
       />
       <BasicText>{{ roleLabel }}</BasicText>

@@ -79,8 +79,8 @@
               center
             >
               <BasicBadge
-                :label="getRoleLabel(user.role as Role)"
-                :type="getRoleBadge(user.role as Role)"
+                :label="getLabelBadge(user.role as Role)"
+                :type="getTypeBadge(user.role as Role)"
                 size="small"
               />
             </BasicCell>
@@ -133,7 +133,7 @@
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Role } from '@/supabase/types/supabase.types'
-  import { formatDate, getRoleBadge, getRoleLabel } from '@/utils'
+  import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import { ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'

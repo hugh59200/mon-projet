@@ -43,18 +43,8 @@
         </div>
         <div class="order-header__right">
           <BasicBadge
-            :label="statusLabel(order.status)"
-            :color="statusColor(order.status)"
-          />
-          <!-- 📄 Facture (future) -->
-          <BasicButton
-            v-if="false"
-            label="Télécharger la facture"
-            type="secondary"
-            variant="outlined"
-            size="small"
-            icon="Download"
-            @click="downloadInvoice"
+            :label="getLabelBadge(order.status)"
+            :type="getTypeBadge(order.status)"
           />
         </div>
       </div>
@@ -127,13 +117,8 @@
             <span>Transporteur</span>
             <span>{{ order.carrier ?? '—' }}</span>
           </div>
-          <div class="summary-line">
-            <span>ID Stripe</span>
-            <span>{{ order.payment_intent_id ?? '—' }}</span>
-          </div>
         </div>
       </div>
-
       <!-- 📦 Livraison -->
       <div class="order-section">
         <BasicText
@@ -154,7 +139,7 @@
             size="body-s"
             color="neutral-700"
           >
-            {{ order.address }}, {{ order.zip }} {{ order.city }}
+            {{ order.address }} {{ order.city ? `, ${order.city}` : '' }}
           </BasicText>
           <BasicText
             size="body-s"
@@ -250,6 +235,8 @@
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { supabase } from '@/supabase/supabaseClient'
+  import type { OrderDetailedView } from '@/supabase/types/supabase.types'
+  import { getLabelBadge, getTypeBadge } from '@/utils'
   import { formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
@@ -258,7 +245,7 @@
   const route = useRoute()
   const toast = useToastStore()
 
-  const order = ref<any>(null)
+  const order = ref<OrderDetailedView | null>(null)
   const hasLoaded = ref(false)
 
   async function loadOrderDetail() {
@@ -268,7 +255,7 @@
         .from('orders_detailed_view')
         .select('*')
         .eq('order_id', orderId)
-        .single()
+        .single<OrderDetailedView>() // ✅ typage strict ici
 
       if (error) throw error
       order.value = data
@@ -280,36 +267,6 @@
   }
 
   onMounted(loadOrderDetail)
-
-  /* -------------------------- 🧩 Helpers -------------------------- */
-
-  function statusLabel(status: string | null) {
-    const map: Record<string, string> = {
-      pending: 'En attente',
-      paid: 'Payée',
-      shipped: 'Expédiée',
-      completed: 'Terminée',
-      canceled: 'Annulée',
-    }
-    return map[status ?? ''] || '—'
-  }
-
-  function statusColor(status: string | null) {
-    switch (status) {
-      case 'pending':
-        return 'warning'
-      case 'paid':
-        return 'info'
-      case 'shipped':
-        return 'primary'
-      case 'completed':
-        return 'success'
-      case 'canceled':
-        return 'danger'
-      default:
-        return 'neutral'
-    }
-  }
 
   const orderSteps = [
     { key: 'paid', label: 'Payée' },
@@ -330,12 +287,6 @@
 
   function trackPackage(tracking: string) {
     window.open(`https://www.laposte.fr/outils/suivre-vos-envois?code=${tracking}`, '_blank')
-  }
-
-  /* -------------------------- 🚀 Futures features (placeholders) -------------------------- */
-
-  function downloadInvoice() {
-    toast.show('Téléchargement de la facture bientôt disponible', 'info')
   }
 
   function contactSupport() {

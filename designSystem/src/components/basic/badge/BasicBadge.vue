@@ -49,12 +49,4 @@
 
 <style lang="less">
   @import './BasicBadge.less';
-
-  .badge {
-    transition: all 0.2s ease-in-out;
-
-    &:hover {
-      transform: translateY(-1px);
-    }
-  }
 </style>
