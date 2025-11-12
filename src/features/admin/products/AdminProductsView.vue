@@ -4,8 +4,18 @@
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
       show-reset
-      @reset="reset"
-    />
+      show-role
+      @reset="reset()"
+    >
+      <template #actions>
+        <BasicButton
+          label="+ Ajouter un produit"
+          type="primary"
+          size="small"
+          @click="isCreateModalVisible = true"
+        />
+      </template>
+    </BasicToolbar>
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -110,6 +120,7 @@
           :product="product"
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
+          :edit-product="openEditProduct"
           :handle-delete="deleteProduct"
           class="gridElemWrapper list list--mobile"
         />
@@ -117,6 +128,13 @@
     </WrapperLoader>
 
     <teleport to="#app">
+      <!-- ➕ Création -->
+      <AdminProductModal
+        v-model="isCreateModalVisible"
+        @saved="fetchData"
+      />
+
+      <!-- 🔍 Lecture / Édition -->
       <AdminProductModal
         v-if="selectedProductId"
         v-model="isModalVisible"
@@ -172,8 +190,14 @@
 
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)
+  const isCreateModalVisible = ref(false)
 
   function openProductModal(id: string) {
+    selectedProductId.value = id
+    isModalVisible.value = true
+  }
+
+  function openEditProduct(id: string) {
     selectedProductId.value = id
     isModalVisible.value = true
   }

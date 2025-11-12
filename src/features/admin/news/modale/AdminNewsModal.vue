@@ -1,17 +1,13 @@
 <template>
   <ModalComponent
     v-model="visible"
-    :closable="true"
+    closable
   >
-    <!-- 🧠 Header -->
     <template #header>
       {{ headerTitle }}
     </template>
-
-    <!-- 🧱 Contenu principal -->
     <template #content>
       <div class="news-form">
-        <!-- 🧾 Titre -->
         <WrapperInput
           v-model="form.title as InputModel"
           label="Titre"
@@ -19,24 +15,18 @@
           :readonly="readonly"
           required
         />
-
-        <!-- 🔗 Slug -->
         <WrapperInput
           v-model="form.slug"
           label="Slug (URL)"
           placeholder="ex: nouvelle-etude-bpc157"
           :readonly="readonly"
         />
-
-        <!-- 📝 Extrait -->
         <WrapperInput
           v-model="form.excerpt"
           label="Résumé court"
           placeholder="Ex : Une nouvelle recherche explore le potentiel du BPC-157..."
           :readonly="readonly"
         />
-
-        <!-- 🧩 Contenu -->
         <WrapperFormElements label="Contenu complet">
           <textarea
             v-model="form.content"
@@ -46,8 +36,6 @@
             :readonly="readonly"
           />
         </WrapperFormElements>
-
-        <!-- 🧭 Catégorie (topic) -->
         <WrapperDropdown
           v-model="form.topic_id!"
           :items="topicsOptions"
@@ -64,8 +52,6 @@
           placeholder="Ex : Innovation médicale"
           hint="Ce champ est optionnel — il créera un nouveau topic s’il n’existe pas encore."
         />
-
-        <!-- 🖼️ Image principale -->
         <WrapperFormElements label="Image principale">
           <BasicInput
             readonly
@@ -74,7 +60,6 @@
             @click="!readonly && openFilePicker()"
             :value="selectedFile?.name || extractFileName(form.image) || ''"
           />
-
           <input
             ref="fileInputRef"
             type="file"
@@ -83,7 +68,6 @@
             :disabled="readonly"
             @change="handleFileChange"
           />
-
           <div
             v-if="imagePreview || form.image"
             class="image-preview"
@@ -116,36 +100,31 @@
       </div>
     </template>
     <template #actions>
-      <div class="justify-content-space-evenly flex">
-        <BasicButton
-          v-if="!readonly"
-          :label="isEditMode ? 'Mettre à jour' : 'Publier l’actualité'"
-          type="primary"
-          :disabled="loading"
-          @click="handleSubmit"
-        />
-      </div>
+      <BasicButton
+        v-if="!readonly"
+        :label="isEditMode ? 'Mettre à jour' : 'Publier l’actualité'"
+        type="primary"
+        :disabled="loading"
+        @click="handleSubmit"
+      />
     </template>
   </ModalComponent>
 </template>
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { createNews, createTopic, fetchNewsById, fetchTopics, updateNews } from '@/supabase/api'
   import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { InputModel } from '@designSystem/index'
   import { computed, onMounted, ref, watch } from 'vue'
-  import { createNews, fetchNewsById, updateNews } from '../../api'
-  import { createTopic, fetchTopics } from '../../api/topics'
   import { useNewsImageHandler } from '../composables/useNewsImageHandler'
 
-  /* 💾 Props / Events */
   const visible = defineModel<boolean>()
   const props = defineProps<{ newsId?: string | null; readonly?: boolean }>()
   const emit = defineEmits(['saved'])
   const toast = useToastStore()
 
-  /* 🧱 State */
   const loading = ref(false)
   const topicsOptions = ref<{ id: string; label: string }[]>([])
   const newTopicLabel = ref('')
@@ -171,7 +150,6 @@
         : 'Publier une actualité',
   )
 
-  /* 📸 Image handler (upload/suppression) */
   const {
     fileInputRef,
     selectedFile,
@@ -184,7 +162,6 @@
     reset: resetImageHandler,
   } = useNewsImageHandler(() => readonly.value)
 
-  /* 📂 Topics */
   async function loadTopics() {
     const topics = await fetchTopics()
     topicsOptions.value = topics.map((t) => ({ id: t.id, label: t.label }))
@@ -219,14 +196,12 @@
     }
   }
 
-  /* 🧾 Chargement d’un article existant */
   async function loadNews() {
     if (!props.newsId) return
     try {
       const data = await fetchNewsById(props.newsId)
       if (!data) return toast.show('Actualité introuvable', 'warning')
 
-      // 🔹 On ne garde que les champs existants dans la table "news"
       form.value = {
         title: data.title,
         slug: data.slug,
@@ -244,7 +219,6 @@
     }
   }
 
-  /* 💾 Enregistrement */
   async function handleSubmit() {
     if (!form.value.title || !form.value.slug) {
       toast.show('Titre et slug obligatoires', 'warning')
@@ -253,23 +227,19 @@
 
     loading.value = true
     try {
-      // 🔹 Création du topic si besoin
       if (!form.value.topic_id && newTopicLabel.value) {
         const topicId = await createTopicIfNeeded()
         if (topicId) form.value.topic_id = topicId
       }
 
-      // 🔹 Upload de l’image si sélectionnée
       if (selectedFile.value) {
         const uploadedUrl = await uploadImage(form.value.title)
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
-      // 🧹 Nettoyage avant envoi à Supabase (évite le bug "topic" field)
       const payload = { ...form.value }
       delete (payload as any).topic
 
-      // 🔹 Enregistrement (update / create)
       if (isEditMode.value && props.newsId) {
         await updateNews(props.newsId, payload)
         toast.show('Actualité mise à jour ✅', 'success')
@@ -287,7 +257,6 @@
     }
   }
 
-  /* 🔁 Init */
   onMounted(async () => {
     await loadTopics()
     await loadNews()
@@ -295,7 +264,6 @@
 
   watch(() => props.newsId, loadNews)
 
-  /* 🧹 Reset complet quand on ferme la modal */
   watch(visible, (val) => {
     if (!val) {
       form.value = {
@@ -313,7 +281,6 @@
     }
   })
 </script>
-
 <style scoped lang="less">
   .news-form {
     display: flex;

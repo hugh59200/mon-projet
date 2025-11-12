@@ -16,13 +16,14 @@ type TableName = keyof (Database['public']['Tables'] & Database['public']['Views
 type Row<T extends TableName> = Tables<T> extends infer R ? R : never
 type SearchFunction<T> = (row: T, query: string) => boolean
 
-interface UseAdminTableOptions<T extends TableName> {
+interface UseAdminTableOptions<T extends TableName, R = Row<T>> {
   table: T
-  orderBy?: keyof Row<T> & string
+  orderBy?: keyof R & string
   ascending?: boolean
   filters?: Record<string, any>
-  searchFn?: SearchFunction<Row<T>>
+  searchFn?: SearchFunction<R>
   limit?: number
+  select?: string // 🆕 permet d’ajouter un SELECT personnalisé
 }
 
 /** ⚙️ Helper typé : gère les surcharges .from() Tables / Views */
@@ -45,7 +46,10 @@ function fromRelation<T extends TableName>(table: T) {
   }
 }
 
-export function useAdminTable<T extends TableName>(options: UseAdminTableOptions<T>) {
+/** ⚙️ Hook générique admin */
+export function useAdminTable<T extends TableName, R = Row<T>>(
+  options: UseAdminTableOptions<T, R>,
+) {
   const {
     table,
     orderBy = 'created_at',
@@ -53,10 +57,11 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
     filters = {},
     searchFn,
     limit = 20,
+    select = '*', // 🆕 valeur par défaut
   } = options
 
-  const data = ref([]) as Ref<Row<T>[]>
-  const filteredData = ref([]) as Ref<Row<T>[]>
+  const data = ref([]) as Ref<R[]>
+  const filteredData = ref([]) as Ref<R[]>
   const total = ref(0)
   const nbPages = ref(1)
   const page = ref(1)
@@ -74,7 +79,7 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       const to = page.value * limit - 1
 
       let query = fromRelation(table)
-        .select('*', { count: 'exact' })
+        .select(select, { count: 'exact' }) // 🆕 ← custom SELECT ici
         .order(sortKey.value, { ascending: sortAsc.value })
         .range(from, to)
 
@@ -85,7 +90,7 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       const { data: rows, count, error } = await query
       if (error) throw error
 
-      const validRows = Array.isArray(rows) ? (rows as Row<T>[]) : []
+      const validRows = Array.isArray(rows) ? (rows as R[]) : []
       data.value = validRows
       total.value = count ?? validRows.length
       nbPages.value = Math.ceil(total.value / limit) || 1
@@ -93,16 +98,16 @@ export function useAdminTable<T extends TableName>(options: UseAdminTableOptions
       if (searchFn && search.value) {
         const q = search.value.toLowerCase().trim()
         filteredData.value = validRows.filter((row) =>
-          (searchFn as (r: Row<T>, q: string) => boolean)(row, q),
+          (searchFn as (r: R, q: string) => boolean)(row, q),
         )
       } else {
         filteredData.value = validRows
       }
     } catch (err) {
       console.error('Erreur fetchData:', err)
-      filteredData.value = [] // ✅ évite que ça reste undefined
+      filteredData.value = []
     } finally {
-      hasLoaded.value = true // ✅ toujours exécuté, succès ou erreur
+      hasLoaded.value = true
       loading.value = false
     }
   }

@@ -83,10 +83,10 @@
 </template>
 
 <script setup lang="ts">
-  import { deleteTopic } from '@/features/admin/api/topics'
   import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useDialog } from '@/features/interface/dialog'
+  import { deleteTopic } from '@/supabase/api/topics'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils/sanitize'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
@@ -94,10 +94,10 @@
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { ref, watch } from 'vue'
-  import { deleteTopicImage } from '../api/topicImages'
+  import { deleteTopicImage } from '../../../supabase/api/topicImages'
   import TopicCardMobile from './mobile/TopicCardMobile.vue'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
-  
+
   const toast = useToastStore()
 
   const { filteredData, loading, hasLoaded, fetchData, reset, search } =

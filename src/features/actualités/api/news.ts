@@ -1,9 +1,6 @@
 import { supabase } from '@/supabase/supabaseClient'
 import type { News, NewsTopics } from '@/supabase/types/supabase.types'
 
-/**
- * 📦 Récupère toutes les actualités avec leur topic
- */
 export async function fetchNews(
   topicId?: string,
 ): Promise<(News & { topic: NewsTopics | null })[]> {
@@ -19,9 +16,6 @@ export async function fetchNews(
   return data
 }
 
-/**
- * 🔎 Récupère un article spécifique par slug
- */
 export async function fetchNewsBySlug(
   slug: string,
 ): Promise<(News & { topic: NewsTopics | null }) | null> {
@@ -35,18 +29,12 @@ export async function fetchNewsBySlug(
   return data
 }
 
-/**
- * 📚 Récupère la liste des topics disponibles
- */
 export async function fetchNewsTopics(): Promise<NewsTopics[]> {
   const { data, error } = await supabase.from('news_topics').select('*').order('id')
   if (error) throw error
   return data
 }
 
-/**
- * 🗑️ Supprime une actualité + son image
- */
 export async function deleteNews(id: string) {
   const { data: article, error: fetchError } = await supabase
     .from('news')

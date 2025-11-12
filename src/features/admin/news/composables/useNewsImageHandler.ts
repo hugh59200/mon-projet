@@ -1,4 +1,4 @@
-import { deleteNewsImage, uploadNewsImage } from '../../api/newsImages'
+import { deleteNewsImage, uploadNewsImage } from '../../../../supabase/api/newsImages'
 import { useImageHandler } from '../../shared/composables/useImageHandler'
 
 export function useNewsImageHandler(readonly: () => boolean) {

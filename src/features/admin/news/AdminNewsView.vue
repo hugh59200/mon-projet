@@ -4,13 +4,12 @@
       v-model:search="search"
       search-placeholder="Rechercher une actualité..."
       show-reset
-      @reset="reset()"
+      show-role
+      @reset="reset"
     >
-      <template
-        v-if="!readonly"
-        #actions
-      >
+      <template #actions>
         <BasicButton
+          v-if="!readonly"
           label="+ Ajouter une actualité"
           type="primary"
           size="small"
@@ -18,64 +17,113 @@
         />
       </template>
     </BasicToolbar>
+    <BasicPagination
+      :current-page="page"
+      :nb-pages="nbPages"
+      :nb-results="total"
+      :nb-pages-max="5"
+      :auto-fetch="fetchData"
+      @change="page = $event"
+    />
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
-      :is-empty="hasLoaded && filteredData.length === 0"
+      :is-empty="hasLoaded && enrichedNews.length === 0"
       message="Chargement des actualités..."
-      empty-message="Aucune actualité 📰"
+      empty-message="Aucune actualité trouvée 😅"
     >
-      <div class="news--desktop">
+      <template v-if="isDesktop || isTablet">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+          <BasicCell
+            :span="18"
+            text="Titre"
+            :is-active="sortKey === 'title'"
+            :icon-color="getSortColor('title')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('title')"
+          />
+          <BasicCell
+            :span="8"
+            text="Thématique"
+            :is-active="sortKey === 'topic_label'"
+            :icon-color="getSortColor('topic_label')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('topic_label')"
+          />
+          <BasicCell
+            :span="6"
+            text="Date de publication"
+            :is-active="sortKey === 'published_at'"
+            :icon-color="getSortColor('published_at')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('published_at')"
+          />
+          <BasicCell :span="4" />
+        </div>
         <div
-          v-for="article in filteredData"
-          :key="article.id"
-          class="news-item"
+          v-for="news in enrichedNews"
+          :key="news.id"
+          class="gridElemWrapper"
         >
-          <div class="news-info">
-            <div class="thumb-container">
-              <img
-                :src="article.image || fallbackImage"
-                class="news-thumb"
-                alt=""
-              />
-            </div>
-            <div class="news-text">
-              <h3>{{ article.title }}</h3>
-              <p class="excerpt">{{ article.excerpt || '—' }}</p>
-              <p class="date">
-                Publié le {{ new Date(article.published_at!).toLocaleDateString() }}
-              </p>
-            </div>
-          </div>
           <div
-            v-if="!readonly"
-            class="actions"
+            class="cardLayoutWrapper list"
+            @click="openNewsModal(news.id)"
           >
+            <BasicCell :span="18">
+              <div class="list__news-info">
+                <img
+                  v-if="news.image"
+                  :src="news.image"
+                  alt="Aperçu"
+                  class="list__news-thumb"
+                />
+                <BasicText
+                  :label="news.title"
+                  size="body-l"
+                  weight="semibold"
+                  color="neutral-900"
+                  pointer
+                />
+              </div>
+            </BasicCell>
+            <BasicCell :span="8">
+              <BasicText
+                :label="news.topic_label || '—'"
+                size="body-m"
+                color="neutral-700"
+              />
+            </BasicCell>
+            <BasicCell :span="6">
+              <BasicText
+                :label="news.published_at ? formatDate(news.published_at) : '—'"
+                size="body-s"
+                color="neutral-500"
+              />
+            </BasicCell>
             <BasicCellActionIcon
-              icon-name="eye"
-              tooltip="Voir / Modifier"
-              @click="openNewsModal(article.id)"
-            />
-            <BasicCellActionIcon
+              v-if="!readonly"
               icon-name="trash"
               tooltip="Supprimer"
+              center
               danger
-              @click="handleDelete(article)"
+              :span="4"
+              @click.stop="handleDelete(news)"
             />
           </div>
         </div>
-      </div>
-      <div class="mobile-cards-list">
+      </template>
+      <template v-else>
         <NewsCardMobile
-          v-for="article in filteredData"
-          :key="article.id"
-          :article="article"
+          v-for="news in enrichedNews"
+          :key="news.id"
+          :article="news"
           :fallback-image="fallbackImage"
           :readonly="readonly"
           @open="openNewsModal"
           @delete="handleDelete"
+          class="gridElemWrapper list list--mobile"
         />
-      </div>
+      </template>
     </WrapperLoader>
     <teleport to="#app">
       <AdminNewsModal
@@ -97,21 +145,44 @@
 <script setup lang="ts">
   import { deleteNews } from '@/features/actualités/api/news'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDialog } from '@/features/interface/dialog'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { fetchTopics } from '@/supabase/api/topics'
+  import type { Tables } from '@/supabase/types/supabase'
   import type { News } from '@/supabase/types/supabase.types'
-  import { sanitizeHTML } from '@/utils/sanitize'
+  import { formatDate, sanitizeHTML } from '@/utils'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicCell from '@designSystem/components/basic/cell/BasicCell.vue'
+  import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
+  import BasicPagination from '@designSystem/components/basic/pagination/BasicPagination.vue'
+  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
-  import { ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import NewsCardMobile from './mobile/NewsCardMobile.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
 
+  type NewsWithTopic = News & { topic_label?: string | null }
+
   const props = defineProps<{ readonly?: boolean }>()
   const toast = useToastStore()
+  const { showDialog } = useDialog()
 
-  const { filteredData, loading, hasLoaded, fetchData, reset, search } = useAdminTable<'news'>({
+  const {
+    filteredData,
+    total,
+    nbPages,
+    page,
+    search,
+    sortKey,
+    sortAsc,
+    loading,
+    hasLoaded,
+    fetchData,
+    reset,
+  } = useAdminTable<'news', NewsWithTopic>({
     table: 'news',
     orderBy: 'published_at',
     ascending: false,
@@ -120,38 +191,48 @@
       (n.excerpt?.toLowerCase()?.includes(q) ?? false),
   })
 
-  // 🖼️ Image de fallback
+  const { isTablet, isDesktop } = useDeviceBreakpoint()
+
+  const { toggleSort, getSortColor } = useSortableTable<Tables<'news'>>(
+    sortKey,
+    sortAsc,
+    filteredData,
+  )
+
   const fallbackImage = '/images/placeholder-news.png'
 
-  const { showDialog } = useDialog()
+  const topicsMap = ref<Record<string, string>>({})
+
+  async function loadTopics() {
+    const topics = await fetchTopics()
+    topicsMap.value = Object.fromEntries(topics.map((t) => [t.id, t.label]))
+  }
+  onMounted(loadTopics)
+
+  const enrichedNews = computed<NewsWithTopic[]>(() =>
+    filteredData.value.map((n) => ({
+      ...n,
+      topic_label: n.topic_id ? topicsMap.value[n.topic_id] : null,
+    })),
+  )
 
   async function handleDelete(article: News) {
     if (props.readonly) return
 
     const safeTitle = sanitizeHTML(article.title ?? '')
-
     const result = await showDialog({
       type: 'YesNo',
       title: 'Supprimer cette actualité ?',
       message: [
         `
-      <p style="margin:0 0 12px;">
-        Voulez-vous vraiment supprimer cette actualité ?
-      </p>
-
-      <p style="margin:0 0 12px;">
-        <strong>Titre :</strong> ${safeTitle}
-      </p>
-
-      <p style="margin:0;">
-        <strong>Confirmez-vous ?</strong>
-      </p>
-    `,
+        <p style="margin:0 0 12px;">Voulez-vous vraiment supprimer cette actualité ?</p>
+        <p style="margin:0 0 12px;"><strong>Titre :</strong> ${safeTitle}</p>
+        <p style="margin:0;"><strong>Confirmez-vous ?</strong></p>
+      `,
       ],
       isHtml: true,
       closable: false,
     })
-
     if (result !== 'Yes') return
 
     try {
@@ -174,114 +255,21 @@
 </script>
 
 <style scoped lang="less">
-  .news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
+  @import '../shared/style/list-base.less';
 
-  .news-item {
-    background: white;
-    padding: 16px 20px;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px fade(@neutral-900, 5%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s ease;
-
-    &:hover {
-      background: fade(@primary-100, 10%);
-    }
-  }
-
-  .news-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    .thumb-container {
-      flex-shrink: 0;
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: fade(@neutral-200, 40%);
+  .list {
+    &__news-info {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 10px;
     }
 
-    .news-thumb {
-      width: 100%;
-      height: 100%;
+    &__news-thumb {
+      width: 48px;
+      height: 48px;
       object-fit: cover;
-    }
-
-    .news-text {
-      display: flex;
-      flex-direction: column;
-
-      h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: @neutral-900;
-      }
-
-      .excerpt {
-        margin: 0;
-        color: fade(@neutral-900, 70%);
-        font-size: 0.9rem;
-      }
-
-      .date {
-        font-size: 0.8rem;
-        color: fade(@neutral-900, 60%);
-      }
-    }
-  }
-
-  .actions {
-    display: flex;
-    gap: 12px;
-
-    .action-icon {
-      cursor: pointer;
-      transition:
-        opacity 0.2s,
-        transform 0.2s;
-
-      &:hover {
-        opacity: 0.8;
-        transform: scale(1.1);
-      }
-
-      &--delete {
-        color: @danger-600;
-      }
-    }
-  }
-
-  .news--desktop {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .mobile-cards-list {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  @media (max-width: 1000px) {
-    .news--desktop {
-      display: none;
-    }
-
-    .mobile-cards-list {
-      display: flex;
+      border-radius: 8px;
+      border: 1px solid @neutral-200;
     }
   }
 </style>

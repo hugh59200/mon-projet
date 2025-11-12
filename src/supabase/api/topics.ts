@@ -2,7 +2,6 @@ import { supabase } from '@/supabase/supabaseClient'
 import type { TablesInsert } from '@/supabase/types/supabase'
 import type { NewsTopics } from '@/supabase/types/supabase.types'
 
-/** 📦 Liste des topics */
 export async function fetchTopics(): Promise<NewsTopics[]> {
   const { data, error } = await supabase
     .from('news_topics')
@@ -12,14 +11,12 @@ export async function fetchTopics(): Promise<NewsTopics[]> {
   return data ?? []
 }
 
-/** 🔎 Topic par ID */
 export async function fetchTopicById(id: string): Promise<NewsTopics | null> {
   const { data, error } = await supabase.from('news_topics').select('*').eq('id', id).maybeSingle()
   if (error) throw new Error(`Erreur Supabase : ${error.message}`)
   return data
 }
 
-/** ➕ Création d’un topic */
 export async function createTopic(
   topic: Partial<TablesInsert<'news_topics'>>,
 ): Promise<NewsTopics> {
@@ -47,7 +44,6 @@ export async function createTopic(
   return data
 }
 
-/** ✏️ Mise à jour d’un topic */
 export async function updateTopic(id: string, payload: { label?: string; image?: string | null }) {
   const { data, error } = await supabase
     .from('news_topics')
@@ -63,7 +59,6 @@ export async function updateTopic(id: string, payload: { label?: string; image?:
   return data
 }
 
-/** 🗑️ Suppression d’un topic */
 export async function deleteTopic(id: string): Promise<void> {
   const { error } = await supabase.from('news_topics').delete().eq('id', id)
   if (error) throw new Error(`Erreur suppression topic : ${error.message}`)

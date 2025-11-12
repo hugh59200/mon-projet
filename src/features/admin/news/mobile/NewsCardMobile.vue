@@ -1,6 +1,5 @@
 <template>
   <MobileCard hoverable>
-    <!-- ✅ Titre -->
     <template #title>
       <div class="news-header">
         <img
@@ -16,13 +15,9 @@
         </div>
       </div>
     </template>
-
-    <!-- ✅ Extrait -->
     <template #info>
       <p class="excerpt">{{ article.excerpt || '—' }}</p>
     </template>
-
-    <!-- ✅ Actions -->
     <template #actions>
       <BasicButton
         label="Voir / Modifier"
@@ -32,7 +27,6 @@
         block
         @click="$emit('open', article.id)"
       />
-
       <BasicButton
         v-if="!readonly"
         label="Supprimer"

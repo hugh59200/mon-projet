@@ -82,9 +82,9 @@
 </template>
 
 <script setup lang="ts">
-  import { createTopic, fetchTopicById, updateTopic } from '@/features/admin/api/topics'
   import { useTopicImageHandler } from '@/features/admin/topics/composables/useTopicImageHandler'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { createTopic, fetchTopicById, updateTopic } from '@/supabase/api/topics'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'

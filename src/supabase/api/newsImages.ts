@@ -1,8 +1,5 @@
 import { supabase } from '@/supabase/supabaseClient'
 
-/**
- * Nettoie le titre d'une news pour créer un chemin valide (sans accents, espaces, caractères spéciaux)
- */
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -12,10 +9,6 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '') // supprime les tirets en trop
 }
 
-/**
- * ☁️ Upload une image d’article dans le bucket `news-images`
- * et retourne son URL publique.
- */
 export async function uploadNewsImage(title: string, file: File): Promise<string> {
   const safeSlug = slugify(title)
   const ext = file.name.split('.').pop()
@@ -31,9 +24,6 @@ export async function uploadNewsImage(title: string, file: File): Promise<string
   return data.publicUrl
 }
 
-/**
- * 🗑️ Supprime une image d’article du bucket `news-images`
- */
 export async function deleteNewsImage(imageUrl: string): Promise<boolean> {
   try {
     const path = imageUrl.split('/news-images/')[1]
