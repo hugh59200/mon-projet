@@ -52,6 +52,7 @@ declare module 'vue' {
     FloatingDropdownWrapper: typeof import('./../designSystem/src/components/wrapper/pop-up/FloatingDropdownWrapper.vue')['default']
     FormContainer: typeof import('./../designSystem/src/components/wrapper/formContainer/FormContainer.vue')['default']
     InputContainer: typeof import('./../designSystem/src/components/wrapper/inputContainer/InputContainer.vue')['default']
+    NavButton: typeof import('./../designSystem/src/components/basic/button/NavButton.vue')['default']
     SmartModalSkeleton: typeof import('./../designSystem/src/components/basic/skeleton/SmartModalSkeleton.vue')['default']
     ToastContainer: typeof import('./../designSystem/src/components/basic/toast/ToastContainer.vue')['default']
     WrapperAutocomplete: typeof import('./../designSystem/src/components/wrapper/autocomplete/WrapperAutocomplete.vue')['default']

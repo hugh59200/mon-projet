@@ -1,20 +1,23 @@
 <template>
   <div
     class="floating-wrapper"
-    ref="triggerRef"
-    @mouseenter="triggerMode === 'hover' ? onEnter() : null"
-    @mouseleave="triggerMode === 'hover' ? onLeave() : null"
-    @click="triggerMode === 'click' ? toggleDropdown() : null"
+    ref="wrapperRef"
   >
     <!-- 🎯 Déclencheur -->
-    <div @click="toggleDropdown()">
+    <div
+      ref="triggerRef"
+      class="floating-wrapper__trigger"
+      @mouseenter="triggerMode === 'hover' ? onEnter() : null"
+      @mouseleave="triggerMode === 'hover' ? onLeave() : null"
+      @click.stop="triggerMode === 'click' ? toggleDropdown() : null"
+    >
       <slot name="trigger" />
     </div>
 
     <!-- 🧊 Zone tampon invisible (anti flicker entre trigger et dropdown) -->
     <div
       v-if="model && triggerMode === 'hover'"
-      class="hover-grace-zone"
+      class="floating-wrapper__grace-zone"
       :style="graceZoneStyle"
     />
 
@@ -24,12 +27,15 @@
         v-if="model"
         class="floating-dropdown"
         :style="dropdownStyle"
-        v-click-outside="{ callback: () => (model = false), exclude: [triggerRef] }"
+        v-click-outside="{
+          callback: () => (model = false),
+          exclude: [triggerRef],
+        }"
         @mouseenter="triggerMode === 'hover' ? onEnter() : null"
         @mouseleave="triggerMode === 'hover' ? onLeave() : null"
       >
         <div
-          class="dropdown-arrow"
+          class="floating-dropdown__arrow"
           :style="arrowStyle"
         />
         <slot />
@@ -45,9 +51,9 @@
 
   defineOptions({ directives: { clickOutside: vClickOutside } })
 
-  /* ---------------------------------------------------------- */
-  /*                     ⚙️ Props et modèles                    */
-  /* ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   ⚙️ Props et modèles
+---------------------------------------------------------- */
   const model = defineModel<boolean>({ default: false })
 
   const props = defineProps({
@@ -62,19 +68,19 @@
       type: String as PropType<'auto' | 'center' | 'start' | 'end'>,
       default: 'auto',
     },
-    /** 🔥 Contrôle le mode d'ouverture : "hover" ou "click" */
     triggerMode: {
       type: String as PropType<'hover' | 'click'>,
       default: 'hover',
     },
   })
 
-  /* ---------------------------------------------------------- */
-  /*                      🔗 Dropdown logic                      */
-  /* ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   🔗 Dropdown logic
+---------------------------------------------------------- */
   const id = Math.random().toString(36).substring(2, 9)
   const { open, close, onChange } = useDropdownManager(id)
 
+  const wrapperRef = ref<HTMLElement | null>(null)
   const triggerRef = ref<HTMLElement | null>(null)
   const dropdownTop = ref<number>(0)
   const dropdownLeft = ref<number | undefined>(undefined)
@@ -98,9 +104,9 @@
     })
   }
 
-  /* ---------------------------------------------------------- */
-  /*                        💅 Styles dynamiques                 */
-  /* ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   💅 Styles dynamiques
+---------------------------------------------------------- */
   const dropdownStyle = computed(() => ({
     top: dropdownTop.value + 'px',
     left: dropdownLeft.value + 'px',
@@ -128,9 +134,9 @@
     return style
   })
 
-  /* ---------------------------------------------------------- */
-  /*                 🪄 Gestion hover & click                    */
-  /* ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   🪄 Gestion hover & click
+---------------------------------------------------------- */
   function onEnter() {
     if (hoverTimer) clearTimeout(hoverTimer)
     if (closeTimer) clearTimeout(closeTimer)
@@ -155,9 +161,9 @@
     else close()
   }
 
-  /* ---------------------------------------------------------- */
-  /*              ⏱️ Fermeture auto & sync globale              */
-  /* ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   ⏱️ Fermeture auto & sync globale
+---------------------------------------------------------- */
   watch(model, (val) => {
     if (val) {
       updatePosition()
@@ -188,21 +194,35 @@
 </script>
 
 <style scoped lang="less">
+  /* ==========================================================
+   🧭 FLOATING DROPDOWN WRAPPER
+   ========================================================== */
+
   .floating-wrapper {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     user-select: none;
+
+    &__trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__grace-zone {
+      position: fixed;
+      height: 12px;
+      pointer-events: none;
+      background: transparent;
+      z-index: 1500;
+    }
   }
 
-  .hover-grace-zone {
-    position: fixed;
-    height: 12px;
-    pointer-events: none;
-    background: transparent;
-    z-index: 1500;
-  }
+  /* ==========================================================
+   🎯 DROPDOWN
+   ========================================================== */
 
   .floating-dropdown {
     position: fixed;
@@ -211,20 +231,23 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     color: white;
     z-index: 2000;
-    animation: bounceIn 0.3s ease;
+    animation: bounceIn 0.25s ease;
     padding: 14px 12px 10px;
+
+    &__arrow {
+      position: absolute;
+      top: -6px;
+      width: 12px;
+      height: 12px;
+      background: @neutral-800;
+      border-top-left-radius: 3px;
+      box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
+    }
   }
 
-  .dropdown-arrow {
-    position: absolute;
-    top: -6px;
-    width: 12px;
-    height: 12px;
-    background: @neutral-800;
-    border-top-left-radius: 3px;
-    box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
-  }
-
+  /* ==========================================================
+   ✨ Animations
+   ========================================================== */
   @keyframes bounceIn {
     0% {
       transform: scale(0.9);

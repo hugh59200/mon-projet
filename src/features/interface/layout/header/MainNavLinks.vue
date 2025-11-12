@@ -8,16 +8,13 @@
       :key="item.path"
       :to="item.path"
       class="main-nav__item"
-      active-class="active"
-      @click="$emit('navigate')"
     >
-      <BasicButton
+      <NavButton
         :label="item.label"
         :iconName="showIcon ? item.icon : undefined"
-        type="reverse"
+        :active="$route.path === item.path"
         variant="ghost"
-        size="small"
-        :class="['main-nav__btn', { active: $route.path === item.path }]"
+        @click="$emit('navigate')"
       />
     </RouterLink>
   </nav>
@@ -53,35 +50,18 @@
     align-items: center;
     gap: 20px;
 
+    &--horizontal {
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    &--vertical {
+      flex-direction: column;
+      gap: 14px;
+    }
+
     &__item {
       text-decoration: none;
     }
-
-    &__btn {
-      padding: 6px 10px;
-      gap: 6px;
-      transition: all 0.25s ease;
-
-      &:hover {
-        background: fade(white, 10%);
-        transform: translateY(-1px);
-      }
-
-      &.active {
-        background: fade(@primary-500, 25%);
-        color: white;
-        transform: translateY(-1px);
-      }
-    }
-  }
-
-  .main-nav--horizontal {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .main-nav--vertical {
-    flex-direction: column;
-    gap: 14px;
   }
 </style>
