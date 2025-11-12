@@ -21,20 +21,18 @@
           size="small"
         />
       </div>
+
       <div
         v-if="isMobile"
         class="catalogue__header--sub"
-        v-responsive-animate.fade.once
       >
         <WrapperInput
-          v-if="isMobile"
           v-model="searchTerm"
           placeholder="Rechercher..."
           icon-left="search"
           size="small"
         />
         <WrapperButton
-          v-if="isMobile"
           button-label="Filtres"
           type="secondary"
           variant="outlined"
@@ -45,45 +43,39 @@
         />
       </div>
     </header>
-    <div
-      class="catalogue__body"
-      v-responsive-animate.slide.once
-    >
+
+    <div class="catalogue__body">
+      <!-- 🧭 Sidebar filters -->
       <aside
         v-if="!isMobile"
         class="catalogue__filters"
-        v-responsive-animate.fade.scroll
       >
         <FilterPanel
-          :allOpen="allOpen"
-          :filterOpen="filterOpen"
-          :priceRange="priceRange"
+          :all-open="allOpen"
+          v-model:filterOpen="filterOpen"
+          v-model:priceRange="priceRange"
+          v-model:selectedCategories="selectedCategories"
+          v-model:inStockOnly="inStockOnly"
+          v-model:selectedTags="selectedTags"
           :categoryItems="categoryItemsWithCounts"
-          :selectedCategories="selectedCategories"
-          :inStockOnly="inStockOnly"
           :stockCount="stockCount"
-          :tags="allTags"
           :tagItems="tagItemsWithCounts"
-          :selectedTags="selectedTags"
+          :tags="allTags"
           @toggleAll="toggleAll"
           @resetAll="resetAll"
           @toggleTag="toggleTag"
-          @update:priceRange="(val) => (priceRange = val)"
-          @update:selectedCategories="(val) => (selectedCategories = val)"
-          @update:inStockOnly="(val) => (inStockOnly = val)"
         />
       </aside>
-      <section
-        class="catalogue__list"
-        v-responsive-animate.fade.scroll
-      >
+
+      <!-- 🛍️ Product list -->
+      <section class="catalogue__list">
         <BasicText
           v-if="hasLoaded"
-          v-responsive-animate.fade.once
           color="neutral-700"
         >
           {{ filteredProducts.length }} résultat{{ filteredProducts.length > 1 ? 's' : '' }}
         </BasicText>
+
         <WrapperLoader
           :loading="loading"
           :has-loaded="hasLoaded"
@@ -104,10 +96,10 @@
               @add="addToCart"
             />
           </div>
+
           <div
             v-if="nbPages > 1"
             class="catalogue__pagination-bottom"
-            v-responsive-animate.fade.once
           >
             <BasicPagination
               :current-page="page"
@@ -119,37 +111,32 @@
         </WrapperLoader>
       </section>
     </div>
+
+    <!-- 📱 Mobile modal -->
     <ModalComponent
       v-model="showFilters"
-      :closable="true"
-      v-responsive-animate.zoom.once
+      closable
     >
       <template #header>Filtres</template>
       <template #content>
         <FilterPanel
-          :allOpen="allOpen"
-          :filterOpen="filterOpen"
-          :priceRange="priceRange"
+          :all-open="allOpen"
+          v-model:filterOpen="filterOpen"
+          v-model:priceRange="priceRange"
+          v-model:selectedCategories="selectedCategories"
+          v-model:inStockOnly="inStockOnly"
+          v-model:selectedTags="selectedTags"
           :categoryItems="categoryItemsWithCounts"
-          :selectedCategories="selectedCategories"
-          :inStockOnly="inStockOnly"
           :stockCount="stockCount"
-          :tags="allTags"
           :tagItems="tagItemsWithCounts"
-          :selectedTags="selectedTags"
+          :tags="allTags"
           @toggleAll="toggleAll"
           @resetAll="resetAll"
           @toggleTag="toggleTag"
-          @update:priceRange="(val) => (priceRange = val)"
-          @update:selectedCategories="(val) => (selectedCategories = val)"
-          @update:inStockOnly="(val) => (inStockOnly = val)"
         />
       </template>
       <template #actions>
-        <div
-          class="justify-content-center flex"
-          v-responsive-animate.slide.once
-        >
+        <div class="justify-content-center flex">
           <BasicButton
             label="Fermer"
             type="primary"
@@ -179,6 +166,7 @@
 
   const { isMobile } = useDeviceBreakpoint()
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
+
   const {
     selectedCategories,
     inStockOnly,
@@ -206,10 +194,11 @@
     selectedCategories.value = []
     inStockOnly.value = false
     selectedTags.value = []
-    sortBy.value = 'default'
+    // reset priceRange (en respectant min/max existants)
+    priceRange.value = { ...priceRange.value, from: priceRange.value.min, to: priceRange.value.max }
+    // UI
     page.value = 1
-    priceRange.value.from = priceRange.value.min
-    priceRange.value.to = priceRange.value.max
+    sortBy.value = 'default'
   }
 
   function viewProduct(id: string) {
@@ -220,6 +209,7 @@
     cart.addToCart(p)
     showAddToCartToast(p)
   }
+
   onMounted(loadProducts)
 </script>
 
@@ -231,84 +221,65 @@
     align-items: stretch;
     gap: 20px;
     background: @neutral-50;
-
-    &__header {
-      border-radius: 14px;
-      background: @neutral-100;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 15px;
-      gap: 16px;
-      transition: all 0.25s ease;
-
-      &--top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-
-        > div {
-          min-width: 160px;
-          max-width: 300px;
-        }
-      }
-      &--sub {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-
-        > div {
-          min-width: 160px;
-          max-width: 300px;
-        }
-      }
-    }
-
-    &__body {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      gap: 24px;
-    }
-
-    &__filters {
-      flex-shrink: 0;
-      width: 260px;
-      background: @neutral-100;
-      border: 1px solid fade(@neutral-200, 60%);
-      border-radius: 12px;
-      padding: 20px 16px;
-      overflow-y: auto;
-    }
-
-    &__list {
-      flex: 1;
-      background: #fff;
-      border-radius: 12px;
-      background: @neutral-100;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      justify-items: stretch;
-      align-items: stretch;
-      gap: 48px 28px;
-      padding-bottom: 20px;
-    }
-
-    &__pagination-bottom {
-      display: flex;
-      justify-content: center;
-      margin-top: 24px;
-    }
+  }
+  .catalogue__header {
+    border-radius: 14px;
+    background: @neutral-100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 15px;
+    gap: 16px;
+    transition: all 0.25s ease;
+  }
+  .catalogue__header--top,
+  .catalogue__header--sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .catalogue__header--top > div,
+  .catalogue__header--sub > div {
+    min-width: 160px;
+    max-width: 300px;
+  }
+  .catalogue__body {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 24px;
+  }
+  .catalogue__filters {
+    flex-shrink: 0;
+    width: 260px;
+    background: @neutral-100;
+    border: 1px solid fade(@neutral-200, 60%);
+    border-radius: 12px;
+    padding: 20px 16px;
+    overflow-y: auto;
+  }
+  .catalogue__list {
+    flex: 1;
+    background: @neutral-100;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .catalogue__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    justify-items: stretch;
+    align-items: stretch;
+    gap: 48px 28px;
+    padding-bottom: 20px;
+  }
+  .catalogue__pagination-bottom {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
   }
 </style>

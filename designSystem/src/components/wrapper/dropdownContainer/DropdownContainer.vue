@@ -48,21 +48,20 @@
       pointer
     />
 
-    <!-- 🚀 Le menu est maintenant rendu dans #overlay-root -->
+    <!-- 🚀 Menu avec v-motion -->
     <Teleport to="#overlay-root">
-      <transition name="fade">
-        <div
-          v-if="isOpen && !disabled"
-          class="dropdown__menu"
-          ref="menuRef"
-          :style="menuPositionStyle"
-          role="listbox"
-        >
-          <ClickOutside @close="closeFromOutside">
-            <slot name="dropdown-items" />
-          </ClickOutside>
-        </div>
-      </transition>
+      <div
+        v-if="isOpen && !disabled"
+        v-motion="motion"
+        class="dropdown__menu"
+        ref="menuRef"
+        :style="menuPositionStyle"
+        role="listbox"
+      >
+        <ClickOutside @close="closeFromOutside">
+          <slot name="dropdown-items" />
+        </ClickOutside>
+      </div>
     </Teleport>
   </div>
 </template>
@@ -99,6 +98,35 @@
     dropdownDirection,
   )
 
+  const motion = computed(() => {
+    const dir = dropdownDirection.value
+    return {
+      initial: {
+        opacity: 0,
+        y: dir === 'up' ? 10 : -10,
+        scale: 0.96,
+        boxShadow: '0 0 0 rgba(0,0,0,0)',
+        backdropFilter: 'blur(0px)',
+      },
+      enter: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.18)',
+        backdropFilter: 'blur(8px)',
+        transition: { type: 'spring', stiffness: 200, damping: 18 },
+      },
+      leave: {
+        opacity: 0,
+        y: dir === 'up' ? 10 : -10,
+        scale: 0.96,
+        boxShadow: '0 0 0 rgba(0,0,0,0)',
+        backdropFilter: 'blur(0px)',
+        transition: { duration: 0.25, ease: 'easeInOut' },
+      },
+    }
+  })
+
   provide('closeDropdown', () => {
     isOpen.value = false
   })
@@ -120,6 +148,7 @@
       !props.readonly &&
       !props.disabled &&
       !props.forceValue &&
+      props.mode !== 'single' &&
       (isFocused.value || isOpen.value) &&
       computedItems.value.length > 0,
   )
@@ -142,21 +171,11 @@
   }
 
   provide('closeDropdown', (force = false) => {
-    // ✅ Ferme uniquement si mode = single ou si on force la fermeture
     if (props.mode === 'multiple' && !force) return
     isOpen.value = false
   })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   @import 'DropdownContainer.less';
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.15s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
 </style>

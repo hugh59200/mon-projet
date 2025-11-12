@@ -1,85 +1,87 @@
 <template>
-  <BasicToolbar
-    v-model:search="search"
-    search-placeholder="Rechercher une commande..."
-    :show-reset="true"
-    @reset="reset"
-  />
-  <BasicPagination
-    :current-page="page"
-    :nb-pages="nbPages"
-    :nb-results="total"
-    :nb-pages-max="5"
-    :auto-fetch="fetchData"
-    @change="page = $event"
-  />
-  <WrapperLoader
-    :loading="loading"
-    :has-loaded="hasLoaded"
-    :is-empty="hasLoaded && filteredData.length === 0"
-    message="Chargement des commandes..."
-    empty-message="Aucune commande trouvée 😅"
-  >
-    <div class="orders--desktop">
-      <div class="cardLayoutWrapper cardLayoutWrapper--header">
-        <BasicCell
-          :span="10"
-          text="Client"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Total"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Date"
-        />
-        <BasicCell
-          center
-          :span="8"
-          text="Statut"
-        />
-        <BasicCell
-          center
-          :span="6"
-          text="Détails"
+  <div>
+    <BasicToolbar
+      v-model:search="search"
+      search-placeholder="Rechercher une commande..."
+      :show-reset="true"
+      @reset="reset"
+    />
+    <BasicPagination
+      :current-page="page"
+      :nb-pages="nbPages"
+      :nb-results="total"
+      :nb-pages-max="5"
+      :auto-fetch="fetchData"
+      @change="page = $event"
+    />
+    <WrapperLoader
+      :loading="loading"
+      :has-loaded="hasLoaded"
+      :is-empty="hasLoaded && filteredData.length === 0"
+      message="Chargement des commandes..."
+      empty-message="Aucune commande trouvée 😅"
+    >
+      <div class="orders--desktop">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+          <BasicCell
+            :span="10"
+            text="Client"
+          />
+          <BasicCell
+            center
+            :span="6"
+            text="Total"
+          />
+          <BasicCell
+            center
+            :span="6"
+            text="Date"
+          />
+          <BasicCell
+            center
+            :span="8"
+            text="Statut"
+          />
+          <BasicCell
+            center
+            :span="6"
+            text="Détails"
+          />
+        </div>
+        <OrderRow
+          v-for="order in filteredData"
+          v-model="localStatuses[order.order_id ?? '']"
+          @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
+          :order="order"
+          :statuses="STATUSES"
+          :format-date="formatDate"
+          :format-currency="formatCurrency"
+          :remove="deleteOrder"
+          :open="openOrderModal"
         />
       </div>
-      <OrderRow
-        v-for="order in filteredData"
-        v-model="localStatuses[order.order_id ?? '']"
-        @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
-        :order="order"
-        :statuses="STATUSES"
-        :format-date="formatDate"
-        :format-currency="formatCurrency"
-        :remove="deleteOrder"
-        :open="openOrderModal"
+      <div class="mobile-cards-list">
+        <OrderCardMobile
+          v-for="order in filteredData"
+          v-model="localStatuses[order.order_id ?? '']"
+          @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
+          :order="order"
+          :statuses="STATUSES"
+          :format-date="formatDate"
+          :format-currency="formatCurrency"
+          :open-order-modal="openOrderModal"
+          :handle-delete="deleteOrder"
+        />
+      </div>
+    </WrapperLoader>
+    <teleport to="#app">
+      <AdminOrderDetailsModal
+        v-if="selectedOrderId"
+        v-model="isModalVisible"
+        :order-id="selectedOrderId"
       />
-    </div>
-    <div class="mobile-cards-list">
-      <OrderCardMobile
-        v-for="order in filteredData"
-        v-model="localStatuses[order.order_id ?? '']"
-        @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
-        :order="order"
-        :statuses="STATUSES"
-        :format-date="formatDate"
-        :format-currency="formatCurrency"
-        :open-order-modal="openOrderModal"
-        :handle-delete="deleteOrder"
-      />
-    </div>
-  </WrapperLoader>
-  <teleport to="#app">
-    <AdminOrderDetailsModal
-      v-if="selectedOrderId"
-      v-model="isModalVisible"
-      :order-id="selectedOrderId"
-    />
-  </teleport>
+    </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">

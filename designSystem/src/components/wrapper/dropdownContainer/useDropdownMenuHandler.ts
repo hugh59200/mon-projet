@@ -1,4 +1,3 @@
-import { useScrollIntoView } from '@/features/interface/composables/useScrollIntoView'
 import type { DropdownItem } from '@designSystem/components'
 import {
   computed,
@@ -12,7 +11,6 @@ import {
 } from 'vue'
 
 export type DropdownDirection = 'up' | 'down'
-export type DropdownContext = ReturnType<typeof useDropdownMenuHandler>
 
 export function useDropdownMenuHandler<T = DropdownItem>(
   items: T[] | Ref<T[]> | ComputedRef<T[]> = [],
@@ -23,10 +21,7 @@ export function useDropdownMenuHandler<T = DropdownItem>(
 ) {
   const isOpen = ref(false)
   const dropdownDirection = ref<DropdownDirection>('down')
-  const scrollRoot = ref<Element | null>(null)
   const io = ref<IntersectionObserver | null>(null)
-
-  const { makeId, makeVisible } = useScrollIntoView()
 
   const resolvedItems = computed(() => unref(items) ?? [])
 
@@ -40,72 +35,65 @@ export function useDropdownMenuHandler<T = DropdownItem>(
     })),
   )
 
-  const updateDropdownVisibilityAndDirection = () => {
-    const root = dropdownRef?.value
-    if (!root) return
+  /**
+   * 📏 Vérifie la place disponible et décide de la direction du menu
+   */
+  const updateDropdownVisibilityAndDirection = async () => {
+    await nextTick()
+    const el = dropdownRef?.value
+    if (!el) return
 
-    const rect = root.getBoundingClientRect()
-    const containerRect = (scrollRoot.value as HTMLElement | null)?.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - rect.bottom
+    const spaceAbove = rect.top
 
-    const topSpace = containerRect ? rect.top - containerRect.top : rect.top
-    const bottomSpace = containerRect
-      ? containerRect.bottom - rect.bottom
-      : window.innerHeight - rect.bottom
+    // Hauteur estimée du menu (ou fallback 200px)
+    const estimatedMenuHeight = 240
 
-    dropdownDirection.value = bottomSpace < 100 && topSpace > bottomSpace ? 'up' : 'down'
+    // Si on n’a pas la place en bas, et qu’en haut c’est mieux => on ouvre vers le haut
+    dropdownDirection.value =
+      spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow ? 'up' : 'down'
   }
 
-  const detach = () => {
+  /**
+   * 👁️ Ferme le dropdown quand il sort du viewport
+   */
+  const attachObserver = () => {
+    if (!dropdownRef?.value) return
+    detachObserver()
+
+    io.value = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting && isOpen.value) {
+          isOpen.value = false
+        }
+      },
+      { threshold: 0.01 },
+    )
+
+    io.value.observe(dropdownRef.value)
+  }
+
+  const detachObserver = () => {
     io.value?.disconnect()
     io.value = null
   }
 
-  const attach = async () => {
-    detach()
-
-    const rootEl = dropdownRef?.value
-
-    if (rootEl?.closest('.modal__dialog')) {
-      return
-    }
-
-    io.value = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry!.isIntersecting && isOpen.value) {
-          isOpen.value = false
-        }
-      },
-      {
-        root: scrollRoot.value ?? null,
-        threshold: 0.01,
-      },
-    )
-
-    if (dropdownRef?.value) {
-      io.value.observe(dropdownRef.value)
-    }
-  }
-
   watch(isOpen, async (open) => {
     if (open) {
-      const el = dropdownRef?.value ?? null
-      scrollRoot.value = el?.closest?.('.content') ?? null
-      await nextTick()
-      updateDropdownVisibilityAndDirection()
-      await attach()
+      await updateDropdownVisibilityAndDirection()
+      attachObserver()
     } else {
-      detach()
+      detachObserver()
     }
   })
 
-  onBeforeUnmount(detach)
+  onBeforeUnmount(detachObserver)
 
   return {
     isOpen,
     dropdownDirection,
     computedItems,
     updateDropdownVisibilityAndDirection,
-    makeId,
-    makeVisible,
   }
 }

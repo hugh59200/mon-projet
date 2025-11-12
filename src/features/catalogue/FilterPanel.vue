@@ -1,5 +1,6 @@
 <template>
   <div class="filters-panel-content">
+    <!-- Header -->
     <div class="filters__head">
       <BasicText
         size="h5"
@@ -13,58 +14,53 @@
           variant="outlined"
           size="small"
           :label="allOpen ? 'Tout réduire' : 'Tout ouvrir'"
-          @click="$emit('toggleAll')"
+          @click="emit('toggleAll')"
         />
         <BasicButton
           type="secondary"
           variant="outlined"
           size="small"
           label="Reset"
-          @click="$emit('resetAll')"
+          @click="emit('resetAll')"
         />
       </div>
     </div>
 
-    <!-- 🔹 Prix -->
+    <!-- Prix -->
     <FilterSection
       v-model="filterOpen.price"
       title="Prix"
     >
-      <BasicRange
-        v-if="priceRange.max > priceRange.min"
-        :model-value="priceRange"
-        @update:model-value="(val) => $emit('update:priceRange', val)"
-      />
+      <BasicRange v-model="priceRange" />
     </FilterSection>
 
-    <!-- 🔹 Catégories -->
+    <!-- Catégories -->
     <FilterSection
       v-model="filterOpen.category"
       title="Catégorie"
     >
       <WrapperDropdown
-        :model-value="selectedCategories"
+        v-model="selectedCategories"
         :items="categoryItems"
-        searchablecfbdftfddccdsww
+        searchable
         deletable
         mode="multiple"
         size="small"
       />
     </FilterSection>
 
-    <!-- 🔹 Stock -->
+    <!-- Disponibilité -->
     <FilterSection
       v-model="filterOpen.stock"
       title="Disponibilité"
     >
       <WrapperCheckbox
-        :model-value="inStockOnly"
-        @update:model-value="(val) => $emit('update:inStockOnly', val)"
+        v-model="inStockOnly"
         :label="`En stock (${stockCount})`"
       />
     </FilterSection>
 
-    <!-- 🔹 Tags -->
+    <!-- Tags -->
     <FilterSection
       v-if="tags.length"
       v-model="filterOpen.tags"
@@ -78,7 +74,7 @@
           size="small"
           :type="selectedTags.includes(t.id) ? 'success' : 'default'"
           deletable
-          @click="$emit('toggleTag', t.id)"
+          @click="emit('toggleTag', t.id)"
         />
       </div>
     </FilterSection>
@@ -88,27 +84,28 @@
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
 
+  // ✅ plusieurs modèles (stables et simples)
+  const filterOpen = defineModel<Record<string, boolean>>('filterOpen', { default: () => ({}) })
+  const priceRange = defineModel<{ min: number; max: number; from: number; to: number }>(
+    'priceRange',
+    {
+      default: () => ({ min: 0, max: 0, from: 0, to: 0 }),
+    },
+  )
+  const selectedCategories = defineModel<string[]>('selectedCategories', { default: () => [] })
+  const inStockOnly = defineModel<boolean>('inStockOnly', { default: false })
+  const selectedTags = defineModel<string[]>('selectedTags', { default: () => [] })
+
+  // props supplémentaires
   defineProps<{
     allOpen: boolean
-    filterOpen: Record<string, boolean>
-    priceRange: any
     categoryItems: any[]
-    selectedCategories: string[]
-    inStockOnly: boolean
-    stockCount: number
-    tags: string[]
     tagItems: any[]
-    selectedTags: string[]
+    tags: string[]
+    stockCount: number
   }>()
 
-  defineEmits([
-    'toggleAll',
-    'resetAll',
-    'toggleTag',
-    'update:priceRange',
-    'update:selectedCategories',
-    'update:inStockOnly',
-  ])
+  const emit = defineEmits(['toggleAll', 'resetAll', 'toggleTag'])
 </script>
 
 <style scoped lang="less">
@@ -116,22 +113,19 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
-
-    .filters__head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .filters__actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .tags-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
+  }
+  .filters__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .filters__actions {
+    display: flex;
+    gap: 8px;
+  }
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 </style>

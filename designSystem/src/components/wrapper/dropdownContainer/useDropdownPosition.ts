@@ -1,4 +1,3 @@
-// composables/useDropdownPosition.ts
 import { nextTick, ref, type Ref } from 'vue'
 import type { DropdownDirection } from './useDropdownMenuHandler'
 
@@ -15,14 +14,24 @@ export function useDropdownPosition(
 
     const rect = dropdownRef.value.getBoundingClientRect()
     const direction = dropdownDirection.value
+    const offsetDown = -4
+    const offsetUp = 14
+    const shiftLeftUp = 2
+
+    const menuHeight = menuRef.value?.offsetHeight || 0
+
+    const leftPosition =
+      direction === 'up'
+        ? `${rect.left + window.scrollX - shiftLeftUp}px`
+        : `${rect.left + window.scrollX}px`
 
     menuPositionStyle.value = {
       position: 'absolute',
       top:
         direction === 'down'
-          ? `${rect.bottom + window.scrollY}px`
-          : `${rect.top + window.scrollY - (menuRef.value?.offsetHeight || 0)}px`,
-      left: `${rect.left + window.scrollX}px`,
+          ? `${rect.bottom + window.scrollY + offsetDown}px`
+          : `${rect.top + window.scrollY - menuHeight - offsetUp}px`,
+      left: leftPosition,
       width: `${rect.width}px`,
       zIndex: '9999',
     }

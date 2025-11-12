@@ -1,5 +1,6 @@
 <template>
   <section class="filter-section">
+    <!-- Header clickable -->
     <header
       class="filter-section__header"
       @click="toggle"
@@ -8,44 +9,50 @@
       <BasicIconNext
         :name="open ? 'ChevronUp' : 'ChevronDown'"
         :size="16"
+        :class="{ 'icon--rotated': open }"
       />
     </header>
 
-    <transition name="fade">
-      <div
-        v-show="open"
-        class="filter-section__content"
-      >
-        <slot />
-      </div>
-    </transition>
+    <!-- Animated content -->
+    <div
+      v-motion="motion"
+      v-show="open"
+      class="filter-section__content"
+    >
+      <slot />
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { computed } from 'vue'
 
-  const props = defineProps<{
-    title: string
-    modelValue?: boolean
-  }>()
+  /** ✅ Modèle v-model (ouvre/ferme la section) */
+  const open = defineModel<boolean>({ default: true })
 
-  const emit = defineEmits<{
-    'update:modelValue': [value: boolean]
-  }>()
+  /** ✅ Props */
+  defineProps<{ title: string }>()
 
-  const open = ref(props.modelValue ?? true)
-
-  watch(
-    () => props.modelValue,
-    (v) => {
-      if (v !== undefined) open.value = v
+  /** ✅ Animation config v-motion */
+  const motion = computed(() => ({
+    initial: { opacity: 0, y: -8, scaleY: 0.96 },
+    enter: {
+      opacity: 1,
+      y: 0,
+      scaleY: 1,
+      transition: { type: 'spring', stiffness: 180, damping: 20 },
     },
-  )
+    leave: {
+      opacity: 0,
+      y: -6,
+      scaleY: 0.96,
+      transition: { duration: 0.2 },
+    },
+  }))
 
+  /** ✅ Toggle logic */
   function toggle() {
     open.value = !open.value
-    emit('update:modelValue', open.value)
   }
 </script>
 
@@ -54,7 +61,7 @@
     background: #fff;
     border: 1px solid @neutral-200;
     border-radius: 12px;
-    // overflow: hidden;
+    overflow: hidden;
     transition: all 0.2s ease;
 
     &__header {
@@ -65,30 +72,24 @@
       cursor: pointer;
       color: @neutral-800;
       user-select: none;
+      transition: background 0.2s ease;
 
       &:hover {
         background: fade(@neutral-900, 4%);
+      }
+
+      .icon--rotated {
+        transform: rotate(180deg);
+        transition: transform 0.25s ease;
       }
     }
 
     &__content {
       display: flex;
       flex-direction: column;
-      gap: 16px; /* <== espace uniforme entre inputs et boutons */
+      gap: 16px;
       padding: 12px;
       border-top: 1px solid fade(@neutral-200, 50%);
     }
-  }
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: all 0.25s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-    max-height: 0;
-    padding: 0;
-    margin: 0;
   }
 </style>
