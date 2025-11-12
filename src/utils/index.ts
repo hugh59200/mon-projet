@@ -1,4 +1,4 @@
 export * from './format'
-export * from './status'
+export * from './mappingBadge'
+export * from './mappingBadge'
 export * from './string'
-export * from './roles'

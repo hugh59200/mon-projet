@@ -1,169 +1,103 @@
 <template>
-  <MobileCard hoverable>
-    <!-- 🏷️ Titre -->
-    <template #title>
-      <div class="product-header">
-        <div class="product-info">
-          <div class="product-name">{{ product.name || 'Produit sans nom' }}</div>
-          <div class="product-category">{{ product.category || '—' }}</div>
-        </div>
-        <div class="product-price">
-          {{ formatCurrency(product.price) }}
-        </div>
+  <div
+    class="mobile-card"
+    @click="openProductModal(product.id)"
+  >
+    <div class="row">
+      <div class="info">
+        <BasicText weight="bold">{{ product.name }}</BasicText>
+        <BasicText size="body-s">{{ product.category || '—' }}</BasicText>
       </div>
-    </template>
+      <BasicText weight="bold">{{ formatCurrency(product.price) }}</BasicText>
+    </div>
 
-    <!-- 🖼️ Image -->
-    <template #badge>
-      <div
-        v-if="product.image"
-        class="image-thumb"
-      >
-        <img
-          :src="product.image"
-          alt="Produit"
-        />
-      </div>
-    </template>
-
-    <!-- ℹ️ Infos supplémentaires -->
-    <template #info>
-      <div class="line">
-        <span class="label">Pureté :</span>
-        <span class="value">{{ product.purity ? product.purity + '%' : '—' }}</span>
-      </div>
-      <div class="line">
-        <span class="label">Stock :</span>
-        <div
-          class="stock-status"
-          :class="product.stock ? 'stock-status--in' : 'stock-status--out'"
-        >
-          <BasicIconNext
-            :name="product.stock ? 'CheckCircle' : 'XCircle'"
-            :color="product.stock ? 'success-600' : 'danger-600'"
-          />
-          <span>{{ product.stock ? 'En stock' : 'Rupture' }}</span>
-        </div>
-      </div>
-    </template>
-
-    <!-- ⚙️ Actions -->
-    <template #actions>
-      <BasicButton
-        label="Voir"
-        type="secondary"
+    <div class="row">
+      <BasicText size="body-s">
+        Pureté : {{ product.purity ? product.purity + '%' : '—' }}
+      </BasicText>
+      <BasicBadge
+        :label="getStockLabel(product.stock)"
+        :type="getStockBadge(product.stock)"
         size="small"
-        variant="outlined"
-        block
-        @click="openProductModal(product.id)"
       />
-      <BasicButton
-        label="Éditer"
-        type="primary"
-        size="small"
-        variant="outlined"
-        block
-        @click="editProduct(product.id)"
-      />
-      <BasicButton
-        label="Supprimer"
-        type="danger"
-        size="small"
-        variant="outlined"
-        block
+    </div>
+
+    <div
+      class="actions"
+      @click.stop
+    >
+      <BasicIconNext
+        name="Trash2"
+        :size="18"
+        color="danger-600"
+        pointer
         @click="handleDelete(product)"
+        class="action-icon"
       />
-    </template>
-  </MobileCard>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
   import type { Products } from '@/supabase/types/supabase.types'
-  import MobileCard from '../../mobile/MobileCard.vue'
+  import { getStockBadge, getStockLabel } from '@/utils'
 
   defineProps<{
     product: Products
-    formatCurrency: (a: number | null) => string
+    formatCurrency: (v: number | null) => string
     openProductModal: (id: string) => void
-    editProduct: (id: string) => void
     handleDelete: (p: Products) => void
   }>()
 </script>
 
 <style scoped lang="less">
-  .product-header {
+  .mobile-card {
+    background: @neutral-100;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: @neutral-200;
+    }
+    &:active {
+      transform: scale(0.98);
+    }
   }
 
-  .product-info {
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .info {
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
 
-  .product-name {
-    font-weight: 600;
-    color: @primary-950;
-    font-size: @font-size-body-l;
-  }
-
-  .product-category {
-    font-size: @font-size-body-m;
-    color: @neutral-500;
-  }
-
-  .product-price {
-    font-weight: 600;
-    color: @primary-700;
-    white-space: nowrap;
-  }
-
-  .image-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid @neutral-200;
-    background: @neutral-100;
+  .actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    justify-content: flex-end;
   }
 
-  .line {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2px 0;
+  .action-icon {
+    opacity: 0.8;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
 
-    .label {
-      color: @neutral-500;
-    }
-    .value {
-      color: @primary-900;
-    }
-  }
-
-  .stock-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-
-    &--in {
-      color: @success-600;
-    }
-    &--out {
-      color: @danger-600;
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
     }
   }
 </style>

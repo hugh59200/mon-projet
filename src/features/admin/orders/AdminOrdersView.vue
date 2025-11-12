@@ -34,7 +34,7 @@
           />
           <BasicCell
             center
-            :span="6"
+            :span="8"
             text="Date"
           />
           <BasicCell
@@ -42,35 +42,32 @@
             :span="8"
             text="Statut"
           />
-          <BasicCell
-            center
-            :span="6"
-            text="Détails"
-          />
         </div>
         <OrderRow
           v-for="order in filteredData"
           v-model="localStatuses[order.order_id ?? '']"
-          @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
+          @update:modelValue="(v: string) => changeOrderStatus(order, v as OrderStatus)"
           :order="order"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
           :remove="deleteOrder"
           :open="openOrderModal"
+          class="gridElemWrapper"
         />
       </div>
       <div class="mobile-cards-list">
         <OrderCardMobile
           v-for="order in filteredData"
           v-model="localStatuses[order.order_id ?? '']"
-          @update:modelValue="(v) => changeOrderStatus(order, v as OrderStatus)"
+          @update:modelValue="(v: string) => changeOrderStatus(order, v as OrderStatus)"
           :order="order"
           :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
           :open-order-modal="openOrderModal"
           :handle-delete="deleteOrder"
+          class="gridElemWrapper"
         />
       </div>
     </WrapperLoader>
@@ -88,10 +85,9 @@
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import { formatCurrency, formatDate } from '@/utils'
-  import type { OrderStatus } from '@/utils/status'
-  import { STATUSES } from '@/utils/status'
+  import type { OrderStatus } from '@/utils/mappingBadge'
+  import { STATUSES } from '@/utils/mappingBadge'
   import { ref, watchEffect } from 'vue'
-
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderRow from './OrderRow.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
@@ -150,7 +146,7 @@
     display: none;
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 800px) {
     .orders--desktop {
       display: none;
     }

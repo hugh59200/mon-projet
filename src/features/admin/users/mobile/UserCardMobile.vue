@@ -1,81 +1,78 @@
 <template>
-  <MobileCard hoverable>
-    <template #title>
-      <div class="user-header">
-        <div class="user-info">
-          <div class="user-name">{{ user.full_name || '—' }}</div>
-          <div class="user-email">{{ user.email }}</div>
-        </div>
-
-        <span
-          class="role-chip"
-          :class="`role-chip--${modelValue}`"
-        >
-          {{ modelValue }}
-        </span>
+  <div
+    class="mobile-card"
+    @click="openUserModal(user.id)"
+  >
+    <div class="row">
+      <div class="user-info">
+        <BasicText weight="bold">{{ user.full_name || '—' }}</BasicText>
+        <BasicText size="body-s">{{ user.email }}</BasicText>
       </div>
-    </template>
+      <BasicBadge
+        :label="getRoleLabel(role)"
+        :type="getRoleBadge(role)"
+        size="small"
+      />
+    </div>
 
-    <template #info>
-      <div class="line">
-        <span class="label">Créé le :</span>
-        <span class="value">{{ formatDate(user.created_at) }}</span>
+    <div class="row">
+      <BasicText size="body-s">Créé le {{ formatDate(user.created_at!) }}</BasicText>
+      <div
+        class="actions"
+        @click.stop
+      >
+        <BasicIconNext
+          name="Trash2"
+          :size="18"
+          color="danger-600"
+          pointer
+          @click="handleDelete(user)"
+          class="action-icon"
+        />
       </div>
-    </template>
-
-    <template #actions>
-      <BasicDropdown
-        v-model="modelValue"
-        :items="roles"
-        size="small"
-        dropdown-type="table"
-        force-value
-        @update:model-value="(v) => handleRoleChange(user, v as Role)"
-      />
-
-      <BasicButton
-        label="Voir le profil"
-        type="secondary"
-        size="small"
-        variant="outlined"
-        block
-        @click="openUserModal(user.id)"
-      />
-      <BasicButton
-        label="Supprimer"
-        type="danger"
-        size="small"
-        variant="outlined"
-        block
-        @click="handleDelete(user)"
-      />
-    </template>
-  </MobileCard>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
   import type { Profiles, Role } from '@/supabase/types/supabase.types'
-  import MobileCard from '../../mobile/MobileCard.vue'
-
-  type RoleOption = { id: Role; label: string }
+  import { getRoleBadge, getRoleLabel } from '@/utils'
 
   defineProps<{
     user: Profiles
-    roles: RoleOption[]
-    formatDate: (d: string | null) => string
-    handleRoleChange: (user: Profiles, role: Role) => void
+    role: Role
+    formatDate: (v: string) => string
     openUserModal: (id: string) => void
-    handleDelete: (user: Profiles) => void
+    handleDelete: (u: Profiles) => void
   }>()
-
-  const modelValue = defineModel<Role>('role', { required: true })
 </script>
+
 <style scoped lang="less">
-  .user-header {
+  .mobile-card {
+    background: @neutral-100;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: @neutral-200;
+    }
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
   }
 
   .user-info {
@@ -84,48 +81,20 @@
     gap: 2px;
   }
 
-  .user-name {
-    font-weight: 600;
-    color: @primary-950;
-    font-size: @font-size-body-l;
-  }
-
-  .user-email {
-    font-size: @font-size-body-m;
-    color: @neutral-500;
-    word-break: break-all;
-  }
-
-  .role-chip {
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: @font-size-body-s;
-    font-weight: 600;
-    text-transform: capitalize;
-    white-space: nowrap;
-
-    &--user {
-      background: fade(@neutral-400, 15%);
-      color: @neutral-700;
-    }
-
-    &--admin {
-      background: fade(@primary-400, 15%);
-      color: @primary-700;
-    }
-  }
-
-  .line {
+  .actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+  }
 
-    .label {
-      color: @neutral-500;
-    }
+  .action-icon {
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+    opacity: 0.8;
 
-    .value {
-      color: @primary-900;
+    &:hover {
+      transform: scale(1.1);
+      opacity: 1;
     }
   }
 </style>

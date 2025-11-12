@@ -1,6 +1,5 @@
 <template>
   <div class="profil">
-    <!-- 🌈 Cover -->
     <div class="profil__cover">
       <img
         src="https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80"
@@ -11,7 +10,6 @@
     </div>
 
     <div class="profil__container">
-      <!-- 👤 Header -->
       <div class="profil__header">
         <div class="profil__avatar">
           <img
@@ -30,7 +28,6 @@
               :size="42"
             />
           </div>
-
           <input
             type="file"
             accept="image/*"
@@ -38,7 +35,6 @@
             @change="handleAvatarSelect"
           />
         </div>
-
         <div class="profil__header-info">
           <BasicText
             size="h3"
@@ -46,7 +42,6 @@
           >
             {{ editableName || 'Mon profil' }}
           </BasicText>
-
           <div class="profil__meta">
             <BasicText
               size="body-m"
@@ -66,10 +61,7 @@
           </div>
         </div>
       </div>
-
-      <!-- 🧱 SECTIONS -->
       <div class="profil__sections">
-        <!-- 🧩 INFOS PERSO -->
         <FilterSection
           title="Informations personnelles"
           v-model="sections.personal"
@@ -92,7 +84,6 @@
             placeholder="12 rue du Peptide"
             input-type="form"
           />
-
           <div class="profil__actions">
             <BasicButton
               label="Enregistrer les modifications"
@@ -103,8 +94,6 @@
             />
           </div>
         </FilterSection>
-
-        <!-- 📦 COMMANDES -->
         <FilterSection
           title="Mes commandes"
           v-model="sections.orders"
@@ -125,10 +114,8 @@
                 <p>Date : {{ formatOrderDate(order.created_at!) }}</p>
               </div>
             </div>
-
             <p v-else>Aucune commande récente.</p>
           </div>
-
           <BasicButton
             label="Voir toutes mes commandes"
             type="secondary"
@@ -136,8 +123,6 @@
             @click="$router.push('/profil/commandes')"
           />
         </FilterSection>
-
-        <!-- 🪄 PRÉFÉRENCES -->
         <FilterSection
           title="Préférences"
           v-model="sections.preferences"
@@ -152,7 +137,6 @@
               label="Recevoir les alertes SMS"
             />
           </div>
-
           <BasicButton
             label="Sauvegarder mes préférences"
             type="secondary"
@@ -160,8 +144,6 @@
             @click="savePreferences"
           />
         </FilterSection>
-
-        <!-- 🔐 SÉCURITÉ -->
         <FilterSection
           title="Sécurité"
           v-model="sections.security"
@@ -178,7 +160,6 @@
             placeholder="Confirmez le mot de passe"
             input-type="form"
           />
-
           <div class="profil__actions">
             <BasicButton
               label="Mettre à jour le mot de passe"
@@ -188,7 +169,6 @@
               @click="updatePasswordAction"
             />
           </div>
-
           <div class="profil__danger">
             <BasicButton
               label="Supprimer mon compte"
@@ -198,8 +178,6 @@
             />
           </div>
         </FilterSection>
-
-        <!-- 💬 SUPPORT -->
         <FilterSection
           title="Assistance & support"
           v-model="sections.support"
@@ -209,7 +187,7 @@
             label="Ouvrir la messagerie"
             type="secondary"
             variant="outlined"
-            @click="chatStore.openChat"
+            @click="openMessaging"
           />
         </FilterSection>
       </div>
@@ -223,6 +201,7 @@
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { onMounted, ref, type Ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
@@ -230,6 +209,7 @@
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
+  const router = useRouter()
 
   const { loadProfile, updateProfile, changeAvatar, loadLastOrdersAction, updatePassword } =
     useProfileActions()
@@ -302,6 +282,14 @@
 
   function savePreferences() {
     // si stockage en DB → appeler API
+  }
+
+  function openMessaging() {
+    if (auth.isAdmin) {
+      router.push('/admin/messagerie')
+    } else {
+      chatStore.openChat()
+    }
   }
 
   onMounted(async () => {

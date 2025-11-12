@@ -5,7 +5,6 @@ import type { User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 
-// ✅ On importe notre service propre
 import {
   signInWithMagicLink as serviceMagicLink,
   signInWithProvider as serviceProviderLogin,
@@ -26,7 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
   const isAdmin = computed(() => profile.value?.role === 'admin')
   const role = computed<Role>(() => (profile.value?.role as Role) || 'user')
 
-  // ✅ Charge profil utilisateur Supabase -> table "profiles"
   async function fetchProfile() {
     if (!user.value) return
     const { data, error: err } = await supabase

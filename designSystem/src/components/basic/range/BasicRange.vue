@@ -4,7 +4,6 @@
       class="basic-range__slider"
       @click="onTrackClick"
     >
-      <!-- curseurs -->
       <input
         type="range"
         class="range range--min"
@@ -21,16 +20,12 @@
         :step="step"
         v-model.number="to"
       />
-
-      <!-- barre -->
       <div class="range-base"></div>
       <div
         class="range-track"
         :style="trackStyle"
       ></div>
     </div>
-
-    <!-- inputs -->
     <div class="basic-range__inputs">
       <BasicInputNumber
         v-model="from"

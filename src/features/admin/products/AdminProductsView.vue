@@ -1,22 +1,11 @@
 <template>
   <div>
-    <!-- 🔍 Toolbar -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
-      show-reset
-      show-role
+      :show-reset="true"
       @reset="reset()"
-    >
-      <BasicButton
-        label="+ Ajouter un produit"
-        type="primary"
-        size="small"
-        @click="isCreateModalVisible = true"
-      />
-    </BasicToolbar>
-
-    <!-- 📄 Pagination -->
+    />
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -26,7 +15,6 @@
       @change="page = $event"
     />
 
-    <!-- 💾 Tableau principal -->
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -34,9 +22,7 @@
       message="Chargement des produits..."
       empty-message="Aucun produit trouvé 😅"
     >
-      <!-- 💻 TABLEAU DESKTOP -->
       <div class="products--desktop">
-        <!-- 🧱 HEADER -->
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
             :span="10"
@@ -59,24 +45,19 @@
           />
           <BasicCell
             center
-            :span="4"
+            :span="6"
             text="Stock"
           />
-          <BasicCell
-            center
-            :span="6"
-            text="Actions"
-          />
         </div>
-
-        <!-- 🧩 LIGNES -->
         <div
           v-for="product in filteredData"
           :key="product.id"
           class="gridElemWrapper"
         >
-          <div class="cardLayoutWrapper product-row">
-            <!-- 🧱 Nom + Image -->
+          <div
+            class="cardLayoutWrapper product-row"
+            @click="openProductModal(product.id)"
+          >
             <BasicCell :span="10">
               <div class="product-name-cell">
                 <img
@@ -88,64 +69,45 @@
                 <span>{{ product.name || '—' }}</span>
               </div>
             </BasicCell>
-
-            <!-- 🏷️ Catégorie -->
             <BasicCell
               center
               :span="8"
             >
-              {{ product.category || '—' }}
+              <BasicText>{{ product.category || '—' }}</BasicText>
             </BasicCell>
-
-            <!-- 💰 Prix -->
             <BasicCell
               center
               :span="4"
             >
-              {{ formatCurrency(product.price) }}
+              <BasicText>{{ formatCurrency(product.price) }}</BasicText>
             </BasicCell>
-
-            <!-- ⚗️ Pureté -->
             <BasicCell
               center
               :span="4"
             >
-              {{ product.purity ? product.purity + '%' : '—' }}
+              <BasicText>{{ product.purity ? product.purity + '%' : '—' }}</BasicText>
             </BasicCell>
-            <!-- 📦 Stock -->
             <BasicCell
               center
-              :span="4"
+              :span="6"
             >
-              <div
-                class="stock-status"
-                :class="product.stock ? 'stock-status--in' : 'stock-status--out'"
-              >
-                <BasicIconNext
-                  :name="product.stock ? 'CheckCircle' : 'XCircle'"
-                  :color="product.stock ? 'success-600' : 'danger-600'"
-                />
-              </div>
+              <BasicBadge
+                :label="getStockLabel(product.stock)"
+                :type="getStockBadge(product.stock)"
+                size="small"
+              />
             </BasicCell>
-            <BasicCellActionIcon
-              icon-name="eye"
-              tooltip="Voir"
-              center
-              :span="3"
-              @click="openProductModal(product.id)"
-            />
             <BasicCellActionIcon
               icon-name="trash"
               tooltip="Supprimer"
               center
               danger
               :span="3"
-              @click="deleteProduct(product)"
+              @click.stop="deleteProduct(product)"
             />
           </div>
         </div>
       </div>
-      <!-- 📱 VERSION MOBILE -->
       <div class="mobile-cards-list">
         <ProductCardMobile
           v-for="product in filteredData"
@@ -153,21 +115,12 @@
           :product="product"
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
-          :edit-product="openEditProduct"
           :handle-delete="deleteProduct"
+          class="gridElemWrapper"
         />
       </div>
     </WrapperLoader>
-
-    <!-- 🪟 MODALES -->
     <teleport to="#app">
-      <!-- ➕ Création -->
-      <AdminProductModal
-        v-model="isCreateModalVisible"
-        @saved="fetchData"
-      />
-
-      <!-- 🔍 Lecture / Édition -->
       <AdminProductModal
         v-if="selectedProductId"
         v-model="isModalVisible"
@@ -181,8 +134,7 @@
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useProductActions } from '@/supabase/actions/useProductActions'
-  import { formatCurrency } from '@/utils/index'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import { formatCurrency, getStockBadge, getStockLabel } from '@/utils'
   import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
@@ -202,20 +154,27 @@
 
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)
-  const isCreateModalVisible = ref(false)
 
   function openProductModal(id: string) {
-    selectedProductId.value = id
-    isModalVisible.value = true
-  }
-
-  function openEditProduct(id: string) {
     selectedProductId.value = id
     isModalVisible.value = true
   }
 </script>
 
 <style scoped lang="less">
+  .product-row {
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.1s ease;
+    &:hover {
+      background: @neutral-100;
+    }
+    &:active {
+      transform: scale(0.995);
+    }
+  }
+
   .product-name-cell {
     display: flex;
     align-items: center;
@@ -227,76 +186,26 @@
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
   }
 
-  .product-row {
-    align-items: center;
-  }
-
-  .stock-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-
-    &--in {
-      color: @success-600;
-    }
-    &--out {
-      color: @danger-600;
-    }
-  }
-
-  .actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 24px; /* ⬆️ augmenté de 8px → 16px pour plus d’espace */
-    padding: 2px 0; /* un léger padding vertical pour équilibrer */
-
-    .action-icon {
-      cursor: pointer;
-      font-size: 16px;
-      width: 20x;
-      height: 20px;
-      transition:
-        opacity 0.2s,
-        transform 0.15s;
-      &:hover {
-        opacity: 0.7;
-        transform: scale(1.1);
-      }
-
-      &--delete {
-        color: @danger-600;
-      }
-    }
-  }
-
-  /* 🌍 Desktop par défaut */
   .products--desktop {
     display: flex;
     flex-direction: column;
-    width: 100%;
   }
 
-  /* 📱 Mobile caché par défaut */
   .mobile-cards-list {
     display: none;
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
   }
 
-  /* ✅ Activation mobile */
-  @media screen and (max-width: 1024px) {
+  @media (max-width: 1024px) {
     .products--desktop {
-      display: none !important;
+      display: none;
     }
     .mobile-cards-list {
-      display: flex !important;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
   }
 </style>

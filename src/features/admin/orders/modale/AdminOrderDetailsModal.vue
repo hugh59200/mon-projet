@@ -11,10 +11,8 @@
         Détails de la commande
       </BasicText>
     </template>
-
     <template #content>
       <div class="order-detail">
-        <!-- ✅ Infos commande -->
         <div
           v-if="order"
           class="order-info-card"
@@ -25,7 +23,6 @@
           >
             Informations commande
           </BasicText>
-
           <div class="info-row">
             <BasicText>
               <b>Client :</b>
@@ -36,7 +33,6 @@
               {{ safeProfile.email }}
             </BasicText>
           </div>
-
           <div class="info-row">
             <BasicText>
               <b>Date :</b>
@@ -47,7 +43,6 @@
               {{ formatCurrency(order.total_amount) }}
             </BasicText>
           </div>
-
           <div class="info-row">
             <BasicText><b>Statut :</b></BasicText>
             <BasicBadge
@@ -56,14 +51,12 @@
               size="small"
             />
           </div>
-
           <div class="info-row">
             <BasicText>
               <b>ID :</b>
               {{ order.order_id }}
             </BasicText>
           </div>
-
           <BasicButton
             label="Télécharger la facture"
             size="small"
@@ -72,8 +65,6 @@
             @click="downloadInvoice"
           />
         </div>
-
-        <!-- ✅ Adresse -->
         <div
           v-if="order"
           class="order-info-card"
@@ -84,7 +75,6 @@
           >
             Adresse de livraison
           </BasicText>
-
           <BasicText v-if="shippingAddress">{{ shippingAddress }}</BasicText>
           <BasicText
             v-else
@@ -94,8 +84,6 @@
             Aucune adresse renseignée
           </BasicText>
         </div>
-
-        <!-- ✅ Paiement -->
         <div
           v-if="order"
           class="order-info-card"
@@ -119,14 +107,12 @@
             </template>
             <span v-else>—</span>
           </div>
-
           <div class="info-row">
             <BasicText>
               <b>Payment Intent :</b>
               {{ order.payment_intent_id || '—' }}
             </BasicText>
           </div>
-
           <BasicButton
             label="Renvoyer l'email de confirmation"
             type="secondary"
@@ -134,8 +120,6 @@
             @click="resendConfirmation"
           />
         </div>
-
-        <!-- ✅ Suivi -->
         <div
           v-if="order"
           class="order-info-card"
@@ -146,7 +130,6 @@
           >
             Suivi livraison
           </BasicText>
-
           <BasicInput
             v-model="carrier"
             placeholder="Transporteur"
@@ -155,14 +138,12 @@
             v-model="trackingNumber"
             placeholder="Numéro ou lien"
           />
-
           <BasicButton
             label="Enregistrer"
             size="small"
             type="primary"
             @click="handleAddTracking"
           />
-
           <div
             v-if="order.tracking_number"
             class="tracking-line"
@@ -178,8 +159,6 @@
             </BasicText>
           </div>
         </div>
-
-        <!-- ✅ Status -->
         <div
           v-if="order"
           class="order-info-card"
@@ -205,8 +184,6 @@
             @click="handleUpdateStatus"
           />
         </div>
-
-        <!-- ✅ Produits commandés -->
         <div
           v-if="order"
           class="order-products"
@@ -217,7 +194,6 @@
           >
             Produits commandés
           </BasicText>
-
           <div class="gridElemWrapper">
             <div class="cardLayoutWrapper cardLayoutWrapper--header">
               <BasicCell
@@ -241,7 +217,6 @@
               />
             </div>
           </div>
-
           <div
             v-for="item in order.detailed_items"
             :key="item.product_id"
@@ -281,10 +256,9 @@
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import { supabase } from '@/supabase/supabaseClient'
-
   import type { EmailSent, OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate } from '@/utils'
-  import { getBadge, getLabel, type OrderStatus, STATUSES } from '@/utils/status'
+  import { getBadge, getLabel, type OrderStatus, STATUSES } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 

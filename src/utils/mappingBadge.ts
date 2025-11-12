@@ -1,4 +1,5 @@
 import type { Enums } from '@/supabase/types/supabase'
+import type { Role } from '@/supabase/types/supabase.types'
 import type { BadgeType } from '@designSystem/index'
 
 export type OrderStatus = Enums<'order_status'>
@@ -52,3 +53,41 @@ export const STATUSES = (Object.keys(ORDER_LABELS) as OrderStatus[]).map((id) =>
   value: id,
   label: ORDER_LABELS[id],
 }))
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: 'Administrateur',
+  user: 'Utilisateur',
+}
+
+export const ROLE_BADGES: Record<Role, BadgeType> = {
+  admin: 'info',
+  user: 'default',
+}
+
+export const getRoleLabel = (r?: Role): string => (r ? (ROLE_LABELS[r] ?? '—') : '—')
+
+export const getRoleBadge = (r?: Role): BadgeType => (r ? (ROLE_BADGES[r] ?? 'default') : 'default')
+
+export type StockStatus = 'in_stock' | 'out_of_stock'
+
+export const STOCK_LABELS: Record<StockStatus, string> = {
+  in_stock: 'En stock',
+  out_of_stock: 'Rupture',
+}
+
+export const STOCK_BADGES: Record<StockStatus, BadgeType> = {
+  in_stock: 'success',
+  out_of_stock: 'error',
+}
+
+export const getStockLabel = (v?: boolean | number | null): string => {
+  if (v === true || (typeof v === 'number' && v > 0)) return STOCK_LABELS.in_stock
+  if (v === false || (typeof v === 'number' && v <= 0)) return STOCK_LABELS.out_of_stock
+  return '—'
+}
+
+export const getStockBadge = (v?: boolean | number | null): BadgeType => {
+  if (v === true || (typeof v === 'number' && v > 0)) return STOCK_BADGES.in_stock
+  if (v === false || (typeof v === 'number' && v <= 0)) return STOCK_BADGES.out_of_stock
+  return 'default'
+}

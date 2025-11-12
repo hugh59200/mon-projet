@@ -50,17 +50,12 @@
           />
           <BasicCell
             center
-            :span="6"
+            :span="8"
             text="Créé le"
             icon-name="ArrowUpDown"
             :is-active="sortKey === 'created_at'"
             :icon-color="getSortColor('created_at')"
             :on-icon-click="() => toggleSort('created_at')"
-          />
-          <BasicCell
-            center
-            :span="6"
-            text="Actions"
           />
         </div>
         <div
@@ -68,38 +63,40 @@
           :key="user.id"
           class="gridElemWrapper"
         >
-          <div class="cardLayoutWrapper">
-            <BasicCell :span="10">{{ user.email }}</BasicCell>
-            <BasicCell :span="8">{{ user.full_name || '—' }}</BasicCell>
-            <BasicCellDropdown
-              v-model="localRoles[user.id]"
-              :items="ROLES"
-              center
-              :span="6"
-              force-value
-              dropdown-type="table"
-              size="small"
-            />
-            <BasicCell
-              center
-              :span="6"
-            >
-              {{ formatDate(user.created_at) }}
+          <div
+            class="cardLayoutWrapper user-row"
+            @click="openUserModal(user.id)"
+          >
+            <BasicCell :span="10">
+              <BasicText>{{ user.email }}</BasicText>
             </BasicCell>
-            <BasicCellActionIcon
-              icon-name="eye"
-              tooltip="Voir"
+
+            <BasicCell :span="8">
+              <BasicText>{{ user.full_name || '—' }}</BasicText>
+            </BasicCell>
+            <BasicCell
+              :span="6"
               center
-              :span="3"
-              @click="openUserModal(user.id)"
-            />
+            >
+              <BasicBadge
+                :label="getRoleLabel(user.role as Role)"
+                :type="getRoleBadge(user.role as Role)"
+                size="small"
+              />
+            </BasicCell>
+            <BasicCell
+              :span="8"
+              center
+            >
+              <BasicText>{{ formatDate(user.created_at) }}</BasicText>
+            </BasicCell>
             <BasicCellActionIcon
               icon-name="trash"
               tooltip="Supprimer"
               center
               danger
               :span="3"
-              @click="deleteUser(user)"
+              @click.stop="deleteUser(user)"
             />
           </div>
         </div>
@@ -116,6 +113,7 @@
           :handle-role-change="changeUserRole"
           :open-user-modal="openUserModal"
           :handle-delete="deleteUser"
+          class="gridElemWrapper"
         />
       </div>
     </WrapperLoader>
@@ -135,7 +133,7 @@
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Role } from '@/supabase/types/supabase.types'
-  import { formatDate } from '@/utils'
+  import { formatDate, getRoleBadge, getRoleLabel } from '@/utils'
   import { ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
@@ -198,6 +196,20 @@
   }
   .mobile-cards-list {
     display: none;
+  }
+
+  .user-row {
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.1s ease;
+
+    &:hover {
+      background: @neutral-100;
+    }
+    &:active {
+      transform: scale(0.995);
+    }
   }
 
   @media (max-width: 1000px) {
