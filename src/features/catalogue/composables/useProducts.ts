@@ -3,9 +3,6 @@ import type { Products } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { computed, ref } from 'vue'
 
-/**
- * Type pour la plage de prix (slider)
- */
 export interface PriceRange {
   min: number
   max: number
@@ -14,21 +11,13 @@ export interface PriceRange {
   step: number
 }
 
-/**
- * 🧠 Composable pour charger et gérer les produits du catalogue
- * - Gère le fetch depuis Supabase
- * - Calcule automatiquement la plage de prix
- * - Expose un state réactif : produits, loading, hasLoaded, priceRange
- */
 export function useProducts() {
   const toast = useToastStore()
 
-  // 🌐 Données
   const products = ref<Products[]>([])
   const loading = ref(false)
   const hasLoaded = ref(false)
 
-  // 💰 Plage de prix pour les filtres
   const priceRange = ref<PriceRange>({
     min: 0,
     max: 100,
@@ -37,9 +26,6 @@ export function useProducts() {
     step: 0.1,
   })
 
-  /**
-   * 🔄 Charge les produits depuis Supabase
-   */
   async function loadProducts() {
     loading.value = true
 
@@ -47,7 +33,6 @@ export function useProducts() {
       const { data, error } = await supabase.from('products').select('*')
       if (error) throw error
 
-      // 🔧 Normalisation typée et sécurisée
       const rows: Products[] = (data || []).map((r) => ({
         ...r,
         price: typeof r.price === 'string' ? parseFloat(r.price) : (r.price as number),
@@ -62,7 +47,6 @@ export function useProducts() {
 
       products.value = rows
 
-      // 🧮 Calcule les bornes de prix
       const prices = rows.map((p) => p.price).filter((n) => typeof n === 'number' && !isNaN(n))
       const min = Math.min(...prices)
       const max = Math.max(...prices)
@@ -70,7 +54,6 @@ export function useProducts() {
       const rawMax = isFinite(max) ? Math.ceil(max) : 0
 
       if (rawMax <= rawMin) {
-        // Sécurité pour éviter un range vide
         priceRange.value.min = rawMin
         priceRange.value.max = rawMin + (priceRange.value.step || 0.1)
       } else {
@@ -89,7 +72,6 @@ export function useProducts() {
     }
   }
 
-  // 🧾 Infos dérivées (optionnelles)
   const nbProducts = computed(() => products.value.length)
 
   const averagePrice = computed(() =>

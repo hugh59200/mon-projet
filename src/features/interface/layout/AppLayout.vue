@@ -152,6 +152,7 @@
     flex: 1;
     min-height: 100vh;
     padding: 2.5vw 4vw;
+    background-color: @neutral-400;
     color: @neutral-900;
     transition: padding 0.3s ease;
 

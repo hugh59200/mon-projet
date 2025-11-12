@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <!-- 🧬 HERO -->
     <section class="home__hero">
       <div class="home__hero-content">
         <BasicText
@@ -17,7 +16,6 @@
         >
           Pureté certifiée • Livraison rapide en Europe • Laboratoires agréés
         </BasicText>
-
         <div class="home__hero-actions">
           <BasicButton
             label="Découvrir nos produits"
@@ -43,8 +41,7 @@
         />
       </div>
     </section>
-
-    <!-- 💊 CATEGORIES -->
+    <HeroBanner />
     <section class="home__categories">
       <BasicText
         size="h3"
@@ -54,7 +51,6 @@
       >
         Nos gammes principales
       </BasicText>
-
       <div class="home__grid">
         <div
           v-for="cat in categories"
@@ -81,8 +77,6 @@
         </div>
       </div>
     </section>
-
-    <!-- 🧪 QUALITÉ -->
     <section class="home__quality">
       <BasicText
         size="h3"
@@ -92,7 +86,6 @@
       >
         Notre engagement qualité
       </BasicText>
-
       <div class="home__quality-list">
         <div
           v-for="q in quality"
@@ -109,8 +102,6 @@
         </div>
       </div>
     </section>
-
-    <!-- 🚀 CTA FINAL -->
     <section class="home__cta">
       <BasicText
         size="h4"
@@ -129,10 +120,10 @@
     </section>
   </div>
 </template>
-
 <script setup lang="ts">
   import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
+  import HeroBanner from './HeroBanner.vue'
 
   interface Category {
     icon: IconNameNext
@@ -190,8 +181,7 @@
       justify-content: space-between;
       gap: 60px;
       flex-wrap: wrap;
-
-      background: linear-gradient(135deg, fade(@primary-50, 60%), fade(@secondary-50, 60%));
+      background: linear-gradient(90deg, fade(@white, 80%), fade(@neutral-0, 80%));
       border-radius: 16px;
       padding: 40px 50px;
       box-shadow: 0 2px 14px fade(@neutral-500, 10%);
@@ -272,7 +262,7 @@
 
     /* 🧪 QUALITÉ */
     &__quality {
-      background: linear-gradient(90deg, fade(@primary-50, 80%), fade(@neutral-100, 80%));
+      background: linear-gradient(90deg, fade(@white, 80%), fade(@neutral-0, 80%));
       padding: 50px;
       border-radius: 16px;
       text-align: center;

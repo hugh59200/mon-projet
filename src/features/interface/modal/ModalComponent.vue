@@ -8,6 +8,7 @@
       ref="modal"
       v-motion="containerMotion"
     >
+      <!-- 🧩 HEADER -->
       <div
         v-if="hasHeader"
         class="modal__header"
@@ -20,6 +21,7 @@
         >
           <slot name="header"></slot>
         </BasicText>
+
         <BasicIconNext
           v-if="closable"
           name="X"
@@ -27,10 +29,13 @@
           pointer
         />
       </div>
+
+      <!-- 🧩 CONTENT -->
       <div
         class="modal__content"
         v-motion="fadeInContent"
       >
+        <!-- Bouton de fermeture si pas de header -->
         <BasicIconNext
           v-if="closable && !hasHeader"
           name="X"
@@ -38,17 +43,23 @@
           pointer
           class="modal__close-icon"
         />
+
+        <!-- 🌀 SQUELETON -->
         <SmartModalSkeleton
           v-if="loading"
           :show-header="false"
           :show-actions="hasActions"
           :blocks="autoBlocks"
         />
+
+        <!-- ✅ CONTENU RÉEL -->
         <slot
           v-else
           name="content"
         ></slot>
       </div>
+
+      <!-- 🧩 ACTIONS -->
       <div
         v-if="hasActions"
         class="modal__actions"
@@ -82,6 +93,9 @@
   const emit = defineEmits(['close'])
   const slots = useSlots()
 
+  /* -----------------------------
+     🧠 LOGIQUE DU SQUELETON
+  ----------------------------- */
   const hasHeader = computed(() => !!slots.header)
   const hasActions = computed(() => !!slots.actions)
 
@@ -91,6 +105,9 @@
     return props.skeletonBlocks ?? base
   })
 
+  /* -----------------------------
+     🧩 FERMETURE DE LA MODALE
+  ----------------------------- */
   function closeModal() {
     if (props.closable) {
       modalVisible.value = false
@@ -107,6 +124,9 @@
   onMounted(() => window.addEventListener('keydown', handleEscapeKeydown))
   onUnmounted(() => window.removeEventListener('keydown', handleEscapeKeydown))
 
+  /* -----------------------------
+     🌀 MOTIONS
+  ----------------------------- */
   const containerMotion = {
     initial: { opacity: 0, scale: 0.96, y: 10 },
     enter: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25 } },
@@ -150,7 +170,7 @@
 
   .modal__actions {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-end;
     gap: 8px;
   }
 </style>

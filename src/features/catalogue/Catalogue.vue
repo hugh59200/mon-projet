@@ -21,7 +21,6 @@
           size="small"
         />
       </div>
-
       <div
         v-if="isMobile"
         class="catalogue__header--sub"
@@ -43,9 +42,7 @@
         />
       </div>
     </header>
-
     <div class="catalogue__body">
-      <!-- 🧭 Sidebar filters -->
       <aside
         v-if="!isMobile"
         class="catalogue__filters"
@@ -66,8 +63,6 @@
           @toggleTag="toggleTag"
         />
       </aside>
-
-      <!-- 🛍️ Product list -->
       <section class="catalogue__list">
         <BasicText
           v-if="hasLoaded"
@@ -96,7 +91,6 @@
               @add="addToCart"
             />
           </div>
-
           <div
             v-if="nbPages > 1"
             class="catalogue__pagination-bottom"
@@ -111,8 +105,6 @@
         </WrapperLoader>
       </section>
     </div>
-
-    <!-- 📱 Mobile modal -->
     <ModalComponent
       v-model="showFilters"
       closable

@@ -23,6 +23,7 @@
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.0",
     "embla-carousel-vue": "^8.6.0",
+    "gsap": "^3.13.0",
     "less": "^4.4.2",
     "less-loader": "^12.3.0",
     "lucide-vue-next": "^0.546.0",
