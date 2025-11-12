@@ -17,6 +17,7 @@
       :name="iconName"
       :color="iconColor"
       :pointer="pointer"
+      :size="16"
       class="input-container__icon-left"
     />
     <div class="input-container__field">
@@ -38,6 +39,7 @@
       name="X"
       :color="'danger-600' as IconColor"
       pointer
+      :size="16"
       @click="modelValue = null"
       class="input-container__icon-delete"
     />
@@ -49,6 +51,7 @@
       :name="iconName"
       :color="iconColor"
       :pointer="pointer"
+      :size="16"
       class="input-container__icon-fallback"
     />
   </div>
@@ -82,7 +85,7 @@
     wrap: false,
     hasLabel: true,
     alertMaxlength: undefined,
-    iconColor: 'primary-600',
+    iconColor: 'neutral-600',
     pointer: false,
   })
 

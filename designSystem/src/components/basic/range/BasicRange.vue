@@ -39,6 +39,7 @@
         :max="to"
         icon-name="Euro"
         icon-state="iconLeft"
+        iconColor="neutral-700"
         text-align="right"
         size="small"
       />
@@ -49,6 +50,7 @@
         :min="from"
         icon-name="Euro"
         icon-state="iconLeft"
+        iconColor="neutral-700"
         :max="max"
         size="small"
       />
@@ -60,7 +62,6 @@
   import { useRange } from '@/features/catalogue/composables/useRange'
   import { computed, watch } from 'vue'
 
-  // modèle unique (parent <-> enfant)
   const model = defineModel<{
     min: number
     max: number
@@ -69,10 +70,8 @@
     step?: number
   }>({ required: true })
 
-  // hook
   const { range, trackStyle } = useRange(model.value.min, model.value.max, model.value.step ?? 0.1)
 
-  // synchronisation modèle parent <-> hook interne
   watch(
     () => model.value,
     (v) => {
@@ -93,7 +92,6 @@
     { deep: true },
   )
 
-  // proxies simples pour le template (évite les erreurs TS)
   const min = computed(() => range.min)
   const max = computed(() => range.max)
   const step = computed(() => range.step)
@@ -106,7 +104,6 @@
     set: (v) => (range.to = v),
   })
 
-  // clic sur track
   function onTrackClick(e: MouseEvent) {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const percent = (e.clientX - rect.left) / rect.width
@@ -163,12 +160,14 @@
       height: 38px;
       margin: 0;
       -webkit-appearance: none;
+      appearance: none;
       background: none;
       pointer-events: none;
       z-index: 3;
 
       &::-webkit-slider-thumb {
         -webkit-appearance: none;
+        appearance: none;
         pointer-events: all;
         height: 18px;
         width: 18px;
