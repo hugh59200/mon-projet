@@ -26,7 +26,6 @@
           <BasicCell
             :span="8"
             text="Email"
-            icon-name="ArrowUpDown"
             :is-active="sortKey === 'email'"
             :icon-color="getSortColor('email')"
             :on-icon-click="() => toggleSort('email')"
@@ -34,25 +33,25 @@
           <BasicCell
             :span="10"
             text="Nom"
-            icon-name="ArrowUpDown"
             :is-active="sortKey === 'full_name'"
             :icon-color="getSortColor('full_name')"
+            :sort-asc="sortAsc"
             :on-icon-click="() => toggleSort('full_name')"
           />
           <BasicCell
             :span="6"
             text="Rôle"
-            icon-name="ArrowUpDown"
             :is-active="sortKey === 'role'"
             :icon-color="getSortColor('role')"
+            :sort-asc="sortAsc"
             :on-icon-click="() => toggleSort('role')"
           />
           <BasicCell
             :span="8"
             text="Créé le"
-            icon-name="ArrowUpDown"
             :is-active="sortKey === 'created_at'"
             :icon-color="getSortColor('created_at')"
+            :sort-asc="sortAsc"
             :on-icon-click="() => toggleSort('created_at')"
           />
           <BasicCell :span="4" />
@@ -127,6 +126,7 @@
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useUserActions } from '@/supabase/actions/useUserActions'
+  import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import { ref, watch } from 'vue'
@@ -159,7 +159,11 @@
   const { isTablet, isDesktop } = useDeviceBreakpoint()
 
   const { deleteUser, changeUserRole } = useUserActions(fetchData)
-  const { toggleSort, getSortColor } = useSortableTable(sortKey, sortAsc)
+  const { toggleSort, getSortColor } = useSortableTable<Tables<'profiles'>>(
+    sortKey,
+    sortAsc,
+    filteredData,
+  )
 
   const localRoles = ref<Record<string, Role>>({})
 

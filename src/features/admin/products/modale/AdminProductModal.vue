@@ -1,32 +1,24 @@
 <template>
   <ModalComponent
     v-model="visible"
-    :closable="true"
+    closable
   >
-    <!-- 🧠 Header -->
     <template #header>
       {{ headerTitle }}
     </template>
-
-    <!-- 🧱 Contenu principal -->
     <template #content>
       <div class="product-form">
-        <!-- 🧱 Nom -->
         <WrapperInput
           v-model="form.name"
           label="Nom"
           placeholder="Ex : IGF-1 LR3"
           required
         />
-
-        <!-- 🏷️ Catégorie -->
         <WrapperInput
           v-model="form.category"
           label="Catégorie"
           placeholder="Ex : Bien-être"
         />
-
-        <!-- 💰 Prix -->
         <WrapperInput
           :model-value="form.price?.toString()"
           @update:model-value="(v) => (form.price = parseFloat(v || '0'))"
@@ -34,16 +26,12 @@
           placeholder="0.00"
           input-type="form"
         />
-
-        <!-- ⚗️ Pureté -->
         <WrapperInput
           :model-value="form.purity?.toString()"
           @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
           label="Pureté (%)"
           placeholder="Ex : 99"
         />
-
-        <!-- 📝 Description -->
         <WrapperFormElements label="Description">
           <textarea
             v-model="form.description"
@@ -52,8 +40,6 @@
             class="custom-textarea"
           />
         </WrapperFormElements>
-
-        <!-- 🖼️ Upload image -->
         <WrapperFormElements label="Image du produit">
           <BasicInput
             readonly
@@ -62,7 +48,6 @@
             @click="openFilePicker()"
             :value="selectedFile?.name || extractFileName(form.image) || ''"
           />
-
           <input
             ref="fileInputRef"
             type="file"
@@ -70,7 +55,6 @@
             class="hidden-input"
             @change="handleFileChange"
           />
-
           <div
             v-if="imagePreview"
             class="image-preview"
@@ -79,7 +63,6 @@
               :src="imagePreview"
               alt="Aperçu produit"
             />
-
             <BasicButton
               label="Supprimer"
               type="secondary"
@@ -89,12 +72,10 @@
             />
           </div>
         </WrapperFormElements>
-
         <WrapperCheckbox
           v-model="form.stock"
           label="Disponible en stock"
         />
-
         <BasicButton
           :label="isEditMode ? 'Mettre à jour le produit' : 'Créer le produit'"
           type="primary"
@@ -114,7 +95,6 @@
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 
-  /* Props et modèle */
   const visible = defineModel<boolean>()
 
   const props = defineProps<{
@@ -127,7 +107,6 @@
 
   const { createProduct, updateProduct } = useProductActions(() => emit('saved'))
 
-  /* État */
   const loading = ref(false)
   const uploadLoading = ref(false)
   const imagePreview = ref<string | null>(null)
@@ -150,12 +129,10 @@
     isEditMode.value ? 'Modifier le produit' : 'Ajouter un produit',
   )
 
-  /* 🖱️ Sélecteur fichier */
   function openFilePicker() {
     fileInputRef.value?.click()
   }
 
-  /* 📤 Sélection fichier */
   function handleFileChange(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0]
     if (!file) return
@@ -167,14 +144,12 @@
     imagePreview.value = URL.createObjectURL(file)
   }
 
-  /* 🔎 Extraire nom fichier */
   function extractFileName(url: string | null | undefined): string | null {
     if (!url) return null
     const parts = url.split('/')
     return parts[parts.length - 1] ?? null
   }
 
-  /* 🧾 Charger produit existant */
   async function loadProduct() {
     if (!props.productId) return
     const { data, error } = await supabase
@@ -189,7 +164,6 @@
     if (data.image) oldImagePath.value = data.image.split('/product-images/')[1] ?? null
   }
 
-  /* ❌ Supprimer image */
   async function removeImage() {
     try {
       if (form.value.image) {
@@ -207,7 +181,6 @@
     }
   }
 
-  /* ☁️ Upload image */
   async function uploadImage(): Promise<string | null> {
     if (!selectedFile.value || !form.value.name) return null
     uploadLoading.value = true
@@ -243,7 +216,6 @@
     }
   }
 
-  /* 🧩 Création / Mise à jour */
   async function handleSubmit() {
     if (!form.value.name || !form.value.category || !form.value.price) {
       toast.show('Nom, catégorie et prix sont obligatoires', 'warning')
@@ -252,7 +224,6 @@
 
     loading.value = true
     try {
-      // Upload image si nécessaire
       if (selectedFile.value) {
         const uploadedUrl = await uploadImage()
         if (uploadedUrl) form.value.image = uploadedUrl
@@ -270,7 +241,6 @@
     }
   }
 
-  /* 🚀 Chargement automatique */
   onMounted(loadProduct)
   watch(() => props.productId, loadProduct)
 </script>
@@ -280,12 +250,11 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 16px 20px; /* plus de padding pour aérer */
+    padding: 16px 20px;
     background: @neutral-50;
     border-radius: 8px;
   }
 
-  /* ✅ Champ texte */
   .custom-textarea {
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -300,12 +269,11 @@
     }
   }
 
-  /* 🖼️ Image du produit */
   .image-preview {
     margin-top: 8px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* centre horizontalement */
+    align-items: center;
     gap: 10px;
     padding: 10px;
     border-radius: 8px;
@@ -313,16 +281,15 @@
     border: 1px solid #e5e7eb;
 
     img {
-      max-width: 280px; /* limite la taille */
+      max-width: 280px;
       width: 100%;
       height: auto;
       border-radius: 10px;
-      object-fit: contain; /* évite l’étirement */
+      object-fit: contain;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
   }
 
-  /* ✅ Checkbox + label stock */
   .inline {
     display: flex;
     align-items: center;
@@ -338,12 +305,10 @@
     }
   }
 
-  /* Cache l’input file */
   .hidden-input {
     display: none;
   }
 
-  /* ✅ Lecture seule : tout légèrement grisé */
   :deep([readonly]) {
     background: #f9fafb !important;
     color: #555 !important;

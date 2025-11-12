@@ -17,6 +17,7 @@
       :auto-fetch="fetchData"
       @change="page = $event"
     />
+
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -24,26 +25,43 @@
       message="Chargement des commandes..."
       empty-message="Aucune commande trouvée 😅"
     >
+      <!-- 💻 Version desktop / tablette -->
       <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
             :span="10"
             text="Client"
+            :is-active="sortKey === 'customer_name'"
+            :icon-color="getSortColor('customer_name')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('customer_name')"
           />
           <BasicCell
-            center
             :span="6"
+            center
             text="Total"
+            :is-active="sortKey === 'total_amount'"
+            :icon-color="getSortColor('total_amount')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('total_amount')"
           />
           <BasicCell
-            center
             :span="8"
+            center
             text="Date"
+            :is-active="sortKey === 'created_at'"
+            :icon-color="getSortColor('created_at')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('created_at')"
           />
           <BasicCell
-            center
             :span="8"
+            center
             text="Statut"
+            :is-active="sortKey === 'status'"
+            :icon-color="getSortColor('status')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('status')"
           />
           <BasicCell :span="3" />
         </div>
@@ -57,26 +75,19 @@
           >
             <BasicCell :span="10">
               <div class="list__client-info">
-                <span class="list__name">{{ order.customer_name }}</span>
-                <span class="list__subtext">{{ order.customer_email }}</span>
+                <span class="list__name">{{ order.customer_name || '—' }}</span>
+                <span class="list__subtext">{{ order.customer_email || '—' }}</span>
               </div>
             </BasicCell>
             <BasicCell
               :span="6"
-              center
-            >
-              <BasicText>{{ formatCurrency(order.total_amount!) }}</BasicText>
-            </BasicCell>
+              :text="formatCurrency(order.total_amount ?? 0)"
+            />
             <BasicCell
               :span="8"
-              center
-            >
-              <BasicText>{{ formatDate(order.created_at!) }}</BasicText>
-            </BasicCell>
-            <BasicCell
-              :span="8"
-              center
-            >
+              :text="formatDate(order.created_at)"
+            />
+            <BasicCell :span="8">
               <BasicBadge
                 :label="getLabelBadge(order.status)"
                 :type="getTypeBadge(order.status)"
@@ -121,29 +132,47 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
+  import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import type { OrderStatus } from '@/utils/mappingBadge'
   import { STATUSES } from '@/utils/mappingBadge'
   import { ref, watchEffect } from 'vue'
-
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
-  const { filteredData, total, nbPages, page, search, loading, hasLoaded, reset, fetchData } =
-    useAdminTable<'orders_overview_for_admin'>({
-      table: 'orders_overview_for_admin',
-      orderBy: 'created_at',
-      ascending: false,
-      searchFn: (o, q) =>
-        (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
-        (o.customer_email?.toLowerCase()?.includes(q) ?? false),
-    })
+  const {
+    filteredData,
+    total,
+    nbPages,
+    page,
+    search,
+    sortKey,
+    sortAsc,
+    loading,
+    hasLoaded,
+    reset,
+    fetchData,
+  } = useAdminTable<'orders_overview_for_admin'>({
+    table: 'orders_overview_for_admin',
+    orderBy: 'created_at',
+    ascending: false,
+    searchFn: (o, q) =>
+      (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
+      (o.customer_email?.toLowerCase()?.includes(q) ?? false),
+  })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
   const { deleteOrder, changeOrderStatus } = useOrderActions(fetchData)
+
+  const { toggleSort, getSortColor } = useSortableTable<Tables<'orders_overview_for_admin'>>(
+    sortKey,
+    sortAsc,
+    filteredData,
+  )
 
   const localStatuses = ref<Record<string, OrderStatus>>({})
 
@@ -172,6 +201,15 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
+
+      .list__name {
+        font-weight: 500;
+      }
+
+      .list__subtext {
+        font-size: 13px;
+        color: @neutral-500;
+      }
     }
   }
 </style>

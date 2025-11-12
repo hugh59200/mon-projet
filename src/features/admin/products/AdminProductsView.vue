@@ -3,7 +3,7 @@
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
-      :show-reset="true"
+      show-reset
       @reset="reset"
     />
     <BasicPagination
@@ -24,30 +24,38 @@
       <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
-            :span="10"
+            :span="12"
             text="Nom"
+            :is-active="sortKey === 'name'"
+            :icon-color="getSortColor('name')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('name')"
           />
           <BasicCell
-            center
             :span="8"
             text="Catégorie"
+            :is-active="sortKey === 'category'"
+            :icon-color="getSortColor('category')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('category')"
           />
           <BasicCell
-            center
-            :span="4"
+            :span="6"
             text="Prix (€)"
+            :is-active="sortKey === 'price'"
+            :icon-color="getSortColor('price')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('price')"
           />
           <BasicCell
-            center
-            :span="4"
-            text="Pureté (%)"
-          />
-          <BasicCell
-            center
             :span="6"
             text="Stock"
+            :is-active="sortKey === 'stock'"
+            :icon-color="getSortColor('stock')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('stock')"
           />
-          <BasicCell :span="3" />
+          <BasicCell :span="4" />
         </div>
         <div
           v-for="product in filteredData"
@@ -58,39 +66,26 @@
             class="cardLayoutWrapper list"
             @click="openProductModal(product.id)"
           >
-            <BasicCell :span="10">
-              <div class="list__product-info">
-                <img
-                  v-if="product.image"
-                  :src="product.image"
-                  alt="Image du produit"
-                  class="list__product-thumb"
-                />
-                <span>{{ product.name || '—' }}</span>
-              </div>
-            </BasicCell>
             <BasicCell
-              :span="8"
-              center
+              :span="12"
+              class="list__product-info"
             >
+              <img
+                v-if="product.image"
+                :src="product.image"
+                alt="Image du produit"
+                class="list__product-thumb"
+              />
+              <span>{{ product.name || '—' }}</span>
+            </BasicCell>
+            <BasicCell :span="8">
               <BasicText>{{ product.category || '—' }}</BasicText>
             </BasicCell>
             <BasicCell
-              :span="4"
-              center
-            >
-              <BasicText>{{ formatCurrency(product.price) }}</BasicText>
-            </BasicCell>
-            <BasicCell
-              :span="4"
-              center
-            >
-              <BasicText>{{ product.purity ? product.purity + '%' : '—' }}</BasicText>
-            </BasicCell>
-            <BasicCell
+              :text="formatCurrency(product.price)"
               :span="6"
-              center
-            >
+            />
+            <BasicCell :span="6">
               <BasicBadge
                 :label="getLabelBadge(product.stock)"
                 :type="getTypeBadge(product.stock)"
@@ -102,7 +97,7 @@
               tooltip="Supprimer"
               center
               danger
-              :span="3"
+              :span="4"
               @click.stop="deleteProduct(product)"
             />
           </div>
@@ -120,6 +115,7 @@
         />
       </template>
     </WrapperLoader>
+
     <teleport to="#app">
       <AdminProductModal
         v-if="selectedProductId"
@@ -133,8 +129,10 @@
 
 <script setup lang="ts">
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useProductActions } from '@/supabase/actions/useProductActions'
+  import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency, getLabelBadge, getTypeBadge } from '@/utils'
   import { ref } from 'vue'
 
@@ -142,18 +140,35 @@
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
 
-  const { filteredData, total, nbPages, page, search, loading, hasLoaded, fetchData, reset } =
-    useAdminTable<'products'>({
-      table: 'products',
-      orderBy: 'created_at',
-      ascending: false,
-      searchFn: (p, q) =>
-        (p.name?.toLowerCase()?.includes(q) ?? false) ||
-        (p.category?.toLowerCase()?.includes(q) ?? false),
-    })
+  const {
+    filteredData,
+    total,
+    nbPages,
+    page,
+    search,
+    sortKey,
+    sortAsc,
+    loading,
+    hasLoaded,
+    fetchData,
+    reset,
+  } = useAdminTable<'products'>({
+    table: 'products',
+    orderBy: 'created_at',
+    ascending: false,
+    searchFn: (p, q) =>
+      (p.name?.toLowerCase()?.includes(q) ?? false) ||
+      (p.category?.toLowerCase()?.includes(q) ?? false),
+  })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
   const { deleteProduct } = useProductActions(fetchData)
+
+  const { toggleSort, getSortColor } = useSortableTable<Tables<'products'>>(
+    sortKey,
+    sortAsc,
+    filteredData,
+  )
 
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)

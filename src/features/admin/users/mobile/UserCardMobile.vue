@@ -14,7 +14,6 @@
         size="small"
       />
     </div>
-
     <div class="row">
       <BasicText size="body-s">Créé le {{ formatDate(user.created_at!) }}</BasicText>
       <div

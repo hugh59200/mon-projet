@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une actualité..."
@@ -19,7 +18,6 @@
         />
       </template>
     </BasicToolbar>
-
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -27,7 +25,6 @@
       message="Chargement des actualités..."
       empty-message="Aucune actualité 📰"
     >
-      <!-- ✅ DESKTOP LIST -->
       <div class="news--desktop">
         <div
           v-for="article in filteredData"
@@ -42,7 +39,6 @@
                 alt=""
               />
             </div>
-
             <div class="news-text">
               <h3>{{ article.title }}</h3>
               <p class="excerpt">{{ article.excerpt || '—' }}</p>
@@ -51,7 +47,6 @@
               </p>
             </div>
           </div>
-
           <div
             v-if="!readonly"
             class="actions"
@@ -70,8 +65,6 @@
           </div>
         </div>
       </div>
-
-      <!-- ✅ MOBILE CARDS -->
       <div class="mobile-cards-list">
         <NewsCardMobile
           v-for="article in filteredData"
@@ -84,14 +77,12 @@
         />
       </div>
     </WrapperLoader>
-
     <teleport to="#app">
       <AdminNewsModal
         v-if="!readonly"
         v-model="isCreateModalVisible"
         @saved="fetchData"
       />
-
       <AdminNewsModal
         v-if="selectedNewsId"
         v-model="isModalVisible"
