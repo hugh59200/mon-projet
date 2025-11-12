@@ -1,6 +1,5 @@
 <template>
   <section class="filter-section">
-    <!-- Header clickable -->
     <header
       class="filter-section__header"
       @click="toggle"
@@ -12,8 +11,6 @@
         :class="{ 'icon--rotated': open }"
       />
     </header>
-
-    <!-- Animated content -->
     <div
       v-motion="motion"
       v-show="open"
@@ -27,13 +24,10 @@
 <script setup lang="ts">
   import { computed } from 'vue'
 
-  /** ✅ Modèle v-model (ouvre/ferme la section) */
   const open = defineModel<boolean>({ default: true })
 
-  /** ✅ Props */
   defineProps<{ title: string }>()
 
-  /** ✅ Animation config v-motion */
   const motion = computed(() => ({
     initial: { opacity: 0, y: -8, scaleY: 0.96 },
     enter: {
@@ -50,7 +44,6 @@
     },
   }))
 
-  /** ✅ Toggle logic */
   function toggle() {
     open.value = !open.value
   }

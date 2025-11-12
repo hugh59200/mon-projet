@@ -69,22 +69,22 @@
             class="cardLayoutWrapper list"
             @click="openNewsModal(news.id)"
           >
-            <BasicCell :span="18">
-              <div class="list__news-info">
-                <img
-                  v-if="news.image"
-                  :src="news.image"
-                  alt="Aperçu"
-                  class="list__news-thumb"
-                />
-                <BasicText
-                  :label="news.title"
-                  size="body-l"
-                  weight="semibold"
-                  color="neutral-900"
-                  pointer
-                />
-              </div>
+            <BasicCell
+              :span="18"
+              class="list__news-info"
+            >
+              <img
+                :src="news.image || fallbackImage"
+                alt="Aperçu"
+                class="list__news-thumb"
+              />
+              <BasicText
+                :label="news.title"
+                size="body-l"
+                weight="semibold"
+                color="neutral-900"
+                pointer
+              />
             </BasicCell>
             <BasicCell :span="8">
               <BasicText
@@ -117,10 +117,9 @@
           v-for="news in enrichedNews"
           :key="news.id"
           :article="news"
+          :open-news-modal="openNewsModal"
+          :handle-delete="handleDelete"
           :fallback-image="fallbackImage"
-          :readonly="readonly"
-          @open="openNewsModal"
-          @delete="handleDelete"
           class="gridElemWrapper list list--mobile"
         />
       </template>

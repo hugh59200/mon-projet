@@ -1,41 +1,52 @@
 <template>
-  <div class="basic-toolbar">
-    <BasicInput
-      v-model="search"
-      :placeholder="searchPlaceholder"
-      icon-name="Search"
-      clearable
-      size="small"
-    />
-    <BasicButton
-      v-if="showReset"
-      label="Réinitialiser"
-      variant="outlined"
-      size="small"
-      @click="emit('reset')"
-    />
-    <slot name="actions" />
-    <BasicBadge
-      v-if="role"
-      :type="role === 'admin' ? 'info' : 'default'"
-    >
-      <BasicIconNext
-        :name="role === 'admin' ? 'ShieldCheck' : 'User'"
-        :size="18"
-        class="role-icon"
+  <FilterSection
+    v-model="open"
+    title="Filtres"
+    class="toolbar-section"
+  >
+    <div class="basic-toolbar">
+      <BasicInput
+        v-model="search"
+        :placeholder="searchPlaceholder"
+        icon-name="Search"
+        clearable
+        size="small"
+        class="toolbar-item"
       />
-      <BasicText>{{ roleLabel }}</BasicText>
-    </BasicBadge>
-  </div>
+      <BasicButton
+        v-if="showReset"
+        label="Réinitialiser"
+        variant="outlined"
+        size="small"
+        class="toolbar-item"
+        @click="emit('reset')"
+      />
+      <slot name="actions" />
+      <BasicBadge
+        v-if="showRole && role"
+        :type="role === 'admin' ? 'info' : 'default'"
+        class="toolbar-item role-badge"
+      >
+        <BasicIconNext
+          :name="role === 'admin' ? 'ShieldCheck' : 'User'"
+          :size="18"
+          class="role-icon"
+        />
+        <BasicText>{{ roleLabel }}</BasicText>
+      </BasicBadge>
+    </div>
+  </FilterSection>
 </template>
 
 <script setup lang="ts">
+  import FilterSection from '@/features/shared/components/FilterSection.vue'
+
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
 
   defineProps<{
     searchPlaceholder?: string
@@ -49,23 +60,32 @@
   const auth = useAuthStore()
   const role = computed(() => auth.profile?.role || 'user')
   const roleLabel = computed(() => (role.value === 'admin' ? 'Administrateur' : 'Utilisateur'))
+
+  const open = ref(false) // fermé par défaut pour gagner de la place
 </script>
 
 <style scoped lang="less">
-  .basic-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    background-color: @white;
+  .toolbar-section {
     margin-bottom: 16px;
-    padding: 12px 16px;
+  }
 
-    > * {
-      flex: 1;
+  .basic-toolbar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    align-items: center;
+
+    .toolbar-item {
+      width: 100%;
+    }
+
+    @media (max-width: 700px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 14px;
+
+      .role-badge {
+        justify-self: end;
+      }
     }
   }
 </style>

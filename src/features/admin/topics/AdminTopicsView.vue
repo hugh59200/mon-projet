@@ -4,7 +4,7 @@
       v-model:search="search"
       search-placeholder="Rechercher un topic..."
       show-reset
-      @reset="reset()"
+      @reset="reset"
     >
       <template #actions>
         <BasicButton
@@ -23,52 +23,83 @@
       message="Chargement des topics..."
       empty-message="Aucun topic pour le moment 🧩"
     >
-      <!-- ✅ DESKTOP LIST -->
-      <div class="topics--desktop">
+      <template v-if="isDesktop || isTablet">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+          <BasicCell
+            :span="18"
+            text="Label"
+            :is-active="sortKey === 'label'"
+            :icon-color="getSortColor('label')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('label')"
+          />
+          <BasicCell
+            :span="14"
+            text="ID"
+            :is-active="sortKey === 'id'"
+            :icon-color="getSortColor('id')"
+            :sort-asc="sortAsc"
+            :on-icon-click="() => toggleSort('id')"
+          />
+          <BasicCell :span="4" />
+        </div>
+
         <div
           v-for="topic in filteredData"
           :key="topic.id"
-          class="topic-item"
+          class="gridElemWrapper"
         >
-          <div class="topic-info">
-            <img
-              v-if="topic.image"
-              :src="topic.image"
-              alt="Image du topic"
-              class="topic-thumb"
-            />
-            <div class="topic-text">
-              <h3>{{ topic.label }}</h3>
-              <p class="slug">#{{ topic.id }}</p>
-            </div>
-          </div>
-
-          <div class="actions">
-            <BasicCellActionIcon
-              icon-name="edit"
-              tooltip="Modifier"
-              @click="openTopicModal(topic.id)"
-            />
+          <div
+            class="cardLayoutWrapper list"
+            @click="openTopicModal(topic.id)"
+          >
+            <BasicCell
+              :span="18"
+              class="list__topic-info"
+            >
+              <img
+                :src="topic.image || fallbackImage"
+                alt="Image du topic"
+                class="list__topic-thumb"
+              />
+              <BasicText
+                :label="topic.label"
+                size="body-l"
+                weight="semibold"
+                color="neutral-900"
+                pointer
+              />
+            </BasicCell>
+            <BasicCell :span="14">
+              <BasicText
+                :label="'#' + topic.id"
+                size="body-s"
+                color="neutral-600"
+              />
+            </BasicCell>
             <BasicCellActionIcon
               icon-name="trash"
               tooltip="Supprimer"
+              center
               danger
-              @click="handleDelete(topic)"
+              :span="4"
+              @click.stop="handleDelete(topic)"
             />
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- ✅ MOBILE CARDS -->
-      <div class="mobile-cards-list">
+      <template v-else>
         <TopicCardMobile
           v-for="topic in filteredData"
           :key="topic.id"
           :topic="topic"
-          @open="openTopicModal"
-          @delete="handleDelete"
+          :fallback-image="fallbackImage"
+          :open-topic-modal="openTopicModal"
+          :handle-delete="handleDelete"
+          class="gridElemWrapper list list--mobile"
         />
-      </div>
+      </template>
     </WrapperLoader>
 
     <teleport to="#app">
@@ -83,24 +114,32 @@
 </template>
 
 <script setup lang="ts">
-  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
+  import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDialog } from '@/features/interface/dialog'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { deleteTopicImage } from '@/supabase/api/topicImages'
   import { deleteTopic } from '@/supabase/api/topics'
+  import type { Tables } from '@/supabase/types/supabase'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils/sanitize'
+  import { ref, watch } from 'vue'
+
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicCell from '@designSystem/components/basic/cell/BasicCell.vue'
   import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
+  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
-  import { ref, watch } from 'vue'
-  import { deleteTopicImage } from '../../../supabase/api/topicImages'
+  import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import TopicCardMobile from './mobile/TopicCardMobile.vue'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
 
   const toast = useToastStore()
+  const { showDialog } = useDialog()
+  const { isTablet, isDesktop } = useDeviceBreakpoint()
 
-  const { filteredData, loading, hasLoaded, fetchData, reset, search } =
+  const { filteredData, sortKey, sortAsc, loading, hasLoaded, fetchData, reset, search } =
     useAdminTable<'news_topics'>({
       table: 'news_topics',
       orderBy: 'created_at',
@@ -108,7 +147,13 @@
       searchFn: (t, q) => t.label?.toLowerCase()?.includes(q) ?? false,
     })
 
-  const { showDialog } = useDialog()
+  const { toggleSort, getSortColor } = useSortableTable<Tables<'news_topics'>>(
+    sortKey,
+    sortAsc,
+    filteredData,
+  )
+
+  const fallbackImage = '/images/placeholder-topic.png'
 
   async function handleDelete(topic: NewsTopics) {
     const safeLabel = sanitizeHTML(topic.label ?? '')
@@ -119,14 +164,8 @@
       message: [
         `
       <p style="margin:0 0 12px;">Voulez-vous vraiment supprimer ce topic ?</p>
-
-      <p style="margin:0 0 12px;">
-        <strong>Topic :</strong> ${safeLabel}
-      </p>
-
-      <p style="margin:0;">
-        <strong>Confirmez-vous ?</strong>
-      </p>
+      <p style="margin:0 0 12px;"><strong>Topic :</strong> ${safeLabel}</p>
+      <p style="margin:0;"><strong>Confirmez-vous ?</strong></p>
     `,
       ],
       isHtml: true,
@@ -141,7 +180,6 @@
           await deleteTopicImage(topic.image)
         } catch {}
       }
-
       await deleteTopic(topic.id)
       toast.show('Topic supprimé ✅', 'success')
       fetchData()
@@ -164,99 +202,22 @@
 </script>
 
 <style scoped lang="less">
-  .topic-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  @import '../shared/style/list-base.less';
 
-  .topic-item {
-    background: white;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px fade(@neutral-900, 5%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s ease;
-
-    &:hover {
-      background: fade(@primary-100, 10%);
+  .list {
+    &__topic-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-  }
 
-  .topic-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    .topic-thumb {
-      width: 52px;
-      height: 52px;
-      border-radius: 8px;
+    &__topic-thumb {
+      width: 48px;
+      height: 48px;
       object-fit: cover;
+      border-radius: 8px;
       border: 1px solid @neutral-200;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .topic-text {
-      display: flex;
-      flex-direction: column;
-
-      h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: @neutral-900;
-      }
-
-      .slug {
-        margin: 0;
-        color: fade(@neutral-900, 55%);
-        font-size: 0.88rem;
-      }
-    }
-  }
-
-  .actions {
-    display: flex;
-    gap: 12px;
-
-    .action-icon {
-      cursor: pointer;
-      transition:
-        opacity 0.2s,
-        transform 0.2s;
-      &:hover {
-        opacity: 0.7;
-        transform: scale(1.1);
-      }
-
-      &--delete {
-        color: @danger-600;
-      }
-    }
-  }
-
-  .topics--desktop {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .mobile-cards-list {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  @media (max-width: 1000px) {
-    .topics--desktop {
-      display: none;
-    }
-
-    .mobile-cards-list {
-      display: flex;
+      background: fade(@neutral-200, 40%);
     }
   }
 </style>

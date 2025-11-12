@@ -273,8 +273,6 @@
             </div>
           </div>
         </FilterSection>
-
-        <!-- 🔘 Actions -->
         <div class="order-card__actions">
           <BasicButton
             label="Voir les détails"
@@ -303,7 +301,6 @@
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import { formatDate } from '@/utils/index'
-  // import { getStatusLabel, getStatusBadge } from '@/utils/status'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
 
