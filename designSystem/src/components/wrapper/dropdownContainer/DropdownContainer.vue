@@ -48,32 +48,37 @@
       pointer
     />
 
-    <div
-      v-if="isOpen && !disabled"
-      class="dropdown__menu"
-      ref="menuRef"
-      role="listbox"
-    >
-      <ClickOutside @close="closeFromOutside">
-        <slot name="dropdown-items" />
-      </ClickOutside>
-    </div>
+    <!-- 🚀 Le menu est maintenant rendu dans #overlay-root -->
+    <Teleport to="#overlay-root">
+      <transition name="fade">
+        <div
+          v-if="isOpen && !disabled"
+          class="dropdown__menu"
+          ref="menuRef"
+          :style="menuPositionStyle"
+          role="listbox"
+        >
+          <ClickOutside @close="closeFromOutside">
+            <slot name="dropdown-items" />
+          </ClickOutside>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts" generic="TDropdownItem = DropdownItem">
   import { useDialog } from '@/features/interface/dialog'
   import { useAutoId, type DropdownItem, type DropdownProps } from '@designSystem/components'
-  import { computed, ref } from 'vue'
+  import { computed, provide, ref, watch } from 'vue'
   import type { DropdownContainerEvent } from './DropdownContainer.types'
   import { useDropdownMenuHandler } from './useDropdownMenuHandler'
+  import { useDropdownPosition } from './useDropdownPosition'
 
   const id = useAutoId('input-dropdown')
   const dropdownRef = ref<HTMLElement | null>(null)
   const menuRef = ref<HTMLElement | null>(null)
-
   const emit = defineEmits<DropdownContainerEvent>()
-
   const isFocused = ref(false)
 
   const props = withDefaults(defineProps<DropdownProps<TDropdownItem>>(), {
@@ -82,24 +87,30 @@
     readonly: false,
     dropdownType: 'form',
     selectedLabel: '',
+    mode: 'single',
   })
 
   const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } =
     useDropdownMenuHandler(props.items, props.keyId, props.keyLabel, props.keyIconName, dropdownRef)
 
+  const { menuPositionStyle, updatePosition } = useDropdownPosition(
+    dropdownRef,
+    menuRef,
+    dropdownDirection,
+  )
+
+  provide('closeDropdown', () => {
+    isOpen.value = false
+  })
+
+  watch(isOpen, (open) => {
+    if (open) updatePosition()
+  })
+
   const dynamicPlaceholder = computed(() => {
-    if (props.readonly) {
-      return 'Sélection impossible (Lecture seule)'
-    }
-
-    if (computedItems.value.length === 0) {
-      return 'Aucun élément disponible'
-    }
-
-    if (!props.selectedLabel) {
-      return props.placeholder || 'Sélectionner une option'
-    }
-
+    if (props.readonly) return 'Sélection impossible (Lecture seule)'
+    if (computedItems.value.length === 0) return 'Aucun élément disponible'
+    if (!props.selectedLabel) return props.placeholder || 'Sélectionner une option'
     return props.placeholder
   })
 
@@ -129,8 +140,23 @@
     isOpen.value = !isOpen.value
     if (isOpen.value) updateDropdownVisibilityAndDirection()
   }
+
+  provide('closeDropdown', (force = false) => {
+    // ✅ Ferme uniquement si mode = single ou si on force la fermeture
+    if (props.mode === 'multiple' && !force) return
+    isOpen.value = false
+  })
 </script>
 
 <style lang="less">
   @import 'DropdownContainer.less';
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.15s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

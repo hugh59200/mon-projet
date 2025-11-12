@@ -12,6 +12,7 @@ import {
 } from 'vue'
 
 export type DropdownDirection = 'up' | 'down'
+export type DropdownContext = ReturnType<typeof useDropdownMenuHandler>
 
 export function useDropdownMenuHandler<T = DropdownItem>(
   items: T[] | Ref<T[]> | ComputedRef<T[]> = [],
@@ -62,14 +63,12 @@ export function useDropdownMenuHandler<T = DropdownItem>(
   const attach = async () => {
     detach()
 
-    // ⛔️ 1. si on est dans une modale ou un conteneur overflow, on ne met PAS d’observer
     const rootEl = dropdownRef?.value
 
     if (rootEl?.closest('.modal__dialog')) {
       return
     }
 
-    // ✅ 2. sinon on attache comme avant
     io.value = new IntersectionObserver(
       ([entry]) => {
         if (!entry!.isIntersecting && isOpen.value) {
@@ -90,7 +89,7 @@ export function useDropdownMenuHandler<T = DropdownItem>(
   watch(isOpen, async (open) => {
     if (open) {
       const el = dropdownRef?.value ?? null
-      scrollRoot.value = el?.closest?.('.content, .wrapper-loader__content') ?? null
+      scrollRoot.value = el?.closest?.('.content') ?? null
       await nextTick()
       updateDropdownVisibilityAndDirection()
       await attach()

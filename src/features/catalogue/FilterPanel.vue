@@ -42,12 +42,12 @@
       v-model="filterOpen.category"
       title="Catégorie"
     >
-      <WrapperDropdownMultiple
+      <WrapperDropdown
         :model-value="selectedCategories"
-        @update:model-value="(val) => $emit('update:selectedCategories', val)"
         :items="categoryItems"
-        searchable
+        searchablecfbdftfddccdsww
         deletable
+        mode="multiple"
         size="small"
       />
     </FilterSection>
