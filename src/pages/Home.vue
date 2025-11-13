@@ -63,59 +63,6 @@
       </div>
     </section>
 
-    <!-- 💊 GAMMES PRINCIPALES -->
-    <section class="home__categories">
-      <BasicText
-        size="h2"
-        weight="bold"
-        class="home__section-title"
-        color="secondary-600"
-      >
-        Nos gammes principales
-      </BasicText>
-      <BasicText
-        size="body-m"
-        color="neutral-600"
-        class="home__section-subtitle"
-      >
-        Choisissez vos peptides par objectif de recherche, type d’étude ou cible physiologique.
-      </BasicText>
-
-      <div class="home__grid">
-        <button
-          v-for="cat in categories"
-          :key="cat.label"
-          type="button"
-          class="home__card"
-          @click="$router.push(cat.to)"
-        >
-          <BasicIconNext
-            :name="cat.icon"
-            :size="40"
-            :color="cat.color"
-          />
-          <BasicText
-            weight="bold"
-            color="neutral-700"
-          >
-            {{ cat.label }}
-          </BasicText>
-          <BasicText
-            size="body-s"
-            color="neutral-500"
-          >
-            {{ cat.desc }}
-          </BasicText>
-          <span
-            v-if="cat.badge"
-            class="home__card-badge"
-          >
-            {{ cat.badge }}
-          </span>
-        </button>
-      </div>
-    </section>
-
     <!-- 🎥 BANNIÈRE VIDÉOS + CARROUSEL PRODUITS -->
     <CategoryHeroBanner />
     <HeroBanner />
@@ -277,15 +224,6 @@
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
   import HeroBanner from './HeroBanner.vue'
 
-  interface Category {
-    icon: IconNameNext
-    label: string
-    desc: string
-    color: string
-    to: string
-    badge?: string
-  }
-
   interface QualityItem {
     icon: IconNameNext
     text: string
@@ -302,32 +240,6 @@
     q: string
     a: string
   }
-
-  const categories = ref<Category[]>([
-    {
-      icon: 'FlaskRound',
-      label: 'Peptides de performance',
-      desc: 'Optimisation physiologique et performance – usage recherche uniquement',
-      color: 'primary-600',
-      to: '/catalogue?categorie=performance',
-      badge: 'Populaire',
-    },
-    {
-      icon: 'Dna',
-      label: 'Peptides de récupération',
-      desc: 'Récupération musculaire et tissulaire sur modèles précliniques',
-      color: 'success-600',
-      to: '/catalogue?categorie=recuperation',
-    },
-    {
-      icon: 'Microscope',
-      label: 'Peptides de recherche cellulaire',
-      desc: 'Cibles cellulaires, mécanismes moléculaires et études exploratoires',
-      color: 'info-600',
-      to: '/catalogue?categorie=cellulaire',
-      badge: 'Nouveaux',
-    },
-  ])
 
   const quality = ref<QualityItem[]>([
     { icon: 'CheckCircle', text: 'Pureté testée ≥ 99% (HPLC & MS)', color: 'success-600' },

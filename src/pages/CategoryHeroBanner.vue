@@ -23,6 +23,9 @@
       </button>
     </div>
 
+    <!-- Fade subtil entre les tags et le contenu -->
+    <div class="category-hero__top-fade"></div>
+
     <!-- Viewport horizontal -->
     <div
       class="category-hero__viewport"
@@ -220,6 +223,11 @@
   const activeVideo = ref<{ youtubeId: string } | null>(null)
   let autoplayTimer: number | null = null
 
+  // visibilité du hero (IO)
+  const heroSection = ref<HTMLElement | null>(null)
+  const isHeroVisible = ref(true)
+  let intersectionObserver: IntersectionObserver | null = null
+
   // slide active
   const activeSlide = computed(() => slides.value[activeIndex.value])
 
@@ -257,7 +265,8 @@
   }
 
   function startAutoplay() {
-    stopAutoplay()
+    // évite de redémarrer si déjà en cours
+    if (autoplayTimer || !isHeroVisible.value) return
     autoplayTimer = window.setInterval(() => {
       activeIndex.value = (activeIndex.value + 1) % slides.value.length
     }, 9000)
@@ -271,19 +280,53 @@
   }
 
   function pauseAutoplay() {
+    // pause forcée au hover, mais on laisse IO décider de redémarrer
     stopAutoplay()
   }
 
   function resumeAutoplay() {
-    startAutoplay()
+    // ne relance que si le hero est visible
+    if (isHeroVisible.value) {
+      startAutoplay()
+    }
   }
 
   onMounted(() => {
-    startAutoplay()
+    // IntersectionObserver pour ne faire tourner l'autoplay que lorsque le hero est visible
+    if ('IntersectionObserver' in window && heroSection.value) {
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.target !== heroSection.value) return
+
+            isHeroVisible.value = entry.isIntersecting
+
+            if (entry.isIntersecting) {
+              startAutoplay()
+            } else {
+              stopAutoplay()
+            }
+          })
+        },
+        {
+          threshold: 0.35, // ~1/3 visible
+        },
+      )
+
+      intersectionObserver.observe(heroSection.value)
+    } else {
+      // fallback si IO n'est pas dispo
+      startAutoplay()
+    }
   })
 
   onBeforeUnmount(() => {
     stopAutoplay()
+
+    if (intersectionObserver && heroSection.value) {
+      intersectionObserver.unobserve(heroSection.value)
+      intersectionObserver.disconnect()
+    }
   })
 </script>
 
@@ -314,9 +357,10 @@
     background: fade(@neutral-0, 35%);
   }
 
-  /* tout le contenu est au-dessus */
+  /* tout le contenu au-dessus du BG */
   .category-hero__nav,
-  .category-hero__viewport {
+  .category-hero__viewport,
+  .category-hero__top-fade {
     position: relative;
     z-index: 1;
   }
@@ -325,23 +369,33 @@
   .category-hero__nav {
     display: flex;
     gap: 10px;
-    padding: 14px 20px 8px;
+    padding: 14px 20px 6px; // léger padding bottom pour rapprocher le fade
   }
 
   .nav-pill {
     border-radius: 999px;
     padding: 4px 14px;
     border: 1px solid fade(@neutral-300, 70%);
-    background: fade(@neutral-0, 90%);
+    background: fade(@neutral-0, 95%);
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 3px fade(@neutral-700, 8%);
   }
   .nav-pill--active {
     border-color: fade(@primary-400, 80%);
-    background: fade(@primary-50, 90%);
+    background: fade(@primary-50, 96%);
     color: @primary-700;
+  }
+
+  /* petit fondu pro entre la nav et le contenu */
+  .category-hero__top-fade {
+    height: 10px;
+    margin: 0 16px 2px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, fade(@neutral-0, 96%) 0%, fade(@neutral-0, 0%) 100%);
+    pointer-events: none;
   }
 
   /* slider */
@@ -356,7 +410,7 @@
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* chaque slide = 100% du viewport, donc translateX(-100%, -200%, ...) fonctionne partout */
+  /* chaque slide = 100% du viewport */
   .category-hero__slide {
     flex: 0 0 100%;
     width: 100%;
