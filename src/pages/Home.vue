@@ -380,6 +380,14 @@
     flex-direction: column;
     gap: 80px;
     padding: 40px 60px;
+    box-sizing: border-box;
+
+    /* optionnel : container centré max width */
+    max-width: 1280px;
+    margin: 0 auto;
+
+    /* sécurité : aucun débordement horizontal dû aux transforms internes */
+    overflow-x: hidden;
 
     /* 🧬 HERO */
     &__hero {

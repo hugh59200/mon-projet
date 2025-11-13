@@ -3,6 +3,12 @@
     class="category-hero"
     ref="heroSection"
   >
+    <!-- BG qui couvre TOUT le conteneur (tags compris) -->
+    <div
+      class="category-hero__bg"
+      :style="bgStyle"
+    ></div>
+
     <!-- Petites pastilles catégorie -->
     <div class="category-hero__nav">
       <button
@@ -20,7 +26,6 @@
     <!-- Viewport horizontal -->
     <div
       class="category-hero__viewport"
-      ref="viewport"
       @mouseenter="pauseAutoplay"
       @mouseleave="resumeAutoplay"
     >
@@ -32,10 +37,7 @@
           v-for="slide in slides"
           :key="slide.id"
           class="category-hero__slide"
-          :style="{
-            '--accent': slide.accent,
-            backgroundImage: slide.bgImage ? `url(${slide.bgImage})` : '',
-          }"
+          :style="{ '--accent': slide.accent }"
         >
           <div class="slide__overlay"></div>
 
@@ -218,23 +220,18 @@
   const activeVideo = ref<{ youtubeId: string } | null>(null)
   let autoplayTimer: number | null = null
 
-  // largeur du viewport (et donc d'une slide)
-  const viewport = ref<HTMLElement | null>(null)
-  const slideWidth = ref(0)
+  // slide active
+  const activeSlide = computed(() => slides.value[activeIndex.value])
 
-  function updateSlideWidth() {
-    if (!viewport.value) return
-    const rect = viewport.value.getBoundingClientRect()
-    slideWidth.value = rect.width
-  }
+  // BG global → image sous nav + contenu
+  const bgStyle = computed(() => ({
+    backgroundImage: activeSlide.value?.bgImage ? `url(${activeSlide.value.bgImage})` : 'none',
+  }))
 
-  // style calculé pour la track (transform en px)
-  const trackStyle = computed(() => {
-    const offset = slideWidth.value * activeIndex.value
-    return {
-      transform: `translateX(-${offset}px)`,
-    }
-  })
+  // Translation du track en POURCENTAGE ⇒ indépendant de la largeur px du parent
+  const trackStyle = computed(() => ({
+    transform: `translate3d(-${activeIndex.value * 100}%, 0, 0)`,
+  }))
 
   function goToSlide(index: number) {
     activeIndex.value = index
@@ -282,14 +279,11 @@
   }
 
   onMounted(() => {
-    updateSlideWidth()
-    window.addEventListener('resize', updateSlideWidth)
     startAutoplay()
   })
 
   onBeforeUnmount(() => {
     stopAutoplay()
-    window.removeEventListener('resize', updateSlideWidth)
   })
 </script>
 
@@ -300,6 +294,31 @@
     overflow: hidden;
     box-shadow: 0 4px 18px fade(@neutral-700, 10%);
     background: @neutral-0;
+  }
+
+  /* BG full-bleed */
+  .category-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  /* léger wash blanc pour la lisibilité globale */
+  .category-hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: fade(@neutral-0, 35%);
+  }
+
+  /* tout le contenu est au-dessus */
+  .category-hero__nav,
+  .category-hero__viewport {
+    position: relative;
+    z-index: 1;
   }
 
   /* nav */
@@ -337,26 +356,14 @@
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* chaque slide occupe exactement la largeur du viewport */
+  /* chaque slide = 100% du viewport, donc translateX(-100%, -200%, ...) fonctionne partout */
   .category-hero__slide {
     flex: 0 0 100%;
+    width: 100%;
     box-sizing: border-box;
 
     position: relative;
     padding: 26px 28px 24px;
-
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    /* voile uniforme */
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: fade(@neutral-0, 40%);
-      z-index: 0;
-    }
   }
 
   /* overlay zone texte */
@@ -557,10 +564,6 @@
         fade(@neutral-0, 94%) 40%,
         transparent 100%
       );
-    }
-
-    .category-hero__slide {
-      background-position: center;
     }
 
     .slide__media {
