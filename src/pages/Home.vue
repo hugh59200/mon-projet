@@ -8,7 +8,13 @@
           color="primary-600"
           class="home__hero-pill"
         >
-          Fournisseur européen • Usage recherche uniquement
+          <BasicIconNext
+            name="Globe"
+            :size="14"
+            color="primary-600"
+            class="home__hero-pill-icon"
+          />
+          <span>Fournisseur européen • Usage recherche uniquement</span>
         </BasicText>
 
         <BasicText
@@ -87,23 +93,30 @@
 
       <div class="home__how-grid">
         <div
-          v-for="step in steps"
+          v-for="(step, index) in steps"
           :key="step.title"
           class="home__how-card"
         >
-          <div class="home__how-icon">
-            <BasicIconNext
-              :name="step.icon"
-              :size="28"
-              color="primary-600"
-            />
+          <div class="home__how-step">
+            <span class="home__how-step-index">{{ index + 1 }}</span>
           </div>
-          <BasicText
-            weight="bold"
-            color="neutral-800"
-          >
-            {{ step.title }}
-          </BasicText>
+
+          <div class="home__how-header">
+            <div class="home__how-icon">
+              <BasicIconNext
+                :name="step.icon"
+                :size="26"
+                color="primary-600"
+              />
+            </div>
+            <BasicText
+              weight="bold"
+              color="neutral-800"
+            >
+              {{ step.title }}
+            </BasicText>
+          </div>
+
           <BasicText
             size="body-s"
             color="neutral-600"
@@ -143,7 +156,7 @@
           <div class="home__quality-icon">
             <BasicIconNext
               :name="q.icon"
-              :size="28"
+              :size="24"
               :color="q.color"
             />
           </div>
@@ -178,6 +191,7 @@
             >
               {{ item.q }}
             </BasicText>
+            <span class="home__faq-chevron">▾</span>
           </summary>
           <BasicText
             size="body-s"
@@ -192,6 +206,13 @@
 
     <!-- 🚀 CTA FINAL -->
     <section class="home__cta">
+      <BasicText
+        size="body-s"
+        color="neutral-100"
+        class="home__cta-eyebrow"
+      >
+        Prêt à démarrer ?
+      </BasicText>
       <BasicText
         size="h3"
         weight="bold"
@@ -290,15 +311,12 @@
   .home {
     display: flex;
     flex-direction: column;
-    gap: 80px;
-    padding: 40px 60px;
+    gap: 72px;
+    padding: 36px 56px;
     box-sizing: border-box;
 
-    /* optionnel : container centré max width */
     max-width: 1280px;
     margin: 0 auto;
-
-    /* sécurité : aucun débordement horizontal dû aux transforms internes */
     overflow-x: hidden;
 
     /* 🧬 HERO */
@@ -306,12 +324,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 60px;
+      gap: 56px;
       flex-wrap: wrap;
       background: linear-gradient(120deg, fade(@white, 92%), fade(@neutral-0, 80%));
       border-radius: 16px;
-      padding: 40px 50px;
-      box-shadow: 0 2px 14px fade(@neutral-500, 10%);
+      padding: 36px 44px;
+      box-shadow: 0 2px 12px fade(@neutral-500, 10%);
       position: relative;
       overflow: hidden;
 
@@ -334,7 +352,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      max-width: 520px;
+      max-width: 480px;
     }
 
     &__hero-pill {
@@ -344,6 +362,9 @@
       background: fade(@primary-100, 90%);
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     &__hero-sub {
@@ -370,21 +391,14 @@
       justify-content: center;
 
       img {
-        max-width: 480px;
+        max-width: 440px;
         width: 100%;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
       }
     }
 
-    /* 💊 CATEGORIES */
-    &__categories {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-    }
-
+    /* TITRES + SOUS-TITRES SECTIONS */
     &__section-title {
       text-align: center;
     }
@@ -392,60 +406,7 @@
     &__section-subtitle {
       text-align: center;
       max-width: 640px;
-    }
-
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
-      width: 100%;
-      max-width: 960px;
-    }
-
-    &__card {
-      background: white;
-      border: 1px solid @neutral-200;
-      border-radius: 12px;
-      padding: 32px 20px;
-      text-align: center;
-      transition: all 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
-      box-sizing: border-box;
-      position: relative;
-      cursor: pointer;
-
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 14px fade(@neutral-600, 15%);
-        border-color: @primary-300;
-      }
-
-      .basic-icon-next {
-        margin-bottom: 6px;
-        transition: transform 0.3s ease;
-      }
-
-      &:hover .basic-icon-next {
-        transform: scale(1.08);
-      }
-    }
-
-    &__card-badge {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      background: fade(@secondary-100, 90%);
-      color: @secondary-600;
+      margin: 0 auto;
     }
 
     /* 📦 COMMENT ÇA MARCHE */
@@ -458,7 +419,7 @@
 
     &__how-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 24px;
       width: 100%;
       max-width: 960px;
@@ -467,31 +428,55 @@
     &__how-card {
       background: white;
       border-radius: 14px;
-      padding: 24px 20px;
-      box-shadow: 0 3px 10px fade(@neutral-600, 10%);
+      padding: 20px 18px 18px;
+      box-shadow: 0 3px 10px fade(@neutral-600, 8%);
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
+    &__how-step {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    &__how-step-index {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid fade(@primary-500, 40%);
+      background: fade(@primary-50, 70%);
+      color: @primary-700;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__how-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     &__how-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       background: fade(@primary-50, 90%);
-      margin-bottom: 4px;
     }
 
     /* 🧪 QUALITÉ */
     &__quality {
       background: rgba(255, 255, 255, 0.9);
-      padding: 50px;
+      padding: 44px 40px;
       border-radius: 16px;
       text-align: center;
-      box-shadow: 0 2px 12px fade(@neutral-600, 10%);
+      box-shadow: 0 2px 10px fade(@neutral-600, 10%);
       backdrop-filter: blur(8px);
     }
 
@@ -499,7 +484,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 18px;
       margin-top: 24px;
     }
 
@@ -508,7 +493,7 @@
       align-items: center;
       gap: 10px;
       background: white;
-      padding: 12px 18px;
+      padding: 10px 16px;
       border-radius: 10px;
       border: 1px solid @neutral-200;
       border-top-width: 3px;
@@ -546,7 +531,7 @@
       background: white;
       border-radius: 10px;
       border: 1px solid @neutral-200;
-      padding: 12px 16px;
+      padding: 10px 14px;
       cursor: pointer;
 
       summary {
@@ -554,6 +539,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 12px;
       }
 
       summary::-webkit-details-marker {
@@ -569,6 +555,16 @@
       }
     }
 
+    &__faq-chevron {
+      font-size: 14px;
+      color: @neutral-500;
+      transition: transform 0.2s ease;
+    }
+
+    &__faq-item[open] .home__faq-chevron {
+      transform: rotate(180deg);
+    }
+
     &__faq-answer {
       margin-top: 8px;
     }
@@ -577,14 +573,20 @@
     &__cta {
       background: linear-gradient(135deg, @primary-700, @secondary-700);
       color: white;
-      padding: 50px 20px;
+      padding: 40px 20px;
       border-radius: 16px;
       text-align: center;
       box-shadow: 0 6px 20px fade(@neutral-800, 20%);
 
       .basic-button {
-        margin-top: 16px;
+        margin-top: 18px;
       }
+    }
+
+    &__cta-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      opacity: 0.9;
     }
 
     &__cta-sub {
@@ -598,7 +600,8 @@
       gap: 56px;
 
       &__hero {
-        padding: 28px 20px;
+        padding: 26px 20px;
+        gap: 32px;
       }
 
       &__hero-actions {
@@ -615,6 +618,10 @@
 
       &__hero-image img {
         max-width: 320px;
+      }
+
+      &__quality {
+        padding-inline: 20px;
       }
     }
   }

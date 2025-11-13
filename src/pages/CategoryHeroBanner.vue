@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-  import { bienEtre, metabolisme, performance } from '@/assets/banner/categories'
+  import { bienEtre, metabolisme, performance } from '@/assets/banners/categories'
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -265,7 +265,6 @@
   }
 
   function startAutoplay() {
-    // évite de redémarrer si déjà en cours
     if (autoplayTimer || !isHeroVisible.value) return
     autoplayTimer = window.setInterval(() => {
       activeIndex.value = (activeIndex.value + 1) % slides.value.length
@@ -280,19 +279,16 @@
   }
 
   function pauseAutoplay() {
-    // pause forcée au hover, mais on laisse IO décider de redémarrer
     stopAutoplay()
   }
 
   function resumeAutoplay() {
-    // ne relance que si le hero est visible
     if (isHeroVisible.value) {
       startAutoplay()
     }
   }
 
   onMounted(() => {
-    // IntersectionObserver pour ne faire tourner l'autoplay que lorsque le hero est visible
     if ('IntersectionObserver' in window && heroSection.value) {
       intersectionObserver = new IntersectionObserver(
         (entries) => {
@@ -309,13 +305,12 @@
           })
         },
         {
-          threshold: 0.35, // ~1/3 visible
+          threshold: 0.35,
         },
       )
 
       intersectionObserver.observe(heroSection.value)
     } else {
-      // fallback si IO n'est pas dispo
       startAutoplay()
     }
   })
@@ -335,7 +330,7 @@
     position: relative;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 18px fade(@neutral-700, 10%);
+    box-shadow: 0 3px 12px fade(@neutral-700, 12%);
     background: @neutral-0;
   }
 
@@ -354,7 +349,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: fade(@neutral-0, 35%);
+    background: fade(@neutral-0, 32%);
   }
 
   /* tout le contenu au-dessus du BG */
@@ -369,7 +364,7 @@
   .category-hero__nav {
     display: flex;
     gap: 10px;
-    padding: 14px 20px 6px; // léger padding bottom pour rapprocher le fade
+    padding: 14px 20px 6px;
   }
 
   .nav-pill {
@@ -387,6 +382,7 @@
     border-color: fade(@primary-400, 80%);
     background: fade(@primary-50, 96%);
     color: @primary-700;
+    box-shadow: 0 0 0 1px fade(@primary-200, 60%);
   }
 
   /* petit fondu pro entre la nav et le contenu */
@@ -417,7 +413,7 @@
     box-sizing: border-box;
 
     position: relative;
-    padding: 26px 28px 24px;
+    padding: 24px 26px 22px;
   }
 
   /* overlay zone texte */
@@ -428,10 +424,10 @@
     background: linear-gradient(
       90deg,
       fade(@neutral-0, 100%) 0%,
-      fade(@neutral-0, 100%) 26%,
-      fade(@neutral-0, 92%) 40%,
-      fade(@neutral-0, 78%) 60%,
-      transparent 90%
+      fade(@neutral-0, 96%) 24%,
+      fade(@neutral-0, 82%) 45%,
+      fade(@neutral-0, 60%) 65%,
+      transparent 92%
     );
     pointer-events: none;
   }
@@ -443,14 +439,14 @@
     display: flex;
     align-items: stretch;
     justify-content: space-between;
-    gap: 30px;
+    gap: 28px;
     flex-wrap: wrap;
   }
 
   .slide__text {
     flex: 1;
     min-width: 260px;
-    max-width: 420px;
+    max-width: 460px;
     display: flex;
     flex-direction: column;
     gap: 10px;
