@@ -153,9 +153,10 @@
   import type { Products } from '@/supabase/types/supabase.types'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import FilterPanel from './FilterPanel.vue'
 
+  const route = useRoute()
   const { isMobile } = useDeviceBreakpoint()
   const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
 
@@ -202,7 +203,14 @@
     showAddToCartToast(p)
   }
 
-  onMounted(loadProducts)
+  onMounted(async () => {
+    await loadProducts()
+
+    const initialTag = typeof route.query.tag === 'string' ? route.query.tag : null
+    if (initialTag) {
+      selectedTags.value = [initialTag]
+    }
+  })
 </script>
 
 <style scoped lang="less">
