@@ -677,6 +677,7 @@
       overflow: visible;
     }
   }
+  
 
   /* 📱 / TABLETTE : layout plus compact */
   @media (max-width: 960px) {
