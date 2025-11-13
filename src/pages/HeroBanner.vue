@@ -9,82 +9,87 @@
       ref="glowLayer"
     ></div>
 
-    <!-- 🧑‍🔬 SECTION CONTENU PÉDAGOGIQUE + PERSONAS -->
+    <!-- 🧑‍🔬 CONTENU PÉDAGOGIQUE + PERSONAS -->
     <div
       class="hero-banner__top"
       ref="topSection"
     >
-      <div class="hero-banner__top-text">
-        <BasicText
-          size="body-s"
-          color="primary-500"
-          class="hero-banner__eyebrow"
-        >
-          Ressources pédagogiques
-        </BasicText>
-
-        <BasicText
-          size="h3"
-          weight="bold"
-          color="primary-700"
-        >
-          Comprendre les peptides avant vos recherches.
-        </BasicText>
-
-        <BasicText
-          size="body-m"
-          color="neutral-600"
-          class="hero-banner__top-sub"
-        >
-          Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
-          peptides dans vos projets de recherche.
-        </BasicText>
-
-        <ul class="hero-banner__bullets">
-          <li>
-            <BasicIconNext
-              name="CheckCircle"
-              :size="16"
-              color="primary-500"
-            />
-            <span>Vulgarisation claire pour équipes R&amp;D et laboratoires.</span>
-          </li>
-          <li>
-            <BasicIconNext
-              name="BookOpenText"
-              :size="16"
-              color="primary-500"
-            />
-            <span>Ressources externes sélectionnées : articles, vidéos, revues.</span>
-          </li>
-          <li>
-            <BasicIconNext
-              name="ShieldCheck"
-              :size="16"
-              color="primary-500"
-            />
-            <span>Rappel constant : recherche exclusivement – aucun usage humain.</span>
-          </li>
-        </ul>
-
-        <div class="hero-banner__cta-row">
-          <BasicButton
-            label="Explorer les ressources"
-            type="primary"
-            variant="filled"
-            size="medium"
-            @click="$router.push('/ressources')"
-          />
+      <!-- panneau texte à gauche -->
+      <div class="hero-banner__panel">
+        <div class="hero-banner__top-text">
           <BasicText
             size="body-s"
-            color="neutral-500"
+            color="primary-600"
+            class="hero-banner__eyebrow"
           >
-            Sélection neutre, sans recommandation médicale.
+            Ressources pédagogiques
           </BasicText>
+
+          <BasicText
+            size="h3"
+            weight="bold"
+            color="primary-700"
+          >
+            Comprendre les peptides avant vos recherches.
+          </BasicText>
+
+          <BasicText
+            size="body-m"
+            color="neutral-700"
+            class="hero-banner__top-sub"
+          >
+            Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
+            peptides dans vos projets de recherche.
+          </BasicText>
+
+          <ul class="hero-banner__bullets">
+            <li>
+              <BasicIconNext
+                name="CheckCircle"
+                :size="16"
+                color="primary-600"
+              />
+              <span>Vulgarisation claire pour équipes R&amp;D et laboratoires.</span>
+            </li>
+            <li>
+              <BasicIconNext
+                name="BookOpenText"
+                :size="16"
+                color="primary-600"
+              />
+              <span>Ressources externes sélectionnées : articles, vidéos, revues.</span>
+            </li>
+            <li>
+              <BasicIconNext
+                name="ShieldCheck"
+                :size="16"
+                color="primary-600"
+              />
+              <span>Rappel constant : recherche exclusivement – aucun usage humain.</span>
+            </li>
+          </ul>
+
+          <div class="hero-banner__cta-row">
+            <BasicButton
+              label="Explorer les ressources pédagogiques"
+              type="primary"
+              variant="filled"
+              size="medium"
+              width="full"
+              @click="$router.push('/ressources')"
+            />
+            <BasicText
+              size="body-s"
+              color="neutral-500"
+              class="hero-banner__disclaimer"
+            >
+              Sélection neutre, sans recommandation médicale.
+            </BasicText>
+          </div>
         </div>
       </div>
 
-      <!-- 👥 PERSONAS / VISUELS CHALEUREUX -->
+      <!-- 👥 PERSONAS -->
       <div class="hero-banner__personas">
         <article
           v-for="persona in personas"
@@ -218,7 +223,6 @@
     alt: string
   }
 
-  // ⚠️ à remplacer par tes vrais paths d’images Nano Banan
   const personas = ref<Persona[]>([
     {
       id: 'rd',
@@ -244,6 +248,14 @@
       image: personaPhd,
       alt: 'Jeune doctorant prenant des notes avec une ambiance chaleureuse',
     },
+    {
+      id: 'quality',
+      name: 'Dr. S. Meyer',
+      role: 'Référent qualité & conformité',
+      tag: 'Qualité & conformité',
+      image: personaLab,
+      alt: 'Scientifiques discutant des résultats dans un laboratoire lumineux',
+    },
   ])
 
   function goToProduct(p: { id: string }) {
@@ -262,16 +274,16 @@
       const cards = topSection.value.querySelectorAll('.persona-card')
 
       if (textBlock) {
-        tl.from(textBlock, { y: 24, opacity: 0, duration: 0.5 }, '-=0.3')
+        tl.from(textBlock, { y: 24, opacity: 0, duration: 0.5 }, '-=0.25')
       }
 
       if (cards.length) {
-        tl.from(cards, { y: 30, opacity: 0, stagger: 0.12, duration: 0.5 }, '-=0.2')
+        tl.from(cards, { y: 28, opacity: 0, stagger: 0.12, duration: 0.45 }, '-=0.2')
       }
 
       // léger mouvement au scroll pour les personas
       cards.forEach((el, i) => {
-        const baseShift = i === 0 ? -8 : i === 1 ? 10 : -4
+        const baseShift = i % 2 === 0 ? -6 : 8
         gsap.to(el, {
           y: baseShift,
           ease: 'none',
@@ -306,15 +318,15 @@
     if (glowLayer.value) {
       gsap.to(glowLayer.value, {
         backgroundPosition: '200% 100%',
-        duration: 20,
+        duration: 22,
         ease: 'none',
         repeat: -1,
         yoyo: true,
       })
 
       gsap.to(glowLayer.value, {
-        yPercent: -8,
-        scale: 1.04,
+        yPercent: -6,
+        scale: 1.03,
         opacity: 0.7,
         scrollTrigger: {
           trigger: heroSection.value,
@@ -327,8 +339,8 @@
       if (window.innerWidth > 768) {
         const glow = glowLayer.value
         mouseHandler = (e: MouseEvent) => {
-          const x = (e.clientX / window.innerWidth - 0.5) * 26
-          const y = (e.clientY / window.innerHeight - 0.5) * 26
+          const x = (e.clientX / window.innerWidth - 0.5) * 24
+          const y = (e.clientY / window.innerHeight - 0.5) * 24
           gsap.to(glow, { x, y, duration: 0.8, ease: 'power2.out' })
         }
         window.addEventListener('mousemove', mouseHandler)
@@ -356,96 +368,136 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 3px 14px fade(@neutral-700, 12%);
-
     background:
-      radial-gradient(circle at 10% 0%, fade(@primary-100, 70%), transparent 55%),
-      radial-gradient(circle at 90% 100%, fade(@secondary-100, 70%), transparent 55%),
-      linear-gradient(135deg, @neutral-0, @neutral-50);
+      radial-gradient(circle at 0% 0%, fade(@primary-100, 75%), transparent 55%),
+      radial-gradient(circle at 100% 100%, fade(@secondary-100, 70%), transparent 55%),
+      linear-gradient(135deg, @neutral-0, @primary-0);
+  }
 
-    &__glow {
-      position: absolute;
-      inset: -40px;
-      z-index: 0;
-      background:
-        radial-gradient(circle at 30% 30%, fade(@primary-200, 40%) 0%, transparent 45%),
-        radial-gradient(circle at 70% 70%, fade(@secondary-200, 40%) 0%, transparent 45%);
-      background-size: 200% 200%;
-      opacity: 0.5;
-      filter: blur(50px);
-      pointer-events: none;
-    }
+  .hero-banner__glow {
+    position: absolute;
+    inset: -40px;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 30% 30%, fade(@primary-200, 40%) 0%, transparent 45%),
+      radial-gradient(circle at 70% 70%, fade(@secondary-200, 40%) 0%, transparent 45%);
+    background-size: 200% 200%;
+    opacity: 0.45;
+    filter: blur(50px);
+    pointer-events: none;
+  }
 
-    &__top {
-      position: relative;
-      z-index: 1;
+  .hero-banner__top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 26px 28px 18px;
+    flex-wrap: nowrap;
+  }
+
+  /* panneau texte à gauche */
+  .hero-banner__panel {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+    max-width: 430px;
+    background: @white;
+    border-radius: 18px;
+    padding: 20px 22px 18px;
+    box-shadow: 0 10px 28px fade(@neutral-800, 10%);
+    border: 1px solid fade(@primary-100, 70%);
+    overflow: hidden;
+  }
+
+  .hero-banner__panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+    width: 3px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, @primary-500, @secondary-400);
+  }
+
+  .hero-banner__top-text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-banner__eyebrow {
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .hero-banner__top-sub {
+    margin-top: 2px;
+  }
+
+  .hero-banner__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    li {
       display: flex;
-      align-items: stretch;
-      justify-content: space-between;
-      gap: 32px;
-      padding: 30px 30px 18px;
-      flex-wrap: wrap;
-    }
-
-    &__top-text {
-      flex: 1;
-      min-width: 260px;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    &__eyebrow {
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    &__top-sub {
-      margin-top: 4px;
-    }
-
-    &__bullets {
-      list-style: none;
-      padding: 0;
-      margin: 6px 0 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      li {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: @neutral-600;
-      }
-    }
-
-    &__cta-row {
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    &__personas {
-      flex: 1.3;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      gap: 16px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: @neutral-700;
     }
   }
 
-  /* 👥 cartes personas */
+  .hero-banner__cta-row {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .hero-banner__disclaimer {
+    font-size: 11px;
+  }
+
+  /* PERSONAS : comportement par défaut = colonne scrollable (tablet / desktop) */
+  .hero-banner__personas {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 360px;
+    padding-right: 6px;
+    overflow-y: auto;
+  }
+
+  .hero-banner__personas::-webkit-scrollbar {
+    width: 4px;
+  }
+  .hero-banner__personas::-webkit-scrollbar-track {
+    background: fade(@primary-50, 60%);
+    border-radius: 999px;
+  }
+  .hero-banner__personas::-webkit-scrollbar-thumb {
+    background: fade(@primary-400, 70%);
+    border-radius: 999px;
+  }
+
+  /* cartes personas */
   .persona-card {
     position: relative;
-    width: 220px;
     border-radius: 16px;
     padding: 10px 10px 12px;
-    background: linear-gradient(135deg, fade(@neutral-0, 96%), fade(@primary-50, 80%));
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+    background: linear-gradient(135deg, fade(@neutral-0, 96%), fade(@primary-50, 85%));
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -481,7 +533,7 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.09em;
-    background: fade(@neutral-900, 70%);
+    background: fade(@neutral-900, 75%);
     color: @neutral-0;
     backdrop-filter: blur(6px);
   }
@@ -493,7 +545,7 @@
     margin-top: 4px;
   }
 
-  /* 💊 BOTTOM TICKER */
+  /* 💊 BOTTOM TICKER (inchangé) */
   .hero-banner__bottom {
     position: relative;
     z-index: 1;
@@ -611,38 +663,71 @@
     }
   }
 
-  /* 📱 RESPONSIVE */
-  @media (max-width: 960px) {
-    .hero-banner {
-      &__top {
-        padding: 24px 18px 16px;
-        gap: 24px;
-      }
+  /* === BREAKPOINTS === */
 
-      &__bottom {
-        padding-inline: 16px;
-      }
+  /* 🖥 Très grand écran : 4 cartes en carré (2×2), pas de scroll vertical */
+  @media (min-width: 1200px) {
+    .hero-banner__personas {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(210px, 1fr));
+      grid-auto-rows: 1fr;
+      gap: 18px;
+      max-height: none;
+      padding-right: 0;
+      overflow: visible;
     }
   }
 
-  @media (max-width: 640px) {
-    .hero-banner {
-      &__top {
-        flex-direction: column;
-      }
+  /* 📱 / TABLETTE : layout plus compact */
+  @media (max-width: 960px) {
+    .hero-banner__top {
+      padding: 22px 18px 14px;
+      gap: 22px;
+    }
 
-      &__personas {
-        justify-content: flex-start;
-      }
+    .hero-banner__panel {
+      max-width: none;
+    }
 
-      .persona-card {
-        width: 100%;
-        max-width: 320px;
-      }
+    .hero-banner__bottom {
+      padding-inline: 16px;
+    }
+  }
 
-      .bottom-title {
-        font-size: 11px;
-      }
+  /* 📱 Mobile : personas sous le texte, carrousel horizontal scrollable */
+  @media (max-width: 768px) {
+    .hero-banner__top {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero-banner__personas {
+      flex: none;
+      max-height: none;
+      padding-right: 0;
+      margin: 6px -8px 0;
+      padding-inline: 8px;
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 12px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .hero-banner__personas::-webkit-scrollbar {
+      height: 4px;
+      width: auto;
+    }
+
+    .persona-card {
+      flex: 0 0 240px;
+      scroll-snap-align: start;
+    }
+
+    .hero-banner__bottom-header {
+      align-items: flex-start;
+      flex-direction: column;
     }
   }
 </style>
