@@ -186,9 +186,9 @@
 </template>
 
 <script setup lang="ts">
-  import personaLab from '@/assets/banners/hero/persona-lab.png'
-  import personaPhd from '@/assets/banners/hero/persona-phd.png'
-  import personaRd from '@/assets/banners/hero/persona-rd.png'
+  import personaLab from '@/assets/home/banners/hero/persona-lab.png'
+  import personaPhd from '@/assets/home/banners/hero/persona-phd.png'
+  import personaRd from '@/assets/home/banners/hero/persona-rd.png'
   import { useProducts } from '@/features/catalogue/composables/useProducts'
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'

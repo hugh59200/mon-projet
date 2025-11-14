@@ -157,6 +157,88 @@
             />
           </div>
         </FilterSection>
+        <FilterSection
+          title="Préférences"
+          v-model="sections.preferences"
+        >
+          <div class="profil__preferences">
+            <BasicCheckbox
+              v-model="newsletter"
+              label="Recevoir les newsletters"
+            />
+            <BasicCheckbox
+              v-model="smsAlerts"
+              label="Recevoir les alertes SMS"
+            />
+          </div>
+
+          <!-- 👇 Nouveau bloc apparence -->
+          <div class="profil__theme-settings">
+            <BasicText
+              size="body-m"
+              weight="bold"
+            >
+              Apparence
+            </BasicText>
+
+            <!-- Choix du thème -->
+            <div class="profil__theme-row">
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Thème
+              </BasicText>
+              <div class="profil__pill-group">
+                <button
+                  type="button"
+                  class="profil__pill"
+                  :class="{ 'profil__pill--active': scheme === 'light' }"
+                  @click="scheme = 'light'"
+                >
+                  Clair
+                </button>
+                <button
+                  type="button"
+                  class="profil__pill"
+                  :class="{ 'profil__pill--active': scheme === 'dark' }"
+                  @click="scheme = 'dark'"
+                >
+                  Sombre
+                </button>
+              </div>
+            </div>
+
+            <!-- Choix de la palette -->
+            <div class="profil__theme-row">
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Palette de couleurs
+              </BasicText>
+              <div class="profil__pill-group">
+                <button
+                  v-for="option in paletteOptions"
+                  :key="option.value"
+                  type="button"
+                  class="profil__pill"
+                  :class="{ 'profil__pill--active': palette === option.value }"
+                  @click="palette = option.value"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <BasicButton
+            label="Sauvegarder mes préférences"
+            type="secondary"
+            variant="filled"
+            @click="savePreferences"
+          />
+        </FilterSection>
 
         <FilterSection
           title="Préférences"
@@ -236,6 +318,7 @@
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
+  import { useTheme } from 'storybook/internal/theming'
   import { onMounted, ref, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '../auth/stores/useAuthStore'
@@ -266,6 +349,14 @@
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
+
+  // 👇 thème + palette
+  const { palette, scheme } = useTheme()
+  const paletteOptions = [
+    { label: 'Lab (clean médical)', value: 'lab' },
+    { label: 'Premium (pharma)', value: 'premium' },
+    { label: 'Neo (biotech)', value: 'neo' },
+  ] as const
 
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
@@ -409,6 +500,55 @@
         height: 100%;
         color: @neutral-400;
         background: fade(@neutral-100, 60%);
+      }
+    }
+
+    &__theme-settings {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid fade(@neutral-200, 70%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    &__theme-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &__pill {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      line-height: 1;
+      border: 1px solid fade(@neutral-300, 80%);
+      background: fade(@neutral-0, 90%);
+      color: @neutral-700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      outline: none;
+
+      &:hover {
+        background: fade(@neutral-100, 70%);
+      }
+
+      &--active {
+        border-color: fade(@primary-500, 70%);
+        background: fade(@primary-50, 85%);
+        color: @primary-700;
+        box-shadow: 0 0 0 1px fade(@primary-200, 70%);
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 2px @focus-ring;
       }
     }
 

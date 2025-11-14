@@ -6,7 +6,7 @@
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0px 0px 2px 2px rgba(0, 167, 155, 0.4);
+    box-shadow: 0 0 0 2px @focus-ring;
   }
 
   .icon-container {
@@ -28,6 +28,7 @@
     padding: @padding-button-m;
     border-radius: @border-radius-m;
     gap: @spacing-10;
+
     svg {
       transform: scale(0.85);
     }
@@ -43,6 +44,7 @@
       transform: scale(0.75);
     }
   }
+
   &--auto {
     width: auto;
   }
@@ -50,135 +52,487 @@
   &--full {
     width: 100%;
   }
+
+  /* ========= PRIMARY ========= */
   &--primary {
+    /* Filled */
     &.btn--filled {
-      .addFilledColors(
-        @primary-filled-default-bg,
-        @primary-filled-default-text,
-        @primary-filled-hover-bg,
-        @primary-filled-hover-text,
-        @primary-filled-active-bg,
-        @primary-filled-active-text
-      );
+      background-color: @primary-filled-default-bg;
+      color: @primary-filled-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @primary-filled-default-text;
+      }
+
+      &:hover {
+        background-color: @primary-filled-hover-bg;
+        color: @primary-filled-hover-text;
+
+        svg {
+          fill: @primary-filled-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @primary-filled-active-bg;
+        color: @primary-filled-active-text;
+
+        svg {
+          fill: @primary-filled-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-filled-disabled-bg;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
+
+    /* Outlined */
     &.btn--outlined {
-      .addOutlinedColors(
-        @primary-outlined-default-bg,
-        @primary-outlined-default-text,
-        @primary-outlined-hover-bg,
-        @primary-outlined-hover-text,
-        @primary-outlined-active-bg,
-        @primary-outlined-active-text
-      );
+      background-color: @primary-outlined-default-bg;
+      color: @primary-outlined-default-text;
+      border: 1px solid @primary-outlined-default-text;
+
+      svg {
+        fill: @primary-outlined-default-text;
+      }
+
+      &:hover {
+        background-color: @primary-outlined-hover-bg;
+        color: @primary-outlined-hover-text;
+        border-color: @primary-outlined-hover-text;
+
+        svg {
+          fill: @primary-outlined-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @primary-outlined-active-bg;
+        color: @primary-outlined-active-text;
+        border-color: @primary-outlined-active-text;
+
+        svg {
+          fill: @primary-outlined-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-outlined-disabled-bg;
+        border-color: @btn-outlined-disabled-content;
+        color: @btn-outlined-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-outlined-disabled-content;
+        }
+      }
     }
+
+    /* Ghost */
     &.btn--ghost {
-      .addGhostedColors(
-        @primary-ghosted-default-bg,
-        @primary-ghosted-default-text,
-        @primary-ghosted-hover-bg,
-        @primary-ghosted-hover-text,
-        @primary-ghosted-active-bg,
-        @primary-ghosted-active-text
-      );
+      background-color: transparent;
+      color: @primary-ghosted-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @primary-ghosted-default-text;
+      }
+
+      &:hover {
+        background-color: @primary-ghosted-hover-bg;
+        color: @primary-ghosted-hover-text;
+
+        svg {
+          fill: @primary-ghosted-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @primary-ghosted-active-bg;
+        color: @primary-ghosted-active-text;
+
+        svg {
+          fill: @primary-ghosted-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: transparent;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
   }
 
+  /* ========= REVERSE ========= */
   &--reverse {
     &.btn--filled {
-      .addFilledColors(
-        @reverse-filled-default-bg,
-        @reverse-filled-default-text,
-        @reverse-filled-hover-bg,
-        @reverse-filled-hover-text,
-        @reverse-filled-active-bg,
-        @reverse-filled-active-text
-      );
+      background-color: @reverse-filled-default-bg;
+      color: @reverse-filled-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @reverse-filled-default-text;
+      }
+
+      &:hover {
+        background-color: @reverse-filled-hover-bg;
+        color: @reverse-filled-hover-text;
+
+        svg {
+          fill: @reverse-filled-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @reverse-filled-active-bg;
+        color: @reverse-filled-active-text;
+
+        svg {
+          fill: @reverse-filled-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-filled-disabled-bg;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
+
     &.btn--outlined {
-      .addOutlinedColors(
-        @reverse-outlined-default-bg,
-        @reverse-outlined-default-text,
-        @reverse-outlined-hover-bg,
-        @reverse-outlined-hover-text,
-        @reverse-outlined-active-bg,
-        @reverse-outlined-active-text
-      );
+      background-color: @reverse-outlined-default-bg;
+      color: @reverse-outlined-default-text;
+      border: 1px solid @reverse-outlined-default-text;
+
+      svg {
+        fill: @reverse-outlined-default-text;
+      }
+
+      &:hover {
+        background-color: @reverse-outlined-hover-bg;
+        color: @reverse-outlined-hover-text;
+        border-color: @reverse-outlined-hover-text;
+
+        svg {
+          fill: @reverse-outlined-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @reverse-outlined-active-bg;
+        color: @reverse-outlined-active-text;
+        border-color: @reverse-outlined-active-text;
+
+        svg {
+          fill: @reverse-outlined-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-outlined-disabled-bg;
+        border-color: @btn-outlined-disabled-content;
+        color: @btn-outlined-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-outlined-disabled-content;
+        }
+      }
     }
+
     &.btn--ghost {
-      .addGhostedColors(
-        @reverse-ghosted-default-bg,
-        @reverse-ghosted-default-text,
-        @reverse-ghosted-hover-bg,
-        @reverse-ghosted-hover-text,
-        @reverse-ghosted-active-bg,
-        @reverse-ghosted-active-text
-      );
+      background-color: transparent;
+      color: @reverse-ghosted-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @reverse-ghosted-default-text;
+      }
+
+      &:hover {
+        background-color: @reverse-ghosted-hover-bg;
+        color: @reverse-ghosted-hover-text;
+
+        svg {
+          fill: @reverse-ghosted-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @reverse-ghosted-active-bg;
+        color: @reverse-ghosted-active-text;
+
+        svg {
+          fill: @reverse-ghosted-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: transparent;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
   }
 
+  /* ========= SECONDARY ========= */
   &--secondary {
     &.btn--filled {
-      .addFilledColors(
-        @secondary-filled-default-bg,
-        @secondary-filled-default-text,
-        @secondary-filled-hover-bg,
-        @secondary-filled-hover-text,
-        @secondary-filled-active-bg,
-        @secondary-filled-active-text
-      );
+      background-color: @secondary-filled-default-bg;
+      color: @secondary-filled-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @secondary-filled-default-text;
+      }
+
+      &:hover {
+        background-color: @secondary-filled-hover-bg;
+        color: @secondary-filled-hover-text;
+
+        svg {
+          fill: @secondary-filled-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @secondary-filled-active-bg;
+        color: @secondary-filled-active-text;
+
+        svg {
+          fill: @secondary-filled-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-filled-disabled-bg;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
+
     &.btn--outlined {
-      .addOutlinedColors(
-        @secondary-outlined-default-bg,
-        @secondary-outlined-default-text,
-        @secondary-outlined-hover-bg,
-        @secondary-outlined-hover-text,
-        @secondary-outlined-active-bg,
-        @secondary-outlined-active-text
-      );
+      background-color: @secondary-outlined-default-bg;
+      color: @secondary-outlined-default-text;
+      border: 1px solid @secondary-outlined-default-text;
+
+      svg {
+        fill: @secondary-outlined-default-text;
+      }
+
+      &:hover {
+        background-color: @secondary-outlined-hover-bg;
+        color: @secondary-outlined-hover-text;
+        border-color: @secondary-outlined-hover-text;
+
+        svg {
+          fill: @secondary-outlined-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @secondary-outlined-active-bg;
+        color: @secondary-outlined-active-text;
+        border-color: @secondary-outlined-active-text;
+
+        svg {
+          fill: @secondary-outlined-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-outlined-disabled-bg;
+        border-color: @btn-outlined-disabled-content;
+        color: @btn-outlined-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-outlined-disabled-content;
+        }
+      }
     }
+
     &.btn--ghost {
-      .addGhostedColors(
-        @secondary-ghosted-default-bg,
-        @secondary-ghosted-default-text,
-        @secondary-ghosted-hover-bg,
-        @secondary-ghosted-hover-text,
-        @secondary-ghosted-active-bg,
-        @secondary-ghosted-active-text
-      );
+      background-color: transparent;
+      color: @secondary-ghosted-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @secondary-ghosted-default-text;
+      }
+
+      &:hover {
+        background-color: @secondary-ghosted-hover-bg;
+        color: @secondary-ghosted-hover-text;
+
+        svg {
+          fill: @secondary-ghosted-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @secondary-ghosted-active-bg;
+        color: @secondary-ghosted-active-text;
+
+        svg {
+          fill: @secondary-ghosted-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: transparent;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
   }
 
+  /* ========= DANGER ========= */
   &--danger {
     &.btn--filled {
-      .addFilledColors(
-        @danger-filled-default-bg,
-        @danger-filled-default-text,
-        @danger-filled-hover-bg,
-        @danger-filled-hover-text,
-        @danger-filled-active-bg,
-        @danger-filled-active-text
-      );
+      background-color: @danger-filled-default-bg;
+      color: @danger-filled-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @danger-filled-default-text;
+      }
+
+      &:hover {
+        background-color: @danger-filled-hover-bg;
+        color: @danger-filled-hover-text;
+
+        svg {
+          fill: @danger-filled-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @danger-filled-active-bg;
+        color: @danger-filled-active-text;
+
+        svg {
+          fill: @danger-filled-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-filled-disabled-bg;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
+
     &.btn--outlined {
-      .addOutlinedColors(
-        @danger-outlined-default-bg,
-        @danger-outlined-default-text,
-        @danger-outlined-hover-bg,
-        @danger-outlined-hover-text,
-        @danger-outlined-active-bg,
-        @danger-outlined-active-text
-      );
+      background-color: @danger-outlined-default-bg;
+      color: @danger-outlined-default-text;
+      border: 1px solid @danger-outlined-default-text;
+
+      svg {
+        fill: @danger-outlined-default-text;
+      }
+
+      &:hover {
+        background-color: @danger-outlined-hover-bg;
+        color: @danger-outlined-hover-text;
+        border-color: @danger-outlined-hover-text;
+
+        svg {
+          fill: @danger-outlined-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @danger-outlined-active-bg;
+        color: @danger-outlined-active-text;
+        border-color: @danger-outlined-active-text;
+
+        svg {
+          fill: @danger-outlined-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: @btn-outlined-disabled-bg;
+        border-color: @btn-outlined-disabled-content;
+        color: @btn-outlined-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-outlined-disabled-content;
+        }
+      }
     }
+
     &.btn--ghost {
-      .addGhostedColors(
-        @danger-ghosted-default-bg,
-        @danger-ghosted-default-text,
-        @danger-ghosted-hover-bg,
-        @danger-ghosted-hover-text,
-        @danger-ghosted-active-bg,
-        @danger-ghosted-active-text
-      );
+      background-color: transparent;
+      color: @danger-ghosted-default-text;
+      border: 1px solid transparent;
+
+      svg {
+        fill: @danger-ghosted-default-text;
+      }
+
+      &:hover {
+        background-color: @danger-ghosted-hover-bg;
+        color: @danger-ghosted-hover-text;
+
+        svg {
+          fill: @danger-ghosted-hover-text;
+        }
+      }
+
+      &.is-active {
+        background-color: @danger-ghosted-active-bg;
+        color: @danger-ghosted-active-text;
+
+        svg {
+          fill: @danger-ghosted-active-text;
+        }
+      }
+
+      &.is-disabled {
+        background-color: transparent;
+        color: @btn-filled-disabled-content;
+        cursor: not-allowed;
+
+        svg {
+          fill: @btn-filled-disabled-content;
+        }
+      }
     }
   }
 
@@ -187,6 +541,7 @@
   }
 }
 
+/* Animations Vue (inchangées) */
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.8s ease;

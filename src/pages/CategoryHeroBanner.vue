@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-  import { bienEtre, metabolisme, performance } from '@/assets/banners/categories'
+  import { bienEtre, metabolisme, performance } from '@/assets/home/banners/categories'
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 

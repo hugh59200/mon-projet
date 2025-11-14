@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <!-- 🧬 HERO PRINCIPAL -->
     <section class="home__hero">
       <div class="home__hero-content">
         <BasicText
@@ -16,7 +15,6 @@
           />
           <span>Fournisseur européen • Usage recherche uniquement</span>
         </BasicText>
-
         <BasicText
           size="h1"
           weight="bold"
@@ -24,7 +22,6 @@
         >
           Peptides de recherche certifiés pour laboratoires et R&amp;D
         </BasicText>
-
         <BasicText
           size="body-l"
           color="neutral-700"
@@ -32,7 +29,6 @@
         >
           Catalogue sélectionné • Certificats d’analyse disponibles • Expédition 24h depuis l’UE
         </BasicText>
-
         <div class="home__hero-actions">
           <BasicButton
             label="Découvrir nos produits"
@@ -49,7 +45,6 @@
             @click="$router.push('/a-propos')"
           />
         </div>
-
         <BasicText
           size="body-m"
           color="neutral-500"
@@ -59,10 +54,9 @@
           humain.
         </BasicText>
       </div>
-
       <div class="home__hero-image">
         <img
-          src="../assets/peptides-hero.jpg"
+          src="../assets/home/présentation-peptides.png"
           alt="Flacon de peptide pour usage recherche"
           class="home__image"
         />
