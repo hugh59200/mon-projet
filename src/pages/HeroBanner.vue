@@ -468,13 +468,12 @@
     font-size: 11px;
   }
 
-  /* PERSONAS : comportement par défaut = colonne scrollable (tablet / desktop) */
   .hero-banner__personas {
     flex: 1.4;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    max-height: 360px;
+    max-height: 450px;
     padding-right: 6px;
     overflow-y: auto;
   }
@@ -501,7 +500,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    overflow: hidden;
   }
 
   .persona-card__image-wrap {
@@ -677,7 +675,6 @@
       overflow: visible;
     }
   }
-  
 
   /* 📱 / TABLETTE : layout plus compact */
   @media (max-width: 960px) {
