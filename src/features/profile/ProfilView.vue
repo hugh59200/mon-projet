@@ -7,27 +7,27 @@
         alt="Cover"
         class="profil__cover-img"
       />
-      <div class="profil__cover-overlay"></div>
+      <div class="profil__cover-overlay" />
     </div>
 
-    <!-- CARD CONTAINER -->
+    <!-- CARD -->
     <div class="profil__container">
-      <!-- HEADER PROFIL -->
+      <!-- HEADER -->
       <div class="profil__header">
+        <!-- Avatar -->
         <div class="profil__avatar">
           <img
             v-if="avatarPreview"
             :src="avatarPreview"
             class="profil__avatar-img"
           />
-
           <div
             v-else
             class="profil__avatar-placeholder"
           >
             <BasicIconNext
               name="User"
-              :size="42"
+              :size="44"
             />
           </div>
 
@@ -39,6 +39,7 @@
           />
         </div>
 
+        <!-- User info -->
         <div class="profil__header-info">
           <BasicText
             size="h3"
@@ -69,7 +70,7 @@
 
       <!-- SECTIONS -->
       <div class="profil__sections">
-        <!-- Informations personnelles -->
+        <!-- PERSONNAL INFO -->
         <FilterSection
           title="Informations personnelles"
           v-model="sections.personal"
@@ -82,7 +83,7 @@
           <BasicInput
             v-model="phone"
             label="Téléphone"
-            placeholder="+33 6 ..."
+            placeholder="+33..."
             input-type="form"
           />
           <BasicInput
@@ -103,49 +104,52 @@
           </div>
         </FilterSection>
 
-        <!-- Mes commandes -->
+        <!-- ORDERS -->
         <FilterSection
           title="Mes commandes"
           v-model="sections.orders"
         >
           <div class="profil__orders">
-            <div
-              v-if="lastOrders.length"
-              v-for="order in lastOrders"
-              :key="order.id"
-              class="order-card"
-              @click="goToOrder(order.id)"
-            >
-              <div class="order-card__header">
-                <BasicText
-                  size="body-l"
-                  weight="bold"
-                >
-                  Commande #{{ order?.id?.slice(0, 8) }}
-                </BasicText>
-                <BasicBadge
-                  :label="getLabelBadge(order.status)"
-                  :type="getTypeBadge(order.status)"
-                  size="small"
-                />
-              </div>
+            <template v-if="lastOrders.length">
+              <div
+                v-for="order in lastOrders"
+                :key="order.id"
+                class="order-card"
+                @click="goToOrder(order.id)"
+              >
+                <div class="order-card__header">
+                  <BasicText
+                    size="body-l"
+                    weight="bold"
+                  >
+                    Commande #{{ order.id?.slice(0, 8) }}
+                  </BasicText>
 
-              <div class="order-card__body">
-                <BasicText
-                  size="body-m"
-                  color="neutral-700"
-                >
-                  Total :
-                  <strong>{{ order.total_amount }} €</strong>
-                </BasicText>
-                <BasicText
-                  size="body-m"
-                  color="neutral-500"
-                >
-                  Date : {{ formatOrderDate(order.created_at!) }}
-                </BasicText>
+                  <BasicBadge
+                    :label="getLabelBadge(order.status)"
+                    :type="getTypeBadge(order.status)"
+                    size="small"
+                  />
+                </div>
+
+                <div class="order-card__body">
+                  <BasicText
+                    size="body-m"
+                    color="neutral-700"
+                  >
+                    Total :
+                    <strong>{{ order.total_amount }} €</strong>
+                  </BasicText>
+
+                  <BasicText
+                    size="body-m"
+                    color="neutral-500"
+                  >
+                    Date : {{ formatOrderDate(order.created_at!) }}
+                  </BasicText>
+                </div>
               </div>
-            </div>
+            </template>
 
             <BasicText
               v-else
@@ -168,7 +172,7 @@
           </div>
         </FilterSection>
 
-        <!-- Préférences (UN SEUL BLOC) -->
+        <!-- PREFERENCES -->
         <FilterSection
           title="Préférences"
           v-model="sections.preferences"
@@ -184,6 +188,7 @@
             />
           </div>
 
+          <!-- THEME PANEL -->
           <ThemeAppearance />
 
           <BasicButton
@@ -194,7 +199,7 @@
           />
         </FilterSection>
 
-        <!-- Sécurité -->
+        <!-- SECURITY -->
         <FilterSection
           title="Sécurité"
           v-model="sections.security"
@@ -232,12 +237,15 @@
           </div>
         </FilterSection>
 
-        <!-- Support -->
+        <!-- SUPPORT -->
         <FilterSection
           title="Assistance & support"
           v-model="sections.support"
         >
-          <p>Vous avez une question ? Contactez notre support client.</p>
+          <BasicText size="body-m">
+            Vous avez une question ? Contactez notre support client.
+          </BasicText>
+
           <BasicButton
             label="Ouvrir la messagerie"
             type="secondary"
@@ -252,10 +260,12 @@
 
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
+  import ThemeAppearance from '@/themes/components/ThemeAppearance.vue'
+
   import { useProfileActions } from '@/supabase/actions/useProfileActions'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
-  import ThemeAppearance from '@/themes/components/ThemeAppearance.vue'
+
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { onMounted, ref, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -343,7 +353,7 @@
   }
 
   function savePreferences() {
-    // si stockage en DB → appeler API
+    // future API storage possible
   }
 
   function openMessaging() {
@@ -362,10 +372,10 @@
 
 <style scoped lang="less">
   .profil {
-    background: var(--neutral-50);
+    background: var(--surface-0);
     min-height: 100vh;
 
-    /* ======= COVER ======= */
+    /* COVER */
     &__cover {
       height: 260px;
       position: relative;
@@ -381,46 +391,57 @@
       &-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to bottom, rgba(var(--neutral-900-rgb), 0.35), transparent 65%);
+        background: linear-gradient(to bottom, rgba(var(--neutral-900-rgb), 0.45), transparent 65%);
       }
     }
 
-    /* ======= CARD CONTAINER ======= */
+    /* CARD */
     &__container {
-      max-width: 980px;
-      margin: -90px auto 60px;
-      background: rgba(var(--neutral-0-rgb), 0.95);
-      border-radius: 24px;
+      background: var(--surface-1);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(10px);
+
       padding: 42px 48px;
-      box-shadow:
-        0 10px 30px rgba(var(--neutral-900-rgb), 0.12),
-        0 2px 6px rgba(var(--neutral-900-rgb), 0.06);
-      backdrop-filter: blur(8px);
+      margin: -90px auto 60px;
+
+      box-shadow: var(--surface-shadow);
+      max-width: 1020px;
+      transition: var(--transition-medium);
+
+      &:hover {
+        border-color: var(--surface-border-strong);
+      }
     }
 
-    /* ======= HEADER ======= */
+    /* HEADER */
     &__header {
       display: flex;
       gap: 28px;
       align-items: center;
+
       padding-bottom: 28px;
       margin-bottom: 32px;
-      border-bottom: 1px solid rgba(var(--neutral-200-rgb), 0.6);
+
+      border-bottom: 1px solid var(--surface-divider);
     }
 
+    /* Avatar */
     &__avatar {
-      width: 115px;
-      height: 115px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       overflow: hidden;
+
+      background: var(--surface-2);
+      border: 2px solid rgba(var(--primary-400-rgb), 0.5);
       position: relative;
-      background: rgba(var(--neutral-100-rgb), 0.4);
-      border: 2px solid rgba(var(--primary-400-rgb), 0.4);
-      transition: 0.3s ease;
+
+      transition: var(--transition-medium);
 
       &:hover {
-        transform: scale(1.04);
-        box-shadow: 0 0 14px rgba(var(--primary-400-rgb), 0.5);
+        transform: scale(1.03);
+        box-shadow: 0 0 18px rgba(var(--primary-400-rgb), 0.5);
       }
 
       &-input {
@@ -435,113 +456,76 @@
         align-items: center;
         justify-content: center;
         height: 100%;
-        color: var(--neutral-300);
+        color: var(--neutral-400);
+        background: var(--surface-2);
       }
     }
 
+    /* Text info header */
     &__header-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    &__meta {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: var(--neutral-600);
-    }
-
-    /* ======= SECTIONS ======= */
-    &__sections {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    /* ====== BUTTON ROW ====== */
-    &__actions {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    /* ====== ORDERS ====== */
-    .order-card {
-      background: rgba(var(--neutral-0-rgb), 0.85);
-      border: 1px solid rgba(var(--neutral-300-rgb), 0.55);
-      border-radius: 14px;
-      padding: 14px 18px;
-      cursor: pointer;
-      transition: 0.22s ease;
-
-      &:hover {
-        background: rgba(var(--secondary-50-rgb), 0.85);
-        border-color: rgba(var(--secondary-300-rgb), 0.6);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(var(--neutral-900-rgb), 0.08);
-      }
-
-      &__header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 6px;
-      }
-
-      &__body {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-    }
-
-    /* ====== THEME SETTINGS ====== */
-    &__theme-settings {
-      padding: 20px;
-      border-radius: 12px;
-      background: rgba(var(--neutral-0-rgb), 0.8);
-      border: 1px solid rgba(var(--neutral-200-rgb), 0.6);
-      box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.05);
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    &__theme-row {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    &__pill-group {
+    &__meta {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      color: var(--neutral-600);
     }
 
-    &__pill {
-      padding: 6px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(var(--neutral-300-rgb), 0.8);
-      background: rgba(var(--neutral-50-rgb), 0.9);
-      color: var(--neutral-700);
-      font-size: 13px;
+    /* SECTIONS */
+    &__sections {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      margin-top: 10px;
+    }
+
+    /* ACTIONS */
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    /* ORDERS */
+    .order-card {
+      background: var(--surface-1);
+      border-radius: var(--radius-l);
+
+      border: 1px solid var(--surface-border);
+      padding: 16px 20px;
+
       cursor: pointer;
-      transition: all 0.22s ease;
-      backdrop-filter: blur(4px);
+      transition: var(--transition-medium);
 
       &:hover {
-        background: rgba(var(--neutral-100-rgb), 0.85);
+        background: var(--surface-2);
+        border-color: var(--surface-border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(var(--neutral-900-rgb), 0.1);
       }
 
-      &--active {
-        background: rgba(var(--primary-50-rgb), 0.95);
-        border-color: rgba(var(--primary-400-rgb), 0.7);
-        color: var(--primary-700);
-        box-shadow: 0 0 0 1px rgba(var(--primary-300-rgb), 0.8);
-        font-weight: 600;
+      &__header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
       }
+
+      &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    /* Danger zone */
+    &__danger {
+      margin-top: 12px;
+      border-top: 1px solid var(--surface-divider);
+      padding-top: 16px;
     }
   }
 </style>

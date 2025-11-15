@@ -1,10 +1,246 @@
+/* ============================================================
+   DESIGN SYSTEM FOUNDATIONS — VERSION 1
+   Base + Surfaces + Neutrals + Status Colors
+   (Typo, spacing, palettes, rgb-tokens arrivent étape 2/6)
+   ============================================================ */
+
+/* ---------------------------------- */
+/*            BASE ROOT              */
+/* ---------------------------------- */
 :root {
-  /* valeurs par défaut au cas où */
   --palette: lab;
   --theme: light;
+
+  /* Font */
+  --font-ui: "Mont", sans-serif;
+  --font-family-primary: "Mont", sans-serif;
+
+  /* Transitions */
+  --transition-fast: 0.18s ease;
+  --transition-medium: 0.28s ease;
+
+  /* Text contrast (dynamic) */
+  --text-title-contrast: var(--neutral-900);
 }
 
-/* === NEUTRALS (light) === */
+[data-theme="dark"] {
+  --text-title-contrast: var(--neutral-50);
+}
+
+/* ---------------------------------- */
+/*          SURFACES (LIGHT)          */
+/* ---------------------------------- */
+:root[data-theme="light"] {
+  --surface-0: var(--neutral-50);
+  --surface-0-rgb: var(--neutral-50-rgb);
+
+  --surface-1: var(--neutral-0);
+  --surface-1-rgb: var(--neutral-0-rgb);
+
+  --surface-2: var(--neutral-50);
+  --surface-2-rgb: var(--neutral-50-rgb);
+
+  --surface-3: var(--neutral-100);
+  --surface-3-rgb: var(--neutral-100-rgb);
+
+  --surface-4: var(--neutral-0);
+
+  --surface-border: rgba(var(--neutral-200-rgb), 0.65);
+  --surface-border-strong: rgba(var(--neutral-300-rgb), 0.9);
+  --surface-divider: rgba(var(--neutral-200-rgb), 0.55);
+
+  --surface-elevated-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  --surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  --surface-hover: rgba(var(--neutral-100-rgb), 0.7);
+  --surface-active: rgba(var(--neutral-200-rgb), 0.7);
+}
+
+/* ---------------------------------- */
+/*          SURFACES (DARK)           */
+/* ---------------------------------- */
+:root[data-theme="dark"] {
+  --surface-0: var(--neutral-950);
+  --surface-0-rgb: var(--neutral-950-rgb);
+
+  --surface-1: var(--neutral-900);
+  --surface-1-rgb: var(--neutral-900-rgb);
+
+  --surface-2: var(--neutral-800);
+  --surface-2-rgb: var(--neutral-800-rgb);
+
+  --surface-3: var(--neutral-700);
+  --surface-3-rgb: var(--neutral-700-rgb);
+
+  --surface-4: var(--neutral-800);
+
+  --surface-border: rgba(var(--neutral-600-rgb), 0.45);
+  --surface-border-strong: rgba(var(--neutral-500-rgb), 0.7);
+  --surface-divider: rgba(var(--neutral-600-rgb), 0.35);
+
+  --surface-elevated-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --surface-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+
+  --surface-hover: rgba(var(--neutral-700-rgb), 0.4);
+  --surface-active: rgba(var(--neutral-600-rgb), 0.4);
+}
+
+/* ---------------------------------- */
+/*               UTILS                */
+/* ---------------------------------- */
+.util-shadow-elevated {
+  box-shadow: var(--surface-elevated-shadow);
+}
+.util-border {
+  border: 1px solid var(--surface-border);
+}
+.util-border-strong {
+  border: 1px solid var(--surface-border-strong);
+}
+
+.util-surface-1 {
+  background: var(--surface-1);
+}
+.util-surface-2 {
+  background: var(--surface-2);
+}
+.util-surface-3 {
+  background: var(--surface-3);
+}
+.util-surface-4 {
+  background: var(--surface-4);
+}
+
+.util-hover {
+  transition: var(--transition-medium);
+}
+.util-hover:hover {
+  background: var(--surface-hover);
+}
+
+:root[data-theme="light"] {
+  --primary-0: #f5f7ff;
+  --primary-50: #eef2ff;
+  --primary-100: #e0e7ff;
+  --primary-200: #c7d2fe;
+  --primary-300: #a5b4fc;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+  --primary-800: #3730a3;
+  --primary-900: #312e81;
+  --primary-950: #1e1b4b;
+  --primary-1000: #100e24;
+
+  --primary-0-rgb: 245, 247, 255;
+  --primary-50-rgb: 238, 242, 255;
+  --primary-100-rgb: 224, 231, 255;
+  --primary-200-rgb: 199, 210, 254;
+  --primary-300-rgb: 165, 180, 252;
+  --primary-400-rgb: 129, 140, 248;
+  --primary-500-rgb: 99, 102, 241;
+  --primary-600-rgb: 79, 70, 229;
+  --primary-700-rgb: 67, 56, 202;
+  --primary-800-rgb: 55, 48, 163;
+  --primary-900-rgb: 49, 46, 129;
+  --primary-950-rgb: 30, 27, 75;
+  --primary-1000-rgb: 16, 14, 36;
+}
+
+:root[data-theme="dark"] {
+  --primary-0: #100e24;
+  --primary-50: #1e1b4b;
+  --primary-100: #312e81;
+  --primary-200: #3730a3;
+  --primary-300: #4338ca;
+  --primary-400: #4f46e5;
+  --primary-500: #6366f1;
+  --primary-600: #818cf8;
+  --primary-700: #a5b4fc;
+  --primary-800: #c7d2fe;
+  --primary-900: #e0e7ff;
+  --primary-950: #eef2ff;
+  --primary-1000: #ffffff;
+
+  --primary-0-rgb: 16, 14, 36;
+  --primary-50-rgb: 30, 27, 75;
+  --primary-100-rgb: 49, 46, 129;
+  --primary-200-rgb: 55, 48, 163;
+  --primary-300-rgb: 67, 56, 202;
+  --primary-400-rgb: 79, 70, 229;
+  --primary-500-rgb: 99, 102, 241;
+  --primary-600-rgb: 129, 140, 248;
+  --primary-700-rgb: 165, 180, 252;
+  --primary-800-rgb: 199, 210, 254;
+  --primary-900-rgb: 224, 231, 255;
+  --primary-950-rgb: 238, 242, 255;
+  --primary-1000-rgb: 255, 255, 255;
+}
+
+:root[data-theme="light"] {
+  --secondary-0: #f6f7ff;
+  --secondary-50: #eef0ff;
+  --secondary-100: #dce0ff;
+  --secondary-200: #b9c1ff;
+  --secondary-300: #96a3ff;
+  --secondary-400: #7384ff;
+  --secondary-500: #5066ff;
+  --secondary-600: #3c51e0;
+  --secondary-700: #2b3eb8;
+  --secondary-800: #1c2a8f;
+  --secondary-900: #111c66;
+  --secondary-950: #0a113d;
+  --secondary-1000: #04081f;
+
+  --secondary-0-rgb: 246, 247, 255;
+  --secondary-50-rgb: 238, 240, 255;
+  --secondary-100-rgb: 220, 224, 255;
+  --secondary-200-rgb: 185, 193, 255;
+  --secondary-300-rgb: 150, 163, 255;
+  --secondary-400-rgb: 115, 132, 255;
+  --secondary-500-rgb: 80, 102, 255;
+  --secondary-600-rgb: 60, 81, 224;
+  --secondary-700-rgb: 43, 62, 184;
+  --secondary-800-rgb: 28, 42, 143;
+  --secondary-900-rgb: 17, 28, 102;
+  --secondary-950-rgb: 10, 17, 61;
+  --secondary-1000-rgb: 4, 8, 31;
+}
+
+:root[data-theme="dark"] {
+  --secondary-0: #0a113d;
+  --secondary-50: #111c66;
+  --secondary-100: #1c2a8f;
+  --secondary-200: #2b3eb8;
+  --secondary-300: #3c51e0;
+  --secondary-400: #5066ff;
+  --secondary-500: #7384ff;
+  --secondary-600: #96a3ff;
+  --secondary-700: #b9c1ff;
+  --secondary-800: #dce0ff;
+  --secondary-900: #eef0ff;
+  --secondary-950: #f6f7ff;
+  --secondary-1000: #ffffff;
+
+  --secondary-0-rgb: 10, 17, 61;
+  --secondary-50-rgb: 17, 28, 102;
+  --secondary-100-rgb: 28, 42, 143;
+  --secondary-200-rgb: 43, 62, 184;
+  --secondary-300-rgb: 60, 81, 224;
+  --secondary-400-rgb: 80, 102, 255;
+  --secondary-500-rgb: 115, 132, 255;
+  --secondary-600-rgb: 150, 163, 255;
+  --secondary-700-rgb: 185, 193, 255;
+  --secondary-800-rgb: 220, 224, 255;
+  --secondary-900-rgb: 238, 240, 255;
+  --secondary-950-rgb: 246, 247, 255;
+  --secondary-1000-rgb: 255, 255, 255;
+}
+
+/* ---------------------------------- */
+/*        NEUTRALS (LIGHT)            */
+/* ---------------------------------- */
 :root[data-theme="light"] {
   --neutral-0: #ffffff;
   --neutral-50: #f9fafb;
@@ -20,7 +256,9 @@
   --neutral-950: #020617;
 }
 
-/* === NEUTRALS (dark) === */
+/* ---------------------------------- */
+/*         NEUTRALS (DARK)            */
+/* ---------------------------------- */
 :root[data-theme="dark"] {
   --neutral-0: #020617;
   --neutral-50: #030712;
@@ -36,9 +274,9 @@
   --neutral-950: #ffffff;
 }
 
-/* ==== STATUS COLORS (identiques pour toutes les palettes) ==== */
-
-/* Danger (rouge) */
+/* ---------------------------------- */
+/*         DANGER (LIGHT/DARK)        */
+/* ---------------------------------- */
 :root[data-theme="light"] {
   --danger-0: #fef2f2;
   --danger-50: #fef2f2;
@@ -66,7 +304,9 @@
   --danger-900: #fee2e2;
 }
 
-/* Warning (orange) */
+/* ---------------------------------- */
+/*       WARNING (LIGHT/DARK)         */
+/* ---------------------------------- */
 :root[data-theme="light"] {
   --warning-50: #fffbeb;
   --warning-100: #fef3c7;
@@ -92,7 +332,9 @@
   --warning-900: #fef3c7;
 }
 
-/* Success (vert) */
+/* ---------------------------------- */
+/*       SUCCESS (LIGHT/DARK)         */
+/* ---------------------------------- */
 :root[data-theme="light"] {
   --success-50: #ecfdf5;
   --success-100: #d1fae5;
@@ -118,7 +360,9 @@
   --success-900: #d1fae5;
 }
 
-/* Info (bleu) */
+/* ---------------------------------- */
+/*         INFO (LIGHT/DARK)          */
+/* ---------------------------------- */
 :root[data-theme="light"] {
   --info-50: #eff6ff;
   --info-100: #dbeafe;
@@ -142,4 +386,663 @@
   --info-700: #93c5fd;
   --info-800: #bfdbfe;
   --info-900: #dbeafe;
+}
+
+:root[data-theme="light"] {
+  --danger-0-rgb: 254, 242, 242;
+  --danger-50-rgb: 254, 242, 242;
+  --danger-100-rgb: 254, 226, 226;
+  --danger-200-rgb: 254, 202, 202;
+  --danger-300-rgb: 252, 165, 165;
+  --danger-400-rgb: 248, 113, 113;
+  --danger-500-rgb: 239, 68, 68;
+  --danger-600-rgb: 220, 38, 38;
+  --danger-700-rgb: 185, 28, 28;
+  --danger-800-rgb: 153, 27, 27;
+  --danger-900-rgb: 127, 29, 29;
+}
+:root[data-theme="dark"] {
+  --danger-0-rgb: 69, 10, 10;
+  --danger-50-rgb: 69, 10, 10;
+  --danger-100-rgb: 127, 29, 29;
+  --danger-200-rgb: 153, 27, 27;
+  --danger-300-rgb: 185, 28, 28;
+  --danger-400-rgb: 220, 38, 38;
+  --danger-500-rgb: 239, 68, 68;
+  --danger-600-rgb: 248, 113, 113;
+  --danger-700-rgb: 252, 165, 165;
+  --danger-800-rgb: 254, 202, 202;
+  --danger-900-rgb: 254, 226, 226;
+}
+
+:root[data-theme="light"] {
+  --warning-50-rgb: 255, 251, 235;
+  --warning-100-rgb: 254, 243, 199;
+  --warning-200-rgb: 253, 230, 138;
+  --warning-300-rgb: 252, 211, 77;
+  --warning-400-rgb: 251, 191, 36;
+  --warning-500-rgb: 245, 158, 11;
+  --warning-600-rgb: 217, 119, 6;
+  --warning-700-rgb: 180, 83, 9;
+  --warning-800-rgb: 146, 64, 14;
+  --warning-900-rgb: 120, 53, 15;
+}
+:root[data-theme="dark"] {
+  --warning-50-rgb: 69, 26, 3;
+  --warning-100-rgb: 120, 53, 15;
+  --warning-200-rgb: 146, 64, 14;
+  --warning-300-rgb: 180, 83, 9;
+  --warning-400-rgb: 217, 119, 6;
+  --warning-500-rgb: 245, 158, 11;
+  --warning-600-rgb: 251, 191, 36;
+  --warning-700-rgb: 252, 211, 77;
+  --warning-800-rgb: 253, 230, 138;
+  --warning-900-rgb: 254, 243, 199;
+}
+
+:root[data-theme="light"] {
+  --success-50-rgb: 236, 253, 245;
+  --success-100-rgb: 209, 250, 229;
+  --success-200-rgb: 167, 243, 208;
+  --success-300-rgb: 110, 231, 183;
+  --success-400-rgb: 52, 211, 153;
+  --success-500-rgb: 34, 197, 94;
+  --success-600-rgb: 22, 163, 74;
+  --success-700-rgb: 21, 128, 61;
+  --success-800-rgb: 22, 101, 52;
+  --success-900-rgb: 20, 83, 45;
+}
+:root[data-theme="dark"] {
+  --success-50-rgb: 5, 46, 22;
+  --success-100-rgb: 20, 83, 45;
+  --success-200-rgb: 22, 101, 52;
+  --success-300-rgb: 21, 128, 61;
+  --success-400-rgb: 22, 163, 74;
+  --success-500-rgb: 34, 197, 94;
+  --success-600-rgb: 52, 211, 153;
+  --success-700-rgb: 110, 231, 183;
+  --success-800-rgb: 167, 243, 208;
+  --success-900-rgb: 209, 250, 229;
+}
+
+:root[data-theme="light"] {
+  --info-50-rgb: 239, 246, 255;
+  --info-100-rgb: 219, 234, 254;
+  --info-200-rgb: 191, 219, 254;
+  --info-300-rgb: 147, 197, 253;
+  --info-400-rgb: 96, 165, 250;
+  --info-500-rgb: 59, 130, 246;
+  --info-600-rgb: 37, 99, 235;
+  --info-700-rgb: 29, 78, 216;
+  --info-800-rgb: 30, 64, 175;
+  --info-900-rgb: 30, 58, 138;
+}
+:root[data-theme="dark"] {
+  --info-50-rgb: 11, 17, 32;
+  --info-100-rgb: 30, 58, 138;
+  --info-200-rgb: 30, 64, 175;
+  --info-300-rgb: 29, 78, 216;
+  --info-400-rgb: 37, 99, 235;
+  --info-500-rgb: 59, 130, 246;
+  --info-600-rgb: 96, 165, 250;
+  --info-700-rgb: 147, 197, 253;
+  --info-800-rgb: 191, 219, 254;
+  --info-900-rgb: 219, 234, 254;
+}
+
+/* ============================================================
+   DESIGN SYSTEM — TYPOGRAPHY
+   Version 2/6 — Production Ready
+   ============================================================ */
+
+/* ---------------------------------- */
+/*          FONT FACE Mont           */
+/* ---------------------------------- */
+
+@font-face {
+  font-family: "Mont";
+  src: url("./Mont_Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Mont";
+  src: url("./Mont_Regular.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Mont";
+  src: url("./Mont_SemiBold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Mont";
+  src: url("./Mont_Bold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* ---------------------------------- */
+/*        ROOT TYPOGRAPHY TOKENS      */
+/* ---------------------------------- */
+
+:root {
+  /* Main font */
+  --font-family-primary: "Mont", sans-serif;
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 600;
+  --font-weight-semibold: 700;
+  --font-weight-bold: 800;
+
+  /* Font sizes */
+  --font-size-body-s: 10px;
+  --font-size-body-m: 12px;
+  --font-size-body-l: 14px;
+  --font-size-body-xl: 16px;
+
+  --font-size-h5: 18px;
+  --font-size-h4: 20px;
+  --font-size-h3: 28px;
+  --font-size-h2: 35px;
+  --font-size-h1: 48px;
+
+  /* Line heights */
+  --line-height-tight: 1.1;
+  --line-height-normal: 1.3;
+  --line-height-relaxed: 1.5;
+}
+
+/* ---------------------------------- */
+/*        TEXT UTILITY CLASSES        */
+/* ---------------------------------- */
+
+/* Sizes */
+.text-body-s {
+  font-size: var(--font-size-body-s);
+}
+.text-body-m {
+  font-size: var(--font-size-body-m);
+}
+.text-body-l {
+  font-size: var(--font-size-body-l);
+}
+.text-body-xl {
+  font-size: var(--font-size-body-xl);
+}
+
+.text-h5 {
+  font-size: var(--font-size-h5);
+}
+.text-h4 {
+  font-size: var(--font-size-h4);
+}
+.text-h3 {
+  font-size: var(--font-size-h3);
+}
+.text-h2 {
+  font-size: var(--font-size-h2);
+}
+.text-h1 {
+  font-size: var(--font-size-h1);
+}
+
+/* Weights */
+.text-light {
+  font-weight: var(--font-weight-light);
+}
+.text-regular {
+  font-weight: var(--font-weight-regular);
+}
+.text-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+.text-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* ---------------------------------- */
+/*     DEFAULT ELEMENT STYLING        */
+/* ---------------------------------- */
+
+body {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-body-l);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-relaxed);
+  color: var(--neutral-800);
+}
+
+/* Headings */
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+h4 {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+}
+
+h5 {
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+}
+
+/* Paragraph */
+
+p {
+  font-size: var(--font-size-body-l);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* ============================================================
+   DESIGN SYSTEM — SPACING / RADII / ELEVATION
+   Version 3/6 — Production Ready
+   ============================================================ */
+
+/* ------------------------------------------------------------ */
+/*                       ROOT TOKENS                            */
+/* ------------------------------------------------------------ */
+
+:root {
+  /* ------------------ SPACING SCALE ------------------ */
+  --spacing-1: 2px;
+  --spacing-5: 4px;
+  --spacing-10: 8px;
+  --spacing-15: 16px;
+  --spacing-20: 24px;
+  --spacing-25: 32px;
+  --spacing-30: 48px;
+  --spacing-35: 64px;
+
+  /* Button horizontal spacings */
+  --spacing-button-s: 30px;
+  --spacing-button-m: 40px;
+  --spacing-button-l: 48px;
+
+  /* Padding tokens */
+  --padding-button-s: 6px;
+  --padding-button-m: 8px;
+  --padding-button-l: 10px;
+
+  --padding-badge-s: 0 5px;
+  --padding-badge-m: 0 8px;
+
+  /* ------------------ RADII SCALE ------------------ */
+  --radius-xs: 2px;
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 8px;
+  --radius-xl: 16px;
+  --radius-xxl: 24px;
+
+  /* Standard UI radii */
+  --radius-card: var(--radius-xl);
+  --radius-input: var(--radius-m);
+  --radius-modal: var(--radius-xl);
+  --radius-button-s: var(--radius-s);
+  --radius-button-m: var(--radius-m);
+  --radius-button-l: var(--radius-l);
+
+  /* ------------------ ELEVATION TOKENS ------------------ */
+  /* Light mode shadows (default) */
+  --shadow-100: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-200: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-300: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-400: 0 6px 16px rgba(0, 0, 0, 0.1);
+  --shadow-500: 0 10px 32px rgba(0, 0, 0, 0.14);
+
+  /* Surface-specific shadows used in Surfaces DS */
+  --shadow-elevated: var(--shadow-300);
+  --shadow-hover: var(--shadow-200);
+}
+
+/* ------------------------------------------------------------ */
+/*               DARK MODE ADAPTATION (ELEVATION)               */
+/* ------------------------------------------------------------ */
+
+:root[data-theme="dark"] {
+  --shadow-100: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-200: 0 2px 4px rgba(0, 0, 0, 0.32);
+  --shadow-300: 0 4px 8px rgba(0, 0, 0, 0.38);
+  --shadow-400: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-500: 0 10px 32px rgba(0, 0, 0, 0.52);
+
+  --shadow-elevated: var(--shadow-300);
+  --shadow-hover: var(--shadow-200);
+}
+
+/* ------------------------------------------------------------ */
+/*                    SPACING UTILITIES                         */
+/* ------------------------------------------------------------ */
+
+.gap-1 {
+  gap: var(--spacing-1);
+}
+.gap-5 {
+  gap: var(--spacing-5);
+}
+.gap-10 {
+  gap: var(--spacing-10);
+}
+.gap-15 {
+  gap: var(--spacing-15);
+}
+.gap-20 {
+  gap: var(--spacing-20);
+}
+.gap-25 {
+  gap: var(--spacing-25);
+}
+.gap-30 {
+  gap: var(--spacing-30);
+}
+.gap-35 {
+  gap: var(--spacing-35);
+}
+
+/* Margin shortcuts */
+.m-0 {
+  margin: 0;
+}
+.m-5 {
+  margin: var(--spacing-5);
+}
+.m-10 {
+  margin: var(--spacing-10);
+}
+.m-15 {
+  margin: var(--spacing-15);
+}
+.m-20 {
+  margin: var(--spacing-20);
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Padding shortcuts */
+.p-5 {
+  padding: var(--spacing-5);
+}
+.p-10 {
+  padding: var(--spacing-10);
+}
+.p-15 {
+  padding: var(--spacing-15);
+}
+.p-20 {
+  padding: var(--spacing-20);
+}
+.p-25 {
+  padding: var(--spacing-25);
+}
+
+/* ------------------------------------------------------------ */
+/*                    RADIUS UTILITIES                           */
+/* ------------------------------------------------------------ */
+
+.radius-xs {
+  border-radius: var(--radius-xs);
+}
+.radius-s {
+  border-radius: var(--radius-s);
+}
+.radius-m {
+  border-radius: var(--radius-m);
+}
+.radius-l {
+  border-radius: var(--radius-l);
+}
+.radius-xl {
+  border-radius: var(--radius-xl);
+}
+.radius-xxl {
+  border-radius: var(--radius-xxl);
+}
+
+/* ------------------------------------------------------------ */
+/*                    ELEVATION UTILITIES                        */
+/* ------------------------------------------------------------ */
+
+.elevation-100 {
+  box-shadow: var(--shadow-100);
+}
+.elevation-200 {
+  box-shadow: var(--shadow-200);
+}
+.elevation-300 {
+  box-shadow: var(--shadow-300);
+}
+.elevation-400 {
+  box-shadow: var(--shadow-400);
+}
+.elevation-500 {
+  box-shadow: var(--shadow-500);
+}
+
+.elevation-elevated {
+  box-shadow: var(--shadow-elevated);
+}
+.elevation-hover {
+  box-shadow: var(--shadow-hover);
+}
+
+/* Auto-hover utility */
+.hover-shadow {
+  transition: box-shadow 0.25s ease;
+}
+.hover-shadow:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+/* ============================================================
+   DESIGN SYSTEM — BUTTON TOKENS
+   ============================================================ */
+
+:root {
+  --btn-primary-bg: rgba(var(--primary-600-rgb), 1);
+  --btn-primary-text: var(--neutral-0);
+  --btn-primary-hover-bg: rgba(var(--primary-700-rgb), 1);
+  --btn-primary-hover-text: var(--neutral-0);
+  --btn-primary-active-bg: rgba(var(--primary-800-rgb), 1);
+  --btn-primary-active-text: var(--neutral-0);
+
+  /* Outlined */
+  --btn-primary-out-bg: transparent;
+  --btn-primary-out-text: rgba(var(--primary-600-rgb), 1);
+  --btn-primary-out-border: rgba(var(--primary-600-rgb), 1);
+
+  --btn-primary-out-hover-bg: rgba(var(--primary-600-rgb), 0.1);
+  --btn-primary-out-hover-text: rgba(var(--primary-700-rgb), 1);
+
+  --btn-primary-out-active-bg: rgba(var(--primary-600-rgb), 0.18);
+  --btn-primary-out-active-text: rgba(var(--primary-800-rgb), 1);
+
+  /* Ghost */
+  --btn-primary-ghost-bg: transparent;
+  --btn-primary-ghost-text: rgba(var(--primary-600-rgb), 1);
+
+  --btn-primary-ghost-hover-bg: rgba(var(--primary-50-rgb), 1);
+  --btn-primary-ghost-hover-text: rgba(var(--primary-700-rgb), 1);
+
+  --btn-primary-ghost-active-bg: rgba(var(--primary-100-rgb), 1);
+  --btn-primary-ghost-active-text: rgba(var(--primary-800-rgb), 1);
+
+  /* Disabled */
+  --btn-disabled-bg: rgba(var(--neutral-200-rgb), 0.6);
+  --btn-disabled-text: rgba(var(--neutral-500-rgb), 0.6);
+  --btn-disabled-border: rgba(var(--neutral-300-rgb), 0.4);
+}
+
+:root[data-theme="dark"] {
+  --btn-primary-bg: rgba(var(--primary-500-rgb), 1);
+  --btn-primary-hover-bg: rgba(var(--primary-400-rgb), 1);
+  --btn-primary-active-bg: rgba(var(--primary-300-rgb), 1);
+
+  --btn-primary-out-text: rgba(var(--primary-300-rgb), 1);
+  --btn-primary-out-border: rgba(var(--primary-300-rgb), 1);
+  --btn-primary-out-hover-bg: rgba(var(--primary-300-rgb), 0.2);
+
+  --btn-primary-ghost-text: rgba(var(--primary-200-rgb), 1);
+  --btn-primary-ghost-hover-bg: rgba(var(--primary-900-rgb), 0.2);
+
+  --btn-disabled-bg: rgba(var(--neutral-700-rgb), 0.35);
+  --btn-disabled-text: rgba(var(--neutral-500-rgb), 0.5);
+  --btn-disabled-border: rgba(var(--neutral-600-rgb), 0.25);
+}
+
+:root {
+  --btn-secondary-bg: var(--secondary-700);
+  --btn-secondary-text: var(--neutral-0);
+
+  --btn-secondary-hover-bg: var(--secondary-800);
+  --btn-secondary-hover-text: var(--neutral-0);
+
+  --btn-secondary-active-bg: var(--secondary-900);
+  --btn-secondary-active-text: var(--neutral-0);
+
+  /* Outlined */
+  --btn-secondary-out-bg: transparent;
+  --btn-secondary-out-text: var(--secondary-700);
+  --btn-secondary-out-border: var(--secondary-700);
+
+  --btn-secondary-out-hover-bg: rgba(var(--secondary-700-rgb), 0.08);
+  --btn-secondary-out-hover-text: var(--secondary-800);
+
+  --btn-secondary-out-active-bg: rgba(var(--secondary-700-rgb), 0.16);
+  --btn-secondary-out-active-text: var(--secondary-900);
+
+  /* Ghost */
+  --btn-secondary-ghost-bg: transparent;
+  --btn-secondary-ghost-text: var(--secondary-700);
+
+  --btn-secondary-ghost-hover-bg: rgba(var(--secondary-100-rgb), 1);
+  --btn-secondary-ghost-hover-text: var(--secondary-800);
+
+  --btn-secondary-ghost-active-bg: rgba(var(--secondary-200-rgb), 1);
+  --btn-secondary-ghost-active-text: var(--secondary-900);
+}
+
+:root {
+  --btn-danger-bg: var(--danger-600);
+  --btn-danger-text: var(--neutral-0);
+
+  --btn-danger-hover-bg: var(--danger-700);
+  --btn-danger-hover-text: var(--neutral-0);
+
+  --btn-danger-active-bg: var(--danger-800);
+  --btn-danger-active-text: var(--neutral-0);
+
+  /* Outlined */
+  --btn-danger-out-bg: transparent;
+  --btn-danger-out-text: var(--danger-600);
+  --btn-danger-out-border: var(--danger-600);
+
+  --btn-danger-out-hover-bg: rgba(var(--danger-600-rgb), 0.1);
+  --btn-danger-out-hover-text: var(--danger-700);
+
+  --btn-danger-out-active-bg: rgba(var(--danger-600-rgb), 0.18);
+  --btn-danger-out-active-text: var(--danger-800);
+
+  /* Ghost */
+  --btn-danger-ghost-bg: transparent;
+  --btn-danger-ghost-text: var(--danger-600);
+
+  --btn-danger-ghost-hover-bg: var(--danger-50);
+  --btn-danger-ghost-hover-text: var(--danger-600);
+
+  --btn-danger-ghost-active-bg: var(--danger-100);
+  --btn-danger-ghost-active-text: var(--danger-800);
+}
+
+:root[data-theme="light"] {
+  --btn-reverse-bg: transparent;
+  --btn-reverse-text: var(--neutral-900);
+
+  --btn-reverse-hover-bg: rgba(var(--neutral-900-rgb), 0.08);
+  --btn-reverse-hover-text: var(--neutral-900);
+
+  --btn-reverse-active-bg: rgba(var(--neutral-900-rgb), 0.16);
+  --btn-reverse-active-text: var(--neutral-900);
+
+  /* Outlined */
+  --btn-reverse-out-bg: transparent;
+  --btn-reverse-out-text: var(--neutral-900);
+  --btn-reverse-out-border: var(--neutral-900);
+
+  --btn-reverse-out-hover-bg: rgba(var(--neutral-900-rgb), 0.08);
+  --btn-reverse-out-hover-text: var(--neutral-900);
+
+  --btn-reverse-out-active-bg: rgba(var(--neutral-900-rgb), 0.16);
+  --btn-reverse-out-active-text: var(--neutral-900);
+
+  /* Ghost */
+  --btn-reverse-ghost-bg: transparent;
+  --btn-reverse-ghost-text: var(--neutral-900);
+
+  --btn-reverse-ghost-hover-bg: rgba(var(--neutral-900-rgb), 0.08);
+  --btn-reverse-ghost-hover-text: var(--neutral-900);
+
+  --btn-reverse-ghost-active-bg: rgba(var(--neutral-900-rgb), 0.16);
+  --btn-reverse-ghost-active-text: var(--neutral-900);
+}
+
+:root[data-theme="dark"] {
+  --btn-reverse-bg: transparent;
+  --btn-reverse-text: var(--neutral-0);
+
+  --btn-reverse-hover-bg: rgba(var(--neutral-0-rgb), 0.1);
+  --btn-reverse-hover-text: var(--neutral-0);
+
+  --btn-reverse-active-bg: rgba(var(--neutral-0-rgb), 0.18);
+  --btn-reverse-active-text: var(--neutral-0);
+
+  /* Outlined */
+  --btn-reverse-out-bg: transparent;
+  --btn-reverse-out-text: var(--neutral-0);
+  --btn-reverse-out-border: var(--neutral-0);
+
+  --btn-reverse-out-hover-bg: rgba(var(--neutral-0-rgb), 0.1);
+  --btn-reverse-out-hover-text: var(--neutral-0);
+
+  --btn-reverse-out-active-bg: rgba(var(--neutral-0-rgb), 0.18);
+  --btn-reverse-out-active-text: var(--neutral-0);
+
+  /* Ghost */
+  --btn-reverse-ghost-bg: transparent;
+  --btn-reverse-ghost-text: var(--neutral-0);
+
+  --btn-reverse-ghost-hover-bg: rgba(var(--neutral-0-rgb), 0.1);
+  --btn-reverse-ghost-hover-text: var(--neutral-0);
+
+  --btn-reverse-ghost-active-bg: rgba(var(--neutral-0-rgb), 0.18);
+  --btn-reverse-ghost-active-text: var(--neutral-0);
 }

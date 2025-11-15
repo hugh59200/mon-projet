@@ -1,12 +1,13 @@
 <template>
-  <section class="filter-section">
+  <section class="fs">
     <header
-      class="filter-section__header"
+      class="fs__header"
       @click="toggle"
     >
       <BasicText
-        weight="semibold"
         size="body-m"
+        weight="semibold"
+        class="fs__title"
       >
         {{ title }}
       </BasicText>
@@ -14,7 +15,7 @@
       <BasicIconNext
         :name="open ? 'ChevronUp' : 'ChevronDown'"
         :size="18"
-        class="filter-section__chevron"
+        class="fs__chevron"
         :class="{ 'is-open': open }"
       />
     </header>
@@ -22,13 +23,12 @@
     <div
       v-motion="motion"
       v-show="open"
-      class="filter-section__content"
+      class="fs__content"
     >
       <slot />
     </div>
   </section>
 </template>
-
 <script setup lang="ts">
   import { computed } from 'vue'
 
@@ -36,18 +36,18 @@
   defineProps<{ title: string }>()
 
   const motion = computed(() => ({
-    initial: { opacity: 0, y: -4, scaleY: 0.98 },
+    initial: { opacity: 0, y: -6, scaleY: 0.96 },
     enter: {
       opacity: 1,
       y: 0,
       scaleY: 1,
-      transition: { type: 'spring', stiffness: 160, damping: 22 },
+      transition: { type: 'spring', stiffness: 160, damping: 20 },
     },
     leave: {
       opacity: 0,
-      y: -4,
-      scaleY: 0.98,
-      transition: { duration: 0.15 },
+      y: -6,
+      scaleY: 0.96,
+      transition: { duration: 0.14 },
     },
   }))
 
@@ -57,45 +57,67 @@
 </script>
 
 <style scoped lang="less">
-  .filter-section {
-    background: rgba(var(--neutral-0-rgb), 0.95);
-    border: 1px solid rgba(var(--neutral-200-rgb), 0.55);
-    border-radius: 14px;
+  .fs {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--surface-elevated-shadow);
+    transition: var(--transition-medium);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.04);
-    transition: all 0.25s ease;
 
+    /* hover léger sur tout le bloc */
+    &:hover {
+      border-color: var(--surface-border-strong);
+    }
+
+    /* ===== HEADER ===== */
     &__header {
-      padding: 14px 18px;
+      padding: 16px 20px;
+      background: var(--surface-3);
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
       user-select: none;
-      background: rgba(var(--neutral-50-rgb), 0.6);
-      transition: background 0.2s ease;
+      transition: var(--transition-fast);
 
       &:hover {
-        background: rgba(var(--neutral-100-rgb), 0.8);
+        background: var(--surface-hover);
+      }
+
+      &:active {
+        background: var(--surface-active);
       }
     }
 
+    &__title {
+      color: var(--text-title-contrast);
+    }
+
+    /* Chevron animation */
     &__chevron {
       transition:
-        transform 0.25s ease,
-        opacity 0.25s ease;
+        transform 0.3s ease,
+        opacity 0.2s ease;
+      opacity: 0.75;
 
       &.is-open {
         transform: rotate(180deg);
       }
+
+      &:hover {
+        opacity: 1;
+      }
     }
 
+    /* ===== CONTENT ===== */
     &__content {
-      padding: 18px 18px 22px;
+      padding: 20px 22px 26px;
       display: flex;
       flex-direction: column;
       gap: 18px;
-      border-top: 1px solid rgba(var(--neutral-200-rgb), 0.5);
+      background: var(--surface-1);
+      border-top: 1px solid var(--surface-border);
     }
   }
 </style>

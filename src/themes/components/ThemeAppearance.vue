@@ -1,72 +1,68 @@
 <template>
-  <div class="theme-appearance">
-    <!-- ===== Thème (Clair / Sombre) ===== -->
-    <div class="theme-appearance__block">
+  <div class="ta util-surface-2 util-border util-radius-l util-shadow-elevated">
+    <!-- TITLE -->
+    <BasicText
+      size="body-l"
+      weight="semibold"
+      class="ta__title"
+    >
+      Apparence
+    </BasicText>
+
+    <!-- THEME -->
+    <div class="ta__row">
       <BasicText
-        size="body-m"
-        weight="bold"
+        size="body-s"
+        color="neutral-600"
       >
         Thème
       </BasicText>
 
-      <div class="theme-appearance__toggle">
+      <div class="ta__pill-group">
         <button
-          class="theme-appearance__pill"
-          :class="{ 'is-active': scheme === 'light' }"
+          class="ta__pill"
+          :class="{ active: scheme === 'light' }"
           @click="scheme = 'light'"
         >
-          <span class="theme-appearance__thumb light"></span>
           Clair
         </button>
 
         <button
-          class="theme-appearance__pill"
-          :class="{ 'is-active': scheme === 'dark' }"
+          class="ta__pill"
+          :class="{ active: scheme === 'dark' }"
           @click="scheme = 'dark'"
         >
-          <span class="theme-appearance__thumb dark"></span>
           Sombre
         </button>
       </div>
     </div>
 
-    <!-- ===== Palettes ===== -->
-    <div class="theme-appearance__block">
+    <!-- PALETTE -->
+    <div class="ta__row">
       <BasicText
-        size="body-m"
-        weight="bold"
+        size="body-s"
+        color="neutral-600"
       >
         Palette
       </BasicText>
 
-      <div class="theme-appearance__palette-grid">
-        <div
-          v-for="p in palettes"
-          :key="p.value"
-          class="theme-appearance__palette-card"
-          :class="{ 'is-active': palette === p.value }"
-          @click="palette = p.value"
+      <div class="ta__pill-group">
+        <button
+          v-for="option in palettes"
+          :key="option.value"
+          class="ta__pill"
+          :class="{ active: palette === option.value }"
+          @click="palette = option.value as Palette"
         >
-          <div class="theme-appearance__swatches">
-            <span class="swatch swatch-primary"></span>
-            <span class="swatch swatch-secondary"></span>
-            <span class="swatch swatch-accent"></span>
-          </div>
-
-          <BasicText
-            size="body-s"
-            weight="semibold"
-          >
-            {{ p.label }}
-          </BasicText>
-        </div>
+          {{ option.label }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useTheme } from '@/themes/composables/useTheme'
+  import { useTheme, type Palette } from '@/themes/composables/useTheme'
 
   const { palette, scheme } = useTheme()
 
@@ -74,133 +70,66 @@
     { label: 'Lab (clean médical)', value: 'lab' },
     { label: 'Premium (pharma)', value: 'premium' },
     { label: 'Neo (biotech)', value: 'neo' },
-  ] as const
+  ]
 </script>
 
 <style scoped lang="less">
-  .theme-appearance {
+  .ta {
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 22px;
+    background: var(--surface-2);
+    border-color: var(--surface-border);
+    transition: var(--transition-medium);
 
-    &__block {
+    &:hover {
+      border-color: var(--surface-border-strong);
+    }
+
+    /* Title */
+    &__title {
+      color: var(--text-title-contrast);
+    }
+
+    /* Rows */
+    &__row {
       display: flex;
       flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Pill container */
+    &__pill-group {
+      display: flex;
       gap: 10px;
-    }
-
-    /* ====== Toggle (Clair / Sombre) ====== */
-    &__toggle {
-      display: flex;
-      gap: 12px;
       flex-wrap: wrap;
     }
 
+    /* Pills */
     &__pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      padding: 7px 18px;
       border-radius: 999px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-1);
+      color: var(--neutral-700);
+      font-size: var(--font-size-body-s);
+      font-weight: var(--font-weight-regular);
       cursor: pointer;
-      font-size: 13px;
-
-      border: 1px solid rgba(var(--neutral-300-rgb), 0.7);
-      background: rgba(var(--neutral-0-rgb), 0.9);
-      transition: all 0.25s ease;
+      transition: var(--transition-medium);
+      backdrop-filter: blur(4px);
 
       &:hover {
-        background: rgba(var(--neutral-100-rgb), 0.85);
+        background: var(--surface-3);
+        border-color: var(--surface-border-strong);
       }
 
-      &.is-active {
-        background: rgba(var(--primary-50-rgb), 0.9);
-        border-color: rgba(var(--primary-500-rgb), 0.7);
-        box-shadow: 0 0 0 1px rgba(var(--primary-200-rgb), 0.7);
+      &.active {
+        background: rgba(var(--primary-100-rgb), 0.85);
+        border-color: rgba(var(--primary-400-rgb), 0.75);
         color: var(--primary-700);
-      }
-    }
-
-    &__thumb {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
-      box-shadow: inset 0 0 0 1px rgba(var(--neutral-900-rgb), 0.15);
-
-      &.light {
-        background: linear-gradient(
-          135deg,
-          var(--neutral-0) 0%,
-          rgba(var(--neutral-200-rgb), 1) 100%
-        );
-      }
-
-      &.dark {
-        background: linear-gradient(
-          135deg,
-          rgba(var(--neutral-800-rgb), 1),
-          rgba(var(--neutral-700-rgb), 1)
-        );
-      }
-    }
-
-    /* ====== Palette Grid ====== */
-    &__palette-grid {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    &__palette-card {
-      width: 150px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(var(--neutral-0-rgb), 0.92);
-      border: 1px solid rgba(var(--neutral-300-rgb), 0.6);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-
-      transition: all 0.25s ease;
-      box-shadow: 0 2px 6px rgba(var(--neutral-900-rgb), 0.05);
-
-      &:hover {
-        transform: translateY(-2px);
-        border-color: rgba(var(--primary-400-rgb), 0.6);
-        box-shadow: 0 4px 12px rgba(var(--neutral-900-rgb), 0.08);
-      }
-
-      &.is-active {
-        background: rgba(var(--primary-50-rgb), 0.9);
-        border-color: rgba(var(--primary-500-rgb), 0.7);
-        box-shadow: 0 0 0 2px rgba(var(--primary-300-rgb), 0.6);
-        transform: translateY(-2px);
-      }
-    }
-
-    /* ====== Swatches ====== */
-    &__swatches {
-      display: flex;
-      gap: 8px;
-    }
-
-    .swatch {
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(var(--neutral-900-rgb), 0.15);
-      border: 2px solid rgba(var(--neutral-0-rgb), 1);
-
-      &-primary {
-        background: var(--primary-500);
-      }
-      &-secondary {
-        background: var(--secondary-500);
-      }
-      &-accent {
-        background: var(--primary-200);
+        box-shadow: 0 0 0 1px rgba(var(--primary-300-rgb), 0.85);
+        font-weight: var(--font-weight-semibold);
       }
     }
   }
