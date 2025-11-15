@@ -197,12 +197,12 @@
     transition:
       transform 0.35s ease,
       box-shadow 0.35s ease;
-    box-shadow: 0 4px 16px fade(@neutral-900, 8%);
+    box-shadow: 0 4px 16px rgba(var(--neutral-900-rgb), 0.08);
     background: transparent;
 
     &:hover {
       transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 8px 20px fade(@neutral-900, 12%);
+      box-shadow: 0 8px 20px rgba(var(--neutral-900-rgb), 0.12);
     }
 
     &.solid {

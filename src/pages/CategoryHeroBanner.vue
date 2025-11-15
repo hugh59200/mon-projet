@@ -330,7 +330,7 @@
     position: relative;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 3px 12px fade(@neutral-700, 12%);
+    box-shadow: 0 3px 12px rgba(var(--neutral-700-rgb), 0.12);
     background: @neutral-0;
   }
 
@@ -349,7 +349,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: fade(@neutral-0, 32%);
+    background: rgba(var(--neutral-0-rgb), 0.32);
   }
 
   /* tout le contenu au-dessus du BG */
@@ -370,19 +370,19 @@
   .nav-pill {
     border-radius: 999px;
     padding: 4px 14px;
-    border: 1px solid fade(@neutral-300, 70%);
-    background: fade(@neutral-0, 95%);
+    border: 1px solid rgba(var(--neutral-300-rgb), 0.70);
+    background: rgba(var(--neutral-0-rgb), 0.95);
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px fade(@neutral-700, 8%);
+    box-shadow: 0 1px 3px rgba(var(--neutral-700-rgb), 0.08);
   }
   .nav-pill--active {
-    border-color: fade(@primary-400, 80%);
-    background: fade(@primary-50, 96%);
+    border-color: rgba(var(--primary-400-rgb), 0.80);
+    background: rgba(var(--primary-50-rgb), 0.96);
     color: @primary-700;
-    box-shadow: 0 0 0 1px fade(@primary-200, 60%);
+    box-shadow: 0 0 0 1px rgba(var(--primary-200-rgb), 0.60);
   }
 
   /* petit fondu pro entre la nav et le contenu */
@@ -390,7 +390,7 @@
     height: 10px;
     margin: 0 16px 2px;
     border-radius: 999px;
-    background: linear-gradient(to bottom, fade(@neutral-0, 96%) 0%, fade(@neutral-0, 0%) 100%);
+    background: linear-gradient(to bottom, rgba(var(--neutral-0-rgb), 0.96) 0%, rgba(var(--neutral-0-rgb), 0.00) 100%);
     pointer-events: none;
   }
 
@@ -423,10 +423,10 @@
     z-index: 1;
     background: linear-gradient(
       90deg,
-      fade(@neutral-0, 100%) 0%,
-      fade(@neutral-0, 96%) 24%,
-      fade(@neutral-0, 82%) 45%,
-      fade(@neutral-0, 60%) 65%,
+      rgba(var(--neutral-0-rgb), 1.00) 0%,
+      rgba(var(--neutral-0-rgb), 0.96) 24%,
+      rgba(var(--neutral-0-rgb), 0.82) 45%,
+      rgba(var(--neutral-0-rgb), 0.60) 65%,
       transparent 92%
     );
     pointer-events: none;
@@ -528,7 +528,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: fade(@neutral-0, 85%);
+    color: rgba(var(--neutral-0-rgb), 0.85);
   }
   .video-card:hover {
     transform: translateY(-6px) scale(1.03);
@@ -610,8 +610,8 @@
     .slide__overlay {
       background: linear-gradient(
         180deg,
-        fade(@neutral-0, 100%) 0%,
-        fade(@neutral-0, 94%) 40%,
+        rgba(var(--neutral-0-rgb), 1.00) 0%,
+        rgba(var(--neutral-0-rgb), 0.94) 40%,
         transparent 100%
       );
     }

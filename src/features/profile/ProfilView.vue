@@ -1,5 +1,6 @@
 <template>
   <div class="profil">
+    <!-- COVER -->
     <div class="profil__cover">
       <img
         src="https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80"
@@ -9,14 +10,15 @@
       <div class="profil__cover-overlay"></div>
     </div>
 
+    <!-- CARD CONTAINER -->
     <div class="profil__container">
+      <!-- HEADER PROFIL -->
       <div class="profil__header">
         <div class="profil__avatar">
           <img
             v-if="avatarPreview"
             :src="avatarPreview"
             class="profil__avatar-img"
-            alt="Avatar"
           />
 
           <div
@@ -28,6 +30,7 @@
               :size="42"
             />
           </div>
+
           <input
             type="file"
             accept="image/*"
@@ -35,6 +38,7 @@
             @change="handleAvatarSelect"
           />
         </div>
+
         <div class="profil__header-info">
           <BasicText
             size="h3"
@@ -42,12 +46,13 @@
           >
             {{ editableName || 'Mon profil' }}
           </BasicText>
+
           <div class="profil__meta">
             <BasicText
               size="body-m"
               color="neutral-700"
             >
-              {{ profile?.email || 'Adresse e-mail non renseignée' }}
+              {{ profile?.email }}
             </BasicText>
 
             <BasicText
@@ -61,7 +66,10 @@
           </div>
         </div>
       </div>
+
+      <!-- SECTIONS -->
       <div class="profil__sections">
+        <!-- Informations personnelles -->
         <FilterSection
           title="Informations personnelles"
           v-model="sections.personal"
@@ -69,7 +77,6 @@
           <BasicInput
             v-model="editableName"
             label="Nom complet"
-            placeholder="Entrez votre nom"
             input-type="form"
           />
           <BasicInput
@@ -84,6 +91,7 @@
             placeholder="12 rue du Peptide"
             input-type="form"
           />
+
           <div class="profil__actions">
             <BasicButton
               label="Enregistrer les modifications"
@@ -94,6 +102,8 @@
             />
           </div>
         </FilterSection>
+
+        <!-- Mes commandes -->
         <FilterSection
           title="Mes commandes"
           v-model="sections.orders"
@@ -157,6 +167,8 @@
             />
           </div>
         </FilterSection>
+
+        <!-- Préférences (UN SEUL BLOC) -->
         <FilterSection
           title="Préférences"
           v-model="sections.preferences"
@@ -172,65 +184,7 @@
             />
           </div>
 
-          <!-- 👇 Nouveau bloc apparence -->
-          <div class="profil__theme-settings">
-            <BasicText
-              size="body-m"
-              weight="bold"
-            >
-              Apparence
-            </BasicText>
-
-            <!-- Choix du thème -->
-            <div class="profil__theme-row">
-              <BasicText
-                size="body-s"
-                color="neutral-600"
-              >
-                Thème
-              </BasicText>
-              <div class="profil__pill-group">
-                <button
-                  type="button"
-                  class="profil__pill"
-                  :class="{ 'profil__pill--active': scheme === 'light' }"
-                  @click="scheme = 'light'"
-                >
-                  Clair
-                </button>
-                <button
-                  type="button"
-                  class="profil__pill"
-                  :class="{ 'profil__pill--active': scheme === 'dark' }"
-                  @click="scheme = 'dark'"
-                >
-                  Sombre
-                </button>
-              </div>
-            </div>
-
-            <!-- Choix de la palette -->
-            <div class="profil__theme-row">
-              <BasicText
-                size="body-s"
-                color="neutral-600"
-              >
-                Palette de couleurs
-              </BasicText>
-              <div class="profil__pill-group">
-                <button
-                  v-for="option in paletteOptions"
-                  :key="option.value"
-                  type="button"
-                  class="profil__pill"
-                  :class="{ 'profil__pill--active': palette === option.value }"
-                  @click="palette = option.value"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
-            </div>
-          </div>
+          <ThemeAppearance />
 
           <BasicButton
             label="Sauvegarder mes préférences"
@@ -240,27 +194,7 @@
           />
         </FilterSection>
 
-        <FilterSection
-          title="Préférences"
-          v-model="sections.preferences"
-        >
-          <div class="profil__preferences">
-            <BasicCheckbox
-              v-model="newsletter"
-              label="Recevoir les newsletters"
-            />
-            <BasicCheckbox
-              v-model="smsAlerts"
-              label="Recevoir les alertes SMS"
-            />
-          </div>
-          <BasicButton
-            label="Sauvegarder mes préférences"
-            type="secondary"
-            variant="filled"
-            @click="savePreferences"
-          />
-        </FilterSection>
+        <!-- Sécurité -->
         <FilterSection
           title="Sécurité"
           v-model="sections.security"
@@ -277,6 +211,7 @@
             placeholder="Confirmez le mot de passe"
             input-type="form"
           />
+
           <div class="profil__actions">
             <BasicButton
               label="Mettre à jour le mot de passe"
@@ -286,6 +221,7 @@
               @click="updatePasswordAction"
             />
           </div>
+
           <div class="profil__danger">
             <BasicButton
               label="Supprimer mon compte"
@@ -295,6 +231,8 @@
             />
           </div>
         </FilterSection>
+
+        <!-- Support -->
         <FilterSection
           title="Assistance & support"
           v-model="sections.support"
@@ -317,8 +255,8 @@
   import { useProfileActions } from '@/supabase/actions/useProfileActions'
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
+  import ThemeAppearance from '@/themes/components/ThemeAppearance.vue'
   import { getLabelBadge, getTypeBadge } from '@/utils'
-  import { useTheme } from 'storybook/internal/theming'
   import { onMounted, ref, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '../auth/stores/useAuthStore'
@@ -349,14 +287,6 @@
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
-
-  // 👇 thème + palette
-  const { palette, scheme } = useTheme()
-  const paletteOptions = [
-    { label: 'Lab (clean médical)', value: 'lab' },
-    { label: 'Premium (pharma)', value: 'premium' },
-    { label: 'Neo (biotech)', value: 'neo' },
-  ] as const
 
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
@@ -432,236 +362,185 @@
 
 <style scoped lang="less">
   .profil {
-    background: @neutral-50;
+    background: var(--neutral-50);
     min-height: 100vh;
-    position: relative;
 
+    /* ======= COVER ======= */
     &__cover {
+      height: 260px;
       position: relative;
-      height: 240px;
       overflow: hidden;
 
       &-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        filter: brightness(0.8);
+        filter: brightness(0.72);
       }
 
       &-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to bottom, fade(@neutral-900, 35%), transparent 70%);
+        background: linear-gradient(to bottom, rgba(var(--neutral-900-rgb), 0.35), transparent 65%);
       }
     }
 
+    /* ======= CARD CONTAINER ======= */
     &__container {
-      max-width: 900px;
-      margin: -70px auto 60px;
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 10px 40px fade(@neutral-900, 15%);
-      position: relative;
-      z-index: 2;
+      max-width: 980px;
+      margin: -90px auto 60px;
+      background: rgba(var(--neutral-0-rgb), 0.95);
+      border-radius: 24px;
+      padding: 42px 48px;
+      box-shadow:
+        0 10px 30px rgba(var(--neutral-900-rgb), 0.12),
+        0 2px 6px rgba(var(--neutral-900-rgb), 0.06);
+      backdrop-filter: blur(8px);
     }
 
+    /* ======= HEADER ======= */
     &__header {
       display: flex;
+      gap: 28px;
       align-items: center;
-      gap: 24px;
-      margin-bottom: 40px;
-      flex-wrap: wrap;
+      padding-bottom: 28px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(var(--neutral-200-rgb), 0.6);
     }
 
     &__avatar {
-      position: relative;
-      width: 110px;
-      height: 110px;
+      width: 115px;
+      height: 115px;
       border-radius: 50%;
       overflow: hidden;
-      background: fade(@neutral-100, 60%);
-      cursor: pointer;
-      transition: all 0.35s ease;
-      border: 2px solid transparent;
-      box-shadow: 0 4px 12px fade(@neutral-900, 10%);
+      position: relative;
+      background: rgba(var(--neutral-100-rgb), 0.4);
+      border: 2px solid rgba(var(--primary-400-rgb), 0.4);
+      transition: 0.3s ease;
 
       &:hover {
-        transform: scale(1.05);
-        border-color: fade(@primary-500, 45%);
-        animation: glow-border 2.8s infinite ease-in-out;
+        transform: scale(1.04);
+        box-shadow: 0 0 14px rgba(var(--primary-400-rgb), 0.5);
       }
 
-      .profil__avatar-placeholder {
+      &-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      &-placeholder {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
         height: 100%;
-        color: @neutral-400;
-        background: fade(@neutral-100, 60%);
+        color: var(--neutral-300);
       }
-    }
-
-    &__theme-settings {
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid fade(@neutral-200, 70%);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    &__theme-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    &__pill-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    &__pill {
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      line-height: 1;
-      border: 1px solid fade(@neutral-300, 80%);
-      background: fade(@neutral-0, 90%);
-      color: @neutral-700;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      outline: none;
-
-      &:hover {
-        background: fade(@neutral-100, 70%);
-      }
-
-      &--active {
-        border-color: fade(@primary-500, 70%);
-        background: fade(@primary-50, 85%);
-        color: @primary-700;
-        box-shadow: 0 0 0 1px fade(@primary-200, 70%);
-      }
-
-      &:focus-visible {
-        box-shadow: 0 0 0 2px @focus-ring;
-      }
-    }
-
-    /* ✨ Glow border animée */
-    @keyframes glow-border {
-      0% {
-        box-shadow: 0 0 0 fade(@primary-500, 40%);
-      }
-      50% {
-        box-shadow: 0 0 18px fade(@primary-400, 60%);
-      }
-      100% {
-        box-shadow: 0 0 0 fade(@primary-500, 40%);
-      }
-    }
-
-    &__avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    &__avatar-input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
     }
 
     &__header-info {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     &__meta {
       display: flex;
-      align-items: center;
-      gap: 8px; // ✅ espace correct entre email et rôle
+      gap: 8px;
       flex-wrap: wrap;
+      color: var(--neutral-600);
     }
 
-    &__role {
-      font-style: italic;
-    }
-
+    /* ======= SECTIONS ======= */
     &__sections {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
 
-    .filter-section {
-      background: fade(@neutral-100, 60%);
-      border: 1px solid fade(@neutral-200, 70%);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 10px fade(@neutral-900, 5%);
-    }
-
-    .profil__actions {
+    /* ====== BUTTON ROW ====== */
+    &__actions {
       margin-top: 16px;
       display: flex;
       justify-content: flex-end;
     }
 
-    .profil__preferences {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    /* ====== ORDERS ====== */
+    .order-card {
+      background: rgba(var(--neutral-0-rgb), 0.85);
+      border: 1px solid rgba(var(--neutral-300-rgb), 0.55);
+      border-radius: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: 0.22s ease;
 
-    .profil__orders {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-
-      .order-card {
-        background: fade(@white, 80%);
-        border: 1px solid fade(@neutral-300, 60%);
-        border-radius: 10px;
-        padding: 14px 18px;
-        box-shadow: 0 2px 6px fade(@neutral-900, 5%);
-        transition: all 0.25s ease;
-        cursor: pointer; // 👈
-        user-select: none;
-
-        &:hover {
-          background: fade(@secondary-50, 80%);
-          border-color: fade(@secondary-400, 60%);
-          box-shadow: 0 4px 10px fade(@neutral-900, 10%);
-          transform: translateY(-1px);
-        }
-
-        &__header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 8px;
-        }
-
-        &__body {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding-left: 2px;
-        }
+      &:hover {
+        background: rgba(var(--secondary-50-rgb), 0.85);
+        border-color: rgba(var(--secondary-300-rgb), 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(var(--neutral-900-rgb), 0.08);
       }
 
-      &-footer {
-        margin-top: 14px;
+      &__header {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+
+    /* ====== THEME SETTINGS ====== */
+    &__theme-settings {
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(var(--neutral-0-rgb), 0.8);
+      border: 1px solid rgba(var(--neutral-200-rgb), 0.6);
+      box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.05);
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    &__theme-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    &__pill-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    &__pill {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(var(--neutral-300-rgb), 0.8);
+      background: rgba(var(--neutral-50-rgb), 0.9);
+      color: var(--neutral-700);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        background: rgba(var(--neutral-100-rgb), 0.85);
+      }
+
+      &--active {
+        background: rgba(var(--primary-50-rgb), 0.95);
+        border-color: rgba(var(--primary-400-rgb), 0.7);
+        color: var(--primary-700);
+        box-shadow: 0 0 0 1px rgba(var(--primary-300-rgb), 0.8);
+        font-weight: 600;
       }
     }
   }

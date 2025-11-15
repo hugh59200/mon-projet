@@ -98,7 +98,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    background: fade(@neutral-100, 60%);
+    background: rgba(var(--neutral-100-rgb), 0.6);
     padding: 14px;
     border-radius: 8px;
   }

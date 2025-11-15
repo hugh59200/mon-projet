@@ -169,7 +169,7 @@
         border-radius: 50%;
         background: @primary-600;
         border: 2px solid white;
-        box-shadow: 0 0 3px fade(@neutral-900, 25%);
+        box-shadow: 0 0 3px rgba(var(--neutral-900-rgb), 0.25);
         cursor: pointer;
         transition:
           transform 0.15s ease,
@@ -178,7 +178,7 @@
 
       &::-webkit-slider-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 0 6px fade(@primary-600, 50%);
+        box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.5);
       }
 
       &::-moz-range-thumb {
@@ -188,7 +188,7 @@
         border-radius: 50%;
         background: @primary-600;
         border: 2px solid white;
-        box-shadow: 0 0 3px fade(@neutral-900, 25%);
+        box-shadow: 0 0 3px rgba(var(--neutral-900-rgb), 0.25);
         cursor: pointer;
       }
 

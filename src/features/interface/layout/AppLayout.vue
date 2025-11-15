@@ -189,10 +189,10 @@
     width: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb {
-    background: fade(@neutral-600, 25%);
+    background: rgba(var(--neutral-600-rgb), 0.25);
     border-radius: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb:hover {
-    background: fade(@neutral-600, 45%);
+    background: rgba(var(--neutral-600-rgb), 0.45);
   }
 </style>

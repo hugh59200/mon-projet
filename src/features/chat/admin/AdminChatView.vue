@@ -147,7 +147,7 @@
       grid-template-columns: 300px 1fr;
       background: white;
       border-radius: 16px;
-      box-shadow: 0 2px 8px fade(@neutral-900, 5%);
+      box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.05);
       border: 1px solid @neutral-200;
       align-items: stretch;
       min-height: 600px;

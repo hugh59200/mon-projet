@@ -114,7 +114,7 @@
   .mobile-drawer {
     width: 270px;
     height: 100vh;
-    background: fade(@neutral-800, 96%);
+    background: rgba(var(--neutral-800-rgb), 0.96);
     color: white;
     box-shadow:
       2px 0 25px rgba(0, 0, 0, 0.45),

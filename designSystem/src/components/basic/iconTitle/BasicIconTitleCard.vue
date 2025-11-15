@@ -92,7 +92,7 @@
     }
 
     .formation--externe {
-      background-color: @pink-400;
+      background-color: pink;
     }
   }
 </style>

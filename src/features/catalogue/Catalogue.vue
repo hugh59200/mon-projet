@@ -255,7 +255,7 @@
     flex-shrink: 0;
     width: 260px;
     background: @neutral-100;
-    border: 1px solid fade(@neutral-200, 60%);
+    border: 1px solid rgba(var(--neutral-200-rgb), 0.60);
     border-radius: 12px;
     padding: 20px 16px;
     overflow-y: auto;

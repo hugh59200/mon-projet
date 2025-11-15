@@ -217,7 +217,7 @@
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
-      background: fade(@neutral-200, 40%);
+      background: rgba(var(--neutral-200-rgb), 0.40);
     }
   }
 </style>

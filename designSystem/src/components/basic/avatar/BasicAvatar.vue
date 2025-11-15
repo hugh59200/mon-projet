@@ -95,7 +95,7 @@
   }
 
   .date-month {
-    background-color: @brick_red-600;
+    // background-color: @brick_red-600;
     padding: 3px 0;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;

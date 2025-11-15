@@ -8,7 +8,7 @@
   <button @click="scheme = scheme === 'light' ? 'dark' : 'light'">Toggle light/dark</button>
 </template>
 <script setup lang="ts">
-  import { useTheme } from '@/features/themes/composables/useTheme'
+  import { useTheme } from '@/themes/composables/useTheme'
 
   const { palette, scheme } = useTheme()
 </script>

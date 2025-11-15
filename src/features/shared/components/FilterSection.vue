@@ -4,13 +4,21 @@
       class="filter-section__header"
       @click="toggle"
     >
-      <BasicText weight="semibold">{{ title }}</BasicText>
+      <BasicText
+        weight="semibold"
+        size="body-m"
+      >
+        {{ title }}
+      </BasicText>
+
       <BasicIconNext
         :name="open ? 'ChevronUp' : 'ChevronDown'"
-        :size="16"
-        :class="{ 'icon--rotated': open }"
+        :size="18"
+        class="filter-section__chevron"
+        :class="{ 'is-open': open }"
       />
     </header>
+
     <div
       v-motion="motion"
       v-show="open"
@@ -25,22 +33,21 @@
   import { computed } from 'vue'
 
   const open = defineModel<boolean>({ default: true })
-
   defineProps<{ title: string }>()
 
   const motion = computed(() => ({
-    initial: { opacity: 0, y: -8, scaleY: 0.96 },
+    initial: { opacity: 0, y: -4, scaleY: 0.98 },
     enter: {
       opacity: 1,
       y: 0,
       scaleY: 1,
-      transition: { type: 'spring', stiffness: 180, damping: 20 },
+      transition: { type: 'spring', stiffness: 160, damping: 22 },
     },
     leave: {
       opacity: 0,
-      y: -6,
-      scaleY: 0.96,
-      transition: { duration: 0.2 },
+      y: -4,
+      scaleY: 0.98,
+      transition: { duration: 0.15 },
     },
   }))
 
@@ -51,38 +58,44 @@
 
 <style scoped lang="less">
   .filter-section {
-    background: #fff;
-    border: 1px solid @neutral-200;
-    border-radius: 12px;
+    background: rgba(var(--neutral-0-rgb), 0.95);
+    border: 1px solid rgba(var(--neutral-200-rgb), 0.55);
+    border-radius: 14px;
     overflow: hidden;
-    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.04);
+    transition: all 0.25s ease;
 
     &__header {
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
       cursor: pointer;
-      color: @neutral-800;
       user-select: none;
+      background: rgba(var(--neutral-50-rgb), 0.6);
       transition: background 0.2s ease;
 
       &:hover {
-        background: fade(@neutral-900, 4%);
+        background: rgba(var(--neutral-100-rgb), 0.8);
       }
+    }
 
-      .icon--rotated {
+    &__chevron {
+      transition:
+        transform 0.25s ease,
+        opacity 0.25s ease;
+
+      &.is-open {
         transform: rotate(180deg);
-        transition: transform 0.25s ease;
       }
     }
 
     &__content {
+      padding: 18px 18px 22px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      padding: 12px;
-      border-top: 1px solid fade(@neutral-200, 50%);
+      gap: 18px;
+      border-top: 1px solid rgba(var(--neutral-200-rgb), 0.5);
     }
   }
 </style>

@@ -70,7 +70,7 @@
     flex-direction: column;
     justify-content: space-between;
     background: #fff;
-    border: 1px solid fade(@neutral-200, 70%);
+    border: 1px solid rgba(var(--neutral-200-rgb), 0.70);
     border-radius: 12px;
     padding: 16px;
     transition: all 0.25s ease;

@@ -82,7 +82,7 @@
   .loader-overlay {
     position: absolute;
     inset: 0;
-    background: fade(@neutral-50, 70%);
+    background: rgba(var(--neutral-50-rgb), 0.7);
     display: flex;
     justify-content: center;
     align-items: center;

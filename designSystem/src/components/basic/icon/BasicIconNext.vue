@@ -306,37 +306,6 @@
     color: @secondary-1000;
   }
 
-  /* Pink */
-  .basic-icon-next--color--pink-50 {
-    color: @pink-50;
-  }
-  .basic-icon-next--color--pink-100 {
-    color: @pink-100;
-  }
-  .basic-icon-next--color--pink-200 {
-    color: @pink-200;
-  }
-  .basic-icon-next--color--pink-300 {
-    color: @pink-300;
-  }
-  .basic-icon-next--color--pink-400 {
-    color: @pink-400;
-  }
-  .basic-icon-next--color--pink-500 {
-    color: @pink-500;
-  }
-  .basic-icon-next--color--pink-600 {
-    color: @pink-600;
-  }
-  .basic-icon-next--color--pink-700 {
-    color: @pink-700;
-  }
-  .basic-icon-next--color--pink-800 {
-    color: @pink-800;
-  }
-  .basic-icon-next--color--pink-900 {
-    color: @pink-900;
-  }
 
   /* Danger */
   .basic-icon-next--color--danger-50 {

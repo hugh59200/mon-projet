@@ -85,15 +85,15 @@
   .conversation-item.new-message {
     animation: flash 0.8s ease-out;
     border-color: @primary-600;
-    box-shadow: 0 0 6px fade(@primary-600, 40%);
+    box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.40);
   }
 
   @keyframes flash {
     0% {
-      background: fade(@primary-600, 35%);
+      background: rgba(var(--primary-600-rgb), 0.35);
     }
     50% {
-      background: fade(@primary-600, 10%);
+      background: rgba(var(--primary-600-rgb), 0.10);
     }
     100% {
       background: transparent;
@@ -119,7 +119,7 @@
       left: 52px;
       right: 10px;
       height: 1px;
-      background: fade(@neutral-300, 30%);
+      background: rgba(var(--neutral-300-rgb), 0.30);
       transition: opacity 0.25s ease;
     }
 
@@ -128,9 +128,9 @@
     }
 
     &:hover {
-      background: fade(@primary-600, 7%);
-      border-color: fade(@primary-600, 12%);
-      box-shadow: 0 2px 6px fade(@primary-600, 8%);
+      background: rgba(var(--primary-600-rgb), 0.07);
+      border-color: rgba(var(--primary-600-rgb), 0.12);
+      box-shadow: 0 2px 6px rgba(var(--primary-600-rgb), 0.08);
       transform: translateY(-1px);
 
       &::after {
@@ -139,12 +139,12 @@
     }
 
     &.active {
-      background: fade(@primary-600, 16%);
+      background: rgba(var(--primary-600-rgb), 0.16);
       border-left: 4px solid @primary-600;
-      border-color: fade(@primary-600, 25%);
+      border-color: rgba(var(--primary-600-rgb), 0.25);
       box-shadow:
-        inset 3px 0 0 fade(@primary-600, 18%),
-        0 1px 6px fade(@primary-600, 10%);
+        inset 3px 0 0 rgba(var(--primary-600-rgb), 0.18),
+        0 1px 6px rgba(var(--primary-600-rgb), 0.10);
       transform: translateY(0);
 
       &::after {
@@ -166,7 +166,7 @@
       transition: all 0.2s ease;
 
       .conversation-item:hover & {
-        border-color: fade(@primary-600, 30%);
+        border-color: rgba(var(--primary-600-rgb), 0.30);
         color: @primary-700;
       }
     }
@@ -270,7 +270,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 6px;
-            box-shadow: 0 1px 3px fade(@primary-600, 30%);
+            box-shadow: 0 1px 3px rgba(var(--primary-600-rgb), 0.30);
           }
         }
       }

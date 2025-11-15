@@ -14,11 +14,11 @@
     position: relative;
     width: 140px;
     height: 6px;
-    background: fade(@neutral-300, 40%);
+    background: rgba(var(--neutral-300-rgb), 0.40);
     border-radius: 6px;
     overflow: hidden;
     margin-top: 28px;
-    box-shadow: inset 0 0 3px fade(@neutral-900, 8%);
+    box-shadow: inset 0 0 3px rgba(var(--neutral-900-rgb), 0.08);
 
     &::after {
       content: '';

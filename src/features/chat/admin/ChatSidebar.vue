@@ -183,14 +183,14 @@
             background: @success-500;
             display: inline-block;
             margin-right: 4px;
-            box-shadow: 0 0 5px fade(@success-500, 40%);
+            box-shadow: 0 0 5px rgba(var(--success-500-rgb), 0.40);
 
             &::after {
               content: '';
               position: absolute;
               inset: 0;
               border-radius: 50%;
-              background: fade(@success-500, 35%);
+              background: rgba(var(--success-500-rgb), 0.35);
               animation: pulse-status 2s infinite ease-in-out;
             }
           }

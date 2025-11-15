@@ -9,13 +9,13 @@
   border-radius: @spacing-10 @spacing-10 0 0;
   cursor: pointer;
   color: @neutral-600;
-  background-color: fade(@neutral-100, 60%);
+  background-color: rgba(var(--neutral-100-rgb), 0.6);
   transition: all 0.25s ease;
   font-weight: 500;
   border-bottom: 3px solid transparent; // base neutre
 
   &:hover {
-    background-color: fade(@neutral-200, 80%);
+    background-color: rgba(var(--neutral-200-rgb), 0.8);
     color: @primary-700;
   }
 
@@ -26,7 +26,7 @@
     font-weight: 600;
     border-bottom: 3px solid @primary-600; // ligne visible sous l'onglet
     z-index: 2;
-    box-shadow: 0 2px 8px fade(@primary-500, 15%);
+    box-shadow: 0 2px 8px rgba(var(--primary-500-rgb), 0.15);
   }
 
   /* ⚪ Onglet inactif */

@@ -97,7 +97,7 @@
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid @neutral-200;
-    background: fade(@neutral-200, 40%);
+    background: rgba(var(--neutral-200-rgb), 0.40);
     flex-shrink: 0;
   }
 

@@ -70,13 +70,13 @@
     display: flex;
     white-space: nowrap;
     scrollbar-width: thin;
-    scrollbar-color: fade(@neutral-700, 30%) transparent;
+    scrollbar-color: rgba(var(--neutral-700-rgb), 0.3) transparent;
 
     &::-webkit-scrollbar {
       height: 6px;
     }
     &::-webkit-scrollbar-thumb {
-      background: fade(@neutral-700, 30%);
+      background: rgba(var(--neutral-700-rgb), 0.3);
       border-radius: 3px;
     }
     &::-webkit-scrollbar-track {
@@ -100,7 +100,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 2px 6px fade(@neutral-800, 12%);
+      box-shadow: 0 2px 6px rgba(var(--neutral-800-rgb), 0.12);
       margin: 0 auto;
 
       .tab {

@@ -169,7 +169,7 @@
       width: 100%;
       border-radius: 12px;
       object-fit: contain;
-      box-shadow: 0 4px 14px fade(@neutral-400, 25%);
+      box-shadow: 0 4px 14px rgba(var(--neutral-400-rgb), 0.25);
       transition: transform 0.3s ease;
       &:hover {
         transform: scale(1.03);
@@ -213,12 +213,12 @@
     .separator {
       width: 60%;
       height: 1px;
-      background: fade(@neutral-300, 60%);
+      background: rgba(var(--neutral-300-rgb), 0.60);
       margin: 10px 0;
     }
 
     .description {
-      background: fade(@neutral-100, 60%);
+      background: rgba(var(--neutral-100-rgb), 0.60);
       border-radius: 10px;
       padding: 12px 16px;
       max-width: 95%;

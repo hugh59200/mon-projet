@@ -11,7 +11,9 @@
     "lint:fix": "eslint --ext .ts,.vue src --fix",
     "format": "prettier --write \"src/**/*.{ts,vue,less,json}\"",
     "deploy:functions": "supabase functions deploy --no-verify-jwt",
-    "gen:types": "mkdir -p src/supabase/types && npx supabase gen types typescript --project-id dwomsbawthlktapmtmqu --schema public > src/supabase/types/supabase.ts"
+    "gen:types": "mkdir -p src/supabase/types && npx supabase gen types typescript --project-id dwomsbawthlktapmtmqu --schema public > src/supabase/types/supabase.ts",
+    "generate:palettes": "tsx src/themes/scripts/generatePalettes.ts",
+    "fix:fade": "tsx src/themes/scripts/fixFade.ts"
   },
   "dependencies": {
     "@supabase/realtime-js": "^2.79.0",
@@ -65,6 +67,7 @@
     "prettier-plugin-tailwindcss": "^0.7.0",
     "storybook": "^9.0.15",
     "supabase": "^2.54.11",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite-plugin-vue-devtools": "^8.0.0",
     "vite-svg-loader": "^5.1.0",

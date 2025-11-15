@@ -429,7 +429,7 @@
     background: #fff;
     border: 1px solid @neutral-200;
     border-radius: 14px;
-    box-shadow: 0 2px 8px fade(@neutral-900, 5%);
+    box-shadow: 0 2px 8px rgba(var(--neutral-900-rgb), 0.05);
     overflow: hidden;
 
     &__header {
@@ -485,7 +485,7 @@
 
     /* hover/active */
     &:hover .faq-item__question {
-      background: fade(@neutral-900, 4%);
+      background: rgba(var(--neutral-900-rgb), 0.04);
     }
     &[open] .chevron {
       transform: rotate(90deg);
@@ -495,8 +495,8 @@
   /* Surlignage quand on arrive depuis un lien (hash) */
   .faq-item:target .faq-item__question,
   .faq-item--flash .faq-item__question {
-    background: fade(@primary-600, 10%);
-    box-shadow: 0 0 0 2px fade(@primary-600, 25%) inset;
+    background: rgba(var(--primary-600-rgb), 0.10);
+    box-shadow: 0 0 0 2px rgba(var(--primary-600-rgb), 0.25) inset;
     border-radius: 10px;
   }
 
@@ -507,8 +507,8 @@
     align-items: center;
     gap: 6px;
     padding: 8px 10px;
-    background: fade(@danger-500, 6%);
-    border: 1px solid fade(@danger-500, 20%);
+    background: rgba(var(--danger-500-rgb), 0.06);
+    border: 1px solid rgba(var(--danger-500-rgb), 0.20);
     border-radius: 8px;
   }
 </style>

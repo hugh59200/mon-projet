@@ -161,8 +161,8 @@
         inset: 0;
         background: linear-gradient(
           to top,
-          fade(@neutral-900, 85%) 0%,
-          fade(@neutral-900, 40%) 100%
+          rgba(var(--neutral-900-rgb), 0.85) 0%,
+          rgba(var(--neutral-900-rgb), 0.40) 100%
         );
         display: flex;
         align-items: flex-end;

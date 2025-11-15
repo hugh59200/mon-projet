@@ -202,7 +202,7 @@
         color: @danger-400;
 
         &:hover {
-          background: fade(@danger-400, 8%);
+          background: rgba(var(--danger-400-rgb), 0.08);
         }
       }
     }

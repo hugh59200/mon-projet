@@ -114,16 +114,16 @@
     }
 
     &--filled {
-      background: fade(@primary-500, 25%);
+      background: rgba(var(--primary-500-rgb), 0.25);
       &:hover {
-        background: fade(@primary-500, 35%);
+        background: rgba(var(--primary-500-rgb), 0.35);
         transform: translateY(-1px);
       }
     }
 
     &--active,
     &.is-active {
-      background: fade(@primary-500, 25%);
+      background: rgba(var(--primary-500-rgb), 0.25);
       color: white;
       transform: translateY(-1px);
     }

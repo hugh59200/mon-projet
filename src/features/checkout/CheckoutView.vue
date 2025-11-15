@@ -316,7 +316,7 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
-      box-shadow: 0 3px 10px fade(@neutral-300, 15%);
+      box-shadow: 0 3px 10px rgba(var(--neutral-300-rgb), 0.15);
     }
 
     /* --- ITEMS --- */
@@ -344,7 +344,7 @@
         height: 58px;
         object-fit: cover;
         border-radius: 10px;
-        border: 1px solid fade(@neutral-300, 40%);
+        border: 1px solid rgba(var(--neutral-300-rgb), 0.40);
         flex-shrink: 0;
       }
 
@@ -371,7 +371,7 @@
           }
 
           .product-search-icon {
-            color: fade(@primary-700, 70%);
+            color: rgba(var(--primary-700-rgb), 0.70);
             transition: color 0.2s ease;
           }
 
@@ -385,11 +385,11 @@
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          color: fade(@neutral-600, 90%);
+          color: rgba(var(--neutral-600-rgb), 0.90);
         }
 
         .product-price {
-          color: fade(@neutral-500, 80%);
+          color: rgba(var(--neutral-500-rgb), 0.80);
           font-size: 13px;
         }
       }
@@ -407,7 +407,7 @@
     .ripple {
       position: absolute;
       border-radius: 50%;
-      background: fade(@primary-500, 25%);
+      background: rgba(var(--primary-500-rgb), 0.25);
       transform: scale(0);
       animation: ripple 0.6s ease-out;
       width: 150px;
@@ -466,13 +466,13 @@
 
       &:hover {
         border-color: @primary-400;
-        background: fade(@primary-50, 40%);
+        background: rgba(var(--primary-50-rgb), 0.40);
       }
 
       &.active {
         border-color: @primary-600;
-        background: fade(@primary-100, 60%);
-        box-shadow: 0 2px 8px fade(@primary-400, 25%);
+        background: rgba(var(--primary-100-rgb), 0.60);
+        box-shadow: 0 2px 8px rgba(var(--primary-400-rgb), 0.25);
       }
 
       &-icon {
@@ -503,17 +503,17 @@
       margin-top: 20px;
       transition: all 0.25s ease-in-out;
       border-radius: 10px;
-      box-shadow: 0 3px 10px fade(@primary-400, 25%);
+      box-shadow: 0 3px 10px rgba(var(--primary-400-rgb), 0.25);
       font-weight: 600;
 
       &:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px fade(@primary-500, 30%);
+        box-shadow: 0 5px 15px rgba(var(--primary-500-rgb), 0.30);
       }
 
       &:active {
         transform: scale(0.98);
-        box-shadow: 0 2px 6px fade(@primary-500, 25%);
+        box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.25);
       }
 
       &:disabled {

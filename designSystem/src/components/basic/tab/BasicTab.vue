@@ -93,7 +93,7 @@
       justify-content: center;
       gap: 10px;
       padding: 10px 22px;
-      box-shadow: inset 0 1px 3px fade(@primary-500, 12%);
+      box-shadow: inset 0 1px 3px rgba(var(--primary-500-rgb), 0.12);
       transition:
         transform 0.18s ease,
         box-shadow 0.18s ease,

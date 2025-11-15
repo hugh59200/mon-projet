@@ -239,7 +239,7 @@
     height: 50px;
     border-radius: 8px;
     object-fit: cover;
-    background: fade(@neutral-700, 40%);
+    background: rgba(var(--neutral-700-rgb), 0.40);
   }
 
   .popup-info {
