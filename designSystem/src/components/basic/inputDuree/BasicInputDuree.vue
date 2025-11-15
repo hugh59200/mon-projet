@@ -104,7 +104,3 @@
     },
   )
 </script>
-
-<style lang="less">
-  @import '../input/BasicInput.less';
-</style>

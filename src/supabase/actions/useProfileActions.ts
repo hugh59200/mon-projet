@@ -6,6 +6,7 @@ import {
   updateProfileInfo,
   uploadAvatar,
 } from '../api/profilesApi'
+import type { Orders } from '../types/supabase.types'
 
 export function useProfileActions() {
   const toast = useToastStore()
@@ -39,7 +40,7 @@ export function useProfileActions() {
     }
   }
 
-  async function loadLastOrdersAction(id: string) {
+  async function loadLastOrdersAction(id: string): Promise<Partial<Orders>[]> {
     try {
       return await getLastOrders(id)
     } catch (err: any) {

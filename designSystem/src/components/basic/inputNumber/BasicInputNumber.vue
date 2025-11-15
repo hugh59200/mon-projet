@@ -155,8 +155,6 @@
   )
 </script>
 <style lang="less">
-  @import '../input/BasicInput.less';
-
   .textalign {
     &--left {
       text-align: left;

@@ -9,7 +9,7 @@
       Apparence
     </BasicText>
 
-    <!-- THEME -->
+    <!-- THEME SECTION -->
     <div class="ta__row">
       <BasicText
         size="body-s"
@@ -18,26 +18,16 @@
         Thème
       </BasicText>
 
-      <div class="ta__pill-group">
-        <button
-          class="ta__pill"
-          :class="{ active: scheme === 'light' }"
-          @click="scheme = 'light'"
-        >
-          Clair
-        </button>
-
-        <button
-          class="ta__pill"
-          :class="{ active: scheme === 'dark' }"
-          @click="scheme = 'dark'"
-        >
-          Sombre
-        </button>
-      </div>
+      <BasicPillGroup
+        v-model="scheme"
+        :options="[
+          { label: 'Clair', value: 'light' },
+          { label: 'Sombre', value: 'dark' },
+        ]"
+      />
     </div>
 
-    <!-- PALETTE -->
+    <!-- PALETTE SECTION -->
     <div class="ta__row">
       <BasicText
         size="body-s"
@@ -46,23 +36,18 @@
         Palette
       </BasicText>
 
-      <div class="ta__pill-group">
-        <button
-          v-for="option in palettes"
-          :key="option.value"
-          class="ta__pill"
-          :class="{ active: palette === option.value }"
-          @click="palette = option.value as Palette"
-        >
-          {{ option.label }}
-        </button>
-      </div>
+      <BasicPillGroup
+        v-model="palette"
+        :options="palettes"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useTheme, type Palette } from '@/themes/composables/useTheme'
+  import { useTheme } from '@/themes/composables/useTheme'
+  import BasicPillGroup from '@designSystem/components/basic/pill/BasicPillGroup.vue'
+  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
 
   const { palette, scheme } = useTheme()
 
@@ -87,50 +72,14 @@
       border-color: var(--surface-border-strong);
     }
 
-    /* Title */
     &__title {
       color: var(--text-title-contrast);
     }
 
-    /* Rows */
     &__row {
       display: flex;
       flex-direction: column;
       gap: 8px;
-    }
-
-    /* Pill container */
-    &__pill-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Pills */
-    &__pill {
-      padding: 7px 18px;
-      border-radius: 999px;
-      border: 1px solid var(--surface-border);
-      background: var(--surface-1);
-      color: var(--neutral-700);
-      font-size: var(--font-size-body-s);
-      font-weight: var(--font-weight-regular);
-      cursor: pointer;
-      transition: var(--transition-medium);
-      backdrop-filter: blur(4px);
-
-      &:hover {
-        background: var(--surface-3);
-        border-color: var(--surface-border-strong);
-      }
-
-      &.active {
-        background: rgba(var(--primary-100-rgb), 0.85);
-        border-color: rgba(var(--primary-400-rgb), 0.75);
-        color: var(--primary-700);
-        box-shadow: 0 0 0 1px rgba(var(--primary-300-rgb), 0.85);
-        font-weight: var(--font-weight-semibold);
-      }
     }
   }
 </style>

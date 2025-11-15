@@ -182,6 +182,5 @@
 </script>
 
 <style lang="less">
-  @import '../input/BasicInput.less';
   @import './BasicInputDate.less';
 </style>

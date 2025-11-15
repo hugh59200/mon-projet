@@ -31,6 +31,8 @@ declare module 'vue' {
     BasicLink: typeof import('./../designSystem/src/components/basic/link/BasicLink.vue')['default']
     BasicLoader: typeof import('./../designSystem/src/components/basic/loader/BasicLoader.vue')['default']
     BasicPagination: typeof import('./../designSystem/src/components/basic/pagination/BasicPagination.vue')['default']
+    BasicPill: typeof import('./../designSystem/src/components/basic/pill/BasicPill.vue')['default']
+    BasicPillGroup: typeof import('./../designSystem/src/components/basic/pill/BasicPillGroup.vue')['default']
     BasicPopup: typeof import('./../designSystem/src/components/basic/popup/BasicPopup.vue')['default']
     BasicRange: typeof import('./../designSystem/src/components/basic/range/BasicRange.vue')['default']
     BasicRedirection: typeof import('./../designSystem/src/components/basic/redirection/BasicRedirection.vue')['default']

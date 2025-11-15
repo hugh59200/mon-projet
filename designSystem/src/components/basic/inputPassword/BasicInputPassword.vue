@@ -86,8 +86,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '../input/BasicInput.less';
-
   .password-toggle {
     background: none;
     border: none;
