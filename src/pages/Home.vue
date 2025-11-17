@@ -1,38 +1,33 @@
 <template>
   <div class="home">
-    <!-- 🧬 HERO PRINCIPAL -->
     <section class="home__hero">
       <div class="home__hero-content">
-        <BasicText
-          size="body-m"
-          color="primary-600"
-          class="home__hero-pill"
-        >
+        <div class="home__hero-pill">
           <BasicIconNext
             name="Globe"
-            :size="14"
-            color="primary-600"
-            class="home__hero-pill-icon"
+            :size="24"
+            color="neutral-400"
           />
-          <span>Fournisseur européen • Usage recherche uniquement</span>
-        </BasicText>
-
+          <BasicText
+            size="body-m"
+            color="neutral-400"
+          >
+            Fournisseur européen • Usage recherche uniquement
+          </BasicText>
+        </div>
         <BasicText
           size="h1"
           weight="bold"
-          color="primary-600"
+          color="primary-700"
         >
           Peptides de recherche certifiés pour laboratoires et R&amp;D
         </BasicText>
-
         <BasicText
           size="body-l"
-          color="neutral-700"
-          class="home__hero-sub"
+          color="neutral-300"
         >
           Catalogue sélectionné • Certificats d’analyse disponibles • Expédition 24h depuis l’UE
         </BasicText>
-
         <div class="home__hero-actions">
           <BasicButton
             label="Découvrir nos produits"
@@ -49,17 +44,14 @@
             @click="$router.push('/a-propos')"
           />
         </div>
-
         <BasicText
-          size="body-m"
-          color="neutral-500"
-          class="home__hero-disclaimer"
+          color="neutral-400"
+          font-style="italic"
         >
           Produits destinés exclusivement à la recherche scientifique. Non destinés à l’usage
           humain.
         </BasicText>
       </div>
-
       <div class="home__hero-image">
         <img
           src="../assets/peptides-hero.jpg"
@@ -68,12 +60,8 @@
         />
       </div>
     </section>
-
-    <!-- 🎥 BANNIÈRE VIDÉOS + CARROUSEL PRODUITS -->
     <CategoryHeroBanner />
     <HeroBanner />
-
-    <!-- 📦 COMMENT ÇA MARCHE -->
     <section class="home__how">
       <BasicText
         size="h2"
@@ -90,7 +78,6 @@
       >
         Un parcours pensé pour les laboratoires, équipes R&amp;D et acteurs du secteur scientifique.
       </BasicText>
-
       <div class="home__how-grid">
         <div
           v-for="step in steps"
@@ -101,18 +88,17 @@
             <div class="home__how-icon">
               <BasicIconNext
                 :name="step.icon"
-                :size="26"
+                :size="35"
                 color="primary-600"
               />
             </div>
             <BasicText
               weight="bold"
-              color="neutral-800"
+              color="neutral-700"
             >
               {{ step.title }}
             </BasicText>
           </div>
-
           <BasicText
             size="body-s"
             color="neutral-600"
@@ -122,8 +108,6 @@
         </div>
       </div>
     </section>
-
-    <!-- 🧪 ENGAGEMENT QUALITÉ -->
     <section class="home__quality">
       <BasicText
         size="h2"
@@ -141,7 +125,6 @@
         Un contrôle rigoureux de la pureté, une traçabilité complète et une logistique adaptée à la
         recherche.
       </BasicText>
-
       <div class="home__quality-list">
         <div
           v-for="q in quality"
@@ -162,8 +145,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ❓ FAQ COURTE -->
     <section class="home__faq">
       <BasicText
         size="h2"
@@ -175,32 +156,20 @@
       </BasicText>
 
       <div class="home__faq-list">
-        <details
+        <FilterSection
           v-for="item in faq"
           :key="item.q"
-          class="home__faq-item"
+          :title="item.q"
         >
-          <summary>
-            <BasicText
-              size="body-m"
-              color="neutral-800"
-            >
-              {{ item.q }}
-            </BasicText>
-            <span class="home__faq-chevron">▾</span>
-          </summary>
           <BasicText
             size="body-s"
             color="neutral-600"
-            class="home__faq-answer"
           >
             {{ item.a }}
           </BasicText>
-        </details>
+        </FilterSection>
       </div>
     </section>
-
-    <!-- 🚀 CTA FINAL -->
     <section class="home__cta">
       <BasicText
         size="body-s"
@@ -216,26 +185,28 @@
       >
         Commencez vos recherches dès aujourd’hui
       </BasicText>
-      <BasicText
-        size="body-m"
-        color="neutral-100"
-        class="home__cta-sub"
-      >
-        Accédez au catalogue complet, aux certificats d’analyse et aux stocks disponibles en temps
-        réel.
-      </BasicText>
-      <BasicButton
-        label="Voir le catalogue"
-        type="secondary"
-        variant="filled"
-        size="large"
-        @click="$router.push('/catalogue')"
-      />
+      <div class="home__cta-content">
+        <BasicText
+          size="body-m"
+          color="neutral-200"
+        >
+          Accédez au catalogue complet, aux certificats d’analyse et aux stocks disponibles en temps
+          réel.
+        </BasicText>
+        <BasicButton
+          label="Voir le catalogue"
+          type="secondary"
+          variant="filled"
+          size="large"
+          @click="$router.push('/catalogue')"
+        />
+      </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+  import FilterSection from '@/features/shared/components/FilterSection.vue'
   import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
@@ -304,10 +275,6 @@
 </script>
 
 <style scoped lang="less">
-  /* ===================================================================
-   🏠 HOME — Neural Glass Hybrid v3 (FULL REWORK)
-   =================================================================== */
-
   .home {
     display: flex;
     flex-direction: column;
@@ -323,10 +290,6 @@
         opacity: 1;
       }
     }
-
-    /* ================================================================
-     🧬 HERO — Glass + Halo Premium
-     ================================================================ */
     &__hero {
       display: flex;
       justify-content: space-between;
@@ -339,7 +302,7 @@
       position: relative;
       overflow: hidden;
 
-      background: fade(@white, 10%);
+      background: fade(@secondary-900, 75%);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
 
@@ -372,20 +335,22 @@
         right: -120px;
         background: @secondary-400;
       }
-    }
 
-    &__hero-content {
-      position: relative;
-      z-index: 2;
-      flex: 1;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      &-content {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        gap: 16px;
+      }
 
-      .BasicText[size='h1'] {
-        color: @neutral-50 !important;
-        text-shadow: 0 2px 10px fade(#000, 40%);
+      &-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
       }
     }
 
@@ -395,12 +360,9 @@
       background: fade(@primary-200, 25%);
       border: 1px solid fade(@primary-500, 30%);
       backdrop-filter: blur(10px);
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      color: @primary-700 !important;
+      gap: 12px;
     }
 
     &__hero-sub {
@@ -418,6 +380,9 @@
       flex: 1;
       display: flex;
       justify-content: center;
+      align-items: center;
+      width: 440px;
+      height: 500px;
 
       img {
         width: 100%;
@@ -427,6 +392,7 @@
           0 16px 32px fade(#000, 40%),
           0 0 14px fade(@primary-300, 25%);
         transition: transform 0.35s ease;
+        object-fit: contain;
 
         &:hover {
           transform: scale(1.03);
@@ -434,9 +400,6 @@
       }
     }
 
-    /* ================================================================
-     📦 COMMENT ÇA MARCHE — Glass Cards
-     ================================================================ */
     &__how {
       text-align: center;
       display: flex;
@@ -446,55 +409,48 @@
       .home__section-title {
         color: @neutral-50 !important;
       }
-    }
 
-    &__how-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 28px;
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-    }
+      &-header {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-    &__how-card {
-      padding: 22px 20px;
-      border-radius: 16px;
+      &-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 28px;
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+      }
 
-      background: fade(@white, 12%);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      &-card {
+        padding: 22px 20px;
+        border-radius: 16px;
 
-      border: 1px solid fade(@neutral-300, 26%);
-      box-shadow:
-        0 12px 26px fade(#000, 32%),
-        inset 0 0 0 1px fade(@white, 15%);
+        background: fade(@white, 12%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
 
-      transition: all 0.25s ease;
-
-      &:hover {
-        transform: translateY(-4px);
-        background: fade(@white, 18%);
-        border-color: fade(@primary-400, 30%);
+        border: 1px solid fade(@neutral-300, 26%);
         box-shadow:
-          0 18px 34px fade(#000, 40%),
-          0 0 16px fade(@primary-400, 25%);
-      }
+          0 12px 26px fade(#000, 32%),
+          inset 0 0 0 1px fade(@white, 15%);
 
-      .BasicText {
-        color: @neutral-50 !important;
+        transition: all 0.25s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+          background: fade(@white, 18%);
+          border-color: fade(@primary-400, 30%);
+          box-shadow:
+            0 18px 34px fade(#000, 40%),
+            0 0 16px fade(@primary-400, 25%);
+        }
       }
     }
 
-    &__how-step-index {
-      background: fade(@primary-400, 35%);
-      border: 1px solid fade(@primary-300, 45%);
-      color: @white;
-    }
-
-    /* ================================================================
-     🧪 QUALITÉ — Glass line-grid
-     ================================================================ */
     &__quality {
       text-align: center;
       padding: 40px 28px;
@@ -545,9 +501,6 @@
       }
     }
 
-    /* ================================================================
-     ❓ FAQ — Interactive Glass Accordions
-     ================================================================ */
     &__faq {
       text-align: center;
 
@@ -591,11 +544,6 @@
         transform: translateY(-2px);
         box-shadow: 0 14px 30px fade(#000, 38%);
       }
-
-      .home__faq-answer {
-        margin-top: 10px;
-        color: @neutral-200 !important;
-      }
     }
 
     &__faq-chevron {
@@ -607,11 +555,8 @@
       transform: rotate(180deg);
     }
 
-    /* ================================================================
-     🚀 CTA FINAL — Premium Gradient
-     ================================================================ */
     &__cta {
-      padding: 48px 24px;
+      padding: 36px 24px;
       border-radius: 20px;
 
       background: linear-gradient(135deg, fade(@primary-600, 75%), fade(@secondary-700, 82%));
@@ -623,19 +568,20 @@
 
       text-align: center;
 
-      .home__cta-eyebrow,
-      .home__cta-sub {
+      &-eyebrow,
+      &-sub {
         color: fade(@white, 88%) !important;
       }
 
-      .BasicButton {
-        margin-top: 22px;
+      &-content {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 36px;
       }
     }
 
-    /* ================================================================
-     📱 RESPONSIVE
-     ================================================================ */
     @media (max-width: 960px) {
       padding: 28px 20px;
       gap: 70px;

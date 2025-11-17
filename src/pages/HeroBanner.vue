@@ -612,7 +612,7 @@
       position: relative;
       z-index: 2;
 
-      background: fade(@secondary-700, 35%);
+      background: linear-gradient(135deg, fade(@primary-600, 75%), fade(@secondary-700, 82%));
       backdrop-filter: blur(14px);
       border-top: 4px solid fade(@primary-400, 40%);
 

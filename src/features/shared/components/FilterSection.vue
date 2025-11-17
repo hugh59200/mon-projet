@@ -4,7 +4,12 @@
       class="filter-section__header"
       @click="toggle"
     >
-      <BasicText weight="semibold">{{ title }}</BasicText>
+      <BasicText
+        weight="semibold"
+        color="neutral-700"
+      >
+        {{ title }}
+      </BasicText>
       <BasicIconNext
         :name="open ? 'ChevronUp' : 'ChevronDown'"
         :size="16"
