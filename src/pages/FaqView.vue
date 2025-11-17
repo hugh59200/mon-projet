@@ -1,114 +1,75 @@
 <template>
-  <section class="faq container">
-    <!-- Header -->
+  <section class="faq__page">
     <header class="faq__header">
-      <div class="faq__title">
+      <div class="faq__header-icon">
         <BasicIconNext
           name="HelpCircle"
-          :size="28"
+          :size="32"
+          color="primary-600"
         />
-        <BasicText
-          size="h3"
-          weight="semibold"
-        >
-          Foire aux questions
-        </BasicText>
       </div>
-      <BasicText color="neutral-700">
+      <BasicText
+        size="h2"
+        weight="bold"
+        color="neutral-900"
+      >
+        Foire aux questions
+      </BasicText>
+      <BasicText
+        size="body-m"
+        color="neutral-600"
+        class="faq__header-subtitle"
+      >
         Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou
         vétérinaire.
       </BasicText>
     </header>
-
-    <!-- Toolbar: recherche + filtre -->
-    <div class="faq__toolbar">
-      <BasicToolbar
-        v-model:search="search"
-        :search-placeholder="'Rechercher une question...'"
-        :show-reset="true"
-        @reset="resetSearch"
-      />
-
-      <BasicDropdown
-        v-model="selectedCategory"
-        :items="categoryOptions"
-        size="small"
-        dropdown-type="table"
-        force-value
-      />
-    </div>
-
-    <!-- Liste groupée par catégorie -->
-    <WrapperLoader
-      :loading="false"
-      :has-loaded="true"
-      :is-empty="groupedVisible.length === 0"
-      message="Chargement de la FAQ..."
-      empty-message="Aucun résultat pour cette recherche."
-    >
-      <div class="faq__groups">
-        <section
-          v-for="group in groupedVisible"
-          :key="group.id"
-          class="faq-group"
+    <div class="faq__layout">
+      <aside class="faq__filters">
+        <div class="faq__filters-card">
+          <BasicText
+            size="body-m"
+            weight="semibold"
+            color="neutral-700"
+          >
+            Filtres
+          </BasicText>
+          <BasicToolbar
+            v-model:search="search"
+            search-placeholder="Rechercher une question..."
+            :show-reset="true"
+            @reset="resetSearch"
+          />
+          <BasicDropdown
+            v-model="selectedCategory"
+            :items="categoryOptions"
+            size="small"
+            dropdown-type="table"
+            force-value
+          />
+        </div>
+      </aside>
+      <div class="faq__content">
+        <WrapperLoader
+          :loading="false"
+          :has-loaded="true"
+          :is-empty="groupedVisible.length === 0"
+          message="Chargement…"
+          empty-message="Aucun résultat."
         >
-          <div class="faq-group__header">
-            <BasicIconNext :name="group.icon" />
-            <BasicText
-              size="h5"
-              weight="semibold"
-            >
-              {{ group.label }}
-            </BasicText>
+          <div class="faq__groups">
+            <FilterGroup
+              v-for="group in groupedVisible"
+              :key="group.id"
+              :title="group.label"
+              :icon="group.icon"
+              :items="group.items"
+              v-model:openState="groupOpenState"
+            />
           </div>
-
-          <div class="faq-group__items">
-            <details
-              v-for="item in group.items"
-              :key="item.id"
-              :id="item.id"
-              class="faq-item"
-            >
-              <summary
-                class="faq-item__question"
-                @click="setHash(item.id)"
-              >
-                <BasicIconNext
-                  name="ChevronRight"
-                  class="chevron"
-                />
-                <BasicText weight="semibold">{{ item.q }}</BasicText>
-              </summary>
-
-              <div class="faq-item__answer">
-                <BasicText color="neutral-700">
-                  <span v-html="item.a" />
-                </BasicText>
-
-                <!-- infos RUO -->
-                <div
-                  v-if="item.ruo"
-                  class="faq-ruo"
-                >
-                  <BasicIconNext
-                    name="ShieldAlert"
-                    :size="16"
-                  />
-                  <BasicText
-                    size="body-s"
-                    color="neutral-700"
-                  >
-                    Usage recherche uniquement (RUO). Aucune indication d’usage humain.
-                  </BasicText>
-                </div>
-              </div>
-            </details>
-          </div>
-        </section>
+        </WrapperLoader>
       </div>
-    </WrapperLoader>
-
-    <!-- CTA Support -->
+    </div>
     <footer class="faq__footer">
       <BasicText color="neutral-700">
         Une question restante ? Notre support vous répond rapidement.
@@ -125,7 +86,8 @@
 
 <script setup lang="ts">
   import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+  import FilterGroup from '@/features/shared/components/FilterGroup.vue'
+  import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
   type CatId = 'qualite' | 'stockage' | 'commande' | 'shipping' | 'conformite' | 'retour'
 
@@ -133,7 +95,7 @@
     id: string
     cat: CatId
     q: string
-    a: string // HTML autorisé (basique)
+    a: string
     ruo?: boolean
     kw?: string[]
   }
@@ -147,9 +109,7 @@
     { id: 'retour', label: 'Retours & Support', icon: 'Undo2' },
   ] as const
 
-  /* ----------------------- CONTENU FAQ ----------------------- */
   const faqs: FaqItem[] = [
-    // Qualité
     {
       id: 'q1',
       cat: 'qualite',
@@ -173,8 +133,6 @@
         Ils ne sont pas destinés à un usage humain et ne constituent pas un médicament.`,
       ruo: true,
     },
-
-    // Stockage
     {
       id: 'q4',
       cat: 'stockage',
@@ -195,8 +153,6 @@
       q: 'Dois-je laisser revenir le flacon à température avant ouverture ?',
       a: `Oui. Laisser revenir à température ambiante avant ouverture pour limiter la <strong>condensation</strong> et l’humidité.`,
     },
-
-    // Commandes
     {
       id: 'q7',
       cat: 'commande',
@@ -217,8 +173,6 @@
       q: 'Proposez-vous des factures avec TVA/TVA intracom ?',
       a: `Oui. Renseignez votre société et, le cas échéant, votre numéro de TVA intracommunautaire.`,
     },
-
-    // Expédition
     {
       id: 'q10',
       cat: 'shipping',
@@ -245,8 +199,6 @@
       a: `Oui, selon zones desservies. Le client est responsable des éventuelles contraintes et droits
         locaux. Déclaration comme <em>réactifs de laboratoire – usage recherche</em>.`,
     },
-
-    // Conformité
     {
       id: 'q14',
       cat: 'conformite',
@@ -269,8 +221,6 @@
       q: 'Traçabilité et contrôles qualité',
       a: `Traçabilité des lots et contrôles analytiques (HPLC, LC-MS, pureté) fournis sur le CoA.`,
     },
-
-    // Retours & support
     {
       id: 'q17',
       cat: 'retour',
@@ -286,7 +236,6 @@
     },
   ]
 
-  /* ----------------------- RECHERCHE / FILTRE ----------------------- */
   const search = ref('')
   const selectedCategory = ref<'all' | CatId>('all')
 
@@ -325,35 +274,46 @@
       .filter((g) => g.items.length > 0)
   })
 
-  /* ----------------------- Permaliens (#hash) ----------------------- */
-  /** Met à jour le hash (permalien question) sans recharger la page */
-  function setHash(id: string) {
-    history.replaceState(null, '', `#${encodeURIComponent(id)}`)
-  }
+  const groupOpenState = ref<Record<string, boolean>>({})
 
-  /** Ouvre la question depuis le hash et scroll + highlight */
+  watch(
+    () => groupedVisible.value,
+    (groups) => {
+      groups.forEach((g) => {
+        g.items.forEach((item) => {
+          if (groupOpenState.value[item.id] === undefined) {
+            groupOpenState.value[item.id] = false
+          }
+        })
+      })
+    },
+    { immediate: true },
+  )
+
   async function openFromHash() {
     const raw = window.location.hash?.slice(1)
     if (!raw) return
     const id = decodeURIComponent(raw)
     const target = faqs.find((f) => f.id === id)
     if (!target) return
-    // Assure que la catégorie est visible
+
     selectedCategory.value = target.cat
+
     await nextTick()
-    requestAnimationFrame(() => {
-      const el = document.getElementById(id) as HTMLDetailsElement | null
-      if (!el) return
-      el.open = true
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      el.classList.add('faq-item--flash')
-      setTimeout(() => el.classList.remove('faq-item--flash'), 1200)
-    })
+
+    groupOpenState.value[id] = true
+
+    await nextTick()
+
+    const el = document.getElementById(id)
+    if (!el) return
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.classList.add('faq-item--flash')
+    setTimeout(() => el.classList.remove('faq-item--flash'), 1200)
   }
 
-  /* ----------------------- JSON-LD (SEO) ----------------------- */
   function injectFaqJsonLd() {
-    // on envoie tous les Q/R pour le rich snippet
     const data = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
@@ -385,130 +345,105 @@
 
 <style scoped lang="less">
   .faq {
-    padding: 32px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    &__header {
+    /* PAGE */
+    &__page {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 48px;
+      padding: 48px 32px;
+      max-width: 1280px;
+      margin: 0 auto;
     }
 
-    &__title {
+    /* HEADER */
+    &__header {
+      text-align: center;
       display: flex;
-      align-items: center;
-      gap: 8px;
-      color: @neutral-900;
-    }
-
-    &__toolbar {
-      display: flex;
+      flex-direction: column;
       gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
+      max-width: 760px;
+      margin: 0 auto;
+
+      &-icon {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+
+      &-subtitle {
+        max-width: 620px;
+        margin: 0 auto;
+      }
+    }
+
+    /* LAYOUT 2 COLONNES */
+    &__layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+
+      @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* SIDEBAR */
+    &__filters {
+      position: sticky;
+      top: 90px;
+      height: fit-content;
+
+      &-card {
+        background: fade(@neutral-50, 40%);
+        backdrop-filter: blur(14px);
+        border: 1px solid fade(@neutral-300, 40%);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px fade(#000, 10%);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+
+    /* CONTENT */
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     &__groups {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 28px;
     }
 
-    &__footer {
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-  }
-
-  /* Group */
-  .faq-group {
-    background: #fff;
-    border: 1px solid @neutral-200;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px fade(@neutral-900, 5%);
-    overflow: hidden;
-
-    &__header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 16px;
-      background: @neutral-50;
-      border-bottom: 1px solid @neutral-200;
-      color: @neutral-900;
-    }
-
-    &__items {
-      display: flex;
-      flex-direction: column;
-    }
-  }
-
-  /* Accordion item */
-  .faq-item {
-    border-top: 1px solid @neutral-200;
-    scroll-margin-top: 90px; // espace sous un éventuel header fixe
-
-    &:first-child {
-      border-top: none;
-    }
-
-    /* remove default arrow */
-    summary::-webkit-details-marker {
-      display: none;
-    }
-
-    &__question {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 16px;
-      cursor: pointer;
-      list-style: none;
-      transition: background-color 0.2s ease;
-      color: @neutral-900;
-
-      .chevron {
-        transition: transform 0.2s ease;
-      }
-    }
-
+    /* ANSWER TEXT */
     &__answer {
-      padding: 0 16px 16px 36px;
-      line-height: 1.6;
-      color: @neutral-800;
+      padding: 4px 2px 12px;
     }
 
-    /* hover/active */
-    &:hover .faq-item__question {
-      background: fade(@neutral-900, 4%);
+    /* RUO BADGE */
+    &__ruo {
+      margin-top: 12px;
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: fade(@danger-500, 10%);
+      border: 1px solid fade(@danger-500, 30%);
     }
-    &[open] .chevron {
-      transform: rotate(90deg);
+
+    /* FOOTER */
+    &__footer {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid fade(@neutral-300, 40%);
     }
-  }
-
-  /* Surlignage quand on arrive depuis un lien (hash) */
-  .faq-item:target .faq-item__question,
-  .faq-item--flash .faq-item__question {
-    background: fade(@primary-600, 10%);
-    box-shadow: 0 0 0 2px fade(@primary-600, 25%) inset;
-    border-radius: 10px;
-  }
-
-  /* RUO callout */
-  .faq-ruo {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 10px;
-    background: fade(@danger-500, 6%);
-    border: 1px solid fade(@danger-500, 20%);
-    border-radius: 8px;
   }
 </style>

@@ -66,12 +66,15 @@
     border-radius: 10px 10px 0 0;
     cursor: pointer;
     transition: all 0.25s ease;
-    background-color: @neutral-100;
+    background: fade(@secondary-900, 75%);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid fade(@neutral-300, 25%);
     user-select: none;
 
     /* ✅ Hover sur onglet non sélectionné */
     &:hover {
-      background-color: @neutral-200;
+      background: fade(@secondary-700, 75%);
 
       &:not(.tab--selected) {
         .tab__label {
@@ -87,7 +90,7 @@
     }
 
     &--selected {
-      background-color: @white;
+      background: fade(@secondary-500, 75%);
       display: flex;
       align-items: center;
       justify-content: center;

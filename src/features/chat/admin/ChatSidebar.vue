@@ -120,13 +120,14 @@
 
 <style scoped lang="less">
   .chat-sidebar {
-    background: @neutral-50;
+    background: @neutral-0;
     border-right: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
     scrollbar-width: thin;
+    border-top-left-radius: 16px;
 
     &__status {
       position: sticky;
@@ -136,7 +137,6 @@
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px;
-      background: white;
       border-bottom: 1px solid @neutral-200;
       gap: 10px;
 
@@ -253,7 +253,10 @@
       overflow-y: auto;
       scrollbar-width: thin;
       scroll-behavior: smooth;
-      background: @neutral-50;
+      background: fade(@primary-200, 75%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid fade(@neutral-300, 25%);
     }
 
     .no-conv {

@@ -128,8 +128,16 @@
     flex-direction: column;
     gap: 16px;
     padding: 24px 32px;
-    background: @neutral-50;
+    background: fade(@neutral-200, 82%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid fade(@neutral-300, 40%);
+    box-shadow:
+      0 4px 14px fade(@neutral-900, 6%),
+      inset 0 0 0 1px fade(@neutral-50, 45%);
     min-height: 100vh;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 
     &__header {
       display: flex;
@@ -145,8 +153,8 @@
     &__layout {
       display: grid;
       grid-template-columns: 300px 1fr;
-      background: white;
-      border-radius: 16px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
       box-shadow: 0 2px 8px fade(@neutral-900, 5%);
       border: 1px solid @neutral-200;
       align-items: stretch;

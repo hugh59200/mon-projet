@@ -326,8 +326,9 @@
     max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px 100px;
-    font-family: 'Inter', sans-serif;
-
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
     .tabs-header {
       display: flex;
       flex-wrap: wrap;

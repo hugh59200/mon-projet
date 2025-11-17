@@ -29,7 +29,7 @@
 <script setup lang="ts">
   import { computed } from 'vue'
 
-  const open = defineModel<boolean>({ default: true })
+  const open = defineModel<boolean>()
 
   defineProps<{ title: string }>()
 

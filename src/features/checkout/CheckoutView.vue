@@ -302,6 +302,16 @@
     padding: 0 20px 100px;
     box-sizing: border-box;
 
+    > div {
+      background: fade(@neutral-200, 82%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid fade(@neutral-300, 40%);
+      box-shadow:
+        0 4px 14px fade(@neutral-900, 6%),
+        inset 0 0 0 1px fade(@neutral-50, 45%);
+    }
+
     &__title {
       text-align: center;
     }
@@ -309,14 +319,11 @@
     &__cart,
     &__infos,
     &__payment {
-      background: white;
-      border: 1px solid @neutral-200;
       border-radius: 14px;
       padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 18px;
-      box-shadow: 0 3px 10px fade(@neutral-300, 15%);
     }
 
     /* --- ITEMS --- */
