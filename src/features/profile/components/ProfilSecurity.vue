@@ -57,7 +57,7 @@
   import { computed, ref } from 'vue'
 
   /* Props */
-  const props = defineProps<{
+  defineProps<{
     loading?: boolean
     open?: boolean
   }>()

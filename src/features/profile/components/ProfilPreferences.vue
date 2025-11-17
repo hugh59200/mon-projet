@@ -38,7 +38,7 @@
   import ThemeAppearance from '@/themes/components/ThemeAppearance.vue'
 
   // Props
-  const props = defineProps<{
+  defineProps<{
     newsletter: boolean
     smsAlerts: boolean
   }>()

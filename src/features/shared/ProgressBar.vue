@@ -14,7 +14,7 @@
     position: relative;
     width: 140px;
     height: 6px;
-    background: rgba(var(--neutral-300-rgb), 0.40);
+    background: rgba(var(--neutral-300-rgb), 0.4);
     border-radius: 6px;
     overflow: hidden;
     margin-top: 28px;
@@ -32,15 +32,15 @@
 
     /* ✅ Couleurs dynamiques */
     &.success::after {
-      background: linear-gradient(90deg, @success-500, lighten(@success-600, 10%), @success-500);
+      background: linear-gradient(90deg, @success-500, @success-600, @success-500);
     }
 
     &.primary::after {
-      background: linear-gradient(90deg, @primary-500, lighten(@primary-600, 10%), @primary-500);
+      background: linear-gradient(90deg, @primary-500, @primary-600, @primary-500);
     }
 
     &.danger::after {
-      background: linear-gradient(90deg, @danger-500, lighten(@danger-600, 10%), @danger-500);
+      background: linear-gradient(90deg, @danger-500, @danger-600, @danger-500);
     }
 
     /* ✨ Effet de brillance subtile */

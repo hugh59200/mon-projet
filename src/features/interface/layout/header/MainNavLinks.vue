@@ -13,7 +13,8 @@
         :label="item.label"
         :iconName="showIcon ? item.icon : undefined"
         :active="$route.path === item.path"
-        variant="ghost"
+        variant="reverse"
+        size="medium"
         @click="$emit('navigate')"
       />
     </RouterLink>
@@ -47,17 +48,18 @@
 <style scoped lang="less">
   .main-nav {
     display: flex;
-    align-items: center;
-    gap: 20px;
+    gap: var(--spacing-20);
 
     &--horizontal {
       flex-direction: row;
+      align-items: center;
       justify-content: center;
     }
 
     &--vertical {
       flex-direction: column;
-      gap: 14px;
+      gap: var(--spacing-15);
+      align-items: flex-start;
     }
 
     &__item {

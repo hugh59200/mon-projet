@@ -33,7 +33,7 @@
           class="po__card"
           @click="$emit('open-order', order.id)"
         >
-          <!-- header -->
+          <!-- HEADER -->
           <div class="po__card-header">
             <BasicText
               size="body-l"
@@ -49,7 +49,7 @@
             />
           </div>
 
-          <!-- body -->
+          <!-- BODY -->
           <div class="po__card-body">
             <BasicText
               size="body-m"
@@ -86,31 +86,25 @@
   import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
-  import { computed } from 'vue'
 
-  const props = withDefaults(
-    defineProps<{
-      orders: Partial<Orders>[]
-      open?: boolean
-    }>(),
-    {
-      open: true,
-    },
-  )
+  /* Props */
+  defineProps<{
+    orders: Partial<Orders>[]
+  }>()
 
-  const emit = defineEmits(['update:open', 'open-order'])
+  /* defineModel → open */
+  const open = defineModel<boolean>({ default: true })
 
-  /* open */
-  const open = computed({
-    get: () => props.open,
-    set: (v) => emit('update:open', v),
-  })
+  /* declare custom emits */
+  const emit = defineEmits<{
+    (e: 'open-order', id?: string): void
+  }>()
 
   function toggle() {
     open.value = !open.value
   }
 
-  /* === helpers === */
+  /* helpers */
   function formatDate(date?: string | null) {
     if (!date) return '—'
     return new Date(date).toLocaleDateString()

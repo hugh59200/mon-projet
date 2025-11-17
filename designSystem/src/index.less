@@ -1,15 +1,26 @@
+/* 🎨 Palette & couleurs */
 @import "fondation/colors/colors.less";
-@import "../../src/themes/themes.css";
+
+/* 🌍 Global (reset, fonts, basiques) */
+@import "fondation/global.less";
+
+/* 🎭 Thèmes CSS (light / dark) */
+@import "fondation/themes/themes.css";
+
+/* 🧬 TOKENS — CSS → LESS (indispensable) */
+@import "fondation/themes/tokens.less";
+
+/* 🧱 Structure & système */
 @import "fondation/spacing/spacing.less";
-@import "fondation//z-index/z-index.less";
 @import "fondation/border/border_radius.less";
 
+/* 🧩 Couleurs boutons (déprécié si tu utilises tokens maintenant) */
 @import "components/basic/button/colors.less";
 
-@import "fondation/global.less";
+/* 🧱 Layout / utils */
 @import "fondation/flex/flex.less";
-
 @import "fondation/breakpoints/breakpoints.less";
 @import "fondation/breakpoints/gridResponsive.less";
 
+/* ✨ Animations */
 @import "fondation/animation/animation.less";

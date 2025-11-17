@@ -1,0 +1,168 @@
+/* ==========================================================================
+   🌟 PREMIUM THEME
+   - Haut de gamme, propre, certifié, look "blue brand"
+   - Light + Dark
+   ========================================================================== */
+
+/* ------------------------------------------
+   PREMIUM — LIGHT
+------------------------------------------ */
+:root[data-theme="premium-light"] {
+  /* ===========================
+     PRIMARY
+  ============================ */
+  --primary-0: #eef3ff;
+  --primary-50: #e2e8ff;
+  --primary-100: #c7d4ff;
+  --primary-200: #a9bcff;
+  --primary-300: #8aa4ff;
+  --primary-400: #6b8cff;
+  --primary-500: #4c6fff; /* Brand */
+  --primary-600: #3754db;
+  --primary-700: #233ead;
+  --primary-800: #182f84;
+  --primary-900: #11255f;
+  --primary-950: #0d1a40;
+  --primary-1000: #0a1026;
+
+  /* RGB (utiles pour ombres / overlays) */
+  --primary-500-rgb: 76, 111, 255;
+
+  /* ===========================
+     SECONDARY
+  ============================ */
+  --secondary-0: #f8f2ff;
+  --secondary-50: #f1e6ff;
+  --secondary-100: #e4d2ff;
+  --secondary-200: #d6bdff;
+  --secondary-300: #c8a7ff;
+  --secondary-400: #b991ff;
+  --secondary-500: #9b6bff;
+  --secondary-600: #8649ff;
+  --secondary-700: #6929d6;
+  --secondary-800: #4f1fa3;
+  --secondary-900: #3b1778;
+  --secondary-950: #2a1056;
+  --secondary-1000: #1b0a36;
+
+  /* ===========================
+     NEUTRALS
+  ============================ */
+  --neutral-0: #ffffff;
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #0a0f1e;
+
+  --neutral-500-rgb: 100, 116, 139;
+
+  /* ===========================
+     SURFACES / UI
+  ============================ */
+  --surface-0: #ffffff;
+  --surface-1: #f8faff;
+  --surface-2: #f1f4ff;
+  --surface-3: #e8edff;
+
+  --surface-border: rgba(0, 0, 0, 0.08);
+  --surface-border-strong: rgba(0, 0, 0, 0.14);
+
+  --surface-divider: rgba(0, 0, 0, 0.08);
+
+  /* SHADOWS */
+  --surface-shadow: rgba(0, 0, 0, 0.08);
+  --surface-elevated-shadow: rgba(0, 0, 0, 0.12);
+
+  --shadow-100: rgba(0, 0, 0, 0.03);
+  --shadow-200: rgba(0, 0, 0, 0.06);
+  --shadow-300: rgba(0, 0, 0, 0.1);
+  --shadow-400: rgba(0, 0, 0, 0.14);
+  --shadow-500: rgba(0, 0, 0, 0.18);
+}
+
+/* ------------------------------------------
+   PREMIUM — DARK
+------------------------------------------ */
+:root[data-theme="premium-dark"] {
+  /* ===========================
+     PRIMARY
+  ============================ */
+  --primary-0: #0f1224;
+  --primary-50: #151936;
+  --primary-100: #1d224d;
+  --primary-200: #263066;
+  --primary-300: #2f3d80;
+  --primary-400: #3c50a7;
+  --primary-500: #6e89ff;
+  --primary-600: #5574f0;
+  --primary-700: #445dc2;
+  --primary-800: #344595;
+  --primary-900: #242f69;
+  --primary-950: #182049;
+  --primary-1000: #0f162f;
+
+  --primary-500-rgb: 110, 137, 255;
+
+  /* ===========================
+     SECONDARY
+  ============================ */
+  --secondary-0: #1a0f2b;
+  --secondary-50: #25163d;
+  --secondary-100: #301c50;
+  --secondary-200: #3a2262;
+  --secondary-300: #452975;
+  --secondary-400: #513087;
+  --secondary-500: #b78aff;
+  --secondary-600: #a373ff;
+  --secondary-700: #8d5bff;
+  --secondary-800: #7446d1;
+  --secondary-900: #5b34a3;
+  --secondary-950: #44257a;
+
+  /* ===========================
+     NEUTRALS
+  ============================ */
+  --neutral-0: #0d1117;
+  --neutral-50: #161b22;
+  --neutral-100: #1f242c;
+  --neutral-200: #2a303a;
+  --neutral-300: #37404c;
+  --neutral-400: #4a5567;
+  --neutral-500: #64748b;
+  --neutral-600: #8692a6;
+  --neutral-700: #aab4c3;
+  --neutral-800: #cbd3df;
+  --neutral-900: #e2e8f0;
+  --neutral-950: #f8fafc;
+
+  --neutral-500-rgb: 100, 116, 139;
+
+  /* ===========================
+     SURFACES
+  ============================ */
+  --surface-0: #0e1116;
+  --surface-1: #1c2230;
+  --surface-2: #273049;
+  --surface-3: #323b55;
+
+  --surface-border: rgba(255, 255, 255, 0.12);
+  --surface-border-strong: rgba(255, 255, 255, 0.2);
+
+  --surface-divider: rgba(255, 255, 255, 0.12);
+
+  --surface-shadow: rgba(0, 0, 0, 0.45);
+  --surface-elevated-shadow: rgba(0, 0, 0, 0.55);
+
+  --shadow-100: rgba(0, 0, 0, 0.1);
+  --shadow-200: rgba(0, 0, 0, 0.2);
+  --shadow-300: rgba(0, 0, 0, 0.3);
+  --shadow-400: rgba(0, 0, 0, 0.4);
+  --shadow-500: rgba(0, 0, 0, 0.5);
+}

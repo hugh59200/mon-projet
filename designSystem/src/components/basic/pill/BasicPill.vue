@@ -23,7 +23,7 @@
 
   type PillSize = 'small' | 'medium'
 
-  const props = withDefaults(
+  withDefaults(
     defineProps<{
       label?: string
       size?: PillSize

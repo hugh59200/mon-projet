@@ -12,23 +12,26 @@
 </template>
 
 <script setup lang="ts">
-import BasicPill from './BasicPill.vue'
+  import BasicPill from './BasicPill.vue'
 
-const props = withDefaults(defineProps<{
-  modelValue: string | number
-  options: Array<{ label: string; value: string | number }>
-  size?: 'small' | 'medium'
-}>(), {
-  size: 'medium',
-})
+  withDefaults(
+    defineProps<{
+      modelValue: string | number
+      options: Array<{ label: string; value: string | number }>
+      size?: 'small' | 'medium'
+    }>(),
+    {
+      size: 'medium',
+    },
+  )
 
-const modelValue = defineModel<string | number>()
+  const modelValue = defineModel<string | number>()
 </script>
 
 <style lang="less" scoped>
-.pill-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+  .pill-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 </style>

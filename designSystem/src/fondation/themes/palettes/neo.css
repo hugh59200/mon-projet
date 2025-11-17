@@ -1,0 +1,168 @@
+/* ==========================================================================
+   ⚡ NEO THEME
+   - Moderne, dynamique, lumineux
+   - Light + Dark
+   ========================================================================== */
+
+/* ------------------------------------------
+   NEO — LIGHT
+------------------------------------------ */
+:root[data-theme="neo-light"] {
+  /* ===========================
+     PRIMARY — Bleu néon
+  ============================ */
+  --primary-0: #eef8ff;
+  --primary-50: #d8efff;
+  --primary-100: #bae2ff;
+  --primary-200: #8fd3ff;
+  --primary-300: #63c4ff;
+  --primary-400: #39b4ff;
+  --primary-500: #0da5ff; /* Neon brand */
+  --primary-600: #008be0;
+  --primary-700: #0070b3;
+  --primary-800: #005385;
+  --primary-900: #003a5c;
+  --primary-950: #02273f;
+  --primary-1000: #011a2a;
+
+  --primary-500-rgb: 13, 165, 255;
+
+  /* ===========================
+     SECONDARY — Violet néon
+  ============================ */
+  --secondary-0: #faf2ff;
+  --secondary-50: #f4e3ff;
+  --secondary-100: #e8caff;
+  --secondary-200: #d8abff;
+  --secondary-300: #c589ff;
+  --secondary-400: #b165ff;
+  --secondary-500: #9a45ff; /* Violet neon */
+  --secondary-600: #7f2ce6;
+  --secondary-700: #621eb7;
+  --secondary-800: #491789;
+  --secondary-900: #34105f;
+  --secondary-950: #230a40;
+
+  --secondary-500-rgb: 154, 69, 255;
+
+  /* ===========================
+     NEUTRALS — Gris technologiques
+  ============================ */
+  --neutral-0: #ffffff;
+  --neutral-50: #f7f9fc;
+  --neutral-100: #eff2f7;
+  --neutral-200: #e1e5ec;
+  --neutral-300: #cbd2dd;
+  --neutral-400: #a8b0bd;
+  --neutral-500: #8690a0;
+  --neutral-600: #6a7383;
+  --neutral-700: #525a67;
+  --neutral-800: #3a414b;
+  --neutral-900: #272c33;
+  --neutral-950: #181b1f;
+
+  --neutral-500-rgb: 134, 144, 160;
+
+  /* ===========================
+     SURFACES — Très lumineux
+  ============================ */
+  --surface-0: #ffffff;
+  --surface-1: #fafbff;
+  --surface-2: #f4f7ff;
+  --surface-3: #edf2ff;
+
+  --surface-border: rgba(0, 0, 0, 0.07);
+  --surface-border-strong: rgba(0, 0, 0, 0.12);
+
+  --surface-divider: rgba(0, 0, 0, 0.06);
+
+  --surface-shadow: rgba(0, 0, 0, 0.04);
+  --surface-elevated-shadow: rgba(0, 0, 0, 0.08);
+
+  --shadow-100: rgba(0, 0, 0, 0.03);
+  --shadow-200: rgba(0, 0, 0, 0.06);
+  --shadow-300: rgba(0, 0, 0, 0.1);
+  --shadow-400: rgba(0, 0, 0, 0.14);
+  --shadow-500: rgba(0, 0, 0, 0.18);
+}
+
+/* ------------------------------------------
+   NEO — DARK
+------------------------------------------ */
+:root[data-theme="neo-dark"] {
+  /* ===========================
+     PRIMARY — Neon bright
+  ============================ */
+  --primary-0: #001520;
+  --primary-50: #001f2e;
+  --primary-100: #002b3e;
+  --primary-200: #003852;
+  --primary-300: #00486a;
+  --primary-400: #005b87;
+  --primary-500: #0da5ff;
+  --primary-600: #0097e6;
+  --primary-700: #007bbd;
+  --primary-800: #005e8e;
+  --primary-900: #004466;
+  --primary-950: #002c44;
+
+  --primary-500-rgb: 13, 165, 255;
+
+  /* ===========================
+     SECONDARY — Violet neon
+  ============================ */
+  --secondary-0: #110024;
+  --secondary-50: #1a0037;
+  --secondary-100: #24014d;
+  --secondary-200: #2f0a62;
+  --secondary-300: #3b1478;
+  --secondary-400: #471f8e;
+  --secondary-500: #b07aff;
+  --secondary-600: #9b59ff;
+  --secondary-700: #8440e6;
+  --secondary-800: #692ebd;
+  --secondary-900: #51228f;
+  --secondary-950: #381663;
+
+  --secondary-500-rgb: 176, 122, 255;
+
+  /* ===========================
+     NEUTRALS — Gris modern tech
+  ============================ */
+  --neutral-0: #0d1117;
+  --neutral-50: #13171f;
+  --neutral-100: #1a1f28;
+  --neutral-200: #222833;
+  --neutral-300: #2c3441;
+  --neutral-400: #3a4353;
+  --neutral-500: #5d677a;
+  --neutral-600: #7a8499;
+  --neutral-700: #9aa3b8;
+  --neutral-800: #c2c9d6;
+  --neutral-900: #e3e8f0;
+  --neutral-950: #f8fafc;
+
+  --neutral-500-rgb: 93, 103, 122;
+
+  /* ===========================
+     SURFACES — Glow subtle
+  ============================ */
+  --surface-0: #0d1117;
+  --surface-1: #151b24;
+  --surface-2: #1d2430;
+  --surface-3: #232c3b;
+
+  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-border-strong: rgba(255, 255, 255, 0.18);
+
+  --surface-divider: rgba(255, 255, 255, 0.1);
+
+  --surface-shadow: rgba(0, 0, 0, 0.5);
+  --surface-elevated-shadow: rgba(0, 0, 0, 0.65);
+
+  --shadow-100: rgba(0, 0, 0, 0.1);
+  --shadow-200: rgba(0, 0, 0, 0.2);
+  --shadow-300: rgba(0, 0, 0, 0.3);
+  --shadow-400: rgba(0, 0, 0, 0.4);
+  --shadow-500: rgba(0, 0, 0, 0.5);
+}

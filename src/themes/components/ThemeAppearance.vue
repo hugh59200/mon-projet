@@ -1,6 +1,5 @@
 <template>
   <div class="ta util-surface-2 util-border util-radius-l util-shadow-elevated">
-    <!-- TITLE -->
     <BasicText
       size="body-l"
       weight="semibold"
@@ -9,7 +8,7 @@
       Apparence
     </BasicText>
 
-    <!-- THEME SECTION -->
+    <!-- THEME -->
     <div class="ta__row">
       <BasicText
         size="body-s"
@@ -17,7 +16,6 @@
       >
         Thème
       </BasicText>
-
       <BasicPillGroup
         v-model="scheme"
         :options="[
@@ -27,7 +25,7 @@
       />
     </div>
 
-    <!-- PALETTE SECTION -->
+    <!-- PALETTE -->
     <div class="ta__row">
       <BasicText
         size="body-s"
@@ -35,7 +33,6 @@
       >
         Palette
       </BasicText>
-
       <BasicPillGroup
         v-model="palette"
         :options="palettes"
@@ -57,7 +54,6 @@
     { label: 'Neo (biotech)', value: 'neo' },
   ]
 </script>
-
 <style scoped lang="less">
   .ta {
     padding: 20px 24px;
@@ -73,7 +69,7 @@
     }
 
     &__title {
-      color: var(--text-title-contrast);
+      color: var(--neutral-900);
     }
 
     &__row {

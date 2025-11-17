@@ -354,9 +354,14 @@ input {
   color: @neutral-500;
 }
 
-@focus-global: 0px 0px 1px 1px rgba(0, 167, 155, 0.4);
 
 .focusable:focus-visible {
   outline: none;
   box-shadow: @focus-global;
 }
+
+@focus-global: 0px 0px 1px 1px rgba(0, 167, 155, 0.4);
+@z-tooltip: 3000;
+@z-dropdown: 2000;
+@z-header: 1000;
+@z-modal: 4000;

@@ -1,7 +1,13 @@
 <template>
-  <section class="fs">
+  <section
+    class="fs"
+    :class="{ 'is-open': open }"
+  >
     <header
       class="fs__header"
+      role="button"
+      :aria-expanded="open"
+      :aria-controls="contentId"
       @click="toggle"
     >
       <BasicText
@@ -13,7 +19,7 @@
       </BasicText>
 
       <BasicIconNext
-        :name="open ? 'ChevronUp' : 'ChevronDown'"
+        :name="'ChevronDown'"
         :size="18"
         class="fs__chevron"
         :class="{ 'is-open': open }"
@@ -23,31 +29,36 @@
     <div
       v-motion="motion"
       v-show="open"
+      :id="contentId"
       class="fs__content"
     >
       <slot />
     </div>
   </section>
 </template>
+
 <script setup lang="ts">
   import { computed } from 'vue'
 
   const open = defineModel<boolean>({ default: true })
   defineProps<{ title: string }>()
 
+  // id unique (utile si tu as plusieurs FsSection dans la page)
+  const contentId = `fs-content-${Math.random().toString(36).slice(2)}`
+
   const motion = computed(() => ({
-    initial: { opacity: 0, y: -6, scaleY: 0.96 },
+    initial: { opacity: 0, y: -4, scale: 0.98 },
     enter: {
       opacity: 1,
       y: 0,
-      scaleY: 1,
-      transition: { type: 'spring', stiffness: 160, damping: 20 },
+      scale: 1,
+      transition: { type: 'spring', stiffness: 180, damping: 18 },
     },
     leave: {
       opacity: 0,
-      y: -6,
-      scaleY: 0.96,
-      transition: { duration: 0.14 },
+      y: -4,
+      scale: 0.98,
+      transition: { duration: 0.12 },
     },
   }))
 
@@ -65,12 +76,11 @@
     transition: var(--transition-medium);
     overflow: hidden;
 
-    /* hover léger sur tout le bloc */
     &:hover {
       border-color: var(--surface-border-strong);
     }
 
-    /* ===== HEADER ===== */
+    /* HEADER */
     &__header {
       padding: 16px 20px;
       background: var(--surface-3);
@@ -79,12 +89,12 @@
       justify-content: space-between;
       cursor: pointer;
       user-select: none;
-      transition: var(--transition-fast);
+      transition: background var(--transition-fast);
+      width: 100%;
 
       &:hover {
         background: var(--surface-hover);
       }
-
       &:active {
         background: var(--surface-active);
       }
@@ -94,12 +104,12 @@
       color: var(--text-title-contrast);
     }
 
-    /* Chevron animation */
+    /* Chevron improved smoothness */
     &__chevron {
       transition:
-        transform 0.3s ease,
+        transform 0.28s ease,
         opacity 0.2s ease;
-      opacity: 0.75;
+      opacity: 0.7;
 
       &.is-open {
         transform: rotate(180deg);
@@ -110,7 +120,7 @@
       }
     }
 
-    /* ===== CONTENT ===== */
+    /* CONTENT */
     &__content {
       padding: 20px 22px 26px;
       display: flex;

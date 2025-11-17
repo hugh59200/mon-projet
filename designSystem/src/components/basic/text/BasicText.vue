@@ -36,10 +36,8 @@
     pointer: false,
   })
 
-  // ✅ Vérifie si la couleur correspond à un token du design system
   const isDesignToken = computed(() => /^[a-zA-Z-]+(\d{2,4})?$/.test(props.color || ''))
 
-  // ✅ Si ce n’est PAS un token (ex : #3B82F6), applique la couleur inline
   const inlineStyle = computed(() => {
     const color = props.color
     if (!color) return {}

@@ -22,9 +22,10 @@
       class="nav-btn__label"
     >
       <BasicText
-        :size="textSizeMapping[size]"
+        :size="textSize[size]"
+        color="neutral-900"
+        weight="semibold"
         nb-max-lines="1"
-        color="white"
       >
         {{ label }}
       </BasicText>
@@ -36,10 +37,10 @@
   import type { TextSize } from '@designSystem/index'
   import type { IconNameNext } from '../icon/BasicIconNext.vue'
 
-  export type NavButtonVariant = 'ghost' | 'filled' | 'active'
-  export type NavButtonSize = 'small' | 'medium'
-
   defineEmits(['click'])
+
+  export type NavBtnVariant = 'ghost' | 'reverse' | 'primary'
+  export type NavBtnSize = 'small' | 'medium'
 
   withDefaults(
     defineProps<{
@@ -47,8 +48,8 @@
       iconName?: IconNameNext
       active?: boolean
       disabled?: boolean
-      variant?: NavButtonVariant
-      size?: NavButtonSize
+      variant?: NavBtnVariant
+      size?: NavBtnSize
     }>(),
     {
       label: '',
@@ -60,74 +61,73 @@
     },
   )
 
-  const textSizeMapping: Record<NavButtonSize, TextSize> = {
+  const textSize: Record<NavBtnSize, TextSize> = {
     small: 'body-s',
     medium: 'body-m',
   }
 </script>
 
 <style scoped lang="less">
-  /* ==========================================================
-   🌟 NAV BUTTON — composant dédié à la navigation
-   ========================================================== */
-
   .nav-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
+    gap: var(--spacing-5);
     border: none;
-    outline: none;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: var(--transition-medium);
+    border-radius: var(--radius-button-m);
     background: transparent;
-    color: white;
-    border-radius: 8px;
-    font-weight: 500;
-    text-align: left;
 
     &--small {
-      padding: 6px 10px;
+      padding: var(--padding-button-s) var(--spacing-10);
     }
-
     &--medium {
-      padding: 8px 14px;
+      padding: var(--padding-button-m) var(--spacing-15);
     }
 
-    &__icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      svg {
-        width: 18px;
-        height: 18px;
-      }
+    /* ICON */
+    &__icon svg {
+      width: 18px;
+      height: 18px;
     }
 
-    /* -------- Variants -------- */
+    /* VARIANT: GHOST */
     &--ghost {
+      color: var(--neutral-700);
+
       &:hover {
-        background: fade(white, 8%);
-        transform: translateY(-1px);
+        background: var(--surface-hover);
+      }
+      &:active {
+        background: var(--surface-active);
       }
     }
 
-    &--filled {
-      background: rgba(var(--primary-500-rgb), 0.25);
+    /* VARIANT: REVERSE (Dark mode nav style) */
+    &--reverse {
+      color: var(--neutral-0);
+
       &:hover {
-        background: rgba(var(--primary-500-rgb), 0.35);
-        transform: translateY(-1px);
+        background: rgba(var(--neutral-0-rgb), 0.1);
+      }
+      &:active {
+        background: rgba(var(--neutral-0-rgb), 0.18);
       }
     }
 
-    &--active,
+    /* VARIANT: PRIMARY (nav selected) */
+    &--primary,
     &.is-active {
-      background: rgba(var(--primary-500-rgb), 0.25);
-      color: white;
-      transform: translateY(-1px);
+      background: rgba(var(--primary-500-rgb), 0.12);
+      color: var(--primary-600);
+      box-shadow: var(--shadow-100);
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.18);
+      }
     }
 
+    /* DISABLED */
     &.is-disabled {
       opacity: 0.6;
       pointer-events: none;

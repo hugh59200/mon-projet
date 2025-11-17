@@ -49,7 +49,7 @@
   import { defineEmits, defineProps } from 'vue'
 
   /* PROPS */
-  const props = defineProps<{
+  defineProps<{
     avatar: string | null
   }>()
 

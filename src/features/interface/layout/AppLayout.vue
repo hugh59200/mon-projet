@@ -1,21 +1,6 @@
 <template>
   <div class="app-layout">
-    <header
-      class="header"
-      v-responsive-animate.fade.once="{ speed: 600 }"
-      :class="{ 'header--hidden': isHidden, 'header--scrolled': hasScrolled }"
-      :style="{
-        backdropFilter: `blur(${blurIntensity}px)`,
-        background: `rgba(255, 255, 255, ${bgOpacity})`,
-      }"
-    >
-      <div
-        class="header__inner"
-        v-feedback-animate.glow="{ color: 'rgba(255,255,255,0.35)', scale: 1.05 }"
-      >
-        <HeaderApp />
-      </div>
-    </header>
+    <HeaderApp class="header" />
     <main
       class="content"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"
@@ -58,7 +43,7 @@
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/supabase/supabaseClient'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
 
   defineOptions({
     directives: {
@@ -80,9 +65,6 @@
   const scrollY = ref(0)
   const isHidden = ref(false)
   const hasScrolled = ref(false)
-
-  const blurIntensity = computed(() => Math.min(scrollY.value / 70, 16))
-  const bgOpacity = computed(() => Math.min(0.65 + scrollY.value / 600, 0.92))
 
   const handleScroll = () => {
     scrollY.value = window.scrollY
@@ -115,36 +97,45 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+
     transition:
       transform 0.4s ease,
       opacity 0.35s ease,
       backdrop-filter 0.4s ease,
       background 0.4s ease,
       box-shadow 0.4s ease;
+
     will-change: transform, opacity, backdrop-filter;
 
-    .header__inner {
-      transition: all 0.3s ease;
-    }
-
-    /* 👇 Apparence initiale */
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    /* Base macOS Glass */
+    background: rgba(var(--surface-2-rgb), 0.55);
+    backdrop-filter: blur(14px) saturate(160%);
+    border-bottom: 1px solid rgba(var(--surface-border-rgb), 0.35);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   }
 
-  /* 🔽 Masqué quand on descend */
   .header--hidden {
     transform: translateY(-100%);
     opacity: 0;
     box-shadow: none;
   }
 
-  /* 🔼 Revient en douceur + verre dépoli accentué */
   .header--scrolled:not(.header--hidden) {
-    backdrop-filter: blur(14px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    opacity: 1;
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(var(--surface-3-rgb), 0.55);
+    box-shadow: var(--surface-elevated-shadow);
+  }
+
+  /* DARK MODE */
+  [data-theme='dark'] .header {
+    background: rgba(var(--surface-2-rgb), 0.35);
+    border-bottom: 1px solid rgba(var(--neutral-500-rgb), 0.35);
+    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.55);
+  }
+
+  [data-theme='dark'] .header--scrolled:not(.header--hidden) {
+    background: rgba(var(--surface-3-rgb), 0.45);
+    backdrop-filter: blur(22px) saturate(180%);
   }
 
   .content {
