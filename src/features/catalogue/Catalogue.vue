@@ -11,7 +11,7 @@
         <BasicText
           size="h4"
           weight="bold"
-          color="neutral-700"
+          color="neutral-300"
         >
           Catalogue de peptides
         </BasicText>
@@ -67,7 +67,7 @@
       <section class="catalogue__list">
         <BasicText
           v-if="hasLoaded"
-          color="neutral-700"
+          color="neutral-300"
         >
           {{ filteredProducts.length }} résultat{{ filteredProducts.length > 1 ? 's' : '' }}
         </BasicText>
@@ -243,11 +243,11 @@
       flex-direction: column;
       gap: 18px;
 
-      background: fade(@white, 12%);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: fade(@secondary-900, 75%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid fade(@neutral-300, 25%);
 
-      border: 1px solid fade(@neutral-300, 22%);
       box-shadow:
         0 8px 28px fade(#000, 35%),
         inset 0 0 0 1px fade(@white, 12%);
@@ -262,11 +262,6 @@
       align-items: center;
       gap: 18px;
       flex-wrap: wrap;
-
-      .BasicText,
-      [size='h4'] {
-        color: @neutral-50;
-      }
     }
 
     &__header--top > div,
@@ -289,9 +284,10 @@
       width: 260px;
       flex-shrink: 0;
 
-      background: fade(@white, 7%);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: fade(@secondary-900, 75%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid fade(@neutral-300, 25%);
 
       padding: 22px 18px;
       border-radius: 16px;
@@ -303,10 +299,6 @@
 
       overflow-y: auto;
       transition: background 0.25s ease;
-
-      &:hover {
-        background: fade(@white, 12%);
-      }
     }
 
     /* ============================================================
@@ -316,9 +308,10 @@
       flex: 1;
       min-height: 500px;
 
-      background: fade(@white, 10%);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: fade(@secondary-900, 75%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid fade(@neutral-300, 25%);
 
       padding: 26px;
       border-radius: 16px;

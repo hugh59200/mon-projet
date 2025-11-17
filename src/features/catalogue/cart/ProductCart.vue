@@ -75,17 +75,16 @@
     justify-content: space-between;
     gap: 12px;
 
-    background: fade(@white, 18%);
+    background: fade(@neutral-200, 82%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    border: 1px solid fade(@neutral-300, 40%);
+    box-shadow:
+      0 4px 14px fade(@neutral-900, 6%),
+      inset 0 0 0 1px fade(@neutral-50, 45%);
 
     border-radius: 16px;
     padding: 18px;
-
-    border: 1px solid fade(@neutral-300, 32%);
-    box-shadow:
-      0 12px 26px fade(#000, 20%),
-      inset 0 0 0 1px fade(@white, 25%);
 
     transition: all 0.28s ease;
     cursor: pointer;
@@ -94,7 +93,6 @@
 
     &:hover {
       transform: translateY(-4px);
-      background: fade(@white, 26%);
       box-shadow:
         0 18px 38px fade(#000, 28%),
         0 0 14px fade(@primary-400, 25%),

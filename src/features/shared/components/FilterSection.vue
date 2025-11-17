@@ -61,13 +61,11 @@
 
   .filter-section {
     position: relative;
+    border-radius: 14px;
 
     background: fade(@neutral-200, 82%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
-    border-radius: 14px;
-
     border: 1px solid fade(@neutral-300, 40%);
     box-shadow:
       0 4px 14px fade(@neutral-900, 6%),
