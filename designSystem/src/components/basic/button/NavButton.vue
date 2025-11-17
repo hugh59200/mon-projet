@@ -68,32 +68,40 @@
 
 <style scoped lang="less">
   /* ==========================================================
-   🌟 NAV BUTTON — composant dédié à la navigation
+   🌟 NAV BUTTON — Neural Glass v2
    ========================================================== */
 
   .nav-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
+    gap: 10px;
+
     border: none;
     outline: none;
     cursor: pointer;
-    transition: all 0.25s ease;
     background: transparent;
-    color: white;
-    border-radius: 8px;
-    font-weight: 500;
-    text-align: left;
 
+    border-radius: 10px;
+
+    font-weight: 500;
+    color: white;
+
+    transition:
+      background 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      opacity 0.2s ease;
+
+    /* ----- SIZES ----- */
     &--small {
-      padding: 6px 10px;
+      padding: 6px 12px;
     }
 
     &--medium {
-      padding: 8px 14px;
+      padding: 8px 16px;
     }
 
+    /* ----- ICON ----- */
     &__icon {
       display: flex;
       align-items: center;
@@ -102,35 +110,79 @@
       svg {
         width: 18px;
         height: 18px;
+        opacity: 0.9;
+        transition: opacity 0.25s ease;
       }
     }
 
-    /* -------- Variants -------- */
+    /* ======================================================
+     VARIANT: GHOST (default)
+     ====================================================== */
     &--ghost {
+      background: fade(@secondary-900, 0%);
+
       &:hover {
-        background: fade(white, 8%);
+        background: fade(@secondary-800, 25%);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 0 8px fade(@primary-500, 20%);
         transform: translateY(-1px);
+      }
+
+      &.is-active {
+        background: fade(@secondary-700, 35%);
+        box-shadow:
+          0 0 6px fade(@primary-500, 25%),
+          inset 0 0 0 1px fade(@primary-500, 35%);
       }
     }
 
+    /* ======================================================
+     VARIANT: FILLED (subtle glass)
+     ====================================================== */
     &--filled {
-      background: fade(@primary-500, 25%);
+      background: linear-gradient(135deg, fade(@primary-700, 55%), fade(@primary-500, 45%));
+      backdrop-filter: blur(4px);
+      border: 1px solid fade(@primary-300, 18%);
+
       &:hover {
-        background: fade(@primary-500, 35%);
+        background: linear-gradient(135deg, fade(@primary-700, 70%), fade(@primary-500, 60%));
+        box-shadow: 0 0 10px fade(@primary-500, 30%);
+        transform: translateY(-1px);
+      }
+
+      &.is-active {
+        background: fade(@primary-700, 70%);
+        box-shadow:
+          0 0 6px fade(@primary-500, 40%),
+          inset 0 0 0 1px fade(@primary-500, 50%);
+      }
+    }
+
+    /* ======================================================
+     VARIANT: ACTIVE (accent glow)
+     ====================================================== */
+    &--active {
+      background: fade(@primary-600, 40%);
+      backdrop-filter: blur(4px);
+
+      box-shadow: 0 0 8px fade(@primary-400, 25%);
+
+      &:hover {
+        background: fade(@primary-600, 55%);
+        box-shadow:
+          0 0 12px fade(@primary-400, 32%),
+          inset 0 0 0 1px fade(@primary-300, 25%);
         transform: translateY(-1px);
       }
     }
 
-    &--active,
-    &.is-active {
-      background: fade(@primary-500, 25%);
-      color: white;
-      transform: translateY(-1px);
-    }
-
+    /* ======================================================
+     DISABLED
+     ====================================================== */
     &.is-disabled {
-      opacity: 0.6;
+      opacity: 0.45;
       pointer-events: none;
+      filter: grayscale(50%);
     }
   }
 </style>

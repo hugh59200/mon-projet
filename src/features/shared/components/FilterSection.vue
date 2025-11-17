@@ -50,39 +50,97 @@
 </script>
 
 <style scoped lang="less">
-  .filter-section {
-    background: #fff;
-    border: 1px solid @neutral-200;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.2s ease;
+  /* ==========================================================
+   🧊 FILTER SECTION — Neural Glass v3
+   ========================================================== */
 
+  .filter-section {
+    position: relative;
+
+    background: fade(@neutral-200, 82%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 14px;
+
+    border: 1px solid fade(@neutral-300, 40%);
+    box-shadow:
+      0 4px 14px fade(@neutral-900, 6%),
+      inset 0 0 0 1px fade(@neutral-50, 45%);
+
+    overflow: hidden;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: fade(@white, 88%);
+      border-color: fade(@primary-500, 35%);
+    }
+
+    /* ----------------------------------------------------------
+     HEADER
+  ---------------------------------------------------------- */
     &__header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
-      cursor: pointer;
-      color: @neutral-800;
-      user-select: none;
-      transition: background 0.2s ease;
 
+      padding: 14px 18px;
+
+      cursor: pointer;
+      user-select: none;
+
+      color: @neutral-800;
+      font-weight: 600;
+
+      transition: all 0.25s ease;
+
+      /* Hover effect */
       &:hover {
         background: fade(@neutral-900, 4%);
+        backdrop-filter: blur(14px);
+      }
+
+      /* Chevron */
+      svg {
+        transition:
+          transform 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+          opacity 0.25s ease;
+        opacity: 0.8;
       }
 
       .icon--rotated {
         transform: rotate(180deg);
-        transition: transform 0.25s ease;
+        opacity: 1;
       }
     }
 
+    /* ----------------------------------------------------------
+     CONTENU
+  ---------------------------------------------------------- */
     &__content {
+      padding: 16px 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      padding: 12px;
-      border-top: 1px solid fade(@neutral-200, 50%);
+
+      border-top: 1px solid fade(@neutral-200, 40%);
+      backdrop-filter: blur(10px);
+
+      animation: fadeInGlass 0.25s ease;
+    }
+  }
+
+  /* ----------------------------------------------------------
+   ANIMATIONS
+---------------------------------------------------------- */
+  @keyframes fadeInGlass {
+    0% {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
 </style>

@@ -5,6 +5,7 @@
       <BasicText
         size="h5"
         weight="bold"
+        color="neutral-700"
       >
         Filtres
       </BasicText>

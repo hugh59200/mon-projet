@@ -1,21 +1,6 @@
 <template>
   <div class="app-layout">
-    <header
-      class="header"
-      v-responsive-animate.fade.once="{ speed: 600 }"
-      :class="{ 'header--hidden': isHidden, 'header--scrolled': hasScrolled }"
-      :style="{
-        backdropFilter: `blur(${blurIntensity}px)`,
-        background: `rgba(255, 255, 255, ${bgOpacity})`,
-      }"
-    >
-      <div
-        class="header__inner"
-        v-feedback-animate.glow="{ color: 'rgba(255,255,255,0.35)', scale: 1.05 }"
-      >
-        <HeaderApp />
-      </div>
-    </header>
+    <HeaderApp />
     <main
       class="content"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"
@@ -58,7 +43,7 @@
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/supabase/supabaseClient'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
 
   defineOptions({
     directives: {
@@ -80,9 +65,6 @@
   const scrollY = ref(0)
   const isHidden = ref(false)
   const hasScrolled = ref(false)
-
-  const blurIntensity = computed(() => Math.min(scrollY.value / 70, 16))
-  const bgOpacity = computed(() => Math.min(0.65 + scrollY.value / 600, 0.92))
 
   const handleScroll = () => {
     scrollY.value = window.scrollY
@@ -106,7 +88,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: linear-gradient(180deg, #f9fafb, #f1f3f5);
+    background: linear-gradient(180deg, @neutral-200, @neutral-100);
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -127,10 +109,9 @@
       transition: all 0.3s ease;
     }
 
-    /* 👇 Apparence initiale */
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    background: fade(@secondary-900, 65%);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px fade(black, 20%);
   }
 
   /* 🔽 Masqué quand on descend */

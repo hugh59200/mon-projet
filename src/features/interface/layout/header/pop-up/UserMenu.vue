@@ -135,74 +135,111 @@
 
 <style scoped lang="less">
   /* ==========================================================
-   👤 USER MENU
+   👤 USER MENU — Neural Glass v2
    ========================================================== */
 
   .user-menu {
+    /* -----------------------------
+     🔵 AVATAR (trigger)
+  ----------------------------- */
     &__avatar {
       position: relative;
       width: 36px;
       height: 36px;
-      border-radius: 50%;
-      background: fade(white, 6%);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
+      border-radius: 50%;
       cursor: pointer;
+
+      background: fade(@secondary-900, 55%);
+      backdrop-filter: blur(6px);
+
+      border: 1px solid fade(@neutral-500, 8%);
+
       transition: all 0.25s ease;
 
+      /* ✨ Glow hover */
       &:hover {
-        background: fade(white, 10%);
+        background: fade(@secondary-900, 70%);
+        box-shadow: 0 0 8px fade(@primary-500, 25%);
+        transform: translateY(-1px);
       }
 
       &-icon {
         color: white;
+        transition: opacity 0.25s ease;
+        opacity: 0.9;
       }
 
+      /* 🔵 Badge messages non lus */
       &-badge {
         position: absolute;
         top: -2px;
         right: -2px;
-        background: @primary-500;
+
+        background: @primary-700;
         color: white;
+
+        width: 15px;
+        height: 15px;
         border-radius: 50%;
-        height: 14px;
-        width: 14px;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         font-size: 11px;
+        font-weight: bold;
+
+        box-shadow: 0 0 0 2px fade(@secondary-900, 80%);
       }
     }
 
+    /* -----------------------------
+     📋 CONTENU DU MENU
+  ----------------------------- */
     &__content {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      padding-bottom: 4px;
 
+      /* -------------------------
+       Dividers
+    ------------------------- */
       &-divider {
         height: 1px;
-        background: fade(white, 10%);
-        margin: 6px 0;
+        background: fade(white, 8%);
+        margin: 8px 0;
 
         &--subtle {
-          margin-top: 2px;
-          margin-bottom: 4px;
+          height: 1px;
           background: fade(white, 4%);
+          margin: 4px 0 6px 0;
         }
       }
 
+      /* -------------------------
+       Listes (liens rapides)
+    ------------------------- */
       &-list {
         display: flex;
         flex-direction: column;
         gap: 2px;
+        padding: 2px 0;
       }
 
+      /* -------------------------
+       Bouton rouge (Déconnexion)
+    ------------------------- */
       .text-red {
-        color: @danger-400;
+        color: @danger-400 !important;
 
         &:hover {
-          background: fade(@danger-400, 8%);
+          background: fade(@danger-400, 10%);
         }
       }
     }

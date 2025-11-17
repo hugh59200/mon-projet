@@ -3,7 +3,7 @@
     class="catalogue"
     v-responsive-animate.fade.once
   >
-    <header
+    <div
       class="catalogue__header"
       v-responsive-animate.slide.once
     >
@@ -11,6 +11,7 @@
         <BasicText
           size="h4"
           weight="bold"
+          color="neutral-700"
         >
           Catalogue de peptides
         </BasicText>
@@ -33,7 +34,7 @@
         />
         <WrapperButton
           button-label="Filtres"
-          type="secondary"
+          type="primary"
           variant="outlined"
           width="full"
           size="small"
@@ -41,7 +42,7 @@
           @click="showFilters = true"
         />
       </div>
-    </header>
+    </div>
     <div class="catalogue__body">
       <aside
         v-if="!isMobile"
@@ -187,9 +188,7 @@
     selectedCategories.value = []
     inStockOnly.value = false
     selectedTags.value = []
-    // reset priceRange (en respectant min/max existants)
     priceRange.value = { ...priceRange.value, from: priceRange.value.min, to: priceRange.value.max }
-    // UI
     page.value = 1
     sortBy.value = 'default'
   }
@@ -214,72 +213,177 @@
 </script>
 
 <style scoped lang="less">
+  /* ============================================================
+   🛒 CATALOGUE — Neural Glass Hybrid v3
+   ============================================================ */
+
   .catalogue {
     width: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 20px;
-    background: @neutral-50;
-  }
-  .catalogue__header {
-    border-radius: 14px;
-    background: @neutral-100;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 15px;
-    gap: 16px;
-    transition: all 0.25s ease;
-  }
-  .catalogue__header--top,
-  .catalogue__header--sub {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .catalogue__header--top > div,
-  .catalogue__header--sub > div {
-    min-width: 160px;
-    max-width: 300px;
-  }
-  .catalogue__body {
-    display: flex;
-    justify-content: center;
-    width: 100%;
     gap: 24px;
+    padding: 26px 0;
+    opacity: 0;
+    animation: fadeInPage 0.8s ease forwards;
+
+    @keyframes fadeInPage {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ============================================================
+     🏷️ HEADER — Light Glass
+     ============================================================ */
+    &__header {
+      border-radius: 16px;
+      padding: 20px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+
+      background: fade(@white, 12%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      border: 1px solid fade(@neutral-300, 22%);
+      box-shadow:
+        0 8px 28px fade(#000, 35%),
+        inset 0 0 0 1px fade(@white, 12%);
+
+      transition: all 0.25s ease;
+    }
+
+    &__header--top,
+    &__header--sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+
+      .BasicText,
+      [size='h4'] {
+        color: @neutral-50;
+      }
+    }
+
+    &__header--top > div,
+    &__header--sub > div {
+      min-width: 160px;
+      max-width: 300px;
+    }
+
+    /* ============================================================
+     🧊 SIDEBAR FILTERS — Neural Glass v3 Dark
+     ============================================================ */
+    &__body {
+      display: flex;
+      width: 100%;
+      gap: 28px;
+      justify-content: center;
+    }
+
+    &__filters {
+      width: 260px;
+      flex-shrink: 0;
+
+      background: fade(@white, 7%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      padding: 22px 18px;
+      border-radius: 16px;
+
+      border: 1px solid fade(@neutral-300, 26%);
+      box-shadow:
+        0 10px 30px fade(#000, 40%),
+        inset 0 0 0 1px fade(@white, 10%);
+
+      overflow-y: auto;
+      transition: background 0.25s ease;
+
+      &:hover {
+        background: fade(@white, 12%);
+      }
+    }
+
+    /* ============================================================
+     🩶 LISTE + CONTENT — Light Glass Pro
+     ============================================================ */
+    &__list {
+      flex: 1;
+      min-height: 500px;
+
+      background: fade(@white, 10%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      padding: 26px;
+      border-radius: 16px;
+      border: 1px solid fade(@neutral-300, 22%);
+
+      box-shadow:
+        0 12px 30px fade(#000, 35%),
+        inset 0 0 0 1px fade(@white, 15%);
+
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+
+      .BasicText {
+        color: @neutral-50 !important;
+      }
+    }
+
+    /* ============================================================
+     🧴 GRID PRODUITS
+     ============================================================ */
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 38px 26px;
+      justify-items: stretch;
+      align-items: stretch;
+      padding-bottom: 20px;
+    }
+
+    /* ============================================================
+     🔵 PAGINATION PREMIUM
+     ============================================================ */
+    &__pagination-bottom {
+      display: flex;
+      justify-content: center;
+
+      .BasicPagination {
+        background: fade(@white, 6%);
+        backdrop-filter: blur(10px);
+        padding: 10px 18px;
+        border-radius: 12px;
+
+        border: 1px solid fade(@neutral-300, 25%);
+        box-shadow: 0 6px 18px fade(#000, 35%);
+      }
+    }
   }
-  .catalogue__filters {
-    flex-shrink: 0;
-    width: 260px;
-    background: @neutral-100;
-    border: 1px solid fade(@neutral-200, 60%);
-    border-radius: 12px;
-    padding: 20px 16px;
-    overflow-y: auto;
-  }
-  .catalogue__list {
-    flex: 1;
-    background: @neutral-100;
-    border-radius: 12px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .catalogue__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    justify-items: stretch;
-    align-items: stretch;
-    gap: 48px 28px;
-    padding-bottom: 20px;
-  }
-  .catalogue__pagination-bottom {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
+
+  /* ============================================================
+   📱 RESPONSIVE
+   ============================================================ */
+  @media (max-width: 900px) {
+    .catalogue__body {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .catalogue__filters {
+      width: 100%;
+      order: 2;
+    }
+
+    .catalogue__list {
+      order: 1;
+    }
   }
 </style>

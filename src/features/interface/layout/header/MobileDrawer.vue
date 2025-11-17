@@ -101,91 +101,128 @@
 </script>
 
 <style scoped lang="less">
+  /* ============================
+     🔵 OVERLAY (fond sombre Neural)
+     ============================ */
   .mobile-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background: fade(@secondary-900, 65%); // bleu-noir Neural
+    backdrop-filter: blur(6px);
     z-index: 2000;
     display: flex;
     justify-content: flex-start;
   }
 
+  /* ============================
+     🔵 DRAWER (glass panel Neural)
+     ============================ */
   .mobile-drawer {
     width: 270px;
     height: 100vh;
-    background: fade(@neutral-800, 96%);
+
+    /* Fond en verre bleu sombre */
+    background: fade(@secondary-900, 92%);
+    backdrop-filter: blur(12px);
+
     color: white;
+
+    /* Ombres plus propres, moins noires */
     box-shadow:
-      2px 0 25px rgba(0, 0, 0, 0.45),
-      inset -2px 0 8px rgba(255, 255, 255, 0.05);
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
-    padding: 24px;
+      3px 0 22px fade(@primary-950, 45%),
+      inset -3px 0 10px fade(white, 4%);
+
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+
+    padding: 26px;
     display: flex;
     flex-direction: column;
+
     overflow-y: auto;
     overflow-x: hidden;
+
     scrollbar-width: thin;
-    scrollbar-color: fade(white, 25%) transparent;
-    position: relative;
+    scrollbar-color: fade(@neutral-500, 30%) transparent;
   }
 
+  /* ============================
+     HEADER
+     ============================ */
   .drawer-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 12px;
+    margin-bottom: 18px;
+
     .drawer-logo {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
+      filter: drop-shadow(0 0 4px fade(@primary-700, 40%));
     }
   }
 
+  /* ============================
+     LINKS
+     ============================ */
   .drawer-links {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
   }
 
+  /* Ligne séparatrice Neural */
   .drawer-divider {
     height: 1px;
-    background: fade(white, 12%);
-    margin: 12px 0;
+    background: fade(@neutral-500, 25%);
+    margin: 16px 0;
   }
 
   .drawer-link {
     background: none;
     border: none;
-    color: white;
+    color: @neutral-0;
     text-align: left;
     padding: 8px 0;
     font-size: 16px;
     cursor: pointer;
-    transition: color 0.25s ease;
+
+    transition: all 0.25s ease;
+
     &:hover {
-      color: @primary-400;
+      color: @primary-300;
+      transform: translateX(4px);
     }
   }
 
+  /* ============================
+     AUTH BUTTONS AREA
+     ============================ */
   .drawer-auth {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     margin-top: auto;
   }
 
+  /* ============================
+     TRANSITIONS
+     ============================ */
   .slide-left-enter-active,
   .slide-left-leave-active {
     transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
+
   .slide-left-enter-from {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(-20%);
+    filter: blur(8px);
   }
+
   .slide-left-leave-to {
     opacity: 0;
-    transform: translateX(-80%);
+    transform: translateX(-16%);
+    filter: blur(6px);
   }
 </style>

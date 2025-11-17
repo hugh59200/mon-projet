@@ -6,7 +6,6 @@
         alt="Cover"
         class="profil__cover-img"
       />
-      <div class="profil__cover-overlay"></div>
     </div>
 
     <div class="profil__container">
@@ -43,10 +42,7 @@
             {{ editableName || 'Mon profil' }}
           </BasicText>
           <div class="profil__meta">
-            <BasicText
-              size="body-m"
-              color="neutral-700"
-            >
+            <BasicText size="body-m">
               {{ profile?.email || 'Adresse e-mail non renseignée' }}
             </BasicText>
 
@@ -340,65 +336,88 @@
 </script>
 
 <style scoped lang="less">
+  /* ==========================================================
+     👤 PROFIL — Neural UI v3 (CONTRASTE AMÉLIORÉ)
+     ========================================================== */
+
   .profil {
-    background: @neutral-50;
+    background: transparent !important;
     min-height: 100vh;
     position: relative;
 
+    /* -----------------------------
+      🖼️ Cover
+    ----------------------------- */
     &__cover {
-      position: relative;
-      height: 240px;
+      height: 260px;
       overflow: hidden;
 
       &-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        filter: brightness(0.8);
-      }
-
-      &-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, fade(@neutral-900, 35%), transparent 70%);
+        filter: brightness(0.75) saturate(1.08);
       }
     }
 
+    /* -----------------------------
+      🧊 MAIN CONTAINER (darker glass)
+    ----------------------------- */
     &__container {
       max-width: 900px;
-      margin: -70px auto 60px;
-      background: white;
-      border-radius: 20px;
+      margin: -80px auto 70px;
       padding: 40px;
-      box-shadow: 0 10px 40px fade(@neutral-900, 15%);
+
+      background: linear-gradient(90deg, @secondary-700, darken(@secondary-700, 4%));
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      border: 1px solid fade(@neutral-300, 22%);
+      border-radius: 22px;
+
+      box-shadow:
+        0 18px 55px fade(#000, 45%),
+        inset 0 0 0 1px fade(@neutral-50, 20%);
+
       position: relative;
       z-index: 2;
     }
 
+    /* -----------------------------
+      👤 HEADER (titre + avatar)
+    ----------------------------- */
     &__header {
       display: flex;
       align-items: center;
-      gap: 24px;
-      margin-bottom: 40px;
+      gap: 26px;
+      margin-bottom: 36px;
       flex-wrap: wrap;
     }
 
+    /* AVATAR */
     &__avatar {
       position: relative;
-      width: 110px;
-      height: 110px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
+
+      background: fade(@neutral-700, 30%);
+      border: 2px solid fade(@neutral-400, 35%);
+
+      box-shadow:
+        0 4px 18px fade(@neutral-900, 35%),
+        0 0 0 3px fade(@white, 10%);
+
       overflow: hidden;
-      background: fade(@neutral-100, 60%);
-      cursor: pointer;
-      transition: all 0.35s ease;
-      border: 2px solid transparent;
-      box-shadow: 0 4px 12px fade(@neutral-900, 10%);
+      transition: all 0.25s ease;
 
       &:hover {
-        transform: scale(1.05);
+        transform: scale(1.035);
         border-color: fade(@primary-500, 45%);
-        animation: glow-border 2.8s infinite ease-in-out;
+        box-shadow:
+          0 0 20px fade(@primary-500, 35%),
+          0 0 0 3px fade(@primary-400, 20%);
       }
 
       .profil__avatar-placeholder {
@@ -407,122 +426,55 @@
         justify-content: center;
         width: 100%;
         height: 100%;
-        color: @neutral-400;
-        background: fade(@neutral-100, 60%);
+        color: @neutral-300;
+        background: fade(@neutral-700, 30%);
       }
     }
 
-    /* ✨ Glow border animée */
-    @keyframes glow-border {
-      0% {
-        box-shadow: 0 0 0 fade(@primary-500, 40%);
-      }
-      50% {
-        box-shadow: 0 0 18px fade(@primary-400, 60%);
-      }
-      100% {
-        box-shadow: 0 0 0 fade(@primary-500, 40%);
-      }
-    }
-
-    &__avatar-img {
+    .profil__avatar-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    &__avatar-input {
+    .profil__avatar-input {
       position: absolute;
       inset: 0;
       opacity: 0;
-      cursor: pointer;
+      cursor: pointer !important;
     }
 
+    /* -----------------------------
+      Header texte
+    ----------------------------- */
     &__header-info {
       display: flex;
       flex-direction: column;
       gap: 6px;
+
+      h3,
+      [size='h3'] {
+        color: @neutral-50;
+      }
     }
 
     &__meta {
       display: flex;
       align-items: center;
-      gap: 8px; // ✅ espace correct entre email et rôle
+      gap: 8px;
       flex-wrap: wrap;
+
+      color: @neutral-300;
     }
 
-    &__role {
-      font-style: italic;
-    }
-
+    /* -----------------------------
+      SECTIONS
+    ----------------------------- */
     &__sections {
       display: flex;
       flex-direction: column;
-      gap: 24px;
-    }
-
-    .filter-section {
-      background: fade(@neutral-100, 60%);
-      border: 1px solid fade(@neutral-200, 70%);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 10px fade(@neutral-900, 5%);
-    }
-
-    .profil__actions {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .profil__preferences {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .profil__orders {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-
-      .order-card {
-        background: fade(@white, 80%);
-        border: 1px solid fade(@neutral-300, 60%);
-        border-radius: 10px;
-        padding: 14px 18px;
-        box-shadow: 0 2px 6px fade(@neutral-900, 5%);
-        transition: all 0.25s ease;
-        cursor: pointer; // 👈
-        user-select: none;
-
-        &:hover {
-          background: fade(@secondary-50, 80%);
-          border-color: fade(@secondary-400, 60%);
-          box-shadow: 0 4px 10px fade(@neutral-900, 10%);
-          transform: translateY(-1px);
-        }
-
-        &__header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 8px;
-        }
-
-        &__body {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding-left: 2px;
-        }
-      }
-
-      &-footer {
-        margin-top: 14px;
-        display: flex;
-        justify-content: center;
-      }
+      gap: 26px;
+      margin-top: 10px;
     }
   }
 </style>

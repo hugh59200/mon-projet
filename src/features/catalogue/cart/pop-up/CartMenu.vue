@@ -163,6 +163,9 @@
 </script>
 
 <style scoped lang="less">
+  /* ================================================
+     🟦 CART ICON — Glow Neural Blue
+     ================================================ */
   .cart-icon {
     position: relative;
     cursor: pointer;
@@ -171,46 +174,62 @@
     justify-content: center;
     color: white;
     transition: transform 0.25s ease;
-    user-select: none;
+
+    .shopping-icon {
+      transition: filter 0.25s ease;
+    }
+
+    &:hover .shopping-icon {
+      filter: drop-shadow(0 0 6px fade(@primary-500, 45%));
+    }
 
     .cart-badge {
       position: absolute;
       top: -9px;
       right: -2px;
-      background: @danger-500;
+
+      background: @primary-700; // Neural Blue accent
       color: white;
+
       border-radius: 50%;
-      height: 14px;
-      width: 14px;
+      height: 16px;
+      width: 16px;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 2px @neutral-900;
-    }
 
-    &:hover .shopping-icon {
-      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+      font-size: 11px;
+      font-weight: bold;
+
+      box-shadow: 0 0 0 2px fade(@secondary-900, 70%);
     }
   }
 
-  /* 🧺 PANIER VIDE */
+  /* ================================================
+     🧺 PANIER VIDE
+     ================================================ */
   .cart-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     text-align: center;
     padding: 30px 20px;
     gap: 8px;
+
     color: fade(white, 70%);
 
     .cart-empty-title {
       margin-top: 8px;
+      color: @neutral-200;
     }
 
     .cart-empty-sub {
       font-size: 0.85rem;
       line-height: 1.3;
+      color: @neutral-400;
     }
 
     .cart-empty-btn {
@@ -219,18 +238,31 @@
     }
   }
 
-  /* 🧾 PANIER NON VIDE */
+  /* ================================================
+     🧾 PANIER REMPLI
+     ================================================ */
   .popup-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     max-height: 240px;
     overflow-y: auto;
 
     .popup-item {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      padding: 6px 0;
+
+      transition:
+        background 0.25s ease,
+        transform 0.2s ease;
+
+      &:hover {
+        background: fade(@neutral-900, 12%);
+        border-radius: 8px;
+        transform: translateX(3px);
+      }
     }
   }
 
@@ -239,7 +271,9 @@
     height: 50px;
     border-radius: 8px;
     object-fit: cover;
-    background: fade(@neutral-700, 40%);
+
+    background: fade(@neutral-800, 45%);
+    border: 1px solid fade(@neutral-500, 15%);
   }
 
   .popup-info {
@@ -248,21 +282,27 @@
     gap: 3px;
   }
 
+  /* +X autres items */
   .popup-more {
     text-align: center;
     font-size: 12px;
-    color: fade(white, 60%);
+    color: fade(@neutral-300, 80%);
     margin-top: 4px;
   }
 
+  /* ================================================
+     TOTAL + ACTIONS
+     ================================================ */
   .popup-actions {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
+    margin-top: 10px;
 
     .popup-total {
       text-align: right;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      color: @primary-400;
     }
 
     .popup-btns {

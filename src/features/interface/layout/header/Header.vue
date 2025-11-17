@@ -122,7 +122,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 28px;
-    background: linear-gradient(90deg, @neutral-900, darken(@neutral-900, 5%));
+    background: linear-gradient(90deg, @secondary-900, darken(@secondary-900, 4%));
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
     &__left {

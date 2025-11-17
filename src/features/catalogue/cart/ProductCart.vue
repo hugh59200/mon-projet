@@ -65,79 +65,105 @@
 </script>
 
 <style scoped lang="less">
+  /* ============================================================
+   🧴 PRODUCT CARD — Neural Glass v3
+   ============================================================ */
+
   .product-cart {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: #fff;
-    border: 1px solid fade(@neutral-200, 70%);
-    border-radius: 12px;
-    padding: 16px;
-    transition: all 0.25s ease;
+    gap: 12px;
+
+    background: fade(@white, 18%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 16px;
+    padding: 18px;
+
+    border: 1px solid fade(@neutral-300, 32%);
+    box-shadow:
+      0 12px 26px fade(#000, 20%),
+      inset 0 0 0 1px fade(@white, 25%);
+
+    transition: all 0.28s ease;
     cursor: pointer;
-    min-height: 340px; /* ✅ cohérence hauteur */
-    height: 100%;
     user-select: none;
+    min-height: 340px;
 
     &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
+      background: fade(@white, 26%);
+      box-shadow:
+        0 18px 38px fade(#000, 28%),
+        0 0 14px fade(@primary-400, 25%),
+        inset 0 0 0 1px fade(@white, 30%);
+      border-color: fade(@primary-400, 30%);
     }
 
+    /* ============================================================
+     IMAGE
+     ============================================================ */
     &__image {
-      aspect-ratio: 1 / 1;
-      height: auto;
+      aspect-ratio: 1/1;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px;
+
       overflow: hidden;
+      border-radius: 12px;
 
       img {
+        max-width: 100%;
         max-height: 100%;
-        max-width: 100%; /* ✅ ne dépasse pas en largeur */
-        width: auto;
-        height: auto;
-        object-fit: contain; /* ✅ toujours entier dans le cadre */
-        transition: transform 0.3s ease;
+        object-fit: contain;
+        transition: transform 0.35s ease;
       }
 
       &:hover img {
-        transform: scale(1.05);
+        transform: scale(1.06);
       }
     }
 
+    /* ============================================================
+     INFOS TEXTES
+     ============================================================ */
     &__info {
+      text-align: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 4px;
-      text-align: center;
     }
 
     &__name {
-      font-weight: 600;
-      font-size: 1rem;
+      font-weight: 700;
       color: @neutral-900;
+      font-size: 1rem;
     }
 
     &__meta {
-      color: @neutral-500;
+      color: @neutral-600;
       font-size: 0.85rem;
+      opacity: 0.9;
     }
 
     &__price {
       color: @primary-700;
+      font-size: 1.05rem;
       margin-top: 2px;
-      font-weight: bold;
     }
 
+    /* ============================================================
+     FOOTER
+     ============================================================ */
     &__footer {
-      margin-top: 8px;
+      margin-top: auto;
+      padding-top: 10px;
+
       display: flex;
       justify-content: center;
-      align-items: flex-end;
-      padding-top: 4px;
     }
 
     &__button {
@@ -145,16 +171,18 @@
     }
   }
 
-  /* ✨ Animation d’apparition fluide */
+  /* ============================================================
+   ✨ ANIMATION FADE-UP
+   ============================================================ */
   .fade-up-enter-active {
     transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .fade-up-leave-active {
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
   }
   .fade-up-enter-from,
   .fade-up-leave-to {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
 </style>

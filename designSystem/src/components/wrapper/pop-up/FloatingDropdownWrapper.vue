@@ -195,9 +195,8 @@
 
 <style scoped lang="less">
   /* ==========================================================
-   🧭 FLOATING DROPDOWN WRAPPER
-   ========================================================== */
-
+     🧭 WRAPPER
+     ========================================================== */
   .floating-wrapper {
     position: relative;
     display: inline-flex;
@@ -221,54 +220,79 @@
   }
 
   /* ==========================================================
-   🎯 DROPDOWN
-   ========================================================== */
-
+     🧊 FLOATING DROPDOWN — Neural Glass v2
+     ========================================================== */
   .floating-dropdown {
     position: fixed;
-    background: @neutral-800;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-    color: white;
     z-index: 2000;
-    animation: bounceIn 0.25s ease;
-    padding: 14px 12px 10px;
 
+    /* 🌫️ Glass effect variant */
+    background: fade(@secondary-900, 92%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border-radius: 14px;
+
+    padding: 16px 14px 12px;
+
+    /* 🫥 Subtle border */
+    border: 1px solid fade(@neutral-500, 6%);
+
+    /* 🧠 Neural-shadow */
+    box-shadow:
+      0 8px 26px fade(@primary-900, 40%),
+      0 4px 18px fade(#000, 55%);
+
+    animation: fadeScaleIn 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* Arrow */
     &__arrow {
       position: absolute;
-      top: -6px;
-      width: 12px;
-      height: 12px;
-      background: @neutral-800;
-      border-top-left-radius: 3px;
-      box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
+      top: -7px;
+      width: 14px;
+      height: 14px;
+
+      background: fade(@secondary-900, 92%);
+      backdrop-filter: blur(14px);
+      border: 1px solid fade(@neutral-500, 6%);
+      border-bottom: none;
+      border-right: none;
+
+      transform: rotate(45deg);
+      border-radius: 4px 0 0 0;
+
+      /* halo */
+      box-shadow:
+        -2px -2px 5px fade(#000, 25%),
+        0 0 6px fade(@primary-700, 15%);
     }
   }
 
   /* ==========================================================
-   ✨ Animations
-   ========================================================== */
-  @keyframes bounceIn {
+     ✨ Animations — Neural Smooth
+     ========================================================== */
+  @keyframes fadeScaleIn {
     0% {
-      transform: scale(0.9);
       opacity: 0;
+      transform: translateY(6px) scale(0.95);
     }
     60% {
-      transform: scale(1.05);
       opacity: 1;
+      transform: translateY(2px) scale(1.02);
     }
     100% {
-      transform: scale(1);
+      transform: translateY(0) scale(1);
     }
   }
 
   .fade-slide-enter-active,
   .fade-slide-leave-active {
-    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.22s cubic-bezier(0.25, 1, 0.5, 1);
   }
+
   .fade-slide-enter-from,
   .fade-slide-leave-to {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
 </style>
