@@ -17,14 +17,16 @@
       <!-- panneau texte à gauche -->
       <div class="hero-banner__panel">
         <div class="hero-banner__top-text">
+          <!-- EYEBROW -->
           <BasicText
             size="body-s"
-            color="primary-600"
+            color="primary-500"
             class="hero-banner__eyebrow"
           >
             Ressources pédagogiques
           </BasicText>
 
+          <!-- TITRE -->
           <BasicText
             size="h3"
             weight="bold"
@@ -33,42 +35,53 @@
             Comprendre les peptides avant vos recherches.
           </BasicText>
 
+          <!-- DESCRIPTION -->
           <BasicText
             size="body-m"
-            color="neutral-700"
+            color="neutral-300"
             class="hero-banner__top-sub"
           >
             Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
             peptides dans vos projets de recherche.
           </BasicText>
 
+          <!-- BULLETS -->
           <ul class="hero-banner__bullets">
             <li>
               <BasicIconNext
                 name="CheckCircle"
                 :size="16"
-                color="primary-600"
+                color="primary-500"
               />
-              <span>Vulgarisation claire pour équipes R&amp;D et laboratoires.</span>
+              <BasicText color="neutral-100">
+                Vulgarisation claire pour équipes R&amp;D et laboratoires.
+              </BasicText>
             </li>
+
             <li>
               <BasicIconNext
                 name="BookOpenText"
                 :size="16"
-                color="primary-600"
+                color="primary-500"
               />
-              <span>Ressources externes sélectionnées : articles, vidéos, revues.</span>
+              <BasicText color="neutral-50">
+                Ressources externes sélectionnées : articles, vidéos, revues.
+              </BasicText>
             </li>
+
             <li>
               <BasicIconNext
                 name="ShieldCheck"
                 :size="16"
-                color="primary-600"
+                color="primary-500"
               />
-              <span>Rappel constant : recherche exclusivement – aucun usage humain.</span>
+              <BasicText color="neutral-100">
+                Rappel constant : recherche exclusivement – aucun usage humain.
+              </BasicText>
             </li>
           </ul>
 
+          <!-- CTA -->
           <div class="hero-banner__cta-row">
             <BasicButton
               label="Explorer les ressources pédagogiques"
@@ -102,10 +115,14 @@
               :alt="persona.alt"
               loading="lazy"
             />
-            <span class="persona-card__tag">
+            <BasicText
+              class="persona-card__tag"
+              color="neutral-0"
+            >
               {{ persona.tag }}
-            </span>
+            </BasicText>
           </div>
+
           <div class="persona-card__info">
             <BasicText
               size="body-s"
@@ -132,23 +149,26 @@
     >
       <div class="hero-banner__bottom-inner">
         <div class="hero-banner__bottom-header">
-          <span class="bottom-title">Quelques peptides de notre catalogue</span>
-          <div class="bottom-actions">
-            <span class="bottom-sub">Research only – Not for human use</span>
-            <button
-              type="button"
-              class="bottom-link"
-              @click="$router.push('/catalogue')"
-            >
-              Voir tout le catalogue
-            </button>
-          </div>
+          <BasicText
+            weight="bold"
+            color="neutral-200"
+          >
+            Quelques peptides de notre catalogue
+          </BasicText>
+
+          <BasicText
+            fontStyle="italic"
+            color="neutral-400"
+          >
+            Research only – Not for human use
+          </BasicText>
         </div>
 
         <div
           class="scroll-track"
           ref="scrollTrack"
         >
+          <!-- boucle principale -->
           <div
             v-for="p in peptides"
             :key="p.id"
@@ -162,7 +182,7 @@
               :src="p.image || '/images/default-peptide.png'"
               :alt="p.name"
             />
-            <span>{{ p.name }}</span>
+            <BasicText color="white">{{ p.name }}</BasicText>
           </div>
 
           <!-- duplication pour loop infinie -->
@@ -177,7 +197,9 @@
               :alt="p.name"
               loading="lazy"
             />
-            <span>{{ p.name }}</span>
+            <BasicText color="white">
+              {{ p.name }}
+            </BasicText>
           </div>
         </div>
       </div>
@@ -360,372 +382,376 @@
 </script>
 
 <style scoped lang="less">
+  /* =========================================================
+   HERO BANNER — BEM + LESS NESTING + GLASS UI Premium
+   ========================================================= */
+
   .hero-banner {
     position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 3px 14px fade(@neutral-700, 12%);
-    background:
-      radial-gradient(circle at 0% 0%, fade(@primary-100, 75%), transparent 55%),
-      radial-gradient(circle at 100% 100%, fade(@secondary-100, 70%), transparent 55%),
-      linear-gradient(135deg, @neutral-0, @primary-0);
-  }
-
-  .hero-banner__glow {
-    position: absolute;
-    inset: -40px;
-    z-index: 0;
-    background:
-      radial-gradient(circle at 30% 30%, fade(@primary-200, 40%) 0%, transparent 45%),
-      radial-gradient(circle at 70% 70%, fade(@secondary-200, 40%) 0%, transparent 45%);
-    background-size: 200% 200%;
-    opacity: 0.45;
-    filter: blur(50px);
-    pointer-events: none;
-  }
-
-  .hero-banner__top {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    gap: 32px;
-    padding: 26px 28px 18px;
-    flex-wrap: nowrap;
-  }
-
-  /* panneau texte à gauche */
-  .hero-banner__panel {
-    position: relative;
-    flex: 1;
-    min-width: 260px;
-    max-width: 430px;
-    background: @white;
     border-radius: 18px;
-    padding: 20px 22px 18px;
-    box-shadow: 0 10px 28px fade(@neutral-800, 10%);
-    border: 1px solid fade(@primary-100, 70%);
-    overflow: hidden;
-  }
-
-  .hero-banner__panel::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 14px;
-    bottom: 14px;
-    width: 3px;
-    border-radius: 999px;
-    background: linear-gradient(to bottom, @primary-500, @secondary-400);
-  }
-
-  .hero-banner__top-text {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .hero-banner__eyebrow {
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hero-banner__top-sub {
-    margin-top: 2px;
-  }
-
-  .hero-banner__bullets {
-    list-style: none;
-    padding: 0;
-    margin: 8px 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: @neutral-700;
-    }
-  }
-
-  .hero-banner__cta-row {
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .hero-banner__disclaimer {
-    font-size: 11px;
-  }
-
-  .hero-banner__personas {
-    flex: 1.4;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-height: 450px;
-    padding-right: 6px;
-    overflow-y: auto;
-  }
-
-  .hero-banner__personas::-webkit-scrollbar {
-    width: 4px;
-  }
-  .hero-banner__personas::-webkit-scrollbar-track {
-    background: fade(@primary-50, 60%);
-    border-radius: 999px;
-  }
-  .hero-banner__personas::-webkit-scrollbar-thumb {
-    background: fade(@primary-400, 70%);
-    border-radius: 999px;
-  }
-
-  /* cartes personas */
-  .persona-card {
-    position: relative;
-    border-radius: 16px;
-    padding: 10px 10px 12px;
-    background: linear-gradient(135deg, fade(@neutral-0, 96%), fade(@primary-50, 85%));
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .persona-card__image-wrap {
-    position: relative;
-    border-radius: 14px;
-    overflow: hidden;
-    aspect-ratio: 4 / 3;
-    background: radial-gradient(
-      circle at 10% 0%,
-      fade(@primary-100, 80%),
-      fade(@secondary-100, 60%)
-    );
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  }
-
-  .persona-card__tag {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    padding: 2px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    background: fade(@neutral-900, 75%);
-    color: @neutral-0;
-    backdrop-filter: blur(6px);
-  }
-
-  .persona-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 4px;
-  }
-
-  /* 💊 BOTTOM TICKER (inchangé) */
-  .hero-banner__bottom {
-    position: relative;
-    z-index: 1;
-    background: fade(@neutral-0, 94%);
-    border-top: 1px solid fade(@neutral-300, 40%);
-    backdrop-filter: blur(10px);
-    padding: 14px 24px 16px;
     overflow: hidden;
 
-    &::before,
-    &::after {
-      content: '';
+    /* 🔮 Glass container */
+    background: fade(@secondary-900, 35%);
+    backdrop-filter: blur(24px);
+    border: 1px solid fade(@neutral-300, 22%);
+    box-shadow:
+      0 30px 80px fade(#000, 40%),
+      inset 0 0 0 1px fade(@white, 10%);
+
+    /* =========================================================
+     GLOW BACKGROUND
+     ========================================================= */
+    &__glow {
       position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 80px;
-      pointer-events: none;
+      inset: -120px;
+      z-index: 0;
+      filter: blur(80px);
+      opacity: 0.55;
+
+      /* Glow thématique Neural Blue + Sonic Indigo */
+      background:
+        radial-gradient(circle at 25% 20%, fade(@primary-400, 55%), transparent 60%),
+        radial-gradient(circle at 75% 80%, fade(@indigo-400, 48%), transparent 60%);
+      background-size: 200% 200%;
+      animation: glowShift 22s ease-in-out infinite alternate;
+    }
+
+    /* =========================================================
+     TOP SECTION
+     ========================================================= */
+    &__top {
+      position: relative;
       z-index: 2;
-    }
-
-    &::before {
-      left: 0;
-      background: linear-gradient(to right, @neutral-0, transparent);
-    }
-
-    &::after {
-      right: 0;
-      background: linear-gradient(to left, @neutral-0, transparent);
-    }
-  }
-
-  .hero-banner__bottom-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .hero-banner__bottom-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .bottom-title {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: @neutral-800;
-  }
-
-  .bottom-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .bottom-sub {
-    font-size: 11px;
-    color: @neutral-500;
-  }
-
-  .bottom-link {
-    border: none;
-    background: transparent;
-    font-size: 12px;
-    font-weight: 500;
-    color: @primary-600;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .scroll-track {
-    display: flex;
-    width: 200%;
-    gap: 40px;
-    align-items: center;
-  }
-
-  .peptide-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    width: 140px;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition:
-      transform 0.25s ease,
-      box-shadow 0.25s ease;
-
-    img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      border-radius: 12px;
-      background: @neutral-0;
-      box-shadow: 0 3px 10px fade(@neutral-700, 12%);
-    }
-
-    span {
-      font-weight: 600;
-      font-size: 12px;
-      color: @neutral-700;
-      text-align: center;
-    }
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px fade(@neutral-700, 18%);
-    }
-  }
-
-  /* === BREAKPOINTS === */
-
-  /* 🖥 Très grand écran : 4 cartes en carré (2×2), pas de scroll vertical */
-  @media (min-width: 1200px) {
-    .hero-banner__personas {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(210px, 1fr));
-      grid-auto-rows: 1fr;
-      gap: 18px;
-      max-height: none;
-      padding-right: 0;
-      overflow: visible;
-    }
-  }
-
-  /* 📱 / TABLETTE : layout plus compact */
-  @media (max-width: 960px) {
-    .hero-banner__top {
-      padding: 22px 18px 14px;
-      gap: 22px;
-    }
-
-    .hero-banner__panel {
-      max-width: none;
-    }
-
-    .hero-banner__bottom {
-      padding-inline: 16px;
-    }
-  }
-
-  /* 📱 Mobile : personas sous le texte, carrousel horizontal scrollable */
-  @media (max-width: 768px) {
-    .hero-banner__top {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .hero-banner__personas {
-      flex: none;
-      max-height: none;
-      padding-right: 0;
-      margin: 6px -8px 0;
-      padding-inline: 8px;
       display: flex;
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      gap: 12px;
-      scroll-snap-type: x mandatory;
+      gap: 32px;
+      padding: 42px 44px;
+      align-items: stretch;
+      flex-wrap: nowrap;
     }
 
-    .hero-banner__personas::-webkit-scrollbar {
-      height: 4px;
-      width: auto;
+    /* ---------------------------------------------------------
+     LEFT PANEL (TEXT BLOCK)
+     --------------------------------------------------------- */
+    &__panel {
+      flex: 1;
+      max-width: 440px;
+      padding: 26px;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+
+      /* Glass panel */
+      background: fade(@secondary-800, 35%);
+      backdrop-filter: blur(26px);
+      border: 1px solid fade(@neutral-300, 26%);
+      box-shadow:
+        0 20px 50px fade(#000, 25%),
+        inset 0 0 0 1px fade(@white, 12%);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 18px;
+        bottom: 18px;
+        left: 0;
+        width: 4px;
+        border-radius: 999px;
+        background: linear-gradient(to bottom, fade(@primary-500, 95%), fade(@indigo-400, 85%));
+      }
+
+      /* TEXT BLOCK */
+      &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        .BasicText[size='h3'] {
+          color: @neutral-0 !important;
+          text-shadow: 0 2px 10px fade(#000, 40%);
+        }
+      }
+
+      &__eyebrow {
+        padding: 4px 12px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+
+        background: fade(@primary-200, 25%);
+        border: 1px solid fade(@primary-400, 30%);
+        backdrop-filter: blur(6px);
+        color: @primary-600 !important;
+      }
+
+      &__sub {
+        color: @neutral-200 !important;
+      }
+
+      &__bullets {
+        margin-top: 8px;
+        padding: 0;
+        list-style: none;
+
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          color: @neutral-100 !important;
+        }
+      }
+
+      &__cta {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        &-disclaimer {
+          font-size: 11px;
+          color: fade(@neutral-200, 85%) !important;
+        }
+      }
     }
 
-    .persona-card {
-      flex: 0 0 240px;
-      scroll-snap-align: start;
-    }
-
-    .hero-banner__bottom-header {
-      align-items: flex-start;
+    /* =========================================================
+     PERSONAS
+     ========================================================= */
+    &__personas {
+      flex: 1.4;
+      display: flex;
       flex-direction: column;
+      gap: 14px;
+
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 6px;
+
+      /* Custom scrollbar */
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: fade(@primary-50, 45%);
+        border-radius: 999px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: fade(@primary-400, 70%);
+        border-radius: 999px;
+      }
+
+      /* PERSONA CARD */
+      .persona-card {
+        border-radius: 16px;
+        padding: 10px 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        /* subtle neural glass */
+        background: linear-gradient(130deg, fade(@neutral-0, 95%), fade(@primary-50, 80%));
+        box-shadow: 0 8px 22px fade(#000, 12%);
+
+        /* Image wrapper */
+        &__image-wrap {
+          position: relative;
+          border-radius: 14px;
+          overflow: hidden;
+          aspect-ratio: 4 / 3;
+
+          background: radial-gradient(
+            circle at 10% 0%,
+            fade(@primary-100, 70%),
+            fade(@indigo-100, 50%)
+          );
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .persona-card__tag {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+
+            padding: 3px 11px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+
+            border-radius: 999px;
+            background: fade(@secondary-950, 78%);
+            color: @neutral-0;
+            backdrop-filter: blur(6px);
+          }
+        }
+
+        &__info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+      }
+    }
+
+    /* =========================================================
+     BOTTOM — PEPTIDE TICKER
+     ========================================================= */
+    &__bottom {
+      position: relative;
+      z-index: 2;
+
+      background: fade(@secondary-700, 35%);
+      backdrop-filter: blur(14px);
+      border-top: 4px solid fade(@primary-400, 40%);
+
+      padding: 16px 24px 18px;
+      overflow: hidden;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80px;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      &::before {
+        left: 0;
+        background: linear-gradient(to right, fade(@secondary-900, 80%), transparent);
+      }
+
+      &::after {
+        right: 0;
+        background: linear-gradient(to left, fade(@secondary-900, 80%), transparent);
+      }
+
+      &-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      &-header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      /* SCROLL TRACK */
+      .scroll-track {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        width: 200%;
+
+        .peptide-item {
+          width: 140px;
+          flex-shrink: 0;
+          cursor: pointer;
+
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+
+          transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+
+          img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: @neutral-0;
+            box-shadow: 0 3px 10px fade(@neutral-700, 16%);
+          }
+
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 14px fade(@neutral-700, 22%);
+          }
+        }
+      }
+    }
+
+    /* =========================================================
+     RESPONSIVE
+     ========================================================= */
+
+    @media (max-width: 960px) {
+      &__top {
+        padding: 26px 20px;
+        gap: 24px;
+      }
+
+      &__panel {
+        max-width: none;
+      }
+
+      &__bottom {
+        padding-inline: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      &__top {
+        flex-direction: column;
+      }
+
+      &__personas {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        gap: 12px;
+        margin: 6px -8px;
+        padding-inline: 8px;
+
+        scroll-snap-type: x mandatory;
+
+        .persona-card {
+          flex: 0 0 240px;
+          scroll-snap-align: start;
+        }
+      }
+
+      &__bottom-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  }
+
+  /* =========================================================
+   ANIMATION — GLOW SHIFT
+   ========================================================= */
+
+  @keyframes glowShift {
+    0% {
+      transform: translate(-20px, -16px) scale(1);
+      opacity: 0.45;
+    }
+    100% {
+      transform: translate(26px, 26px) scale(1.15);
+      opacity: 0.75;
     }
   }
 </style>

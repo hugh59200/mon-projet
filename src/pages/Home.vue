@@ -93,14 +93,10 @@
 
       <div class="home__how-grid">
         <div
-          v-for="(step, index) in steps"
+          v-for="step in steps"
           :key="step.title"
           class="home__how-card"
         >
-          <div class="home__how-step">
-            <span class="home__how-step-index">{{ index + 1 }}</span>
-          </div>
-
           <div class="home__how-header">
             <div class="home__how-icon">
               <BasicIconNext
@@ -308,304 +304,345 @@
 </script>
 
 <style scoped lang="less">
+  /* ===================================================================
+   🏠 HOME — Neural Glass Hybrid v3 (FULL REWORK)
+   =================================================================== */
+
   .home {
     display: flex;
     flex-direction: column;
-    gap: 72px;
-    padding: 36px 56px;
-    box-sizing: border-box;
-
+    gap: 90px;
+    padding: 40px 56px;
     max-width: 1280px;
     margin: 0 auto;
-    overflow-x: hidden;
+    animation: homeFadeIn 0.8s ease forwards;
+    opacity: 0;
 
-    /* 🧬 HERO */
+    @keyframes homeFadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ================================================================
+     🧬 HERO — Glass + Halo Premium
+     ================================================================ */
     &__hero {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 56px;
       flex-wrap: wrap;
-      background: linear-gradient(120deg, fade(@white, 92%), fade(@neutral-0, 80%));
-      border-radius: 16px;
-      padding: 36px 44px;
-      box-shadow: 0 2px 12px fade(@neutral-500, 10%);
+      gap: 56px;
+
+      padding: 48px;
+      border-radius: 22px;
+
       position: relative;
       overflow: hidden;
 
-      &::before {
+      background: fade(@white, 10%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+
+      border: 1px solid fade(@neutral-300, 25%);
+      box-shadow:
+        0 20px 40px fade(#000, 35%),
+        inset 0 0 0 1px fade(@white, 20%);
+
+      /* Halos */
+      &::before,
+      &::after {
         content: '';
         position: absolute;
-        inset: -40px;
-        background:
-          radial-gradient(circle at 0% 0%, fade(@primary-200, 40%), transparent 55%),
-          radial-gradient(circle at 100% 100%, fade(@secondary-200, 35%), transparent 55%);
-        opacity: 0.7;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.25;
         pointer-events: none;
+      }
+
+      &::before {
+        top: -160px;
+        left: -120px;
+        background: @primary-400;
+      }
+
+      &::after {
+        bottom: -160px;
+        right: -120px;
+        background: @secondary-400;
       }
     }
 
     &__hero-content {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       flex: 1;
+      max-width: 500px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      max-width: 480px;
+
+      .BasicText[size='h1'] {
+        color: @neutral-50 !important;
+        text-shadow: 0 2px 10px fade(#000, 40%);
+      }
     }
 
     &__hero-pill {
-      align-self: flex-start;
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 999px;
-      background: fade(@primary-100, 90%);
-      text-transform: uppercase;
+      background: fade(@primary-200, 25%);
+      border: 1px solid fade(@primary-500, 30%);
+      backdrop-filter: blur(10px);
+      font-weight: 600;
       letter-spacing: 0.06em;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      color: @primary-700 !important;
     }
 
     &__hero-sub {
-      margin-top: 4px;
-    }
-
-    &__hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 16px;
+      color: @neutral-200 !important;
     }
 
     &__hero-disclaimer {
-      margin-top: 8px;
-      max-width: 360px;
+      color: fade(@neutral-100, 80%) !important;
+      font-size: 0.9rem;
     }
 
     &__hero-image {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       flex: 1;
       display: flex;
       justify-content: center;
 
       img {
-        max-width: 440px;
         width: 100%;
-        border-radius: 16px;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        max-width: 440px;
+        border-radius: 20px;
+        box-shadow:
+          0 16px 32px fade(#000, 40%),
+          0 0 14px fade(@primary-300, 25%);
+        transition: transform 0.35s ease;
+
+        &:hover {
+          transform: scale(1.03);
+        }
       }
     }
 
-    /* TITRES + SOUS-TITRES SECTIONS */
-    &__section-title {
-      text-align: center;
-    }
-
-    &__section-subtitle {
-      text-align: center;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-
-    /* 📦 COMMENT ÇA MARCHE */
+    /* ================================================================
+     📦 COMMENT ÇA MARCHE — Glass Cards
+     ================================================================ */
     &__how {
+      text-align: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 24px;
+      gap: 26px;
+
+      .home__section-title {
+        color: @neutral-50 !important;
+      }
     }
 
     &__how-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
+      gap: 28px;
       width: 100%;
       max-width: 960px;
+      margin: 0 auto;
     }
 
     &__how-card {
-      background: white;
-      border-radius: 14px;
-      padding: 20px 18px 18px;
-      box-shadow: 0 3px 10px fade(@neutral-600, 8%);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+      padding: 22px 20px;
+      border-radius: 16px;
 
-    &__how-step {
-      display: flex;
-      justify-content: flex-start;
+      background: fade(@white, 12%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+
+      border: 1px solid fade(@neutral-300, 26%);
+      box-shadow:
+        0 12px 26px fade(#000, 32%),
+        inset 0 0 0 1px fade(@white, 15%);
+
+      transition: all 0.25s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        background: fade(@white, 18%);
+        border-color: fade(@primary-400, 30%);
+        box-shadow:
+          0 18px 34px fade(#000, 40%),
+          0 0 16px fade(@primary-400, 25%);
+      }
+
+      .BasicText {
+        color: @neutral-50 !important;
+      }
     }
 
     &__how-step-index {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 1px solid fade(@primary-500, 40%);
-      background: fade(@primary-50, 70%);
-      color: @primary-700;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      background: fade(@primary-400, 35%);
+      border: 1px solid fade(@primary-300, 45%);
+      color: @white;
     }
 
-    &__how-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    &__how-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: fade(@primary-50, 90%);
-    }
-
-    /* 🧪 QUALITÉ */
+    /* ================================================================
+     🧪 QUALITÉ — Glass line-grid
+     ================================================================ */
     &__quality {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 44px 40px;
-      border-radius: 16px;
       text-align: center;
-      box-shadow: 0 2px 10px fade(@neutral-600, 10%);
-      backdrop-filter: blur(8px);
+      padding: 40px 28px;
+      border-radius: 20px;
+
+      background: fade(@white, 10%);
+      backdrop-filter: blur(20px);
+
+      border: 1px solid fade(@neutral-300, 22%);
+      box-shadow:
+        0 10px 30px fade(#000, 38%),
+        inset 0 0 0 1px fade(@white, 15%);
     }
 
     &__quality-list {
+      margin-top: 26px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 18px;
-      margin-top: 24px;
+      gap: 16px;
     }
 
     &__quality-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      background: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: 1px solid @neutral-200;
-      border-top-width: 3px;
-      transition: all 0.25s ease;
+      gap: 12px;
+      cursor: default;
+
+      padding: 12px 18px;
+      border-radius: 14px;
+
+      background: fade(@white, 20%);
+      backdrop-filter: blur(14px);
+
+      border: 1px solid fade(@neutral-300, 30%);
+      box-shadow: inset 0 0 0 1px fade(@white, 20%);
+
+      transition: all 0.28s ease;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 8px fade(@neutral-700, 12%);
+        transform: translateY(-3px);
+        background: fade(@white, 28%);
+        box-shadow: 0 12px 26px fade(#000, 30%);
+      }
+
+      .BasicText {
+        color: @neutral-100 !important;
       }
     }
 
-    &__quality-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ❓ FAQ */
+    /* ================================================================
+     ❓ FAQ — Interactive Glass Accordions
+     ================================================================ */
     &__faq {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
+      text-align: center;
+
+      .home__section-title {
+        color: @neutral-50 !important;
+      }
     }
 
     &__faq-list {
+      max-width: 760px;
       width: 100%;
-      max-width: 780px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     &__faq-item {
-      background: white;
-      border-radius: 10px;
-      border: 1px solid @neutral-200;
-      padding: 10px 14px;
+      padding: 18px 20px;
+      border-radius: 16px;
+
+      background: fade(@white, 14%);
+      backdrop-filter: blur(12px);
       cursor: pointer;
+
+      border: 1px solid fade(@neutral-300, 28%);
+      box-shadow:
+        0 10px 28px fade(#000, 32%),
+        inset 0 0 0 1px fade(@white, 15%);
 
       summary {
         list-style: none;
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 12px;
-      }
-
-      summary::-webkit-details-marker {
-        display: none;
-      }
-
-      &::marker {
-        content: '';
+        align-items: center;
+        color: @neutral-50 !important;
       }
 
       &[open] {
-        box-shadow: 0 3px 10px fade(@neutral-700, 10%);
+        background: fade(@white, 18%);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px fade(#000, 38%);
+      }
+
+      .home__faq-answer {
+        margin-top: 10px;
+        color: @neutral-200 !important;
       }
     }
 
     &__faq-chevron {
-      font-size: 14px;
-      color: @neutral-500;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s ease;
+      color: @neutral-200;
     }
 
     &__faq-item[open] .home__faq-chevron {
       transform: rotate(180deg);
     }
 
-    &__faq-answer {
-      margin-top: 8px;
-    }
-
-    /* 🚀 CTA FINAL */
+    /* ================================================================
+     🚀 CTA FINAL — Premium Gradient
+     ================================================================ */
     &__cta {
-      background: linear-gradient(135deg, @primary-700, @secondary-700);
-      color: white;
-      padding: 40px 20px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 6px 20px fade(@neutral-800, 20%);
+      padding: 48px 24px;
+      border-radius: 20px;
 
-      .basic-button {
-        margin-top: 18px;
+      background: linear-gradient(135deg, fade(@primary-600, 75%), fade(@secondary-700, 82%));
+      backdrop-filter: blur(18px);
+
+      box-shadow:
+        0 12px 40px fade(#000, 35%),
+        inset 0 0 0 1px fade(@white, 10%);
+
+      text-align: center;
+
+      .home__cta-eyebrow,
+      .home__cta-sub {
+        color: fade(@white, 88%) !important;
+      }
+
+      .BasicButton {
+        margin-top: 22px;
       }
     }
 
-    &__cta-eyebrow {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      opacity: 0.9;
-    }
-
-    &__cta-sub {
-      max-width: 520px;
-      margin: 8px auto 0;
-    }
-
-    /* 📱 RESPONSIVE */
+    /* ================================================================
+     📱 RESPONSIVE
+     ================================================================ */
     @media (max-width: 960px) {
-      padding: 24px 16px;
-      gap: 56px;
+      padding: 28px 20px;
+      gap: 70px;
 
       &__hero {
-        padding: 26px 20px;
+        padding: 32px;
         gap: 32px;
-      }
-
-      &__hero-actions {
-        justify-content: flex-start;
       }
     }
 
@@ -613,15 +650,10 @@
       &__hero {
         flex-direction: column;
         align-items: flex-start;
-        gap: 24px;
       }
 
       &__hero-image img {
-        max-width: 320px;
-      }
-
-      &__quality {
-        padding-inline: 20px;
+        max-width: 330px;
       }
     }
   }

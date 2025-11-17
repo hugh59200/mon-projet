@@ -38,6 +38,7 @@ export type TextColor =
   | 'neutral-200'
   | 'neutral-100'
   | 'neutral-50'
+  | 'neutral-0'
   | 'success-900'
   | 'success-800'
   | 'success-700'
