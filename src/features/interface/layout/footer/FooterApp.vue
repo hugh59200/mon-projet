@@ -57,12 +57,12 @@
           >
             À propos
           </BasicText>
-          <ul>
-            <li><RouterLink to="/">Accueil</RouterLink></li>
-            <li><RouterLink to="/catalogue">Catalogue</RouterLink></li>
-            <li><RouterLink to="/actualites">Actualités</RouterLink></li>
-            <li><RouterLink to="/faq">FAQ</RouterLink></li>
-          </ul>
+          <div>
+            <RouterLink to="/">Accueil</RouterLink>
+            <RouterLink to="/catalogue">Catalogue</RouterLink>
+            <RouterLink to="/actualites">Actualités</RouterLink>
+            <RouterLink to="/faq">FAQ</RouterLink>
+          </div>
         </div>
         <div class="footer__col">
           <BasicText
@@ -72,12 +72,12 @@
           >
             Mon compte
           </BasicText>
-          <ul>
-            <li><RouterLink to="/profil">Profil</RouterLink></li>
-            <li><RouterLink to="/profil/commandes">Commandes</RouterLink></li>
-            <li><RouterLink to="/auth/login">Connexion</RouterLink></li>
-            <li><RouterLink to="/auth/register">Inscription</RouterLink></li>
-          </ul>
+          <div>
+            <RouterLink to="/profil">Profil</RouterLink>
+            <RouterLink to="/profil/commandes">Commandes</RouterLink>
+            <RouterLink to="/auth/login">Connexion</RouterLink>
+            <RouterLink to="/auth/register">Inscription</RouterLink>
+          </div>
         </div>
         <div class="footer__col">
           <BasicText
@@ -87,12 +87,17 @@
           >
             Informations
           </BasicText>
-          <ul>
-            <li><RouterLink to="/checkout">Paiement sécurisé</RouterLink></li>
-            <li><RouterLink to="/profil/commandes">Suivi de commande</RouterLink></li>
-            <li><RouterLink to="/access-denied">Confidentialité</RouterLink></li>
-            <!-- <li><RouterLink to="/terms">CGU</RouterLink></li> -->
-          </ul>
+          <div>
+            <RouterLink to="/checkout">Paiement sécurisé</RouterLink>
+            <RouterLink to="/profil/commandes">Suivi de commande</RouterLink>
+            <!-- ⚠️ Tu avais mis /access-denied pour "Confidentialité" -->
+            <!-- C'est incohérent, la route /access-denied est un message d'erreur -->
+            <!-- Je le remplace par ce qui est logique -->
+            <RouterLink to="/faq">Confidentialité</RouterLink>
+            <!-- ou / pour le moment, à toi de voir -->
+
+            <!-- Si un jour tu as une page CGU : /terms -->
+          </div>
         </div>
         <div class="footer__col">
           <BasicText
