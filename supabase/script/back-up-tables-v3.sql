@@ -1066,3 +1066,95 @@ $$;
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status(uuid, text, boolean) TO authenticated;
 
 
+-- ============================================================
+-- 📜 PAYMENT EVENTS — Logs Stripe & PayPal (idempotent)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.payment_events (
+  id bigint generated always as identity primary key,
+  provider text NOT NULL,
+  order_id uuid REFERENCES public.orders(id) ON DELETE SET NULL,
+  payload jsonb,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_events_order_id 
+  ON public.payment_events(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_payment_events_provider 
+  ON public.payment_events(provider);
+
+
+
+-- ============================================================
+-- 🟡 PAYPAL ORDER ID (New column for orders)
+-- ============================================================
+
+ALTER TABLE public.orders 
+  ADD COLUMN IF NOT EXISTS paypal_order_id text;
+
+CREATE INDEX IF NOT EXISTS orders_paypal_order_id_idx 
+  ON public.orders (paypal_order_id);
+
+
+
+-- ============================================================
+-- 🧾 UPDATE orders_full_view TO INCLUDE paypal_order_id
+-- (Drop + recreate cleanly, keeping existing behavior)
+-- ============================================================
+
+DROP VIEW IF EXISTS public.orders_full_view CASCADE;
+
+CREATE OR REPLACE VIEW public.orders_full_view AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+
+  -- Stripe
+  o.stripe_session_id,
+  o.payment_intent_id,
+  o.order_number,
+
+  -- PayPal
+  o.paypal_order_id,
+
+  -- Shipping info
+  o.full_name AS shipping_name,
+  o.email AS shipping_email,
+  o.address AS shipping_address,
+  o.city AS shipping_city,
+  o.zip AS shipping_zip,
+  o.country AS shipping_country,
+
+  -- Order metadata
+  o.status,
+  o.payment_method,
+  o.total_amount,
+  o.carrier,
+  o.tracking_number,
+  o.created_at,
+  o.shipped_at,
+  o.updated_at,
+
+  odv.detailed_items,
+
+  -- Emails analytics
+  (SELECT COUNT(*) FROM public.emails_sent e WHERE e.order_id = o.id) AS emails_count,
+  (SELECT MAX(sent_at) FROM public.emails_sent e WHERE e.order_id = o.id) AS last_email_sent_at,
+  (SELECT jsonb_agg(DISTINCT e.type) FROM public.emails_sent e WHERE e.order_id = o.id) AS email_types,
+
+  -- Profile fallback
+  jsonb_build_object(
+    'id',        COALESCE(p.id, o.user_id),
+    'email',     COALESCE(p.email, o.email),
+    'full_name', COALESCE(p.full_name, o.full_name),
+    'role',      COALESCE(p.role, 'user'),
+    'created_at', p.created_at
+  ) AS profile_info
+
+FROM public.orders o
+LEFT JOIN public.profiles p ON p.id = o.user_id
+LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
+
+ALTER VIEW public.orders_full_view SET (security_invoker = true);
+GRANT SELECT ON public.orders_full_view TO authenticated;

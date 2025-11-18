@@ -63,9 +63,9 @@
           Total :
         </BasicText>
         <BasicText
-          size="h5"
+          size="h4"
           weight="bold"
-          color="primary-600"
+          color="neutral-700"
         >
           {{ cart.totalPrice.toFixed(2) }} €
         </BasicText>
@@ -177,7 +177,7 @@
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import { supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { Bitcoin, CreditCard, TestTube } from 'lucide-vue-next'
+  import { CreditCard } from 'lucide-vue-next'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import ProductModalCheckout from './modale/ProductModalCheckout.vue'
@@ -201,24 +201,18 @@
     {
       label: 'Carte bancaire (Stripe)',
       value: 'stripe',
-      desc: 'Paiement sécurisé par carte via Stripe',
+      desc: 'Paiement sécurisé via Stripe',
       icon: CreditCard,
     },
     {
-      label: 'Crypto-monnaie',
-      value: 'crypto',
-      desc: 'Payer avec Bitcoin, Ethereum ou USDT',
-      icon: Bitcoin,
-    },
-    {
-      label: 'Paiement simulé (test)',
-      value: 'simulation',
-      desc: 'Aucun paiement réel, pour test uniquement',
-      icon: TestTube,
+      label: 'PayPal',
+      value: 'paypal',
+      desc: 'Payer avec votre compte PayPal ou carte',
+      icon: CreditCard,
     },
   ]
 
-  const selectedPayment = ref<PaymentProvider>('simulation')
+  const selectedPayment = ref<PaymentProvider>('paypal')
 
   function openProductModal(productId?: string, event?: MouseEvent) {
     if (!productId || !event) return
@@ -368,22 +362,21 @@
           position: relative;
 
           .product-name.clickable {
-            color: @primary-700;
+            color: @neutral-700;
             transition: color 0.2s ease;
 
             &:hover {
-              color: @primary-600;
               text-decoration: underline;
             }
           }
 
           .product-search-icon {
-            color: fade(@primary-700, 70%);
+            color: fade(@neutral-700, 70%);
             transition: color 0.2s ease;
           }
 
           &:hover .product-search-icon {
-            color: @primary-600;
+            color: @neutral-600;
           }
         }
 

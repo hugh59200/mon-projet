@@ -1,4 +1,9 @@
-import { stripe, supabase } from '../../utils/clients.ts'
+import {
+  PAYMENT_CANCEL_URL,
+  PAYMENT_SUCCESS_URL_BASE,
+  stripe,
+  supabase,
+} from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
 
 interface Payload {
@@ -15,17 +20,8 @@ Deno.serve(
       throw new Error('amount, email et orderId requis')
     }
 
-    const ENV = Deno.env.get('ENV') || 'development'
-
-    const successUrl =
-      ENV === 'development'
-        ? `https://localhost:5278/paiement/success?session_id={CHECKOUT_SESSION_ID}`
-        : `https://fast-peptides.com/paiement/success?session_id={CHECKOUT_SESSION_ID}`
-
-    const cancelUrl =
-      ENV === 'development'
-        ? `https://localhost:5278/paiement/cancel`
-        : `https://fast-peptides.com/paiement/cancel`
+    const successUrl = `${PAYMENT_SUCCESS_URL_BASE}?session_id={CHECKOUT_SESSION_ID}`
+    const cancelUrl = PAYMENT_CANCEL_URL
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -45,7 +41,7 @@ Deno.serve(
       ],
     })
 
-    // ✅ update DB
+    // 🟦 Mise à jour DB
     await supabase
       .from('orders')
       .update({

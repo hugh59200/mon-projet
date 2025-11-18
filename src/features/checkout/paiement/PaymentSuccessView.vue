@@ -6,6 +6,7 @@
     }"
     class="payment-success"
   >
+    <!-- Icône -->
     <div class="payment-success__icon-wrapper">
       <BasicIconNext
         name="CheckCircle2"
@@ -22,7 +23,7 @@
       <strong>Fast Peptides</strong>
       !
       <br />
-      Votre paiement est validé et votre commande est en préparation.
+      Votre commande a bien été validée.
     </p>
 
     <ProgressBar color="success" />
@@ -39,85 +40,97 @@
 </template>
 
 <script setup lang="ts">
+  import ProgressBar from '@/features/shared/ProgressBar.vue'
+  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
-  import { onMounted, ref } from 'vue'
+  import { onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
   const router = useRouter()
-  const auth = useAuthStore()
   const cart = useCartStore()
+  const auth = useAuthStore()
 
-  const loading = ref(true)
-  const success = ref(false)
-  const order = ref<any>(null)
+  const emit = defineEmits(['finished'])
 
   onMounted(async () => {
-    console.log('✅ PaymentSuccess mounted')
+    console.log('💚 PaymentSuccess mounted')
 
-    const sessionId = route.query.session_id as string
-    if (!sessionId) {
-      console.error('❌ Pas de session_id dans l’URL')
-      loading.value = false
-      return
+    const stripeSessionId = route.query.session_id as string | undefined
+    const paypalOrderId = route.query.order_id as string | undefined
+    const orderId = route.query.orderId as string | undefined // PayPal second naming
+
+    // -----------------------------------------
+    // 1️⃣ STRIPE
+    // -----------------------------------------
+    if (stripeSessionId) {
+      console.log('🔵 Stripe detected')
+      await handleStripeSuccess(stripeSessionId)
     }
 
-    console.log('🔎 Recherche commande en base…', sessionId)
+    // -----------------------------------------
+    // 2️⃣ PAYPAL
+    // -----------------------------------------
+    else if (paypalOrderId || orderId) {
+      console.log('🟡 PayPal detected')
+      await handlePaypalSuccess(paypalOrderId ?? orderId!)
+    }
 
-    // ✅ On récupère la commande liée à la session Stripe
-    const { data, error } = await supabase
+    // -----------------------------------------
+    // 3️⃣ Fallback utilisateur
+    // -----------------------------------------
+    else {
+      console.warn('⚠️ No identifiers → fallback user last order')
+
+      await fallbackLatestOrder()
+    }
+
+    // -----------------------------------------
+    // 4️⃣ Fin + clear panier
+    // -----------------------------------------
+    await cart.clearCart()
+    emit('finished')
+
+    setTimeout(() => {
+      router.push('/profil/commandes')
+    }, 2500)
+  })
+
+  async function handleStripeSuccess(sessionId: string) {
+    const { data } = await supabase
       .from('orders')
-      .select('*')
+      .select('id')
       .eq('stripe_session_id', sessionId)
       .maybeSingle()
 
+    if (!data) console.error('❌ Stripe order not found')
+  }
+
+  async function handlePaypalSuccess(orderId: string) {
+    const { data, error } = await supabase.functions.invoke('capture-paypal-order', {
+      body: { orderId },
+    })
+
     if (error) {
-      console.error('❌ Erreur SELECT:', error)
-      loading.value = false
-      return
+      console.error('❌ PayPal capture failed', error)
     }
+  }
 
-    order.value = data
+  async function fallbackLatestOrder() {
+    const { data } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('user_id', auth.user?.id!)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-    if (!order.value) {
-      console.warn('⚠️ Aucune commande liée à cette session, fallback user + last order')
-      const fallback = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', auth.user?.id!)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (fallback.data) {
-        order.value = fallback.data
-        console.log('✅ Fallback trouvé :', fallback.data)
-      }
-    }
-
-    if (!order.value) {
-      console.error('❌ Toujours aucune commande trouvée')
-      loading.value = false
-      return
-    }
-
-    console.log('✅ Commande récupérée :', order.value)
-
-    // ✅ On ne gère plus l’email ici — c’est Stripe Webhook qui envoie
-    await cart.clearCart()
-    console.log('🧹 Panier vidé après succès')
-
-    success.value = true
-    loading.value = false
-
-    // ✅ Redirection
-    setTimeout(() => {
-      router.push('/profil/commandes')
-    }, 3000)
-  })
+    if (!data) console.error('❌ No order found even in fallback')
+  }
 </script>
 
 <style scoped lang="less">

@@ -359,6 +359,7 @@ export type Database = {
           order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
+          paypal_order_id: string | null
           shipped_at: string | null
           status: Database["public"]["Enums"]["order_status"]
           stripe_session_id: string | null
@@ -381,6 +382,7 @@ export type Database = {
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
+          paypal_order_id?: string | null
           shipped_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
@@ -403,6 +405,7 @@ export type Database = {
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
+          paypal_order_id?: string | null
           shipped_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
@@ -426,6 +429,59 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_events: {
+        Row: {
+          created_at: string | null
+          id: number
+          order_id: string | null
+          payload: Json | null
+          provider: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: never
+          order_id?: string | null
+          payload?: Json | null
+          provider: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: never
+          order_id?: string | null
+          payload?: Json | null
+          provider?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_detailed_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_full_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_overview_for_admin"
+            referencedColumns: ["order_id"]
           },
         ]
       }
@@ -725,6 +781,7 @@ export type Database = {
           order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
+          paypal_order_id: string | null
           profile_info: Json | null
           shipped_at: string | null
           shipping_address: string | null
@@ -738,10 +795,6 @@ export type Database = {
           total_amount: number | null
           tracking_number: string | null
           updated_at: string | null
-          user_address: string | null
-          user_country: string | null
-          user_email: string | null
-          user_full_name: string | null
           user_id: string | null
         }
         Relationships: [

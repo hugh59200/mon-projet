@@ -17,7 +17,7 @@ interface RequestBody {
   status: string
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   const { order_id, status }: RequestBody = await req.json()
   if (!order_id || !status) return new Response('Missing fields', { status: 400 })
 

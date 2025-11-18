@@ -1,7 +1,7 @@
 // src/features/checkout/paiement/service/paymentService.ts
 import { supabase } from '@/supabase/supabaseClient'
 
-export type PaymentProvider = 'simulation' | 'stripe' | 'crypto'
+export type PaymentProvider = 'stripe' | 'paypal'
 
 export interface PaymentIntent {
   id: string
@@ -33,32 +33,39 @@ export async function finalizeOrderAfterPayment(orderId: string, paymentIntentId
 
 export async function processPayment(
   amount: number,
-  provider: PaymentProvider = 'simulation',
+  provider: PaymentProvider,
   email?: string,
   orderId?: string,
 ): Promise<PaymentIntent> {
   switch (provider) {
     case 'stripe':
       return createStripeCheckout(amount, email, orderId)
-    case 'simulation':
-      return simulatePayment(amount)
-    case 'crypto':
-      return createCryptoInvoice(amount)
+    case 'paypal':
+      const paypal = await createPaypalOrder(amount, email!, orderId!)
+      window.location.assign(paypal.url) // maintenant OK
+      return {
+        id: paypal.paypalOrderId,
+        amount,
+        currency: 'EUR',
+        status: 'pending',
+        provider: 'paypal',
+        checkout_url: paypal.url,
+        created_at: new Date().toISOString(),
+      }
+
     default:
       throw new Error('Mode de paiement non supporté')
   }
 }
-async function simulatePayment(amount: number): Promise<PaymentIntent> {
-  await new Promise((r) => setTimeout(r, 1000))
 
-  return {
-    id: `sim_${Math.random().toString(36).slice(2)}`,
-    amount,
-    currency: 'EUR',
-    status: 'succeeded',
-    provider: 'simulation',
-    created_at: new Date().toISOString(),
-  }
+async function createPaypalOrder(amount: number, email: string, orderId: string) {
+  const { data, error } = await supabase.functions.invoke('create-paypal-order', {
+    body: { amount, email, orderId },
+  })
+
+  if (error) throw new Error(error.message)
+
+  return data.data // pas data !!
 }
 
 type StripeSessionResponse = {
@@ -94,24 +101,6 @@ async function createStripeCheckout(
     status: 'pending',
     provider: 'stripe',
     checkout_url: result.url,
-    created_at: new Date().toISOString(),
-  }
-}
-
-async function createCryptoInvoice(amount: number): Promise<PaymentIntent> {
-  const { data, error } = await supabase.functions.invoke('create-crypto-invoice', {
-    body: { amount },
-  })
-
-  if (error || !data) throw new Error(error?.message || 'Erreur facture crypto')
-
-  return {
-    id: data.invoiceId,
-    amount,
-    currency: 'EUR',
-    status: 'pending',
-    provider: 'crypto',
-    checkout_url: data.url,
     created_at: new Date().toISOString(),
   }
 }

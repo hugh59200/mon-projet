@@ -8,6 +8,7 @@
     "designSystem/**/*",
     "src/plugin/registration/types/*.ts"
   ],
+  "exclude": ["node_modules", "supabase"],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "types": ["vite/client", "pinia-plugin-persistedstate"],

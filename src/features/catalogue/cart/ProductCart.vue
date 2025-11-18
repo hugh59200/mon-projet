@@ -4,7 +4,6 @@
       class="product-cart"
       @click="$emit('view', product.id)"
     >
-      <!-- 🧴 Image produit -->
       <div class="product-cart__image">
         <img
           :src="product.image"
@@ -12,42 +11,35 @@
           loading="lazy"
         />
       </div>
-
-      <!-- 🧾 Infos -->
       <div class="product-cart__info">
         <BasicText
           size="body-l"
           weight="bold"
-          class="product-cart__name"
+          color="neutral-800"
         >
           {{ product.name }}
         </BasicText>
 
         <BasicText
-          size="body-s"
-          color="neutral-500"
-          class="product-cart__meta"
+          size="body-m"
+          color="neutral-600"
         >
           {{ product.category }} • Pureté : {{ product.purity }}%
         </BasicText>
-
         <BasicText
           size="body-l"
           weight="bold"
-          class="product-cart__price"
+          color="primary-800"
         >
           {{ product.price.toFixed(2) }} €
         </BasicText>
       </div>
-
-      <!-- 🛒 Bouton -->
       <div class="product-cart__footer">
         <BasicButton
           :label="product.stock ? 'Ajouter au panier' : 'Rupture'"
           :disabled="!product.stock"
           :type="product.stock ? 'primary' : 'secondary'"
-          size="small"
-          class="product-cart__button"
+          width="full"
           @click.stop="$emit('add', product)"
         />
       </div>
@@ -65,10 +57,6 @@
 </script>
 
 <style scoped lang="less">
-  /* ============================================================
-   🧴 PRODUCT CARD — Neural Glass v3
-   ============================================================ */
-
   .product-cart {
     display: flex;
     flex-direction: column;
@@ -100,9 +88,6 @@
       border-color: fade(@primary-400, 30%);
     }
 
-    /* ============================================================
-     IMAGE
-     ============================================================ */
     &__image {
       aspect-ratio: 1/1;
       width: 100%;
@@ -125,26 +110,11 @@
       }
     }
 
-    /* ============================================================
-     INFOS TEXTES
-     ============================================================ */
     &__info {
       text-align: center;
       display: flex;
       flex-direction: column;
       gap: 4px;
-    }
-
-    &__name {
-      font-weight: 700;
-      color: @neutral-900;
-      font-size: 1rem;
-    }
-
-    &__meta {
-      color: @neutral-600;
-      font-size: 0.85rem;
-      opacity: 0.9;
     }
 
     &__price {
@@ -153,9 +123,6 @@
       margin-top: 2px;
     }
 
-    /* ============================================================
-     FOOTER
-     ============================================================ */
     &__footer {
       margin-top: auto;
       padding-top: 10px;
@@ -169,9 +136,6 @@
     }
   }
 
-  /* ============================================================
-   ✨ ANIMATION FADE-UP
-   ============================================================ */
   .fade-up-enter-active {
     transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
