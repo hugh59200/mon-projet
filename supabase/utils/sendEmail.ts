@@ -4,7 +4,7 @@ import { sendWithProvider } from './emailProvider.ts'
 import { logEmail } from './logEmail.ts'
 
 const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN')!
-const FROM = `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>` // SANDBOX OK
+const FROM = `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>` // OBLIGATOIRE en sandbox
 
 export async function sendEmail({
   to,

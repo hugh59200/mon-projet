@@ -3,8 +3,7 @@ import { corsHeaders, handleCors } from './cors.ts'
 type HandlerFn<T> = (req: Request, body: T) => Promise<unknown> | unknown
 
 /**
- * ✅ Standard JSON API handler
- * Parse JSON body, returns `{ success, data }`
+ * Standard JSON API handler
  */
 export function createHandler<T = unknown>(handler: HandlerFn<T>) {
   return async (req: Request): Promise<Response> => {
@@ -12,16 +11,20 @@ export function createHandler<T = unknown>(handler: HandlerFn<T>) {
     if (cors) return cors
 
     try {
-      let body: T | undefined
+      let body: unknown = undefined
+
       if (req.method !== 'GET') {
         try {
-          body = (await req.json()) as T
+          body = await req.json()
         } catch {
           body = undefined
         }
       }
 
-      const result = await handler(req, body as T)
+      // 🟦 Telling TS: "trust me, runtime is fine"
+      const typedBody = body as T
+
+      const result = await handler(req, typedBody)
 
       return new Response(JSON.stringify({ success: true, data: result }), {
         status: 200,
@@ -42,10 +45,8 @@ export function createHandler<T = unknown>(handler: HandlerFn<T>) {
 }
 
 /**
- * ✅ Webhook handler (Stripe, PayPal, Coinbase, etc.)
- * - Keeps raw body intact (required for signature verification)
- * - Same response format `{ success, data }`
- * - CORS safe
+ * Webhook handler (Stripe / PayPal / Coinbase)
+ * Returns rawBody for signature verification
  */
 export function createWebhookHandler(
   handler: (rawBody: string, req: Request) => Promise<unknown> | unknown,
@@ -62,7 +63,7 @@ export function createWebhookHandler(
     }
 
     try {
-      // ✅ RAW body = obligatoire pour Stripe
+      // RAW body obligatoire pour Stripe
       const buf = await req.arrayBuffer()
       const rawBody = new TextDecoder().decode(buf)
 

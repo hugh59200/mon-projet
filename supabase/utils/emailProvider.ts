@@ -6,15 +6,18 @@ const EMAIL_PROVIDER = (Deno.env.get('EMAIL_PROVIDER') ?? 'resend') as EmailProv
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
 const MAILGUN_API_KEY = Deno.env.get('MAILGUN_API_KEY') ?? ''
-const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN') ?? '' // ex: sandboxxxxxx.mailgun.org
+const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN') ?? '' // ex: sandboxXXXX.mailgun.org
 
 export interface EmailPayload {
   to: string
   subject: string
   html: string
-  from: string // IMPORTANT
+  from: string
 }
 
+/* -------------------------
+   RESEND
+---------------------------- */
 async function sendWithResend(payload: EmailPayload) {
   if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY manquant')
 
@@ -34,6 +37,9 @@ async function sendWithResend(payload: EmailPayload) {
   return res.json()
 }
 
+/* -------------------------
+   MAILGUN
+---------------------------- */
 async function sendWithMailgun(payload: EmailPayload) {
   if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
     throw new Error('MAILGUN_API_KEY ou MAILGUN_DOMAIN manquant')
@@ -42,7 +48,7 @@ async function sendWithMailgun(payload: EmailPayload) {
   const url = `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`
 
   const body = new URLSearchParams({
-    from: payload.from, // ICI le FROM sandbox correct
+    from: payload.from,
     to: payload.to,
     subject: payload.subject,
     html: payload.html,
@@ -64,6 +70,9 @@ async function sendWithMailgun(payload: EmailPayload) {
   return res.json()
 }
 
+/* -------------------------
+   SELECTOR
+---------------------------- */
 export function sendWithProvider(payload: EmailPayload) {
   switch (EMAIL_PROVIDER) {
     case 'resend':

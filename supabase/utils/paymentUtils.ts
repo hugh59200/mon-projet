@@ -1,47 +1,32 @@
+// supabase/utils/paymentUtils.ts
 import { supabase } from './clients.ts'
 
-/**
- * 🔵 Standard update for any provider
- */
-export async function updateOrderPaid(orderId: string, referenceId?: string) {
-  await supabase
+export async function updateOrderPaid(orderId: string, paymentIntentId: string) {
+  const { error } = await supabase
     .from('orders')
     .update({
       status: 'paid',
-      payment_intent_id: referenceId ?? null,
+      payment_intent_id: paymentIntentId,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId)
+
+  if (error) throw error
 }
 
-/**
- * 🔍 Generic JSON success response
- */
-export function successResponse(orderId: string) {
-  return {
-    status: 'success',
-    orderId,
-  }
-}
-
-/**
- * ❌ Generic error response
- */
-export function errorResponse(error: unknown) {
-  return {
-    status: 'error',
-    error: String(error),
-  }
-}
-
-/**
- * 🧾 Log webhook/payment events (optional but PRO)
- */
-export async function logPaymentEvent(provider: string, orderId: string, payload: any) {
+export async function logPaymentEvent(provider: string, orderId: string | null, event: unknown) {
   await supabase.from('payment_events').insert({
     provider,
     order_id: orderId,
-    payload: JSON.stringify(payload),
+    payload: event,
     created_at: new Date().toISOString(),
   })
+}
+
+export function successResponse(orderId: string) {
+  return { ok: true, orderId }
+}
+
+export function errorResponse(err: unknown) {
+  return { ok: false, error: String(err) }
 }

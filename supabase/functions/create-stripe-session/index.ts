@@ -1,10 +1,7 @@
-import {
-  PAYMENT_CANCEL_URL,
-  PAYMENT_SUCCESS_URL_BASE,
-  stripe,
-  supabase,
-} from '../../utils/clients.ts'
+import { PAYMENT_CANCEL_URL, PAYMENT_SUCCESS_URL_BASE, supabase } from '../../utils/clients.ts'
+
 import { createHandler } from '../../utils/createHandler.ts'
+import { createCheckoutSession } from '../../utils/stripeClient.ts'
 
 interface Payload {
   amount: number
@@ -17,31 +14,26 @@ Deno.serve(
     const { amount, email, orderId } = body
 
     if (!amount || !email || !orderId) {
-      throw new Error('amount, email et orderId requis')
+      throw new Error('amount, email, orderId requis')
     }
 
-    const successUrl = `${PAYMENT_SUCCESS_URL_BASE}?session_id={CHECKOUT_SESSION_ID}`
-    const cancelUrl = PAYMENT_CANCEL_URL
-
-    const session = await stripe.checkout.sessions.create({
+    const params: Record<string, string> = {
       mode: 'payment',
       customer_email: email,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: { order_id: orderId },
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: { name: 'Commande Fast Peptides' },
-            unit_amount: Math.round(amount * 100),
-          },
-          quantity: 1,
-        },
-      ],
-    })
+      success_url: `${PAYMENT_SUCCESS_URL_BASE}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: PAYMENT_CANCEL_URL,
+      'metadata[order_id]': orderId,
 
-    // 🟦 Mise à jour DB
+      // line_items[0]
+      'line_items[0][price_data][currency]': 'eur',
+      'line_items[0][price_data][product_data][name]': 'Commande Fast Peptides',
+      'line_items[0][price_data][unit_amount]': String(Math.round(amount * 100)),
+      'line_items[0][quantity]': '1',
+    }
+
+    const session = await createCheckoutSession(params)
+
+    // Mise à jour DB
     await supabase
       .from('orders')
       .update({
