@@ -109,7 +109,7 @@
       transition: all 0.3s ease;
     }
 
-    background: fade(@secondary-900, 65%);
+    background: color-mix(in srgb, var(--secondary-900) 65%, transparent);
     backdrop-filter: blur(14px);
     box-shadow: 0 4px 20px fade(black, 20%);
   }
@@ -170,10 +170,10 @@
     width: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb {
-    background: fade(@neutral-600, 25%);
+    background: color-mix(in srgb, @neutral-600 25%, transparent);
     border-radius: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb:hover {
-    background: fade(@neutral-600, 45%);
+    background: color-mix(in srgb, @neutral-600 45%, transparent);
   }
 </style>

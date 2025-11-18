@@ -112,7 +112,7 @@
       transition: all 0.3s ease;
       background: @neutral-100;
       color: @neutral-800;
-      box-shadow: 0 1px 2px fade(@neutral-800, 5%);
+      box-shadow: 0 1px 2px color-mix(in srgb, @neutral-800 5%, transparent);
 
       .content {
         display: block;
@@ -131,18 +131,18 @@
 
       /* 💫 Survol doux */
       &:hover {
-        background: fade(@neutral-200, 60%);
+        background: color-mix(in srgb, @neutral-200 60%, transparent);
       }
 
       /* ✨ Animation "lu" (transition douce du fond) */
       &.read {
-        background: fade(@primary-50, 80%);
+        background: color-mix(in srgb, var(--primary-50) 80%, transparent);
         transition: background 0.5s ease;
       }
     }
 
     &.mine .bubble {
-      background: @primary-600;
+      background: var(--primary-600);
       color: white;
       border-bottom-right-radius: 4px;
 
@@ -152,8 +152,8 @@
 
       /* 💫 Transition douce quand le message devient lu */
       &.read {
-        background: @primary-500;
-        box-shadow: 0 0 6px fade(@primary-600, 30%);
+        background: var(--primary-500);
+        box-shadow: 0 0 6px color-mix(in srgb, var(--primary-600) 30%, transparent);
         transition: background 0.4s ease;
       }
     }

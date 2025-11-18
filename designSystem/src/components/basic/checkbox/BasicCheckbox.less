@@ -5,7 +5,7 @@
   cursor: pointer;
 
   &__label {
-    margin: @spacing-10 0 0 @spacing-10;
+    margin: var(--spacing-10) 0 0 var(--spacing-10);
     font-size: @font-size-body-l;
     font-weight: @font-weight-regular;
     caret-color: transparent;
@@ -20,14 +20,14 @@
     align-items: center;
     justify-content: center;
     border-radius: @border-radius-s;
-    margin: @spacing-10 0;
+    margin: var(--spacing-10) 0;
     transition:
       background-color 0.15s ease,
       border-color 0.15s ease;
 
     &--checked {
-      background-color: @primary-600;
-      border: 1px solid @primary-600;
+      background-color: var(--primary-600);
+      border: 1px solid var(--primary-600);
       svg {
         color: white;
       }

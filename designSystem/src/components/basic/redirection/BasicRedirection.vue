@@ -59,13 +59,13 @@
   .basic-redirection {
     display: flex;
     flex-direction: column;
-    gap: @spacing-15;
+    gap: var(--spacing-15);
 
     &__bottom {
       position: relative;
       display: flex;
       flex-direction: column;
-      gap: @spacing-15;
+      gap: var(--spacing-15);
     }
 
     &__affix {

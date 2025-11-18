@@ -88,11 +88,11 @@
     }
 
     &--sort:hover {
-      color: @primary-600;
+      color: var(--primary-600);
     }
 
     &.active {
-      color: @primary-600;
+      color: var(--primary-600);
       font-weight: 600;
     }
 

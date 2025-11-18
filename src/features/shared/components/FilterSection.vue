@@ -63,20 +63,20 @@
     position: relative;
     border-radius: 14px;
 
-    background: fade(@neutral-200, 82%);
+    background: color-mix(in srgb, @neutral-200 82%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid fade(@neutral-300, 40%);
+    border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
     box-shadow:
-      0 4px 14px fade(@neutral-900, 6%),
-      inset 0 0 0 1px fade(@neutral-50, 45%);
+      0 4px 14px color-mix(in srgb, @neutral-900 6%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, @neutral-50 45%, transparent);
 
     overflow: hidden;
     transition: all 0.25s ease;
 
     &:hover {
       background: fade(@white, 88%);
-      border-color: fade(@primary-500, 35%);
+      border-color: color-mix(in srgb, var(--primary-500) 35%, transparent);
     }
 
     /* ----------------------------------------------------------
@@ -99,7 +99,7 @@
 
       /* Hover effect */
       &:hover {
-        background: fade(@neutral-900, 4%);
+        background: color-mix(in srgb, @neutral-900 4%, transparent);
         backdrop-filter: blur(14px);
       }
 
@@ -126,7 +126,7 @@
       flex-direction: column;
       gap: 16px;
 
-      border-top: 1px solid fade(@neutral-200, 40%);
+      border-top: 1px solid color-mix(in srgb, @neutral-200 40%, transparent);
       backdrop-filter: blur(10px);
 
       animation: fadeInGlass 0.25s ease;

@@ -64,7 +64,7 @@
       font-size: 14px;
 
       &:focus {
-        border-color: @primary-500;
+        border-color: var(--primary-500);
         background: white;
       }
     }

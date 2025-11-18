@@ -243,10 +243,8 @@
       flex-direction: column;
       gap: 18px;
 
-      background: fade(@secondary-900, 75%);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      border: 1px solid fade(@neutral-300, 25%);
+      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
 
       box-shadow:
         0 8px 28px fade(#000, 35%),
@@ -284,15 +282,15 @@
       width: 260px;
       flex-shrink: 0;
 
-      background: fade(@secondary-900, 75%);
+      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid fade(@neutral-300, 25%);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
 
       padding: 22px 18px;
       border-radius: 16px;
 
-      border: 1px solid fade(@neutral-300, 26%);
+      border: 1px solid color-mix(in srgb, @neutral-300 26%, transparent);
       box-shadow:
         0 10px 30px fade(#000, 40%),
         inset 0 0 0 1px fade(@white, 10%);
@@ -308,14 +306,14 @@
       flex: 1;
       min-height: 500px;
 
-      background: fade(@secondary-900, 75%);
+      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid fade(@neutral-300, 25%);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
 
       padding: 26px;
       border-radius: 16px;
-      border: 1px solid fade(@neutral-300, 22%);
+      border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
 
       box-shadow:
         0 12px 30px fade(#000, 35%),
@@ -355,7 +353,7 @@
         padding: 10px 18px;
         border-radius: 12px;
 
-        border: 1px solid fade(@neutral-300, 25%);
+        border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
         box-shadow: 0 6px 18px fade(#000, 35%);
       }
     }

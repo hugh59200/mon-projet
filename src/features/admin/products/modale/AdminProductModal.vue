@@ -301,7 +301,7 @@
     border-radius: 8px;
     input[type='checkbox'] {
       transform: scale(1.2);
-      accent-color: @primary-600;
+      accent-color: var(--primary-600);
     }
   }
 

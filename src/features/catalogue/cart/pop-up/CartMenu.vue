@@ -190,7 +190,7 @@
       }
 
       &:hover &-svg {
-        filter: drop-shadow(0 0 6px fade(@primary-500, 45%));
+        filter: drop-shadow(0 0 6px color-mix(in srgb, var(--primary-500) 45%, transparent));
       }
     }
 
@@ -199,7 +199,7 @@
       top: -9px;
       right: -2px;
 
-      background: @primary-700;
+      background: var(--primary-700);
       color: white;
 
       border-radius: 50%;
@@ -213,7 +213,7 @@
       font-size: 11px;
       font-weight: bold;
 
-      box-shadow: 0 0 0 2px fade(@secondary-900, 70%);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary-900) 70%, transparent);
     }
 
     /* ======================
@@ -278,8 +278,8 @@
         border-radius: 8px;
         object-fit: cover;
 
-        background: fade(@neutral-800, 45%);
-        border: 1px solid fade(@neutral-500, 15%);
+        background: color-mix(in srgb, @neutral-800 45%, transparent);
+        border: 1px solid color-mix(in srgb, @neutral-500 15%, transparent);
       }
 
       &-info {
@@ -292,7 +292,7 @@
     &__more {
       text-align: center;
       font-size: 12px;
-      color: fade(@neutral-300, 80%);
+      color: color-mix(in srgb, @neutral-300 80%, transparent);
       margin-top: 4px;
     }
 
@@ -309,7 +309,7 @@
     &__total {
       text-align: right;
       margin-bottom: 8px;
-      color: @primary-400;
+      color: var(--primary-400);
     }
 
     &__btns {

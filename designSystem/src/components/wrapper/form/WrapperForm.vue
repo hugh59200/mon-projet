@@ -91,15 +91,15 @@
 
     &__main {
       flex: 1;
-      background: fade(@secondary-900, 75%);
+      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid fade(@neutral-300, 25%);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
 
       box-shadow:
         0 8px 28px fade(#000, 35%),
         inset 0 0 0 1px fade(@white, 12%);
-      padding: @spacing-20 0;
+      padding: var(--spacing-20) 0;
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -111,7 +111,7 @@
     }
 
     &__content {
-      padding: 0 @spacing-15 0 @spacing-20;
+      padding: 0 var(--spacing-15) 0 var(--spacing-20);
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -119,13 +119,13 @@
 
     .scroll-container {
       flex: 1;
-      margin-right: @spacing-5;
+      margin-right: var(--spacing-5);
       overflow: hidden;
     }
 
     @media (max-width: 1000px) {
       &__header {
-        padding: 0 @spacing-20;
+        padding: 0 var(--spacing-20);
         display: flex;
         justify-content: space-between;
         align-items: center;

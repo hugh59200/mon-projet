@@ -119,20 +119,20 @@
      VARIANT: GHOST (default)
      ====================================================== */
     &--ghost {
-      background: fade(@secondary-900, 0%);
+      background: color-mix(in srgb, var(--secondary-900) 0%, transparent);
 
       &:hover {
-        background: fade(@secondary-800, 25%);
+        background: color-mix(in srgb, var(--secondary-800) 25%, transparent);
         backdrop-filter: blur(4px);
-        box-shadow: 0 0 8px fade(@primary-500, 20%);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--primary-500) 20%, transparent);
         transform: translateY(-1px);
       }
 
       &.is-active {
-        background: fade(@secondary-700, 35%);
+        background: color-mix(in srgb, var(--secondary-700) 35%, transparent);
         box-shadow:
-          0 0 6px fade(@primary-500, 25%),
-          inset 0 0 0 1px fade(@primary-500, 35%);
+          0 0 6px color-mix(in srgb, var(--primary-500) 25%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--primary-500) 35%, transparent);
       }
     }
 
@@ -140,21 +140,21 @@
      VARIANT: FILLED (subtle glass)
      ====================================================== */
     &--filled {
-      background: linear-gradient(135deg, fade(@primary-700, 55%), fade(@primary-500, 45%));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-700) 55%, transparent), color-mix(in srgb, var(--primary-500) 45%, transparent));
       backdrop-filter: blur(4px);
-      border: 1px solid fade(@primary-300, 18%);
+      border: 1px solid color-mix(in srgb, var(--primary-300) 18%, transparent);
 
       &:hover {
-        background: linear-gradient(135deg, fade(@primary-700, 70%), fade(@primary-500, 60%));
-        box-shadow: 0 0 10px fade(@primary-500, 30%);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--primary-700) 70%, transparent), color-mix(in srgb, var(--primary-500) 60%, transparent));
+        box-shadow: 0 0 10px color-mix(in srgb, var(--primary-500) 30%, transparent);
         transform: translateY(-1px);
       }
 
       &.is-active {
-        background: fade(@primary-700, 70%);
+        background: color-mix(in srgb, var(--primary-700) 70%, transparent);
         box-shadow:
-          0 0 6px fade(@primary-500, 40%),
-          inset 0 0 0 1px fade(@primary-500, 50%);
+          0 0 6px color-mix(in srgb, var(--primary-500) 40%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--primary-500) 50%, transparent);
       }
     }
 
@@ -162,16 +162,16 @@
      VARIANT: ACTIVE (accent glow)
      ====================================================== */
     &--active {
-      background: fade(@primary-600, 40%);
+      background: color-mix(in srgb, var(--primary-600) 40%, transparent);
       backdrop-filter: blur(4px);
 
-      box-shadow: 0 0 8px fade(@primary-400, 25%);
+      box-shadow: 0 0 8px color-mix(in srgb, var(--primary-400) 25%, transparent);
 
       &:hover {
-        background: fade(@primary-600, 55%);
+        background: color-mix(in srgb, var(--primary-600) 55%, transparent);
         box-shadow:
-          0 0 12px fade(@primary-400, 32%),
-          inset 0 0 0 1px fade(@primary-300, 25%);
+          0 0 12px color-mix(in srgb, var(--primary-400) 32%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--primary-300) 25%, transparent);
         transform: translateY(-1px);
       }
     }

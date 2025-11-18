@@ -41,8 +41,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: @spacing-10;
-    border-radius: @spacing-10;
+    padding: var(--spacing-10);
+    border-radius: var(--spacing-10);
     border: 1px solid @neutral-200;
     gap: 8px;
     cursor: pointer;
@@ -52,9 +52,9 @@
       border-color 0.3s ease;
 
     svg {
-      padding-top: @spacing-10;
+      padding-top: var(--spacing-10);
       height: 100%;
-      fill: @secondary-1000;
+      fill: var(--secondary-100);
       transition: fill 0.3s ease;
       transform: scale(1.4);
     }
@@ -72,7 +72,7 @@
     }
 
     &--active {
-      background-color: @secondary-900;
+      background-color: var(--secondary-900);
       color: white;
 
       &:deep(svg g) {

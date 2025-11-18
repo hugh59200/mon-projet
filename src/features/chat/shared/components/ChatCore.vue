@@ -246,12 +246,12 @@
     flex-direction: column;
 
     .chat-offline-banner {
-      background: fade(@danger-600, 10%);
+      background: color-mix(in srgb, @danger-600 10%, transparent);
       color: @danger-700;
       text-align: center;
       padding: 6px;
       font-size: 13px;
-      border-bottom: 1px solid fade(@danger-600, 15%);
+      border-bottom: 1px solid color-mix(in srgb, @danger-600 15%, transparent);
     }
 
     .chat-loader {
@@ -292,11 +292,11 @@
       width: 6px;
     }
     .chat-messages::-webkit-scrollbar-thumb {
-      background: fade(@neutral-500, 40%);
+      background: color-mix(in srgb, @neutral-500 40%, transparent);
       border-radius: 4px;
     }
     .chat-messages::-webkit-scrollbar-thumb:hover {
-      background: fade(@neutral-600, 60%);
+      background: color-mix(in srgb, @neutral-600 60%, transparent);
     }
 
     .new-messages-btn {
@@ -304,7 +304,7 @@
       bottom: 70px;
       left: 50%;
       transform: translateX(-50%);
-      background: @primary-600;
+      background: var(--primary-600);
       color: white;
       border: none;
       border-radius: 999px;
@@ -315,7 +315,7 @@
       box-shadow: 0 2px 8px fade(black, 15%);
       transition: background 0.2s ease;
       &:hover {
-        background: @primary-700;
+        background: var(--primary-700);
       }
     }
 

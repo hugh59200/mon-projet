@@ -395,9 +395,9 @@
     overflow: hidden;
 
     /* 🔮 Glass container */
-    background: fade(@secondary-900, 35%);
+    background: color-mix(in srgb, var(--secondary-900) 35%, transparent);
     backdrop-filter: blur(24px);
-    border: 1px solid fade(@neutral-300, 22%);
+    border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
     box-shadow:
       0 30px 80px fade(#000, 40%),
       inset 0 0 0 1px fade(@white, 10%);
@@ -414,8 +414,8 @@
 
       /* Glow thématique Neural Blue + Sonic Indigo */
       background:
-        radial-gradient(circle at 25% 20%, fade(@primary-400, 55%), transparent 60%),
-        radial-gradient(circle at 75% 80%, fade(@indigo-400, 48%), transparent 60%);
+        radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--primary-400) 55%, transparent), transparent 60%),
+        radial-gradient(circle at 75% 80%, color-mix(in srgb, @indigo-400 48%, transparent), transparent 60%);
       background-size: 200% 200%;
       animation: glowShift 22s ease-in-out infinite alternate;
     }
@@ -445,9 +445,9 @@
       overflow: hidden;
 
       /* Glass panel */
-      background: fade(@secondary-800, 35%);
+      background: color-mix(in srgb, var(--secondary-800) 35%, transparent);
       backdrop-filter: blur(26px);
-      border: 1px solid fade(@neutral-300, 26%);
+      border: 1px solid color-mix(in srgb, @neutral-300 26%, transparent);
       box-shadow:
         0 20px 50px fade(#000, 25%),
         inset 0 0 0 1px fade(@white, 12%);
@@ -460,7 +460,7 @@
         left: 0;
         width: 4px;
         border-radius: 999px;
-        background: linear-gradient(to bottom, fade(@primary-500, 95%), fade(@indigo-400, 85%));
+        background: linear-gradient(to bottom, color-mix(in srgb, var(--primary-500) 95%, transparent), color-mix(in srgb, @indigo-400 85%, transparent));
       }
 
       /* TEXT BLOCK */
@@ -482,10 +482,10 @@
         font-weight: 600;
         letter-spacing: 0.14em;
 
-        background: fade(@primary-200, 25%);
-        border: 1px solid fade(@primary-400, 30%);
+        background: color-mix(in srgb, var(--primary-200) 25%, transparent);
+        border: 1px solid color-mix(in srgb, var(--primary-400) 30%, transparent);
         backdrop-filter: blur(6px);
-        color: @primary-600 !important;
+        color: var(--primary-600) !important;
       }
 
       &__sub {
@@ -518,7 +518,7 @@
 
         &-disclaimer {
           font-size: 11px;
-          color: fade(@neutral-200, 85%) !important;
+          color: color-mix(in srgb, @neutral-200 85%, transparent) !important;
         }
       }
     }
@@ -541,11 +541,11 @@
         width: 4px;
       }
       &::-webkit-scrollbar-track {
-        background: fade(@primary-50, 45%);
+        background: color-mix(in srgb, var(--primary-50) 45%, transparent);
         border-radius: 999px;
       }
       &::-webkit-scrollbar-thumb {
-        background: fade(@primary-400, 70%);
+        background: color-mix(in srgb, var(--primary-400) 70%, transparent);
         border-radius: 999px;
       }
 
@@ -558,7 +558,7 @@
         gap: 8px;
 
         /* subtle neural glass */
-        background: linear-gradient(130deg, fade(@neutral-0, 95%), fade(@primary-50, 80%));
+        background: linear-gradient(130deg, color-mix(in srgb, @neutral-0 95%, transparent), color-mix(in srgb, var(--primary-50) 80%, transparent));
         box-shadow: 0 8px 22px fade(#000, 12%);
 
         /* Image wrapper */
@@ -570,8 +570,8 @@
 
           background: radial-gradient(
             circle at 10% 0%,
-            fade(@primary-100, 70%),
-            fade(@indigo-100, 50%)
+            color-mix(in srgb, var(--primary-100) 70%, transparent),
+            color-mix(in srgb, @indigo-100 50%, transparent)
           );
 
           img {
@@ -591,7 +591,7 @@
             letter-spacing: 0.08em;
 
             border-radius: 999px;
-            background: fade(@secondary-950, 78%);
+            background: color-mix(in srgb, var(--secondary-950) 78%, transparent);
             color: @neutral-0;
             backdrop-filter: blur(6px);
           }
@@ -612,9 +612,9 @@
       position: relative;
       z-index: 2;
 
-      background: linear-gradient(135deg, fade(@primary-600, 75%), fade(@secondary-700, 82%));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-600) 75%, transparent), color-mix(in srgb, var(--secondary-700) 82%, transparent));
       backdrop-filter: blur(14px);
-      border-top: 4px solid fade(@primary-400, 40%);
+      border-top: 4px solid color-mix(in srgb, var(--primary-400) 40%, transparent);
 
       padding: 16px 24px 18px;
       overflow: hidden;
@@ -632,12 +632,12 @@
 
       &::before {
         left: 0;
-        background: linear-gradient(to right, fade(@secondary-900, 80%), transparent);
+        background: linear-gradient(to right, color-mix(in srgb, var(--secondary-900) 80%, transparent), transparent);
       }
 
       &::after {
         right: 0;
-        background: linear-gradient(to left, fade(@secondary-900, 80%), transparent);
+        background: linear-gradient(to left, color-mix(in srgb, var(--secondary-900) 80%, transparent), transparent);
       }
 
       &-inner {
@@ -681,12 +681,12 @@
             border-radius: 12px;
             object-fit: contain;
             background: @neutral-0;
-            box-shadow: 0 3px 10px fade(@neutral-700, 16%);
+            box-shadow: 0 3px 10px color-mix(in srgb, @neutral-700 16%, transparent);
           }
 
           &:hover {
             transform: translateY(-4px);
-            box-shadow: 0 4px 14px fade(@neutral-700, 22%);
+            box-shadow: 0 4px 14px color-mix(in srgb, @neutral-700 22%, transparent);
           }
         }
       }

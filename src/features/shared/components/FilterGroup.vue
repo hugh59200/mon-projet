@@ -69,9 +69,9 @@
 
 <style scoped lang="less">
   .filter-group {
-    background: fade(@neutral-50, 40%);
+    background: color-mix(in srgb, @neutral-50 40%, transparent);
     backdrop-filter: blur(14px);
-    border: 1px solid fade(@neutral-300, 35%);
+    border: 1px solid color-mix(in srgb, @neutral-300 35%, transparent);
     border-radius: 18px;
     padding: 18px 20px 22px;
 
@@ -88,7 +88,7 @@
       align-items: center;
       justify-content: space-between;
       padding-bottom: 6px;
-      border-bottom: 1px solid fade(@neutral-300, 35%);
+      border-bottom: 1px solid color-mix(in srgb, @neutral-300 35%, transparent);
     }
 
     &__title {
@@ -126,7 +126,7 @@
     border-radius: 14px !important;
     overflow: hidden;
     background: fade(@white, 50%) !important;
-    border: 1px solid fade(@neutral-300, 40%) !important;
+    border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent) !important;
 
     box-shadow:
       0 4px 12px fade(#000, 6%),
@@ -140,7 +140,7 @@
       background: fade(@white, 70%) !important;
       box-shadow:
         0 8px 20px fade(#000, 10%),
-        inset 0 0 0 1px fade(@primary-300, 30%);
+        inset 0 0 0 1px color-mix(in srgb, var(--primary-300) 30%, transparent);
     }
   }
 </style>

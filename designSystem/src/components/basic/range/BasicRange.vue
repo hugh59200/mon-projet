@@ -140,7 +140,7 @@
       position: absolute;
       top: 18px;
       height: 4px;
-      background: @primary-500;
+      background: var(--primary-500);
       border-radius: 2px;
       z-index: 2;
       pointer-events: none;
@@ -167,9 +167,9 @@
         height: 18px;
         width: 18px;
         border-radius: 50%;
-        background: @primary-600;
+        background: var(--primary-600);
         border: 2px solid white;
-        box-shadow: 0 0 3px fade(@neutral-900, 25%);
+        box-shadow: 0 0 3px color-mix(in srgb, @neutral-900 25%, transparent);
         cursor: pointer;
         transition:
           transform 0.15s ease,
@@ -178,7 +178,7 @@
 
       &::-webkit-slider-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 0 6px fade(@primary-600, 50%);
+        box-shadow: 0 0 6px color-mix(in srgb, var(--primary-600) 50%, transparent);
       }
 
       &::-moz-range-thumb {
@@ -186,9 +186,9 @@
         height: 18px;
         width: 18px;
         border-radius: 50%;
-        background: @primary-600;
+        background: var(--primary-600);
         border: 2px solid white;
-        box-shadow: 0 0 3px fade(@neutral-900, 25%);
+        box-shadow: 0 0 3px color-mix(in srgb, @neutral-900 25%, transparent);
         cursor: pointer;
       }
 

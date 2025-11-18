@@ -69,12 +69,12 @@
     color: @neutral-600;
 
     a {
-      color: @primary-700;
+      color: var(--primary-700);
       text-decoration: none;
 
       &:hover {
         text-decoration: underline;
-        color: darken(@primary-700, 5%);
+        color: color-mix(in srgb, black 5%, var(--primary-700));
       }
     }
   }

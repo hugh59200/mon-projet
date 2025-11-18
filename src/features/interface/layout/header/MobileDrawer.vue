@@ -107,7 +107,7 @@
   .mobile-overlay {
     position: fixed;
     inset: 0;
-    background: fade(@secondary-900, 65%); // bleu-noir Neural
+    background: color-mix(in srgb, var(--secondary-900) 65%, transparent); // bleu-noir Neural
     backdrop-filter: blur(6px);
     z-index: 2000;
     display: flex;
@@ -122,14 +122,14 @@
     height: 100vh;
 
     /* Fond en verre bleu sombre */
-    background: fade(@secondary-900, 92%);
+    background: color-mix(in srgb, var(--secondary-900) 92%, transparent);
     backdrop-filter: blur(12px);
 
     color: white;
 
     /* Ombres plus propres, moins noires */
     box-shadow:
-      3px 0 22px fade(@primary-950, 45%),
+      3px 0 22px color-mix(in srgb, var(--primary-950) 45%, transparent),
       inset -3px 0 10px fade(white, 4%);
 
     border-top-right-radius: 20px;
@@ -143,7 +143,7 @@
     overflow-x: hidden;
 
     scrollbar-width: thin;
-    scrollbar-color: fade(@neutral-500, 30%) transparent;
+    scrollbar-color: color-mix(in srgb, @neutral-500 30%, transparent) transparent;
   }
 
   /* ============================
@@ -158,7 +158,7 @@
     .drawer-logo {
       width: 30px;
       height: 30px;
-      filter: drop-shadow(0 0 4px fade(@primary-700, 40%));
+      filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary-700) 40%, transparent));
     }
   }
 
@@ -175,7 +175,7 @@
   /* Ligne séparatrice Neural */
   .drawer-divider {
     height: 1px;
-    background: fade(@neutral-500, 25%);
+    background: color-mix(in srgb, @neutral-500 25%, transparent);
     margin: 16px 0;
   }
 
@@ -191,7 +191,7 @@
     transition: all 0.25s ease;
 
     &:hover {
-      color: @primary-300;
+      color: var(--primary-300);
       transform: translateX(4px);
     }
   }

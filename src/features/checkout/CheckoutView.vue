@@ -297,13 +297,13 @@
     box-sizing: border-box;
 
     > div {
-      background: fade(@neutral-200, 82%);
+      background: color-mix(in srgb, @neutral-200 82%, transparent);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid fade(@neutral-300, 40%);
+      border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
       box-shadow:
-        0 4px 14px fade(@neutral-900, 6%),
-        inset 0 0 0 1px fade(@neutral-50, 45%);
+        0 4px 14px color-mix(in srgb, @neutral-900 6%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, @neutral-50 45%, transparent);
     }
 
     &__title {
@@ -345,7 +345,7 @@
         height: 58px;
         object-fit: cover;
         border-radius: 10px;
-        border: 1px solid fade(@neutral-300, 40%);
+        border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
         flex-shrink: 0;
       }
 
@@ -371,7 +371,7 @@
           }
 
           .product-search-icon {
-            color: fade(@neutral-700, 70%);
+            color: color-mix(in srgb, @neutral-700 70%, transparent);
             transition: color 0.2s ease;
           }
 
@@ -385,11 +385,11 @@
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          color: fade(@neutral-600, 90%);
+          color: color-mix(in srgb, @neutral-600 90%, transparent);
         }
 
         .product-price {
-          color: fade(@neutral-500, 80%);
+          color: color-mix(in srgb, @neutral-500 80%, transparent);
           font-size: 13px;
         }
       }
@@ -407,7 +407,7 @@
     .ripple {
       position: absolute;
       border-radius: 50%;
-      background: fade(@primary-500, 25%);
+      background: color-mix(in srgb, var(--primary-500) 25%, transparent);
       transform: scale(0);
       animation: ripple 0.6s ease-out;
       width: 150px;
@@ -465,14 +465,14 @@
       transition: all 0.25s ease;
 
       &:hover {
-        border-color: @primary-400;
-        background: fade(@primary-50, 40%);
+        border-color: var(--primary-400);
+        background: color-mix(in srgb, var(--primary-50) 40%, transparent);
       }
 
       &.active {
-        border-color: @primary-600;
-        background: fade(@primary-100, 60%);
-        box-shadow: 0 2px 8px fade(@primary-400, 25%);
+        border-color: var(--primary-600);
+        background: color-mix(in srgb, var(--primary-100) 60%, transparent);
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-400) 25%, transparent);
       }
 
       &-icon {
@@ -487,7 +487,7 @@
         svg {
           width: 18px;
           height: 18px;
-          color: @primary-700;
+          color: var(--primary-700);
         }
       }
 
@@ -503,17 +503,17 @@
       margin-top: 20px;
       transition: all 0.25s ease-in-out;
       border-radius: 10px;
-      box-shadow: 0 3px 10px fade(@primary-400, 25%);
+      box-shadow: 0 3px 10px color-mix(in srgb, var(--primary-400) 25%, transparent);
       font-weight: 600;
 
       &:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px fade(@primary-500, 30%);
+        box-shadow: 0 5px 15px color-mix(in srgb, var(--primary-500) 30%, transparent);
       }
 
       &:active {
         transform: scale(0.98);
-        box-shadow: 0 2px 6px fade(@primary-500, 25%);
+        box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-500) 25%, transparent);
       }
 
       &:disabled {

@@ -217,7 +217,7 @@
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
-      background: fade(@neutral-200, 40%);
+      background: color-mix(in srgb, @neutral-200 40%, transparent);
     }
   }
 </style>

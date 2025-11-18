@@ -9,13 +9,13 @@
   &--medium {
     height: 30px;
     padding: @padding-badge-m;
-    gap: @spacing-10;
+    gap: var(--spacing-10);
   }
 
   &--small {
     height: 20px;
     padding: @padding-badge-s;
-    gap: @spacing-5;
+    gap: var(--spacing-5);
 
     svg {
       transform: scale(0.65);
@@ -23,11 +23,11 @@
   }
 
   &--default {
-    background-color: @secondary-0;
-    color: @secondary-600;
-    border-color: @secondary-600;
+    background-color: var(--secondary-0);
+    color: var(--secondary-600);
+    border-color: var(--secondary-600);
     svg {
-      fill: @secondary-0;
+      fill: var(--secondary-0);
     }
   }
 

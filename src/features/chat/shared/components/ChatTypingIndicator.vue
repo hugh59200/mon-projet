@@ -38,7 +38,7 @@
     .dot {
       width: 6px;
       height: 6px;
-      background: fade(@neutral-600, 70%);
+      background: color-mix(in srgb, @neutral-600 70%, transparent);
       border-radius: 50%;
       animation: typingDots 1.3s infinite ease-in-out;
     }

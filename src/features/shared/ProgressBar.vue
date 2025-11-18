@@ -14,11 +14,11 @@
     position: relative;
     width: 140px;
     height: 6px;
-    background: fade(@neutral-300, 40%);
+    background: color-mix(in srgb, @neutral-300 40%, transparent);
     border-radius: 6px;
     overflow: hidden;
     margin-top: 28px;
-    box-shadow: inset 0 0 3px fade(@neutral-900, 8%);
+    box-shadow: inset 0 0 3px color-mix(in srgb, @neutral-900 8%, transparent);
 
     &::after {
       content: '';
@@ -32,15 +32,15 @@
 
     /* ✅ Couleurs dynamiques */
     &.success::after {
-      background: linear-gradient(90deg, @success-500, lighten(@success-600, 10%), @success-500);
+      background: linear-gradient(90deg, @success-500, color-mix(in srgb, white 10%, @success-600), @success-500);
     }
 
     &.primary::after {
-      background: linear-gradient(90deg, @primary-500, lighten(@primary-600, 10%), @primary-500);
+      background: linear-gradient(90deg, var(--primary-500), color-mix(in srgb, white 10%, var(--primary-600)), var(--primary-500));
     }
 
     &.danger::after {
-      background: linear-gradient(90deg, @danger-500, lighten(@danger-600, 10%), @danger-500);
+      background: linear-gradient(90deg, @danger-500, color-mix(in srgb, white 10%, @danger-600), @danger-500);
     }
 
     /* ✨ Effet de brillance subtile */

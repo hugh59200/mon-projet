@@ -335,10 +335,10 @@
     border-radius: 20px;
     overflow: hidden;
 
-    background: fade(@secondary-900, 45%);
+    background: color-mix(in srgb, var(--secondary-900) 45%, transparent);
     backdrop-filter: blur(22px);
 
-    border: 1px solid fade(@neutral-300, 22%);
+    border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
     box-shadow:
       0 28px 70px fade(#000, 45%),
       inset 0 0 0 1px fade(@white, 10%);
@@ -361,10 +361,10 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          fade(@secondary-900, 45%) 0%,
-          fade(@secondary-950, 55%) 40%,
-          fade(@secondary-900, 35%) 75%,
-          fade(@secondary-900, 50%) 100%
+          color-mix(in srgb, var(--secondary-900) 45%, transparent) 0%,
+          color-mix(in srgb, var(--secondary-950) 55%, transparent) 40%,
+          color-mix(in srgb, var(--secondary-900) 35%, transparent) 75%,
+          color-mix(in srgb, var(--secondary-900) 50%, transparent) 100%
         );
         backdrop-filter: blur(8px);
       }
@@ -388,10 +388,10 @@
         border-radius: 999px;
         color: @neutral-200 !important;
 
-        background: fade(@neutral-0, 40%);
+        background: color-mix(in srgb, @neutral-0 40%, transparent);
         backdrop-filter: blur(10px);
 
-        border: 1px solid fade(@neutral-300, 35%);
+        border: 1px solid color-mix(in srgb, @neutral-300 35%, transparent);
         color: @neutral-900;
 
         box-shadow:
@@ -401,17 +401,17 @@
         transition: all 0.25s ease;
 
         &:hover {
-          background: fade(@neutral-0, 65%);
+          background: color-mix(in srgb, @neutral-0 65%, transparent);
           box-shadow: 0 4px 18px fade(#000, 18%);
         }
 
         &--active {
-          background: fade(@primary-200, 45%);
-          border-color: fade(@primary-400, 60%);
-          color: @primary-700 !important;
+          background: color-mix(in srgb, var(--primary-200) 45%, transparent);
+          border-color: color-mix(in srgb, var(--primary-400) 60%, transparent);
+          color: var(--primary-700) !important;
           box-shadow:
-            0 0 0 1px fade(@primary-300, 55%),
-            0 6px 16px fade(@primary-400, 35%);
+            0 0 0 1px color-mix(in srgb, var(--primary-300) 55%, transparent),
+            0 6px 16px color-mix(in srgb, var(--primary-400) 35%, transparent);
         }
       }
     }
@@ -425,7 +425,7 @@
       height: 12px;
       border-radius: 999px;
 
-      background: linear-gradient(to bottom, fade(@neutral-50, 80%) 0%, fade(@neutral-0, 0%) 100%);
+      background: linear-gradient(to bottom, color-mix(in srgb, @neutral-50 80%, transparent) 0%, color-mix(in srgb, @neutral-0 0%, transparent) 100%);
       pointer-events: none;
     }
 
@@ -459,9 +459,9 @@
 
         background: linear-gradient(
           90deg,
-          fade(@secondary-900, 90%) 0%,
-          fade(@secondary-900, 70%) 28%,
-          fade(@secondary-800, 45%) 58%,
+          color-mix(in srgb, var(--secondary-900) 90%, transparent) 0%,
+          color-mix(in srgb, var(--secondary-900) 70%, transparent) 28%,
+          color-mix(in srgb, var(--secondary-800) 45%, transparent) 58%,
           transparent 100%
         );
         backdrop-filter: blur(12px);
@@ -504,7 +504,7 @@
         .slide__disclaimer {
           margin-top: 6px;
           font-size: 12px;
-          color: fade(@neutral-400, 80%) !important;
+          color: color-mix(in srgb, @neutral-400 80%, transparent) !important;
           max-width: 380px;
         }
 
@@ -535,7 +535,7 @@
           border-radius: 18px;
           overflow: hidden;
 
-          background: fade(@secondary-950, 45%);
+          background: color-mix(in srgb, var(--secondary-950) 45%, transparent);
           box-shadow:
             0 10px 28px fade(#000, 45%),
             inset 0 0 0 1px fade(@white, 8%);
@@ -562,7 +562,7 @@
 
             padding: 14px;
 
-            background: linear-gradient(0deg, fade(@secondary-900, 85%) 0%, transparent 60%);
+            background: linear-gradient(0deg, color-mix(in srgb, var(--secondary-900) 85%, transparent) 0%, transparent 60%);
           }
 
           &__badge {
@@ -574,7 +574,7 @@
 
             border-radius: 999px;
             color: @neutral-0;
-            background: fade(@primary-400, 35%);
+            background: color-mix(in srgb, var(--primary-400) 35%, transparent);
             backdrop-filter: blur(6px);
           }
 
@@ -587,7 +587,7 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: fade(@neutral-0, 85%);
+            color: color-mix(in srgb, @neutral-0 85%, transparent);
           }
 
           &:hover {
@@ -621,7 +621,7 @@
         border-radius: 16px;
         overflow: hidden;
 
-        background: @secondary-950;
+        background: var(--secondary-950);
         box-shadow: 0 12px 40px fade(#000, 50%);
 
         iframe {
@@ -638,9 +638,9 @@
           height: 40px;
           border-radius: 50%;
 
-          background: fade(@neutral-0, 10%);
+          background: color-mix(in srgb, @neutral-0 10%, transparent);
           backdrop-filter: blur(8px);
-          border: 1px solid fade(@neutral-300, 30%);
+          border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
 
           font-size: 22px;
           color: @neutral-0;
@@ -649,7 +649,7 @@
           transition: background 0.25s ease;
 
           &:hover {
-            background: fade(@neutral-0, 20%);
+            background: color-mix(in srgb, @neutral-0 20%, transparent);
           }
         }
       }
@@ -697,8 +697,8 @@
         .slide__overlay {
           background: linear-gradient(
             180deg,
-            fade(@secondary-900, 90%) 0%,
-            fade(@secondary-900, 70%) 35%,
+            color-mix(in srgb, var(--secondary-900) 90%, transparent) 0%,
+            color-mix(in srgb, var(--secondary-900) 70%, transparent) 35%,
             transparent 100%
           );
         }

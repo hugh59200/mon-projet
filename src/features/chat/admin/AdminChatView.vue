@@ -128,13 +128,13 @@
     flex-direction: column;
     gap: 16px;
     padding: 24px 32px;
-    background: fade(@neutral-200, 82%);
+    background: color-mix(in srgb, @neutral-200 82%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid fade(@neutral-300, 40%);
+    border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
     box-shadow:
-      0 4px 14px fade(@neutral-900, 6%),
-      inset 0 0 0 1px fade(@neutral-50, 45%);
+      0 4px 14px color-mix(in srgb, @neutral-900 6%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, @neutral-50 45%, transparent);
     min-height: 100vh;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
@@ -155,7 +155,7 @@
       grid-template-columns: 300px 1fr;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
-      box-shadow: 0 2px 8px fade(@neutral-900, 5%);
+      box-shadow: 0 2px 8px color-mix(in srgb, @neutral-900 5%, transparent);
       border: 1px solid @neutral-200;
       align-items: stretch;
       min-height: 600px;

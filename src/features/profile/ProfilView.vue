@@ -160,6 +160,11 @@
         >
           <div class="profil__preferences">
             <BasicCheckbox
+              v-model="isBrownTheme"
+              label="Thème marron"
+            />
+
+            <BasicCheckbox
               v-model="newsletter"
               label="Recevoir les newsletters"
             />
@@ -232,7 +237,7 @@
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
-  import { onMounted, ref, type Ref } from 'vue'
+  import { onMounted, ref, watch, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
@@ -246,6 +251,8 @@
   const { loadProfile, updateProfile, changeAvatar, loadLastOrdersAction, updatePassword } =
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
+
+  const isBrownTheme = ref(false)
 
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
@@ -263,6 +270,11 @@
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
 
+  watch(isBrownTheme, (v) => {
+    const html = document.documentElement
+    html.classList.toggle('theme-brown', v)
+    html.classList.toggle('theme-blue', !v)
+  })
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
   }
@@ -332,10 +344,12 @@
   onMounted(async () => {
     await sections.loadFromSupabase()
     await fetchProfileData()
+    const html = document.documentElement
+    html.classList.add('theme-blue') // thème par défaut
   })
 </script>
 
-<style scoped lang="less">
+<style lang="less">
   /* ==========================================================
      👤 PROFIL — Neural UI v3 (CONTRASTE AMÉLIORÉ)
      ========================================================== */
@@ -368,17 +382,17 @@
       margin: -80px auto 70px;
       padding: 40px;
 
-      background: linear-gradient(90deg, @secondary-700, darken(@secondary-700, 4%));
+      background: linear-gradient(90deg, var(--secondary-700), color-mix(in srgb, black 4%, var(--secondary-700)));
 
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
 
-      border: 1px solid fade(@neutral-300, 22%);
+      border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
       border-radius: 22px;
 
       box-shadow:
         0 18px 55px fade(#000, 45%),
-        inset 0 0 0 1px fade(@neutral-50, 20%);
+        inset 0 0 0 1px color-mix(in srgb, @neutral-50 20%, transparent);
 
       position: relative;
       z-index: 2;
@@ -402,11 +416,11 @@
       height: 120px;
       border-radius: 50%;
 
-      background: fade(@neutral-700, 30%);
-      border: 2px solid fade(@neutral-400, 35%);
+      background: color-mix(in srgb, @neutral-700 30%, transparent);
+      border: 2px solid color-mix(in srgb, @neutral-400 35%, transparent);
 
       box-shadow:
-        0 4px 18px fade(@neutral-900, 35%),
+        0 4px 18px color-mix(in srgb, @neutral-900 35%, transparent),
         0 0 0 3px fade(@white, 10%);
 
       overflow: hidden;
@@ -414,10 +428,10 @@
 
       &:hover {
         transform: scale(1.035);
-        border-color: fade(@primary-500, 45%);
+        border-color: color-mix(in srgb, var(--primary-500) 45%, transparent);
         box-shadow:
-          0 0 20px fade(@primary-500, 35%),
-          0 0 0 3px fade(@primary-400, 20%);
+          0 0 20px color-mix(in srgb, var(--primary-500) 35%, transparent),
+          0 0 0 3px color-mix(in srgb, var(--primary-400) 20%, transparent);
       }
 
       .profil__avatar-placeholder {
@@ -427,7 +441,7 @@
         width: 100%;
         height: 100%;
         color: @neutral-300;
-        background: fade(@neutral-700, 30%);
+        background: color-mix(in srgb, @neutral-700 30%, transparent);
       }
     }
 

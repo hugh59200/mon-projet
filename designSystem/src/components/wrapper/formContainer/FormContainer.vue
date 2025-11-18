@@ -45,13 +45,13 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: @spacing-25;
+    gap: var(--spacing-25);
 
     &__bloc {
       display: grid;
       align-items: end;
       grid-template-columns: repeat(36, 1fr);
-      row-gap: @spacing-25;
+      row-gap: var(--spacing-25);
       column-gap: 2%;
     }
 
@@ -61,7 +61,7 @@
       top: -5px;
       background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 75%, rgba(0, 0, 0, 0) 100%);
       z-index: 2;
-      padding-bottom: @spacing-5;
+      padding-bottom: var(--spacing-5);
     }
 
     &__actions {
@@ -75,7 +75,7 @@
   }
 
   .divider {
-    margin-bottom: @spacing-20;
+    margin-bottom: var(--spacing-20);
     user-select: none;
 
     span {

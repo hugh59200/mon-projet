@@ -302,11 +302,11 @@
       position: relative;
       overflow: hidden;
 
-      background: fade(@secondary-900, 75%);
+      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
 
-      border: 1px solid fade(@neutral-300, 25%);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
       box-shadow:
         0 20px 40px fade(#000, 35%),
         inset 0 0 0 1px fade(@white, 20%);
@@ -327,13 +327,13 @@
       &::before {
         top: -160px;
         left: -120px;
-        background: @primary-400;
+        background: var(--primary-400);
       }
 
       &::after {
         bottom: -160px;
         right: -120px;
-        background: @secondary-400;
+        background: var(--secondary-400);
       }
 
       &-content {
@@ -357,8 +357,8 @@
     &__hero-pill {
       padding: 5px 14px;
       border-radius: 999px;
-      background: fade(@primary-200, 25%);
-      border: 1px solid fade(@primary-500, 30%);
+      background: color-mix(in srgb, var(--primary-200) 25%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary-500) 30%, transparent);
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
@@ -370,7 +370,7 @@
     }
 
     &__hero-disclaimer {
-      color: fade(@neutral-100, 80%) !important;
+      color: color-mix(in srgb, @neutral-100 80%, transparent) !important;
       font-size: 0.9rem;
     }
 
@@ -390,7 +390,7 @@
         border-radius: 20px;
         box-shadow:
           0 16px 32px fade(#000, 40%),
-          0 0 14px fade(@primary-300, 25%);
+          0 0 14px color-mix(in srgb, var(--primary-300) 25%, transparent);
         transition: transform 0.35s ease;
         object-fit: contain;
 
@@ -433,7 +433,7 @@
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
 
-        border: 1px solid fade(@neutral-300, 26%);
+        border: 1px solid color-mix(in srgb, @neutral-300 26%, transparent);
         box-shadow:
           0 12px 26px fade(#000, 32%),
           inset 0 0 0 1px fade(@white, 15%);
@@ -443,10 +443,10 @@
         &:hover {
           transform: translateY(-4px);
           background: fade(@white, 18%);
-          border-color: fade(@primary-400, 30%);
+          border-color: color-mix(in srgb, var(--primary-400) 30%, transparent);
           box-shadow:
             0 18px 34px fade(#000, 40%),
-            0 0 16px fade(@primary-400, 25%);
+            0 0 16px color-mix(in srgb, var(--primary-400) 25%, transparent);
         }
       }
     }
@@ -459,7 +459,7 @@
       background: fade(@white, 10%);
       backdrop-filter: blur(20px);
 
-      border: 1px solid fade(@neutral-300, 22%);
+      border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
       box-shadow:
         0 10px 30px fade(#000, 38%),
         inset 0 0 0 1px fade(@white, 15%);
@@ -485,7 +485,7 @@
       background: fade(@white, 20%);
       backdrop-filter: blur(14px);
 
-      border: 1px solid fade(@neutral-300, 30%);
+      border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
       box-shadow: inset 0 0 0 1px fade(@white, 20%);
 
       transition: all 0.28s ease;
@@ -526,7 +526,7 @@
       backdrop-filter: blur(12px);
       cursor: pointer;
 
-      border: 1px solid fade(@neutral-300, 28%);
+      border: 1px solid color-mix(in srgb, @neutral-300 28%, transparent);
       box-shadow:
         0 10px 28px fade(#000, 32%),
         inset 0 0 0 1px fade(@white, 15%);
@@ -559,7 +559,7 @@
       padding: 36px 24px;
       border-radius: 20px;
 
-      background: linear-gradient(135deg, fade(@primary-600, 75%), fade(@secondary-700, 82%));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-600) 75%, transparent), color-mix(in srgb, var(--secondary-700) 82%, transparent));
       backdrop-filter: blur(18px);
 
       box-shadow:

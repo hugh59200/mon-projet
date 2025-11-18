@@ -71,7 +71,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: @primary-700;
+      color: var(--primary-700);
       margin-bottom: 8px;
     }
 

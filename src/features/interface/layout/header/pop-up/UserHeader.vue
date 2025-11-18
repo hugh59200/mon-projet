@@ -163,7 +163,7 @@
       }
 
       &-fallback {
-        background: @primary-600;
+        background: var(--primary-600);
         width: 100%;
         height: 100%;
         border-radius: 50%;

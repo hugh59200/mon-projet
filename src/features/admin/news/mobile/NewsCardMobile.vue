@@ -102,7 +102,7 @@
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid @neutral-200;
-    background: fade(@neutral-200, 40%);
+    background: color-mix(in srgb, @neutral-200 40%, transparent);
     flex-shrink: 0;
   }
 

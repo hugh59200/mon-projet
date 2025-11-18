@@ -47,7 +47,7 @@
 
   &:not(.dropdown--disabled, .dropdown--readonly) {
     &:hover {
-      border-color: @primary-600;
+      border-color: var(--primary-600);
     }
     &:focus-within {
       box-shadow: @focus-global;
@@ -57,21 +57,21 @@
 
   &--small {
     height: 30px;
-    padding: @spacing-5;
+    padding: var(--spacing-5);
     font-size: @font-size-body-m;
     border-radius: @border-radius-s;
   }
 
   &--medium {
     height: 40px;
-    padding: @spacing-10;
+    padding: var(--spacing-10);
     font-size: @font-size-body-l;
     border-radius: @border-radius-m;
   }
 
   &--large {
     height: 48px;
-    padding: @spacing-10;
+    padding: var(--spacing-10);
     font-size: @font-size-body-l;
     border-radius: @border-radius-l;
   }
@@ -82,7 +82,7 @@
     position: absolute;
     left: 0;
     margin-top: 8px;
-    border: 1px solid fade(@neutral-300, 60%);
+    border: 1px solid color-mix(in srgb, @neutral-300 60%, transparent);
     border-radius: @border-radius-m;
     z-index: @z-dropdown;
     background-color: rgba(255, 255, 255, 0.8);
@@ -117,7 +117,7 @@
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background-color: @primary-500;
+      background-color: var(--primary-500);
     }
 
     &--no-data {

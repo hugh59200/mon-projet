@@ -37,7 +37,7 @@
 
   /* --- Hover / Focus / Disabled --- */
   &:not(.input-container--disabled, .input-container--readonly):hover {
-    border-color: @primary-600;
+    border-color: var(--primary-600);
   }
 
   &:not(
@@ -47,7 +47,7 @@
       .input-container--readonly
     ):focus-within {
     box-shadow: @focus-global;
-    border-color: @primary-600;
+    border-color: var(--primary-600);
   }
 
   &--disabled,

@@ -56,7 +56,7 @@
 <style scoped lang="less">
   .elem {
     svg {
-      fill: @primary-600;
+      fill: var(--primary-600);
     }
 
     &:not(.elem--readonly)&--danger {

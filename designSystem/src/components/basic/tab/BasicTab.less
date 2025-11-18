@@ -4,29 +4,29 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: @spacing-15 @spacing-20;
-  gap: @spacing-5;
-  border-radius: @spacing-10 @spacing-10 0 0;
+  padding: var(--spacing-15) var(--spacing-20);
+  gap: var(--spacing-5);
+  border-radius: var(--spacing-10) var(--spacing-10) 0 0;
   cursor: pointer;
   color: @neutral-600;
-  background-color: fade(@neutral-100, 60%);
+  background-color: color-mix(in srgb, @neutral-100 60%, transparent);
   transition: all 0.25s ease;
   font-weight: 500;
   border-bottom: 3px solid transparent; // base neutre
 
   &:hover {
-    background-color: fade(@neutral-200, 80%);
-    color: @primary-700;
+    background-color: color-mix(in srgb, @neutral-200 80%, transparent);
+    color: var(--primary-700);
   }
 
   /* ✅ Onglet actif — mise en avant claire */
   &--selected {
     background-color: @white;
-    color: @primary-700;
+    color: var(--primary-700);
     font-weight: 600;
-    border-bottom: 3px solid @primary-600; // ligne visible sous l'onglet
+    border-bottom: 3px solid var(--primary-600); // ligne visible sous l'onglet
     z-index: 2;
-    box-shadow: 0 2px 8px fade(@primary-500, 15%);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-500) 15%, transparent);
   }
 
   /* ⚪ Onglet inactif */

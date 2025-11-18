@@ -67,7 +67,7 @@
   .compact-toast {
     display: flex;
     align-items: center;
-    background: fade(@neutral-900, 95%);
+    background: color-mix(in srgb, @neutral-900 95%, transparent);
     color: white;
     border-radius: 8px;
     padding: 8px 10px;

@@ -183,14 +183,14 @@
             background: @success-500;
             display: inline-block;
             margin-right: 4px;
-            box-shadow: 0 0 5px fade(@success-500, 40%);
+            box-shadow: 0 0 5px color-mix(in srgb, @success-500 40%, transparent);
 
             &::after {
               content: '';
               position: absolute;
               inset: 0;
               border-radius: 50%;
-              background: fade(@success-500, 35%);
+              background: color-mix(in srgb, @success-500 35%, transparent);
               animation: pulse-status 2s infinite ease-in-out;
             }
           }
@@ -225,7 +225,7 @@
 
         &:focus {
           outline: none;
-          border-color: @primary-500;
+          border-color: var(--primary-500);
         }
       }
 
@@ -253,10 +253,10 @@
       overflow-y: auto;
       scrollbar-width: thin;
       scroll-behavior: smooth;
-      background: fade(@primary-200, 75%);
+      background: color-mix(in srgb, var(--primary-200) 75%, transparent);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid fade(@neutral-300, 25%);
+      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
     }
 
     .no-conv {

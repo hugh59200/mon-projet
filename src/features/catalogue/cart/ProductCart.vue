@@ -63,13 +63,13 @@
     justify-content: space-between;
     gap: 12px;
 
-    background: fade(@neutral-200, 82%);
+    background: color-mix(in srgb, @neutral-200 82%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid fade(@neutral-300, 40%);
+    border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
     box-shadow:
-      0 4px 14px fade(@neutral-900, 6%),
-      inset 0 0 0 1px fade(@neutral-50, 45%);
+      0 4px 14px color-mix(in srgb, @neutral-900 6%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, @neutral-50 45%, transparent);
 
     border-radius: 16px;
     padding: 18px;
@@ -83,9 +83,9 @@
       transform: translateY(-4px);
       box-shadow:
         0 18px 38px fade(#000, 28%),
-        0 0 14px fade(@primary-400, 25%),
+        0 0 14px color-mix(in srgb, var(--primary-400) 25%, transparent),
         inset 0 0 0 1px fade(@white, 30%);
-      border-color: fade(@primary-400, 30%);
+      border-color: color-mix(in srgb, var(--primary-400) 30%, transparent);
     }
 
     &__image {
@@ -118,7 +118,7 @@
     }
 
     &__price {
-      color: @primary-700;
+      color: var(--primary-700);
       font-size: 1.05rem;
       margin-top: 2px;
     }

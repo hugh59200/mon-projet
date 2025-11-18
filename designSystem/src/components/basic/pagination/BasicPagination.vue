@@ -136,8 +136,8 @@
     border-radius: 6px;
 
     &--active {
-      background: @primary-100;
-      color: @primary-800;
+      background: var(--primary-100);
+      color: var(--primary-800);
       font-weight: 600;
     }
 

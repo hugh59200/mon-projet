@@ -154,17 +154,17 @@
       border-radius: 50%;
       cursor: pointer;
 
-      background: fade(@secondary-900, 55%);
+      background: color-mix(in srgb, var(--secondary-900) 55%, transparent);
       backdrop-filter: blur(6px);
 
-      border: 1px solid fade(@neutral-500, 8%);
+      border: 1px solid color-mix(in srgb, @neutral-500 8%, transparent);
 
       transition: all 0.25s ease;
 
       /* ✨ Glow hover */
       &:hover {
-        background: fade(@secondary-900, 70%);
-        box-shadow: 0 0 8px fade(@primary-500, 25%);
+        background: color-mix(in srgb, var(--secondary-900) 70%, transparent);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--primary-500) 25%, transparent);
         transform: translateY(-1px);
       }
 
@@ -180,7 +180,7 @@
         top: -2px;
         right: -2px;
 
-        background: @primary-700;
+        background: var(--primary-700);
         color: white;
 
         width: 15px;
@@ -194,7 +194,7 @@
         font-size: 11px;
         font-weight: bold;
 
-        box-shadow: 0 0 0 2px fade(@secondary-900, 80%);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary-900) 80%, transparent);
       }
     }
 
@@ -239,7 +239,7 @@
         color: @danger-400 !important;
 
         &:hover {
-          background: fade(@danger-400, 10%);
+          background: color-mix(in srgb, @danger-400 10%, transparent);
         }
       }
     }

@@ -161,8 +161,8 @@
         inset: 0;
         background: linear-gradient(
           to top,
-          fade(@neutral-900, 85%) 0%,
-          fade(@neutral-900, 40%) 100%
+          color-mix(in srgb, @neutral-900 85%, transparent) 0%,
+          color-mix(in srgb, @neutral-900 40%, transparent) 100%
         );
         display: flex;
         align-items: flex-end;

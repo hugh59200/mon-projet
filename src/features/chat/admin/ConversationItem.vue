@@ -84,16 +84,16 @@
 <style scoped lang="less">
   .conversation-item.new-message {
     animation: flash 0.8s ease-out;
-    border-color: @primary-600;
-    box-shadow: 0 0 6px fade(@primary-600, 40%);
+    border-color: var(--primary-600);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--primary-600) 40%, transparent);
   }
 
   @keyframes flash {
     0% {
-      background: fade(@primary-600, 35%);
+      background: color-mix(in srgb, var(--primary-600) 35%, transparent);
     }
     50% {
-      background: fade(@primary-600, 10%);
+      background: color-mix(in srgb, var(--primary-600) 10%, transparent);
     }
     100% {
       background: transparent;
@@ -119,7 +119,7 @@
       left: 52px;
       right: 10px;
       height: 1px;
-      background: fade(@neutral-300, 30%);
+      background: color-mix(in srgb, @neutral-300 30%, transparent);
       transition: opacity 0.25s ease;
     }
 
@@ -128,9 +128,9 @@
     }
 
     &:hover {
-      background: fade(@primary-600, 7%);
-      border-color: fade(@primary-600, 12%);
-      box-shadow: 0 2px 6px fade(@primary-600, 8%);
+      background: color-mix(in srgb, var(--primary-600) 7%, transparent);
+      border-color: color-mix(in srgb, var(--primary-600) 12%, transparent);
+      box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-600) 8%, transparent);
       transform: translateY(-1px);
 
       &::after {
@@ -139,12 +139,12 @@
     }
 
     &.active {
-      background: fade(@primary-600, 16%);
-      border-left: 4px solid @primary-600;
-      border-color: fade(@primary-600, 25%);
+      background: color-mix(in srgb, var(--primary-600) 16%, transparent);
+      border-left: 4px solid var(--primary-600);
+      border-color: color-mix(in srgb, var(--primary-600) 25%, transparent);
       box-shadow:
-        inset 3px 0 0 fade(@primary-600, 18%),
-        0 1px 6px fade(@primary-600, 10%);
+        inset 3px 0 0 color-mix(in srgb, var(--primary-600) 18%, transparent),
+        0 1px 6px color-mix(in srgb, var(--primary-600) 10%, transparent);
       transform: translateY(0);
 
       &::after {
@@ -162,12 +162,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: @primary-600;
+      color: var(--primary-600);
       transition: all 0.2s ease;
 
       .conversation-item:hover & {
-        border-color: fade(@primary-600, 30%);
-        color: @primary-700;
+        border-color: color-mix(in srgb, var(--primary-600) 30%, transparent);
+        color: var(--primary-700);
       }
     }
 
@@ -188,7 +188,7 @@
         transition: color 0.2s ease;
 
         .conversation-item:hover & {
-          color: @primary-700;
+          color: var(--primary-700);
         }
       }
 
@@ -259,7 +259,7 @@
           }
 
           .badge {
-            background: @primary-600;
+            background: var(--primary-600);
             color: white;
             font-size: 12px;
             font-weight: 600;
@@ -270,7 +270,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 6px;
-            box-shadow: 0 1px 3px fade(@primary-600, 30%);
+            box-shadow: 0 1px 3px color-mix(in srgb, var(--primary-600) 30%, transparent);
           }
         }
       }

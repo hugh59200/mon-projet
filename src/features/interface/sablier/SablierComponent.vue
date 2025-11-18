@@ -48,7 +48,7 @@
     border-radius: 30px;
 
     .loading {
-      color: @primary-800;
+      color: var(--primary-800);
       padding-bottom: 10px;
       display: block;
       max-width: 1000px;
@@ -60,7 +60,7 @@
   .spinner > div {
     width: 18px;
     height: 18px;
-    background-color: @primary-800;
+    background-color: var(--primary-800);
     border-radius: 100%;
     display: inline-block;
     -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;

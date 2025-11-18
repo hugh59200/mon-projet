@@ -44,12 +44,12 @@
     border: 1px solid @neutral-200;
     border-radius: 10px;
     padding: 16px 18px;
-    box-shadow: 0 1px 3px fade(@neutral-900, 5%);
+    box-shadow: 0 1px 3px color-mix(in srgb, @neutral-900 5%, transparent);
     transition: all 0.2s ease-in-out;
     gap: 10px;
 
     &.hoverable:hover {
-      box-shadow: 0 2px 6px fade(@neutral-900, 10%);
+      box-shadow: 0 2px 6px color-mix(in srgb, @neutral-900 10%, transparent);
       transform: translateY(-1px);
     }
 

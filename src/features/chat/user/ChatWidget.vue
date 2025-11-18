@@ -116,7 +116,7 @@
     /* ------------------------- Bouton principal ------------------------- */
     .chat-toggle {
       position: relative;
-      background: @primary-600;
+      background: var(--primary-600);
       color: white;
       border: none;
       border-radius: 50%;
@@ -134,7 +134,7 @@
 
       &:hover {
         transform: scale(1.05);
-        background: @primary-700;
+        background: var(--primary-700);
       }
 
       .chat-badge {
@@ -172,7 +172,7 @@
 
     /* ------------------------- Header modernisé ------------------------- */
     .chat-header {
-      background: linear-gradient(135deg, @primary-700, @primary-600);
+      background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
       color: white;
       padding: 10px 14px;
       display: flex;

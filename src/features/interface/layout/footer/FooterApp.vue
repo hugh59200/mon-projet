@@ -167,7 +167,7 @@
     z-index: 1;
     width: 100%;
 
-    background: linear-gradient(90deg, darken(@secondary-900, 2%), darken(@secondary-900, 6%));
+    background: linear-gradient(90deg, color-mix(in srgb, black 2%, var(--secondary-900)), color-mix(in srgb, black 6%, var(--secondary-900)));
 
     padding: 60px 40px 30px;
 
@@ -175,7 +175,7 @@
     flex-direction: column;
     gap: 60px;
 
-    border-top: 1px solid fade(@primary-500, 10%);
+    border-top: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
     box-shadow: 0 -4px 18px fade(#000, 45%);
 
     backdrop-filter: blur(10px);
@@ -210,18 +210,18 @@
         flex: 1;
         padding: 26px 28px;
 
-        background: fade(@neutral-900, 65%);
-        border: 1px solid fade(@neutral-100, 10%);
+        background: color-mix(in srgb, @neutral-900 65%, transparent);
+        border: 1px solid color-mix(in srgb, @neutral-100 10%, transparent);
         border-radius: 14px;
 
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
 
         box-shadow:
-          inset 0 0 0 1px fade(@neutral-50, 15%),
+          inset 0 0 0 1px color-mix(in srgb, @neutral-50 15%, transparent),
           0 8px 26px fade(#000, 55%);
 
-        color: fade(@neutral-200, 90%);
+        color: color-mix(in srgb, @neutral-200 90%, transparent);
         line-height: 1.55;
 
         position: relative;
@@ -241,7 +241,7 @@
           grid-template-columns: repeat(2, 1fr);
 
           strong {
-            color: @primary-300;
+            color: var(--primary-300);
           }
         }
       }
@@ -266,12 +266,12 @@
       display: block;
       font-size: 14px;
       margin: 6px 0;
-      color: fade(@neutral-200, 85%);
+      color: color-mix(in srgb, @neutral-200 85%, transparent);
       text-decoration: none;
       transition: 0.2s ease;
 
       &:hover {
-        color: @primary-300;
+        color: var(--primary-300);
       }
     }
 
@@ -288,20 +288,20 @@
      BOTTOM BAR
   ====================================================== */
     &__bottom {
-      border-top: 1px solid fade(@neutral-100, 10%);
+      border-top: 1px solid color-mix(in srgb, @neutral-100 10%, transparent);
       padding-top: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
 
-      color: fade(@neutral-300, 85%);
+      color: color-mix(in srgb, @neutral-300 85%, transparent);
 
       .footer__version {
         cursor: pointer;
         transition: color 0.25s ease;
 
         &:hover {
-          color: @primary-300;
+          color: var(--primary-300);
         }
       }
     }

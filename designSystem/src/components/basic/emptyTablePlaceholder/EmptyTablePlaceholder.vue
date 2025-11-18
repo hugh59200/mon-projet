@@ -33,7 +33,7 @@
       justify-content: center;
       align-items: center;
       border-radius: 20px;
-      background-color: @secondary-800;
+      background-color: var(--secondary-800);
       padding: 24px 48px;
       max-width: 60%;
       min-height: 180px;

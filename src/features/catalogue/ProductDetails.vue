@@ -206,7 +206,7 @@
     }
 
     &__price {
-      color: @primary-700;
+      color: var(--primary-700);
     }
 
     &__actions {

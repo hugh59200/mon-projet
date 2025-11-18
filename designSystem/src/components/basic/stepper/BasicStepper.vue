@@ -31,7 +31,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: @spacing-15;
+    gap: var(--spacing-15);
   }
 
   @container (max-width: @breakpoint-mobile) {

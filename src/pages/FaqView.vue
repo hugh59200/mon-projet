@@ -394,9 +394,9 @@
       height: fit-content;
 
       &-card {
-        background: fade(@neutral-50, 40%);
+        background: color-mix(in srgb, @neutral-50 40%, transparent);
         backdrop-filter: blur(14px);
-        border: 1px solid fade(@neutral-300, 40%);
+        border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
         border-radius: 16px;
         box-shadow: 0 4px 20px fade(#000, 10%);
         padding: 20px;
@@ -431,8 +431,8 @@
       gap: 6px;
       padding: 8px 10px;
       border-radius: 8px;
-      background: fade(@danger-500, 10%);
-      border: 1px solid fade(@danger-500, 30%);
+      background: color-mix(in srgb, @danger-500 10%, transparent);
+      border: 1px solid color-mix(in srgb, @danger-500 30%, transparent);
     }
 
     /* FOOTER */
@@ -443,7 +443,7 @@
       justify-content: center;
       gap: 16px;
       padding-top: 20px;
-      border-top: 1px solid fade(@neutral-300, 40%);
+      border-top: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
     }
   }
 </style>

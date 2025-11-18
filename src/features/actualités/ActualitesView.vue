@@ -181,7 +181,7 @@
       justify-content: flex-end;
       padding: 20px;
       color: white;
-      background: linear-gradient(to top, fade(@neutral-900, 88%) 0%, fade(@neutral-900, 55%) 100%);
+      background: linear-gradient(to top, color-mix(in srgb, @neutral-900 88%, transparent) 0%, color-mix(in srgb, @neutral-900 55%, transparent) 100%);
       transition: background 0.3s ease;
 
       .topic-title {
@@ -223,7 +223,7 @@
     background: white;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 3px 10px fade(@neutral-900, 5%);
+    box-shadow: 0 3px 10px color-mix(in srgb, @neutral-900 5%, transparent);
     text-decoration: none;
     color: inherit;
     transition:
@@ -232,13 +232,13 @@
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 6px 16px fade(@neutral-900, 10%);
+      box-shadow: 0 6px 16px color-mix(in srgb, @neutral-900 10%, transparent);
     }
 
     img {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-bottom: 1px solid fade(@neutral-900, 10%);
+      border-bottom: 1px solid color-mix(in srgb, @neutral-900 10%, transparent);
       object-fit: cover;
       object-position: center;
       transition: transform 0.4s ease;
@@ -287,11 +287,11 @@
         }
 
         :deep(a) {
-          color: @primary-600;
+          color: var(--primary-600);
           text-decoration: underline;
 
           &:hover {
-            color: @primary-800;
+            color: var(--primary-800);
           }
         }
 
