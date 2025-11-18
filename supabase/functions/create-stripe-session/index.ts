@@ -1,7 +1,9 @@
+// functions/create-stripe-session/index.ts
+
 import { PAYMENT_CANCEL_URL, PAYMENT_SUCCESS_URL_BASE, supabase } from '../../utils/clients.ts'
 
 import { createHandler } from '../../utils/createHandler.ts'
-import { createCheckoutSession } from '../../utils/stripeClient.ts'
+import { stripeCreateCheckoutSession } from '../../utils/stripeClient.ts'
 
 interface Payload {
   amount: number
@@ -31,9 +33,8 @@ Deno.serve(
       'line_items[0][quantity]': '1',
     }
 
-    const session = await createCheckoutSession(params)
+    const session = await stripeCreateCheckoutSession(params)
 
-    // Mise à jour DB
     await supabase
       .from('orders')
       .update({
