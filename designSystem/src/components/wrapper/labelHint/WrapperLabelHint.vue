@@ -47,7 +47,7 @@
     caret-color: transparent;
 
     ::v-deep(.basic-hint) {
-      padding-top: var(--spacing-5);
+      padding-top: @spacing-5;
     }
   }
 
@@ -57,7 +57,7 @@
 
   .wrapper__hint {
     height: 14px;
-    margin-top: calc(-var(--spacing-5));
-    margin-bottom: var(--spacing-5);
+    margin-top: calc(-@spacing-5);
+    margin-bottom: @spacing-5;
   }
 </style>

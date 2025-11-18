@@ -1,8 +1,8 @@
-@import './BasicPopupMixin.less';
+@import "./BasicPopupMixin.less";
 
 .popup {
   width: 400px;
-  padding: var(--spacing-10) var(--spacing-15);
+  padding: @spacing-10 @spacing-15;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -17,7 +17,7 @@
   }
 
   .mainIcon {
-    margin: 0 var(--spacing-15) 0 var(--spacing-5);
+    margin: 0 @spacing-15 0 @spacing-5;
   }
 
   .closeIconMask {
@@ -54,7 +54,7 @@
 
   .firstParagraph,
   .secondParagraph {
-    margin: var(--spacing-10) 0;
+    margin: @spacing-10 0;
   }
 
   &--primary,

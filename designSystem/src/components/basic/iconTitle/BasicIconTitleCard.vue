@@ -41,8 +41,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: var(--spacing-10);
-    border-radius: var(--spacing-10);
+    padding: @spacing-10;
+    border-radius: @spacing-10;
     border: 1px solid @neutral-200;
     gap: 8px;
     cursor: pointer;
@@ -52,7 +52,7 @@
       border-color 0.3s ease;
 
     svg {
-      padding-top: var(--spacing-10);
+      padding-top: @spacing-10;
       height: 100%;
       fill: var(--secondary-100);
       transition: fill 0.3s ease;

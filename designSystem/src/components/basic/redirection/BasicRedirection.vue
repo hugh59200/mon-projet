@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount } from 'vue'
+  import { onBeforeUnmount, onMounted, ref } from 'vue'
   import type { BasicRedirectionProps } from './BasicRedirection.types'
 
   const props = withDefaults(defineProps<BasicRedirectionProps>(), {
@@ -59,13 +59,13 @@
   .basic-redirection {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-15);
+    gap: @spacing-15;
 
     &__bottom {
       position: relative;
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-15);
+      gap: @spacing-15;
     }
 
     &__affix {

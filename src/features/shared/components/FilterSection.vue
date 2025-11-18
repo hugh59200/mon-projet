@@ -74,11 +74,6 @@
     overflow: hidden;
     transition: all 0.25s ease;
 
-    &:hover {
-      background: fade(@white, 88%);
-      border-color: color-mix(in srgb, var(--primary-500) 35%, transparent);
-    }
-
     /* ----------------------------------------------------------
      HEADER
   ---------------------------------------------------------- */
@@ -98,10 +93,6 @@
       transition: all 0.25s ease;
 
       /* Hover effect */
-      &:hover {
-        background: color-mix(in srgb, @neutral-900 4%, transparent);
-        backdrop-filter: blur(14px);
-      }
 
       /* Chevron */
       svg {

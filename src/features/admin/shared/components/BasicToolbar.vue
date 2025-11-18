@@ -61,12 +61,12 @@
   const role = computed(() => auth.profile?.role || 'user')
   const roleLabel = computed(() => (role.value === 'admin' ? 'Administrateur' : 'Utilisateur'))
 
-  const open = ref(false) // fermé par défaut pour gagner de la place
+  const open = ref(false)
 </script>
 
 <style scoped lang="less">
   .toolbar-section {
-    margin-bottom: 16px;
+    margin: 16px;
   }
 
   .basic-toolbar {

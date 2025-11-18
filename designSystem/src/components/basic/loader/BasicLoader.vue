@@ -38,7 +38,7 @@
   }
 
   const colorMap = {
-    primary: '#00a48b',
+    primary: '#FFFFFF',
     neutral: '#999',
     danger: '#d32f2f',
   }
@@ -51,9 +51,11 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    color: white;
   }
 
   .loader {
+    color: white;
     border-radius: 50%;
     border-style: solid;
     border-color: transparent;

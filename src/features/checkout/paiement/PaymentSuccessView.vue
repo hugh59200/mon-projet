@@ -111,7 +111,7 @@
   }
 
   async function handlePaypalSuccess(orderId: string) {
-    const { data, error } = await supabase.functions.invoke('capture-paypal-order', {
+    const { error } = await supabase.functions.invoke('capture-paypal-order', {
       body: { orderId },
     })
 

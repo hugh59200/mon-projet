@@ -1,6 +1,6 @@
 import { useProfilePreferencesActions } from '@/supabase/actions/useProfilePreferencesActions'
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '../auth/stores/useAuthStore'
 
 export const useProfileSectionsStore = defineStore(
@@ -46,10 +46,6 @@ export const useProfileSectionsStore = defineStore(
 
       await save(auth.user.id, prefs)
     }
-
-    watch([personal, orders, preferences, security, support], saveToSupabase, {
-      deep: true,
-    })
 
     return {
       personal,

@@ -3,12 +3,71 @@
   align-items: center;
   flex-wrap: wrap;
 
+  &--small {
+    .pagination__button {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
+    .pagination__span {
+      font-size: 12px;
+      margin-left: 10px;
+    }
+
+    .arrow {
+      transform: scale(0.55);
+    }
+  }
+
+  /* ---------- MEDIUM (défaut) ---------- */
+  &--medium {
+    .pagination__button {
+      min-width: 26px;
+      height: 26px;
+      padding: 0 10px;
+      margin: @spacing-5;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+
+    .pagination__span {
+      font-size: 14px;
+      margin-left: 14px;
+    }
+
+    .arrow {
+      transform: scale(0.7);
+    }
+  }
+
+  /* ---------- LARGE ---------- */
+  &--large {
+    .pagination__button {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 14px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    .pagination__span {
+      font-size: 16px;
+      margin-left: 18px;
+    }
+
+    .arrow {
+      transform: scale(0.95);
+    }
+  }
+
   > * {
-    margin: var(--spacing-5) 0;
+    margin: @spacing-5 0;
   }
 
   &__span {
-    color: var(--secondary-800);
     margin-left: 16px;
   }
 
@@ -25,8 +84,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 var(--spacing-5);
-    margin: var(--spacing-5);
+    padding: 0 @spacing-5;
+    margin: @spacing-5;
     border: 1px solid @neutral-200;
     border-radius: @border-radius-s;
 
@@ -63,7 +122,7 @@
 
 .arrow {
   cursor: pointer;
-  fill: var(--secondary-800);
+  fill: white;
   transition:
     fill 0.3s ease,
     opacity 0.3s ease;
@@ -75,7 +134,7 @@
   }
 
   &--disabled {
-    fill: @neutral-200;
+    fill: white;
     cursor: auto;
   }
 }

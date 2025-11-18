@@ -16,8 +16,7 @@
         <BasicButton
           :disabled="!canMovePrevious"
           label="Précédent"
-          type="secondary"
-          variant="ghost"
+          variant="outlined"
           size="small"
           iconName="ArrowLeft"
           @click="handleMovePrevious"
@@ -25,8 +24,7 @@
         <BasicButton
           :disabled="!canMoveNext"
           label="Suivant"
-          type="secondary"
-          variant="ghost"
+          variant="outlined"
           size="small"
           iconRight
           iconName="ArrowRight"
@@ -99,10 +97,9 @@
       box-shadow:
         0 8px 28px fade(#000, 35%),
         inset 0 0 0 1px fade(@white, 12%);
-      padding: var(--spacing-20) 0;
+      padding: @spacing-20 0;
       display: flex;
       flex-direction: column;
-      gap: 24px;
       overflow: hidden;
     }
 
@@ -111,7 +108,7 @@
     }
 
     &__content {
-      padding: 0 var(--spacing-15) 0 var(--spacing-20);
+      padding: 0 @spacing-15 0 @spacing-20;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -119,13 +116,13 @@
 
     .scroll-container {
       flex: 1;
-      margin-right: var(--spacing-5);
+      margin-right: @spacing-5;
       overflow: hidden;
     }
 
     @media (max-width: 1000px) {
       &__header {
-        padding: 0 var(--spacing-20);
+        padding: 0 @spacing-20;
         display: flex;
         justify-content: space-between;
         align-items: center;

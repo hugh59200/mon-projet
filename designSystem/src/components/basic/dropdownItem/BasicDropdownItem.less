@@ -2,7 +2,7 @@
   background-color: @white;
   display: flex;
   align-items: center;
-  padding: var(--spacing-10) var(--spacing-10);
+  padding: @spacing-10 @spacing-10;
   cursor: pointer;
   transition: background-color 0.2s;
   color: var(--secondary-100);
@@ -31,6 +31,10 @@
   &--active {
     background-color: var(--secondary-800);
     color: @white;
+
+    .dropdown-item__label {
+      color: white;
+    }
     .icon {
       fill: @white;
     }

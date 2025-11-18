@@ -17,7 +17,10 @@
         :name="iconName"
         :class="['icon', `icon--${size}`]"
       />
-      <BasicText class="dropdown-item__label">
+      <BasicText
+        class="dropdown-item__label"
+        color="neutral-800"
+      >
         {{ label }}
       </BasicText>
     </slot>

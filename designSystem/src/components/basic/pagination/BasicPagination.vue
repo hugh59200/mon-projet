@@ -1,17 +1,16 @@
 <template>
   <div
     class="pagination"
+    :class="`pagination--${props.size ?? 'medium'}`"
     v-if="nbPages > 1"
   >
-    <!-- Flèche gauche -->
     <BasicIcon
       name="arrow-left"
       active
       :class="{ 'arrow--disabled': currentPage === 1, arrow: true }"
       @click="prevPage"
+      color="white"
     />
-
-    <!-- Pages -->
     <div
       v-for="page in pages"
       :key="page.num"
@@ -28,19 +27,16 @@
         {{ page.type === 'ellipse' ? '…' : page.num }}
       </BasicText>
     </div>
-
-    <!-- Flèche droite -->
     <BasicIcon
       name="arrow-right"
       active
       :class="{ 'arrow--disabled': currentPage === nbPages, arrow: true }"
       @click="nextPage"
     />
-
-    <!-- Résumé des résultats -->
     <BasicText
       v-if="nbResults && nbResults > 0"
       class="pagination__span"
+      color="white"
     >
       {{ nbResults }} résultat{{ nbResults > 1 ? 's' : '' }}
     </BasicText>
@@ -60,26 +56,27 @@
     currentPage: number
     nbPagesMax: number
     nbResults?: number
-    autoFetch?: () => Promise<void> // 🧩 optionnelle : intégration directe avec fetchData
+    autoFetch?: () => Promise<void>
+    size?: 'small' | 'medium' | 'large'
   }>()
 
   const emit = defineEmits<{
     (e: 'change', page: number): void
   }>()
 
-  // --- Navigation
   const prevPage = () => {
     if (props.currentPage > 1) emit('change', props.currentPage - 1)
   }
+
   const nextPage = () => {
     if (props.currentPage < props.nbPages) emit('change', props.currentPage + 1)
   }
+
   const goToPage = (page: Page) => {
     if (page.type === 'ellipse') return
     if (page.num > 0 && page.num <= props.nbPages) emit('change', page.num)
   }
 
-  // --- Pagination dynamique
   const pages = computed(() => {
     let result = Array.from(Array(props.nbPages).keys()).map<Page>((index) => ({
       type: 'num',
@@ -108,7 +105,6 @@
     return result
   })
 
-  // --- 🔁 Auto-fetch quand la page change (intégration directe avec useAdminTable)
   watch(
     () => props.currentPage,
     async () => {

@@ -41,6 +41,7 @@ declare module 'vue' {
     BasicTabs: typeof import('./../designSystem/src/components/basic/tabs/BasicTabs.vue')['default']
     BasicTag: typeof import('./../designSystem/src/components/basic/tag/BasicTag.vue')['default']
     BasicText: typeof import('./../designSystem/src/components/basic/text/BasicText.vue')['default']
+    BasicThemeSelector: typeof import('./../designSystem/src/components/basic/theme/BasicThemeSelector.vue')['default']
     BasicToast: typeof import('./../designSystem/src/components/basic/toast/BasicToast.vue')['default']
     BasicToggleSwitch: typeof import('./../designSystem/src/components/basic/toggleSwitch/BasicToggleSwitch.vue')['default']
     BasicTooltip: typeof import('./../designSystem/src/components/basic/tooltip/BasicTooltip.vue')['default']

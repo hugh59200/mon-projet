@@ -1,11 +1,7 @@
 <template>
   <footer class="footer">
     <div class="footer__main">
-      <!-- 🔹 Bloc logo + disclaimer (horizontal quand desktop) -->
-      <div
-        v-if="isDesktop"
-        class="footer__brand"
-      >
+      <div class="footer__brand">
         <div class="footer__brand-left">
           <img
             src="@/assets/logo-app.png"
@@ -13,7 +9,6 @@
             class="footer__logo"
           />
         </div>
-
         <div class="footer__brand-right">
           <div class="footer__disclaimer">
             <BasicIconNext
@@ -53,8 +48,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 🔹 Liens (centrés verticalement par rapport au bloc de gauche) -->
       <div class="footer__columns">
         <div class="footer__col">
           <BasicText
@@ -71,7 +64,6 @@
             <li><RouterLink to="/faq">FAQ</RouterLink></li>
           </ul>
         </div>
-
         <div class="footer__col">
           <BasicText
             size="h5"
@@ -87,7 +79,6 @@
             <li><RouterLink to="/auth/register">Inscription</RouterLink></li>
           </ul>
         </div>
-
         <div class="footer__col">
           <BasicText
             size="h5"
@@ -103,7 +94,6 @@
             <!-- <li><RouterLink to="/terms">CGU</RouterLink></li> -->
           </ul>
         </div>
-
         <div class="footer__col">
           <BasicText
             size="h5"
@@ -135,8 +125,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 🔹 Bas de page -->
     <div class="footer__bottom">
       <BasicText
         size="body-s"
@@ -155,51 +143,35 @@
     </div>
   </footer>
 </template>
-
-<script setup lang="ts">
-  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  const { isDesktop } = useDeviceBreakpoint()
-</script>
-
+<script setup lang="ts"></script>
 <style scoped lang="less">
   .footer {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-
-    background: linear-gradient(90deg, color-mix(in srgb, black 2%, var(--secondary-900)), color-mix(in srgb, black 6%, var(--secondary-900)));
-
-    padding: 60px 40px 30px;
-
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, black 2%, var(--secondary-900)),
+      color-mix(in srgb, black 6%, var(--secondary-900))
+    );
+    padding: 60px 40px;
     display: flex;
     flex-direction: column;
     gap: 60px;
-
     border-top: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
     box-shadow: 0 -4px 18px fade(#000, 45%);
-
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 
-    /* ======================================================
-     MAIN CONTENT
-  ====================================================== */
     &__main {
       display: flex;
-      flex-wrap: wrap;
-      gap: 60px;
       justify-content: space-between;
+      align-items: flex-start;
+      gap: 60px;
+      flex-wrap: wrap;
     }
 
-    /* ======================================================
-     BRAND BLOCK (Logo + disclaimer)
-  ====================================================== */
     &__brand {
       display: flex;
       gap: 40px;
       align-items: flex-start;
-      flex: 1.4;
-      min-width: 380px;
+      flex: 1 1 380px;
 
       .footer__logo {
         width: clamp(140px, 15vw, 220px);
@@ -213,9 +185,7 @@
         background: color-mix(in srgb, @neutral-900 65%, transparent);
         border: 1px solid color-mix(in srgb, @neutral-100 10%, transparent);
         border-radius: 14px;
-
         backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
 
         box-shadow:
           inset 0 0 0 1px color-mix(in srgb, @neutral-50 15%, transparent),
@@ -223,7 +193,6 @@
 
         color: color-mix(in srgb, @neutral-200 90%, transparent);
         line-height: 1.55;
-
         position: relative;
 
         .footer__quote-icon {
@@ -247,14 +216,17 @@
       }
     }
 
-    /* ======================================================
-     COLUMNS BLOCK
-  ====================================================== */
     &__columns {
-      flex: 1.4;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 40px 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+
+      flex: 1 1 380px;
+
+      .footer__col {
+        min-width: 150px;
+        flex: 1 1 170px;
+      }
     }
 
     &__col-title {
@@ -275,18 +247,12 @@
       }
     }
 
-    /* ======================================================
-     NEWSLETTER
-  ====================================================== */
     &__newsletter {
       margin-top: 12px;
       display: flex;
       gap: 8px;
     }
 
-    /* ======================================================
-     BOTTOM BAR
-  ====================================================== */
     &__bottom {
       border-top: 1px solid color-mix(in srgb, @neutral-100 10%, transparent);
       padding-top: 18px;
@@ -306,21 +272,14 @@
       }
     }
 
-    /* ======================================================
-     RESPONSIVE
-  ====================================================== */
-    @media (max-width: 1500px) {
+    @media (max-width: 1200px) {
       .footer__disclaimer-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 900px) {
       padding: 50px 28px 30px;
-
-      .footer__main {
-        flex-direction: column;
-      }
 
       .footer__brand {
         flex-direction: column;
@@ -334,10 +293,6 @@
 
     @media (max-width: 700px) {
       padding: 50px 20px 20px;
-
-      &__columns {
-        grid-template-columns: 1fr;
-      }
 
       &__bottom {
         flex-direction: column;

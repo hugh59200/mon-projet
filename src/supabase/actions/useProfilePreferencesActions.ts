@@ -17,7 +17,6 @@ export function useProfilePreferencesActions() {
   async function save(userId: string, prefs: string) {
     try {
       await updateUiPreferences(userId, prefs)
-      toast.show('Préférences sauvegardées ✅', 'success')
     } catch (err: any) {
       toast.show(`Erreur sauvegarde : ${err.message}`, 'danger')
     }

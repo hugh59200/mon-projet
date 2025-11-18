@@ -13,6 +13,7 @@
       :nb-pages-max="5"
       :auto-fetch="fetchData"
       @change="page = $event"
+      size="small"
     />
     <WrapperLoader
       :loading="loading"

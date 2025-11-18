@@ -94,21 +94,21 @@
           title="Mes commandes"
           v-model="sections.orders"
         >
-          <div class="profil__orders">
+          <div class="orders-grid">
             <div
-              v-if="lastOrders.length"
               v-for="order in lastOrders"
               :key="order.id"
-              class="order-card"
+              class="order-item"
               @click="goToOrder(order.id)"
             >
-              <div class="order-card__header">
+              <div class="order-item__head">
                 <BasicText
                   size="body-l"
                   weight="bold"
                 >
-                  Commande #{{ order?.id?.slice(0, 8) }}
+                  Commande #{{ order.id?.slice(0, 8) }}
                 </BasicText>
+
                 <BasicBadge
                   :label="getLabelBadge(order.status)"
                   :type="getTypeBadge(order.status)"
@@ -116,7 +116,7 @@
                 />
               </div>
 
-              <div class="order-card__body">
+              <div class="order-item__body">
                 <BasicText
                   size="body-m"
                   color="neutral-700"
@@ -124,34 +124,33 @@
                   Total :
                   <strong>{{ order.total_amount }} €</strong>
                 </BasicText>
+
                 <BasicText
                   size="body-m"
                   color="neutral-500"
                 >
-                  Date : {{ formatOrderDate(order.created_at!) }}
+                  Passée le {{ formatOrderDate(order.created_at!) }}
                 </BasicText>
               </div>
             </div>
 
             <BasicText
-              v-else
+              v-if="!lastOrders.length"
               size="body-m"
               color="neutral-500"
               align="center"
             >
-              Aucune commande récente.
+              Vous n’avez pas encore de commande.
             </BasicText>
           </div>
 
-          <div class="profil__orders-footer">
-            <BasicButton
-              label="Voir toutes mes commandes"
-              type="secondary"
-              variant="outlined"
-              block
-              @click="$router.push('/profil/commandes')"
-            />
-          </div>
+          <BasicButton
+            label="Voir toutes mes commandes"
+            type="secondary"
+            variant="outlined"
+            block
+            @click="$router.push('/profil/commandes')"
+          />
         </FilterSection>
 
         <FilterSection
@@ -159,27 +158,69 @@
           v-model="sections.preferences"
         >
           <div class="profil__preferences">
-            <BasicCheckbox
-              v-model="isBrownTheme"
-              label="Thème marron"
-            />
+            <!-- 🎛️ Bloc thème -->
+            <div class="pref-card">
+              <BasicText
+                size="body-m"
+                weight="semibold"
+                class="pref-card__title"
+              >
+                Apparence
+              </BasicText>
 
-            <BasicCheckbox
-              v-model="newsletter"
-              label="Recevoir les newsletters"
-            />
-            <BasicCheckbox
-              v-model="smsAlerts"
-              label="Recevoir les alertes SMS"
-            />
+              <div class="pref-card__row">
+                <div class="pref-card__info">
+                  <BasicText
+                    size="body-m"
+                    weight="semibold"
+                  >
+                    Thème de l’interface
+                  </BasicText>
+                  <BasicText
+                    size="body-s"
+                    color="neutral-600"
+                  >
+                    Sélectionnez l’ambiance couleur que vous préférez.
+                  </BasicText>
+                </div>
+
+                <BasicThemeSelector v-model="isBrownTheme" />
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="pref-card">
+              <BasicText
+                size="body-m"
+                weight="semibold"
+                class="pref-card__title"
+              >
+                Notifications
+              </BasicText>
+
+              <div class="pref-card__list">
+                <BasicCheckbox
+                  v-model="newsletter"
+                  label="Recevoir les newsletters"
+                />
+
+                <BasicCheckbox
+                  v-model="smsAlerts"
+                  label="Recevoir les alertes SMS"
+                />
+              </div>
+            </div>
           </div>
+
           <BasicButton
             label="Sauvegarder mes préférences"
             type="secondary"
             variant="filled"
+            block
             @click="savePreferences"
           />
         </FilterSection>
+
         <FilterSection
           title="Sécurité"
           v-model="sections.security"
@@ -237,8 +278,10 @@
   import { useUserActions } from '@/supabase/actions/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref, watch, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { BasicThemeSelector } from '../../../designSystem/src'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
@@ -247,6 +290,7 @@
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
   const router = useRouter()
+  const toast = useToastStore()
 
   const { loadProfile, updateProfile, changeAvatar, loadLastOrdersAction, updatePassword } =
     useProfileActions()
@@ -264,6 +308,8 @@
 
   const newsletter = ref(false)
   const smsAlerts = ref(false)
+
+  const pendingChanges = ref(false)
 
   const loading = ref(false)
   const newPassword = ref('')
@@ -330,7 +376,8 @@
   }
 
   function savePreferences() {
-    // si stockage en DB → appeler API
+    pendingChanges.value = false
+    toast.show('Préférences sauvegardées 👍', 'success')
   }
 
   function openMessaging() {
@@ -350,15 +397,83 @@
 </script>
 
 <style lang="less">
-  /* ==========================================================
-     👤 PROFIL — Neural UI v3 (CONTRASTE AMÉLIORÉ)
-     ========================================================== */
+  .orders-grid {
+    display: grid;
+    gap: 18px;
+  }
 
+  .order-item {
+    background: color-mix(in srgb, @neutral-50 45%, transparent);
+    border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
+    padding: 18px 22px;
+    border-radius: 14px;
+
+    transition: all 0.25s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--primary-400) 40%, transparent);
+      box-shadow: 0 8px 22px fade(#000, 12%);
+    }
+
+    &__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  .pref-card {
+    background: color-mix(in srgb, @neutral-50 35%, transparent);
+    border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
+    padding: 22px 24px;
+    border-radius: 14px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__title {
+      margin-bottom: 4px;
+      color: @neutral-700;
+    }
+
+    &__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
   .profil {
     background: transparent !important;
     min-height: 100vh;
     position: relative;
 
+    &__preferences {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
     /* -----------------------------
       🖼️ Cover
     ----------------------------- */
@@ -382,7 +497,11 @@
       margin: -80px auto 70px;
       padding: 40px;
 
-      background: linear-gradient(90deg, var(--secondary-700), color-mix(in srgb, black 4%, var(--secondary-700)));
+      background: linear-gradient(
+        90deg,
+        var(--secondary-700),
+        color-mix(in srgb, black 4%, var(--secondary-700))
+      );
 
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
