@@ -1,5 +1,4 @@
 import { ENV, PAYMENT_CANCEL_URL, PAYMENT_SUCCESS_URL_BASE, supabase } from '../../utils/clients.ts'
-
 import { createHandler } from '../../utils/createHandler.ts'
 
 const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
@@ -16,6 +15,7 @@ interface CreatePaypalOrderBody {
 
 async function getAccessToken() {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`)
+
   const res = await fetch(`${BASE_URL}/v1/oauth2/token`, {
     method: 'POST',
     headers: {
@@ -25,7 +25,10 @@ async function getAccessToken() {
     body: 'grant_type=client_credentials',
   })
 
-  if (!res.ok) throw new Error('Unable to get PayPal token')
+  if (!res.ok) {
+    console.error(await res.text())
+    throw new Error('Unable to get PayPal token')
+  }
 
   const data = await res.json()
   return data.access_token
@@ -33,8 +36,12 @@ async function getAccessToken() {
 
 Deno.serve(
   createHandler<CreatePaypalOrderBody>(async (_req, body) => {
+    if (!body) throw new Error('missing JSON body')
+
     const { amount, email, orderId } = body
-    if (!amount || !email || !orderId) throw new Error('amount, email et orderId requis')
+    if (!amount || !email || !orderId) {
+      throw new Error('amount, email et orderId requis')
+    }
 
     const accessToken = await getAccessToken()
 
@@ -67,9 +74,14 @@ Deno.serve(
 
     const data = await response.json()
 
+    if (!data || !data.links) {
+      console.error('PayPal bad response:', data)
+      throw new Error('Unexpected PayPal API response')
+    }
+
     const approvalUrl =
-      data.links?.find((l: any) => l.rel === 'approve')?.href ??
-      data.links?.find((l: any) => l.rel === 'payer-action')?.href
+      data.links.find((l: any) => l.rel === 'approve')?.href ??
+      data.links.find((l: any) => l.rel === 'payer-action')?.href
 
     if (!approvalUrl) {
       console.error('⚠️ APPROVAL URL MISSING:', data)
@@ -84,7 +96,6 @@ Deno.serve(
       })
       .eq('id', orderId)
 
-    // 👉 createHandler encapsule ceci correctement
     return {
       url: approvalUrl,
       paypalOrderId: data.id,

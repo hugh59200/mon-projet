@@ -23,7 +23,9 @@ async function getAccessToken() {
     },
     body: 'grant_type=client_credentials',
   })
+
   if (!res.ok) throw new Error('Unable to get PayPal token')
+
   return (await res.json()).access_token
 }
 
@@ -52,9 +54,12 @@ Deno.serve(
         'Content-Type': 'application/json',
       },
     })
+
     const captureData = await capture.json()
 
-    if (captureData.status !== 'COMPLETED') throw new Error('Paiement non confirmé PayPal')
+    if (captureData.status !== 'COMPLETED') {
+      throw new Error('Paiement non confirmé PayPal')
+    }
 
     // 3. Update order → PAID
     await supabase
