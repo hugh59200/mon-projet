@@ -1,6 +1,6 @@
 import { type AvatarProps } from '@designSystem/components/basic/avatar/BasicAvatar.types'
-import type { BadgeProps } from '../badge'
 import type { IconName } from '@designSystem/fondation/icons/iconsList'
+import type { BadgeProps } from '../breadcrumbs'
 
 export type SubtitleProps = {
   text: string

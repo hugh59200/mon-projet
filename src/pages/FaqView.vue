@@ -8,21 +8,21 @@
           color="primary-600"
         />
       </div>
-      <BasicText
-        size="h2"
-        weight="bold"
-        color="neutral-900"
-      >
-        Foire aux questions
-      </BasicText>
-      <BasicText
-        size="body-m"
-        color="neutral-600"
-        class="faq__header-subtitle"
-      >
-        Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou
-        vétérinaire.
-      </BasicText>
+      <div class="section-title">
+        <BasicText
+          size="h2"
+          weight="bold"
+          class="section-title__text"
+        >
+          Foire aux
+          <span>questions</span>
+        </BasicText>
+
+        <div class="section-title__subtitle">
+          Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou
+          vétérinaire.
+        </div>
+      </div>
     </header>
     <div class="faq__layout">
       <aside class="faq__filters">
@@ -344,6 +344,30 @@
 </script>
 
 <style scoped lang="less">
+  .section-title {
+    text-align: center;
+    margin-bottom: 22px;
+
+    &__text {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: @neutral-900;
+      margin-bottom: 6px;
+
+      span {
+        background: linear-gradient(90deg, var(--primary-600), var(--primary-400));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    &__subtitle {
+      font-size: 15px;
+      color: @neutral-600;
+    }
+  }
   .faq {
     /* PAGE */
     &__page {
@@ -353,26 +377,80 @@
       padding: 48px 32px;
       max-width: 1280px;
       margin: 0 auto;
+
+      @media (max-width: 768px) {
+        padding: 32px 16px;
+        gap: 32px;
+      }
     }
 
     /* HEADER */
     &__header {
+      position: relative;
+      overflow: hidden;
       text-align: center;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
+      padding: 28px 24px;
+      border-radius: 18px;
+
+      /* Glass */
+      background: color-mix(in srgb, var(--secondary-900) 6%, rgba(255, 255, 255, 0.04));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.09),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+      /* Glow top */
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 0%,
+          color-mix(in srgb, var(--primary-500) 20%, transparent) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      > * {
+        position: relative;
+        z-index: 1;
+      }
 
       &-icon {
         display: flex;
         justify-content: center;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+
+        /* halo doux autour de l’icône */
+        &::before {
+          content: '';
+          position: absolute;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            color-mix(in srgb, var(--primary-500) 22%, transparent) 0%,
+            transparent 75%
+          );
+        }
       }
 
       &-subtitle {
         max-width: 620px;
         margin: 0 auto;
+        font-size: 14px;
+        color: @neutral-600;
+        opacity: 0.9;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
       }
     }
 
@@ -393,12 +471,16 @@
       top: 90px;
       height: fit-content;
 
+      @media (max-width: 900px) {
+        position: static;
+      }
+
       &-card {
-        background: color-mix(in srgb, @neutral-50 40%, transparent);
+        background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(14px);
-        border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
+        border: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 16px;
-        box-shadow: 0 4px 20px fade(#000, 10%);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
         padding: 20px;
         display: flex;
         flex-direction: column;
@@ -419,7 +501,7 @@
       gap: 28px;
     }
 
-    /* ANSWER TEXT */
+    /* ANSWER BLOCK */
     &__answer {
       padding: 4px 2px 12px;
     }
@@ -437,13 +519,32 @@
 
     /* FOOTER */
     &__footer {
-      margin-top: 20px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
       padding-top: 20px;
-      border-top: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    /* ANIMATION HASH (scroll-to) */
+    &-item--flash {
+      animation: faqFlash 1.2s ease-out;
+    }
+
+    @keyframes faqFlash {
+      0% {
+        background: color-mix(in srgb, var(--primary-500) 12%, transparent);
+      }
+      60% {
+        background: color-mix(in srgb, var(--primary-500) 3%, transparent);
+      }
+      100% {
+        background: transparent;
+      }
     }
   }
 </style>

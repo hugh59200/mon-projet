@@ -117,7 +117,7 @@
         <FilterSection
           title="Produits"
           :model-value="openSections[safeId(order)]?.items"
-          @update:model-value="(v: boolean) => setSection(order, 'items', v)"
+          @update:model-value="(v: boolean | undefined) => setSection(order, 'items', v ?? false)"
         >
           <div
             v-motion="{
@@ -176,7 +176,7 @@
         <FilterSection
           title="Résumé"
           :model-value="openSections[safeId(order)]?.summary"
-          @update:model-value="(v: boolean) => setSection(order, 'summary', v)"
+          @update:model-value="(v: boolean | undefined) => setSection(order, 'summary', v ?? false)"
         >
           <div
             v-motion="{
@@ -241,7 +241,9 @@
         <FilterSection
           title="Suivi"
           :model-value="openSections[safeId(order)]?.tracking"
-          @update:model-value="(v: boolean) => setSection(order, 'tracking', v)"
+          @update:model-value="
+            (v: boolean | undefined) => setSection(order, 'tracking', v ?? false)
+          "
         >
           <div
             v-motion="{

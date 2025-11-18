@@ -1,6 +1,10 @@
 <template>
   <div class="app-layout">
     <HeaderApp />
+
+    <!-- ⭐ BREADCRUMB GLOBAL -->
+    <!-- <BasicBreadcrumbs class="breadcrumb-wrapper" /> -->
+
     <main
       class="content"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"
@@ -14,6 +18,7 @@
           <component :is="Component" />
         </transition>
       </RouterView>
+
       <transition
         name="fade"
         appear
@@ -21,6 +26,7 @@
         <SablierComponent v-if="sablier.estSablierVisible" />
       </transition>
     </main>
+
     <footer
       class="footer"
       v-responsive-animate.slide.once="{ speed: 700 }"
@@ -60,7 +66,7 @@
     if (!session) cart.items = []
   })
 
-  // 🧭 Gestion du header dynamique
+  // HEADER dynamique
   const lastScroll = ref(0)
   const scrollY = ref(0)
   const isHidden = ref(false)
@@ -83,6 +89,11 @@
 
 <style scoped lang="less">
   @import '/src/assets/Mont/Mont.less';
+
+  .breadcrumb-wrapper {
+    position: relative;
+    z-index: 900; /* juste sous le header */
+  }
 
   .app-layout {
     display: flex;
@@ -114,14 +125,12 @@
     box-shadow: 0 4px 20px fade(black, 20%);
   }
 
-  /* 🔽 Masqué quand on descend */
   .header--hidden {
     transform: translateY(-100%);
     opacity: 0;
     box-shadow: none;
   }
 
-  /* 🔼 Revient en douceur + verre dépoli accentué */
   .header--scrolled:not(.header--hidden) {
     backdrop-filter: blur(14px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);

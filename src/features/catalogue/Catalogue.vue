@@ -7,14 +7,28 @@
       class="catalogue__header"
       v-responsive-animate.slide.once
     >
-      <div class="catalogue__header--top">
+      <div
+        class="catalogue__title-wrapper"
+        v-motion="{
+          initial: { opacity: 0, y: -20 },
+          enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
+        }"
+      >
         <BasicText
-          size="h4"
+          size="h3"
           weight="bold"
-          color="neutral-300"
+          class="catalogue__title"
         >
-          Catalogue de peptides
+          Notre
+          <span>catalogue</span>
         </BasicText>
+
+        <div class="catalogue__subtitle">
+          Découvrez l’ensemble de nos peptides & produits disponibles ⚗️
+        </div>
+      </div>
+
+      <div class="catalogue__header--top">
         <WrapperDropdown
           v-model="sortBy"
           :items="sortItems"
@@ -221,7 +235,6 @@
 </script>
 
 <style scoped lang="less">
-
   .catalogue {
     width: 100%;
     min-height: 100vh;
@@ -231,6 +244,32 @@
     padding: 26px 0;
     opacity: 0;
     animation: fadeInPage 0.8s ease forwards;
+
+    &__title-wrapper {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    &__title {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: @neutral-100;
+      margin-bottom: 6px;
+
+      span {
+        background: linear-gradient(90deg, var(--primary-500), var(--primary-300));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    &__subtitle {
+      font-size: 15px;
+      color: @neutral-300;
+      opacity: 0.85;
+    }
 
     @keyframes fadeInPage {
       to {
