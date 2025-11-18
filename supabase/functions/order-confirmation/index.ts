@@ -4,12 +4,13 @@ import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
 interface OrderConfirmationBody {
-  order_id: string
+  order_id?: string
+  orderId?: string
 }
 
 Deno.serve(
   createHandler<OrderConfirmationBody>(async (_req, body) => {
-    const { order_id } = body
+    const order_id = body.order_id ?? body.orderId
     if (!order_id) throw new Error('Missing order_id')
 
     const { data: order } = await supabase

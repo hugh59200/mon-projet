@@ -1,20 +1,20 @@
-import { supabase } from '../../utils/clients.ts'
+import {
+  ENV,
+  FUNCTION_URL,
+  PAYPAL_CLIENT_ID,
+  PAYPAL_SECRET,
+  supabase,
+} from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
 
-interface CaptureBody {
-  orderId: string
-}
-
-const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
-const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!
-
+// 🌍 PayPal API base URL
 const BASE_URL =
-  Deno.env.get('ENV') === 'development'
-    ? 'https://api-m.sandbox.paypal.com'
-    : 'https://api-m.paypal.com'
+  ENV === 'development' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'
 
+// 🔐 Token PayPal
 async function getAccessToken() {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`)
+
   const res = await fetch(`${BASE_URL}/v1/oauth2/token`, {
     method: 'POST',
     headers: {
@@ -29,39 +29,44 @@ async function getAccessToken() {
   return (await res.json()).access_token
 }
 
-Deno.serve(
-  createHandler<CaptureBody>(async (_req, { orderId }) => {
+export default Deno.serve(
+  createHandler(async (_req, body: { orderId: string }) => {
+    const { orderId } = body
     if (!orderId) throw new Error('orderId requis')
 
-    // 1. récupérer l’id PayPal dans la DB
+    // 1️⃣ Récupérer l'order PayPal
     const { data: order } = await supabase
       .from('orders')
       .select('paypal_order_id')
       .eq('id', orderId)
       .maybeSingle()
 
-    if (!order?.paypal_order_id) throw new Error('Aucun paypal_order_id trouvé')
+    if (!order?.paypal_order_id) {
+      throw new Error('Aucun paypal_order_id trouvé')
+    }
 
     const paypalId = order.paypal_order_id
 
-    // 2. capture PayPal
-    const accessToken = await getAccessToken()
+    // 2️⃣ Token PayPal
+    const token = await getAccessToken()
 
-    const capture = await fetch(`${BASE_URL}/v2/checkout/orders/${paypalId}/capture`, {
+    // 3️⃣ Capture paiement
+    const captureRes = await fetch(`${BASE_URL}/v2/checkout/orders/${paypalId}/capture`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })
 
-    const captureData = await capture.json()
+    const captureData = await captureRes.json()
 
     if (captureData.status !== 'COMPLETED') {
-      throw new Error('Paiement non confirmé PayPal')
+      console.error('💥 Capture PayPal:', captureData)
+      throw new Error('Paiement PayPal non confirmé')
     }
 
-    // 3. Update order → PAID
+    // 4️⃣ Update DB
     await supabase
       .from('orders')
       .update({
@@ -70,11 +75,17 @@ Deno.serve(
       })
       .eq('id', orderId)
 
-    // 4. Log event
     await supabase.from('payment_events').insert({
       provider: 'paypal',
       order_id: orderId,
       payload: captureData,
+    })
+
+    // 5️⃣ Email confirmation
+    await fetch(`${FUNCTION_URL}/order-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId }),
     })
 
     return { status: 'paid', orderId }

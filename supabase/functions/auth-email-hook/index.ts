@@ -1,13 +1,21 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
-const rawSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET')!
-const secret = rawSecret.replace('v1,whsec_', '')
-const wh = new Webhook(secret)
+const FRONT_URL = Deno.env.get('FRONT_URL') ?? 'https://fast-peptides.com'
 
-const FRONT_URL = 'https://localhost:5278'
+// Typage du payload envoyé par Supabase Auth Webhooks
+interface SupabaseAuthEmailHookPayload {
+  type: string
+  user: {
+    email: string
+    user_metadata?: { full_name?: string }
+  }
+  email_data: {
+    token: string
+    email_action_type: 'signup' | 'recovery' | 'email_change'
+  }
+}
 
 const TITLES = {
   signup: 'Confirmez votre inscription ✅',
@@ -15,26 +23,25 @@ const TITLES = {
   email_change: 'Confirmez votre nouvelle adresse email',
 } as const
 
-serve(async (req: Request) => {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
+export default Deno.serve(
+  createHandler<SupabaseAuthEmailHookPayload>(async (_req, body) => {
+    console.log('📩 Auth Email Hook Triggered:', body)
 
-  try {
-    const payload = await req.text()
-    const headers = Object.fromEntries(req.headers)
+    const { user, email_data } = body
 
-    const { user, email_data } = wh.verify(payload, headers) as {
-      user: { email: string; user_metadata?: { full_name?: string } }
-      email_data: { token: string; email_action_type: keyof typeof TITLES }
+    if (!user?.email) throw new Error('Missing user email')
+    if (!email_data?.token || !email_data?.email_action_type) {
+      throw new Error('Missing email_data from Supabase hook')
     }
 
-    const confirmation_url = `${FRONT_URL}/auth/callback?token=${encodeURIComponent(email_data.token)}&type=${encodeURIComponent(email_data.email_action_type)}&email=${encodeURIComponent(user.email)}`
+    const action = email_data.email_action_type
+    const subject = TITLES[action]
 
-    const html = renderEmailTemplate(email_data.email_action_type, {
+    const confirmation_url =
+      `${FRONT_URL}/auth/callback?token=${encodeURIComponent(email_data.token)}` +
+      `&type=${encodeURIComponent(action)}&email=${encodeURIComponent(user.email)}`
+
+    const html = renderEmailTemplate(action, {
       full_name: user.user_metadata?.full_name ?? '',
       confirmation_url,
       url: confirmation_url,
@@ -42,18 +49,11 @@ serve(async (req: Request) => {
 
     const result = await sendEmail({
       to: user.email,
-      subject: TITLES[email_data.email_action_type],
+      subject,
       html,
+      type: `auth_${action}`,
     })
 
-    return new Response(JSON.stringify({ success: true, result }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: String(err) }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-})
+    return { success: true, result }
+  }),
+)

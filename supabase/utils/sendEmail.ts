@@ -1,8 +1,10 @@
-// utils/sendEmail.ts
-import { resend } from './clients.ts'
+// supabase/utils/sendEmail.ts
+
+import { sendWithProvider } from './emailProvider.ts'
 import { logEmail } from './logEmail.ts'
 
-const FROM = 'Fast Peptides <no-reply@fast-peptides.com>'
+const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN')!
+const FROM = `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>` // SANDBOX OK
 
 export async function sendEmail({
   to,
@@ -17,30 +19,27 @@ export async function sendEmail({
   type?: string
   order_id?: string
 }) {
-  console.log(`📧 Sending email to ${to} | Subject: ${subject}`)
+  console.log(`📧 Sending email via provider | to: ${to} | subject: ${subject}`)
 
   try {
-    const result = await resend.emails.send({
+    const providerResponse = await sendWithProvider({
       from: FROM,
       to,
       subject,
       html,
     })
 
-    console.log('✅ Resend response:', result)
-
-    // ✅ Statut toujours SENT si pas d'erreur JS
     await logEmail({
       to_email: to,
       subject,
       body_html: html,
       type,
       order_id,
-      provider_response: result,
+      provider_response: providerResponse,
       status: 'sent',
     })
 
-    return result
+    return providerResponse
   } catch (error) {
     console.error('❌ Error sending email:', error)
 
