@@ -3,13 +3,10 @@
     class="hero-banner"
     ref="heroSection"
   >
-    <!-- ✨ fond animé -->
     <div
       class="hero-banner__glow"
       ref="glowLayer"
     ></div>
-
-    <!-- 🧑‍🔬 CONTENU PÉDAGOGIQUE + PERSONAS -->
     <div
       class="hero-banner__top"
       ref="topSection"
@@ -25,8 +22,6 @@
           >
             Ressources pédagogiques
           </BasicText>
-
-          <!-- TITRE -->
           <BasicText
             size="h3"
             weight="bold"
@@ -34,8 +29,6 @@
           >
             Comprendre les peptides avant vos recherches.
           </BasicText>
-
-          <!-- DESCRIPTION -->
           <BasicText
             size="body-m"
             color="neutral-300"
@@ -44,8 +37,6 @@
             Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
             peptides dans vos projets de recherche.
           </BasicText>
-
-          <!-- BULLETS -->
           <ul class="hero-banner__bullets">
             <li>
               <BasicIconNext
@@ -57,7 +48,6 @@
                 Vulgarisation claire pour équipes R&amp;D et laboratoires.
               </BasicText>
             </li>
-
             <li>
               <BasicIconNext
                 name="BookOpenText"
@@ -68,7 +58,6 @@
                 Ressources externes sélectionnées : articles, vidéos, revues.
               </BasicText>
             </li>
-
             <li>
               <BasicIconNext
                 name="ShieldCheck"
@@ -80,8 +69,6 @@
               </BasicText>
             </li>
           </ul>
-
-          <!-- CTA -->
           <div class="hero-banner__cta-row">
             <BasicButton
               label="Explorer les ressources pédagogiques"
@@ -101,8 +88,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 👥 PERSONAS -->
       <div class="hero-banner__personas">
         <article
           v-for="persona in personas"
@@ -122,7 +107,6 @@
               {{ persona.tag }}
             </BasicText>
           </div>
-
           <div class="persona-card__info">
             <BasicText
               size="body-s"
@@ -141,8 +125,6 @@
         </article>
       </div>
     </div>
-
-    <!-- 💊 SECTION PEPTIDES (TICKER) -->
     <div
       class="hero-banner__bottom"
       ref="carouselContainer"
@@ -155,7 +137,6 @@
           >
             Quelques peptides de notre catalogue
           </BasicText>
-
           <BasicText
             fontStyle="italic"
             color="neutral-400"
@@ -163,12 +144,10 @@
             Research only – Not for human use
           </BasicText>
         </div>
-
         <div
           class="scroll-track"
           ref="scrollTrack"
         >
-          <!-- boucle principale -->
           <div
             v-for="p in peptides"
             :key="p.id"
@@ -184,8 +163,6 @@
             />
             <BasicText color="white">{{ p.name }}</BasicText>
           </div>
-
-          <!-- duplication pour loop infinie -->
           <div
             v-for="p in peptides"
             :key="'dup-' + p.id"
@@ -211,20 +188,23 @@
   import personaLab from '@/assets/banners/hero/persona-lab.png'
   import personaPhd from '@/assets/banners/hero/persona-phd.png'
   import personaRd from '@/assets/banners/hero/persona-rd.png'
-  import { useProducts } from '@/features/catalogue/composables/useProducts'
+  import { useProductsStore } from '@/features/catalogue/composables/useProducts'
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  import { storeToRefs } from 'pinia'
   import { onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   gsap.registerPlugin(ScrollTrigger)
 
   const router = useRouter()
-  const { products, loadProducts } = useProducts()
+  const productsStore = useProductsStore()
+  const { products } = storeToRefs(productsStore)
+  const { load } = productsStore
   const peptides = products
 
   onMounted(() => {
-    loadProducts()
+    load()
   })
 
   const heroSection = ref<HTMLElement>()
@@ -414,8 +394,16 @@
 
       /* Glow thématique Neural Blue + Sonic Indigo */
       background:
-        radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--primary-400) 55%, transparent), transparent 60%),
-        radial-gradient(circle at 75% 80%, color-mix(in srgb, @indigo-400 48%, transparent), transparent 60%);
+        radial-gradient(
+          circle at 25% 20%,
+          color-mix(in srgb, var(--primary-400) 55%, transparent),
+          transparent 60%
+        ),
+        radial-gradient(
+          circle at 75% 80%,
+          color-mix(in srgb, @indigo-400 48%, transparent),
+          transparent 60%
+        );
       background-size: 200% 200%;
       animation: glowShift 22s ease-in-out infinite alternate;
     }
@@ -460,7 +448,11 @@
         left: 0;
         width: 4px;
         border-radius: 999px;
-        background: linear-gradient(to bottom, color-mix(in srgb, var(--primary-500) 95%, transparent), color-mix(in srgb, @indigo-400 85%, transparent));
+        background: linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--primary-500) 95%, transparent),
+          color-mix(in srgb, @indigo-400 85%, transparent)
+        );
       }
 
       /* TEXT BLOCK */
@@ -558,7 +550,11 @@
         gap: 8px;
 
         /* subtle neural glass */
-        background: linear-gradient(130deg, color-mix(in srgb, @neutral-0 95%, transparent), color-mix(in srgb, var(--primary-50) 80%, transparent));
+        background: linear-gradient(
+          130deg,
+          color-mix(in srgb, @neutral-0 95%, transparent),
+          color-mix(in srgb, var(--primary-50) 80%, transparent)
+        );
         box-shadow: 0 8px 22px fade(#000, 12%);
 
         /* Image wrapper */
@@ -612,7 +608,11 @@
       position: relative;
       z-index: 2;
 
-      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-600) 75%, transparent), color-mix(in srgb, var(--secondary-700) 82%, transparent));
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--primary-600) 75%, transparent),
+        color-mix(in srgb, var(--secondary-700) 82%, transparent)
+      );
       backdrop-filter: blur(14px);
       border-top: 4px solid color-mix(in srgb, var(--primary-400) 40%, transparent);
 
@@ -632,12 +632,20 @@
 
       &::before {
         left: 0;
-        background: linear-gradient(to right, color-mix(in srgb, var(--secondary-900) 80%, transparent), transparent);
+        background: linear-gradient(
+          to right,
+          color-mix(in srgb, var(--secondary-900) 80%, transparent),
+          transparent
+        );
       }
 
       &::after {
         right: 0;
-        background: linear-gradient(to left, color-mix(in srgb, var(--secondary-900) 80%, transparent), transparent);
+        background: linear-gradient(
+          to left,
+          color-mix(in srgb, var(--secondary-900) 80%, transparent),
+          transparent
+        );
       }
 
       &-inner {

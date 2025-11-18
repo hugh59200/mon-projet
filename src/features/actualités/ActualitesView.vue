@@ -1,6 +1,5 @@
 <template>
   <div class="page actualites">
-    <!-- 🎠 Carrousel des catégories -->
     <BasicCarousel
       v-if="topics.length"
       :items="topics"
@@ -34,8 +33,6 @@
         </RouterLink>
       </template>
     </BasicCarousel>
-
-    <!-- 🧩 Titre principal -->
     <BasicText
       size="h1"
       weight="semibold"
@@ -44,8 +41,6 @@
     >
       {{ activeTopicLabel || 'Actualités' }}
     </BasicText>
-
-    <!-- 📰 Liste des articles -->
     <div class="articles">
       <RouterLink
         v-for="article in articles"
@@ -60,7 +55,6 @@
         />
 
         <div class="info">
-          <!-- Catégorie -->
           <BasicText
             v-if="article.topic"
             size="body-s"
@@ -69,8 +63,6 @@
           >
             {{ article.topic.label }}
           </BasicText>
-
-          <!-- Titre -->
           <BasicText
             size="h4"
             weight="semibold"
@@ -79,8 +71,6 @@
           >
             {{ article.title }}
           </BasicText>
-
-          <!-- Date -->
           <BasicText
             size="body-s"
             fontStyle="italic"
@@ -89,8 +79,6 @@
           >
             {{ formatDate(article.published_at) }}
           </BasicText>
-
-          <!-- Extrait -->
           <div
             class="excerpt"
             v-html="parseAndSanitize(article.excerpt)"
@@ -102,40 +90,37 @@
 </template>
 
 <script setup lang="ts">
-  import { fetchNews, fetchNewsTopics } from '@/features/actualités/api/news'
-  import type { News, NewsTopics } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
   import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { computed, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useNewsStore } from './store/useNewsStore'
 
   const route = useRoute()
-  const articles = ref<(News & { topic: NewsTopics | null })[]>([])
-  const topics = ref<NewsTopics[]>([])
+
+  const newsStore = useNewsStore()
+
+  const { loadTopics, loadArticles } = newsStore
+
+  const { topics, articles } = storeToRefs(newsStore)
+
   const activeCategory = computed(() => route.query.categorie as string | undefined)
   const activeTopicLabel = computed(
     () => topics.value.find((t) => t.id === activeCategory.value)?.label || null,
   )
 
-  async function loadArticles() {
-    articles.value = await fetchNews(activeCategory.value)
-  }
-
-  async function loadTopics() {
-    topics.value = await fetchNewsTopics()
-  }
-
   onMounted(async () => {
     await loadTopics()
-    await loadArticles()
+    await loadArticles(activeCategory.value)
   })
 
   watch(
     () => route.query.categorie,
-    () => {
-      loadArticles()
+    async () => {
+      await loadArticles(activeCategory.value, true)
     },
   )
 </script>
@@ -148,7 +133,6 @@
     font-size: clamp(1.8rem, 4vw, 2.4rem);
   }
 
-  /* --- Carrousel des catégories --- */
   .topic-card {
     position: relative;
     display: block;
@@ -181,7 +165,11 @@
       justify-content: flex-end;
       padding: 20px;
       color: white;
-      background: linear-gradient(to top, color-mix(in srgb, @neutral-900 88%, transparent) 0%, color-mix(in srgb, @neutral-900 55%, transparent) 100%);
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, @neutral-900 88%, transparent) 0%,
+        color-mix(in srgb, @neutral-900 55%, transparent) 100%
+      );
       transition: background 0.3s ease;
 
       .topic-title {
@@ -204,7 +192,6 @@
     }
   }
 
-  /* --- Grille des articles --- */
   .articles {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));

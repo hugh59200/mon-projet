@@ -71,7 +71,6 @@
         >
           {{ filteredProducts.length }} résultat{{ filteredProducts.length > 1 ? 's' : '' }}
         </BasicText>
-
         <WrapperLoader
           :loading="loading"
           :has-loaded="hasLoaded"
@@ -148,18 +147,21 @@
   import { useFilters } from '@/features/catalogue/composables/useFilters'
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
-  import { useProducts } from '@/features/catalogue/composables/useProducts'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { Products } from '@/supabase/types/supabase.types'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
+  import { storeToRefs } from 'pinia'
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
 
+  const productsStore = useProductsStore()
+  const { products, priceRange, hasLoaded, loading } = storeToRefs(productsStore)
+  const { load } = productsStore
   const route = useRoute()
   const { isMobile } = useDeviceBreakpoint()
-  const { products, priceRange, loadProducts, loading, hasLoaded } = useProducts()
 
   const {
     selectedCategories,
@@ -188,7 +190,13 @@
     selectedCategories.value = []
     inStockOnly.value = false
     selectedTags.value = []
-    priceRange.value = { ...priceRange.value, from: priceRange.value.min, to: priceRange.value.max }
+
+    priceRange.value = {
+      ...priceRange.value,
+      from: priceRange.value.min,
+      to: priceRange.value.max,
+    }
+
     page.value = 1
     sortBy.value = 'default'
   }
@@ -203,7 +211,7 @@
   }
 
   onMounted(async () => {
-    await loadProducts()
+    load()
 
     const initialTag = typeof route.query.tag === 'string' ? route.query.tag : null
     if (initialTag) {
@@ -213,9 +221,6 @@
 </script>
 
 <style scoped lang="less">
-  /* ============================================================
-   🛒 CATALOGUE — Neural Glass Hybrid v3
-   ============================================================ */
 
   .catalogue {
     width: 100%;
@@ -232,10 +237,6 @@
         opacity: 1;
       }
     }
-
-    /* ============================================================
-     🏷️ HEADER — Light Glass
-     ============================================================ */
     &__header {
       border-radius: 16px;
       padding: 20px 26px;
@@ -268,9 +269,6 @@
       max-width: 300px;
     }
 
-    /* ============================================================
-     🧊 SIDEBAR FILTERS — Neural Glass v3 Dark
-     ============================================================ */
     &__body {
       display: flex;
       width: 100%;
@@ -299,9 +297,6 @@
       transition: background 0.25s ease;
     }
 
-    /* ============================================================
-     🩶 LISTE + CONTENT — Light Glass Pro
-     ============================================================ */
     &__list {
       flex: 1;
       min-height: 500px;
@@ -328,9 +323,6 @@
       }
     }
 
-    /* ============================================================
-     🧴 GRID PRODUITS
-     ============================================================ */
     &__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -340,9 +332,6 @@
       padding-bottom: 20px;
     }
 
-    /* ============================================================
-     🔵 PAGINATION PREMIUM
-     ============================================================ */
     &__pagination-bottom {
       display: flex;
       justify-content: center;
@@ -359,9 +348,6 @@
     }
   }
 
-  /* ============================================================
-   📱 RESPONSIVE
-   ============================================================ */
   @media (max-width: 900px) {
     .catalogue__body {
       flex-direction: column;

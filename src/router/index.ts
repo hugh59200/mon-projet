@@ -1,3 +1,7 @@
+/* -------------------------------------------------------------------------- */
+/* 📦 IMPORTS SYNCHRONES (remplacement des () => import(...))                */
+/* -------------------------------------------------------------------------- */
+
 import AdminNewsTable from '@/features/admin/news/AdminNewsView.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsView.vue'
@@ -5,15 +9,52 @@ import AdminTopicsTable from '@/features/admin/topics/AdminTopicsView.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import AdminChatView from '@/features/chat/admin/AdminChatView.vue'
 import AdminStatsView from '@/features/stats/AdminStatsView.vue'
+
 import Home from '@/pages/Home.vue'
+
+/* AUTH */
+import AccessDeniedView from '@/features/auth/AccessDeniedView.vue'
+import AuthCallback from '@/features/auth/AuthCallback.vue'
+import AuthEmailSent from '@/features/auth/AuthEmailSent.vue'
+import AuthLogin from '@/features/auth/AuthLogin.vue'
+import AuthOverlay from '@/features/auth/AuthOverlay.vue'
+import AuthRegister from '@/features/auth/AuthRegister.vue'
+import AuthReset from '@/features/auth/AuthReset.vue'
+import UpdatePasswordSuccessView from '@/features/auth/UpdatePasswordSuccessView.vue'
+import UpdatePasswordView from '@/features/auth/UpdatePasswordView.vue'
+
+/* PROFIL */
+import OrderDetailView from '@/features/order/OrderDetailView.vue'
+import OrdersView from '@/features/order/OrdersView.vue'
+import ProfilView from '@/features/profile/ProfilView.vue'
+
+/* CATALOGUE */
+import Catalogue from '@/features/catalogue/Catalogue.vue'
+import ProductDetails from '@/features/catalogue/ProductDetails.vue'
+
+/* ACTUALITÉS */
+import ActualiteDetailView from '@/features/actualités/ActualiteDetailView.vue'
+import ActualitesView from '@/features/actualités/ActualitesView.vue'
+
+/* CHECKOUT */
+import CheckoutView from '@/features/checkout/CheckoutView.vue'
+import PaymentCancelView from '@/features/checkout/paiement/PaymentCancelView.vue'
+import PaymentResultWrapper from '@/features/checkout/paiement/PaymentResultWrapper.vue'
+import PaymentSuccessView from '@/features/checkout/paiement/PaymentSuccessView.vue'
+import PanierView from '@/pages/PanierView.vue'
+
+/* FAQ */
+import FaqView from '@/pages/FaqView.vue'
+
+/* ROUTER CORE */
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
 import { registerBaseGuard } from './registerBaseGuard'
 
+/* -------------------------------------------------------------------------- */
+/* 📌 ROUTES (strictement identiques, seul "component:" change)              */
+/* -------------------------------------------------------------------------- */
 const routes: Array<RouteRecordRaw> = [
-  /* -------------------------------------------------------------------------- */
-  /* 🏠 PUBLIC                                                                 */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/',
     name: 'home',
@@ -28,64 +69,40 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* 🔐 AUTH (overlay complet)                                                  */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/auth',
-    component: () => import('@/features/auth/AuthOverlay.vue'),
+    component: AuthOverlay,
     children: [
       {
         path: 'callback',
         name: 'auth-callback',
-        component: () => import('@/features/auth/AuthCallback.vue'),
-        meta: {
-          title: 'Connexion en cours – Fast Peptides',
-        },
+        component: AuthCallback,
+        meta: { title: 'Connexion en cours – Fast Peptides' },
       },
     ],
   },
-  /* -------------------------------------------------------------------------- */
-  /* 🧭 PROFIL & COMPTE                                                         */
-  /* -------------------------------------------------------------------------- */
+
   {
     path: '/auth',
-    component: () => import('@/features/auth/AuthOverlay.vue'),
+    component: AuthOverlay,
     children: [
-      {
-        path: 'login',
-        name: 'auth-login',
-        component: () => import('@/features/auth/AuthLogin.vue'),
-      },
-      {
-        path: 'register',
-        name: 'auth-register',
-        component: () => import('@/features/auth/AuthRegister.vue'),
-      },
-      {
-        path: 'reset-password',
-        name: 'auth-reset',
-        component: () => import('@/features/auth/AuthReset.vue'),
-      },
-      {
-        path: 'email-sent',
-        name: 'email-sent',
-        component: () => import('@/features/auth/AuthEmailSent.vue'),
-      },
+      { path: 'login', name: 'auth-login', component: AuthLogin },
+      { path: 'register', name: 'auth-register', component: AuthRegister },
+      { path: 'reset-password', name: 'auth-reset', component: AuthReset },
+      { path: 'email-sent', name: 'email-sent', component: AuthEmailSent },
       {
         path: 'callback',
         name: 'auth-callback',
-        component: () => import('@/features/auth/AuthCallback.vue'),
-        meta: {
-          title: 'Connexion en cours – Fast Peptides',
-        },
+        component: AuthCallback,
+        meta: { title: 'Connexion en cours – Fast Peptides' },
       },
     ],
   },
+
   {
     path: '/profil',
     name: 'profil',
-    component: () => import('@/features/profile/ProfilView.vue'),
+    component: ProfilView,
     meta: {
       requiresAuth: true,
       title: 'Mon profil – Fast Peptides',
@@ -96,58 +113,55 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/profil/commandes',
     name: 'orders',
-    component: () => import('@/features/order/OrdersView.vue'),
+    component: OrdersView,
     meta: {
       requiresAuth: true,
       title: 'Mes commandes – Fast Peptides',
       description: 'Retrouvez toutes vos commandes précédentes sur Fast Peptides.',
     },
   },
+
   {
     path: '/profil/commandes/:id',
     name: 'order-detail',
-    component: () => import('@/features/order/OrderDetailView.vue'),
+    component: OrderDetailView,
     meta: {
       requiresAuth: true,
       getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
     },
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧾 AUTRES ROUTES AUTH                                                     */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/update-password',
     name: 'update-password',
-    component: () => import('@/features/auth/UpdatePasswordView.vue'),
+    component: UpdatePasswordView,
     meta: {
       title: 'Nouveau mot de passe – Fast Peptides',
       description: 'Choisissez un nouveau mot de passe pour accéder à votre compte Fast Peptides.',
     },
   },
+
   {
     path: '/update-password/success',
     name: 'update-password-success',
-    component: () => import('@/features/auth/UpdatePasswordSuccessView.vue'),
+    component: UpdatePasswordSuccessView,
     meta: {
       title: 'Mot de passe mis à jour – Fast Peptides',
       description: 'Votre mot de passe a été modifié avec succès.',
     },
   },
+
   {
     path: '/access-denied',
     name: 'access-denied',
-    component: () => import('@/features/auth/AccessDeniedView.vue'),
+    component: AccessDeniedView,
     meta: { title: 'Accès refusé – Fast Peptides' },
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* 🧪 CATALOGUE                                                              */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/catalogue',
     name: 'catalogue',
-    component: () => import('@/features/catalogue/Catalogue.vue'),
+    component: Catalogue,
     meta: {
       label: 'Catalogue',
       icon: 'Boxes',
@@ -156,10 +170,11 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Explorez notre catalogue complet de peptides de recherche de haute qualité.',
     },
   },
+
   {
     path: '/catalogue/:id',
     name: 'product-detail',
-    component: () => import('@/features/catalogue/ProductDetails.vue'),
+    component: ProductDetails,
     meta: {
       title: 'Produit – Fast Peptides',
       getDescription: (route) =>
@@ -167,13 +182,10 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* 📰 ACTUALITÉS                                                             */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/actualites',
     name: 'actualites',
-    component: () => import('@/features/actualités/ActualitesView.vue'),
+    component: ActualitesView,
     meta: {
       label: 'Actualités',
       icon: 'Newspaper',
@@ -183,33 +195,32 @@ const routes: Array<RouteRecordRaw> = [
         'Découvrez les dernières actualités, études et innovations dans le domaine des peptides sur Fast Peptides.',
     },
   },
+
   {
     path: '/actualites/:slug',
     name: 'actualite-detail',
-    component: () => import('@/features/actualités/ActualiteDetailView.vue'),
+    component: ActualiteDetailView,
     meta: {
       getTitle: (route) => `${route.params.slug as string} – Actualités Peptides – Fast Peptides`,
       description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
     },
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* 🛒 PANIER & PAIEMENT                                                      */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/panier',
     name: 'cart',
-    component: () => import('@/pages/PanierView.vue'),
+    component: PanierView,
     meta: {
       requiresAuth: true,
       title: 'Mon panier – Fast Peptides',
       description: 'Consultez les produits ajoutés à votre panier avant de valider votre commande.',
     },
   },
+
   {
     path: '/checkout',
     name: 'checkout',
-    component: () => import('@/features/checkout/CheckoutView.vue'),
+    component: CheckoutView,
     meta: {
       requiresCart: true,
       requiresAuth: true,
@@ -217,14 +228,15 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Validez et payez votre commande de peptides en toute sécurité.',
     },
   },
+
   {
     path: '/paiement',
-    component: () => import('@/features/checkout/paiement/PaymentResultWrapper.vue'),
+    component: PaymentResultWrapper,
     children: [
       {
         path: 'success',
         name: 'payment-success',
-        component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
+        component: PaymentSuccessView,
         meta: {
           title: 'Paiement réussi – Fast Peptides',
           description: 'Votre paiement a été validé avec succès. Merci pour votre commande !',
@@ -233,7 +245,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'cancel',
         name: 'payment-cancel',
-        component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
+        component: PaymentCancelView,
         meta: {
           title: 'Paiement annulé – Fast Peptides',
           description: 'Votre paiement a été interrompu ou annulé.',
@@ -241,9 +253,7 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  /* -------------------------------------------------------------------------- */
-  /* 🧑‍💼 ADMIN                                                                */
-  /* -------------------------------------------------------------------------- */
+
   {
     path: '/admin',
     component: () => import('@/features/admin/AdminTabsView.vue'),
@@ -256,70 +266,20 @@ const routes: Array<RouteRecordRaw> = [
     },
     redirect: { name: 'AdminUsers' },
     children: [
-      {
-        path: 'utilisateurs',
-        name: 'AdminUsers',
-        component: AdminUsersView,
-        meta: { label: 'Utilisateurs', icon: 'Users' },
-      },
-      {
-        path: 'commandes',
-        name: 'AdminOrders',
-        component: AdminOrdersView,
-        meta: { label: 'Commandes', icon: 'ShoppingCart' },
-      },
-      {
-        path: 'produits',
-        name: 'AdminProducts',
-        component: AdminProductsTable,
-        meta: { label: 'Produits', icon: 'PackageSearch' },
-      },
-      {
-        path: 'actualites',
-        name: 'AdminNews',
-        component: AdminNewsTable,
-        meta: { label: 'Actualités', icon: 'Newspaper' },
-      },
-      {
-        path: 'topics',
-        name: 'AdminTopics',
-        component: AdminTopicsTable,
-        meta: { label: 'Catégories', icon: 'FolderTree' },
-      },
-      {
-        path: 'messagerie',
-        name: 'AdminMessagerie',
-        component: AdminChatView,
-        meta: {
-          label: 'Messagerie',
-          icon: 'MessageSquare',
-          color: '#3B82F6',
-          requiresAuth: true,
-          requiresAdmin: true,
-        },
-      },
-      {
-        path: 'statistiques',
-        name: 'AdminStats',
-        component: AdminStatsView,
-        meta: {
-          label: 'Statistiques',
-          icon: 'BarChart3',
-          color: '#10B981',
-          requiresAuth: true,
-          requiresAdmin: true,
-        },
-      },
+      { path: 'utilisateurs', name: 'AdminUsers', component: AdminUsersView },
+      { path: 'commandes', name: 'AdminOrders', component: AdminOrdersView },
+      { path: 'produits', name: 'AdminProducts', component: AdminProductsTable },
+      { path: 'actualites', name: 'AdminNews', component: AdminNewsTable },
+      { path: 'topics', name: 'AdminTopics', component: AdminTopicsTable },
+      { path: 'messagerie', name: 'AdminMessagerie', component: AdminChatView },
+      { path: 'statistiques', name: 'AdminStats', component: AdminStatsView },
     ],
   },
 
-  /* -------------------------------------------------------------------------- */
-  /* ❓ FAQ                                                                     */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/faq',
     name: 'faq',
-    component: () => import('@/pages/FaqView.vue'),
+    component: FaqView,
     meta: {
       label: 'FAQ',
       icon: 'HelpCircle',
