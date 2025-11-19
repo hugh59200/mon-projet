@@ -253,7 +253,7 @@
       overflow-y: auto;
       scrollbar-width: thin;
       scroll-behavior: smooth;
-      background: color-mix(in srgb, var(--primary-200) 75%, transparent);
+      background: rgba(var(--primary-200-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);

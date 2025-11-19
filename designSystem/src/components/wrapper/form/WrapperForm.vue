@@ -89,7 +89,7 @@
 
     &__main {
       flex: 1;
-      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);

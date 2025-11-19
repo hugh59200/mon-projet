@@ -20,17 +20,17 @@
     <template v-if="hasLoaded && order">
       <!-- 🧾 En-tête commande -->
       <div
-        class="order-header"
+        class="order-detail__header"
         v-motion="{
           initial: { opacity: 0, y: -20 },
           enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 90 } },
         }"
       >
-        <div class="order-header__left">
+        <div class="order-detail__header-left">
           <BasicText
             size="h4"
             weight="bold"
-            class="order-header__title"
+            class="order-detail__header-title"
           >
             Commande du {{ formatDate(order.created_at) }}
           </BasicText>
@@ -41,7 +41,7 @@
             N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
           </BasicText>
         </div>
-        <div class="order-header__right">
+        <div class="order-detail__header-right">
           <BasicBadge
             :label="getLabelBadge(order.status)"
             :type="getTypeBadge(order.status)"
@@ -50,26 +50,26 @@
       </div>
 
       <!-- 🧩 Produits -->
-      <div class="order-section">
+      <div class="order-detail__section">
         <BasicText
           size="h5"
           weight="semibold"
-          class="order-section__title"
+          class="order-detail__section-title"
         >
           Produits
         </BasicText>
-        <div class="order-items">
+        <div class="order-detail__items">
           <div
             v-for="(item, i) in order.detailed_items ?? []"
             :key="i"
-            class="order-item"
+            class="order-detail__item"
           >
             <img
               :src="item.image || defaultImage"
               alt="Produit"
-              class="order-item__img"
+              class="order-detail__item-img"
             />
-            <div class="order-item__info">
+            <div class="order-detail__item-info">
               <BasicText
                 size="body-m"
                 weight="semibold"
@@ -96,39 +96,39 @@
       </div>
 
       <!-- 💰 Récapitulatif -->
-      <div class="order-section">
+      <div class="order-detail__section">
         <BasicText
           size="h5"
           weight="semibold"
-          class="order-section__title"
+          class="order-detail__section-title"
         >
           Récapitulatif
         </BasicText>
-        <div class="order-summary">
-          <div class="summary-line">
+        <div class="order-detail__summary">
+          <div class="order-detail__summary-line">
             <span>Total</span>
             <strong>{{ formatPrice(order.total_amount) }}</strong>
           </div>
-          <div class="summary-line">
+          <div class="order-detail__summary-line">
             <span>Méthode de paiement</span>
             <span>{{ order.payment_method ?? '—' }}</span>
           </div>
-          <div class="summary-line">
+          <div class="order-detail__summary-line">
             <span>Transporteur</span>
             <span>{{ order.carrier ?? '—' }}</span>
           </div>
         </div>
       </div>
       <!-- 📦 Livraison -->
-      <div class="order-section">
+      <div class="order-detail__section">
         <BasicText
           size="h5"
           weight="semibold"
-          class="order-section__title"
+          class="order-detail__section-title"
         >
           Informations de livraison
         </BasicText>
-        <div class="order-address">
+        <div class="order-detail__address">
           <BasicText
             size="body-s"
             color="neutral-800"
@@ -160,34 +160,34 @@
       <!-- 🚚 Suivi -->
       <div
         v-if="order.status"
-        class="order-section"
+        class="order-detail__section"
       >
         <BasicText
           size="h5"
           weight="semibold"
-          class="order-section__title"
+          class="order-detail__section-title"
         >
           Suivi de la commande
         </BasicText>
-        <div class="order-timeline">
+        <div class="order-detail__timeline">
           <div
             v-for="step in orderSteps"
             :key="step.key"
-            class="timeline-step"
+            class="order-detail__timeline-step"
             :class="{ active: step.key === mapStatus(order.status) }"
           >
-            <div class="dot"></div>
+            <div class="order-detail__timeline-dot"></div>
             <BasicText
               size="body-s"
               color="neutral-600"
-              class="label"
+              class="order-detail__timeline-label"
             >
               {{ step.label }}
             </BasicText>
           </div>
         </div>
 
-        <div class="tracking-actions">
+        <div class="order-detail__tracking-actions">
           <BasicButton
             v-if="order.tracking_number"
             label="Suivre le colis"
@@ -213,7 +213,7 @@
     <!-- 🚫 Si commande introuvable -->
     <div
       v-else-if="hasLoaded && !order"
-      class="empty-state"
+      class="order-detail__empty-state"
     >
       <BasicText
         size="body-m"
@@ -308,8 +308,8 @@
       margin-bottom: 8px;
     }
 
-    .order-header {
-      background: white;
+    &__header {
+      background: @white;
       border: 1px solid @neutral-200;
       border-radius: 14px;
       padding: 24px;
@@ -319,12 +319,12 @@
       flex-wrap: wrap;
       box-shadow: 0 2px 6px color-mix(in srgb, @neutral-400 8%, transparent);
 
-      &__title {
+      &-title {
         margin-bottom: 2px;
         color: @neutral-900;
       }
 
-      &__right {
+      &-right {
         display: flex;
         gap: 10px;
         align-items: center;
@@ -332,8 +332,8 @@
       }
     }
 
-    .order-section {
-      background: white;
+    &__section {
+      background: @white;
       border: 1px solid @neutral-200;
       border-radius: 12px;
       padding: 20px;
@@ -342,18 +342,18 @@
       flex-direction: column;
       gap: 14px;
 
-      &__title {
+      &-title {
         color: @neutral-900;
       }
     }
 
-    .order-items {
+    &__items {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .order-item {
+    &__item {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -365,7 +365,7 @@
         border-bottom: none;
       }
 
-      &__img {
+      &-img {
         width: 56px;
         height: 56px;
         border-radius: 10px;
@@ -374,7 +374,7 @@
         flex-shrink: 0;
       }
 
-      &__info {
+      &-info {
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -382,54 +382,31 @@
       }
     }
 
-    .order-summary {
+    &__summary {
       background: color-mix(in srgb, @neutral-50 80%, transparent);
       border-radius: 10px;
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
 
-      .summary-line {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: @neutral-700;
+    &__summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: @neutral-700;
 
-        strong {
-          color: var(--primary-700);
-        }
+      strong {
+        color: var(--primary-700);
       }
     }
 
-    .order-timeline {
+    &__timeline {
       display: flex;
       justify-content: space-between;
       position: relative;
       padding: 8px 0;
-
-      .timeline-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        color: @neutral-500;
-
-        .dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: @neutral-300;
-          margin-bottom: 4px;
-        }
-
-        &.active {
-          color: var(--primary-700);
-          .dot {
-            background: var(--primary-500);
-          }
-        }
-      }
 
       &:before {
         content: '';
@@ -440,21 +417,49 @@
         height: 2px;
         background: @neutral-200;
       }
+
+      &-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        color: @neutral-500;
+
+        &.active {
+          color: var(--primary-700);
+
+          .order-detail__timeline-dot {
+            background: var(--primary-500);
+          }
+        }
+      }
+
+      &-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: @neutral-300;
+        margin-bottom: 4px;
+      }
+
+      &-label {
+        text-align: center;
+      }
     }
 
-    .tracking-actions {
+    &__tracking-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 10px;
     }
 
-    .order-address {
+    &__address {
       line-height: 1.5;
       color: @neutral-700;
     }
 
-    .empty-state {
+    &__empty-state {
       text-align: center;
       padding: 60px 20px;
       display: flex;
@@ -464,20 +469,20 @@
     }
 
     @media (max-width: 768px) {
-      .order-header {
+      &__header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
       }
 
-      .order-section {
+      &__section {
         padding: 16px;
       }
 
-      .order-item {
+      &__item {
         flex-wrap: wrap;
 
-        &__img {
+        &-img {
           width: 48px;
           height: 48px;
         }

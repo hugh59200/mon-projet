@@ -119,20 +119,20 @@
      VARIANT: GHOST (default)
      ====================================================== */
     &--ghost {
-      background: color-mix(in srgb, var(--secondary-900) 0%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0);
 
       &:hover {
-        background: color-mix(in srgb, var(--secondary-800) 25%, transparent);
+        background: rgba(var(--secondary-800-rgb), 0.25);
         backdrop-filter: blur(4px);
-        box-shadow: 0 0 8px color-mix(in srgb, var(--primary-500) 20%, transparent);
+        box-shadow: 0 0 8px rgba(var(--primary-500-rgb), 0.2);
         transform: translateY(-1px);
       }
 
       &.is-active {
-        background: color-mix(in srgb, var(--secondary-700) 35%, transparent);
+        background: rgba(var(--secondary-700-rgb), 0.35);
         box-shadow:
-          0 0 6px color-mix(in srgb, var(--primary-500) 25%, transparent),
-          inset 0 0 0 1px color-mix(in srgb, var(--primary-500) 35%, transparent);
+          0 0 6px rgba(var(--primary-500-rgb), 0.25),
+          inset 0 0 0 1px rgba(var(--primary-500-rgb), 0.35);
       }
     }
 
@@ -140,21 +140,21 @@
      VARIANT: FILLED (subtle glass)
      ====================================================== */
     &--filled {
-      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-700) 55%, transparent), color-mix(in srgb, var(--primary-500) 45%, transparent));
+      background: linear-gradient(135deg, rgba(var(--primary-700-rgb), 0.55), rgba(var(--primary-500-rgb), 0.45));
       backdrop-filter: blur(4px);
-      border: 1px solid color-mix(in srgb, var(--primary-300) 18%, transparent);
+      border: 1px solid rgba(var(--primary-300-rgb), 0.18);
 
       &:hover {
-        background: linear-gradient(135deg, color-mix(in srgb, var(--primary-700) 70%, transparent), color-mix(in srgb, var(--primary-500) 60%, transparent));
-        box-shadow: 0 0 10px color-mix(in srgb, var(--primary-500) 30%, transparent);
+        background: linear-gradient(135deg, rgba(var(--primary-700-rgb), 0.7), rgba(var(--primary-500-rgb), 0.6));
+        box-shadow: 0 0 10px rgba(var(--primary-500-rgb), 0.3);
         transform: translateY(-1px);
       }
 
       &.is-active {
-        background: color-mix(in srgb, var(--primary-700) 70%, transparent);
+        background: rgba(var(--primary-700-rgb), 0.7);
         box-shadow:
-          0 0 6px color-mix(in srgb, var(--primary-500) 40%, transparent),
-          inset 0 0 0 1px color-mix(in srgb, var(--primary-500) 50%, transparent);
+          0 0 6px rgba(var(--primary-500-rgb), 0.4),
+          inset 0 0 0 1px rgba(var(--primary-500-rgb), 0.5);
       }
     }
 
@@ -162,16 +162,16 @@
      VARIANT: ACTIVE (accent glow)
      ====================================================== */
     &--active {
-      background: color-mix(in srgb, var(--primary-600) 40%, transparent);
+      background: rgba(var(--primary-600-rgb), 0.4);
       backdrop-filter: blur(4px);
 
-      box-shadow: 0 0 8px color-mix(in srgb, var(--primary-400) 25%, transparent);
+      box-shadow: 0 0 8px rgba(var(--primary-400-rgb), 0.25);
 
       &:hover {
-        background: color-mix(in srgb, var(--primary-600) 55%, transparent);
+        background: rgba(var(--primary-600-rgb), 0.55);
         box-shadow:
-          0 0 12px color-mix(in srgb, var(--primary-400) 32%, transparent),
-          inset 0 0 0 1px color-mix(in srgb, var(--primary-300) 25%, transparent);
+          0 0 12px rgba(var(--primary-400-rgb), 0.32),
+          inset 0 0 0 1px rgba(var(--primary-300-rgb), 0.25);
         transform: translateY(-1px);
       }
     }

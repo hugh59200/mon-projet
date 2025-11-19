@@ -413,7 +413,7 @@
         inset: 0;
         background: radial-gradient(
           circle at 50% 0%,
-          color-mix(in srgb, var(--primary-500) 20%, transparent) 0%,
+          rgba(var(--primary-500-rgb), 0.2) 0%,
           transparent 70%
         );
         pointer-events: none;
@@ -438,7 +438,7 @@
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            color-mix(in srgb, var(--primary-500) 22%, transparent) 0%,
+            rgba(var(--primary-500-rgb), 0.22) 0%,
             transparent 75%
           );
         }
@@ -537,10 +537,10 @@
 
     @keyframes faqFlash {
       0% {
-        background: color-mix(in srgb, var(--primary-500) 12%, transparent);
+        background: rgba(var(--primary-500-rgb), 0.12);
       }
       60% {
-        background: color-mix(in srgb, var(--primary-500) 3%, transparent);
+        background: rgba(var(--primary-500-rgb), 0.03);
       }
       100% {
         background: transparent;

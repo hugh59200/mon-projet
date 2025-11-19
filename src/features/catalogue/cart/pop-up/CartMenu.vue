@@ -190,7 +190,7 @@
       }
 
       &:hover &-svg {
-        filter: drop-shadow(0 0 6px color-mix(in srgb, var(--primary-500) 45%, transparent));
+        filter: drop-shadow(0 0 6px rgba(var(--primary-500-rgb), 0.45));
       }
     }
 
@@ -213,7 +213,7 @@
       font-size: 11px;
       font-weight: bold;
 
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary-900) 70%, transparent);
+      box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 0.7);
     }
 
     /* ======================

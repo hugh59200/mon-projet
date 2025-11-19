@@ -15,8 +15,8 @@
         v-for="(slide, index) in slides"
         :key="slide.id"
         type="button"
-        class="nav-pill"
-        :class="{ 'nav-pill--active': index === activeIndex }"
+        class="category-hero__nav-pill"
+        :class="{ 'category-hero__nav-pill--active': index === activeIndex }"
         @click="goToSlide(index)"
       >
         {{ slide.label }}
@@ -42,14 +42,14 @@
           class="category-hero__slide"
           :style="{ '--accent': slide.accent }"
         >
-          <div class="slide__overlay"></div>
+          <div class="category-hero__slide-overlay"></div>
 
-          <div class="slide__content">
-            <div class="slide__text">
+          <div class="category-hero__slide-content">
+            <div class="category-hero__slide-text">
               <BasicText
                 size="body-s"
                 color="primary-500"
-                class="slide__eyebrow"
+                class="category-hero__slide-eyebrow"
               >
                 {{ slide.eyebrow }}
               </BasicText>
@@ -65,7 +65,7 @@
               <BasicText
                 size="body-m"
                 color="neutral-700"
-                class="slide__desc"
+                class="category-hero__slide-desc"
               >
                 {{ slide.description }}
               </BasicText>
@@ -73,13 +73,13 @@
               <BasicText
                 size="body-s"
                 color="neutral-500"
-                class="slide__disclaimer"
+                class="category-hero__slide-disclaimer"
               >
                 Produits destinés exclusivement à la recherche scientifique – non destinés à l’usage
                 humain.
               </BasicText>
 
-              <div class="slide__actions">
+              <div class="category-hero__slide-actions">
                 <BasicButton
                   :label="`Explorer les peptides ${slide.label}`"
                   type="primary"
@@ -97,9 +97,9 @@
               </div>
             </div>
 
-            <div class="slide__media">
+            <div class="category-hero__slide-media">
               <div
-                class="video-card"
+                class="category-hero__video-card"
                 @click="openVideo(slide)"
               >
                 <img
@@ -107,16 +107,16 @@
                   :alt="slide.title"
                   loading="lazy"
                 />
-                <div class="video-card__overlay">
-                  <span class="video-card__badge">Vidéo YouTube</span>
+                <div class="category-hero__video-card-overlay">
+                  <span class="category-hero__video-card-badge">Vidéo YouTube</span>
                   <BasicText
                     size="body-s"
                     color="white"
-                    class="video-card__title"
+                    class="category-hero__video-card-title"
                   >
                     {{ slide.videoLabel }}
                   </BasicText>
-                  <div class="video-card__cta">▶ Regarder</div>
+                  <div class="category-hero__video-card-cta">▶ Regarder</div>
                 </div>
               </div>
             </div>
@@ -335,7 +335,7 @@
     border-radius: 20px;
     overflow: hidden;
 
-    background: color-mix(in srgb, var(--secondary-900) 45%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.45);
     backdrop-filter: blur(22px);
 
     border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
@@ -361,10 +361,10 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          color-mix(in srgb, var(--secondary-900) 45%, transparent) 0%,
-          color-mix(in srgb, var(--secondary-950) 55%, transparent) 40%,
-          color-mix(in srgb, var(--secondary-900) 35%, transparent) 75%,
-          color-mix(in srgb, var(--secondary-900) 50%, transparent) 100%
+          rgba(var(--secondary-900-rgb), 0.45) 0%,
+          rgba(var(--secondary-950-rgb), 0.55) 40%,
+          rgba(var(--secondary-900-rgb), 0.35) 75%,
+          rgba(var(--secondary-900-rgb), 0.5) 100%
         );
         backdrop-filter: blur(8px);
       }
@@ -380,39 +380,39 @@
       display: flex;
       gap: 10px;
       padding: 18px 24px 8px;
+    }
 
-      .nav-pill {
-        padding: 5px 16px;
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: 999px;
-        color: @neutral-200 !important;
+    &__nav-pill {
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 999px;
+      color: @neutral-200 !important;
 
-        background: color-mix(in srgb, @neutral-0 40%, transparent);
-        backdrop-filter: blur(10px);
+      background: color-mix(in srgb, @neutral-0 40%, transparent);
+      backdrop-filter: blur(10px);
 
-        border: 1px solid color-mix(in srgb, @neutral-300 35%, transparent);
-        color: @neutral-900;
+      border: 1px solid color-mix(in srgb, @neutral-300 35%, transparent);
+      color: @neutral-900;
 
+      box-shadow:
+        0 4px 14px fade(#000, 12%),
+        inset 0 0 0 1px fade(@white, 12%);
+
+      transition: all 0.25s ease;
+
+      &:hover {
+        background: color-mix(in srgb, @neutral-0 65%, transparent);
+        box-shadow: 0 4px 18px fade(#000, 18%);
+      }
+
+      &--active {
+        background: rgba(var(--primary-200-rgb), 0.45);
+        border-color: rgba(var(--primary-400-rgb), 0.6);
+        color: var(--primary-700) !important;
         box-shadow:
-          0 4px 14px fade(#000, 12%),
-          inset 0 0 0 1px fade(@white, 12%);
-
-        transition: all 0.25s ease;
-
-        &:hover {
-          background: color-mix(in srgb, @neutral-0 65%, transparent);
-          box-shadow: 0 4px 18px fade(#000, 18%);
-        }
-
-        &--active {
-          background: color-mix(in srgb, var(--primary-200) 45%, transparent);
-          border-color: color-mix(in srgb, var(--primary-400) 60%, transparent);
-          color: var(--primary-700) !important;
-          box-shadow:
-            0 0 0 1px color-mix(in srgb, var(--primary-300) 55%, transparent),
-            0 6px 16px color-mix(in srgb, var(--primary-400) 35%, transparent);
-        }
+          0 0 0 1px rgba(var(--primary-300-rgb), 0.55),
+          0 6px 16px rgba(var(--primary-400-rgb), 0.35);
       }
     }
 
@@ -450,18 +450,17 @@
       flex: 0 0 100%;
       padding: 28px 32px 28px;
       position: relative;
-
       /* overlay lisibilité */
-      .slide__overlay {
+      &-overlay {
         position: absolute;
         inset: 0;
         z-index: 1;
 
         background: linear-gradient(
           90deg,
-          color-mix(in srgb, var(--secondary-900) 90%, transparent) 0%,
-          color-mix(in srgb, var(--secondary-900) 70%, transparent) 28%,
-          color-mix(in srgb, var(--secondary-800) 45%, transparent) 58%,
+          rgba(var(--secondary-900-rgb), 0.9) 0%,
+          rgba(var(--secondary-900-rgb), 0.7) 28%,
+          rgba(var(--secondary-800-rgb), 0.45) 58%,
           transparent 100%
         );
         backdrop-filter: blur(12px);
@@ -469,7 +468,7 @@
       }
 
       /* contenu slide */
-      .slide__content {
+      &-content {
         position: relative;
         z-index: 2;
 
@@ -483,118 +482,118 @@
       /* -------------------------
        TEXT BLOCK
        ------------------------- */
-      .slide__text {
+      &-text {
         flex: 1;
         max-width: 460px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+      }
 
-        .slide__eyebrow {
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          font-weight: 600;
-        }
+      &-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+      }
 
-        .slide__desc {
-          color: @neutral-300 !important;
-          margin-top: 4px;
-        }
+      &-desc {
+        color: @neutral-300 !important;
+        margin-top: 4px;
+      }
 
-        .slide__disclaimer {
-          margin-top: 6px;
-          font-size: 12px;
-          color: color-mix(in srgb, @neutral-400 80%, transparent) !important;
-          max-width: 380px;
-        }
+      &-disclaimer {
+        margin-top: 6px;
+        font-size: 12px;
+        color: color-mix(in srgb, @neutral-400 80%, transparent) !important;
+        max-width: 380px;
+      }
 
-        .slide__actions {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          margin-top: 14px;
-        }
+      &-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 14px;
       }
 
       /* -------------------------
        VIDEO BLOCK
        ------------------------- */
-      .slide__media {
+      &-media {
         flex: 1.1;
         min-width: 260px;
 
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+    }
 
-        .video-card {
-          position: relative;
-          width: 340px;
-          max-width: 100%;
-          aspect-ratio: 16/9;
-          border-radius: 18px;
-          overflow: hidden;
+    &__video-card {
+      position: relative;
+      width: 340px;
+      max-width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 18px;
+      overflow: hidden;
 
-          background: color-mix(in srgb, var(--secondary-950) 45%, transparent);
-          box-shadow:
-            0 10px 28px fade(#000, 45%),
-            inset 0 0 0 1px fade(@white, 8%);
+      background: rgba(var(--secondary-950-rgb), 0.45);
+      box-shadow:
+        0 10px 28px fade(#000, 45%),
+        inset 0 0 0 1px fade(@white, 8%);
 
-          transition:
-            transform 0.28s ease,
-            box-shadow 0.28s ease;
-          cursor: pointer;
+      transition:
+        transform 0.28s ease,
+        box-shadow 0.28s ease;
+      cursor: pointer;
 
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.86;
-          }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.86;
+      }
 
-          &__overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 6px;
+      &-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 6px;
 
-            padding: 14px;
+        padding: 14px;
 
-            background: linear-gradient(0deg, color-mix(in srgb, var(--secondary-900) 85%, transparent) 0%, transparent 60%);
-          }
+        background: linear-gradient(0deg, rgba(var(--secondary-900-rgb), 0.85) 0%, transparent 60%);
+      }
 
-          &__badge {
-            align-self: start;
-            padding: 2px 10px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
+      &-badge {
+        align-self: start;
+        padding: 2px 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
 
-            border-radius: 999px;
-            color: @neutral-0;
-            background: color-mix(in srgb, var(--primary-400) 35%, transparent);
-            backdrop-filter: blur(6px);
-          }
+        border-radius: 999px;
+        color: @neutral-0;
+        background: rgba(var(--primary-400-rgb), 0.35);
+        backdrop-filter: blur(6px);
+      }
 
-          &__title {
-            color: @neutral-0 !important;
-            font-weight: 600;
-          }
+      &-title {
+        color: @neutral-0 !important;
+        font-weight: 600;
+      }
 
-          &__cta {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            color: color-mix(in srgb, @neutral-0 85%, transparent);
-          }
+      &-cta {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: color-mix(in srgb, @neutral-0 85%, transparent);
+      }
 
-          &:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 14px 36px fade(#000, 55%);
-          }
-        }
+      &:hover {
+        transform: translateY(-6px) scale(1.03);
+        box-shadow: 0 14px 36px fade(#000, 55%);
       }
     }
 
@@ -689,27 +688,25 @@
     }
 
     @media (max-width: 760px) {
-      &__slide {
-        .slide__content {
-          flex-direction: column;
-        }
+      &__slide-content {
+        flex-direction: column;
+      }
 
-        .slide__overlay {
-          background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--secondary-900) 90%, transparent) 0%,
-            color-mix(in srgb, var(--secondary-900) 70%, transparent) 35%,
-            transparent 100%
-          );
-        }
+      &__slide-overlay {
+        background: linear-gradient(
+          180deg,
+          rgba(var(--secondary-900-rgb), 0.9) 0%,
+          rgba(var(--secondary-900-rgb), 0.7) 35%,
+          transparent 100%
+        );
+      }
 
-        .slide__media {
-          justify-content: flex-start;
+      &__slide-media {
+        justify-content: flex-start;
+      }
 
-          .video-card {
-            width: 100%;
-          }
-        }
+      &__video-card {
+        width: 100%;
       }
     }
   }

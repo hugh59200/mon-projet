@@ -83,9 +83,9 @@
       transform: translateY(-4px);
       box-shadow:
         0 18px 38px fade(#000, 28%),
-        0 0 14px color-mix(in srgb, var(--primary-400) 25%, transparent),
+        0 0 14px rgba(var(--primary-400-rgb), 0.25),
         inset 0 0 0 1px fade(@white, 30%);
-      border-color: color-mix(in srgb, var(--primary-400) 30%, transparent);
+      border-color: rgba(var(--primary-400-rgb), 0.3);
     }
 
     &__image {

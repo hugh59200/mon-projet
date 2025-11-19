@@ -94,14 +94,14 @@
           title="Mes commandes"
           v-model="sections.orders"
         >
-          <div class="orders-grid">
+          <div class="profil__orders">
             <div
               v-for="order in lastOrders"
               :key="order.id"
-              class="order-item"
+              class="profil__order-card"
               @click="goToOrder(order.id)"
             >
-              <div class="order-item__head">
+              <div class="profil__order-card-head">
                 <BasicText
                   size="body-l"
                   weight="bold"
@@ -116,7 +116,7 @@
                 />
               </div>
 
-              <div class="order-item__body">
+              <div class="profil__order-card-body">
                 <BasicText
                   size="body-m"
                   color="neutral-700"
@@ -139,6 +139,7 @@
               size="body-m"
               color="neutral-500"
               align="center"
+              class="profil__orders-empty"
             >
               Vous n’avez pas encore de commande.
             </BasicText>
@@ -159,17 +160,17 @@
         >
           <div class="profil__preferences">
             <!-- 🎛️ Bloc thème -->
-            <div class="pref-card">
+            <div class="profil__pref-card">
               <BasicText
                 size="body-m"
                 weight="semibold"
-                class="pref-card__title"
+                class="profil__pref-card-title"
               >
                 Apparence
               </BasicText>
 
-              <div class="pref-card__row">
-                <div class="pref-card__info">
+              <div class="profil__pref-card-row">
+                <div class="profil__pref-card-info">
                   <BasicText
                     size="body-m"
                     weight="semibold"
@@ -189,16 +190,16 @@
             </div>
 
             <!-- Notifications -->
-            <div class="pref-card">
+            <div class="profil__pref-card">
               <BasicText
                 size="body-m"
                 weight="semibold"
-                class="pref-card__title"
+                class="profil__pref-card-title"
               >
                 Notifications
               </BasicText>
 
-              <div class="pref-card__list">
+              <div class="profil__pref-card-list">
                 <BasicCheckbox
                   v-model="newsletter"
                   label="Recevoir les newsletters"
@@ -397,73 +398,6 @@
 </script>
 
 <style lang="less">
-  .orders-grid {
-    display: grid;
-    gap: 18px;
-  }
-
-  .order-item {
-    background: color-mix(in srgb, @neutral-50 45%, transparent);
-    border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
-    padding: 18px 22px;
-    border-radius: 14px;
-
-    transition: all 0.25s ease;
-    cursor: pointer;
-
-    &:hover {
-      transform: translateY(-2px);
-      border-color: color-mix(in srgb, var(--primary-400) 40%, transparent);
-      box-shadow: 0 8px 22px fade(#000, 12%);
-    }
-
-    &__head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    &__body {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-  }
-
-  .pref-card {
-    background: color-mix(in srgb, @neutral-50 35%, transparent);
-    border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
-    padding: 22px 24px;
-    border-radius: 14px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-    &__title {
-      margin-bottom: 4px;
-      color: @neutral-700;
-    }
-
-    &__row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    &__info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    &__list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-  }
   .profil {
     background: transparent !important;
     min-height: 100vh;
@@ -474,6 +408,79 @@
       flex-direction: column;
       gap: 22px;
     }
+
+    &__orders {
+      display: grid;
+      gap: 18px;
+    }
+
+    &__orders-empty {
+      display: block;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    &__order-card {
+      background: color-mix(in srgb, @neutral-50 45%, transparent);
+      border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
+      padding: 18px 22px;
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+        border-color: rgba(var(--primary-400-rgb), 0.4);
+        box-shadow: 0 8px 22px fade(#000, 12%);
+      }
+
+      &-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      &-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+
+    &__pref-card {
+      background: color-mix(in srgb, @neutral-50 35%, transparent);
+      border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
+      padding: 22px 24px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      &-title {
+        margin-bottom: 4px;
+        color: @neutral-700;
+      }
+
+      &-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      &-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      &-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
     /* -----------------------------
       🖼️ Cover
     ----------------------------- */
@@ -547,10 +554,10 @@
 
       &:hover {
         transform: scale(1.035);
-        border-color: color-mix(in srgb, var(--primary-500) 45%, transparent);
+        border-color: rgba(var(--primary-500-rgb), 0.45);
         box-shadow:
-          0 0 20px color-mix(in srgb, var(--primary-500) 35%, transparent),
-          0 0 0 3px color-mix(in srgb, var(--primary-400) 20%, transparent);
+          0 0 20px rgba(var(--primary-500-rgb), 0.35),
+          0 0 0 3px rgba(var(--primary-400-rgb), 0.2);
       }
 
       .profil__avatar-placeholder {

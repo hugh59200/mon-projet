@@ -154,7 +154,7 @@
       border-radius: 50%;
       cursor: pointer;
 
-      background: color-mix(in srgb, var(--secondary-900) 55%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.55);
       backdrop-filter: blur(6px);
 
       border: 1px solid color-mix(in srgb, @neutral-500 8%, transparent);
@@ -163,8 +163,8 @@
 
       /* ✨ Glow hover */
       &:hover {
-        background: color-mix(in srgb, var(--secondary-900) 70%, transparent);
-        box-shadow: 0 0 8px color-mix(in srgb, var(--primary-500) 25%, transparent);
+        background: rgba(var(--secondary-900-rgb), 0.7);
+        box-shadow: 0 0 8px rgba(var(--primary-500-rgb), 0.25);
         transform: translateY(-1px);
       }
 
@@ -194,7 +194,7 @@
         font-size: 11px;
         font-weight: bold;
 
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary-900) 80%, transparent);
+        box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 0.8);
       }
     }
 

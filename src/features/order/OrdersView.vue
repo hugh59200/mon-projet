@@ -16,15 +16,18 @@
         Mes
         <span>commandes</span>
       </BasicText>
+
       <div class="user-orders__subtitle">
         Retrouvez ici l’historique de toutes vos commandes passées 🧾
       </div>
+
+      <div class="user-orders__timeline"></div>
     </div>
 
-    <WrapperLoader
-      :loading="!hasLoaded"
-      message="Chargement de vos commandes..."
-    />
+    <!-- Loader -->
+    <WrapperLoader :loading="!hasLoaded" />
+
+    <!-- Si aucun résultat -->
     <div
       v-if="hasLoaded && orders.length === 0"
       class="user-orders__empty"
@@ -39,6 +42,7 @@
       >
         Vous n’avez encore passé aucune commande.
       </BasicText>
+
       <BasicButton
         label="Découvrir le catalogue"
         type="primary"
@@ -48,14 +52,14 @@
       />
     </div>
 
-    <!-- ✅ Liste des commandes -->
+    <!-- Liste commandes -->
     <div
       v-else
       class="user-orders__list"
     >
-      <!-- 🧭 Contrôles globaux -->
+      <!-- Contrôles globaux -->
       <div
-        class="orders-controls"
+        class="user-orders__controls"
         v-motion="{
           initial: { opacity: 0, y: 10 },
           enter: { opacity: 1, y: 0, transition: { delay: 0.1, type: 'spring', stiffness: 120 } },
@@ -70,11 +74,11 @@
         />
       </div>
 
-      <!-- 🧾 Cartes commandes -->
+      <!-- Cartes commandes -->
       <div
         v-for="(order, index) in orders"
         :key="index"
-        class="order-card"
+        class="user-orders__card"
         v-motion="{
           initial: { opacity: 0, y: 40, scale: 0.97 },
           enter: {
@@ -85,24 +89,26 @@
           },
         }"
       >
-        <!-- 🏷️ En-tête -->
-        <div class="order-card__header">
-          <div class="order-card__header-left">
+        <!-- En-tête -->
+        <div class="user-orders__card-header">
+          <div class="user-orders__card-header-left">
             <BasicText
               size="body-l"
               weight="bold"
-              class="order-card__date"
+              class="user-orders__card-date"
             >
               Commande du {{ formatDate(order.created_at) }}
             </BasicText>
+
             <BasicText
               size="body-s"
               color="neutral-600"
-              class="order-card__number"
+              class="user-orders__card-number"
             >
               N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
             </BasicText>
           </div>
+
           <BasicBadge
             :label="getLabelBadge(order.status)"
             :type="getTypeBadge(order.status)"
@@ -110,7 +116,7 @@
           />
         </div>
 
-        <!-- 🔽 Produits -->
+        <!-- Produits -->
         <FilterSection
           title="Produits"
           :model-value="openSections[safeId(order)]?.items"
@@ -127,20 +133,21 @@
               },
               leave: { opacity: 0, y: -10, height: 0, transition: { duration: 0.25 } },
             }"
-            class="order-card__items"
+            class="user-orders__card-items"
           >
             <div
               v-for="(item, i) in order.detailed_items ?? []"
               :key="i"
-              class="order-item"
+              class="user-orders__item"
             >
               <img
                 :src="item.product_image || defaultImage"
                 alt="Produit"
-                class="order-item__img"
+                class="user-orders__item-img"
               />
-              <div class="order-item__details">
-                <div class="order-item__name">
+
+              <div class="user-orders__item-details">
+                <div class="user-orders__item-name">
                   <BasicText
                     size="body-m"
                     weight="semibold"
@@ -149,13 +156,15 @@
                     {{ item.product_name }}
                   </BasicText>
                 </div>
-                <div class="order-item__meta">
+
+                <div class="user-orders__item-meta">
                   <BasicText
                     size="body-s"
                     color="neutral-500"
                   >
                     Quantité : {{ item.quantity }}
                   </BasicText>
+
                   <BasicText
                     size="body-s"
                     weight="bold"
@@ -169,7 +178,7 @@
           </div>
         </FilterSection>
 
-        <!-- 🔽 Résumé -->
+        <!-- Résumé -->
         <FilterSection
           title="Résumé"
           :model-value="openSections[safeId(order)]?.summary"
@@ -186,9 +195,9 @@
               },
               leave: { opacity: 0, y: -10, height: 0, transition: { duration: 0.25 } },
             }"
-            class="order-card__summary"
+            class="user-orders__card-summary"
           >
-            <div class="summary-line">
+            <div class="user-orders__summary-line">
               <BasicText
                 size="body-s"
                 color="neutral-700"
@@ -196,14 +205,15 @@
                 Total
               </BasicText>
               <BasicText
-                size="body-m"
+                size="body-s"
                 weight="bold"
-                color="primary-900"
+                color="neutral-800"
               >
                 {{ formatPrice(order.total_amount) }}
               </BasicText>
             </div>
-            <div class="summary-line">
+
+            <div class="user-orders__summary-line">
               <BasicText
                 size="body-s"
                 color="neutral-700"
@@ -217,7 +227,8 @@
                 {{ order.payment_method ?? '—' }}
               </BasicText>
             </div>
-            <div class="summary-line">
+
+            <div class="user-orders__summary-line">
               <BasicText
                 size="body-s"
                 color="neutral-700"
@@ -234,7 +245,7 @@
           </div>
         </FilterSection>
 
-        <!-- 🔽 Suivi -->
+        <!-- Suivi -->
         <FilterSection
           title="Suivi"
           :model-value="openSections[safeId(order)]?.tracking"
@@ -253,26 +264,29 @@
               },
               leave: { opacity: 0, y: -15, height: 0, transition: { duration: 0.25 } },
             }"
-            class="order-timeline"
+            class="user-orders__timeline"
           >
             <div
               v-for="step in orderSteps"
               :key="step.key"
-              class="timeline-step"
+              class="user-orders__timeline-step"
               :class="{ active: step.key === order.status }"
             >
-              <div class="dot"></div>
+              <div class="user-orders__timeline-dot"></div>
+
               <BasicText
                 size="body-s"
                 color="neutral-600"
-                class="label"
+                class="user-orders__timeline-label"
               >
                 {{ step.label }}
               </BasicText>
             </div>
           </div>
         </FilterSection>
-        <div class="order-card__actions">
+
+        <!-- Actions -->
+        <div class="user-orders__card-actions">
           <BasicButton
             label="Voir les détails"
             type="secondary"
@@ -280,6 +294,7 @@
             size="small"
             @click="$router.push(`/profil/commandes/${order.order_id ?? ''}`)"
           />
+
           <BasicButton
             v-if="order.tracking_number"
             label="Suivre le colis"
@@ -448,14 +463,14 @@
       gap: 26px;
     }
 
-    .orders-controls {
+    &__controls {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 12px;
     }
 
-    .order-card {
-      background: white;
+    &__card {
+      background: @white;
       border: 1px solid @neutral-200;
       border-radius: 16px;
       padding: 26px;
@@ -470,7 +485,7 @@
         transform: translateY(-2px);
       }
 
-      &__header {
+      &-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -478,121 +493,38 @@
         gap: 10px;
         padding-bottom: 6px;
         border-bottom: 1px solid color-mix(in srgb, @neutral-200 70%, transparent);
+
+        &-left {
+          display: flex;
+          gap: 24px;
+        }
       }
 
-      &__date {
+      &-date {
         color: @neutral-900;
       }
 
-      &__number {
+      &-number {
         font-size: 13px;
       }
 
-      &__items {
+      &-items {
         display: flex;
         flex-direction: column;
         gap: 14px;
         padding: 6px 0;
       }
 
-      .order-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        border-bottom: 1px solid color-mix(in srgb, @neutral-200 60%, transparent);
-        padding-bottom: 8px;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &__img {
-          width: 60px;
-          height: 60px;
-          border-radius: 10px;
-          object-fit: cover;
-          border: 1px solid @neutral-200;
-          flex-shrink: 0;
-        }
-
-        &__details {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
-        &__meta {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-        }
-      }
-
-      &__summary {
+      &-summary {
         background: color-mix(in srgb, @neutral-50 80%, transparent);
         border-radius: 10px;
         padding: 16px 18px;
         display: flex;
         flex-direction: column;
         gap: 10px;
-
-        .summary-line {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 2px 0;
-
-          &:not(:last-child) {
-            border-bottom: 1px dashed color-mix(in srgb, @neutral-300 50%, transparent);
-            padding-bottom: 6px;
-          }
-        }
       }
 
-      .order-timeline {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        padding: 8px 0;
-
-        .timeline-step {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          flex: 1;
-          color: @neutral-500;
-
-          .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: @neutral-300;
-            margin-bottom: 4px;
-          }
-
-          &.active {
-            color: var(--primary-700);
-            .dot {
-              background: var(--primary-500);
-            }
-          }
-        }
-
-        &:before {
-          content: '';
-          position: absolute;
-          top: 6px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: @neutral-200;
-        }
-      }
-
-      &__actions {
+      &-actions {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
@@ -601,36 +533,129 @@
       }
     }
 
+    &__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid color-mix(in srgb, @neutral-200 60%, transparent);
+      padding-bottom: 8px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid @neutral-200;
+        flex-shrink: 0;
+      }
+
+      &-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      &-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+    }
+
+    &__summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 0;
+
+      &:not(:last-child) {
+        border-bottom: 1px dashed color-mix(in srgb, @neutral-300 50%, transparent);
+        padding-bottom: 6px;
+      }
+    }
+
+    &__timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      padding: 8px 0;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: @neutral-200;
+      }
+
+      &-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        color: @neutral-500;
+
+        &.active {
+          color: var(--primary-700);
+
+          .user-orders__timeline-dot {
+            background: var(--primary-500);
+          }
+        }
+      }
+
+      &-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: @neutral-300;
+        margin-bottom: 4px;
+      }
+
+      &-label {
+        text-align: center;
+      }
+    }
+
     @media (max-width: 768px) {
-      .order-card {
+      &__card {
         padding: 18px;
 
-        &__header {
+        &-header {
           flex-direction: column;
           align-items: flex-start;
         }
 
-        .order-item {
-          flex-wrap: wrap;
-
-          &__img {
-            width: 48px;
-            height: 48px;
-          }
-
-          &__meta {
-            justify-content: flex-start;
-            gap: 16px;
-          }
-        }
-
-        &__actions {
+        &-actions {
           flex-direction: column;
           align-items: stretch;
 
           button {
             width: 100%;
           }
+        }
+      }
+
+      &__item {
+        flex-wrap: wrap;
+
+        &-img {
+          width: 48px;
+          height: 48px;
+        }
+
+        &-meta {
+          justify-content: flex-start;
+          gap: 16px;
         }
       }
     }

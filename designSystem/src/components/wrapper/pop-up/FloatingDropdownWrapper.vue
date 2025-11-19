@@ -227,7 +227,7 @@
     z-index: 2000;
 
     /* 🌫️ Glass effect variant */
-    background: color-mix(in srgb, var(--secondary-900) 92%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.92);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 
@@ -240,7 +240,7 @@
 
     /* 🧠 Neural-shadow */
     box-shadow:
-      0 8px 26px color-mix(in srgb, var(--primary-900) 40%, transparent),
+      0 8px 26px rgba(var(--primary-900-rgb), 0.4),
       0 4px 18px fade(#000, 55%);
 
     animation: fadeScaleIn 0.22s cubic-bezier(0.25, 1, 0.5, 1);
@@ -252,7 +252,7 @@
       width: 14px;
       height: 14px;
 
-      background: color-mix(in srgb, var(--secondary-900) 92%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.92);
       backdrop-filter: blur(14px);
       border: 1px solid color-mix(in srgb, @neutral-500 6%, transparent);
       border-bottom: none;
@@ -264,7 +264,7 @@
       /* halo */
       box-shadow:
         -2px -2px 5px fade(#000, 25%),
-        0 0 6px color-mix(in srgb, var(--primary-700) 15%, transparent);
+        0 0 6px rgba(var(--primary-700-rgb), 0.15);
     }
   }
 

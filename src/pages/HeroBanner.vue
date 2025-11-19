@@ -375,7 +375,7 @@
     overflow: hidden;
 
     /* 🔮 Glass container */
-    background: color-mix(in srgb, var(--secondary-900) 35%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.35);
     backdrop-filter: blur(24px);
     border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
     box-shadow:
@@ -396,7 +396,7 @@
       background:
         radial-gradient(
           circle at 25% 20%,
-          color-mix(in srgb, var(--primary-400) 55%, transparent),
+          rgba(var(--primary-400-rgb), 0.55),
           transparent 60%
         ),
         radial-gradient(
@@ -433,7 +433,7 @@
       overflow: hidden;
 
       /* Glass panel */
-      background: color-mix(in srgb, var(--secondary-800) 35%, transparent);
+      background: rgba(var(--secondary-800-rgb), 0.35);
       backdrop-filter: blur(26px);
       border: 1px solid color-mix(in srgb, @neutral-300 26%, transparent);
       box-shadow:
@@ -450,7 +450,7 @@
         border-radius: 999px;
         background: linear-gradient(
           to bottom,
-          color-mix(in srgb, var(--primary-500) 95%, transparent),
+          rgba(var(--primary-500-rgb), 0.95),
           color-mix(in srgb, @indigo-400 85%, transparent)
         );
       }
@@ -474,8 +474,8 @@
         font-weight: 600;
         letter-spacing: 0.14em;
 
-        background: color-mix(in srgb, var(--primary-200) 25%, transparent);
-        border: 1px solid color-mix(in srgb, var(--primary-400) 30%, transparent);
+        background: rgba(var(--primary-200-rgb), 0.25);
+        border: 1px solid rgba(var(--primary-400-rgb), 0.3);
         backdrop-filter: blur(6px);
         color: var(--primary-600) !important;
       }
@@ -533,11 +533,11 @@
         width: 4px;
       }
       &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--primary-50) 45%, transparent);
+        background: rgba(var(--primary-50-rgb), 0.45);
         border-radius: 999px;
       }
       &::-webkit-scrollbar-thumb {
-        background: color-mix(in srgb, var(--primary-400) 70%, transparent);
+        background: rgba(var(--primary-400-rgb), 0.7);
         border-radius: 999px;
       }
 
@@ -553,7 +553,7 @@
         background: linear-gradient(
           130deg,
           color-mix(in srgb, @neutral-0 95%, transparent),
-          color-mix(in srgb, var(--primary-50) 80%, transparent)
+          rgba(var(--primary-50-rgb), 0.8)
         );
         box-shadow: 0 8px 22px fade(#000, 12%);
 
@@ -566,7 +566,7 @@
 
           background: radial-gradient(
             circle at 10% 0%,
-            color-mix(in srgb, var(--primary-100) 70%, transparent),
+            rgba(var(--primary-100-rgb), 0.7),
             color-mix(in srgb, @indigo-100 50%, transparent)
           );
 
@@ -587,7 +587,7 @@
             letter-spacing: 0.08em;
 
             border-radius: 999px;
-            background: color-mix(in srgb, var(--secondary-950) 78%, transparent);
+            background: rgba(var(--secondary-950-rgb), 0.78);
             color: @neutral-0;
             backdrop-filter: blur(6px);
           }
@@ -610,11 +610,11 @@
 
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--primary-600) 75%, transparent),
-        color-mix(in srgb, var(--secondary-700) 82%, transparent)
+        rgba(var(--primary-600-rgb), 0.75),
+        rgba(var(--secondary-700-rgb), 0.82)
       );
       backdrop-filter: blur(14px);
-      border-top: 4px solid color-mix(in srgb, var(--primary-400) 40%, transparent);
+      border-top: 4px solid rgba(var(--primary-400-rgb), 0.4);
 
       padding: 16px 24px 18px;
       overflow: hidden;
@@ -634,7 +634,7 @@
         left: 0;
         background: linear-gradient(
           to right,
-          color-mix(in srgb, var(--secondary-900) 80%, transparent),
+          rgba(var(--secondary-900-rgb), 0.8),
           transparent
         );
       }
@@ -643,7 +643,7 @@
         right: 0;
         background: linear-gradient(
           to left,
-          color-mix(in srgb, var(--secondary-900) 80%, transparent),
+          rgba(var(--secondary-900-rgb), 0.8),
           transparent
         );
       }

@@ -136,7 +136,7 @@
 
       /* ✨ Animation "lu" (transition douce du fond) */
       &.read {
-        background: color-mix(in srgb, var(--primary-50) 80%, transparent);
+        background: rgba(var(--primary-50-rgb), 0.8);
         transition: background 0.5s ease;
       }
     }
@@ -153,7 +153,7 @@
       /* 💫 Transition douce quand le message devient lu */
       &.read {
         background: var(--primary-500);
-        box-shadow: 0 0 6px color-mix(in srgb, var(--primary-600) 30%, transparent);
+        box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.3);
         transition: background 0.4s ease;
       }
     }

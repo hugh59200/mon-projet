@@ -107,7 +107,7 @@
   .mobile-overlay {
     position: fixed;
     inset: 0;
-    background: color-mix(in srgb, var(--secondary-900) 65%, transparent); // bleu-noir Neural
+    background: rgba(var(--secondary-900-rgb), 0.65); // bleu-noir Neural
     backdrop-filter: blur(6px);
     z-index: 2000;
     display: flex;
@@ -122,14 +122,14 @@
     height: 100vh;
 
     /* Fond en verre bleu sombre */
-    background: color-mix(in srgb, var(--secondary-900) 92%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.92);
     backdrop-filter: blur(12px);
 
     color: white;
 
     /* Ombres plus propres, moins noires */
     box-shadow:
-      3px 0 22px color-mix(in srgb, var(--primary-950) 45%, transparent),
+      3px 0 22px rgba(var(--primary-950-rgb), 0.45),
       inset -3px 0 10px fade(white, 4%);
 
     border-top-right-radius: 20px;
@@ -158,7 +158,7 @@
     .drawer-logo {
       width: 30px;
       height: 30px;
-      filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary-700) 40%, transparent));
+      filter: drop-shadow(0 0 4px rgba(var(--primary-700-rgb), 0.4));
     }
   }
 

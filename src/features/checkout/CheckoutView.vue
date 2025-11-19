@@ -407,7 +407,7 @@
     .ripple {
       position: absolute;
       border-radius: 50%;
-      background: color-mix(in srgb, var(--primary-500) 25%, transparent);
+      background: rgba(var(--primary-500-rgb), 0.25);
       transform: scale(0);
       animation: ripple 0.6s ease-out;
       width: 150px;
@@ -466,13 +466,13 @@
 
       &:hover {
         border-color: var(--primary-400);
-        background: color-mix(in srgb, var(--primary-50) 40%, transparent);
+        background: rgba(var(--primary-50-rgb), 0.4);
       }
 
       &.active {
         border-color: var(--primary-600);
-        background: color-mix(in srgb, var(--primary-100) 60%, transparent);
-        box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-400) 25%, transparent);
+        background: rgba(var(--primary-100-rgb), 0.6);
+        box-shadow: 0 2px 8px rgba(var(--primary-400-rgb), 0.25);
       }
 
       &-icon {
@@ -503,17 +503,17 @@
       margin-top: 20px;
       transition: all 0.25s ease-in-out;
       border-radius: 10px;
-      box-shadow: 0 3px 10px color-mix(in srgb, var(--primary-400) 25%, transparent);
+      box-shadow: 0 3px 10px rgba(var(--primary-400-rgb), 0.25);
       font-weight: 600;
 
       &:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px color-mix(in srgb, var(--primary-500) 30%, transparent);
+        box-shadow: 0 5px 15px rgba(var(--primary-500-rgb), 0.3);
       }
 
       &:active {
         transform: scale(0.98);
-        box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-500) 25%, transparent);
+        box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.25);
       }
 
       &:disabled {

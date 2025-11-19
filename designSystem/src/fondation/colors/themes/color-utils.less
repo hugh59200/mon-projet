@@ -1,0 +1,7 @@
+/* Utility mixin for exporting RGB triplets */
+.declare-rgb-var(@token, @color) {
+  @r: red(@color);
+  @g: green(@color);
+  @b: blue(@color);
+  --@{token}-rgb: ~"@{r}, @{g}, @{b}";
+}

@@ -178,7 +178,7 @@
 
       &::-webkit-slider-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 0 6px color-mix(in srgb, var(--primary-600) 50%, transparent);
+        box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.5);
       }
 
       &::-moz-range-thumb {

@@ -140,7 +140,7 @@
       background: fade(@white, 70%) !important;
       box-shadow:
         0 8px 20px fade(#000, 10%),
-        inset 0 0 0 1px color-mix(in srgb, var(--primary-300) 30%, transparent);
+        inset 0 0 0 1px rgba(var(--primary-300-rgb), 0.3);
     }
   }
 </style>

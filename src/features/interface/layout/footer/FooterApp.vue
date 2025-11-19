@@ -160,7 +160,7 @@
     display: flex;
     flex-direction: column;
     gap: 60px;
-    border-top: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
+    border-top: 1px solid rgba(var(--primary-500-rgb), 0.1);
     box-shadow: 0 -4px 18px fade(#000, 45%);
     backdrop-filter: blur(10px);
 

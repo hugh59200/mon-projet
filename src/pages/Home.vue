@@ -302,7 +302,7 @@
       position: relative;
       overflow: hidden;
 
-      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
 
@@ -357,8 +357,8 @@
     &__hero-pill {
       padding: 5px 14px;
       border-radius: 999px;
-      background: color-mix(in srgb, var(--primary-200) 25%, transparent);
-      border: 1px solid color-mix(in srgb, var(--primary-500) 30%, transparent);
+      background: rgba(var(--primary-200-rgb), 0.25);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.3);
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
@@ -390,7 +390,7 @@
         border-radius: 20px;
         box-shadow:
           0 16px 32px fade(#000, 40%),
-          0 0 14px color-mix(in srgb, var(--primary-300) 25%, transparent);
+          0 0 14px rgba(var(--primary-300-rgb), 0.25);
         transition: transform 0.35s ease;
         object-fit: contain;
 
@@ -443,10 +443,10 @@
         &:hover {
           transform: translateY(-4px);
           background: fade(@white, 18%);
-          border-color: color-mix(in srgb, var(--primary-400) 30%, transparent);
+          border-color: rgba(var(--primary-400-rgb), 0.3);
           box-shadow:
             0 18px 34px fade(#000, 40%),
-            0 0 16px color-mix(in srgb, var(--primary-400) 25%, transparent);
+            0 0 16px rgba(var(--primary-400-rgb), 0.25);
         }
       }
     }
@@ -559,7 +559,7 @@
       padding: 36px 24px;
       border-radius: 20px;
 
-      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-600) 75%, transparent), color-mix(in srgb, var(--secondary-700) 82%, transparent));
+      background: linear-gradient(135deg, rgba(var(--primary-600-rgb), 0.75), rgba(var(--secondary-700-rgb), 0.82));
       backdrop-filter: blur(18px);
 
       box-shadow:

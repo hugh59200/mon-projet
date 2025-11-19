@@ -66,7 +66,7 @@
     border-radius: 10px 10px 0 0;
     cursor: pointer;
     transition: all 0.25s ease;
-    background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.75);
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
     border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
@@ -74,7 +74,7 @@
 
     /* ✅ Hover sur onglet non sélectionné */
     &:hover {
-      background: color-mix(in srgb, var(--secondary-700) 75%, transparent);
+      background: rgba(var(--secondary-700-rgb), 0.75);
 
       &:not(.tab--selected) {
         .tab__label {
@@ -90,13 +90,13 @@
     }
 
     &--selected {
-      background: color-mix(in srgb, var(--secondary-500) 75%, transparent);
+      background: rgba(var(--secondary-500-rgb), 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       padding: 10px 22px;
-      box-shadow: inset 0 1px 3px color-mix(in srgb, var(--primary-500) 12%, transparent);
+      box-shadow: inset 0 1px 3px rgba(var(--primary-500-rgb), 0.12);
       transition:
         transform 0.18s ease,
         box-shadow 0.18s ease,

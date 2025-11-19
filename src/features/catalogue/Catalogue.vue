@@ -283,7 +283,7 @@
       flex-direction: column;
       gap: 18px;
 
-      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.75);
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
 
       box-shadow:
@@ -319,7 +319,7 @@
       width: 260px;
       flex-shrink: 0;
 
-      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
@@ -340,7 +340,7 @@
       flex: 1;
       min-height: 500px;
 
-      background: color-mix(in srgb, var(--secondary-900) 75%, transparent);
+      background: rgba(var(--secondary-900-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);

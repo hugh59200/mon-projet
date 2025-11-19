@@ -120,7 +120,7 @@
       transition: all 0.3s ease;
     }
 
-    background: color-mix(in srgb, var(--secondary-900) 65%, transparent);
+    background: rgba(var(--secondary-900-rgb), 0.65);
     backdrop-filter: blur(14px);
     box-shadow: 0 4px 20px fade(black, 20%);
   }
