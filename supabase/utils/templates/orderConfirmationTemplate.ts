@@ -1,76 +1,104 @@
+// supabase/functions/utils/templates/orderConfirmationTemplate.ts
+
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 
 export function orderConfirmationTemplate({
   order_id,
+  order_number, // V2: Nouveau champ
   full_name,
+  subtotal, // V2
+  shipping_cost, // V2
   total_amount,
   items = [],
   created_at,
 }: {
   order_id: string
+  order_number?: string
   full_name?: string
+  subtotal?: number
+  shipping_cost?: number
   total_amount: number
   created_at: string
   items: { name: string; quantity: number; price: number }[]
 }) {
-  // ID minifié pour l'affichage
-  const shortId = order_id.slice(0, 8)
+  // Priorité au numéro FP-2025-XXX, sinon fallback UUID court
+  const displayId = order_number ?? order_id.slice(0, 8).toUpperCase()
 
+  // Génération des lignes produits
   const rows = items
     .map(
       (i) => `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #eee;">${i.name}</td>
-          <td style="text-align:center;padding:10px 12px;">${i.quantity}</td>
-          <td style="text-align:right;padding:10px 12px;">${(i.quantity * i.price).toFixed(2)} €</td>
+          <td style="padding:12px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="display:block;font-weight:600;color:#1e293b;">${i.name}</span>
+          </td>
+          <td style="text-align:center;padding:12px 0;border-bottom:1px solid #e2e8f0;color:#64748b;">
+            x${i.quantity}
+          </td>
+          <td style="text-align:right;padding:12px 0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#1e293b;">
+            ${(i.quantity * i.price).toFixed(2)} €
+          </td>
         </tr>
       `,
     )
     .join('')
 
+  // Gestion affichage livraison (Offerte ou Prix)
+  const shippingLabel =
+    !shipping_cost || shipping_cost === 0 ? 'Offerte' : `${shipping_cost.toFixed(2)} €`
+
+  // Calcul sous-total fallback si non fourni
+  const subtotalDisplay = subtotal
+    ? subtotal.toFixed(2)
+    : items.reduce((acc, i) => acc + i.quantity * i.price, 0).toFixed(2)
+
   const bodyHTML = `
-    <p>Bonjour ${full_name || 'cher client'},</p>
+    <p>Bonjour <strong>${full_name || 'cher client'}</strong>,</p>
 
     <p>
-      Merci pour votre commande <strong>#${shortId}</strong> passée le 
-      ${new Date(created_at).toLocaleDateString('fr-FR')}.
+      Nous avons bien reçu votre commande <strong>${displayId}</strong> passée le 
+      ${new Date(created_at).toLocaleDateString('fr-FR')}. 
+      Elle est en cours de traitement.
     </p>
 
-    <p style="margin-bottom:12px;">Voici un récapitulatif :</p>
+    <div style="margin: 24px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+      <h3 style="margin-top:0; margin-bottom:16px; font-size:16px; color:#0f172a;">Récapitulatif</h3>
+      
+      <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
 
-    <table
-      style="
-        border-collapse:collapse;
-        width:100%;
-        border:1px solid #eee;
-        font-size:14px;
-      "
-    >
-      <thead style="background:#f7f7f7;">
-        <tr>
-          <th align="left" style="padding:10px 12px;">Produit</th>
-          <th align="center" style="padding:10px 12px;">Qté</th>
-          <th align="right" style="padding:10px 12px;">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 2px dashed #e2e8f0;">
+        <table style="width:100%; font-size:14px;">
+          <tr>
+            <td style="padding-bottom:8px; color:#64748b;">Sous-total</td>
+            <td style="text-align:right; padding-bottom:8px; color:#1e293b;">${subtotalDisplay} €</td>
+          </tr>
+          <tr>
+            <td style="padding-bottom:8px; color:#64748b;">Livraison</td>
+            <td style="text-align:right; padding-bottom:8px; color:#1e293b;">${shippingLabel}</td>
+          </tr>
+          <tr>
+            <td style="padding-top:8px; font-weight:700; font-size:18px; color:#0f172a;">Total</td>
+            <td style="text-align:right; padding-top:8px; font-weight:700; font-size:18px; color:#00796B;">
+              ${total_amount.toFixed(2)} €
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-    <p style="text-align:right;margin-top:16px;font-size:16px;">
-      <strong>Total : ${total_amount.toFixed(2)} €</strong>
-    </p>
-
-    <p style="margin-top:24px;">
-      Nous vous tiendrons informé dès que votre commande sera expédiée.
+    <p>
+      Vous recevrez un nouvel email avec le numéro de suivi dès que votre colis sera expédié 🚚.
     </p>
   `
 
   return baseEmailTemplate({
-    title: `Confirmation de votre commande 🎉`,
+    title: `Commande confirmée ✅`,
     bodyHTML,
-    ctaLabel: 'Voir ma commande',
-    ctaUrl: `https://fast-peptides.com/compte/commandes/${order_id}`,
+    ctaLabel: 'Suivre ma commande',
+    ctaUrl: `https://fast-peptides.com/profil/commandes/${order_id}`, // Lien vers le détail
   })
 }

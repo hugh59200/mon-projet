@@ -14,6 +14,7 @@ Deno.serve(
     const { order_id, status } = body
     if (!order_id || !status) throw new Error('Missing order_id or status')
 
+    // ✅ SELECT V2 : On utilise les bonnes colonnes de la vue
     const { data: order } = await supabase
       .from('orders_full_view')
       .select('shipping_email, order_number, carrier, tracking_number')
@@ -22,16 +23,19 @@ Deno.serve(
 
     if (!order) throw new Error('Order not found')
 
+    // Génère le message texte personnalisé selon le statut
     const message = getStatusMessage(status, order.carrier, order.tracking_number)
+    const displayId = order.order_number ?? order_id
 
     const html = renderEmailTemplate('status_update', {
       order_id,
+      order_number: displayId,
       message,
     })
 
     await sendEmail({
-      to: order.shipping_email,
-      subject: `Mise à jour – Commande ${order.order_number ?? order_id}`,
+      to: order.shipping_email, // Attention c'est bien shipping_email dans la vue
+      subject: `Mise à jour – Commande ${displayId}`,
       html,
       type: 'status_update',
       order_id,

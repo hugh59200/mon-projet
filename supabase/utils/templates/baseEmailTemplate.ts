@@ -1,3 +1,5 @@
+// supabase/functions/utils/templates/baseEmailTemplate.ts
+
 export function baseEmailTemplate({
   title,
   bodyHTML,
@@ -16,20 +18,22 @@ export function baseEmailTemplate({
   const ctaBlock =
     ctaLabel && ctaUrl
       ? `
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;">
         <tr>
           <td align="center">
             <a href="${ctaUrl}"
-              style="background:${primary};
-                     color:#fff;
-                     font-size:16px;
-                     font-weight:600;
-                     padding:14px 32px;
-                     border-radius:8px;
-                     text-decoration:none;
-                     display:inline-block;">
-               ${ctaLabel}
-            </a>
+               style="background:${primary};
+                      color:#ffffff;
+                      font-size:16px;
+                      font-weight:bold;
+                      padding:14px 32px;
+                      border-radius:8px;
+                      text-decoration:none;
+                      display:inline-block;
+                      mso-padding-alt:0;
+                      box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+               <span style="mso-text-raise: 15pt;">${ctaLabel}</span>
+               </a>
           </td>
         </tr>
       </table>
@@ -38,64 +42,46 @@ export function baseEmailTemplate({
 
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${title}</title>
-</head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  </head>
+<body style="margin:0;padding:0;background-color:#f4f7fa;font-family:'Segoe UI', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  
+  <center style="width:100%;background-color:#f4f7fa;padding:40px 0;">
+    <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+      
+      <div style="background-color:${primary};padding:40px 20px;text-align:center;">
+        <img src="${logoUrl}" width="64" height="64" alt="Fast Peptides" style="display:block;margin:0 auto 16px;border-radius:12px;" />
+        <h1 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+          ${title}
+        </h1>
+      </div>
 
-<body style="margin:0;padding:0;background:#f0f4f8;font-family:'Segoe UI',Roboto,Arial,sans-serif;">
+      <div style="padding:40px 32px;color:#334155;line-height:1.6;font-size:16px;">
+        ${bodyHTML}
+        
+        ${ctaBlock}
 
-  <center style="width:100%;background:#f0f4f8;padding:40px 0;">
-    <div style="max-width:620px;margin:0 auto;">
+        <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e2e8f0;text-align:center;font-size:14px;color:#64748b;">
+          <p style="margin:0 0 8px;">Besoin d'aide ? Contactez notre support.</p>
+          <p style="margin:0;">
+            L’équipe Fast Peptides 🧬<br/>
+            <a href="https://fastpeptides.com" style="color:${accent};text-decoration:none;font-weight:600;">fastpeptides.com</a>
+          </p>
+        </div>
+      </div>
 
-      <!-- Wrapper -->
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-        style="background:#fff;border-radius:16px;overflow:hidden;
-               box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+      <div style="background-color:#f8fafc;padding:20px;text-align:center;font-size:12px;color:#94a3b8;">
+        <p style="margin:0;">© ${new Date().getFullYear()} Fast Peptides — Tous droits réservés.</p>
+      </div>
 
-        <!-- Header -->
-        <tr>
-          <td align="center" style="background:${primary};padding:35px 20px;color:#fff;">
-            <img
-              src="${logoUrl}"
-              width="70"
-              alt="Fast Peptides"
-              style="display:block;margin:0 auto 16px;"
-            />
-            <h1 style="margin:0;font-size:24px;font-weight:700;color:#fff;">
-              ${title}
-            </h1>
-          </td>
-        </tr>
-
-        <!-- Content -->
-        <tr>
-          <td style="padding:32px 28px;color:#222;line-height:1.6;font-size:15px;">
-            ${bodyHTML}
-
-            ${ctaBlock}
-
-            <hr style="margin:32px 0;border:none;border-top:1px solid #eee;" />
-
-            <p style="font-size:13px;color:#777;text-align:center;margin:0;">
-              L’équipe Fast Peptides 🧬<br/>
-              <a href="https://fastpeptides.com"
-                 style="color:${accent};text-decoration:none;font-weight:500;">
-                fastpeptides.com
-              </a>
-            </p>
-          </td>
-        </tr>
-      </table>
-
-      <p style="font-size:12px;color:#999;text-align:center;margin-top:24px;">
-        © ${new Date().getFullYear()} Fast Peptides — Tous droits réservés.
-      </p>
     </div>
   </center>
+
 </body>
 </html>
   `

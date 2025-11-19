@@ -212,7 +212,6 @@
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import {
-    finalizeOrderAfterPayment,
     processPayment,
     type PaymentProvider,
   } from '@/features/checkout/paiement/service/paymentService'
@@ -241,19 +240,15 @@
 
   // --- 💰 LOGIQUE FINANCIÈRE V2.0 ---
 
-  // 1. Seuil livraison gratuite (ex: 100€)
   const FREE_SHIPPING_THRESHOLD = 100
   const FLAT_SHIPPING_RATE = 9.9
 
-  // 2. Sous-total (Somme des produits)
   const cartSubtotal = computed(() => cart.totalPrice)
 
-  // 3. Frais de port calculés
   const shippingCost = computed(() => {
     return cartSubtotal.value >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE
   })
 
-  // 4. Total Final à payer
   const finalTotal = computed(() => {
     return cartSubtotal.value + shippingCost.value
   })
@@ -286,9 +281,20 @@
 
   function openProductModal(productId?: string, event?: MouseEvent) {
     if (!productId || !event) return
-    // ... (ripple effect identique à ton code original) ...
-    selectedProductId.value = productId
-    isModalVisible.value = true
+    const target = event.currentTarget as HTMLElement
+    if (!target) return
+
+    const ripple = document.createElement('span')
+    ripple.className = 'checkout__ripple'
+    ripple.style.left = `${event.offsetX}px`
+    ripple.style.top = `${event.offsetY}px`
+    target.appendChild(ripple)
+    setTimeout(() => ripple.remove(), 600)
+
+    setTimeout(() => {
+      selectedProductId.value = productId
+      isModalVisible.value = true
+    }, 150)
   }
 
   async function submitOrder() {
@@ -304,23 +310,16 @@
         toast.show('Votre panier est vide.', 'warning')
         return
       }
-      //TODO a remettre plus tard
-      // if (!address.value || !zip.value || !city.value || !fullName.value) {
-      //   toast.show("Veuillez compléter l'adresse de livraison.", 'warning')
-      //   return
-      // }
 
       try {
         // 2. Préparation du payload pour l'API V2
-        // On mappe les items pour correspondre strictement à ce que l'API attend
         const orderItemsPayload = cart.items.map((item) => ({
           product_id: item.product_id!,
           quantity: item.quantity ?? 1,
-          product_price: item.product_price ?? 0, // Prix snapshot
+          product_price: item.product_price ?? 0,
         }))
 
         // 3. Appel API centralisé (createOrder)
-        // Cela va créer la commande, les lignes produits (avec snapshots) et gérer le stock
         const newOrder = await createOrder({
           userId: auth.user.id,
           email: auth.user.email ?? '',
@@ -331,11 +330,10 @@
           country: country.value,
           paymentMethod: selectedPayment.value,
 
-          // Données financières calculées
           subtotal: cartSubtotal.value,
           shippingCost: shippingCost.value,
-          taxAmount: 0, // Si tu gères la TVA, calcule-la ici (ex: subtotal * 0.20)
-          discountAmount: 0, // Si tu as un système de coupon
+          taxAmount: 0,
+          discountAmount: 0,
           totalAmount: finalTotal.value,
 
           items: orderItemsPayload,
@@ -343,28 +341,24 @@
 
         // 4. Traitement du Paiement
         // On utilise l'ID de la commande fraîchement créée
-        const payment = await processPayment(
-          finalTotal.value, // On paie le total final (incluant livraison)
+        await processPayment(
+          finalTotal.value,
           selectedPayment.value,
           auth.user.email,
           newOrder.order_id!, // ID de la vue ou ID de la table
         )
 
-        if (selectedPayment.value === 'stripe') {
-          // Stripe redirige généralement, donc on s'arrête là
+        // 🛑 STOP IMPÉRATIF ICI POUR STRIPE ET PAYPAL
+        // Ces méthodes impliquent une redirection externe.
+        // On ne doit PAS exécuter de code après ceci (pas de toast success local, pas de redirect local).
+        if (selectedPayment.value === 'stripe' || selectedPayment.value === 'paypal') {
           return
         }
 
-        // 5. Finalisation (PayPal ou autre flux direct)
-        await finalizeOrderAfterPayment(
-          newOrder.order_id!,
-          payment.id,
-          selectedPayment.value, // <--- C'est ce qu'il manquait !
-        )
-
-        toast.show('Commande validée avec succès ! 🎉', 'success')
-        await cart.clearCart()
-        router.push(`/profil/commandes/${newOrder.order_id}`)
+        // --- Code mort pour l'instant (pour méthodes sans redirection future) ---
+        // toast.show('Commande validée avec succès ! 🎉', 'success')
+        // await cart.clearCart()
+        // router.push(`/profil/commandes/${newOrder.order_id}`)
       } catch (err: any) {
         console.error(err)
         toast.show(`Erreur : ${err.message || 'Impossible de créer la commande'}`, 'danger')
@@ -374,7 +368,6 @@
 </script>
 
 <style scoped lang="less">
-  /* Style identique à l'original, j'ai juste ajouté le style pour le résumé financier */
   .checkout {
     max-width: 800px;
     margin: 20px auto;
@@ -486,6 +479,26 @@
         font-weight: 600;
         color: @neutral-900;
         font-size: 14px;
+      }
+    }
+
+    /* 🌊 Effet ripple au clic */
+    &__ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(var(--primary-500-rgb), 0.25);
+      transform: scale(0);
+      animation: ripple 0.6s ease-out;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(2.5);
+        opacity: 0;
       }
     }
 

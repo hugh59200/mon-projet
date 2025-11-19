@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std/http/server.ts'
 import { getStatusMessage } from '../../utils/getStatusMessage.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 

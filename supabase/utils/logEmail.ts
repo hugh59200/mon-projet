@@ -10,14 +10,21 @@ export async function logEmail({
   provider_response,
   status = 'sent',
 }: any) {
-  await supabase.from('emails_sent').insert({
-    order_id,
+  // On utilise maybeSingle pour éviter de planter si l'order_id est null (ex: signup)
+  // Mais ici c'est un insert simple.
+
+  const { error } = await supabase.from('emails_sent').insert({
+    order_id: order_id || null,
     to_email,
     subject,
-    body_html,
+    body_html, // Stocker le HTML peut prendre de la place, attention à la limite de taille DB
     type,
     provider_response: provider_response ? JSON.stringify(provider_response) : null,
     status,
     sent_at: new Date().toISOString(),
   })
+
+  if (error) {
+    console.error('❌ Failed to log email in DB:', error)
+  }
 }

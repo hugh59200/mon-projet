@@ -6,7 +6,6 @@
     }"
     class="payment-success"
   >
-    <!-- Icône -->
     <div class="payment-success__icon-wrapper">
       <BasicIconNext
         name="CheckCircle2"
@@ -65,7 +64,7 @@
 
     const stripeSessionId = route.query.session_id as string | undefined
     const paypalOrderId = route.query.order_id as string | undefined
-    const orderId = route.query.orderId as string | undefined // PayPal second naming
+    const customOrderId = route.query.orderId as string | undefined // PayPal second naming
 
     // -----------------------------------------
     // 1️⃣ STRIPE
@@ -78,9 +77,9 @@
     // -----------------------------------------
     // 2️⃣ PAYPAL
     // -----------------------------------------
-    else if (paypalOrderId || orderId) {
+    else if (paypalOrderId || customOrderId) {
       console.log('🟡 PayPal detected')
-      await handlePaypalSuccess(paypalOrderId ?? orderId!)
+      await handlePaypalSuccess(paypalOrderId ?? customOrderId!)
     }
 
     // -----------------------------------------
@@ -88,7 +87,6 @@
     // -----------------------------------------
     else {
       console.warn('⚠️ No identifiers → fallback user last order')
-
       await fallbackLatestOrder()
     }
 
@@ -104,6 +102,7 @@
   })
 
   async function handleStripeSuccess(sessionId: string) {
+    // Vérification de l'existence de la commande via la session ID
     const { data } = await supabase
       .from('orders')
       .select('id')
@@ -111,19 +110,24 @@
       .maybeSingle()
 
     if (!data) console.error('❌ Stripe order not found')
+    else console.log('✅ Stripe order confirmed:', data.id)
   }
 
   async function handlePaypalSuccess(orderId: string) {
+    // Appel à l'Edge Function pour capturer le paiement PayPal
     const { error } = await supabase.functions.invoke('capture-paypal-order', {
       body: { orderId },
     })
 
     if (error) {
       console.error('❌ PayPal capture failed', error)
+    } else {
+      console.log('✅ PayPal capture success')
     }
   }
 
   async function fallbackLatestOrder() {
+    // Récupère la dernière commande de l'utilisateur en cas d'erreur de redirection
     const { data } = await supabase
       .from('orders')
       .select('id')
@@ -133,6 +137,7 @@
       .maybeSingle()
 
     if (!data) console.error('❌ No order found even in fallback')
+    else console.log('✅ Fallback order found:', data.id)
   }
 </script>
 

@@ -10,10 +10,10 @@ interface OrderConfirmationBody {
 
 Deno.serve(
   createHandler<OrderConfirmationBody>(async (_req, body) => {
-    console.log('BODY RAW:', body)
     const order_id = body.order_id ?? body.orderId
     if (!order_id) throw new Error('Missing order_id')
 
+    // 1. Récupération via la vue V2
     const { data: order } = await supabase
       .from('orders_full_view')
       .select('*')
@@ -24,24 +24,35 @@ Deno.serve(
 
     const orderNumber = order.order_number ?? order_id
 
+    // 2. Préparation des données pour le template V2
     const html = renderEmailTemplate('confirmation', {
       order_id,
       order_number: orderNumber,
+      created_at: order.created_at,
+      full_name: order.shipping_name, // Utilise shipping_name de la vue
+
+      // 💰 Données Financières V2
+      total_amount: order.total_amount,
+      subtotal: order.subtotal,
+      shipping_cost: order.shipping_cost,
+      discount_amount: order.discount_amount,
+
+      // 📦 Mapping des items (depuis JSONB)
       items: (order.detailed_items ?? []).map((i: any) => ({
         name: i.product_name ?? 'Produit',
-        quantity: i.quantity ?? 1,
-        price: Number((i.total ?? 0) / (i.quantity ?? 1)),
+        quantity: Number(i.quantity ?? 1),
+        price: Number(i.product_price ?? 0), // Prix unitaire direct
+        total: Number(i.total ?? 0),
       })),
-      total_amount: order.total_amount,
-      full_name: order.shipping_name,
-      created_at: order.created_at,
+
       ctaLabel: 'Voir ma commande',
-      ctaUrl: `https://fast-peptides.com/compte/commandes/${orderNumber}`,
+      ctaUrl: `https://fast-peptides.com/profil/commandes/${order_id}`,
     })
 
+    // 3. Envoi
     await sendEmail({
-      to: order.shipping_email,
-      subject: `Confirmation commande #${orderNumber}`,
+      to: order.shipping_email, // Utilise shipping_email de la vue
+      subject: `Confirmation de votre commande ${orderNumber}`,
       html,
       type: 'confirmation',
       order_id,
