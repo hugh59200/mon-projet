@@ -21,13 +21,10 @@
       </div>
     </div>
 
-    <!-- 🔄 Loader -->
     <WrapperLoader
       :loading="!hasLoaded"
       message="Chargement de vos commandes..."
     />
-
-    <!-- 🚫 Aucune commande -->
     <div
       v-if="hasLoaded && orders.length === 0"
       class="user-orders__empty"
@@ -106,11 +103,11 @@
               N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
             </BasicText>
           </div>
-          <!-- <BasicBadge
-            :label="getStatusLabel(order.status)"
-            :type="getStatusBadge(order.status)"
+          <BasicBadge
+            :label="getLabelBadge(order.status)"
+            :type="getTypeBadge(order.status)"
             size="small"
-          /> -->
+          />
         </div>
 
         <!-- 🔽 Produits -->
@@ -138,7 +135,7 @@
               class="order-item"
             >
               <img
-                :src="item.image || defaultImage"
+                :src="item.product_image || defaultImage"
                 alt="Produit"
                 class="order-item__img"
               />
@@ -149,7 +146,7 @@
                     weight="semibold"
                     color="neutral-900"
                   >
-                    {{ item.name }}
+                    {{ item.product_name }}
                   </BasicText>
                 </div>
                 <div class="order-item__meta">
@@ -162,9 +159,9 @@
                   <BasicText
                     size="body-s"
                     weight="bold"
-                    color="primary-700"
+                    color="neutral-800"
                   >
-                    {{ formatPrice(item.price) }}
+                    {{ formatPrice(item.product_price) }}
                   </BasicText>
                 </div>
               </div>
@@ -201,7 +198,7 @@
               <BasicText
                 size="body-m"
                 weight="bold"
-                color="primary-800"
+                color="primary-900"
               >
                 {{ formatPrice(order.total_amount) }}
               </BasicText>
@@ -303,19 +300,18 @@
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import { formatDate } from '@/utils/index'
+  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
 
   type OrderItemDetailed = {
     product_id: string
-    name: string
-    category: string
-    price: number
-    purity: number | null
-    stock: boolean
-    image: string | null
+    product_name: string
+    product_price: number
+    product_image: string | null
+    product_stock: boolean
     quantity: number
-    subtotal: number
+    total: number
   }
 
   type OrderDetailed = {
