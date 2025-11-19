@@ -7,6 +7,9 @@ import {
   uploadAvatar,
 } from '../api/profilesApi'
 
+// Type de retour pour les fonctions de mise à jour
+type ActionResponse = Promise<boolean>
+
 export function useProfileActions() {
   const toast = useToastStore()
 
@@ -19,19 +22,21 @@ export function useProfileActions() {
     }
   }
 
-  async function updateProfile(id: string, payload: any) {
+  async function updateProfile(id: string, payload: any): ActionResponse {
     try {
       await updateProfileInfo(id, payload)
-      toast.show('Profil mis à jour ✅', 'success')
+      // On retire le toast de succès ici pour le laisser au composant qui fait une action spécifique
+      return true
     } catch (err: any) {
       toast.show(`Erreur mise à jour : ${err.message}`, 'danger')
+      return false
     }
   }
 
   async function changeAvatar(id: string, file: File) {
     try {
       const publicUrl = await uploadAvatar(id, file)
-      toast.show('Avatar mis à jour 🎨', 'success')
+      // On retire le toast de succès ici pour le laisser au composant qui fait une action spécifique
       return publicUrl
     } catch (err: any) {
       toast.show(`Erreur avatar : ${err.message}`, 'danger')
@@ -48,12 +53,14 @@ export function useProfileActions() {
     }
   }
 
-  async function updatePassword(newPassword: string) {
+  async function updatePassword(newPassword: string): ActionResponse {
     try {
-      await updatePasswordApi(newPassword) // ✅ Manquait l'import
-      toast.show('Mot de passe mis à jour ✅', 'success')
+      await updatePasswordApi(newPassword)
+      // On retire le toast de succès ici pour le laisser au composant
+      return true
     } catch (err: any) {
       toast.show(err.message, 'danger')
+      return false
     }
   }
 

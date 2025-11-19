@@ -1,13 +1,5 @@
 <template>
   <div class="page article-detail">
-    <BasicLink
-      :to="'/actualites'"
-      type="secondary"
-      state="icon-left"
-      iconName="ArrowLeft"
-      class="back-link"
-      label="Retour aux actualités"
-    />
     <WrapperLoader
       :loading="loading"
       :has-loaded="!!article"

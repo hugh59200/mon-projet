@@ -1,10 +1,6 @@
 <template>
   <div class="app-layout">
     <HeaderApp />
-
-    <!-- ⭐ BREADCRUMB GLOBAL -->
-    <!-- <BasicBreadcrumbs class="breadcrumb-wrapper" /> -->
-
     <main
       class="content"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"

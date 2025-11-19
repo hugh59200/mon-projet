@@ -3,12 +3,15 @@
     <div class="profil__cover">
       <img
         src="https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80"
-        alt="Cover"
+        alt="Bannière de profil"
         class="profil__cover-img"
       />
     </div>
 
-    <div class="profil__container">
+    <div
+      class="profil__container"
+      v-motion-slide-visible-once-bottom
+    >
       <div class="profil__header">
         <div class="profil__avatar">
           <img
@@ -33,6 +36,12 @@
             class="profil__avatar-input"
             @change="handleAvatarSelect"
           />
+          <div class="profil__avatar-overlay">
+            <BasicIconNext
+              name="Camera"
+              :size="20"
+            />
+          </div>
         </div>
         <div class="profil__header-info">
           <BasicText
@@ -42,17 +51,31 @@
             {{ editableName || 'Mon profil' }}
           </BasicText>
           <div class="profil__meta">
-            <BasicText size="body-m">
-              {{ profile?.email || 'Adresse e-mail non renseignée' }}
+            <BasicText
+              size="body-m"
+              color="neutral-400"
+            >
+              <BasicIconNext
+                name="Mail"
+                :size="14"
+                class="inline-icon"
+              />
+              {{ profile?.email || 'e-mail non renseignée' }}
             </BasicText>
 
             <BasicText
               v-if="profile?.role"
               size="body-s"
-              color="neutral-500"
+              color="primary-400"
+              weight="semibold"
               class="profil__role"
             >
-              • {{ profile.role }}
+              <BasicIconNext
+                name="Shield"
+                :size="14"
+                class="inline-icon"
+              />
+              {{ profile.role }}
             </BasicText>
           </div>
         </div>
@@ -61,24 +84,30 @@
         <FilterSection
           title="Informations personnelles"
           v-model="sections.personal"
+          icon="User"
         >
-          <BasicInput
-            v-model="editableName"
-            label="Nom complet"
-            placeholder="Entrez votre nom"
-            input-type="form"
-          />
-          <BasicInput
-            v-model="phone"
-            label="Téléphone"
-            placeholder="+33 6 ..."
-            input-type="form"
-          />
-          <BasicInput
+          <div class="profil__form-grid">
+            <WrapperInput
+              v-model="editableName"
+              label="Nom complet"
+              placeholder="Entrez votre nom"
+              input-type="form"
+              icon-left="User"
+            />
+            <WrapperInput
+              v-model="phone"
+              label="Téléphone"
+              placeholder="+33 6 ..."
+              input-type="form"
+              icon-left="Phone"
+            />
+          </div>
+          <WrapperInput
             v-model="address"
-            label="Adresse"
-            placeholder="12 rue du Peptide"
+            label="Adresse postale"
+            placeholder="12 rue du Peptide, 75000 Paris"
             input-type="form"
+            icon-left="MapPin"
           />
           <div class="profil__actions">
             <BasicButton
@@ -87,12 +116,16 @@
               variant="filled"
               :disabled="loading"
               @click="updateProfileForm"
+              icon-left="Save"
+              block
             />
           </div>
         </FilterSection>
+
         <FilterSection
-          title="Mes commandes"
+          title="Mes commandes récentes"
           v-model="sections.orders"
+          icon="Box"
         >
           <div class="profil__orders">
             <div
@@ -119,14 +152,14 @@
               <div class="profil__order-card-body">
                 <BasicText
                   size="body-m"
-                  color="neutral-700"
+                  color="neutral-400"
                 >
                   Total :
-                  <strong>{{ order.total_amount }} €</strong>
+                  <strong class="text-primary">{{ order.total_amount }} €</strong>
                 </BasicText>
 
                 <BasicText
-                  size="body-m"
+                  size="body-s"
                   color="neutral-500"
                 >
                   Passée le {{ formatOrderDate(order.created_at!) }}
@@ -151,15 +184,16 @@
             variant="outlined"
             block
             @click="$router.push('/profil/commandes')"
+            icon-left="ArrowRight"
           />
         </FilterSection>
 
         <FilterSection
-          title="Préférences"
+          title="Préférences & réglages"
           v-model="sections.preferences"
+          icon="Settings"
         >
           <div class="profil__preferences">
-            <!-- 🎛️ Bloc thème -->
             <div class="profil__pref-card">
               <BasicText
                 size="body-m"
@@ -174,12 +208,13 @@
                   <BasicText
                     size="body-m"
                     weight="semibold"
+                    color="neutral-100"
                   >
                     Thème de l’interface
                   </BasicText>
                   <BasicText
                     size="body-s"
-                    color="neutral-600"
+                    color="neutral-400"
                   >
                     Sélectionnez l’ambiance couleur que vous préférez.
                   </BasicText>
@@ -189,7 +224,6 @@
               </div>
             </div>
 
-            <!-- Notifications -->
             <div class="profil__pref-card">
               <BasicText
                 size="body-m"
@@ -202,12 +236,12 @@
               <div class="profil__pref-card-list">
                 <BasicCheckbox
                   v-model="newsletter"
-                  label="Recevoir les newsletters"
+                  label="Recevoir les newsletters et promotions"
                 />
 
                 <BasicCheckbox
                   v-model="smsAlerts"
-                  label="Recevoir les alertes SMS"
+                  label="Recevoir les alertes SMS (commandes & livraisons)"
                 />
               </div>
             </div>
@@ -215,36 +249,45 @@
 
           <BasicButton
             label="Sauvegarder mes préférences"
-            type="secondary"
+            type="primary"
             variant="filled"
             block
             @click="savePreferences"
+            icon-left="Download"
           />
         </FilterSection>
 
         <FilterSection
-          title="Sécurité"
+          title="Sécurité & gestion du compte"
           v-model="sections.security"
+          icon="Lock"
         >
-          <BasicInput
-            v-model="newPassword"
-            type="password"
-            placeholder="Nouveau mot de passe"
-            input-type="form"
-          />
-          <BasicInput
-            v-model="confirmPassword"
-            type="password"
-            placeholder="Confirmez le mot de passe"
-            input-type="form"
-          />
+          <div class="profil__form-grid two-cols">
+            <WrapperInput
+              v-model="newPassword"
+              type="password"
+              label="Nouveau mot de passe"
+              input-type="form"
+              icon-left="Key"
+            />
+            <WrapperInput
+              v-model="confirmPassword"
+              type="password"
+              label="Confirmez le mot de passe"
+              input-type="form"
+              icon-left="Key"
+            />
+          </div>
           <div class="profil__actions">
             <BasicButton
               label="Mettre à jour le mot de passe"
-              type="primary"
+              type="secondary"
               variant="filled"
-              :disabled="passwordLoading"
+              :disabled="
+                passwordLoading || newPassword !== confirmPassword || newPassword.length < 6
+              "
               @click="updatePasswordAction"
+              icon-left="RefreshCw"
             />
           </div>
           <div class="profil__danger">
@@ -253,19 +296,30 @@
               type="danger"
               variant="outlined"
               @click="deleteOwnAccount"
+              icon-left="Trash"
             />
           </div>
         </FilterSection>
+
         <FilterSection
           title="Assistance & support"
           v-model="sections.support"
+          icon="MessageCircle"
         >
-          <p>Vous avez une question ? Contactez notre support client.</p>
+          <BasicText
+            size="body-m"
+            color="neutral-400"
+            style="margin-bottom: 12px"
+          >
+            Vous avez une question sur une commande ou un produit ? Contactez notre support client
+            pour une assistance immédiate.
+          </BasicText>
           <BasicButton
             label="Ouvrir la messagerie"
             type="secondary"
             variant="outlined"
             @click="openMessaging"
+            icon-left="Mail"
           />
         </FilterSection>
       </div>
@@ -310,8 +364,6 @@
   const newsletter = ref(false)
   const smsAlerts = ref(false)
 
-  const pendingChanges = ref(false)
-
   const loading = ref(false)
   const newPassword = ref('')
   const confirmPassword = ref('')
@@ -352,32 +404,53 @@
     if (!file || !auth.user) return
 
     const publicUrl = await changeAvatar(auth.user.id, file)
-    if (publicUrl) avatarPreview.value = publicUrl
+
+    if (publicUrl) {
+      avatarPreview.value = publicUrl
+      toast.show('Avatar mis à jour 🎨', 'success')
+    }
   }
 
   async function updateProfileForm() {
     if (!auth.user) return
     loading.value = true
 
-    await updateProfile(auth.user.id, {
+    const success = await updateProfile(auth.user.id, {
       full_name: editableName.value,
       phone: phone.value,
       address: address.value,
     })
 
+    if (success) {
+      toast.show('Profil mis à jour avec succès! ✅', 'success')
+    }
     loading.value = false
   }
 
   async function updatePasswordAction() {
-    if (newPassword.value !== confirmPassword.value) return
+    if (newPassword.value !== confirmPassword.value) {
+      toast.show('Les mots de passe ne correspondent pas.', 'danger')
+      return
+    }
+    if (newPassword.value.length < 6) {
+      toast.show('Le mot de passe doit contenir au moins 6 caractères.', 'danger')
+      return
+    }
+
     passwordLoading.value = true
 
-    await updatePassword(newPassword.value)
+    const success = await updatePassword(newPassword.value)
+    if (success) {
+      toast.show('Mot de passe mis à jour! ✅', 'success')
+      newPassword.value = ''
+      confirmPassword.value = ''
+    }
+
     passwordLoading.value = false
   }
 
   function savePreferences() {
-    pendingChanges.value = false
+    // Logique de sauvegarde des préférences
     toast.show('Préférences sauvegardées 👍', 'success')
   }
 
@@ -399,46 +472,262 @@
 
 <style lang="less">
   .profil {
-    background: transparent !important;
-    min-height: 100vh;
-    position: relative;
+    &__form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
 
-    &__preferences {
+      &.two-cols {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    &__actions {
+      margin-top: 20px;
+      .BasicButton {
+        max-width: 300px;
+      }
+    }
+
+    &__danger {
+      margin-top: 30px;
+      border-top: 1px dashed @neutral-800; /* Neutre -> @variable */
+      padding-top: 20px;
+
+      .BasicButton {
+        max-width: 250px;
+      }
+    }
+
+    /* -----------------------------
+    🖼️ Cover
+  ----------------------------- */
+    &__cover {
+      height: 280px;
+      overflow: hidden;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+
+      &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.65) saturate(1.1);
+      }
+    }
+
+    /* -----------------------------
+    🧊 MAIN CONTAINER (glass)
+  ----------------------------- */
+    &__container {
+      max-width: 950px;
+      margin: -100px auto 70px;
+      padding: 40px;
+
+      /* Thème (Secondary) -> var(...-rgb) */
+      background: rgba(var(--secondary-800-rgb), 0.9);
+
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+
+      /* Neutre -> @variable avec fade */
+      border: 1px solid fade(@neutral-300, 15%);
+
+      box-shadow: 0 25px 60px fade(#000, 50%);
+
+      position: relative;
+      z-index: 10;
+    }
+
+    /* -----------------------------
+    👤 HEADER (titre + avatar)
+  ----------------------------- */
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid @neutral-800; /* Neutre -> @variable */
+    }
+
+    /* AVATAR */
+    &__avatar {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      flex-shrink: 0;
+
+      background: var(--secondary-700); /* Thème (Secondary) -> var() */
+      border: 4px solid var(--secondary-900); /* Thème (Secondary) -> var() */
+
+      box-shadow:
+        0 6px 20px fade(@neutral-900, 50%),
+        /* Neutre -> @variable */ 0 0 0 4px var(--primary-500); /* Thème (Primary) -> var() */
+
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow:
+          0 8px 25px fade(@neutral-900, 60%),
+          /* Neutre -> @variable */ 0 0 0 4px var(--primary-400); /* Thème (Primary) -> var() */
+      }
+
+      &-overlay {
+        color: @neutral-50; /* Neutre -> @variable */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+
+        .profil__avatar:hover & {
+          opacity: 1;
+        }
+      }
+
+      .profil__avatar-placeholder {
+        color: @neutral-300; /* Neutre -> @variable */
+        background: var(--secondary-700); /* Thème (Secondary) -> var() */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .profil__avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .profil__avatar-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer !important;
+        z-index: 15;
+      }
+    }
+
+    /* -----------------------------
+    Header texte
+  ----------------------------- */
+    &__header-info {
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 8px;
+
+      h3,
+      [size='h3'] {
+        color: @neutral-50; /* Neutre -> @variable */
+      }
     }
 
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .inline-icon {
+        margin-right: 4px;
+        position: relative;
+        top: -1px;
+      }
+
+      .BasicText {
+        color: @neutral-400; /* Neutre -> @variable */
+      }
+
+      .profil__role {
+        /* Thème (Primary) -> var(...-rgb) */
+        background: rgba(var(--primary-500-rgb), 0.15);
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+    }
+
+    /* -----------------------------
+    SECTIONS
+  ----------------------------- */
+    &__sections {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-top: 10px;
+
+      :deep(.FilterSection) {
+        /* Neutre -> @variable avec fade */
+        border: 1px solid fade(@neutral-500, 10%);
+        /* Thème (Secondary) -> var(...-rgb) */
+        background: rgba(var(--secondary-900-rgb), 0.5);
+        border-radius: 16px;
+        padding: 20px;
+      }
+
+      :deep(.FilterSection__content) {
+        padding-top: 20px;
+
+        .BasicInput:not(:last-child) {
+          margin-bottom: 12px;
+        }
+      }
+
+      :deep(.FilterSection__head .BasicText) {
+        color: @neutral-50; /* Neutre -> @variable */
+      }
+    }
+
+    /* -----------------------------
+    CARDS
+  ----------------------------- */
     &__orders {
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 18px;
+      margin-bottom: 20px;
     }
 
-    &__orders-empty {
-      display: block;
-      margin-top: 6px;
-      text-align: center;
-    }
-
-    &__order-card {
-      background: color-mix(in srgb, @neutral-50 45%, transparent);
-      border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
+    &__order-card,
+    &__pref-card {
+      background: @neutral-100; /* Thème (Secondary) -> var() */
+      border: 1px solid @neutral-800; /* Neutre -> @variable */
       padding: 18px 22px;
       border-radius: 14px;
       transition: all 0.25s ease;
+
+      .BasicText {
+        color: @neutral-100; /* Neutre -> @variable */
+      }
+    }
+
+    &__order-card {
       cursor: pointer;
 
       &:hover {
         transform: translateY(-2px);
-        border-color: rgba(var(--primary-400-rgb), 0.4);
-        box-shadow: 0 8px 22px fade(#000, 12%);
+        border-color: var(--primary-400); /* Thème (Primary) -> var() */
+        /* Thème (Primary) -> var(...-rgb) */
+        box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.2);
       }
 
       &-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+
+        .BasicText {
+          color: @neutral-50; /* Neutre -> @variable */
+        }
       }
 
       &-body {
@@ -446,26 +735,36 @@
         flex-direction: column;
         gap: 4px;
       }
+
+      .text-primary {
+        color: var(--primary-400); /* Thème (Primary) -> var() */
+      }
+
+      .profil__orders-empty {
+        display: block;
+        margin-top: 6px;
+        text-align: center;
+      }
     }
 
     &__pref-card {
-      background: color-mix(in srgb, @neutral-50 35%, transparent);
-      border: 1px solid color-mix(in srgb, @neutral-300 30%, transparent);
-      padding: 22px 24px;
-      border-radius: 14px;
+      cursor: default;
       display: flex;
       flex-direction: column;
       gap: 16px;
 
       &-title {
-        margin-bottom: 4px;
         color: @neutral-700;
+        border-bottom: 1px solid @neutral-800;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
       }
 
       &-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
       }
 
       &-info {
@@ -477,144 +776,36 @@
       &-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 14px;
       }
     }
 
-    /* -----------------------------
-      🖼️ Cover
-    ----------------------------- */
-    &__cover {
-      height: 260px;
-      overflow: hidden;
-
-      &-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        filter: brightness(0.75) saturate(1.08);
-      }
-    }
-
-    /* -----------------------------
-      🧊 MAIN CONTAINER (darker glass)
-    ----------------------------- */
-    &__container {
-      max-width: 900px;
-      margin: -80px auto 70px;
-      padding: 40px;
-
-      background: linear-gradient(
-        90deg,
-        var(--secondary-700),
-        color-mix(in srgb, black 4%, var(--secondary-700))
-      );
-
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-
-      border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
-      border-radius: 22px;
-
-      box-shadow:
-        0 18px 55px fade(#000, 45%),
-        inset 0 0 0 1px color-mix(in srgb, @neutral-50 20%, transparent);
-
-      position: relative;
-      z-index: 2;
-    }
-
-    /* -----------------------------
-      👤 HEADER (titre + avatar)
-    ----------------------------- */
-    &__header {
-      display: flex;
-      align-items: center;
-      gap: 26px;
-      margin-bottom: 36px;
-      flex-wrap: wrap;
-    }
-
-    /* AVATAR */
-    &__avatar {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-
-      background: color-mix(in srgb, @neutral-700 30%, transparent);
-      border: 2px solid color-mix(in srgb, @neutral-400 35%, transparent);
-
-      box-shadow:
-        0 4px 18px color-mix(in srgb, @neutral-900 35%, transparent),
-        0 0 0 3px fade(@white, 10%);
-
-      overflow: hidden;
-      transition: all 0.25s ease;
-
-      &:hover {
-        transform: scale(1.035);
-        border-color: rgba(var(--primary-500-rgb), 0.45);
-        box-shadow:
-          0 0 20px rgba(var(--primary-500-rgb), 0.35),
-          0 0 0 3px rgba(var(--primary-400-rgb), 0.2);
+    /* --- Media Queries --- */
+    @media (max-width: 768px) {
+      &__container {
+        margin: -60px 20px 50px;
+        padding: 30px 20px;
       }
 
-      .profil__avatar-placeholder {
-        display: flex;
-        align-items: center;
+      &__header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      &__meta {
         justify-content: center;
-        width: 100%;
-        height: 100%;
-        color: @neutral-300;
-        background: color-mix(in srgb, @neutral-700 30%, transparent);
       }
-    }
 
-    .profil__avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .profil__avatar-input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer !important;
-    }
-
-    /* -----------------------------
-      Header texte
-    ----------------------------- */
-    &__header-info {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      h3,
-      [size='h3'] {
-        color: @neutral-50;
+      &__form-grid {
+        grid-template-columns: 1fr;
       }
-    }
 
-    &__meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-
-      color: @neutral-300;
-    }
-
-    /* -----------------------------
-      SECTIONS
-    ----------------------------- */
-    &__sections {
-      display: flex;
-      flex-direction: column;
-      gap: 26px;
-      margin-top: 10px;
+      &__orders {
+        grid-template-columns: 1fr;
+      }
     }
   }
 </style>
