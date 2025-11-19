@@ -114,7 +114,8 @@
               label="Enregistrer les modifications"
               type="primary"
               variant="filled"
-              :disabled="loading"
+              :disabled="loading || !hasPersonalChanges"
+              :loading="loading"
               @click="updateProfileForm"
               icon-left="Save"
               block
@@ -174,7 +175,7 @@
               align="center"
               class="profil__orders-empty"
             >
-              Vous n’avez pas encore de commande.
+              Vous n’avez pas encore de commande. **Commencez vos achats !**
             </BasicText>
           </div>
 
@@ -252,6 +253,8 @@
             type="primary"
             variant="filled"
             block
+            :disabled="preferencesLoading || !hasPreferenceChanges"
+            :loading="preferencesLoading"
             @click="savePreferences"
             icon-left="Download"
           />
@@ -286,6 +289,7 @@
               :disabled="
                 passwordLoading || newPassword !== confirmPassword || newPassword.length < 6
               "
+              :loading="passwordLoading"
               @click="updatePasswordAction"
               icon-left="RefreshCw"
             />
@@ -334,13 +338,14 @@
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref, watch, type Ref } from 'vue'
+  import { computed, onMounted, ref, watch, type Ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { BasicThemeSelector } from '../../../designSystem/src'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
+  // --- Stores et Hooks ---
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
@@ -351,29 +356,75 @@
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
 
+  // --- États Locaux ---
   const isBrownTheme = ref(false)
-
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
 
+  // Données Personnelles Éditables (pour le formulaire)
   const editableName = ref('')
-  const avatarPreview = ref<string | null>(null)
   const phone = ref('')
   const address = ref('')
+  const avatarPreview = ref<string | null>(null)
 
+  // Données d'Origine (pour vérifier si des changements ont été faits)
+  const originalProfile = ref<{ full_name?: string; phone?: string; address?: string }>({})
+  const originalNewsletter = ref(false)
+  const originalSmsAlerts = ref(false)
+
+  // Préférences
   const newsletter = ref(false)
   const smsAlerts = ref(false)
+  const preferencesLoading = ref(false) // Nouveau loader pour les préférences
 
-  const loading = ref(false)
+  // Sécurité
+  const loading = ref(false) // Loader pour le profil
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
 
-  watch(isBrownTheme, (v) => {
-    const html = document.documentElement
-    html.classList.toggle('theme-brown', v)
-    html.classList.toggle('theme-blue', !v)
+  // --- Computed pour l'UX des boutons ---
+
+  const hasPersonalChanges = computed(() => {
+    return (
+      editableName.value !== originalProfile.value.full_name ||
+      phone.value !== originalProfile.value.phone ||
+      address.value !== originalProfile.value.address
+    )
   })
+
+  const hasPreferenceChanges = computed(() => {
+    return (
+      newsletter.value !== originalNewsletter.value ||
+      smsAlerts.value !== originalSmsAlerts.value ||
+      isBrownTheme.value.toString() !==
+        (localStorage.getItem('theme-preference') === 'brown').toString()
+    )
+  })
+
+  // --- Watchers et Logique de Thème Persistant ---
+
+  const THEME_STORAGE_KEY = 'theme-preference'
+
+  watch(isBrownTheme, (isBrown) => {
+    const html = document.documentElement
+    html.classList.toggle('theme-brown', isBrown)
+    html.classList.toggle('theme-blue', !isBrown)
+    localStorage.setItem(THEME_STORAGE_KEY, isBrown ? 'brown' : 'blue')
+  })
+
+  function loadThemePreference() {
+    const preference = localStorage.getItem(THEME_STORAGE_KEY)
+    const isBrown = preference === 'brown'
+    isBrownTheme.value = isBrown
+
+    const html = document.documentElement
+    // Application immédiate de la classe au montage
+    html.classList.add(isBrown ? 'theme-brown' : 'theme-blue')
+  }
+
+  // --- Fonctions Utilitaires ---
+
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
   }
@@ -383,6 +434,8 @@
     router.push(`/profil/commandes/${id}`)
   }
 
+  // --- Actions Profil ---
+
   async function fetchProfileData() {
     if (!auth.user) return
 
@@ -390,12 +443,31 @@
     if (!data) return
 
     profile.value = data
+
+    // Initialisation des données éditables et de l'état d'origine
     editableName.value = data.full_name ?? ''
-    avatarPreview.value = data.avatar_url ? data.avatar_url : null
     phone.value = data.phone ?? ''
     address.value = data.address ?? ''
 
+    originalProfile.value = {
+      full_name: editableName.value,
+      phone: phone.value,
+      address: address.value,
+    }
+
+    // Avatar
+    avatarPreview.value = data.avatar_url ? data.avatar_url : null
+
+    // Commandes
     lastOrders.value = await loadLastOrdersAction(auth.user.id)
+
+    // Préférences (à charger également depuis la BDD si implémenté, ou via un défaut)
+    // Simuler le chargement des préférences depuis le profil si elles y étaient stockées
+    newsletter.value = data.newsletter ?? false
+    smsAlerts.value = data.sms_alerts ?? false
+
+    originalNewsletter.value = newsletter.value
+    originalSmsAlerts.value = smsAlerts.value
   }
 
   async function handleAvatarSelect(e: Event) {
@@ -412,16 +484,27 @@
   }
 
   async function updateProfileForm() {
-    if (!auth.user) return
+    if (!auth.user || !hasPersonalChanges.value) return
     loading.value = true
 
-    const success = await updateProfile(auth.user.id, {
+    const updatedData = {
       full_name: editableName.value,
       phone: phone.value,
       address: address.value,
-    })
+    }
+
+    const success = await updateProfile(auth.user.id, updatedData)
 
     if (success) {
+      // Mettre à jour l'état d'origine pour désactiver le bouton de sauvegarde
+      originalProfile.value = updatedData
+
+      // Mettre à jour les données d'affichage dans le header
+      if (profile.value) {
+        profile.value.full_name = editableName.value
+        profile.value.phone = phone.value
+      }
+
       toast.show('Profil mis à jour avec succès! ✅', 'success')
     }
     loading.value = false
@@ -439,7 +522,9 @@
 
     passwordLoading.value = true
 
+    // Dans un scénario réel, on demanderait le mot de passe ACTUEL ici.
     const success = await updatePassword(newPassword.value)
+
     if (success) {
       toast.show('Mot de passe mis à jour! ✅', 'success')
       newPassword.value = ''
@@ -449,9 +534,27 @@
     passwordLoading.value = false
   }
 
-  function savePreferences() {
-    // Logique de sauvegarde des préférences
-    toast.show('Préférences sauvegardées 👍', 'success')
+  async function savePreferences() {
+    if (!hasPreferenceChanges.value) return
+    preferencesLoading.value = true
+
+    // Logique de sauvegarde des préférences dans la BDD (si implémentée)
+    const preferencesData = {
+      newsletter: newsletter.value,
+      sms_alerts: smsAlerts.value,
+      // theme_preference est géré par localStorage et le watch
+    }
+
+    const success = await updateProfile(auth.user!.id, preferencesData)
+
+    if (success) {
+      // Mettre à jour l'état d'origine pour désactiver le bouton
+      originalNewsletter.value = newsletter.value
+      originalSmsAlerts.value = smsAlerts.value
+      toast.show('Préférences sauvegardées 👍', 'success')
+    }
+
+    preferencesLoading.value = false
   }
 
   function openMessaging() {
@@ -462,11 +565,11 @@
     }
   }
 
+  // --- Lifecycle Hook ---
   onMounted(async () => {
+    loadThemePreference()
     await sections.loadFromSupabase()
     await fetchProfileData()
-    const html = document.documentElement
-    html.classList.add('theme-blue') // thème par défaut
   })
 </script>
 
@@ -492,7 +595,7 @@
 
     &__danger {
       margin-top: 30px;
-      border-top: 1px dashed @neutral-800; /* Neutre -> @variable */
+      border-top: 1px dashed @neutral-800;
       padding-top: 20px;
 
       .BasicButton {
@@ -502,7 +605,7 @@
 
     /* -----------------------------
     🖼️ Cover
-  ----------------------------- */
+    ----------------------------- */
     &__cover {
       height: 280px;
       overflow: hidden;
@@ -520,19 +623,17 @@
 
     /* -----------------------------
     🧊 MAIN CONTAINER (glass)
-  ----------------------------- */
+    ----------------------------- */
     &__container {
       max-width: 950px;
       margin: -100px auto 70px;
       padding: 40px;
 
-      /* Thème (Secondary) -> var(...-rgb) */
       background: rgba(var(--secondary-800-rgb), 0.9);
 
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
 
-      /* Neutre -> @variable avec fade */
       border: 1px solid fade(@neutral-300, 15%);
 
       box-shadow: 0 25px 60px fade(#000, 50%);
@@ -543,14 +644,14 @@
 
     /* -----------------------------
     👤 HEADER (titre + avatar)
-  ----------------------------- */
+    ----------------------------- */
     &__header {
       display: flex;
       align-items: center;
       gap: 30px;
       margin-bottom: 40px;
       padding-bottom: 20px;
-      border-bottom: 1px solid @neutral-800; /* Neutre -> @variable */
+      border-bottom: 1px solid @neutral-800;
     }
 
     /* AVATAR */
@@ -561,12 +662,12 @@
       border-radius: 50%;
       flex-shrink: 0;
 
-      background: var(--secondary-700); /* Thème (Secondary) -> var() */
-      border: 4px solid var(--secondary-900); /* Thème (Secondary) -> var() */
+      background: var(--secondary-700);
+      border: 4px solid var(--secondary-900);
 
       box-shadow:
         0 6px 20px fade(@neutral-900, 50%),
-        /* Neutre -> @variable */ 0 0 0 4px var(--primary-500); /* Thème (Primary) -> var() */
+        0 0 0 4px var(--primary-500);
 
       overflow: hidden;
       transition: all 0.3s ease;
@@ -576,16 +677,20 @@
         transform: scale(1.05);
         box-shadow:
           0 8px 25px fade(@neutral-900, 60%),
-          /* Neutre -> @variable */ 0 0 0 4px var(--primary-400); /* Thème (Primary) -> var() */
+          0 0 0 4px var(--primary-400);
       }
 
       &-overlay {
-        color: @neutral-50; /* Neutre -> @variable */
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        color: @neutral-50;
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0;
         transition: opacity 0.3s ease;
+        z-index: 10;
 
         .profil__avatar:hover & {
           opacity: 1;
@@ -593,8 +698,8 @@
       }
 
       .profil__avatar-placeholder {
-        color: @neutral-300; /* Neutre -> @variable */
-        background: var(--secondary-700); /* Thème (Secondary) -> var() */
+        color: @neutral-300;
+        background: var(--secondary-700);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -619,7 +724,7 @@
 
     /* -----------------------------
     Header texte
-  ----------------------------- */
+    ----------------------------- */
     &__header-info {
       display: flex;
       flex-direction: column;
@@ -627,7 +732,7 @@
 
       h3,
       [size='h3'] {
-        color: @neutral-50; /* Neutre -> @variable */
+        color: @neutral-50;
       }
     }
 
@@ -644,11 +749,11 @@
       }
 
       .BasicText {
-        color: @neutral-400; /* Neutre -> @variable */
+        color: @neutral-400;
       }
 
       .profil__role {
-        /* Thème (Primary) -> var(...-rgb) */
+        color: var(--primary-400);
         background: rgba(var(--primary-500-rgb), 0.15);
         padding: 2px 8px;
         border-radius: 6px;
@@ -657,7 +762,7 @@
 
     /* -----------------------------
     SECTIONS
-  ----------------------------- */
+    ----------------------------- */
     &__sections {
       display: flex;
       flex-direction: column;
@@ -665,15 +770,15 @@
       margin-top: 10px;
 
       :deep(.FilterSection) {
-        /* Neutre -> @variable avec fade */
+        /* ⬅️ AJOUT :deep() */
         border: 1px solid fade(@neutral-500, 10%);
-        /* Thème (Secondary) -> var(...-rgb) */
         background: rgba(var(--secondary-900-rgb), 0.5);
         border-radius: 16px;
         padding: 20px;
       }
 
       :deep(.FilterSection__content) {
+        /* ⬅️ AJOUT :deep() */
         padding-top: 20px;
 
         .BasicInput:not(:last-child) {
@@ -682,13 +787,14 @@
       }
 
       :deep(.FilterSection__head .BasicText) {
-        color: @neutral-50; /* Neutre -> @variable */
+        /* ⬅️ AJOUT :deep() */
+        color: @neutral-50;
       }
     }
 
     /* -----------------------------
     CARDS
-  ----------------------------- */
+    ----------------------------- */
     &__orders {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -698,14 +804,14 @@
 
     &__order-card,
     &__pref-card {
-      background: @neutral-100; /* Thème (Secondary) -> var() */
-      border: 1px solid @neutral-800; /* Neutre -> @variable */
+      background: @neutral-50;
+      border: 1px solid @neutral-200;
       padding: 18px 22px;
       border-radius: 14px;
       transition: all 0.25s ease;
 
       .BasicText {
-        color: @neutral-100; /* Neutre -> @variable */
+        color: @neutral-900;
       }
     }
 
@@ -714,8 +820,7 @@
 
       &:hover {
         transform: translateY(-2px);
-        border-color: var(--primary-400); /* Thème (Primary) -> var() */
-        /* Thème (Primary) -> var(...-rgb) */
+        border-color: var(--primary-400);
         box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.2);
       }
 
@@ -726,7 +831,7 @@
         margin-bottom: 10px;
 
         .BasicText {
-          color: @neutral-50; /* Neutre -> @variable */
+          color: @neutral-900;
         }
       }
 
@@ -734,10 +839,15 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+
+        .BasicText {
+          color: @neutral-600;
+        }
       }
 
       .text-primary {
-        color: var(--primary-400); /* Thème (Primary) -> var() */
+        color: var(--primary-500);
+        font-weight: bold;
       }
 
       .profil__orders-empty {
@@ -745,6 +855,16 @@
         margin-top: 6px;
         text-align: center;
       }
+    }
+
+    /* -----------------------------
+    PREFERENCES
+    ----------------------------- */
+    &__preferences {
+      display: flex;
+      flex-direction: column;
+      gap: 16px; /* Espacement vertical entre les cartes */
+      margin-bottom: 20px;
     }
 
     &__pref-card {
@@ -755,7 +875,7 @@
 
       &-title {
         color: @neutral-700;
-        border-bottom: 1px solid @neutral-800;
+        border-bottom: 1px solid @neutral-200;
         padding-bottom: 10px;
         margin-bottom: 10px;
       }
@@ -771,12 +891,62 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+
+        .BasicText[color='neutral-100'] {
+          color: @neutral-900 !important;
+        }
       }
 
       &-list {
         display: flex;
         flex-direction: column;
         gap: 14px;
+
+        :deep(.BasicCheckbox) {
+          /* ⬅️ AJOUT :deep() */
+          /* Styles spécifiques aux checkboxes si besoin */
+          .BasicText {
+            color: @neutral-800; /* Assurer une couleur de texte appropriée dans la carte */
+          }
+        }
+      }
+
+      /* STYLE DU SÉLECTEUR DE THÈME */
+      :deep(.BasicThemeSelector) {
+        /* ⬅️ AJOUT :deep() */
+        border: 1px solid @neutral-300;
+        padding: 6px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: @neutral-500;
+        }
+
+        .BasicThemeSelector__option {
+          width: 38px;
+          height: 38px;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          &--active {
+            box-shadow: 0 0 0 3px var(--primary-500);
+            transform: scale(1.05);
+          }
+        }
+        .BasicText {
+          font-weight: 500;
+          color: @neutral-700;
+        }
+      }
+    }
+
+    /* Ciblage direct des WrapperInput dans les formulaires */
+    :deep(.WrapperInput) {
+      /* ⬅️ AJOUT :deep() pour tous les WrapperInput */
+      .BasicInput {
+        border-color: @neutral-300;
+        background: @neutral-50;
       }
     }
 

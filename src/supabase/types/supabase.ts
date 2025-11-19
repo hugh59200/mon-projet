@@ -526,6 +526,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          newsletter: boolean
+          sms_alerts: boolean
           address: string | null
           avatar_url: string | null
           birthdate: string | null
