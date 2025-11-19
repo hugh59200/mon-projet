@@ -11,6 +11,7 @@
         <RouterLink
           :to="`/actualites?categorie=${item.id}`"
           class="actualites__topic-card"
+          :aria-label="`Voir les actualités sur : ${item.label}`"
         >
           <img
             :src="item.image"
@@ -45,7 +46,7 @@
         }"
       >
         <BasicText
-          size="h3"
+          size="h1"
           weight="bold"
           class="actualites__header-title"
         >
@@ -59,21 +60,67 @@
       </div>
       <div class="actualites__header-separator"></div>
     </div>
-
+    <RouterLink
+      v-if="featuredArticle"
+      :to="`/actualites/${featuredArticle.slug}`"
+      class="actualites__featured"
+      v-motion-slide-visible-once-bottom
+    >
+      <div class="actualites__featured-image-wrapper">
+        <img
+          :src="featuredArticle.image!"
+          :alt="featuredArticle.title"
+        />
+      </div>
+      <div class="actualites__featured-content">
+        <BasicText
+          size="body-s"
+          color="primary-500"
+          weight="semibold"
+          class="actualites__featured-topic"
+        >
+          {{ featuredArticle.topic?.label || 'Article en vedette' }}
+        </BasicText>
+        <BasicText
+          size="h3"
+          weight="bold"
+          color="neutral-900"
+          class="actualites__featured-title"
+        >
+          {{ featuredArticle.title }}
+        </BasicText>
+        <BasicText
+          size="body-m"
+          color="neutral-700"
+          class="actualites__featured-excerpt"
+          v-html="parseAndSanitize(featuredArticle.excerpt)"
+        />
+        <BasicText
+          size="body-s"
+          fontStyle="italic"
+          color="neutral-500"
+          class="actualites__featured-date"
+        >
+          Publié le {{ formatDate(featuredArticle.published_at) }}
+        </BasicText>
+      </div>
+    </RouterLink>
     <BasicText
-      size="h1"
+      size="h2"
       weight="semibold"
       color="neutral-900"
       class="actualites__title"
     >
       {{ activeTopicLabel }}
     </BasicText>
+
     <div class="actualites__articles">
       <RouterLink
-        v-for="article in articles"
+        v-for="article in nonFeaturedArticles"
         :key="article.slug"
         :to="`/actualites/${article.slug}`"
         class="actualites__article-card"
+        v-motion-slide-visible-once-bottom
       >
         <img
           v-if="article.image"
@@ -125,19 +172,25 @@
   import { computed, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useNewsStore } from './store/useNewsStore'
+  // Supposons que votre type Article est importé ici:
+  // import type { Article } from '@/supabase/types/supabase.types'
 
   const route = useRoute()
 
   const newsStore = useNewsStore()
-
   const { loadTopics, loadArticles } = newsStore
-
   const { topics, articles } = storeToRefs(newsStore)
 
   const activeCategory = computed(() => route.query.categorie as string | undefined)
   const activeTopicLabel = computed(
-    () => topics.value.find((t) => t.id === activeCategory.value)?.label || null,
+    () => topics.value.find((t) => t.id === activeCategory.value)?.label || 'Tous nos articles',
   )
+
+  // LOGIQUE POUR L'ARTICLE VEDETTE ET LA GRILLE
+  // Le premier article est l'article en vedette
+  const featuredArticle = computed(() => articles.value[0])
+  // Les autres articles forment la grille (à partir de l'index 1)
+  const nonFeaturedArticles = computed(() => articles.value.slice(1))
 
   onMounted(async () => {
     await loadTopics()
@@ -156,10 +209,28 @@
   .actualites {
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    padding: 20px 0;
+    gap: 40px; /* Augmenté l'espacement pour l'effet professionnel */
+    padding: 30px 0; /* Padding ajusté */
+
+    // Mixin pour les ombres des cartes
+    .card-shadow(@shadow) {
+      box-shadow: @shadow;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    // Mixin pour les ombres au hover
+    .card-hover-effect() {
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); // Ombre plus forte
+      }
+    }
 
     &__header {
+      .card-shadow(0 8px 20px rgba(0, 0, 0, 0.1));
+
       border-radius: 18px;
       padding: 34px 32px;
       margin-bottom: 10px;
@@ -212,6 +283,7 @@
       }
     }
 
+    // Styles du carrousel de Topics
     &__topic-card {
       position: relative;
       display: block;
@@ -219,15 +291,11 @@
       overflow: hidden;
       height: 220px;
       text-decoration: none;
-      transition: transform 0.3s ease;
-      background: @neutral-200;
+      .card-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
 
       &:hover {
         transform: translateY(-4px);
-
-        img {
-          transform: scale(1.08);
-        }
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
       }
 
       img {
@@ -246,42 +314,96 @@
         padding: 20px;
         color: white;
         background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.55) 100%);
+      }
+    }
 
-        .actualites__topic-title {
-          font-size: clamp(1.1rem, 2vw, 1.3rem);
-          margin-bottom: 6px;
-          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.75);
+    // Styles du titre de la grille
+    &__title {
+      font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+      margin-top: 10px; // Espacement clair entre featured et la grille
+    }
+
+    /* --- NOUVEAUX STYLES: ARTICLE EN VEDETTE (FEATURED) --- */
+    &__featured {
+      display: flex;
+      gap: 40px;
+      padding: 30px;
+      margin-bottom: 10px;
+      border-radius: 20px;
+      background: @neutral-50; // Fond clair pour le contraste
+
+      .card-shadow(0 8px 25px rgba(0, 0, 0, 0.08));
+      .card-hover-effect();
+
+      &-image-wrapper {
+        width: 55%;
+        flex-shrink: 0;
+      }
+
+      img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        transition: transform 0.4s ease;
+      }
+
+      &-content {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      &-title {
+        font-size: clamp(1.8rem, 3vw, 2.2rem) !important;
+        line-height: 1.25;
+      }
+
+      &-topic {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      &-excerpt {
+        max-height: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      @media (max-width: 960px) {
+        flex-direction: column;
+        padding: 24px;
+        gap: 20px;
+
+        &-image-wrapper,
+        &-content {
+          width: 100%;
         }
 
-        .actualites__topic-description {
-          font-size: clamp(0.9rem, 1.5vw, 0.95rem);
-          line-height: 1.5;
-          opacity: 0.95;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        img {
+          height: 250px;
+        }
 
-          :deep(a),
-          :deep(span) {
-            color: #6ec9ff !important;
-          }
+        &-excerpt {
+          max-height: none;
         }
       }
     }
 
-    &__title {
-      font-size: clamp(2rem, 3vw, 2.4rem);
-      font-weight: 700;
-      color: @neutral-900;
-    }
+    /* --- STYLES GRILLE D'ARTICLES CLASSIQUES --- */
 
     &__articles {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 28px;
+      gap: 36px 30px; /* Augmenté l'espacement entre les cartes */
       padding: 0 12px;
 
       @media (max-width: 768px) {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 28px;
       }
 
       .actualites__article-card {
@@ -290,17 +412,8 @@
         background: white;
         border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-        text-decoration: none;
-        color: inherit;
-        transition:
-          transform 0.25s ease,
-          box-shadow 0.25s ease;
-
-        &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        }
+        .card-shadow(0 3px 10px rgba(0, 0, 0, 0.05));
+        .card-hover-effect();
 
         img {
           width: 100%;
@@ -320,13 +433,11 @@
           .actualites__article-topic {
             margin-bottom: 4px;
             display: block;
-            color: var(--primary-600);
           }
 
           .actualites__article-title {
             margin-bottom: 6px;
             font-size: clamp(1.05rem, 2vw, 1.15rem);
-            color: @neutral-900;
           }
 
           .actualites__article-date {
@@ -334,13 +445,11 @@
             margin-bottom: 10px;
             font-size: 0.9rem;
             font-style: italic;
-            color: @neutral-500;
           }
 
           .actualites__article-excerpt {
             line-height: 1.45;
             font-size: clamp(0.9rem, 1.5vw, 0.95rem);
-            color: @neutral-700;
 
             :deep(a) {
               color: var(--primary-600);

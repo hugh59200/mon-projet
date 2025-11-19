@@ -1,29 +1,28 @@
 <template>
   <div class="basic-carousel">
-    <!-- ⬅️ Bouton gauche -->
     <BasicButton
       v-if="showArrows"
       type="secondary"
       variant="filled"
       size="small"
       iconName="ArrowLeft"
-      :disabled="scrollPosition === 0"
+      :disabled="scrollPosition <= 1"
       class="nav-btn prev"
       @click="scrollLeft"
+      aria-label="Défiler à gauche"
     />
 
-    <!-- 🎠 Conteneur scrollable -->
     <div
       ref="carouselRef"
       class="carousel-container"
       @wheel.prevent="onWheel"
-      @mousedown="onMouseDown"
-      @mousemove="onMouseMove"
-      @mouseup="onMouseUp"
-      @mouseleave="onMouseUp"
-      @touchstart="onTouchStart"
-      @touchmove="onTouchMove"
-      @touchend="onTouchEnd"
+      @mousedown="handleDragStart"
+      @mousemove="handleDragMove"
+      @mouseup="handleDragEnd"
+      @mouseleave="handleDragEnd"
+      @touchstart="handleDragStart"
+      @touchmove="handleDragMove"
+      @touchend="handleDragEnd"
     >
       <div
         class="carousel-track"
@@ -44,7 +43,6 @@
       </div>
     </div>
 
-    <!-- ➡️ Bouton droit -->
     <BasicButton
       v-if="showArrows"
       type="secondary"
@@ -54,6 +52,7 @@
       :disabled="scrollMaxReached"
       class="nav-btn next"
       @click="scrollRight"
+      aria-label="Défiler à droite"
     />
   </div>
 </template>
@@ -83,6 +82,8 @@
   const startX = ref(0)
   const scrollStart = ref(0)
 
+  const SCROLL_TOLERANCE = 2 // Petite tolérance pour les erreurs d'arrondi des navigateurs
+
   const trackStyle = computed(() => ({
     gap: `${props.gap}px`,
   }))
@@ -91,79 +92,98 @@
     flex: `0 0 ${props.itemWidth}px`,
   }))
 
+  // --- Mise à jour de la position de défilement
+
+  const updateScrollPosition = () => {
+    if (!carouselRef.value) return
+    // Utiliser Math.round pour gérer la position en pixels de manière cohérente
+    scrollPosition.value = Math.round(carouselRef.value.scrollLeft)
+  }
+
   // --- Défilement via boutons
+  const scrollByAmount = computed(() => props.itemWidth + props.gap)
+
   const scrollLeft = () => {
     if (!carouselRef.value) return
-    carouselRef.value.scrollBy({ left: -props.itemWidth - props.gap, behavior: 'smooth' })
-    updateScrollPosition()
+    carouselRef.value.scrollBy({ left: -scrollByAmount.value, behavior: 'smooth' })
+    // La position sera mise à jour par l'écouteur de scroll (meilleure pratique)
   }
 
   const scrollRight = () => {
     if (!carouselRef.value) return
-    carouselRef.value.scrollBy({ left: props.itemWidth + props.gap, behavior: 'smooth' })
-    updateScrollPosition()
-  }
-
-  const updateScrollPosition = () => {
-    if (!carouselRef.value) return
-    scrollPosition.value = carouselRef.value.scrollLeft
+    carouselRef.value.scrollBy({ left: scrollByAmount.value, behavior: 'smooth' })
+    // La position sera mise à jour par l'écouteur de scroll (meilleure pratique)
   }
 
   const scrollMaxReached = computed(() => {
     if (!carouselRef.value) return false
-    const maxScroll = carouselRef.value.scrollWidth - carouselRef.value.clientWidth - 5
-    return scrollPosition.value >= maxScroll
+
+    // Calcul de la distance maximale que l'on peut scroller
+    const maxScroll = carouselRef.value.scrollWidth - carouselRef.value.clientWidth
+
+    // Vérifie si la position actuelle est très proche ou égale à la fin
+    return scrollPosition.value >= maxScroll - SCROLL_TOLERANCE
   })
 
-  // --- Scroll molette + drag souris/tactile
+  // --- Logique unifiée Drag/Touch
+  type DragEvent = MouseEvent | TouchEvent
+
+  const getClientX = (e: DragEvent): number => {
+    return e instanceof TouchEvent ? (e.touches[0]?.pageX ?? 0) : e.pageX
+  }
+
+  const handleDragStart = (e: DragEvent) => {
+    e.preventDefault()
+    if (!carouselRef.value) return
+
+    isDragging.value = true
+
+    // Pour les événements souris, il faut prendre en compte le décalage initial
+    if (e instanceof MouseEvent) {
+      startX.value = getClientX(e) - (carouselRef.value?.offsetLeft ?? 0)
+    } else {
+      startX.value = getClientX(e)
+    }
+    scrollStart.value = carouselRef.value?.scrollLeft ?? 0
+  }
+
+  const handleDragMove = (e: DragEvent) => {
+    if (!isDragging.value || !carouselRef.value) return
+
+    const clientX = getClientX(e)
+    let walk: number
+
+    // Ajustement de la marche en fonction du type d'événement
+    if (e instanceof MouseEvent) {
+      const x = clientX - carouselRef.value.offsetLeft
+      walk = x - startX.value
+    } else {
+      walk = clientX - startX.value
+    }
+
+    carouselRef.value.scrollLeft = scrollStart.value - walk
+    updateScrollPosition()
+  }
+
+  const handleDragEnd = () => {
+    isDragging.value = false
+  }
+
+  // --- Scroll molette
   const onWheel = (e: WheelEvent) => {
     if (!carouselRef.value) return
-    carouselRef.value.scrollLeft += e.deltaY
+    carouselRef.value.scrollLeft += e.deltaY * 0.7 // Ralentir légèrement la molette pour le contrôle
     updateScrollPosition()
-  }
-
-  const onMouseDown = (e: MouseEvent) => {
-    isDragging.value = true
-    startX.value = e.pageX - (carouselRef.value?.offsetLeft ?? 0)
-    scrollStart.value = carouselRef.value?.scrollLeft ?? 0
-  }
-
-  const onMouseMove = (e: MouseEvent) => {
-    if (!isDragging.value || !carouselRef.value) return
-    const x = e.pageX - carouselRef.value.offsetLeft
-    const walk = x - startX.value
-    carouselRef.value.scrollLeft = scrollStart.value - walk
-    updateScrollPosition()
-  }
-
-  const onMouseUp = () => {
-    isDragging.value = false
-  }
-
-  const onTouchStart = (e: TouchEvent) => {
-    isDragging.value = true
-    startX.value = e.touches[0]!.pageX
-    scrollStart.value = carouselRef.value?.scrollLeft ?? 0
-  }
-
-  const onTouchMove = (e: TouchEvent) => {
-    if (!isDragging.value || !carouselRef.value) return
-    const x = e.touches[0]!.pageX
-    const walk = x - startX.value
-    carouselRef.value.scrollLeft = scrollStart.value - walk
-    updateScrollPosition()
-  }
-
-  const onTouchEnd = () => {
-    isDragging.value = false
   }
 
   onMounted(async () => {
     await nextTick()
     updateScrollPosition()
+
+    // Écouter l'événement 'scroll' natif pour une mise à jour précise et continue
+    carouselRef.value?.addEventListener('scroll', updateScrollPosition)
   })
 </script>
-
 <style scoped lang="less">
   .basic-carousel {
     display: flex;

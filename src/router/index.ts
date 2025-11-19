@@ -12,7 +12,7 @@ import { registerBaseGuard } from './registerBaseGuard'
 
 const routes: Array<RouteRecordRaw> = [
   /* -------------------------------------------------------------------------- */
-  /* 🏠 PUBLIC                                                                 */
+  /* 🏠 PUBLIC                                                                  */
   /* -------------------------------------------------------------------------- */
   {
     path: '/',
@@ -20,6 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
     meta: {
       label: 'Accueil',
+      breadcrumbLabel: 'Accueil', // 💡 Ajout pour le Breadcrumbs
       icon: 'Home',
       order: 1,
       title: 'Accueil – Fast Peptides',
@@ -34,6 +35,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/auth',
     component: () => import('@/features/auth/AuthOverlay.vue'),
+    // Pas de breadcrumbs sur les pages d'auth
     children: [
       {
         path: 'callback',
@@ -51,6 +53,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/auth',
     component: () => import('@/features/auth/AuthOverlay.vue'),
+    // Pas de breadcrumbs sur les pages d'auth
     children: [
       {
         path: 'login',
@@ -88,6 +91,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/profile/ProfilView.vue'),
     meta: {
       requiresAuth: true,
+      breadcrumbLabel: 'Mon profil', // 💡 Ajout pour le Breadcrumbs
       title: 'Mon profil – Fast Peptides',
       description: 'Gérez vos informations personnelles, préférences et sécurité de votre compte.',
     },
@@ -99,6 +103,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/order/OrdersView.vue'),
     meta: {
       requiresAuth: true,
+      breadcrumbLabel: 'Mes commandes', // 💡 Ajout pour le Breadcrumbs
       title: 'Mes commandes – Fast Peptides',
       description: 'Retrouvez toutes vos commandes précédentes sur Fast Peptides.',
     },
@@ -110,11 +115,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
+      // 💡 Ajout du label dynamique
+      breadcrumbLabel: (route: { params: { id: string } }) =>
+        `Commande #${route.params.id as string}`,
     },
   },
 
   /* -------------------------------------------------------------------------- */
-  /* 🧾 AUTRES ROUTES AUTH                                                     */
+  /* 🧾 AUTRES ROUTES AUTH                                                      */
   /* -------------------------------------------------------------------------- */
   {
     path: '/update-password',
@@ -142,7 +150,7 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   /* -------------------------------------------------------------------------- */
-  /* 🧪 CATALOGUE                                                              */
+  /* 🧪 CATALOGUE                                                               */
   /* -------------------------------------------------------------------------- */
   {
     path: '/catalogue',
@@ -150,6 +158,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/catalogue/Catalogue.vue'),
     meta: {
       label: 'Catalogue',
+      breadcrumbLabel: 'Catalogue', // 💡 Ajout pour le Breadcrumbs
       icon: 'Boxes',
       order: 2,
       title: 'Catalogue – Fast Peptides',
@@ -164,11 +173,13 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Produit – Fast Peptides',
       getDescription: (route) =>
         `Découvrez le peptide ${route.params.id as string} sur Fast Peptides.`,
+      // 💡 Ajout du label dynamique
+      breadcrumbLabel: (route: { params: { id: string } }) => route.params.id as string,
     },
   },
 
   /* -------------------------------------------------------------------------- */
-  /* 📰 ACTUALITÉS                                                             */
+  /* 📰 ACTUALITÉS                                                              */
   /* -------------------------------------------------------------------------- */
   {
     path: '/actualites',
@@ -176,6 +187,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/actualités/ActualitesView.vue'),
     meta: {
       label: 'Actualités',
+      breadcrumbLabel: 'Actualités', // 💡 Ajout pour le Breadcrumbs
       icon: 'Newspaper',
       order: 3,
       title: 'Actualités – Fast Peptides',
@@ -190,11 +202,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       getTitle: (route) => `${route.params.slug as string} – Actualités Peptides – Fast Peptides`,
       description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
+      // 💡 Ajout du label dynamique
+      breadcrumbLabel: (route: { params: { slug: string } }) => route.params.slug as string,
     },
   },
 
   /* -------------------------------------------------------------------------- */
-  /* 🛒 PANIER & PAIEMENT                                                      */
+  /* 🛒 PANIER & PAIEMENT                                                       */
   /* -------------------------------------------------------------------------- */
   {
     path: '/panier',
@@ -202,6 +216,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/PanierView.vue'),
     meta: {
       requiresAuth: true,
+      breadcrumbLabel: 'Mon panier', // 💡 Ajout pour le Breadcrumbs
       title: 'Mon panier – Fast Peptides',
       description: 'Consultez les produits ajoutés à votre panier avant de valider votre commande.',
     },
@@ -213,6 +228,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresCart: true,
       requiresAuth: true,
+      breadcrumbLabel: 'Paiement', // 💡 Ajout pour le Breadcrumbs
       title: 'Paiement – Fast Peptides',
       description: 'Validez et payez votre commande de peptides en toute sécurité.',
     },
@@ -242,7 +258,7 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   /* -------------------------------------------------------------------------- */
-  /* 🧑‍💼 ADMIN                                                                */
+  /* 🧑‍💼 ADMIN                                                                  */
   /* -------------------------------------------------------------------------- */
   {
     path: '/admin',
@@ -250,6 +266,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      breadcrumbLabel: 'Administration', // 💡 Ajout du label parent
       title: 'Espace administrateur – Fast Peptides',
       description:
         'Gérez les produits, utilisateurs, commandes, statistiques et actualités du site Fast Peptides.',
@@ -260,31 +277,51 @@ const routes: Array<RouteRecordRaw> = [
         path: 'utilisateurs',
         name: 'AdminUsers',
         component: AdminUsersView,
-        meta: { label: 'Utilisateurs', icon: 'Users' },
+        meta: {
+          label: 'Utilisateurs',
+          breadcrumbLabel: 'Utilisateurs', // 💡 Ajout pour le Breadcrumbs
+          icon: 'Users',
+        },
       },
       {
         path: 'commandes',
         name: 'AdminOrders',
         component: AdminOrdersView,
-        meta: { label: 'Commandes', icon: 'ShoppingCart' },
+        meta: {
+          label: 'Commandes',
+          breadcrumbLabel: 'Commandes', // 💡 Ajout pour le Breadcrumbs
+          icon: 'ShoppingCart',
+        },
       },
       {
         path: 'produits',
         name: 'AdminProducts',
         component: AdminProductsTable,
-        meta: { label: 'Produits', icon: 'PackageSearch' },
+        meta: {
+          label: 'Produits',
+          breadcrumbLabel: 'Produits', // 💡 Ajout pour le Breadcrumbs
+          icon: 'PackageSearch',
+        },
       },
       {
         path: 'actualites',
         name: 'AdminNews',
         component: AdminNewsTable,
-        meta: { label: 'Actualités', icon: 'Newspaper' },
+        meta: {
+          label: 'Actualités',
+          breadcrumbLabel: 'Actualités', // 💡 Ajout pour le Breadcrumbs
+          icon: 'Newspaper',
+        },
       },
       {
         path: 'topics',
         name: 'AdminTopics',
         component: AdminTopicsTable,
-        meta: { label: 'Catégories', icon: 'FolderTree' },
+        meta: {
+          label: 'Catégories',
+          breadcrumbLabel: 'Catégories', // 💡 Ajout pour le Breadcrumbs
+          icon: 'FolderTree',
+        },
       },
       {
         path: 'messagerie',
@@ -292,6 +329,7 @@ const routes: Array<RouteRecordRaw> = [
         component: AdminChatView,
         meta: {
           label: 'Messagerie',
+          breadcrumbLabel: 'Messagerie', // 💡 Ajout pour le Breadcrumbs
           icon: 'MessageSquare',
           color: '#3B82F6',
           requiresAuth: true,
@@ -304,6 +342,7 @@ const routes: Array<RouteRecordRaw> = [
         component: AdminStatsView,
         meta: {
           label: 'Statistiques',
+          breadcrumbLabel: 'Statistiques', // 💡 Ajout pour le Breadcrumbs
           icon: 'BarChart3',
           color: '#10B981',
           requiresAuth: true,
@@ -322,6 +361,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/FaqView.vue'),
     meta: {
       label: 'FAQ',
+      breadcrumbLabel: 'FAQ', // 💡 Ajout pour le Breadcrumbs
       icon: 'HelpCircle',
       order: 4,
       title: 'FAQ – Fast Peptides',
