@@ -35,7 +35,6 @@
         class="modal__content"
         v-motion="fadeInContent"
       >
-        <!-- Bouton de fermeture si pas de header -->
         <BasicIconNext
           v-if="closable && !hasHeader"
           name="X"
@@ -44,7 +43,6 @@
           class="modal__close-icon"
         />
 
-        <!-- 🌀 SQUELETON -->
         <SmartModalSkeleton
           v-if="loading"
           :show-header="false"
@@ -52,7 +50,6 @@
           :blocks="autoBlocks"
         />
 
-        <!-- ✅ CONTENU RÉEL -->
         <slot
           v-else
           name="content"
@@ -74,7 +71,7 @@
 <script setup lang="ts">
   import { useHandleClickOutside } from '@/features/interface/composables/useHandleClickOutside'
   import { SmartModalSkeleton } from '@designSystem/index'
-  import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, useSlots, type Ref } from 'vue'
 
   interface ModalProps {
     closable?: boolean
@@ -89,13 +86,12 @@
   })
 
   const modalVisible = defineModel<boolean>()
-  const modal = ref()
+  const modal = ref<HTMLElement | null>(null)
+  const overlayRoot = ref<HTMLElement | null>(null) // 👈 NEW
+
   const emit = defineEmits(['close'])
   const slots = useSlots()
 
-  /* -----------------------------
-     🧠 LOGIQUE DU SQUELETON
-  ----------------------------- */
   const hasHeader = computed(() => !!slots.header)
   const hasActions = computed(() => !!slots.actions)
 
@@ -105,9 +101,6 @@
     return props.skeletonBlocks ?? base
   })
 
-  /* -----------------------------
-     🧩 FERMETURE DE LA MODALE
-  ----------------------------- */
   function closeModal() {
     if (props.closable) {
       modalVisible.value = false
@@ -115,18 +108,23 @@
     }
   }
 
-  useHandleClickOutside(modal, closeModal)
+  const protectedRefs: Array<Ref<HTMLElement | null>> = [modal, overlayRoot]
+
+  useHandleClickOutside(protectedRefs, closeModal)
 
   function handleEscapeKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && modalVisible.value && props.closable) closeModal()
   }
 
-  onMounted(() => window.addEventListener('keydown', handleEscapeKeydown))
-  onUnmounted(() => window.removeEventListener('keydown', handleEscapeKeydown))
+  onMounted(() => {
+    overlayRoot.value = document.getElementById('overlay-root') as HTMLElement | null
+    window.addEventListener('keydown', handleEscapeKeydown)
+  })
 
-  /* -----------------------------
-     🌀 MOTIONS
-  ----------------------------- */
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleEscapeKeydown)
+  })
+
   const containerMotion = {
     initial: { opacity: 0, scale: 0.96, y: 10 },
     enter: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25 } },

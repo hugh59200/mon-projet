@@ -1,14 +1,14 @@
 <template>
   <DropdownContainer
     :size
-    :items="props.items"
-    :selectedLabel="selectedLabel"
+    :items
+    :selectedLabel
     :mode
     @on-key-down="onKeyDown"
   >
     <template #dropdown-items>
       <BasicDropdownItem
-        v-for="item in props.items"
+        v-for="item in items"
         :label="item.label"
         :iconName="item.iconName"
         :active="isActive(item.id)"

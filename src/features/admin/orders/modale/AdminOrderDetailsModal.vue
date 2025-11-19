@@ -170,13 +170,10 @@
           >
             Modifier le statut
           </BasicText>
-
           <BasicDropdown
             v-model="selectedStatus"
             :items="STATUSES"
-            dropdown-type="table"
           />
-
           <BasicButton
             label="Mettre à jour"
             size="small"
@@ -290,6 +287,7 @@
   const carrier = ref('')
   const trackingNumber = ref('')
   const selectedStatus = ref<OrderStatus>('pending')
+
 
   const safeProfile = computed<ProfileInfoSafe>(() => {
     const p = order.value?.profile_info
