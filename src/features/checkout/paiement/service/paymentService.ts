@@ -42,7 +42,7 @@ export async function processPayment(
       return createStripeCheckout(amount, email, orderId)
     case 'paypal':
       const paypal = await createPaypalOrder(amount, email!, orderId!)
-      window.location.assign(paypal.url) // maintenant OK
+      window.location.assign(paypal.url)
       return {
         id: paypal.paypalOrderId,
         amount,

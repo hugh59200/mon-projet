@@ -1,15 +1,16 @@
-// utils/getStatusMessage.ts
-
 export function getStatusMessage(status: string, carrier?: string, tracking_number?: string) {
   const lower = status.toLowerCase()
 
   switch (lower) {
     case 'pending':
-      return 'Votre commande est en attente de traitement. Nous la préparerons très bientôt. 🕓'
+      return 'Elle est en attente de traitement. Nous la préparerons très bientôt. 🕓'
+
     case 'confirmed':
-      return 'Votre commande a bien été confirmée ✅. Elle sera bientôt préparée.'
+      return 'Elle a bien été confirmée ✅ et sera bientôt préparée.'
+
     case 'processing':
-      return 'Votre commande est en cours de préparation dans nos laboratoires. 🧪'
+      return 'Elle est actuellement en cours de préparation dans nos laboratoires. 🧪'
+
     case 'shipped': {
       let trackingInfo = ''
       if (carrier || tracking_number) {
@@ -17,6 +18,7 @@ export function getStatusMessage(status: string, carrier?: string, tracking_numb
           tracking_number && tracking_number.startsWith('http')
             ? `<a href="${tracking_number}" target="_blank">${tracking_number}</a>`
             : tracking_number || ''
+
         trackingInfo = `
           <div style="margin-top:10px;">
             ${carrier ? `<p><b>Transporteur :</b> ${carrier}</p>` : ''}
@@ -24,13 +26,16 @@ export function getStatusMessage(status: string, carrier?: string, tracking_numb
           </div>
         `
       }
-      return `Votre commande a été expédiée 🚚. Vous la recevrez très prochainement.${trackingInfo}`
+      return `Elle a été expédiée 🚚. Vous la recevrez très prochainement.${trackingInfo}`
     }
+
     case 'completed':
-      return 'Votre commande a été livrée avec succès 🎉. Merci de votre confiance !'
+      return 'Elle a été livrée avec succès 🎉. Merci de votre confiance !'
+
     case 'canceled':
-      return "Votre commande a été annulée ❌. Si vous pensez qu'il s'agit d'une erreur, contactez notre support."
+      return "Elle a été annulée ❌. Si vous pensez qu'il s'agit d'une erreur, contactez notre support."
+
     default:
-      return `Le statut de votre commande a été mis à jour : <b>${status}</b>`
+      return `Son statut a été mis à jour : <b>${status}</b>`
   }
 }

@@ -13,10 +13,13 @@ export function renderEmailTemplate(type: string, data: any) {
 
     case 'payment':
       return genericTemplate({
-        title: 'Paiement confirmé ✅',
-        message: `Votre paiement de ${(Number(data.amount) || 0).toFixed(2)}€ a bien été reçu.`,
+        title: 'Paiement confirmé 💳',
+        message: `
+      Votre paiement de ${(Number(data.amount) || 0).toFixed(2)} € a bien été reçu.<br/>
+      Merci pour votre commande !
+    `,
         ctaLabel: 'Voir ma commande',
-        ctaUrl: `https://fast-peptides.com/compte/commande/${data.order_id}`,
+        ctaUrl: `https://fast-peptides.com/compte/commandes/${data.order_id}`,
       })
 
     case 'shipping':
@@ -24,10 +27,13 @@ export function renderEmailTemplate(type: string, data: any) {
 
     case 'status_update':
       return genericTemplate({
-        title: 'Mise à jour de votre commande 🔔',
-        message: data.message ?? 'Votre commande a été mise à jour.',
-        ctaLabel: data.ctaLabel,
-        ctaUrl: data.ctaUrl,
+        title: `Mise à jour de votre commande 🔔`,
+        message: `
+      La commande <strong>#${String(data.order_id).slice(0, 8)}</strong> a été mise à jour.<br/><br/>
+      ${data.message ?? ''}
+    `,
+        ctaLabel: 'Voir ma commande',
+        ctaUrl: `https://fast-peptides.com/compte/commandes/${data.order_id}`,
       })
 
     case 'signup':

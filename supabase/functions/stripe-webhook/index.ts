@@ -1,13 +1,24 @@
 // supabase/functions/stripe-webhook/index.ts
 
-import { FUNCTION_URL } from '../../utils/clients.ts'
-import { createWebhookHandler } from '../../utils/createHandler.ts'
+import { supabase } from '../../utils/clients.ts'
 import { logPaymentEvent, updateOrderPaid } from '../../utils/paymentUtils.ts'
-import { STRIPE_WEBHOOK_SECRET, retrievePaymentIntent } from '../../utils/stripeClient.ts'
+import { STRIPE_WEBHOOK_SECRET } from '../../utils/stripeClient.ts'
 
-// --- Vérification de signature Stripe en REST ---
+/**
+ * Vérification Stripe correcte : timestamp + "." + rawBody
+ */
 async function verifyStripeSignature(rawBody: string, signature: string, secret: string) {
   const encoder = new TextEncoder()
+
+  const parts = signature.split(',')
+
+  const timestamp = parts.find((p) => p.startsWith('t='))?.slice(2)
+  const v1 = parts.find((p) => p.startsWith('v1='))?.slice(3)
+
+  if (!timestamp || !v1) throw new Error('Bad Stripe signature format')
+
+  const signedPayload = `${timestamp}.${rawBody}`
+
   const key = await crypto.subtle.importKey(
     'raw',
     encoder.encode(secret),
@@ -16,63 +27,62 @@ async function verifyStripeSignature(rawBody: string, signature: string, secret:
     ['sign'],
   )
 
-  const signedPayload = signature
-    .split(',')
-    .find((s) => s.startsWith('v1='))
-    ?.replace('v1=', '')
-  if (!signedPayload) throw new Error('Bad Stripe signature format')
-
-  const mac = await crypto.subtle.sign('HMAC', key, encoder.encode(rawBody))
-  const expectedSig = Array.from(new Uint8Array(mac))
+  const mac = await crypto.subtle.sign('HMAC', key, encoder.encode(signedPayload))
+  const expected = Array.from(new Uint8Array(mac))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 
-  if (expectedSig !== signedPayload) {
-    throw new Error('Invalid Stripe signature')
-  }
+  if (expected !== v1) throw new Error('Invalid Stripe signature')
 }
 
-export default Deno.serve(
-  createWebhookHandler(async (rawBody, req) => {
+/**
+ * Webhook handler
+ */
+Deno.serve(async (req) => {
+  try {
     const signature = req.headers.get('stripe-signature')
-    if (!signature) throw new Error('Missing stripe-signature')
+    if (!signature) {
+      return new Response('Missing stripe-signature', { status: 400 })
+    }
 
-    // 🟦 Vérification manuelle HMAC SHA256
+    // IMPORTANT: garder le raw body
+    const rawBody = await req.text()
+
+    // Vérification de la signature Stripe
     await verifyStripeSignature(rawBody, signature, STRIPE_WEBHOOK_SECRET)
 
-    // 🟦 Parse JSON après vérification
+    // Le payload Stripe vérifié
     const event = JSON.parse(rawBody)
+    console.log('⚡ Webhook reçu et vérifié :', event.type)
 
-    console.log('⚡ Stripe webhook received:', event.type)
-
-    // Log du raw event
+    // Log pour backup
     await logPaymentEvent('stripe', event.data?.object?.metadata?.order_id ?? null, event)
 
+    // On ne traite que checkout.session.completed
     if (event.type !== 'checkout.session.completed') {
-      return { ignored: event.type }
+      return Response.json({ ignored: event.type })
     }
 
     const session = event.data.object
     const orderId = session.metadata?.order_id
-    const paymentIntentId = session.payment_intent
+    const paymentIntent = session.payment_intent
 
     if (!orderId) throw new Error('Missing order_id in metadata')
 
-    console.log('💰 Payment succeeded for order:', orderId)
+    console.log('💰 Paiement validé, order_id:', orderId)
 
-    // ▶ Récupérer PaymentIntent si besoin
-    await retrievePaymentIntent(paymentIntentId)
+    // Update DB
+    await updateOrderPaid(orderId, paymentIntent)
 
-    // ▶ Mettre la commande en 'paid'
-    await updateOrderPaid(orderId, paymentIntentId)
-
-    // ▶ Déclencher email confirmation
-    await fetch(`${FUNCTION_URL}/order-confirmation`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId }),
+    // Envoi email
+    await supabase.functions.invoke('order-confirmation', {
+      body: { order_id: orderId },
     })
 
-    return { success: true, orderId }
-  }),
-)
+    return Response.json({ success: true, orderId })
+  } catch (err) {
+    console.error('❌ Webhook error:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+    return new Response('Webhook error: ' + errorMessage, { status: 400 })
+  }
+})

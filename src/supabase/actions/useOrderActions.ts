@@ -3,6 +3,7 @@ import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi
 import type { OrderStatus } from '@/utils'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+import { supabase } from '../supabaseClient'
 
 type MinimalOrder = {
   order_id?: string | null
@@ -60,13 +61,8 @@ export function useOrderActions(fetchData?: () => void) {
     try {
       await updateOrderStatusInDB(id, status)
 
-      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-order-update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ order_id: id, status }),
+      await supabase.functions.invoke('send-order-update', {
+        body: { order_id: id, status },
       })
 
       toast.show('Statut mis à jour ✅', 'success')

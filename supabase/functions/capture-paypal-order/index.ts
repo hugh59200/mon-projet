@@ -1,17 +1,10 @@
-import {
-  ENV,
-  FUNCTION_URL,
-  PAYPAL_CLIENT_ID,
-  PAYPAL_SECRET,
-  supabase,
-} from '../../utils/clients.ts'
+import { ENV, FUNCTION_URL, supabase } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
+import { PAYPAL_CLIENT_ID, PAYPAL_SECRET } from '../../utils/paypalClient.ts'
 
-// 🌍 PayPal API base URL
 const BASE_URL =
   ENV === 'development' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'
 
-// 🔐 Token PayPal
 async function getAccessToken() {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`)
 
@@ -34,7 +27,6 @@ export default Deno.serve(
     const { orderId } = body
     if (!orderId) throw new Error('orderId requis')
 
-    // 1️⃣ Récupérer l'order PayPal
     const { data: order } = await supabase
       .from('orders')
       .select('paypal_order_id')
@@ -47,10 +39,8 @@ export default Deno.serve(
 
     const paypalId = order.paypal_order_id
 
-    // 2️⃣ Token PayPal
     const token = await getAccessToken()
 
-    // 3️⃣ Capture paiement
     const captureRes = await fetch(`${BASE_URL}/v2/checkout/orders/${paypalId}/capture`, {
       method: 'POST',
       headers: {
@@ -66,7 +56,6 @@ export default Deno.serve(
       throw new Error('Paiement PayPal non confirmé')
     }
 
-    // 4️⃣ Update DB
     await supabase
       .from('orders')
       .update({
@@ -81,7 +70,6 @@ export default Deno.serve(
       payload: captureData,
     })
 
-    // 5️⃣ Email confirmation
     await fetch(`${FUNCTION_URL}/order-confirmation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

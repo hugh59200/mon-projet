@@ -23,7 +23,11 @@ Deno.serve(
     if (!order) throw new Error('Order not found')
 
     const message = getStatusMessage(status, order.carrier, order.tracking_number)
-    const html = renderEmailTemplate('status_update', { message })
+
+    const html = renderEmailTemplate('status_update', {
+      order_id,
+      message,
+    })
 
     await sendEmail({
       to: order.shipping_email,

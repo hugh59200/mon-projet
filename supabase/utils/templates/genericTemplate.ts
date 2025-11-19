@@ -11,9 +11,13 @@ export function genericTemplate({
   ctaLabel?: string
   ctaUrl?: string
 }) {
+  const bodyHTML = `
+    <p style="margin:0 0 12px;">${message}</p>
+  `
+
   return baseEmailTemplate({
     title,
-    bodyHTML: `<p>${message}</p>`,
+    bodyHTML,
     ctaLabel,
     ctaUrl,
   })

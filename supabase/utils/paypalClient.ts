@@ -1,7 +1,7 @@
 import { ENV } from './clients.ts'
 
-const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
-const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!
+export const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
+export const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!
 
 export const BASE_URL =
   ENV === 'development' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'

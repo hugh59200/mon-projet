@@ -66,12 +66,8 @@
 
   const visible = ref(true)
 
-  /**
-   * Événement émis par les pages enfants (success/cancel)
-   * quand le flux de paiement est terminé.
-   */
   function handleFinish() {
-    setTimeout(() => (visible.value = false), 500) // animation de sortie douce
+    setTimeout(() => (visible.value = false), 2000)
   }
 </script>
 
