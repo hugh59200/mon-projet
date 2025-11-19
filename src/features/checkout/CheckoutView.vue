@@ -304,11 +304,11 @@
         toast.show('Votre panier est vide.', 'warning')
         return
       }
-
-      if (!address.value || !zip.value || !city.value || !fullName.value) {
-        toast.show("Veuillez compléter l'adresse de livraison.", 'warning')
-        return
-      }
+      //TODO a remettre plus tard
+      // if (!address.value || !zip.value || !city.value || !fullName.value) {
+      //   toast.show("Veuillez compléter l'adresse de livraison.", 'warning')
+      //   return
+      // }
 
       try {
         // 2. Préparation du payload pour l'API V2

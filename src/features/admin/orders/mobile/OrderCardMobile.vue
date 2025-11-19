@@ -4,12 +4,30 @@
     @click="openOrderModal(order.order_id!)"
   >
     <div class="row">
-      <BasicText weight="bold">{{ order.customer_name }}</BasicText>
-      <BasicText size="body-s">{{ formatDate(order.created_at!) }}</BasicText>
+      <div class="client-info">
+        <BasicText weight="bold">{{ order.customer_name || 'Client Inconnu' }}</BasicText>
+        <BasicText
+          size="body-s"
+          color="neutral-500"
+        >
+          {{ order.order_number ?? order.order_id?.slice(0, 8) }}
+        </BasicText>
+      </div>
+      <BasicText
+        size="body-s"
+        color="neutral-600"
+      >
+        {{ formatDate(order.created_at!) }}
+      </BasicText>
     </div>
 
     <div class="row">
-      <BasicText>{{ formatCurrency(order.total_amount!) }}</BasicText>
+      <BasicText
+        weight="bold"
+        color="primary-700"
+      >
+        {{ formatCurrency(order.total_amount ?? 0) }}
+      </BasicText>
 
       <div
         class="status-actions"
@@ -20,6 +38,9 @@
           :type="getTypeBadge(order.status)"
           size="small"
         />
+
+        <div class="separator"></div>
+
         <BasicIconNext
           name="Trash2"
           :size="18"
@@ -34,11 +55,11 @@
 </template>
 
 <script setup lang="ts">
-  import type { Tables } from '@/supabase/types/supabase'
-  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
+  import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
+  import { getLabelBadge, getTypeBadge } from '@/utils' // Helper V2
 
   defineProps<{
-    order: Tables<'orders_overview_for_admin'>
+    order: OrdersOverviewForAdmin
     formatDate: (v: string) => string
     formatCurrency: (v: number) => string
     openOrderModal: (id: string) => void
@@ -48,21 +69,23 @@
 
 <style scoped lang="less">
   .mobile-card {
-    padding: 14px;
-    border-radius: 10px;
-    background: @neutral-100;
+    padding: 16px;
+    border-radius: 12px;
+    background: @white;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid @neutral-200;
     transition:
       background 0.2s ease,
       transform 0.2s ease;
     cursor: pointer;
 
     &:hover {
-      background: @neutral-200;
-      transform: translateY(-1px);
+      background: @neutral-50;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     &:active {
@@ -76,17 +99,29 @@
     align-items: center;
   }
 
+  .client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   .status-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+  }
+
+  .separator {
+    width: 1px;
+    height: 16px;
+    background: @neutral-300;
   }
 
   .action-icon {
     transition:
       transform 0.2s ease,
       opacity 0.2s ease;
-    opacity: 0.8;
+    opacity: 0.7;
 
     &:hover {
       transform: scale(1.15);

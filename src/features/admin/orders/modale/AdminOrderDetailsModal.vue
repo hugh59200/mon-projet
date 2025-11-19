@@ -3,6 +3,7 @@
     v-model="visible"
     :closable="true"
     :loading="isLoading"
+    size="medium"
   >
     <template #header>
       <BasicText
@@ -13,234 +14,225 @@
       </BasicText>
     </template>
     <template #content>
-      <div class="order-detail">
-        <div
-          v-if="order"
-          class="order-info-card"
-        >
-          <BasicText
-            size="h5"
-            weight="bold"
-          >
-            Informations commande
-          </BasicText>
-          <div class="info-row">
-            <BasicText>
-              <b>Client :</b>
-              {{ safeProfile.full_name }}
+      <div
+        class="order-detail"
+        v-if="order"
+      >
+        <div class="order-info-card">
+          <div class="card-header">
+            <BasicText
+              size="h5"
+              weight="bold"
+            >
+              Informations commande
             </BasicText>
-            <BasicText>
-              <b>Email :</b>
-              {{ safeProfile.email }}
-            </BasicText>
-          </div>
-          <div class="info-row">
-            <BasicText>
-              <b>Date :</b>
-              {{ formatDate(order.created_at) }}
-            </BasicText>
-            <BasicText>
-              <b>Total :</b>
-              {{ formatCurrency(order.total_amount) }}
-            </BasicText>
-          </div>
-          <div class="info-row">
-            <BasicText><b>Statut :</b></BasicText>
             <BasicBadge
               :label="getLabelBadge(order.status)"
               :type="getTypeBadge(order.status)"
-              size="small"
             />
           </div>
-          <div class="info-row">
-            <BasicText>
-              <b>ID :</b>
-              {{ order.order_id }}
-            </BasicText>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Client</span>
+              <span class="value">{{ profileInfo.full_name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Email</span>
+              <span class="value">{{ profileInfo.email }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Date</span>
+              <span class="value">{{ formatDate(order.created_at!) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Total</span>
+              <span class="value text-primary-700 font-bold">
+                {{ formatCurrency(order.total_amount ?? 0) }}
+              </span>
+            </div>
+            <div class="info-item col-span-2">
+              <span class="label">ID Commande</span>
+              <span class="value font-mono text-xs">
+                {{ order.order_number || order.order_id }}
+              </span>
+            </div>
           </div>
-          <BasicButton
-            label="Télécharger la facture"
-            size="small"
-            type="primary"
-            icon-name="Download"
-            @click="downloadInvoice"
-          />
+
+          <div class="card-actions">
+            <BasicButton
+              label="Télécharger facture"
+              size="small"
+              type="secondary"
+              variant="outlined"
+              icon-name="Download"
+              @click="downloadInvoice"
+            />
+          </div>
         </div>
-        <div
-          v-if="order"
-          class="order-info-card"
-        >
+
+        <div class="order-info-card">
           <BasicText
             size="h5"
             weight="bold"
+            class="mb-2"
           >
             Adresse de livraison
           </BasicText>
-          <BasicText v-if="shippingAddress">{{ shippingAddress }}</BasicText>
+          <div
+            v-if="shippingAddress"
+            class="address-block"
+          >
+            <p class="font-bold">{{ order.shipping_name }}</p>
+            <p>{{ order.shipping_address }}</p>
+            <p>{{ order.shipping_zip }} {{ order.shipping_city }}</p>
+            <p>{{ order.shipping_country }}</p>
+          </div>
           <BasicText
             v-else
-            color="neutral-600"
+            color="neutral-500"
             size="body-s"
           >
             Aucune adresse renseignée
           </BasicText>
         </div>
-        <div
-          v-if="order"
-          class="order-info-card"
-        >
+
+        <div class="order-info-card">
           <BasicText
             size="h5"
             weight="bold"
+            class="mb-2"
           >
-            Paiement Stripe
+            Paiement
           </BasicText>
-          <div class="info-row">
-            <BasicText><b>Session :</b></BasicText>
-            <template v-if="order.stripe_session_id">
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Méthode</span>
+              <span class="value capitalize">{{ order.payment_method || '—' }}</span>
+            </div>
+            <div
+              class="info-item"
+              v-if="order.stripe_session_id"
+            >
+              <span class="label">Session Stripe</span>
               <BasicLink
                 :href="stripeLink!"
                 target="_blank"
+                class="text-xs"
               >
-                {{ order.stripe_session_id }}
+                {{ order.stripe_session_id.slice(0, 12) }}...
               </BasicLink>
-            </template>
-            <span v-else>—</span>
+            </div>
+            <div
+              class="info-item"
+              v-if="order.paypal_order_id"
+            >
+              <span class="label">ID PayPal</span>
+              <span class="value text-xs">{{ order.paypal_order_id }}</span>
+            </div>
           </div>
-          <div class="info-row">
-            <BasicText>
-              <b>Payment Intent :</b>
-              {{ order.payment_intent_id || '—' }}
-            </BasicText>
-          </div>
-          <BasicButton
-            label="Renvoyer l'email de confirmation"
-            type="secondary"
-            size="small"
-            @click="renvoyerMailConfirmation"
-          />
         </div>
-        <div
-          v-if="order"
-          class="order-info-card"
-        >
+
+        <div class="order-info-card">
           <BasicText
             size="h5"
             weight="bold"
+            class="mb-3"
           >
-            Suivi livraison
+            Suivi Livraison
           </BasicText>
-          <BasicInput
-            v-model="carrier"
-            placeholder="Transporteur"
-          />
-          <BasicInput
-            v-model="trackingNumber"
-            placeholder="Numéro ou lien"
-          />
-          <BasicButton
-            label="Enregistrer"
-            size="small"
-            type="primary"
-            @click="handleAddTracking"
-          />
+          <div class="tracking-form">
+            <BasicInput
+              v-model="carrier"
+              placeholder="Transporteur (ex: Colissimo)"
+              size="small"
+            />
+            <BasicInput
+              v-model="trackingNumber"
+              placeholder="N° de suivi"
+              size="small"
+            />
+            <BasicButton
+              label="Enregistrer"
+              size="small"
+              type="primary"
+              @click="handleAddTracking"
+            />
+          </div>
+
           <div
             v-if="order.tracking_number"
-            class="tracking-line"
+            class="tracking-display mt-3 rounded border border-green-100 bg-green-50 p-2"
           >
-            <BasicText size="body-s">
-              <b>Suivi :</b>
-              <BasicLink
-                :href="order.tracking_number"
-                target="_blank"
-              >
-                {{ order.tracking_number }}
-              </BasicLink>
+            <BasicText
+              size="body-s"
+              color="success-700"
+            >
+              Actuel :
+              <strong>{{ order.carrier }}</strong>
+              - {{ order.tracking_number }}
             </BasicText>
           </div>
         </div>
-        <div
-          v-if="order"
-          class="order-info-card"
-        >
+
+        <div class="order-info-card border-blue-100 bg-blue-50">
           <BasicText
             size="h5"
             weight="bold"
+            class="mb-3"
+            color="primary-800"
           >
-            Modifier le statut
+            Actions
           </BasicText>
-          <BasicDropdown
-            v-model="selectedStatus"
-            :items="STATUSES"
-          />
-          <BasicButton
-            label="Mettre à jour"
-            size="small"
-            type="secondary"
-            variant="outlined"
-            @click="handleUpdateStatus"
-          />
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <span class="mb-1 block text-xs text-neutral-500">Changer statut</span>
+              <BasicDropdown
+                v-model="selectedStatus"
+                :items="STATUSES"
+                size="small"
+              />
+            </div>
+            <BasicButton
+              label="Mettre à jour"
+              size="small"
+              type="primary"
+              @click="handleUpdateStatus"
+            />
+          </div>
         </div>
-        <div
-          v-if="order"
-          class="order-products"
-        >
+
+        <div class="order-products">
           <BasicText
             size="h5"
             weight="bold"
+            class="mb-3"
           >
             Produits commandés
           </BasicText>
-          <div class="gridElemWrapper">
-            <div class="cardLayoutWrapper cardLayoutWrapper--header">
-              <BasicCell
-                :span="14"
-                text="Produit"
-              />
-              <BasicCell
-                :span="6"
-                text="Qté"
-                center
-              />
-              <BasicCell
-                :span="8"
-                text="Prix"
-                center
-              />
-              <BasicCell
-                :span="8"
-                text="Total"
-                center
-              />
+
+          <div class="products-table">
+            <div class="table-header">
+              <div class="col-name">Produit</div>
+              <div class="col-qty">Qté</div>
+              <div class="col-price">Prix U.</div>
+              <div class="col-total">Total</div>
             </div>
-          </div>
-          <div
-            v-for="item in order.detailed_items"
-            :key="item.product_id"
-            class="gridElemWrapper"
-          >
-            <div class="cardLayoutWrapper">
-              <BasicCell :span="14">
-                <BasicText>{{ item.product_name }}</BasicText>
-              </BasicCell>
-              <BasicCell
-                :span="6"
-                center
-              >
-                <BasicText>{{ item.quantity }}</BasicText>
-              </BasicCell>
-              <BasicCell
-                :span="8"
-                center
-              >
-                <BasicText>{{ Number(item.product_price).toFixed(2) }}€</BasicText>
-              </BasicCell>
-              <BasicCell
-                :span="8"
-                center
-              >
-                <BasicText>{{ (item.product_price * item.quantity).toFixed(2) }}€</BasicText>
-              </BasicCell>
+
+            <div
+              v-for="item in detailedItems"
+              :key="item.product_id"
+              class="table-row"
+            >
+              <div class="col-name">
+                <div class="product-name">{{ item.product_name }}</div>
+              </div>
+              <div class="col-qty">{{ item.quantity }}</div>
+              <div class="col-price">{{ formatCurrency(item.product_price) }}</div>
+              <div class="col-total font-bold">
+                {{ formatCurrency(item.total) }}
+              </div>
             </div>
           </div>
         </div>
@@ -252,47 +244,60 @@
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
+  import { fetchOrderById } from '@/supabase/api/ordersApi' // ✅ API V2
   import { supabase } from '@/supabase/supabaseClient'
-  import type { EmailSent, OrdersFullView } from '@/supabase/types/supabase.types'
-  import { formatCurrency, formatDate } from '@/utils'
-  import { getLabelBadge, getTypeBadge, type OrderStatus, STATUSES } from '@/utils/mappingBadge'
+  import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types' // ✅ Types V2
+  import {
+    formatCurrency,
+    formatDate,
+    getLabelBadge,
+    getTypeBadge,
+    type OrderStatus,
+    STATUSES,
+  } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
-
-  type ProfileInfoSafe = {
-    full_name: string
-    email: string
-  }
-
-  type OrderItemSafe = {
-    product_id: string
-    product_name: string
-    product_price: number
-    quantity: number
-  }
-
-  type OrdersFullViewSafe = Omit<OrdersFullView, 'profile_info' | 'detailed_items'> & {
-    profile_info: ProfileInfoSafe
-    detailed_items: OrderItemSafe[]
-  }
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
   const { changeOrderStatus } = useOrderActions()
 
-  const order = ref<OrdersFullViewSafe | null>(null)
-  const emails = ref<EmailSent[]>([])
+  // État local typé
+  const order = ref<OrdersFullView | null>(null)
+  const isLoading = ref(true)
+
+  // Champs formulaire local
   const carrier = ref('')
   const trackingNumber = ref('')
   const selectedStatus = ref<OrderStatus>('pending')
 
-  const safeProfile = computed<ProfileInfoSafe>(() => {
-    const p = order.value?.profile_info
+  // --- COMPUTED HELPERS ---
+
+  // Profile Info sécurisé (gestion du JSON)
+  const profileInfo = computed(() => {
+    if (!order.value) return { full_name: 'Inconnu', email: '-' }
+
+    // 🛠️ CORRECTION : On casse le typage dès la racine pour éviter l'erreur de récursion
+    const rawOrder = order.value as any
+    const info = rawOrder.profile_info
+
     return {
-      full_name: p?.full_name || 'Inconnu',
-      email: p?.email || '-',
+      full_name: info?.full_name || 'Inconnu',
+      email: info?.email || '-',
     }
+  })
+
+  // Items sécurisés (gestion du JSON)
+  const detailedItems = computed<OrderItemDetailed[]>(() => {
+    if (!order.value) return []
+
+    // 🛠️ CORRECTION ULTIME :
+    // On caste l'objet PARENT (order.value) en 'any' tout de suite.
+    // Cela empêche TypeScript d'essayer de lire la définition complexe de 'order'
+    const rawOrder = order.value as any
+
+    return (rawOrder.detailed_items as OrderItemDetailed[]) || []
   })
 
   const stripeLink = computed(() =>
@@ -303,70 +308,41 @@
 
   const shippingAddress = computed(() => {
     if (!order.value) return null
-    const p = [
+    const parts = [
       order.value.shipping_address,
       order.value.shipping_zip,
       order.value.shipping_city,
       order.value.shipping_country,
     ].filter(Boolean)
-    return p.length ? p.join(', ') : null
+    return parts.length ? parts.join(', ') : null
   })
 
+  // --- ACTIONS ---
+
   async function loadOrder() {
-    const { data, error } = await supabase
-      .from('orders_full_view')
-      .select('*')
-      .eq('order_id', props.orderId)
-      .single()
-
-    if (error || !data) return
-
-    order.value = {
-      ...data,
-      profile_info: toProfileInfo(data.profile_info),
-      detailed_items: toDetailedItems(data.detailed_items),
-    } as OrdersFullViewSafe
-  }
-
-  function toProfileInfo(json: unknown): ProfileInfoSafe {
-    if (json && typeof json === 'object') {
-      const obj = json as Record<string, unknown>
-      return {
-        full_name: typeof obj.full_name === 'string' ? obj.full_name : 'Inconnu',
-        email: typeof obj.email === 'string' ? obj.email : '-',
+    if (!props.orderId) return
+    isLoading.value = true
+    try {
+      // ✅ Utilisation de l'API centralisée
+      const data = await fetchOrderById(props.orderId)
+      if (data) {
+        order.value = data
+        carrier.value = data.carrier || ''
+        trackingNumber.value = data.tracking_number || ''
+        selectedStatus.value = (data.status as OrderStatus) || 'pending'
       }
+    } catch (err) {
+      console.error(err)
+      toast.show('Erreur chargement commande', 'danger')
+    } finally {
+      isLoading.value = false
     }
-    return { full_name: 'Inconnu', email: '-' }
-  }
-
-  function toDetailedItems(json: unknown): OrderItemSafe[] {
-    if (!Array.isArray(json)) return []
-
-    return json.map((i: any) => ({
-      product_id: String(i.product_id ?? ''),
-      product_name: String(i.product_name ?? i.name ?? 'Produit'),
-      product_price: Number(
-        i.product_price ?? i.price ?? i.unit_price ?? i.total_amount_per_unit ?? 0,
-      ),
-      quantity: Number(i.quantity ?? 1),
-    }))
-  }
-
-  async function loadEmails() {
-    const { data } = await supabase
-      .from('emails_sent')
-      .select('*')
-      .eq('order_id', props.orderId)
-      .order('sent_at', { ascending: false })
-
-    emails.value = data ?? []
   }
 
   const handleUpdateStatus = async () => {
     if (!order.value) return
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
     await loadOrder()
-    await loadEmails()
   }
 
   const handleAddTracking = async () => {
@@ -383,29 +359,13 @@
         shipped_at: new Date().toISOString(),
         status: 'shipped',
       })
-      .eq('id', order.value.order_id!)
+      .eq('id', order.value.order_id!) // Utilise l'ID technique pour l'update
 
     if (error) {
       toast.show('Erreur suivi ❌', 'danger')
     } else {
       toast.show('Suivi ajouté ✅', 'success')
       await loadOrder()
-      await loadEmails()
-    }
-  }
-
-  const renvoyerMailConfirmation = async () => {
-    if (!order.value) return
-
-    const { error } = await supabase.functions.invoke('order-confirmation', {
-      body: { order_id: order.value.order_id },
-    })
-
-    if (error) {
-      toast.show('Erreur email ❌', 'danger')
-    } else {
-      toast.show('Email renvoyé ✅', 'success')
-      await loadEmails()
     }
   }
 
@@ -420,29 +380,17 @@
 
     const link = document.createElement('a')
     link.href = `data:application/pdf;base64,${data.pdf_base64}`
-    link.download = `facture_${order.value.order_id}.pdf`
+    link.download = `facture_${order.value.order_number || 'commande'}.pdf`
     link.click()
 
     toast.show('Facture téléchargée ✅', 'success')
-
-    await loadEmails()
   }
 
-  watch(
-    () => props.orderId,
-    () => {
-      loadOrder()
-      loadEmails()
-    },
-  )
+  // --- WATCHERS ---
 
-  const isLoading = ref(true)
+  watch(() => props.orderId, loadOrder)
 
-  onMounted(async () => {
-    await loadOrder()
-    await loadEmails()
-    isLoading.value = false
-  })
+  onMounted(loadOrder)
 </script>
 
 <style scoped lang="less">
@@ -451,19 +399,96 @@
     flex-direction: column;
     gap: 20px;
   }
+
   .order-info-card {
-    background: @neutral-100;
-    padding: 18px;
-    border-radius: 10px;
+    background: @white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid @neutral-100;
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      &.col-span-2 {
+        grid-column: span 2;
+      }
+
+      .label {
+        font-size: 12px;
+        color: @neutral-500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .value {
+        font-size: 14px;
+        color: @neutral-900;
+      }
+    }
+  }
+
+  .address-block {
+    font-size: 14px;
+    line-height: 1.5;
+    color: @neutral-700;
+  }
+
+  .tracking-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
     gap: 10px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
   }
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-  }
-  .order-products {
-    margin-top: 10px;
+
+  .products-table {
+    border: 1px solid @neutral-200;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr;
+      background: @neutral-50;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      color: @neutral-600;
+      border-bottom: 1px solid @neutral-200;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr;
+      padding: 12px;
+      font-size: 14px;
+      align-items: center;
+      border-bottom: 1px solid @neutral-100;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 </style>

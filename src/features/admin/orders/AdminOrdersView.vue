@@ -1,6 +1,5 @@
 <template>
   <div class="admin-orders">
-    <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une commande..."
@@ -8,7 +7,6 @@
       @reset="reset"
     />
 
-    <!-- 📄 Pagination -->
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -25,7 +23,6 @@
       message="Chargement des commandes..."
       empty-message="Aucune commande trouvée 😅"
     >
-      <!-- 💻 Version desktop / tablette -->
       <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header admin-orders__header">
           <BasicCell
@@ -67,6 +64,7 @@
         </div>
         <div
           v-for="order in filteredData"
+          :key="order.order_id!"
           class="gridElemWrapper admin-orders__row"
         >
           <div
@@ -77,6 +75,9 @@
               <div class="admin-orders__client">
                 <span class="admin-orders__client-name">{{ order.customer_name || '—' }}</span>
                 <span class="admin-orders__client-subtext">{{ order.customer_email || '—' }}</span>
+                <span class="admin-orders__client-subtext text-xs text-neutral-400">
+                  {{ order.order_number }}
+                </span>
               </div>
             </BasicCell>
             <BasicCell
@@ -100,18 +101,17 @@
               center
               danger
               :span="3"
-              @click="deleteOrder(order)"
+              @click.stop="deleteOrder(order)"
             />
           </div>
         </div>
       </template>
+
       <template v-else>
         <OrderCardMobile
           v-for="order in filteredData"
-          v-model="localStatuses[order.order_id ?? '']"
-          @update:modelValue="(v: string) => changeOrderStatus(order, v as OrderStatus)"
+          :key="order.order_id!"
           :order="order"
-          :statuses="STATUSES"
           :format-date="formatDate"
           :format-currency="formatCurrency"
           :open-order-modal="openOrderModal"
@@ -120,6 +120,7 @@
         />
       </template>
     </WrapperLoader>
+
     <teleport to="#app">
       <AdminOrderDetailsModal
         v-if="selectedOrderId"
@@ -135,15 +136,14 @@
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
-  import type { Tables } from '@/supabase/types/supabase'
+  import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
-  import type { OrderStatus } from '@/utils/mappingBadge'
-  import { STATUSES } from '@/utils/mappingBadge'
-  import { ref, watchEffect } from 'vue'
+  import { ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
+  // 1. Hook Admin Table
   const {
     filteredData,
     total,
@@ -162,27 +162,22 @@
     ascending: false,
     searchFn: (o, q) =>
       (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
-      (o.customer_email?.toLowerCase()?.includes(q) ?? false),
+      (o.customer_email?.toLowerCase()?.includes(q) ?? false) ||
+      (o.order_number?.toLowerCase()?.includes(q) ?? false),
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
-  const { deleteOrder, changeOrderStatus } = useOrderActions(fetchData)
 
-  const { toggleSort, getSortColor } = useSortableTable<Tables<'orders_overview_for_admin'>>(
+  // 🧹 NETTOYAGE ICI : On ne garde que deleteOrder
+  const { deleteOrder } = useOrderActions(fetchData)
+
+  const { toggleSort, getSortColor } = useSortableTable<OrdersOverviewForAdmin>(
     sortKey,
     sortAsc,
     filteredData,
   )
 
-  const localStatuses = ref<Record<string, OrderStatus>>({})
-
-  watchEffect(() => {
-    const map: Record<string, OrderStatus> = {}
-    for (const o of filteredData.value) {
-      if (o.order_id && o.status) map[o.order_id] = o.status as OrderStatus
-    }
-    localStatuses.value = map
-  })
+  // 🧹 J'ai supprimé 'localStatuses' et 'watchEffect' qui ne servent plus à rien
 
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
@@ -192,7 +187,6 @@
     isModalVisible.value = true
   }
 </script>
-
 <style scoped lang="less">
   .admin-orders {
     &__item {
