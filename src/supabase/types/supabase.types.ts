@@ -1,6 +1,13 @@
 import type { Tables, TablesInsert, TablesUpdate } from './supabase'
 
+// ==========================================
+// 🔐 ROLES
+// ==========================================
 export type Role = 'admin' | 'user'
+
+// ==========================================
+// 👤 TABLES (Types directs depuis supabase.ts)
+// ==========================================
 
 export type Profiles = Tables<'profiles'>
 export type ProfilesInsert = TablesInsert<'profiles'>
@@ -9,6 +16,9 @@ export type ProfilesUpdate = TablesUpdate<'profiles'>
 export type Orders = Tables<'orders'>
 export type OrderInsert = TablesInsert<'orders'>
 export type OrderUpdate = TablesUpdate<'orders'>
+
+export type OrderItem = Tables<'order_items'>
+// Note : OrderItem contient maintenant 'product_name_snapshot'
 
 export type EmailSent = Tables<'emails_sent'>
 export type EmailSentInsert = TablesInsert<'emails_sent'>
@@ -26,27 +36,48 @@ export type NewsTopics = Tables<'news_topics'>
 export type NewsTopicsInsert = TablesInsert<'news_topics'>
 export type NewsTopicsUpdate = TablesUpdate<'news_topics'>
 
-export type CartView = Tables<'user_cart_view'>
-export type CartItems = Tables<'user_cart_items'>
-
-export type OrdersOverviewForAdmin = Tables<'orders_overview_for_admin'>
-export type OrdersFullView = Tables<'orders_full_view'>
-
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
+
+export type CartItems = Tables<'user_cart_items'>
+
+// ==========================================
+// 👁️ VUES (VIEWS)
+// ==========================================
+
+// Contient maintenant stock (number), sale_price, is_on_sale
+export type CartView = Tables<'user_cart_view'>
+
+export type OrdersOverviewForAdmin = Tables<'orders_overview_for_admin'>
+
+// Contient paypal_order_id, subtotal, tax_amount, etc.
+export type OrdersFullView = Tables<'orders_full_view'>
+
 export type ConversationOverview = Tables<'conversation_overview'>
 
-export type OrderItem = Tables<'order_items'>
+// ==========================================
+// 🛠️ TYPES MANUELS & COMPLEXES
+// ==========================================
 
+/**
+ * ⚠️ IMPORTANT V2.0 :
+ * Ce type correspond à l'objet JSON construit dans la vue SQL 'orders_detailed_view'.
+ * Il doit matcher les clés définies dans le jsonb_build_object du script SQL.
+ */
 export type OrderItemDetailed = {
-  id?: string
-  name: string
-  price: number
+  product_id: string
+  product_name: string // V2: C'est le snapshot ou le nom actuel
+  product_price: number
+  product_image: string | null
+  product_stock: number // V2: Integer maintenant
   quantity: number
-  image?: string | null
+  total: number // V2: price * quantity
 }
 
+/**
+ * Version enrichie de la commande avec les items détaillés
+ */
 export type OrderDetailedView = Omit<Tables<'orders_detailed_view'>, 'detailed_items'> & {
   detailed_items: OrderItemDetailed[] | null
 }

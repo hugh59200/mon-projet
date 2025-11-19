@@ -289,6 +289,7 @@ export type Database = {
           order_id: string
           price: number
           product_id: string
+          product_name_snapshot: string
           quantity: number
         }
         Insert: {
@@ -297,6 +298,7 @@ export type Database = {
           order_id: string
           price: number
           product_id: string
+          product_name_snapshot: string
           quantity?: number
         }
         Update: {
@@ -305,6 +307,7 @@ export type Database = {
           order_id?: string
           price?: number
           product_id?: string
+          product_name_snapshot?: string
           quantity?: number
         }
         Relationships: [
@@ -352,6 +355,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          discount_amount: number | null
           email: string
           full_name: string
           id: string
@@ -361,9 +365,12 @@ export type Database = {
           payment_method: string | null
           paypal_order_id: string | null
           shipped_at: string | null
+          shipping_cost: number | null
           status: Database["public"]["Enums"]["order_status"]
           stripe_session_id: string | null
-          total_amount: number | null
+          subtotal: number | null
+          tax_amount: number | null
+          total_amount: number
           tracking_number: string | null
           updated_at: string | null
           user_id: string | null
@@ -375,6 +382,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          discount_amount?: number | null
           email: string
           full_name: string
           id?: string
@@ -384,9 +392,12 @@ export type Database = {
           payment_method?: string | null
           paypal_order_id?: string | null
           shipped_at?: string | null
+          shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
-          total_amount?: number | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount: number
           tracking_number?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -398,6 +409,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          discount_amount?: number | null
           email?: string
           full_name?: string
           id?: string
@@ -407,9 +419,12 @@ export type Database = {
           payment_method?: string | null
           paypal_order_id?: string | null
           shipped_at?: string | null
+          shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           stripe_session_id?: string | null
-          total_amount?: number | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number
           tracking_number?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -492,10 +507,12 @@ export type Database = {
           description: string | null
           id: string
           image: string | null
+          is_on_sale: boolean | null
           name: string
           price: number
           purity: number | null
-          stock: boolean | null
+          sale_price: number | null
+          stock: number
           tags: string[] | null
         }
         Insert: {
@@ -504,10 +521,12 @@ export type Database = {
           description?: string | null
           id?: string
           image?: string | null
+          is_on_sale?: boolean | null
           name: string
           price: number
           purity?: number | null
-          stock?: boolean | null
+          sale_price?: number | null
+          stock?: number
           tags?: string[] | null
         }
         Update: {
@@ -516,18 +535,18 @@ export type Database = {
           description?: string | null
           id?: string
           image?: string | null
+          is_on_sale?: boolean | null
           name?: string
           price?: number
           purity?: number | null
-          stock?: boolean | null
+          sale_price?: number | null
+          stock?: number
           tags?: string[] | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          newsletter: boolean
-          sms_alerts: boolean
           address: string | null
           avatar_url: string | null
           birthdate: string | null
@@ -743,15 +762,18 @@ export type Database = {
           country: string | null
           created_at: string | null
           detailed_items: Json | null
+          discount_amount: number | null
           email: string | null
           full_name: string | null
           order_id: string | null
           payment_method: string | null
           shipped_at: string | null
+          shipping_cost: number | null
           status: Database["public"]["Enums"]["order_status"] | null
+          subtotal: number | null
+          tax_amount: number | null
           total_amount: number | null
           tracking_number: string | null
-          updated_at: string | null
           user_id: string | null
         }
         Relationships: [
@@ -776,9 +798,7 @@ export type Database = {
           carrier: string | null
           created_at: string | null
           detailed_items: Json | null
-          email_types: Json | null
-          emails_count: number | null
-          last_email_sent_at: string | null
+          discount_amount: number | null
           order_id: string | null
           order_number: string | null
           payment_intent_id: string | null
@@ -788,12 +808,15 @@ export type Database = {
           shipped_at: string | null
           shipping_address: string | null
           shipping_city: string | null
+          shipping_cost: number | null
           shipping_country: string | null
           shipping_email: string | null
           shipping_name: string | null
           shipping_zip: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           stripe_session_id: string | null
+          subtotal: number | null
+          tax_amount: number | null
           total_amount: number | null
           tracking_number: string | null
           updated_at: string | null
@@ -818,21 +841,15 @@ export type Database = {
       }
       orders_overview_for_admin: {
         Row: {
-          carrier: string | null
           created_at: string | null
           customer_email: string | null
           customer_name: string | null
           emails_count: number | null
-          last_email_sent_at: string | null
-          last_email_type: string | null
           order_id: string | null
           order_number: string | null
-          payment_method: string | null
           shipped_at: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_amount: number | null
-          tracking_number: string | null
-          updated_at: string | null
           user_id: string | null
         }
         Relationships: [
@@ -855,12 +872,14 @@ export type Database = {
       user_cart_view: {
         Row: {
           cart_item_id: string | null
+          is_on_sale: boolean | null
           product_category: string | null
           product_id: string | null
           product_image: string | null
           product_name: string | null
           product_price: number | null
-          product_stock: boolean | null
+          product_sale_price: number | null
+          product_stock: number | null
           quantity: number | null
           updated_at: string | null
           user_id: string | null
@@ -897,7 +916,6 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string | null
-          profile_created_at: string | null
           role: string | null
         }
         Relationships: []
@@ -982,10 +1000,14 @@ export type Database = {
           p_address: string
           p_city: string
           p_country: string
+          p_discount_amount: number
           p_email: string
           p_full_name: string
           p_items: Json
           p_payment_method: string
+          p_shipping_cost: number
+          p_subtotal: number
+          p_tax_amount: number
           p_total_amount: number
           p_user_id: string
           p_zip: string

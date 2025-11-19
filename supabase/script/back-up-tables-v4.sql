@@ -594,3 +594,58 @@ CREATE POLICY "Users can update own files" ON storage.objects FOR UPDATE TO auth
 CREATE POLICY "Users can delete own files" ON storage.objects FOR DELETE TO authenticated USING (bucket_id IN ('avatars','news-images','topic-images') AND owner = auth.uid());
 
 ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles, public.products, public.orders, public.order_items, public.messages, public.conversations, public.user_cart_items, public.emails_sent;
+
+
+-- ============================================================
+-- ✅ CORRECTIF : AJOUT RPC MANQUANTE
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.admin_update_order_status(
+  p_order_id uuid,
+  p_new_status text,
+  p_send_email boolean DEFAULT true
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER -- Important : s'exécute avec les droits du créateur (admin)
+AS $$
+DECLARE
+  updated_order jsonb;
+BEGIN
+  -- 1. Vérification Admin
+  IF NOT public.is_admin(auth.uid()) THEN
+    RAISE EXCEPTION 'Accès refusé : Réservé aux administrateurs.';
+  END IF;
+
+  -- 2. Mise à jour du statut
+  UPDATE public.orders
+  SET status = p_new_status::order_status,
+      updated_at = now()
+  WHERE id = p_order_id;
+
+  -- 3. Log de l'email (Optionnel)
+  IF p_send_email THEN
+    INSERT INTO public.emails_sent(order_id, to_email, subject, body_html, type, status)
+    SELECT
+      o.id,
+      o.email,
+      'Mise à jour de votre commande',
+      '<p>Le statut de votre commande est passé à : <strong>' || p_new_status || '</strong></p>',
+      'status_update',
+      'sent'
+    FROM public.orders o
+    WHERE o.id = p_order_id;
+  END IF;
+
+  -- 4. Retourner la vue complète mise à jour
+  SELECT to_jsonb(ofv.*)
+  INTO updated_order
+  FROM public.orders_full_view ofv
+  WHERE ofv.order_id = p_order_id;
+
+  RETURN updated_order;
+END;
+$$;
+
+-- Permissions
+GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
