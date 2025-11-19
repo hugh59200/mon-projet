@@ -377,25 +377,28 @@
 
   // État typé avec les vues Supabase
   const orders = ref<OrdersFullView[]>([])
-  const openSections = ref({}) as Ref<Record<string, { items: boolean; summary: boolean; tracking: boolean }>>
+  const openSections = ref({}) as Ref<
+    Record<string, { items: boolean; summary: boolean; tracking: boolean }>
+  >
+
   const allOpen = ref(true)
 
   const auth = useAuthStore()
   const toast = useToastStore()
   const hasLoaded = ref(false)
 
-  // 🛡️ Gestion ID sécurisé (order_id de la vue est prioritaire)
-  function safeId(order: OrdersFullView) {
-    return order.order_id ?? `temp_${Math.random().toString(36).slice(2, 8)}`
-  }
-
   // 🛠️ Helper pour caster le JSONB en type strict TypeScript
-  function getItems(order: OrdersFullView): OrderItemDetailed[] {
+  function getItems(order: any): OrderItemDetailed[] {
     return (order.detailed_items as unknown as OrderItemDetailed[]) || []
   }
 
+  function safeId(order: any): string {
+    return (order.order_id || `temp_${Math.random().toString(36).slice(2, 8)}`) as string
+  }
+
+  // 👇 Update this function
   function setSection(
-    order: OrdersFullView,
+    order: any, // <--- Change from 'OrdersFullView' to 'any'
     key: 'items' | 'summary' | 'tracking',
     value: boolean,
   ) {
@@ -406,6 +409,7 @@
     openSections.value[id][key] = value
   }
 
+  // ... rest of the code
   function toggleAllSections() {
     allOpen.value = !allOpen.value
     Object.keys(openSections.value).forEach((id) => {
