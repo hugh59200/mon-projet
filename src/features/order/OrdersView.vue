@@ -21,7 +21,7 @@
         Retrouvez ici l’historique de toutes vos commandes passées 🧾
       </div>
 
-      <div class="user-orders__timeline"></div>
+      <div class="user-orders__title-divider"></div>
     </div>
 
     <!-- Loader -->
@@ -269,8 +269,10 @@
             <div
               v-for="step in orderSteps"
               :key="step.key"
-              class="user-orders__timeline-step"
-              :class="{ active: step.key === order.status }"
+              :class="[
+                'user-orders__timeline-step',
+                { 'user-orders__timeline-step--active': step.key === order.status },
+              ]"
             >
               <div class="user-orders__timeline-dot"></div>
 
@@ -448,6 +450,13 @@
       color: @neutral-600;
     }
 
+    &__title-divider {
+      width: 100%;
+      height: 1px;
+      margin-top: 16px;
+      background: linear-gradient(90deg, rgba(var(--primary-500-rgb), 0.25), transparent);
+    }
+
     &__empty {
       text-align: center;
       padding: 70px 20px;
@@ -604,7 +613,7 @@
         flex: 1;
         color: @neutral-500;
 
-        &.active {
+        &--active {
           color: var(--primary-700);
 
           .user-orders__timeline-dot {

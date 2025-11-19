@@ -11,6 +11,7 @@
       placeholder="Écrire un message..."
       required
       aria-label="Champ de texte du message"
+      class="chat-input__field"
       @input="typing"
     />
     <BasicButton
@@ -55,7 +56,7 @@
     padding: 10px 12px;
     background: white;
 
-    input {
+    &__field {
       flex: 1;
       border: 1px solid @neutral-200;
       border-radius: 8px;

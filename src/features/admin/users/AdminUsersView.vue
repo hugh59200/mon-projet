@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-users">
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un utilisateur..."
@@ -23,7 +23,7 @@
       empty-message="Aucun utilisateur trouvé 😅"
     >
       <template v-if="isDesktop || isTablet">
-        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header admin-users__header">
           <BasicCell
             :span="8"
             text="Email"
@@ -59,10 +59,11 @@
         </div>
         <div
           v-for="user in filteredData"
-          class="gridElemWrapper"
+          :key="user.id"
+          class="gridElemWrapper admin-users__row"
         >
           <div
-            class="cardLayoutWrapper list"
+            class="cardLayoutWrapper admin-users__item"
             @click="openUserModal(user.id)"
           >
             <BasicCell
@@ -107,7 +108,7 @@
           :handle-role-change="changeUserRole"
           :open-user-modal="openUserModal"
           :handle-delete="deleteUser"
-          class="gridElemWrapper list list--mobile"
+          class="gridElemWrapper admin-users__mobile-card"
         />
       </template>
     </WrapperLoader>
@@ -191,5 +192,17 @@
   }
 </script>
 <style scoped lang="less">
-  @import '../shared/style/list-base.less';
+  .admin-users {
+    &__item {
+      cursor: pointer;
+
+      &:hover {
+        background: var(--primary-0);
+      }
+    }
+
+    &__mobile-card {
+      margin: 4px 0;
+    }
+  }
 </style>

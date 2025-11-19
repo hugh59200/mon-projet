@@ -1,144 +1,146 @@
 <template>
-  <FloatingDropdownWrapper
-    v-model="isOpen"
-    :width="280"
-    align="right"
-    arrow-align="auto"
-    :close-delay="800"
-    :trigger-mode="!isMobile ? 'hover' : 'click'"
-  >
-    <!-- TRIGGER = CART ICON -->
-    <template #trigger>
-      <div class="cart__icon">
-        <BasicIconNext
-          class="cart__icon-svg"
-          name="ShoppingCart"
-          :size="26"
-        />
-        <div
-          v-if="cart.totalItems > 0"
-          class="cart__badge"
-        >
-          <BasicText
-            size="body-s"
-            weight="bold"
+  <div class="cart">
+    <FloatingDropdownWrapper
+      v-model="isOpen"
+      :width="280"
+      align="right"
+      arrow-align="auto"
+      :close-delay="800"
+      :trigger-mode="!isMobile ? 'hover' : 'click'"
+    >
+      <!-- TRIGGER = CART ICON -->
+      <template #trigger>
+        <div class="cart__icon">
+          <BasicIconNext
+            class="cart__icon-svg"
+            name="ShoppingCart"
+            :size="26"
+          />
+          <div
+            v-if="cart.totalItems > 0"
+            class="cart__badge"
           >
-            {{ cart.totalItems }}
-          </BasicText>
+            <BasicText
+              size="body-s"
+              weight="bold"
+            >
+              {{ cart.totalItems }}
+            </BasicText>
+          </div>
         </div>
-      </div>
-    </template>
+      </template>
 
-    <!-- DROPDOWN CONTENT -->
-    <div class="cart__content">
-      <!-- EMPTY CART -->
-      <div
-        v-if="cart.items.length === 0"
-        class="cart__empty"
-      >
-        <BasicIconNext
-          name="ShoppingBag"
-          :size="40"
-          color="neutral-400"
-        />
-
-        <BasicText
-          size="body-m"
-          weight="semibold"
-          color="neutral-200"
-          class="cart__empty-title"
-        >
-          Votre panier est vide
-        </BasicText>
-
-        <BasicText
-          size="body-s"
-          color="neutral-400"
-          class="cart__empty-sub"
-        >
-          Découvrez nos peptides et complétez votre panier.
-        </BasicText>
-
-        <BasicButton
-          label="Voir les produits"
-          type="primary"
-          size="small"
-          class="cart__empty-btn"
-          @click="goToProducts"
-        />
-      </div>
-
-      <!-- FILLED CART -->
-      <div
-        v-else
-        class="cart__list"
-      >
-        <!-- ITEMS -->
+      <!-- DROPDOWN CONTENT -->
+      <div class="cart__content">
+        <!-- EMPTY CART -->
         <div
-          v-for="item in cart.items.slice(0, 3)"
-          class="cart__item"
+          v-if="cart.items.length === 0"
+          class="cart__empty"
         >
-          <img
-            :src="item.product_image || defaultImage"
-            alt=""
-            class="cart__item-img"
+          <BasicIconNext
+            name="ShoppingBag"
+            :size="40"
+            color="neutral-400"
           />
 
-          <div class="cart__item-info">
-            <BasicText
-              size="body-s"
-              weight="semibold"
-              color="neutral-300"
-            >
-              {{ item.product_name }}
-            </BasicText>
-
-            <BasicText
-              size="body-s"
-              color="neutral-300"
-            >
-              {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
-            </BasicText>
-          </div>
-        </div>
-
-        <!-- MORE -->
-        <div
-          v-if="cart.items.length > 3"
-          class="cart__more"
-        >
-          +{{ cart.items.length - 3 }} autres articles...
-        </div>
-
-        <!-- TOTAL + BUTTONS -->
-        <div class="cart__actions">
           <BasicText
-            size="body-s"
-            color="primary-400"
+            size="body-m"
             weight="semibold"
-            class="cart__total"
+            color="neutral-200"
+            class="cart__empty-title"
           >
-            Total : {{ formatCurrency(cart.totalPrice) }}
+            Votre panier est vide
           </BasicText>
 
-          <div class="cart__btns">
-            <BasicButton
-              label="Voir le panier"
-              type="reverse"
-              size="small"
-              @click="goToCart"
+          <BasicText
+            size="body-s"
+            color="neutral-400"
+            class="cart__empty-sub"
+          >
+            Découvrez nos peptides et complétez votre panier.
+          </BasicText>
+
+          <BasicButton
+            label="Voir les produits"
+            type="primary"
+            size="small"
+            class="cart__empty-btn"
+            @click="goToProducts"
+          />
+        </div>
+
+        <!-- FILLED CART -->
+        <div
+          v-else
+          class="cart__list"
+        >
+          <!-- ITEMS -->
+          <div
+            v-for="item in cart.items.slice(0, 3)"
+            class="cart__item"
+          >
+            <img
+              :src="item.product_image || defaultImage"
+              alt=""
+              class="cart__item-img"
             />
-            <BasicButton
-              label="Paiement"
-              type="primary"
-              size="small"
-              @click="goToCheckout"
-            />
+
+            <div class="cart__item-info">
+              <BasicText
+                size="body-s"
+                weight="semibold"
+                color="neutral-300"
+              >
+                {{ item.product_name }}
+              </BasicText>
+
+              <BasicText
+                size="body-s"
+                color="neutral-300"
+              >
+                {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
+              </BasicText>
+            </div>
+          </div>
+
+          <!-- MORE -->
+          <div
+            v-if="cart.items.length > 3"
+            class="cart__more"
+          >
+            +{{ cart.items.length - 3 }} autres articles...
+          </div>
+
+          <!-- TOTAL + BUTTONS -->
+          <div class="cart__actions">
+            <BasicText
+              size="body-s"
+              color="primary-400"
+              weight="semibold"
+              class="cart__total"
+            >
+              Total : {{ formatCurrency(cart.totalPrice) }}
+            </BasicText>
+
+            <div class="cart__btns">
+              <BasicButton
+                label="Voir le panier"
+                type="reverse"
+                size="small"
+                @click="goToCart"
+              />
+              <BasicButton
+                label="Paiement"
+                type="primary"
+                size="small"
+                @click="goToCheckout"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </FloatingDropdownWrapper>
+    </FloatingDropdownWrapper>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -173,6 +175,9 @@
 
 <style scoped lang="less">
   .cart {
+    display: inline-flex;
+    position: relative;
+
     /* ======================
      ICON TRIGGER
   ====================== */

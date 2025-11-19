@@ -28,7 +28,7 @@
         </div>
       </div>
 
-      <div class="catalogue__header--top">
+      <div class="catalogue__header-top">
         <WrapperDropdown
           v-model="sortBy"
           :items="sortItems"
@@ -38,7 +38,7 @@
       </div>
       <div
         v-if="isMobile"
-        class="catalogue__header--sub"
+        class="catalogue__header-sub"
       >
         <WrapperInput
           v-model="searchTerm"
@@ -293,8 +293,8 @@
       transition: all 0.25s ease;
     }
 
-    &__header--top,
-    &__header--sub {
+    &__header-top,
+    &__header-sub {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -302,8 +302,8 @@
       flex-wrap: wrap;
     }
 
-    &__header--top > div,
-    &__header--sub > div {
+    &__header-top > div,
+    &__header-sub > div {
       min-width: 160px;
       max-width: 300px;
     }

@@ -10,17 +10,17 @@
       <div class="auth-overlay__backdrop" />
       <main class="auth-overlay__container">
         <section class="auth-overlay__left">
-          <div class="auth-brand">
-            <div class="auth-brand__header">
+          <div class="auth-overlay__brand">
+            <div class="auth-overlay__brand-header">
               <img
                 src="@/assets/logo-app.png"
-                class="auth-brand__logo"
+                class="auth-overlay__brand-logo"
               />
               <BasicText
                 size="h1"
                 weight="bold"
                 color="white"
-                class="auth-brand__title"
+                class="auth-overlay__brand-title"
               >
                 Fast Peptides
               </BasicText>
@@ -28,16 +28,16 @@
             <BasicText
               size="body-m"
               color="white"
-              class="auth-brand__subtitle"
+              class="auth-overlay__brand-subtitle"
             >
               Accélérez la recherche biomoléculaire
               <br />
               avec précision et élégance 🔬
             </BasicText>
-            <div class="auth-brand__illustration">
+            <div class="auth-overlay__brand-illustration">
               <img
                 src="@/assets/lab-illustration.jpg"
-                class="auth-brand__image"
+                class="auth-overlay__brand-image"
               />
             </div>
           </div>
@@ -158,6 +158,16 @@
     );
     backdrop-filter: blur(14px) saturate(130%);
     animation: fadeIn 0.25s ease forwards;
+    overflow: hidden;
+
+    &__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 10, 24, 0.35);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      z-index: 0;
+    }
 
     &__skip {
       position: absolute;
@@ -178,6 +188,8 @@
       box-shadow:
         0 6px 24px rgba(0, 0, 0, 0.05),
         0 12px 40px rgba(15, 23, 42, 0.12);
+      position: relative;
+      z-index: 1;
     }
 
     &__left {
@@ -199,6 +211,54 @@
       justify-content: center;
     }
 
+    &__brand {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+
+      &-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      &-logo {
+        width: 56px;
+        height: 56px;
+      }
+
+      &-title {
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      &-subtitle {
+        font-size: 16px;
+        opacity: 0.92;
+        line-height: 1.5;
+        margin: 20px 0 40px;
+      }
+
+      &-illustration {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        flex-grow: 1;
+      }
+
+      &-image {
+        width: 100%;
+        max-width: 360px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        padding: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        animation: float 6s ease-in-out infinite;
+      }
+    }
+
     @media (max-width: 860px) {
       &__container {
         flex-direction: column;
@@ -208,54 +268,6 @@
       &__left {
         display: none;
       }
-    }
-  }
-
-  .auth-brand {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-
-    &__header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    &__logo {
-      width: 56px;
-      height: 56px;
-    }
-
-    &__title {
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    &__subtitle {
-      font-size: 16px;
-      opacity: 0.92;
-      line-height: 1.5;
-      margin: 20px 0 40px;
-    }
-
-    &__illustration {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      flex-grow: 1;
-    }
-
-    &__image {
-      width: 100%;
-      max-width: 360px;
-      border-radius: 12px;
-      background: #f8f9fa;
-      padding: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      animation: float 6s ease-in-out infinite;
     }
   }
 

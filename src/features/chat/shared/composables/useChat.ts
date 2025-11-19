@@ -23,7 +23,7 @@ export function useChat(role: ChatRole) {
 
   const scroll = useScrollMessages(() => {
     if (typeof window === 'undefined') return null
-    return document.querySelector('.messages-list, .chat-messages') as HTMLElement | null
+    return document.querySelector('.messages-list, .chat-core__messages') as HTMLElement | null
   })
 
   const conv = role === 'admin' ? useChatConversations() : null

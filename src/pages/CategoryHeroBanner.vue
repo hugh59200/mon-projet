@@ -425,7 +425,11 @@
       height: 12px;
       border-radius: 999px;
 
-      background: linear-gradient(to bottom, color-mix(in srgb, @neutral-50 80%, transparent) 0%, color-mix(in srgb, @neutral-0 0%, transparent) 100%);
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, @neutral-50 80%, transparent) 0%,
+        color-mix(in srgb, @neutral-0 0%, transparent) 100%
+      );
       pointer-events: none;
     }
 

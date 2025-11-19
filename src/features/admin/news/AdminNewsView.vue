@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-news">
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher une actualité..."
@@ -33,7 +33,7 @@
       empty-message="Aucune actualité trouvée 😅"
     >
       <template v-if="isDesktop || isTablet">
-        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header admin-news__header">
           <BasicCell
             :span="18"
             text="Titre"
@@ -63,20 +63,20 @@
         <div
           v-for="news in enrichedNews"
           :key="news.id"
-          class="gridElemWrapper"
+          class="gridElemWrapper admin-news__row"
         >
           <div
-            class="cardLayoutWrapper list"
+            class="cardLayoutWrapper admin-news__item"
             @click="openNewsModal(news.id)"
           >
             <BasicCell
               :span="18"
-              class="list__news-info"
+              class="admin-news__info"
             >
               <img
                 :src="news.image || fallbackImage"
                 alt="Aperçu"
-                class="list__news-thumb"
+                class="admin-news__thumb"
               />
               <BasicText
                 :label="news.title"
@@ -84,6 +84,7 @@
                 weight="semibold"
                 color="neutral-900"
                 pointer
+                class="admin-news__title"
               />
             </BasicCell>
             <BasicCell :span="8">
@@ -120,7 +121,7 @@
           :open-news-modal="openNewsModal"
           :handle-delete="handleDelete"
           :fallback-image="fallbackImage"
-          class="gridElemWrapper list list--mobile"
+          class="gridElemWrapper admin-news__mobile-card"
         />
       </template>
     </WrapperLoader>
@@ -254,16 +255,26 @@
 </script>
 
 <style scoped lang="less">
-  @import '../shared/style/list-base.less';
+  .admin-news {
+    &__item {
+      cursor: pointer;
 
-  .list {
-    &__news-info {
+      &:hover {
+        background: var(--primary-0);
+      }
+    }
+
+    &__mobile-card {
+      margin: 4px 0;
+    }
+
+    &__info {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    &__news-thumb {
+    &__thumb {
       width: 48px;
       height: 48px;
       object-fit: cover;

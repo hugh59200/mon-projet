@@ -1,11 +1,11 @@
 <template>
   <div
     class="chat-widget"
-    :class="{ open: chatStore.isOpen }"
+    :class="{ 'chat-widget--open': chatStore.isOpen }"
   >
     <!-- bouton -->
     <button
-      class="chat-toggle"
+      class="chat-widget__toggle"
       @click="toggleChat"
     >
       <BasicIconNext
@@ -15,7 +15,7 @@
       />
       <div
         v-if="chatNotif.unreadCount > 0"
-        class="chat-badge"
+        class="chat-widget__badge"
       >
         {{ chatNotif.unreadCount }}
       </div>
@@ -25,25 +25,25 @@
     <transition name="fade-scale">
       <div
         v-if="chatStore.isOpen"
-        class="chat-window"
+        class="chat-widget__window"
       >
-        <header class="chat-header">
-          <div class="chat-header-left">
-            <div class="chat-header-icon">
+        <header class="chat-widget__header">
+          <div class="chat-widget__header-left">
+            <div class="chat-widget__header-icon">
               <BasicIconNext
                 name="MessageCircle"
                 :size="18"
                 :color="'white' as IconColor"
               />
             </div>
-            <div class="chat-header-info">
-              <span class="chat-header-title">Support Fast Peptides</span>
-              <span class="chat-header-status">En ligne</span>
+            <div class="chat-widget__header-info">
+              <span class="chat-widget__header-title">Support Fast Peptides</span>
+              <span class="chat-widget__header-status">En ligne</span>
             </div>
           </div>
 
           <div
-            class="chat-header-close"
+            class="chat-widget__header-close"
             @click="toggleChat"
           >
             <BasicIconNext
@@ -113,8 +113,7 @@
     right: 24px;
     z-index: 9999;
 
-    /* ------------------------- Bouton principal ------------------------- */
-    .chat-toggle {
+    &__toggle {
       position: relative;
       background: var(--primary-600);
       color: white;
@@ -136,28 +135,27 @@
         transform: scale(1.05);
         background: var(--primary-700);
       }
-
-      .chat-badge {
-        position: absolute;
-        top: -4px;
-        right: 0;
-        background: @danger-600;
-        color: white;
-        border-radius: 999px;
-        min-width: 20px;
-        height: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 6px fade(black, 25%);
-        animation: badge-pop 0.25s ease;
-      }
     }
 
-    /* ------------------------- Fenêtre principale ------------------------- */
-    .chat-window {
+    &__badge {
+      position: absolute;
+      top: -4px;
+      right: 0;
+      background: @danger-600;
+      color: white;
+      border-radius: 999px;
+      min-width: 20px;
+      height: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px fade(black, 25%);
+      animation: badge-pop 0.25s ease;
+    }
+
+    &__window {
       position: absolute;
       bottom: 70px;
       right: 0;
@@ -170,8 +168,7 @@
       overflow: hidden;
     }
 
-    /* ------------------------- Header modernisé ------------------------- */
-    .chat-header {
+    &__header {
       background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
       color: white;
       padding: 10px 14px;
@@ -180,51 +177,51 @@
       align-items: center;
       border-bottom: 1px solid fade(white, 15%);
       box-shadow: 0 1px 4px fade(black, 20%);
+    }
 
-      .chat-header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+    &__header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-      .chat-header-icon {
-        background: fade(white, 12%);
-        border-radius: 999px;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    &__header-icon {
+      background: fade(white, 12%);
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      .chat-header-info {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
+    &__header-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
 
-        .chat-header-title {
-          font-weight: 600;
-          font-size: 14px;
-          letter-spacing: 0.2px;
-        }
+    &__header-title {
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+    }
 
-        .chat-header-status {
-          font-size: 11px;
-          color: fade(white, 75%);
-        }
-      }
+    &__header-status {
+      font-size: 11px;
+      color: fade(white, 75%);
+    }
 
-      .chat-header-close {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 6px;
-        transition: background 0.2s ease;
+    &__header-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
 
-        &:hover {
-          background: fade(white, 10%);
-        }
+      &:hover {
+        background: fade(white, 10%);
       }
     }
 

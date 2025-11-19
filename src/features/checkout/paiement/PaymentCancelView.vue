@@ -69,6 +69,10 @@
         pulse-danger 3s ease-in-out infinite 2s;
     }
 
+    &__icon {
+      filter: drop-shadow(0 6px 14px rgba(220, 38, 38, 0.25));
+    }
+
     &__title {
       font-size: 26px;
       font-weight: 700;

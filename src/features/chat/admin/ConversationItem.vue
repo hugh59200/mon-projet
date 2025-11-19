@@ -1,48 +1,53 @@
 <template>
   <div
     class="conversation-item"
-    :class="{ active, 'new-message': isNew }"
+    :class="{
+      'conversation-item--active': active,
+      'conversation-item--new': isNew,
+    }"
     @click="conversation.user_id && $emit('select', conversation.user_id)"
   >
-    <div class="conversation-avatar">
+    <div class="conversation-item__avatar">
       <BasicIconNext name="User" />
     </div>
 
-    <div class="conversation-content">
-      <div class="conversation-header">
-        <span class="email">{{ conversation.user_email || 'Utilisateur anonyme' }}</span>
+    <div class="conversation-item__content">
+      <div class="conversation-item__header">
+        <span class="conversation-item__email">
+          {{ conversation.user_email || 'Utilisateur anonyme' }}
+        </span>
       </div>
 
-      <div class="conversation-footer">
-        <div class="preview-wrapper">
+      <div class="conversation-item__footer">
+        <div class="conversation-item__preview-wrapper">
           <small
             v-show="!isTyping"
-            class="preview"
+            class="conversation-item__preview"
           >
             {{ conversation.last_message || 'Aucun message' }}
           </small>
 
           <div
             v-show="isTyping"
-            class="typing-indicator"
+            class="conversation-item__typing-indicator"
           >
-            <span class="dot" />
-            <span class="dot" />
-            <span class="dot" />
+            <span class="conversation-item__dot" />
+            <span class="conversation-item__dot" />
+            <span class="conversation-item__dot" />
           </div>
         </div>
 
-        <div class="right-info">
+        <div class="conversation-item__meta">
           <span
             v-if="conversation.last_message_at && !isTyping"
-            class="time"
+            class="conversation-item__time"
           >
             {{ formattedTime }}
           </span>
 
           <div
             v-if="unread"
-            class="badge"
+            class="conversation-item__badge"
           >
             {{ unread }}
           </div>
@@ -82,12 +87,6 @@
 </script>
 
 <style scoped lang="less">
-  .conversation-item.new-message {
-    animation: flash 0.8s ease-out;
-    border-color: var(--primary-600);
-    box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.4);
-  }
-
   @keyframes flash {
     0% {
       background: rgba(var(--primary-600-rgb), 0.35);
@@ -123,6 +122,12 @@
       transition: opacity 0.25s ease;
     }
 
+    &--new {
+      animation: flash 0.8s ease-out;
+      border-color: var(--primary-600);
+      box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.4);
+    }
+
     &:last-child::after {
       display: none;
     }
@@ -138,7 +143,7 @@
       }
     }
 
-    &.active {
+    &--active {
       background: rgba(var(--primary-600-rgb), 0.16);
       border-left: 4px solid var(--primary-600);
       border-color: rgba(var(--primary-600-rgb), 0.25);
@@ -152,7 +157,7 @@
       }
     }
 
-    .conversation-avatar {
+    &__avatar {
       flex-shrink: 0;
       width: 36px;
       height: 36px;
@@ -171,121 +176,121 @@
       }
     }
 
-    .conversation-content {
+    &__content {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 5px;
       overflow: hidden;
+    }
 
-      .conversation-header {
-        font-size: 14px;
-        font-weight: 600;
-        color: @neutral-900;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        transition: color 0.2s ease;
+    &__header {
+      font-size: 14px;
+      font-weight: 600;
+      color: @neutral-900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: color 0.2s ease;
 
-        .conversation-item:hover & {
-          color: var(--primary-700);
-        }
+      .conversation-item:hover & {
+        color: var(--primary-700);
+      }
+    }
+
+    &__footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    &__preview-wrapper {
+      flex: 1;
+      position: relative;
+      min-height: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    &__preview,
+    &__typing-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.25s ease;
+    }
+
+    &__preview {
+      font-size: 13px;
+      color: @neutral-600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__typing-indicator {
+      gap: 4px;
+      height: 18px;
+    }
+
+    &__dot {
+      width: 5px;
+      height: 5px;
+      background: @neutral-500;
+      border-radius: 50%;
+      animation: typingDots 1.3s infinite ease-in-out;
+
+      &:nth-child(2) {
+        animation-delay: 0.2s;
       }
 
-      .conversation-footer {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 8px;
-
-        /* ✅ Conteneur stable */
-        .preview-wrapper {
-          flex: 1;
-          position: relative;
-          min-height: 18px; // garde la même hauteur dans tous les cas
-          display: flex;
-          align-items: center;
-
-          .preview,
-          .typing-indicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            align-items: center;
-            transition: opacity 0.25s ease;
-          }
-        }
-
-        .preview {
-          font-size: 13px;
-          color: @neutral-600;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .typing-indicator {
-          gap: 4px;
-          height: 18px;
-
-          .dot {
-            width: 5px;
-            height: 5px;
-            background: @neutral-500;
-            border-radius: 50%;
-            animation: typingDots 1.3s infinite ease-in-out;
-          }
-
-          .dot:nth-child(2) {
-            animation-delay: 0.2s;
-          }
-          .dot:nth-child(3) {
-            animation-delay: 0.4s;
-          }
-        }
-
-        .right-info {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          flex-shrink: 0;
-
-          .time {
-            font-size: 12px;
-            color: @neutral-500;
-            white-space: nowrap;
-          }
-
-          .badge {
-            background: var(--primary-600);
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 999px;
-            min-width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            box-shadow: 0 1px 3px rgba(var(--primary-600-rgb), 0.3);
-          }
-        }
+      &:nth-child(3) {
+        animation-delay: 0.4s;
       }
+    }
 
-      @keyframes typingDots {
-        0%,
-        80%,
-        100% {
-          transform: scale(0.6);
-          opacity: 0.5;
-        }
-        40% {
-          transform: scale(1);
-          opacity: 1;
-        }
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    &__time {
+      font-size: 12px;
+      color: @neutral-500;
+      white-space: nowrap;
+    }
+
+    &__badge {
+      background: var(--primary-600);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 999px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      box-shadow: 0 1px 3px rgba(var(--primary-600-rgb), 0.3);
+    }
+
+    @keyframes typingDots {
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
       }
     }
   }

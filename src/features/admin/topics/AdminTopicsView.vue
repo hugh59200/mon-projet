@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-topics">
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un topic..."
@@ -24,7 +24,7 @@
       empty-message="Aucun topic pour le moment 🧩"
     >
       <template v-if="isDesktop || isTablet">
-        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header admin-topics__header">
           <BasicCell
             :span="18"
             text="Label"
@@ -47,20 +47,20 @@
         <div
           v-for="topic in filteredData"
           :key="topic.id"
-          class="gridElemWrapper"
+          class="gridElemWrapper admin-topics__row"
         >
           <div
-            class="cardLayoutWrapper list"
+            class="cardLayoutWrapper admin-topics__item"
             @click="openTopicModal(topic.id)"
           >
             <BasicCell
               :span="18"
-              class="list__topic-info"
+              class="admin-topics__info"
             >
               <img
                 :src="topic.image || fallbackImage"
                 alt="Image du topic"
-                class="list__topic-thumb"
+                class="admin-topics__thumb"
               />
               <BasicText
                 :label="topic.label"
@@ -97,7 +97,7 @@
           :fallback-image="fallbackImage"
           :open-topic-modal="openTopicModal"
           :handle-delete="handleDelete"
-          class="gridElemWrapper list list--mobile"
+          class="gridElemWrapper admin-topics__mobile-card"
         />
       </template>
     </WrapperLoader>
@@ -202,16 +202,26 @@
 </script>
 
 <style scoped lang="less">
-  @import '../shared/style/list-base.less';
+  .admin-topics {
+    &__item {
+      cursor: pointer;
 
-  .list {
-    &__topic-info {
+      &:hover {
+        background: var(--primary-0);
+      }
+    }
+
+    &__mobile-card {
+      margin: 4px 0;
+    }
+
+    &__info {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    &__topic-thumb {
+    &__thumb {
       width: 48px;
       height: 48px;
       object-fit: cover;

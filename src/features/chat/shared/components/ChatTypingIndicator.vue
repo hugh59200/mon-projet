@@ -2,11 +2,11 @@
   <transition name="typing-fade">
     <div
       v-if="isTyping"
-      class="typing-bubble"
+      class="chat-typing-indicator"
     >
-      <span class="dot" />
-      <span class="dot" />
-      <span class="dot" />
+      <span class="chat-typing-indicator__dot" />
+      <span class="chat-typing-indicator__dot" />
+      <span class="chat-typing-indicator__dot" />
     </div>
   </transition>
 </template>
@@ -18,7 +18,7 @@
 </script>
 
 <style scoped lang="less">
-  .typing-bubble {
+  .chat-typing-indicator {
     position: absolute;
     bottom: 10px;
     left: 50px;
@@ -35,17 +35,17 @@
     padding: 6px 10px;
     width: 48px;
 
-    .dot {
+    &__dot {
       width: 6px;
       height: 6px;
       background: color-mix(in srgb, @neutral-600 70%, transparent);
       border-radius: 50%;
       animation: typingDots 1.3s infinite ease-in-out;
     }
-    .dot:nth-child(2) {
+    &__dot:nth-child(2) {
       animation-delay: 0.2s;
     }
-    .dot:nth-child(3) {
+    &__dot:nth-child(3) {
       animation-delay: 0.4s;
     }
   }

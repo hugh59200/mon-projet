@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-orders">
     <!-- 🔍 Barre de recherche -->
     <BasicToolbar
       v-model:search="search"
@@ -27,7 +27,7 @@
     >
       <!-- 💻 Version desktop / tablette -->
       <template v-if="isDesktop || isTablet">
-        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header admin-orders__header">
           <BasicCell
             :span="8"
             text="Client"
@@ -67,16 +67,16 @@
         </div>
         <div
           v-for="order in filteredData"
-          class="gridElemWrapper"
+          class="gridElemWrapper admin-orders__row"
         >
           <div
-            class="cardLayoutWrapper list"
+            class="cardLayoutWrapper admin-orders__item"
             @click="openOrderModal(order.order_id!)"
           >
             <BasicCell :span="10">
-              <div class="list__client-info">
-                <span class="list__name">{{ order.customer_name || '—' }}</span>
-                <span class="list__subtext">{{ order.customer_email || '—' }}</span>
+              <div class="admin-orders__client">
+                <span class="admin-orders__client-name">{{ order.customer_name || '—' }}</span>
+                <span class="admin-orders__client-subtext">{{ order.customer_email || '—' }}</span>
               </div>
             </BasicCell>
             <BasicCell
@@ -116,7 +116,7 @@
           :format-currency="formatCurrency"
           :open-order-modal="openOrderModal"
           :handle-delete="deleteOrder"
-          class="gridElemWrapper list list--mobile"
+          class="gridElemWrapper admin-orders__mobile-card"
         />
       </template>
     </WrapperLoader>
@@ -194,22 +194,32 @@
 </script>
 
 <style scoped lang="less">
-  @import '../shared/style/list-base.less';
+  .admin-orders {
+    &__item {
+      cursor: pointer;
 
-  .list {
-    &__client-info {
+      &:hover {
+        background: var(--primary-0);
+      }
+    }
+
+    &__mobile-card {
+      margin: 4px 0;
+    }
+
+    &__client {
       display: flex;
       flex-direction: column;
       gap: 2px;
+    }
 
-      .list__name {
-        font-weight: 500;
-      }
+    &__client-name {
+      font-weight: 500;
+    }
 
-      .list__subtext {
-        font-size: 13px;
-        color: @neutral-500;
-      }
+    &__client-subtext {
+      font-size: 13px;
+      color: @neutral-500;
     }
   }
 </style>

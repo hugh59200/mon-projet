@@ -20,23 +20,25 @@
         >
           <!-- Partie gauche -->
           <section class="payment-overlay__left">
-            <div class="payment-brand">
-              <div class="payment-brand__header">
+            <div class="payment-overlay__brand">
+              <div class="payment-overlay__brand-header">
                 <img
                   src="@/assets/logo-app.png"
                   alt="Logo Fast Peptides"
-                  class="payment-brand__logo"
+                  class="payment-overlay__brand-logo"
                 />
-                <h1 class="payment-brand__title">Fast Peptides</h1>
+                <h1 class="payment-overlay__brand-title">Fast Peptides</h1>
               </div>
 
-              <p class="payment-brand__subtitle">Paiement sécurisé et vérifié par Stripe 🔒</p>
+              <p class="payment-overlay__brand-subtitle">
+                Paiement sécurisé et vérifié par Stripe 🔒
+              </p>
 
-              <div class="payment-brand__illustration">
+              <div class="payment-overlay__brand-illustration">
                 <img
                   src="@/assets/lab-illustration.jpg"
                   alt="Paiement sécurisé"
-                  class="payment-brand__image"
+                  class="payment-overlay__brand-image"
                 />
               </div>
             </div>
@@ -86,6 +88,16 @@
     );
     backdrop-filter: blur(14px) saturate(130%);
     animation: fadeIn 0.25s ease forwards;
+    overflow: hidden;
+
+    &__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 12, 22, 0.35);
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+      z-index: 0;
+    }
 
     &__container {
       display: flex;
@@ -99,6 +111,8 @@
       box-shadow:
         0 6px 24px rgba(0, 0, 0, 0.05),
         0 12px 40px rgba(15, 23, 42, 0.12);
+      position: relative;
+      z-index: 1;
     }
 
     &__left {
@@ -120,6 +134,54 @@
       justify-content: center;
     }
 
+    &__brand {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+
+      &-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      &-logo {
+        width: 56px;
+        height: 56px;
+      }
+
+      &-title {
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      &-subtitle {
+        font-size: 16px;
+        opacity: 0.92;
+        line-height: 1.5;
+        margin: 20px 0 40px;
+      }
+
+      &-illustration {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        flex-grow: 1;
+      }
+
+      &-image {
+        width: 100%;
+        max-width: 360px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        padding: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        animation: float 6s ease-in-out infinite;
+      }
+    }
+
     @media (max-width: 860px) {
       &__container {
         flex-direction: column;
@@ -129,54 +191,6 @@
       &__left {
         display: none;
       }
-    }
-  }
-
-  .payment-brand {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-
-    &__header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    &__logo {
-      width: 56px;
-      height: 56px;
-    }
-
-    &__title {
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    &__subtitle {
-      font-size: 16px;
-      opacity: 0.92;
-      line-height: 1.5;
-      margin: 20px 0 40px;
-    }
-
-    &__illustration {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      flex-grow: 1;
-    }
-
-    &__image {
-      width: 100%;
-      max-width: 360px;
-      border-radius: 12px;
-      background: #f8f9fa;
-      padding: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      animation: float 6s ease-in-out infinite;
     }
   }
 

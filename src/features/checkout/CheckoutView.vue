@@ -27,24 +27,26 @@
           />
           <div class="checkout__item-info">
             <div
-              class="product-name-wrapper"
+              class="checkout__item-name-trigger"
               @click="openProductModal(item.product_id!, $event)"
             >
               <BasicText
                 weight="bold"
-                class="product-name clickable"
+                class="checkout__item-name checkout__item-name--interactive"
               >
                 {{ item.product_name }}
               </BasicText>
               <BasicIconNext
                 name="Search"
                 :size="16"
-                class="product-search-icon"
+                class="checkout__item-name-icon"
               />
             </div>
-            <div class="product-line">
+            <div class="checkout__item-line">
               <span>{{ item.quantity ?? 1 }} ×</span>
-              <span class="product-price">{{ (item.product_price ?? 0).toFixed(2) }} €</span>
+              <span class="checkout__item-line-price">
+                {{ (item.product_price ?? 0).toFixed(2) }} €
+              </span>
             </div>
           </div>
         </div>
@@ -126,8 +128,10 @@
         <div
           v-for="method in paymentMethods"
           :key="method.value"
-          class="checkout__method"
-          :class="{ active: selectedPayment === method.value }"
+          :class="[
+            'checkout__method',
+            { 'checkout__method--active': selectedPayment === method.value },
+          ]"
           @click="selectedPayment = method.value as PaymentProvider"
         >
           <div class="checkout__method-icon">
@@ -220,7 +224,7 @@
     if (!target) return
 
     const ripple = document.createElement('span')
-    ripple.className = 'ripple'
+    ripple.className = 'checkout__ripple'
     ripple.style.left = `${event.offsetX}px`
     ripple.style.top = `${event.offsetY}px`
     target.appendChild(ripple)
@@ -354,43 +358,43 @@
         flex-direction: column;
         gap: 4px;
 
-        .product-name-wrapper {
+        .checkout__item-name-trigger {
           display: flex;
           align-items: center;
           gap: 6px;
           cursor: pointer;
           position: relative;
 
-          .product-name.clickable {
+          .checkout__item-name {
             color: @neutral-700;
             transition: color 0.2s ease;
 
-            &:hover {
+            &--interactive:hover {
               text-decoration: underline;
             }
           }
 
-          .product-search-icon {
+          .checkout__item-name-icon {
             color: color-mix(in srgb, @neutral-700 70%, transparent);
             transition: color 0.2s ease;
           }
 
-          &:hover .product-search-icon {
+          &:hover .checkout__item-name-icon {
             color: @neutral-600;
           }
         }
 
-        .product-line {
+        .checkout__item-line {
           display: flex;
           align-items: center;
           gap: 6px;
           font-size: 13px;
           color: color-mix(in srgb, @neutral-600 90%, transparent);
-        }
 
-        .product-price {
-          color: color-mix(in srgb, @neutral-500 80%, transparent);
-          font-size: 13px;
+          &-price {
+            color: color-mix(in srgb, @neutral-500 80%, transparent);
+            font-size: 13px;
+          }
         }
       }
 
@@ -404,7 +408,7 @@
     }
 
     /* 🌊 Effet ripple au clic */
-    .ripple {
+    &__ripple {
       position: absolute;
       border-radius: 50%;
       background: rgba(var(--primary-500-rgb), 0.25);
@@ -469,7 +473,7 @@
         background: rgba(var(--primary-50-rgb), 0.4);
       }
 
-      &.active {
+      &--active {
         border-color: var(--primary-600);
         background: rgba(var(--primary-100-rgb), 0.6);
         box-shadow: 0 2px 8px rgba(var(--primary-400-rgb), 0.25);

@@ -1,7 +1,7 @@
 <template>
-  <div class="filters-panel-content">
+  <div class="catalogue-filters">
     <!-- Header -->
-    <div class="filters__head">
+    <div class="catalogue-filters__head">
       <BasicText
         size="h5"
         weight="bold"
@@ -9,7 +9,7 @@
       >
         Filtres
       </BasicText>
-      <div class="filters__actions">
+      <div class="catalogue-filters__actions">
         <BasicButton
           type="secondary"
           variant="outlined"
@@ -59,7 +59,7 @@
       v-model="filterOpen.tags"
       title="Tags"
     >
-      <div class="tags-list">
+      <div class="catalogue-filters__tags">
         <BasicBadge
           v-for="t in tagItems"
           :key="t.id"
@@ -100,23 +100,26 @@
 </script>
 
 <style scoped lang="less">
-  .filters-panel-content {
+  .catalogue-filters {
     display: flex;
     flex-direction: column;
     gap: 18px;
-  }
-  .filters__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .filters__actions {
-    display: flex;
-    gap: 8px;
-  }
-  .tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+
+    &__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    &__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
   }
 </style>

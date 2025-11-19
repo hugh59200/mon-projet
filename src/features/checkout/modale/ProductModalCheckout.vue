@@ -13,26 +13,26 @@
 
       <!-- 🧱 CONTENU -->
       <template #content>
-        <div class="product-details">
+        <div class="product-modal">
           <!-- 🖼️ Image -->
           <div
-            class="image-wrapper"
+            class="product-modal__image-wrapper"
             v-if="product?.image"
           >
             <img
               :src="product.image"
               :alt="product.name"
-              class="product-image"
+              class="product-modal__image"
             />
           </div>
 
           <!-- 🔹 Bloc infos -->
-          <div class="info">
-            <div class="title-line">
+          <div class="product-modal__info">
+            <div class="product-modal__title-row">
               <BasicText
                 size="h5"
                 weight="bold"
-                class="name"
+                class="product-modal__name"
               >
                 {{ product?.name }}
               </BasicText>
@@ -45,7 +45,7 @@
               />
             </div>
 
-            <div class="badges">
+            <div class="product-modal__badges">
               <BasicBadge
                 v-if="product?.purity"
                 :label="`Pureté ${product.purity}%`"
@@ -63,14 +63,14 @@
               size="h4"
               color="primary-600"
               weight="bold"
-              class="price"
+              class="product-modal__price"
             >
               {{ product?.price ? product.price.toFixed(2) + ' €' : '—' }}
             </BasicText>
 
-            <div class="separator" />
+            <div class="product-modal__separator" />
 
-            <div class="description">
+            <div class="product-modal__description">
               <BasicText
                 size="body-s"
                 color="neutral-700"
@@ -84,7 +84,7 @@
 
       <!-- ✅ FOOTER -->
       <template #footer>
-        <div class="footer">
+        <div class="product-modal__footer">
           <BasicButton
             label="Fermer"
             variant="outlined"
@@ -150,106 +150,104 @@
   }
 
   /* === Layout général === */
-  .product-details {
+  .product-modal {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 18px;
     padding: 20px;
-  }
 
-  /* === Image === */
-  .image-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+    &__image-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
 
-    .product-image {
+    &__image {
       max-width: 240px;
       width: 100%;
       border-radius: 12px;
       object-fit: contain;
       box-shadow: 0 4px 14px color-mix(in srgb, @neutral-400 25%, transparent);
       transition: transform 0.3s ease;
+
       &:hover {
         transform: scale(1.03);
       }
     }
-  }
 
-  /* === Infos === */
-  .info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    gap: 12px;
+    &__info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      gap: 12px;
+    }
 
-    .title-line {
+    &__title-row {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-
-      .name {
-        font-size: 18px;
-        color: @neutral-900;
-      }
     }
 
-    .badges {
+    &__name {
+      font-size: 18px;
+      color: @neutral-900;
+    }
+
+    &__badges {
       display: flex;
       justify-content: center;
       gap: 8px;
       flex-wrap: wrap;
     }
 
-    .price {
+    &__price {
       margin-top: 4px;
       font-size: 22px;
     }
 
-    .separator {
+    &__separator {
       width: 60%;
       height: 1px;
       background: color-mix(in srgb, @neutral-300 60%, transparent);
       margin: 10px 0;
     }
 
-    .description {
+    &__description {
       background: color-mix(in srgb, @neutral-100 60%, transparent);
       border-radius: 10px;
       padding: 12px 16px;
       max-width: 95%;
       line-height: 1.5;
     }
+
+    &__footer {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding-top: 10px;
+    }
   }
 
-  /* === Footer === */
-  .footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 10px;
-  }
-
-  /* === Responsive === */
   @media (max-width: 600px) {
-    .product-details {
+    .product-modal {
       gap: 14px;
       padding: 12px;
-    }
 
-    .info .name {
-      font-size: 16px;
-    }
+      &__name {
+        font-size: 16px;
+      }
 
-    .info .price {
-      font-size: 18px;
-    }
+      &__price {
+        font-size: 18px;
+      }
 
-    .info .description {
-      font-size: 13px;
+      &__description {
+        font-size: 13px;
+      }
     }
   }
 </style>

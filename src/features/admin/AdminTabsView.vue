@@ -2,7 +2,7 @@
   <WrapperForm
     v-model="selectedTab"
     :tabs="tabs"
-    class="tabs-view"
+    class="admin-tabs"
   >
     <router-view v-slot="{ Component }">
       <transition
@@ -34,7 +34,7 @@
 </script>
 
 <style scoped lang="less">
-  .tabs-view {
+  .admin-tabs {
     height: 100%;
     overflow: hidden;
     display: flex;

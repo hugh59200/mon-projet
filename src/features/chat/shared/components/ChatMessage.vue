@@ -1,12 +1,18 @@
 <template>
   <div
     class="chat-message"
-    :class="[{ mine: isMine, grouped: isGrouped }, { read: message.is_read }]"
+    :class="{
+      'chat-message--mine': isMine,
+      'chat-message--grouped': isGrouped,
+    }"
   >
-    <div class="bubble">
+    <div
+      class="chat-message__bubble"
+      :class="{ 'chat-message__bubble--read': message.is_read }"
+    >
       <!-- 💬 Contenu du message -->
       <BasicText
-        class="content"
+        class="chat-message__content"
         :label="message.content"
         size="body-m"
         :color="isMine ? 'white' : 'neutral-700'"
@@ -14,9 +20,9 @@
       />
 
       <!-- ⏱️ Métadonnées -->
-      <div class="meta">
+      <div class="chat-message__meta">
         <BasicText
-          class="time"
+          class="chat-message__time"
           :label="formattedTime"
           size="body-s"
           :color="isMine ? 'white' : 'neutral-500'"
@@ -25,7 +31,7 @@
         <transition name="fade-scale">
           <span
             v-if="isMine"
-            class="status"
+            class="chat-message__status"
           >
             <BasicIconNext
               :name="message.is_read ? 'CheckCheck' : 'Check'"
@@ -100,11 +106,11 @@
     gap: 2px;
     animation: fade-in 0.2s ease;
 
-    &.mine {
+    &--mine {
       align-items: flex-end;
     }
 
-    .bubble {
+    &__bubble {
       max-width: 75%;
       padding: 10px 14px;
       border-radius: 16px;
@@ -114,56 +120,58 @@
       color: @neutral-800;
       box-shadow: 0 1px 2px color-mix(in srgb, @neutral-800 5%, transparent);
 
-      .content {
-        display: block;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      .meta {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 4px;
-        margin-top: 4px;
-        font-size: 12px;
-      }
-
-      /* 💫 Survol doux */
       &:hover {
         background: color-mix(in srgb, @neutral-200 60%, transparent);
       }
-
-      /* ✨ Animation "lu" (transition douce du fond) */
-      &.read {
-        background: rgba(var(--primary-50-rgb), 0.8);
-        transition: background 0.5s ease;
-      }
     }
 
-    &.mine .bubble {
+    &__bubble--read {
+      background: rgba(var(--primary-50-rgb), 0.8);
+      transition: background 0.5s ease;
+    }
+
+    &--mine &__bubble {
       background: var(--primary-600);
       color: white;
       border-bottom-right-radius: 4px;
-
-      .meta {
-        justify-content: flex-end;
-      }
-
-      /* 💫 Transition douce quand le message devient lu */
-      &.read {
-        background: var(--primary-500);
-        box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.3);
-        transition: background 0.4s ease;
-      }
     }
 
-    /* 👥 Espacement entre messages groupés */
-    &.grouped .bubble {
+    &--mine &__bubble--read {
+      background: var(--primary-500);
+      box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.3);
+      transition: background 0.4s ease;
+    }
+
+    &__content {
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    &--grouped &__bubble {
       margin-top: 2px;
     }
 
-    /* ✨ Apparition des coches */
+    &__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    &__time {
+      display: inline-flex;
+      align-items: center;
+    }
+
     .fade-scale-enter-active,
     .fade-scale-leave-active {
       transition: all 0.25s ease;

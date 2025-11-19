@@ -1,7 +1,7 @@
 <template>
   <div class="chat-admin">
     <header class="chat-admin__header">
-      <div class="header-left">
+      <div class="chat-admin__header-info">
         <BasicIconNext
           name="MessageCircle"
           :size="20"
@@ -13,14 +13,14 @@
           Messages clients
         </BasicText>
       </div>
-      <div class="header-actions">
+      <div class="chat-admin__header-actions">
         <BasicInput
           v-model="searchQuery"
           placeholder="Rechercher une conversation..."
           icon-name="Search"
           clearable
           size="small"
-          class="header-search"
+          class="chat-admin__header-search"
         />
       </div>
     </header>
@@ -145,7 +145,19 @@
       justify-content: space-between;
       gap: 16px;
 
-      .header-search {
+      &-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      &-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      &-search {
         width: 260px;
       }
     }

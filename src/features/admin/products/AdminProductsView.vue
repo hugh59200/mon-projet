@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-products">
     <BasicToolbar
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
@@ -32,7 +32,7 @@
       empty-message="Aucun produit trouvé 😅"
     >
       <template v-if="isDesktop || isTablet">
-        <div class="cardLayoutWrapper cardLayoutWrapper--header">
+        <div class="cardLayoutWrapper cardLayoutWrapper--header admin-products__header">
           <BasicCell
             :span="12"
             text="Nom"
@@ -70,23 +70,23 @@
         <div
           v-for="product in filteredData"
           :key="product.id"
-          class="gridElemWrapper"
+          class="gridElemWrapper admin-products__row"
         >
           <div
-            class="cardLayoutWrapper list"
+            class="cardLayoutWrapper admin-products__item"
             @click="openProductModal(product.id)"
           >
             <BasicCell
               :span="12"
-              class="list__product-info"
+              class="admin-products__info"
             >
               <img
                 v-if="product.image"
                 :src="product.image"
                 alt="Image du produit"
-                class="list__product-thumb"
+                class="admin-products__thumb"
               />
-              <span>{{ product.name || '—' }}</span>
+              <span class="admin-products__name">{{ product.name || '—' }}</span>
             </BasicCell>
             <BasicCell :span="8">
               <BasicText>{{ product.category || '—' }}</BasicText>
@@ -122,7 +122,7 @@
           :open-product-modal="openProductModal"
           :edit-product="openEditProduct"
           :handle-delete="deleteProduct"
-          class="gridElemWrapper list list--mobile"
+          class="gridElemWrapper admin-products__mobile-card"
         />
       </template>
     </WrapperLoader>
@@ -204,21 +204,35 @@
 </script>
 
 <style scoped lang="less">
-  @import '../shared/style/list-base.less';
+  .admin-products {
+    &__item {
+      cursor: pointer;
 
-  .list {
-    &__product-info {
+      &:hover {
+        background: var(--primary-0);
+      }
+    }
+
+    &__mobile-card {
+      margin: 4px 0;
+    }
+
+    &__info {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    &__product-thumb {
+    &__thumb {
       width: 48px;
       height: 48px;
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
+    }
+
+    &__name {
+      font-weight: 500;
     }
   }
 </style>

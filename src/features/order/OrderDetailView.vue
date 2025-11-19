@@ -173,8 +173,10 @@
           <div
             v-for="step in orderSteps"
             :key="step.key"
-            class="order-detail__timeline-step"
-            :class="{ active: step.key === mapStatus(order.status) }"
+            :class="[
+              'order-detail__timeline-step',
+              { 'order-detail__timeline-step--active': step.key === mapStatus(order.status) },
+            ]"
           >
             <div class="order-detail__timeline-dot"></div>
             <BasicText
@@ -425,7 +427,7 @@
         flex: 1;
         color: @neutral-500;
 
-        &.active {
+        &--active {
           color: var(--primary-700);
 
           .order-detail__timeline-dot {

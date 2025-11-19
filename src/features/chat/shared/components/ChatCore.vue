@@ -8,7 +8,7 @@
     <transition name="fade-scale">
       <div
         v-if="!isOnline"
-        class="chat-offline-banner"
+        class="chat-core__offline-banner"
       >
         Vous êtes hors ligne — vos messages seront envoyés dès que possible.
       </div>
@@ -21,7 +21,7 @@
       <div
         v-if="loading"
         key="loader"
-        class="chat-loader"
+        class="chat-core__loader"
         role="status"
         aria-live="polite"
       >
@@ -31,11 +31,11 @@
 
       <div
         v-else
-        class="chat-content"
+        class="chat-core__content"
       >
         <div
           ref="msgList"
-          class="chat-messages"
+          class="chat-core__messages"
           aria-live="polite"
           @scroll="onScroll"
           @click="hideNewMessagesBtn"
@@ -56,7 +56,7 @@
     <transition name="slide-fade">
       <button
         v-if="showNewMessagesBtn"
-        class="new-messages-btn"
+        class="chat-core__new-messages-btn"
         @click="scrollToBottomSmooth"
       >
         Nouveaux messages
@@ -245,7 +245,7 @@
     display: flex;
     flex-direction: column;
 
-    .chat-offline-banner {
+    &__offline-banner {
       background: color-mix(in srgb, @danger-600 10%, transparent);
       color: @danger-700;
       text-align: center;
@@ -254,7 +254,7 @@
       border-bottom: 1px solid color-mix(in srgb, @danger-600 15%, transparent);
     }
 
-    .chat-loader {
+    &__loader {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -266,7 +266,7 @@
       min-height: 600px;
     }
 
-    .chat-content {
+    &__content {
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -274,7 +274,7 @@
       min-height: 0;
     }
 
-    .chat-messages {
+    &__messages {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -288,18 +288,18 @@
       padding-bottom: 20px;
     }
 
-    .chat-messages::-webkit-scrollbar {
+    &__messages::-webkit-scrollbar {
       width: 6px;
     }
-    .chat-messages::-webkit-scrollbar-thumb {
+    &__messages::-webkit-scrollbar-thumb {
       background: color-mix(in srgb, @neutral-500 40%, transparent);
       border-radius: 4px;
     }
-    .chat-messages::-webkit-scrollbar-thumb:hover {
+    &__messages::-webkit-scrollbar-thumb:hover {
       background: color-mix(in srgb, @neutral-600 60%, transparent);
     }
 
-    .new-messages-btn {
+    &__new-messages-btn {
       position: absolute;
       bottom: 70px;
       left: 50%;

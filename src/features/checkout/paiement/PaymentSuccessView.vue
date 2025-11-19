@@ -26,7 +26,10 @@
       Votre commande a bien été validée.
     </p>
 
-    <ProgressBar color="success" />
+    <ProgressBar
+      color="success"
+      class="payment-success__progress"
+    />
 
     <BasicButton
       label="Voir mes commandes"
@@ -151,6 +154,10 @@
         bounce-end 3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
+    &__icon {
+      filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.35));
+    }
+
     &__title {
       font-size: 26px;
       font-weight: 700;
@@ -172,6 +179,12 @@
 
     &__cta {
       margin-top: 24px;
+    }
+
+    &__progress {
+      width: 100%;
+      max-width: 320px;
+      margin: 12px 0 8px;
     }
 
     /* --- Animations --- */

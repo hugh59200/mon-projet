@@ -50,18 +50,18 @@
     text-align: center;
     gap: 16px;
     padding: 20px;
-  }
 
-  .auth-email__icon-wrapper {
-    animation:
-      popin 0.4s ease-out forwards,
-      bounce-end 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
+    &__icon-wrapper {
+      animation:
+        popin 0.4s ease-out forwards,
+        bounce-end 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
 
-  .auth-email__subtitle {
-    line-height: 1.5;
-    max-width: 300px; /* ✅ bloque trop grande largeur */
-    margin-top: 4px;
+    &__subtitle {
+      line-height: 1.5;
+      max-width: 300px;
+      margin-top: 4px;
+    }
   }
 
   /* Animations */

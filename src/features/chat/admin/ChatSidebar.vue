@@ -1,8 +1,8 @@
 <template>
   <aside class="chat-sidebar">
     <div class="chat-sidebar__status">
-      <div class="status-left">
-        <div class="avatar">
+      <div class="chat-sidebar__status-left">
+        <div class="chat-sidebar__avatar">
           <img
             v-if="avatarUrl"
             :src="avatarUrl"
@@ -10,7 +10,7 @@
           />
           <div
             v-else
-            class="avatar-placeholder"
+            class="chat-sidebar__avatar-placeholder"
           >
             <BasicIconNext
               name="User"
@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <div class="user-info">
+        <div class="chat-sidebar__user-info">
           <BasicText
             size="body-m"
             weight="semibold"
@@ -31,13 +31,13 @@
             size="body-s"
             color="neutral-700"
           >
-            <span class="status-dot online" />
+            <span class="chat-sidebar__status-dot" />
             Connecté • Admin
           </BasicText>
         </div>
       </div>
     </div>
-    <div class="conversation-container">
+    <div class="chat-sidebar__conversation-list">
       <ConversationItem
         v-for="conv in enrichedConversations"
         :conversation="conv"
@@ -48,7 +48,7 @@
       />
       <div
         v-if="!enrichedConversations.length"
-        class="no-conv"
+        class="chat-sidebar__empty-state"
       >
         <BasicIconNext
           name="Inbox"
@@ -139,62 +139,62 @@
       padding: 12px 16px;
       border-bottom: 1px solid @neutral-200;
       gap: 10px;
+    }
 
-      .status-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    &__status-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          overflow: hidden;
-          flex-shrink: 0;
-          border: 1px solid @neutral-200;
-          background: @neutral-100;
+    &__avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid @neutral-200;
+      background: @neutral-100;
 
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
 
-          .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: @neutral-500;
-          }
-        }
+    &__avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: @neutral-500;
+    }
 
-        .user-info {
-          display: flex;
-          flex-direction: column;
-          line-height: 1.3;
+    &__user-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
 
-          .status-dot {
-            position: relative;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: @success-500;
-            display: inline-block;
-            margin-right: 4px;
-            box-shadow: 0 0 5px color-mix(in srgb, @success-500 40%, transparent);
+    &__status-dot {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: @success-500;
+      display: inline-block;
+      margin-right: 4px;
+      box-shadow: 0 0 5px color-mix(in srgb, @success-500 40%, transparent);
 
-            &::after {
-              content: '';
-              position: absolute;
-              inset: 0;
-              border-radius: 50%;
-              background: color-mix(in srgb, @success-500 35%, transparent);
-              animation: pulse-status 2s infinite ease-in-out;
-            }
-          }
-        }
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: color-mix(in srgb, @success-500 35%, transparent);
+        animation: pulse-status 2s infinite ease-in-out;
       }
     }
 
@@ -246,7 +246,7 @@
       }
     }
 
-    .conversation-container {
+    &__conversation-list {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -259,7 +259,7 @@
       border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
     }
 
-    .no-conv {
+    &__empty-state {
       flex: 1;
       display: flex;
       flex-direction: column;

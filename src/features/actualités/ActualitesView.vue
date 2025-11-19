@@ -1,5 +1,5 @@
 <template>
-  <div class="page actualites">
+  <div class="actualites page">
     <BasicCarousel
       v-if="topics.length"
       :items="topics"
@@ -10,23 +10,23 @@
       <template #item="{ item }">
         <RouterLink
           :to="`/actualites?categorie=${item.id}`"
-          class="topic-card"
+          class="actualites__topic-card"
         >
           <img
             :src="item.image"
             :alt="item.label"
           />
-          <div class="overlay">
+          <div class="actualites__topic-overlay">
             <BasicText
               size="h3"
               weight="semibold"
               color="white"
-              class="topic-title"
+              class="actualites__topic-title"
             >
               {{ item.label }}
             </BasicText>
             <div
-              class="topic-description"
+              class="actualites__topic-description"
               v-html="parseAndSanitize(item.description)"
             />
           </div>
@@ -34,11 +34,11 @@
       </template>
     </BasicCarousel>
     <div
-      class="news-header"
+      class="actualites__header"
       v-responsive-animate.slide.once
     >
       <div
-        class="news-header__title-wrapper"
+        class="actualites__header-title-wrapper"
         v-motion="{
           initial: { opacity: 0, y: -20 },
           enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
@@ -47,33 +47,33 @@
         <BasicText
           size="h3"
           weight="bold"
-          class="news-header__title"
+          class="actualites__header-title"
         >
           Nos
           <span>actualités</span>
         </BasicText>
 
-        <div class="news-header__subtitle">
+        <div class="actualites__header-subtitle">
           Derniers articles, recherches & informations importantes 📚
         </div>
       </div>
-      <div class="news-header__separator"></div>
+      <div class="actualites__header-separator"></div>
     </div>
 
     <BasicText
       size="h1"
       weight="semibold"
       color="neutral-900"
-      class="page-title"
+      class="actualites__title"
     >
       {{ activeTopicLabel }}
     </BasicText>
-    <div class="articles">
+    <div class="actualites__articles">
       <RouterLink
         v-for="article in articles"
         :key="article.slug"
         :to="`/actualites/${article.slug}`"
-        class="article-card"
+        class="actualites__article-card"
       >
         <img
           v-if="article.image"
@@ -81,12 +81,12 @@
           :alt="article.title"
         />
 
-        <div class="info">
+        <div class="actualites__article-info">
           <BasicText
             v-if="article.topic"
             size="body-s"
             color="primary-600"
-            class="topic-label"
+            class="actualites__article-topic"
           >
             {{ article.topic.label }}
           </BasicText>
@@ -94,7 +94,7 @@
             size="h4"
             weight="semibold"
             color="neutral-900"
-            class="article-title"
+            class="actualites__article-title"
           >
             {{ article.title }}
           </BasicText>
@@ -102,12 +102,12 @@
             size="body-s"
             fontStyle="italic"
             color="neutral-500"
-            class="date"
+            class="actualites__article-date"
           >
             {{ formatDate(article.published_at) }}
           </BasicText>
           <div
-            class="excerpt"
+            class="actualites__article-excerpt"
             v-html="parseAndSanitize(article.excerpt)"
           />
         </div>
@@ -153,16 +153,13 @@
 </script>
 
 <style scoped lang="less">
-  .page.actualites {
+  .actualites {
     display: flex;
     flex-direction: column;
     gap: 32px;
     padding: 20px 0;
 
-    /* ===============================
-     ░▒▒░  HEADER ACTUALITÉS  ░▒▒░
-     =============================== */
-    .news-header {
+    &__header {
       border-radius: 18px;
       padding: 34px 32px;
       margin-bottom: 10px;
@@ -172,14 +169,13 @@
       background: var(--secondary-200);
       backdrop-filter: blur(26px);
       -webkit-backdrop-filter: blur(26px);
-
       border: 1px solid rgba(255, 255, 255, 0.1);
 
-      &__title-wrapper {
+      &-title-wrapper {
         text-align: center;
       }
 
-      &__title {
+      &-title {
         font-size: 30px;
         font-weight: 800;
         letter-spacing: -0.3px;
@@ -196,13 +192,11 @@
           background-clip: text;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-
-          /* Glow text sans fade */
           filter: drop-shadow(0 1px 4px rgba(var(--primary-400-rgb), 0.18));
         }
       }
 
-      &__subtitle {
+      &-subtitle {
         font-size: 15px;
         color: rgba(255, 255, 255, 0.86);
         opacity: 0.92;
@@ -210,7 +204,7 @@
         text-shadow: 0 0 6px rgba(255, 255, 255, 0.06);
       }
 
-      &__separator {
+      &-separator {
         width: 100%;
         height: 1px;
         background: rgba(255, 255, 255, 0.18);
@@ -218,10 +212,7 @@
       }
     }
 
-    /* ===============================
-     ░▒▒░  TOPIC CARDS  ░▒▒░
-     =============================== */
-    .topic-card {
+    &__topic-card {
       position: relative;
       display: block;
       border-radius: 18px;
@@ -246,7 +237,7 @@
         transition: transform 0.6s ease;
       }
 
-      .overlay {
+      .actualites__topic-overlay {
         position: absolute;
         inset: 0;
         display: flex;
@@ -254,16 +245,15 @@
         justify-content: flex-end;
         padding: 20px;
         color: white;
-
         background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.55) 100%);
 
-        .topic-title {
+        .actualites__topic-title {
           font-size: clamp(1.1rem, 2vw, 1.3rem);
           margin-bottom: 6px;
           text-shadow: 0 3px 6px rgba(0, 0, 0, 0.75);
         }
 
-        .topic-description {
+        .actualites__topic-description {
           font-size: clamp(0.9rem, 1.5vw, 0.95rem);
           line-height: 1.5;
           opacity: 0.95;
@@ -277,10 +267,13 @@
       }
     }
 
-    /* ===============================
-     ░▒▒░  ARTICLES GRID  ░▒▒░
-     =============================== */
-    .articles {
+    &__title {
+      font-size: clamp(2rem, 3vw, 2.4rem);
+      font-weight: 700;
+      color: @neutral-900;
+    }
+
+    &__articles {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 28px;
@@ -291,7 +284,7 @@
         gap: 20px;
       }
 
-      .article-card {
+      .actualites__article-card {
         display: flex;
         flex-direction: column;
         background: white;
@@ -321,22 +314,22 @@
           }
         }
 
-        .info {
+        .actualites__article-info {
           padding: 18px 16px 22px;
 
-          .topic-label {
+          .actualites__article-topic {
             margin-bottom: 4px;
             display: block;
             color: var(--primary-600);
           }
 
-          .article-title {
+          .actualites__article-title {
             margin-bottom: 6px;
             font-size: clamp(1.05rem, 2vw, 1.15rem);
             color: @neutral-900;
           }
 
-          .date {
+          .actualites__article-date {
             display: block;
             margin-bottom: 10px;
             font-size: 0.9rem;
@@ -344,7 +337,7 @@
             color: @neutral-500;
           }
 
-          .excerpt {
+          .actualites__article-excerpt {
             line-height: 1.45;
             font-size: clamp(0.9rem, 1.5vw, 0.95rem);
             color: @neutral-700;
