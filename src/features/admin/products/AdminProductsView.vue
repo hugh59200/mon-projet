@@ -108,7 +108,7 @@
               center
               danger
               :span="4"
-              @click.stop="deleteProduct(product)"
+              @click="deleteProduct(product)"
             />
           </div>
         </div>

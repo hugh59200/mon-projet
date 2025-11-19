@@ -23,7 +23,7 @@
         :focusable="!isDisabled"
         :pointer="!isDisabled"
         :disabled="isDisabled"
-        @click="onClick"
+        @click.stop="onClick"
       />
     </BasicTooltip>
   </component>

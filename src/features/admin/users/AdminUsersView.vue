@@ -90,7 +90,7 @@
               center
               danger
               :span="4"
-              @click.stop="deleteUser(user)"
+              @click="deleteUser(user)"
             />
           </div>
         </div>

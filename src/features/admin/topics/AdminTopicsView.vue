@@ -83,7 +83,7 @@
               center
               danger
               :span="4"
-              @click.stop="handleDelete(topic)"
+              @click="handleDelete(topic)"
             />
           </div>
         </div>

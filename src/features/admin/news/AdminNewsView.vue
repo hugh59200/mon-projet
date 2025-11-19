@@ -107,7 +107,7 @@
               center
               danger
               :span="4"
-              @click.stop="handleDelete(news)"
+              @click="handleDelete(news)"
             />
           </div>
         </div>

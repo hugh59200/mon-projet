@@ -29,7 +29,7 @@
       <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header">
           <BasicCell
-            :span="10"
+            :span="8"
             text="Client"
             :is-active="sortKey === 'customer_name'"
             :icon-color="getSortColor('customer_name')"
@@ -46,7 +46,7 @@
             :on-icon-click="() => toggleSort('total_amount')"
           />
           <BasicCell
-            :span="8"
+            :span="7"
             center
             text="Date"
             :is-active="sortKey === 'created_at'"
@@ -100,7 +100,7 @@
               center
               danger
               :span="3"
-              @click.stop="deleteOrder(order)"
+              @click="deleteOrder(order)"
             />
           </div>
         </div>
