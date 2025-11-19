@@ -183,21 +183,18 @@
             class="mb-3"
             color="primary-800"
           >
-            Actions
+            Changer statut
           </BasicText>
-          <div class="flex items-end gap-3">
-            <div class="flex-1">
-              <span class="mb-1 block text-xs text-neutral-500">Changer statut</span>
-              <BasicDropdown
-                v-model="selectedStatus"
-                :items="STATUSES"
-                size="small"
-              />
-            </div>
+          <div class="flex-gap-5 align-items-center flex">
+            <BasicDropdown
+              v-model="selectedStatus"
+              :items="STATUSES"
+              size="small"
+            />
             <BasicButton
               label="Mettre à jour"
-              size="small"
               type="primary"
+              size="small"
               @click="handleUpdateStatus"
             />
           </div>
@@ -338,12 +335,32 @@
       isLoading.value = false
     }
   }
-
   const handleUpdateStatus = async () => {
     if (!order.value) return
+
+    // 1. Mise à jour DB (RPC) + Log historique
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
+
+    // 2. ✅ ENVOI EMAIL (Appel explicite à l'Edge Function)
+    try {
+      await supabase.functions.invoke('send-order-update', {
+        body: {
+          order_id: order.value.order_id,
+          status: selectedStatus.value,
+        },
+      })
+      // Note: Le toast de succès est déjà affiché par changeOrderStatus
+    } catch (e) {
+      console.error('Erreur envoi email:', e)
+      toast.show("Statut mis à jour, mais échec de l'envoi d'email", 'warning')
+    }
+
+    // 3. Rafraîchissement UI
     await loadOrder()
+    // await loadEmails() // Si tu as cette fonction pour lister les mails envoyés
   }
+
+  // Dans src/features/admin/orders/modale/AdminOrderDetailsModal.vue
 
   const handleAddTracking = async () => {
     if (!carrier.value || !trackingNumber.value)
@@ -351,20 +368,32 @@
 
     if (!order.value) return
 
+    // 1. Update DB
     const { error } = await supabase
       .from('orders')
       .update({
         carrier: carrier.value,
         tracking_number: trackingNumber.value,
         shipped_at: new Date().toISOString(),
-        status: 'shipped',
+        status: 'shipped', // On force le statut shipped
       })
-      .eq('id', order.value.order_id!) // Utilise l'ID technique pour l'update
+      .eq('id', order.value.order_id!) // Utilise l'ID technique
 
     if (error) {
       toast.show('Erreur suivi ❌', 'danger')
     } else {
-      toast.show('Suivi ajouté ✅', 'success')
+      // 2. ✅ ENVOI EMAIL EXPÉDITION (Nouveau)
+      try {
+        // On utilise l'Edge Function dédiée (ou send-order-update si tu préfères)
+        await supabase.functions.invoke('send-shipping-email', {
+          body: { order_id: order.value.order_id },
+        })
+        toast.show('Suivi ajouté et email envoyé ✅', 'success')
+      } catch (e) {
+        console.error('Erreur email tracking:', e)
+        toast.show('Suivi enregistré, échec envoi email', 'warning')
+      }
+
       await loadOrder()
     }
   }

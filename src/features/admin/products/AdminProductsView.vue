@@ -86,29 +86,51 @@
                 alt="Image du produit"
                 class="admin-products__thumb"
               />
-              <span class="admin-products__name">{{ product.name || '—' }}</span>
+              <div class="flex flex-col">
+                <span class="admin-products__name">{{ product.name || '—' }}</span>
+                <span
+                  v-if="product.is_on_sale"
+                  class="text-xs font-bold text-red-600"
+                >
+                  PROMO
+                </span>
+              </div>
             </BasicCell>
             <BasicCell :span="8">
               <BasicText>{{ product.category || '—' }}</BasicText>
             </BasicCell>
-            <BasicCell
-              :text="formatCurrency(product.price)"
-              :span="6"
-            />
+
+            <BasicCell :span="6">
+              <div class="flex flex-col items-start">
+                <template v-if="product.is_on_sale && product.sale_price">
+                  <span class="text-xs text-neutral-400 line-through">
+                    {{ formatCurrency(product.price) }}
+                  </span>
+                  <span class="font-bold text-red-600">
+                    {{ formatCurrency(product.sale_price) }}
+                  </span>
+                </template>
+                <template v-else>
+                  <span>{{ formatCurrency(product.price) }}</span>
+                </template>
+              </div>
+            </BasicCell>
+
             <BasicCell :span="6">
               <BasicBadge
-                :label="getLabelBadge(product.stock)"
-                :type="getTypeBadge(product.stock)"
+                :label="getProductStockLabel(product.stock)"
+                :type="getProductStockType(product.stock)"
                 size="small"
               />
             </BasicCell>
+
             <BasicCellActionIcon
               icon-name="trash"
               tooltip="Supprimer"
               center
               danger
               :span="4"
-              @click="deleteProduct(product)"
+              @click.stop="deleteProduct(product)"
             />
           </div>
         </div>
@@ -128,13 +150,11 @@
     </WrapperLoader>
 
     <teleport to="#app">
-      <!-- ➕ Création -->
       <AdminProductModal
         v-model="isCreateModalVisible"
         @saved="fetchData"
       />
 
-      <!-- 🔍 Lecture / Édition -->
       <AdminProductModal
         v-if="selectedProductId"
         v-model="isModalVisible"
@@ -151,9 +171,10 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { useProductActions } from '@/supabase/actions/useProductActions'
   import type { Tables } from '@/supabase/types/supabase'
-  import { formatCurrency, getLabelBadge, getTypeBadge } from '@/utils'
+  import { formatCurrency } from '@/utils'
   import { ref } from 'vue'
 
+  import type { BadgeType } from '@designSystem/components/basic/badge'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
@@ -200,6 +221,20 @@
   function openEditProduct(id: string) {
     selectedProductId.value = id
     isModalVisible.value = true
+  }
+
+  // --- Helpers Affichage Stock V2 ---
+  function getProductStockLabel(stock: number | null) {
+    if (!stock || stock <= 0) return 'Rupture'
+    if (stock < 10) return `Faible (${stock})`
+    return `En stock (${stock})`
+  }
+
+  // ✅ CORRECTION ICI : Retourner un type accepté par BadgeType
+  function getProductStockType(stock: number | null): BadgeType {
+    if (!stock || stock <= 0) return 'error' // Rouge
+    if (stock < 10) return 'pending' // Orange (remplace 'warning')
+    return 'success' // Vert
   }
 </script>
 

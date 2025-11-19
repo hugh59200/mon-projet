@@ -239,11 +239,6 @@
                   v-model="newsletter"
                   label="Recevoir les newsletters et promotions"
                 />
-
-                <BasicCheckbox
-                  v-model="smsAlerts"
-                  label="Recevoir les alertes SMS (commandes & livraisons)"
-                />
               </div>
             </div>
           </div>
@@ -370,11 +365,9 @@
   // Données d'Origine (pour vérifier si des changements ont été faits)
   const originalProfile = ref<{ full_name?: string; phone?: string; address?: string }>({})
   const originalNewsletter = ref(false)
-  const originalSmsAlerts = ref(false)
 
   // Préférences
   const newsletter = ref(false)
-  const smsAlerts = ref(false)
   const preferencesLoading = ref(false) // Nouveau loader pour les préférences
 
   // Sécurité
@@ -396,7 +389,6 @@
   const hasPreferenceChanges = computed(() => {
     return (
       newsletter.value !== originalNewsletter.value ||
-      smsAlerts.value !== originalSmsAlerts.value ||
       isBrownTheme.value.toString() !==
         (localStorage.getItem('theme-preference') === 'brown').toString()
     )
@@ -463,11 +455,10 @@
 
     // Préférences (à charger également depuis la BDD si implémenté, ou via un défaut)
     // Simuler le chargement des préférences depuis le profil si elles y étaient stockées
-    newsletter.value = data.newsletter ?? false
-    smsAlerts.value = data.sms_alerts ?? false
+    // TODO: remplacer par les vraies données
+    newsletter.value = false
 
     originalNewsletter.value = newsletter.value
-    originalSmsAlerts.value = smsAlerts.value
   }
 
   async function handleAvatarSelect(e: Event) {
@@ -541,7 +532,6 @@
     // Logique de sauvegarde des préférences dans la BDD (si implémentée)
     const preferencesData = {
       newsletter: newsletter.value,
-      sms_alerts: smsAlerts.value,
       // theme_preference est géré par localStorage et le watch
     }
 
@@ -550,7 +540,6 @@
     if (success) {
       // Mettre à jour l'état d'origine pour désactiver le bouton
       originalNewsletter.value = newsletter.value
-      originalSmsAlerts.value = smsAlerts.value
       toast.show('Préférences sauvegardées 👍', 'success')
     }
 

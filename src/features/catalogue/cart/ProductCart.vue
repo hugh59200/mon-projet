@@ -125,14 +125,14 @@
       position: absolute;
       top: 12px;
       left: 12px;
-      background: var(--error-600);
+      background: @red-600;
       color: white;
       font-size: 10px;
       font-weight: 800;
       padding: 4px 8px;
       border-radius: 6px;
       z-index: 2;
-      box-shadow: 0 2px 8px rgba(var(--error-500-rgb), 0.4);
+      box-shadow: 0 2px 8px fade(@red-600, 0.4);
       letter-spacing: 0.5px;
     }
 

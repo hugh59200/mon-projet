@@ -272,7 +272,7 @@
     }
 
     &__sale-price {
-      color: var(--error-600);
+      color: @red-600;
       font-weight: bold;
     }
 

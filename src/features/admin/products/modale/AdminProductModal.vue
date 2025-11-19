@@ -14,24 +14,87 @@
           placeholder="Ex : IGF-1 LR3"
           required
         />
-        <WrapperInput
-          v-model="form.category"
-          label="Catégorie"
-          placeholder="Ex : Bien-être"
-        />
-        <WrapperInput
-          :model-value="form.price?.toString()"
-          @update:model-value="(v) => (form.price = parseFloat(v || '0'))"
-          label="Prix (€)"
-          placeholder="0.00"
-          input-type="form"
-        />
-        <WrapperInput
-          :model-value="form.purity?.toString()"
-          @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
-          label="Pureté (%)"
-          placeholder="Ex : 99"
-        />
+
+        <div class="form-row">
+          <WrapperInput
+            v-model="form.category"
+            label="Catégorie"
+            placeholder="Ex : Bien-être"
+            class="flex-1"
+          />
+          <WrapperInput
+            :model-value="form.purity?.toString()"
+            @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
+            label="Pureté (%)"
+            placeholder="Ex : 99"
+            class="w-1/3"
+          />
+        </div>
+
+        <div class="form-section">
+          <BasicText
+            size="body-s"
+            weight="bold"
+            color="neutral-500"
+            class="mb-2"
+          >
+            Tarification
+          </BasicText>
+          <div class="form-row">
+            <WrapperInput
+              :model-value="form.price?.toString()"
+              @update:model-value="(v) => (form.price = parseFloat(v || '0'))"
+              label="Prix standard (€)"
+              placeholder="0.00"
+              input-type="form"
+              class="flex-1"
+            />
+
+            <div class="promo-toggle">
+              <WrapperCheckbox
+                v-model="form.is_on_sale"
+                label="En promotion"
+              />
+            </div>
+
+            <WrapperInput
+              v-if="form.is_on_sale"
+              :model-value="form.sale_price?.toString()"
+              @update:model-value="(v) => (form.sale_price = parseFloat(v || '0'))"
+              label="Prix Promo (€)"
+              placeholder="0.00"
+              input-type="form"
+              class="slide-in flex-1"
+            />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <BasicText
+            size="body-s"
+            weight="bold"
+            color="neutral-500"
+            class="mb-2"
+          >
+            Inventaire
+          </BasicText>
+          <WrapperInput
+            :model-value="form.stock?.toString()"
+            @update:model-value="(v) => (form.stock = parseInt(v || '0'))"
+            label="Stock (Quantité)"
+            placeholder="0"
+            input-type="form"
+            type="number"
+          />
+          <BasicText
+            size="body-s"
+            color="neutral-500"
+            class="mt-1"
+          >
+            Mettre 0 pour afficher "Rupture de stock".
+          </BasicText>
+        </div>
+
         <WrapperFormElements label="Description">
           <textarea
             v-model="form.description"
@@ -40,6 +103,7 @@
             class="custom-textarea"
           />
         </WrapperFormElements>
+
         <WrapperFormElements label="Image du produit">
           <BasicInput
             readonly
@@ -72,15 +136,13 @@
             />
           </div>
         </WrapperFormElements>
-        <WrapperCheckbox
-          v-model="form.stock"
-          label="Disponible en stock"
-        />
+
         <BasicButton
           :label="isEditMode ? 'Mettre à jour le produit' : 'Créer le produit'"
           type="primary"
           :disabled="loading"
           @click="handleSubmit"
+          class="mt-4"
         />
       </div>
     </template>
@@ -91,7 +153,7 @@
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useProductActions } from '@/supabase/actions/useProductActions'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { TablesInsert } from '@/supabase/types/supabase'
+  import type { TablesInsert } from '@/supabase/types/supabase' // Type généré V2
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -102,9 +164,7 @@
   }>()
 
   const emit = defineEmits(['saved'])
-
   const toast = useToastStore()
-
   const { createProduct, updateProduct } = useProductActions(() => emit('saved'))
 
   const loading = ref(false)
@@ -114,13 +174,16 @@
   const fileInputRef = ref<HTMLInputElement | null>(null)
   const oldImagePath = ref<string | null>(null)
 
+  // ✅ Initialisation compatible V2
   const form = ref<TablesInsert<'products'>>({
     name: '',
     category: '',
     price: 0,
+    sale_price: null, // Nouveau
+    is_on_sale: false, // Nouveau
     purity: null,
     description: '',
-    stock: true,
+    stock: 0, // Nouveau : Integer (0 par défaut)
     image: null,
   })
 
@@ -151,7 +214,24 @@
   }
 
   async function loadProduct() {
-    if (!props.productId) return
+    if (!props.productId) {
+      // Reset form for creation mode
+      form.value = {
+        name: '',
+        category: '',
+        price: 0,
+        sale_price: null,
+        is_on_sale: false,
+        purity: null,
+        description: '',
+        stock: 0,
+        image: null,
+      }
+      imagePreview.value = null
+      selectedFile.value = null
+      return
+    }
+
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -159,7 +239,8 @@
       .single()
 
     if (error) return toast.show('Erreur chargement produit', 'danger')
-    form.value = data
+
+    form.value = { ...data } // Spread pour éviter les refs liées
     imagePreview.value = data.image || null
     if (data.image) oldImagePath.value = data.image.split('/product-images/')[1] ?? null
   }
@@ -192,7 +273,7 @@
 
       const folderPath = `products/${productSlug}`
       const fileExt = selectedFile.value.name.split('.').pop()
-      const fileName = `peptide-${productSlug}.${fileExt}`
+      const fileName = `peptide-${productSlug}-${Date.now()}.${fileExt}` // Ajout timestamp pour éviter cache
       const fullPath = `${folderPath}/${fileName}`
 
       if (oldImagePath.value) {
@@ -229,10 +310,16 @@
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
+      // Nettoyage payload pour éviter d'envoyer sale_price null si pas en solde (optionnel mais propre)
+      const payload = { ...form.value }
+      if (!payload.is_on_sale) {
+        payload.sale_price = null
+      }
+
       if (isEditMode.value && props.productId) {
-        await updateProduct(props.productId, form.value)
+        await updateProduct(props.productId, payload)
       } else {
-        await createProduct(form.value)
+        await createProduct(payload)
       }
 
       visible.value = false
@@ -243,6 +330,9 @@
 
   onMounted(loadProduct)
   watch(() => props.productId, loadProduct)
+  watch(visible, (val) => {
+    if (val) loadProduct() // Recharger quand la modale s'ouvre
+  })
 </script>
 
 <style scoped lang="less">
@@ -255,6 +345,26 @@
     border-radius: 8px;
   }
 
+  .form-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .form-section {
+    padding: 12px;
+    border: 1px solid @neutral-200;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .promo-toggle {
+    display: flex;
+    align-items: center;
+    height: 42px; /* Pour aligner avec les inputs */
+    padding: 0 8px;
+  }
+
   .custom-textarea {
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -262,10 +372,11 @@
     font-size: 14px;
     width: 100%;
     resize: vertical;
+    font-family: inherit;
 
-    &:read-only {
-      background: #f8f8f8;
-      color: #666;
+    &:focus {
+      outline: 2px solid var(--primary-200);
+      border-color: var(--primary-500);
     }
   }
 
@@ -281,27 +392,11 @@
     border: 1px solid #e5e7eb;
 
     img {
-      max-width: 280px;
+      max-width: 200px;
       width: 100%;
       height: auto;
-      border-radius: 10px;
+      border-radius: 6px;
       object-fit: contain;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  .inline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    border-radius: 8px;
-    input[type='checkbox'] {
-      transform: scale(1.2);
-      accent-color: var(--primary-600);
     }
   }
 
@@ -309,9 +404,18 @@
     display: none;
   }
 
-  :deep([readonly]) {
-    background: #f9fafb !important;
-    color: #555 !important;
-    cursor: not-allowed;
+  .slide-in {
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 </style>

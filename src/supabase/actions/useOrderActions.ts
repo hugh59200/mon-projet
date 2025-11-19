@@ -3,6 +3,7 @@ import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi
 import type { OrderStatus } from '@/utils' // Ton helper V2
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+import { supabase } from '../supabaseClient'
 
 // Type minimaliste qui accepte Vue ou Table
 type MinimalOrder = {
@@ -54,8 +55,11 @@ export function useOrderActions(fetchData?: () => void) {
       // RPC : Met à jour statut + Log email
       await updateOrderStatusInDB(id, status)
 
-      // Note: Pas besoin d'appeler send-order-update ici, la RPC log l'email
-      // et ton trigger DB ou webhook devrait gérer l'envoi.
+      // 2. EDGE FUNCTION : Envoie l'email physique au client 📧
+      // C'est ici qu'on s'assure que le mail part vraiment !
+      await supabase.functions.invoke('send-order-update', {
+        body: { order_id: id, status },
+      })
 
       toast.show(`Statut mis à jour : ${status}`, 'success')
       fetchData?.()
