@@ -1,4 +1,3 @@
-// src/features/checkout/paiement/service/paymentService.ts
 import { supabase } from '@/supabase/supabaseClient'
 
 export type PaymentProvider = 'stripe' | 'paypal'
@@ -13,21 +12,38 @@ export interface PaymentIntent {
   created_at: string
 }
 
-export async function finalizeOrderAfterPayment(orderId: string, paymentIntentId?: string) {
+/**
+ * ✅ V2.0 : Finalise la commande en mettant à jour les colonnes spécifiques
+ * (paypal_order_id ou stripe_session_id) selon le provider.
+ */
+export async function finalizeOrderAfterPayment(
+  orderId: string,
+  paymentId: string,
+  provider: PaymentProvider, // ⚠️ Ajout nécessaire pour cibler la bonne colonne
+) {
   try {
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        status: 'paid',
-        payment_intent_id: paymentIntentId ?? null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', orderId)
+    const updateData: any = {
+      status: 'paid', // Ou 'processing' selon ta logique métier
+      updated_at: new Date().toISOString(),
+    }
+
+    // 🔀 Mapping vers les nouvelles colonnes V2
+    if (provider === 'paypal') {
+      updateData.paypal_order_id = paymentId
+    } else if (provider === 'stripe') {
+      updateData.stripe_session_id = paymentId
+    } else {
+      // Fallback legacy
+      updateData.payment_intent_id = paymentId
+    }
+
+    const { error } = await supabase.from('orders').update(updateData).eq('id', orderId)
 
     if (error) throw error
-    console.log('✅ Commande mise à jour en "paid" -', orderId)
+    console.log(`✅ Commande ${orderId} finalisée (${provider})`)
   } catch (err) {
     console.error('❌ Erreur finalisation commande:', err)
+    throw err // Important de relancer l'erreur pour que l'UI le sache
   }
 }
 
@@ -42,9 +58,11 @@ export async function processPayment(
       return createStripeCheckout(amount, email, orderId)
     case 'paypal':
       const paypal = await createPaypalOrder(amount, email!, orderId!)
-      window.location.assign(paypal.url)
+      // PayPal nécessite souvent une redirection manuelle ici ou dans le composant
+      if (paypal.url) window.location.assign(paypal.url)
+
       return {
-        id: paypal.paypalOrderId,
+        id: paypal.paypalOrderId, // C'est cet ID qui ira dans paypal_order_id
         amount,
         currency: 'EUR',
         status: 'pending',
@@ -58,14 +76,15 @@ export async function processPayment(
   }
 }
 
+// --- FONCTIONS INTERNES (Restent inchangées si tes Edge Functions n'ont pas bougé) ---
+
 async function createPaypalOrder(amount: number, email: string, orderId: string) {
   const { data, error } = await supabase.functions.invoke('create-paypal-order', {
     body: { amount, email, orderId },
   })
 
   if (error) throw new Error(error.message)
-
-  return data.data // pas data !!
+  return data // Vérifie bien si c'est data ou data.data selon ton Edge Function retour
 }
 
 type StripeSessionResponse = {
@@ -85,7 +104,7 @@ async function createStripeCheckout(
 
   if (error) throw new Error(error.message)
 
-  const result = data?.data as StripeSessionResponse
+  const result = data as StripeSessionResponse // Souvent data est direct le body de la réponse
 
   if (!result?.url) {
     console.error('❌ Pas d’URL Stripe reçue', result)
@@ -95,7 +114,7 @@ async function createStripeCheckout(
   window.location.assign(result.url)
 
   return {
-    id: result.sessionId,
+    id: result.sessionId, // C'est cet ID qui ira dans stripe_session_id
     amount,
     currency: 'EUR',
     status: 'pending',

@@ -4,18 +4,27 @@
       class="product-cart"
       @click="$emit('view', product.id)"
     >
+      <div
+        v-if="product.is_on_sale"
+        class="product-cart__badge-promo"
+      >
+        PROMO
+      </div>
+
       <div class="product-cart__image">
         <img
-          :src="product.image"
+          :src="product.image || ''"
           :alt="product.name"
           loading="lazy"
         />
       </div>
+
       <div class="product-cart__info">
         <BasicText
           size="body-l"
           weight="bold"
           color="neutral-800"
+          class="truncate-text"
         >
           {{ product.name }}
         </BasicText>
@@ -26,19 +35,41 @@
         >
           {{ product.category }} • Pureté : {{ product.purity }}%
         </BasicText>
-        <BasicText
-          size="body-l"
-          weight="bold"
-          color="primary-800"
-        >
-          {{ product.price.toFixed(2) }} €
-        </BasicText>
+
+        <div class="product-cart__price-wrapper">
+          <template v-if="product.is_on_sale && product.sale_price">
+            <BasicText
+              size="body-m"
+              class="product-cart__old-price"
+            >
+              {{ product.price.toFixed(2) }} €
+            </BasicText>
+            <BasicText
+              size="body-l"
+              weight="bold"
+              color="warning-600"
+            >
+              {{ product.sale_price.toFixed(2) }} €
+            </BasicText>
+          </template>
+
+          <template v-else>
+            <BasicText
+              size="body-l"
+              weight="bold"
+              color="primary-800"
+            >
+              {{ product.price.toFixed(2) }} €
+            </BasicText>
+          </template>
+        </div>
       </div>
+
       <div class="product-cart__footer">
         <BasicButton
-          :label="product.stock ? 'Ajouter au panier' : 'Rupture'"
-          :disabled="!product.stock"
-          :type="product.stock ? 'primary' : 'secondary'"
+          :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture'"
+          :disabled="(product.stock ?? 0) <= 0"
+          :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
           width="full"
           @click.stop="$emit('add', product)"
         />
@@ -48,12 +79,13 @@
 </template>
 
 <script setup lang="ts">
-  defineProps({
-    product: {
-      type: Object,
-      required: true,
-    },
-  })
+  import type { Products } from '@/supabase/types/supabase.types'
+
+  defineProps<{
+    product: Products
+  }>()
+
+  defineEmits(['view', 'add'])
 </script>
 
 <style scoped lang="less">
@@ -62,6 +94,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 12px;
+    position: relative; // Pour le badge promo
 
     background: color-mix(in srgb, @neutral-200 82%, transparent);
     backdrop-filter: blur(12px);
@@ -86,6 +119,21 @@
         0 0 14px rgba(var(--primary-400-rgb), 0.25),
         inset 0 0 0 1px fade(@white, 30%);
       border-color: rgba(var(--primary-400-rgb), 0.3);
+    }
+
+    &__badge-promo {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--error-600);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(var(--error-500-rgb), 0.4);
+      letter-spacing: 0.5px;
     }
 
     &__image {
@@ -117,10 +165,27 @@
       gap: 4px;
     }
 
-    &__price {
-      color: var(--primary-700);
-      font-size: 1.05rem;
+    .truncate-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Prix V2 */
+    &__price-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       margin-top: 2px;
+      min-height: 28px; // Evite le saut de ligne
+    }
+
+    &__old-price {
+      text-decoration: line-through;
+      color: @neutral-500;
+      font-size: 0.9rem;
     }
 
     &__footer {
@@ -129,10 +194,6 @@
 
       display: flex;
       justify-content: center;
-    }
-
-    &__button {
-      width: 100%;
     }
   }
 

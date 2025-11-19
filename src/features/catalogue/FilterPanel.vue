@@ -1,6 +1,5 @@
 <template>
   <div class="catalogue-filters">
-    <!-- Header -->
     <div class="catalogue-filters__head">
       <BasicText
         size="h5"
@@ -26,12 +25,14 @@
         />
       </div>
     </div>
+
     <FilterSection
       v-model="filterOpen.price"
       title="Prix"
     >
       <BasicRange v-model="priceRange" />
     </FilterSection>
+
     <FilterSection
       v-model="filterOpen.category"
       title="Catégorie"
@@ -45,6 +46,7 @@
         size="small"
       />
     </FilterSection>
+
     <FilterSection
       v-model="filterOpen.stock"
       title="Disponibilité"
@@ -54,6 +56,7 @@
         :label="`En stock (${stockCount})`"
       />
     </FilterSection>
+
     <FilterSection
       v-if="tags.length"
       v-model="filterOpen.tags"
@@ -77,6 +80,7 @@
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
 
+  // Models
   const filterOpen = defineModel<Record<string, boolean>>('filterOpen', { default: () => ({}) })
   const priceRange = defineModel<{ min: number; max: number; from: number; to: number }>(
     'priceRange',

@@ -45,8 +45,8 @@
           variant="outlined"
           size="small"
           icon-left="SlidersHorizontal"
-          @click="showFilters = true"
           aria-controls="mobile-filter-modal"
+          @click="showFilters = true"
         />
       </div>
     </header>
@@ -196,11 +196,11 @@
   import { usePagination } from '@/features/catalogue/composables/usePagination'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import type { Products } from '@/supabase/types/supabase.types'
-  import { BasicButton } from '@designSystem/components/basic/button' // Import manquant
+  import type { Products } from '@/supabase/types/supabase.types' // ✅ Type V2
+  import { BasicButton } from '@designSystem/components/basic/button'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { storeToRefs } from 'pinia'
-  import { onMounted, ref, watch } from 'vue' // Ajout de watch
+  import { onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
@@ -215,9 +215,7 @@
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
 
-  const catalogueListRef = ref<HTMLElement | null>(null) // Référence pour le défilement
-
-  // --- Logique des Filtres ---
+  // --- Logique des Filtres (Attention: vérifie bien useFilters.ts pour le stock > 0) ---
   const {
     selectedCategories,
     inStockOnly,
@@ -238,54 +236,38 @@
   const { filterOpen, allOpen, toggleAll } = useFilterSections()
 
   // --- État Local ---
-  const showFilters = ref(false) // Pour la modale de filtres mobile
+  const showFilters = ref(false)
 
   // --- Fonctions Utilitaires ---
 
-  /**
-   * Réinitialise tous les filtres à leur état par défaut.
-   */
   function resetAll() {
     selectedCategories.value = []
     inStockOnly.value = false
     selectedTags.value = []
 
-    // Réinitialisation de la plage de prix à min/max
     priceRange.value = {
       ...priceRange.value,
       from: priceRange.value.min,
       to: priceRange.value.max,
     }
 
-    // Réinitialisation de la page et du tri
     page.value = 1
     sortBy.value = 'default'
-    searchTerm.value = '' // Ajout pour réinitialiser la recherche
+    searchTerm.value = ''
   }
 
-  /**
-   * Redirige vers la page de détail du produit.
-   */
   function viewProduct(id: string) {
     router.push(`/catalogue/${id}`)
   }
 
-  /**
-   * Ajoute un produit au panier et affiche une notification.
-   */
   function addToCart(p: Products) {
     cart.addToCart(p)
     showAddToCartToast(p)
   }
 
-  /**
-   * Fait défiler jusqu'au haut de la liste de produits.
-   * Utile après un changement de page ou l'application de filtres.
-   */
   function scrollToProductList() {
     const listElement = document.querySelector('.catalogue__list')
     if (listElement) {
-      // Utiliser la fonction scrollIntoView pour un défilement doux
       listElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
@@ -295,51 +277,30 @@
   onMounted(async () => {
     load()
 
-    // Gestion du tag initial depuis l'URL (si présent)
     const initialTag = typeof route.query.tag === 'string' ? route.query.tag : null
     if (initialTag) {
       selectedTags.value = [initialTag]
     }
 
-    // Mise à jour du titre pour le SEO
     document.title = 'Catalogue de Peptides – Fast Peptides'
   })
 
-  // 💡 UX Amélioration : Réinitialiser la page et remonter lors du changement de filtre/tri/recherche.
   watch(
     [selectedCategories, inStockOnly, selectedTags, priceRange, sortBy, searchTerm],
     () => {
-      // Si la modification vient d'un filtre/tri/recherche, revenir à la première page
       page.value = 1
-      // Après un filtrage, on peut remonter l'utilisateur au début de la liste
       scrollToProductList()
     },
-    { deep: true }, // Utilisation de deep pour les objets (priceRange) et tableaux
+    { deep: true },
   )
 
-  // 💡 UX Amélioration : Remonter l'utilisateur au début de la liste lors du changement de page.
   watch(page, () => {
     scrollToProductList()
   })
-
-  // 💡 SEO/Partage : Optionnel - mettre à jour l'URL avec les filtres sélectionnés (décommenter si nécessaire)
-  /*
-watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page], () => {
-  router.replace({
-    query: {
-      ...route.query,
-      categories: selectedCategories.value.join(','),
-      inStock: inStockOnly.value || undefined,
-      tags: selectedTags.value.join(','),
-      sort: sortBy.value !== 'default' ? sortBy.value : undefined,
-      search: searchTerm.value || undefined,
-      page: page.value > 1 ? page.value : undefined,
-    }
-  }).catch(() => {}) // Catch pour éviter les erreurs de navigation redondante
-}, { deep: true, immediate: false })
-*/
 </script>
+
 <style scoped lang="less">
+  /* Style inchangé */
   .catalogue {
     width: 100%;
     min-height: 100vh;
@@ -350,14 +311,12 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
     opacity: 0;
     animation: fadeInPage 0.8s ease forwards;
 
-    // Animation de chargement initial (conservée)
     @keyframes fadeInPage {
       to {
         opacity: 1;
       }
     }
 
-    // --- Titre et En-tête ---
     &__title-wrapper {
       text-align: center;
       margin-bottom: 10px;
@@ -400,9 +359,8 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
       transition: all 0.25s ease;
     }
 
-    // Contrôles mobiles de recherche/filtres
     &__mobile-controls {
-      display: none; // Caché par défaut (Desktop)
+      display: none;
     }
 
     &__search-input {
@@ -410,7 +368,6 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
       min-width: 120px;
     }
 
-    // --- Corps (Filtres + Liste) ---
     &__body {
       display: flex;
       width: 100%;
@@ -466,21 +423,20 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
       }
     }
 
-    // CONTROLE DE LISTE (Desktop) : Recherche à gauche, Tri à droite
     &__list-controls {
       display: flex;
-      justify-content: space-between; // Aligner les deux extrémités
+      justify-content: space-between;
       align-items: center;
       gap: 18px;
       margin-bottom: 4px;
 
       .catalogue__search-input-desktop {
-        flex-grow: 1; // Prend un maximum d'espace
-        max-width: 450px; // Limite maximale pour la recherche
+        flex-grow: 1;
+        max-width: 450px;
       }
 
       .catalogue__sort-dropdown {
-        width: 200px; // Taille définie (plus petit que la recherche)
+        width: 200px;
         flex-shrink: 0;
       }
     }
@@ -503,13 +459,11 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
         backdrop-filter: blur(10px);
         padding: 10px 18px;
         border-radius: 12px;
-
         border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
         box-shadow: 0 6px 18px fade(#000, 35%);
       }
     }
 
-    // --- Media Queries ---
     @media (max-width: 1100px) {
       .catalogue__grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -524,14 +478,13 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
       }
 
       .catalogue__filters {
-        display: none; // Les filtres desktop sont cachés
+        display: none;
       }
 
       .catalogue__list {
         order: 1;
       }
 
-      // Contrôles sur mobile : Recherche et Tri sont alignés verticalement
       .catalogue__list-controls {
         flex-direction: column;
         align-items: stretch;
@@ -539,17 +492,17 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
 
         .catalogue__sort-dropdown,
         .catalogue__search-input-desktop {
-          width: 100%; // Pleine largeur
-          max-width: unset; // Annuler la limite desktop
+          width: 100%;
+          max-width: unset;
         }
       }
 
       .catalogue__search-input-desktop {
-        display: none; // Cache la recherche Desktop pour ne laisser que la version mobile dans le header
+        display: none;
       }
 
       .catalogue__mobile-controls {
-        display: flex; // Affiché uniquement sur mobile (recherche + bouton filtre)
+        display: flex;
         gap: 12px;
       }
 
@@ -566,11 +519,6 @@ watch([selectedCategories, inStockOnly, selectedTags, sortBy, searchTerm, page],
       .catalogue__mobile-controls {
         flex-direction: column;
         align-items: stretch;
-      }
-
-      .catalogue__list-controls {
-        // Sur mobile, l'ordre est déjà géré par le flex-direction: column
-        // Mais s'assurer que le tri et la recherche suivent les mêmes règles de largeur.
       }
 
       .catalogue__grid {

@@ -2,13 +2,12 @@
   <div class="cart">
     <FloatingDropdownWrapper
       v-model="isOpen"
-      :width="280"
+      :width="300"
       align="right"
       arrow-align="auto"
       :close-delay="800"
       :trigger-mode="!isMobile ? 'hover' : 'click'"
     >
-      <!-- TRIGGER = CART ICON -->
       <template #trigger>
         <div class="cart__icon">
           <BasicIconNext
@@ -19,6 +18,7 @@
           <div
             v-if="cart.totalItems > 0"
             class="cart__badge"
+            v-motion-pop
           >
             <BasicText
               size="body-s"
@@ -30,9 +30,7 @@
         </div>
       </template>
 
-      <!-- DROPDOWN CONTENT -->
       <div class="cart__content">
-        <!-- EMPTY CART -->
         <div
           v-if="cart.items.length === 0"
           class="cart__empty"
@@ -69,41 +67,51 @@
           />
         </div>
 
-        <!-- FILLED CART -->
         <div
           v-else
-          class="cart__list"
+          class="cart__list-wrapper"
         >
-          <!-- ITEMS -->
-          <div
-            v-for="item in cart.items.slice(0, 3)"
-            class="cart__item"
-          >
-            <img
-              :src="item.product_image || defaultImage"
-              alt=""
-              class="cart__item-img"
-            />
+          <div class="cart__list">
+            <div
+              v-for="item in cart.items.slice(0, 3)"
+              class="cart__item"
+            >
+              <img
+                :src="item.product_image || defaultImage"
+                alt=""
+                class="cart__item-img"
+              />
 
-            <div class="cart__item-info">
-              <BasicText
-                size="body-s"
-                weight="semibold"
-                color="neutral-300"
-              >
-                {{ item.product_name }}
-              </BasicText>
+              <div class="cart__item-info">
+                <BasicText
+                  size="body-s"
+                  weight="semibold"
+                  color="neutral-300"
+                  class="cart__item-name"
+                >
+                  {{ item.product_name }}
+                </BasicText>
 
-              <BasicText
-                size="body-s"
-                color="neutral-300"
-              >
-                {{ item.quantity }} × {{ formatCurrency(item.product_price) }}
-              </BasicText>
+                <div class="cart__item-price-row">
+                  <BasicText
+                    size="body-s"
+                    color="neutral-400"
+                  >
+                    {{ item.quantity }} ×
+                  </BasicText>
+
+                  <BasicText
+                    size="body-s"
+                    weight="bold"
+                    color="neutral-200"
+                  >
+                    {{ formatPrice(item.product_price) }}
+                  </BasicText>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- MORE -->
           <div
             v-if="cart.items.length > 3"
             class="cart__more"
@@ -111,16 +119,22 @@
             +{{ cart.items.length - 3 }} autres articles...
           </div>
 
-          <!-- TOTAL + BUTTONS -->
           <div class="cart__actions">
-            <BasicText
-              size="body-s"
-              color="primary-400"
-              weight="semibold"
-              class="cart__total"
-            >
-              Total : {{ formatCurrency(cart.totalPrice) }}
-            </BasicText>
+            <div class="cart__total-row">
+              <BasicText
+                size="body-s"
+                color="neutral-400"
+              >
+                Total estimé
+              </BasicText>
+              <BasicText
+                size="body-m"
+                color="primary-400"
+                weight="bold"
+              >
+                {{ formatPrice(cart.totalPrice) }}
+              </BasicText>
+            </div>
 
             <div class="cart__btns">
               <BasicButton
@@ -147,7 +161,6 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { formatCurrency } from '@/utils/index'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -156,6 +169,13 @@
   const { isMobile } = useDeviceBreakpoint()
 
   const isOpen = ref(false)
+
+  function formatPrice(value: number | null | undefined) {
+    if (value == null || isNaN(Number(value))) return '—'
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
+      Number(value),
+    )
+  }
 
   function goToCart() {
     isOpen.value = false
@@ -179,8 +199,8 @@
     position: relative;
 
     /* ======================
-     ICON TRIGGER
-  ====================== */
+      ICON TRIGGER
+    ====================== */
     &__icon {
       position: relative;
       cursor: pointer;
@@ -201,31 +221,28 @@
 
     &__badge {
       position: absolute;
-      top: -9px;
-      right: -2px;
-
-      background: var(--primary-700);
+      top: -8px;
+      right: -6px;
+      background: var(--primary-600);
       color: white;
-
       border-radius: 50%;
-      height: 16px;
-      width: 16px;
-
+      height: 18px;
+      width: 18px; /* Un peu plus grand pour lisibilité */
       display: flex;
       align-items: center;
       justify-content: center;
-
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
-
-      box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 0.7);
+      box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 1);
     }
 
     /* ======================
-     EMPTY
-  ====================== */
+      DROPDOWN CONTENT
+    ====================== */
     &__content {
       padding: 0;
+      /* Un fond légèrement plus opaque pour le dropdown */
+      background: rgba(30, 30, 30, 0.95);
     }
 
     &__empty {
@@ -233,11 +250,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-
       text-align: center;
       padding: 30px 20px;
       gap: 8px;
-
       color: fade(white, 70%);
 
       &-title {
@@ -258,73 +273,95 @@
     }
 
     /* ======================
-     LIST (cart filled)
-  ====================== */
+      LIST (cart filled)
+    ====================== */
+    &__list-wrapper {
+      padding: 16px;
+    }
+
     &__list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 240px;
-      overflow-y: auto;
+      gap: 12px;
     }
 
     &__item {
       display: flex;
-      align-items: center;
+      align-items: flex-start; /* Alignement top pour multiline */
       gap: 12px;
-      padding: 6px 0;
-      transition:
-        background 0.25s ease,
-        transform 0.2s ease;
+      padding-bottom: 12px;
+      border-bottom: 1px solid color-mix(in srgb, @neutral-700 50%, transparent);
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
 
       &-img {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
         object-fit: cover;
-
         background: color-mix(in srgb, @neutral-800 45%, transparent);
         border: 1px solid color-mix(in srgb, @neutral-500 15%, transparent);
+        flex-shrink: 0;
       }
 
       &-info {
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: 2px;
+        flex: 1;
+        min-width: 0; /* Pour le truncate */
+      }
+
+      &-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      &-price-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
     }
 
     &__more {
       text-align: center;
       font-size: 12px;
-      color: color-mix(in srgb, @neutral-300 80%, transparent);
-      margin-top: 4px;
+      color: color-mix(in srgb, @neutral-300 60%, transparent);
+      padding: 8px 0 4px;
+      font-style: italic;
     }
 
     /* ======================
-     TOTAL + BUTTONS
-  ====================== */
+      TOTAL + BUTTONS
+    ====================== */
     &__actions {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid color-mix(in srgb, @neutral-500 30%, transparent);
     }
 
-    &__total {
-      text-align: right;
-      margin-bottom: 8px;
-      color: var(--primary-400);
+    &__total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     &__btns {
       display: flex;
-      gap: 6px;
+      gap: 8px;
 
       button {
         flex: 1;
         font-size: 13px;
-        padding: 4px 0;
       }
     }
   }

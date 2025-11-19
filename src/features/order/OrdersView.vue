@@ -1,6 +1,5 @@
 <template>
   <div class="user-orders">
-    <!-- 🧾 Titre -->
     <div
       class="user-orders__title-wrapper"
       v-motion="{
@@ -24,10 +23,8 @@
       <div class="user-orders__title-divider"></div>
     </div>
 
-    <!-- Loader -->
     <WrapperLoader :loading="!hasLoaded" />
 
-    <!-- Si aucun résultat -->
     <div
       v-if="hasLoaded && orders.length === 0"
       class="user-orders__empty"
@@ -52,12 +49,10 @@
       />
     </div>
 
-    <!-- Liste commandes -->
     <div
       v-else
       class="user-orders__list"
     >
-      <!-- Contrôles globaux -->
       <div
         class="user-orders__controls"
         v-motion="{
@@ -74,10 +69,8 @@
         />
       </div>
 
-      <!-- Cartes commandes -->
       <div
         v-for="(order, index) in orders"
-        :key="index"
         class="user-orders__card"
         v-motion="{
           initial: { opacity: 0, y: 40, scale: 0.97 },
@@ -89,7 +82,6 @@
           },
         }"
       >
-        <!-- En-tête -->
         <div class="user-orders__card-header">
           <div class="user-orders__card-header-left">
             <BasicText
@@ -105,7 +97,7 @@
               color="neutral-600"
               class="user-orders__card-number"
             >
-              N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
+              N° {{ (order.order_number ?? order.order_id)?.slice(0, 15) }}
             </BasicText>
           </div>
 
@@ -116,7 +108,6 @@
           />
         </div>
 
-        <!-- Produits -->
         <FilterSection
           title="Produits"
           :model-value="openSections[safeId(order)]?.items"
@@ -136,7 +127,7 @@
             class="user-orders__card-items"
           >
             <div
-              v-for="(item, i) in order.detailed_items ?? []"
+              v-for="(item, i) in getItems(order)"
               :key="i"
               class="user-orders__item"
             >
@@ -170,7 +161,7 @@
                     weight="bold"
                     color="neutral-800"
                   >
-                    {{ formatPrice(item.product_price) }}
+                    {{ formatPrice(item.total) }}
                   </BasicText>
                 </div>
               </div>
@@ -178,9 +169,8 @@
           </div>
         </FilterSection>
 
-        <!-- Résumé -->
         <FilterSection
-          title="Résumé"
+          title="Résumé financier"
           :model-value="openSections[safeId(order)]?.summary"
           @update:model-value="(v: boolean | undefined) => setSection(order, 'summary', v ?? false)"
         >
@@ -200,52 +190,117 @@
             <div class="user-orders__summary-line">
               <BasicText
                 size="body-s"
-                color="neutral-700"
+                color="neutral-600"
               >
-                Total
+                Sous-total
               </BasicText>
               <BasicText
                 size="body-s"
-                weight="bold"
                 color="neutral-800"
+              >
+                {{ formatPrice(order.subtotal) }}
+              </BasicText>
+            </div>
+
+            <div class="user-orders__summary-line">
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Livraison ({{ order.carrier ?? 'Standard' }})
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-800"
+              >
+                <template v-if="(order.shipping_cost ?? 0) > 0">
+                  {{ formatPrice(order.shipping_cost) }}
+                </template>
+                <template v-else>
+                  <span style="color: var(--success-600); font-weight: 600">Offerte</span>
+                </template>
+              </BasicText>
+            </div>
+
+            <div
+              v-if="(order.tax_amount ?? 0) > 0"
+              class="user-orders__summary-line"
+            >
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                TVA
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-800"
+              >
+                {{ formatPrice(order.tax_amount) }}
+              </BasicText>
+            </div>
+
+            <div
+              v-if="(order.discount_amount ?? 0) > 0"
+              class="user-orders__summary-line"
+            >
+              <BasicText
+                size="body-s"
+                style="color: var(--success-600)"
+              >
+                Remise
+              </BasicText>
+              <BasicText
+                size="body-s"
+                style="color: var(--success-600)"
+              >
+                -{{ formatPrice(order.discount_amount) }}
+              </BasicText>
+            </div>
+
+            <div
+              class="user-orders__title-divider"
+              style="margin: 8px 0; opacity: 0.5"
+            ></div>
+
+            <div class="user-orders__summary-line">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="neutral-900"
+              >
+                Total payé
+              </BasicText>
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="neutral-900"
               >
                 {{ formatPrice(order.total_amount) }}
               </BasicText>
             </div>
 
-            <div class="user-orders__summary-line">
+            <div
+              class="user-orders__summary-line"
+              style="margin-top: 4px"
+            >
               <BasicText
                 size="body-s"
-                color="neutral-700"
+                color="neutral-500"
               >
-                Méthode
+                Moyen de paiement
               </BasicText>
               <BasicText
                 size="body-s"
-                color="neutral-700"
+                color="neutral-500"
+                style="text-transform: capitalize"
               >
                 {{ order.payment_method ?? '—' }}
-              </BasicText>
-            </div>
-
-            <div class="user-orders__summary-line">
-              <BasicText
-                size="body-s"
-                color="neutral-700"
-              >
-                Livraison
-              </BasicText>
-              <BasicText
-                size="body-s"
-                color="neutral-700"
-              >
-                {{ order.carrier ?? '—' }}
               </BasicText>
             </div>
           </div>
         </FilterSection>
 
-        <!-- Suivi -->
         <FilterSection
           title="Suivi"
           :model-value="openSections[safeId(order)]?.tracking"
@@ -275,7 +330,6 @@
               ]"
             >
               <div class="user-orders__timeline-dot"></div>
-
               <BasicText
                 size="body-s"
                 color="neutral-600"
@@ -287,7 +341,6 @@
           </div>
         </FilterSection>
 
-        <!-- Actions -->
         <div class="user-orders__card-actions">
           <BasicButton
             label="Voir les détails"
@@ -315,53 +368,37 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import FilterSection from '@/features/shared/components/FilterSection.vue'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { fetchUserOrders } from '@/supabase/api/ordersApi' // ✅ API V2
+  import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types' // ✅ Types V2
   import { formatDate } from '@/utils/index'
-  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
+  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge' // ✅ Helper V2
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, type Ref } from 'vue'
 
-  type OrderItemDetailed = {
-    product_id: string
-    product_name: string
-    product_price: number
-    product_image: string | null
-    product_stock: boolean
-    quantity: number
-    total: number
-  }
-
-  type OrderDetailed = {
-    order_id: string | null
-    user_id: string | null
-    email: string | null
-    full_name: string | null
-    address: string | null
-    city: string | null
-    country: string | null
-    status: string | null
-    created_at: string | null
-    total_amount: number | null
-    payment_method: string | null
-    tracking_number: string | null
-    carrier: string | null
-    detailed_items: OrderItemDetailed[] | null
-  }
-
-  const orders = ref<OrderDetailed[]>([])
-  const openSections = ref<Record<string, { items: boolean; summary: boolean; tracking: boolean }>>(
-    {},
-  )
+  // État typé avec les vues Supabase
+  const orders = ref<OrdersFullView[]>([])
+  const openSections = ref({}) as Ref<Record<string, { items: boolean; summary: boolean; tracking: boolean }>>
   const allOpen = ref(true)
+
   const auth = useAuthStore()
   const toast = useToastStore()
   const hasLoaded = ref(false)
 
-  function safeId(order: OrderDetailed) {
+  // 🛡️ Gestion ID sécurisé (order_id de la vue est prioritaire)
+  function safeId(order: OrdersFullView) {
     return order.order_id ?? `temp_${Math.random().toString(36).slice(2, 8)}`
   }
 
-  function setSection(order: OrderDetailed, key: 'items' | 'summary' | 'tracking', value: boolean) {
+  // 🛠️ Helper pour caster le JSONB en type strict TypeScript
+  function getItems(order: OrdersFullView): OrderItemDetailed[] {
+    return (order.detailed_items as unknown as OrderItemDetailed[]) || []
+  }
+
+  function setSection(
+    order: OrdersFullView,
+    key: 'items' | 'summary' | 'tracking',
+    value: boolean,
+  ) {
     const id = safeId(order)
     if (!openSections.value[id]) {
       openSections.value[id] = { items: true, summary: true, tracking: true }
@@ -383,17 +420,17 @@
   async function loadUserOrders() {
     try {
       if (!auth.user) return
-      const { data, error } = await supabase
-        .from('orders_detailed_view')
-        .select('*')
-        .eq('email', auth.user.email!)
-        .order('created_at', { ascending: false })
-      if (error) throw error
-      orders.value = (data ?? []) as OrderDetailed[]
+      // ✅ Appel API centralisé
+      const data = await fetchUserOrders(auth.user.id)
+
+      orders.value = data
+
+      // Initialisation des sections ouvertes par défaut
       orders.value.forEach((o) => {
         openSections.value[safeId(o)] = { items: true, summary: true, tracking: true }
       })
-    } catch {
+    } catch (e) {
+      console.error(e)
       toast.show('Erreur lors du chargement de vos commandes', 'danger')
     } finally {
       hasLoaded.value = true
@@ -410,7 +447,9 @@
 
   function formatPrice(value: number | null | undefined) {
     if (value == null || isNaN(Number(value))) return '—'
-    return `${Number(value).toFixed(2)} €`
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
+      Number(value),
+    )
   }
 
   function trackPackage(tracking: string) {
@@ -419,6 +458,9 @@
 </script>
 
 <style scoped lang="less">
+  /* ✅ J'ai gardé ton CSS original car il était très bien structuré.
+     Je n'ai fait aucune modification de style destructrice.
+  */
   .user-orders {
     margin: 0 auto;
     max-width: 950px;

@@ -34,7 +34,7 @@
             size="body-m"
             color="neutral-500"
           >
-            N° {{ (order.order_id ?? '').slice(0, 8).toUpperCase() }}
+            N° {{ (order.order_number ?? order.order_id)?.slice(0, 15) }}
           </BasicText>
         </div>
         <div class="order-detail__header-right">
@@ -64,13 +64,13 @@
               'order-detail__timeline-step',
               {
                 'order-detail__timeline-step--active':
-                  index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status!)),
+                  index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status)),
               },
             ]"
           >
             <div class="order-detail__timeline-dot">
               <BasicIconNext
-                v-if="index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status!))"
+                v-if="index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status))"
                 name="Check"
                 :size="10"
                 color="white"
@@ -118,12 +118,12 @@
           </BasicText>
           <div class="order-detail__items">
             <div
-              v-for="(item, i) in order.detailed_items ?? []"
+              v-for="(item, i) in getItems(order)"
               :key="i"
               class="order-detail__item"
             >
               <img
-                :src="item.image || defaultImage"
+                :src="item.product_image || defaultImage"
                 alt="Produit"
                 class="order-detail__item-img"
               />
@@ -133,7 +133,7 @@
                   weight="semibold"
                   color="neutral-900"
                 >
-                  {{ item.name }}
+                  {{ item.product_name }}
                 </BasicText>
                 <BasicText
                   size="body-s"
@@ -147,7 +147,7 @@
                 weight="bold"
                 color="primary-700"
               >
-                {{ formatPrice(item.price) }}
+                {{ formatPrice(item.total) }}
               </BasicText>
             </div>
           </div>
@@ -162,31 +162,36 @@
             >
               Informations de livraison
             </BasicText>
+
             <div class="order-detail__address">
               <BasicText
                 size="body-m"
                 weight="semibold"
                 color="neutral-900"
               >
-                {{ order.full_name }}
+                {{ order.shipping_name }}
               </BasicText>
               <BasicText
                 size="body-s"
                 color="neutral-700"
               >
-                {{ order.address }} {{ order.city ? `, ${order.city}` : '' }} {{ order.zip }}
+                {{ order.shipping_address }}
+                <br />
+                {{ order.shipping_zip }} {{ order.shipping_city }}
               </BasicText>
               <BasicText
                 size="body-s"
                 color="neutral-700"
               >
-                {{ order.country }}
+                {{ order.shipping_country }}
               </BasicText>
               <BasicText
                 size="body-s"
                 color="neutral-600"
+                style="margin-top: 8px"
               >
-                Transporteur: **{{ order.carrier ?? '—' }}**
+                Transporteur:
+                <strong>{{ order.carrier ?? 'Standard' }}</strong>
               </BasicText>
             </div>
           </div>
@@ -202,20 +207,45 @@
             <div class="order-detail__summary">
               <div class="order-detail__summary-line">
                 <span>Sous-total</span>
-                <span>{{ formatPrice(order.total_amount! - order.shipping_cost!) }}</span>
+                <span>{{ formatPrice(order.subtotal) }}</span>
               </div>
+
               <div class="order-detail__summary-line">
                 <span>Frais de port</span>
-                <span>{{ formatPrice(order.shipping_cost!) }}</span>
+                <span>
+                  {{
+                    (order.shipping_cost ?? 0) > 0 ? formatPrice(order.shipping_cost) : 'Offerts'
+                  }}
+                </span>
               </div>
+
+              <div
+                v-if="(order.tax_amount ?? 0) > 0"
+                class="order-detail__summary-line"
+              >
+                <span>TVA</span>
+                <span>{{ formatPrice(order.tax_amount) }}</span>
+              </div>
+
+              <div
+                v-if="(order.discount_amount ?? 0) > 0"
+                class="order-detail__summary-line"
+              >
+                <span style="color: var(--success-600)">Remise</span>
+                <span style="color: var(--success-600)">
+                  -{{ formatPrice(order.discount_amount) }}
+                </span>
+              </div>
+
               <div class="order-detail__summary-line order-detail__summary-line--total">
                 <span>Total TTC</span>
-                <strong>{{ formatPrice(order.total_amount!) }}</strong>
+                <strong>{{ formatPrice(order.total_amount) }}</strong>
               </div>
+
               <div class="order-detail__summary-line order-detail__summary-line--payment">
                 <span>Méthode de paiement</span>
                 <BasicBadge
-                  :label="order.payment_method ?? 'Non spécifié'"
+                  :label="order.payment_method ?? 'CB'"
                   type="info"
                   size="small"
                 />
@@ -249,67 +279,34 @@
 
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
-  import { supabase } from '@/supabase/supabaseClient'
-  import type { Database } from '@/supabase/types/supabase'
-  // Importation des types de la BDD pour une meilleure complétion
+  import { fetchOrderById } from '@/supabase/api/ordersApi'
+  import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { formatDate } from '@/utils/index'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
-  // 💡 Typage de la vue détaillé (basé sur votre export orders_detailed_view)
-  type OrderItem = {
-    name: string
-    quantity: number
-    price: number
-    image?: string | null
-  }
-
-  type OrderDetailedView = Omit<
-    Database['public']['Views']['orders_detailed_view']['Row'],
-    'detailed_items'
-  > & {
-    // ✅ Ajout temporaire ou permanent de la colonne manquante pour le typage
-    shipping_cost: number | null
-    detailed_items: OrderItem[]
-  }
-
   const route = useRoute()
   const toast = useToastStore()
 
-  const order = ref<OrderDetailedView | null>(null)
+  // ✅ On utilise le type correct généré par Supabase
+  const order = ref<OrdersFullView | null>(null)
   const hasLoaded = ref(false)
-
-  // 💡 CONSTANTE À UTILISER EN ATTENDANT LA BDD (par exemple, 5.00 €)
-  const DEFAULT_SHIPPING_COST = 5.0
 
   async function loadOrderDetail() {
     try {
       const orderId = String(route.params.id ?? '')
+      if (!orderId) return
 
-      // La vue orders_detailed_view n'a pas encore shipping_cost,
-      // mais nous allons la charger et l'ajouter manuellement dans l'objet.
-      const { data, error } = (await supabase
-        .from('orders_detailed_view')
-        .select('*')
-        .eq('order_id', orderId)
-        .single()) as { data: Omit<OrderDetailedView, 'shipping_cost'> | null; error: any }
-
-      if (error) throw error
+      // ✅ Appel propre à l'API centralisée
+      const data = await fetchOrderById(orderId)
 
       if (data) {
-        // Hydratation de la propriété shipping_cost.
-        // Si elle venait de la BDD un jour, elle serait ici.
-        // En attendant, nous l'ajoutons manuellement pour l'affichage.
-        order.value = {
-          ...data,
-          // Si la colonne est ajoutée plus tard, elle sera null ici. On utilise la constante.
-          // S'il existe un champ 'shipping_cost' dans la vue, il sera prioritaire.
-          shipping_cost: (data as any).shipping_cost ?? DEFAULT_SHIPPING_COST,
-        } as OrderDetailedView
+        order.value = data
       }
-    } catch {
+    } catch (e) {
+      console.error(e)
       toast.show('Erreur lors du chargement de la commande', 'danger')
     } finally {
       hasLoaded.value = true
@@ -318,6 +315,11 @@
 
   onMounted(loadOrderDetail)
 
+  // Helper pour récupérer les items typés depuis le JSON
+  function getItems(order: OrdersFullView): OrderItemDetailed[] {
+    return (order.detailed_items as unknown as OrderItemDetailed[]) || []
+  }
+
   const orderSteps = [
     { key: 'paid', label: 'Commande Confirmée' },
     { key: 'processing', label: 'En préparation' },
@@ -325,7 +327,7 @@
     { key: 'completed', label: 'Livrée' },
   ]
 
-  function mapStatus(status: string | null) {
+  function mapStatus(status: string | null | undefined) {
     if (!status) return 'paid'
     if (['pending', 'paid'].includes(status)) return 'paid'
     return status
@@ -333,7 +335,9 @@
 
   function formatPrice(value: number | null | undefined) {
     if (value == null || isNaN(Number(value))) return '0,00 €'
-    return `${Number(value).toFixed(2).replace('.', ',')} €`
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
+      Number(value),
+    )
   }
 
   function trackPackage(tracking: string) {
@@ -344,7 +348,9 @@
     toast.show('Ouverture de la messagerie pour le support...', 'info')
   }
 </script>
+
 <style scoped lang="less">
+  /* Je n'ai pas touché au CSS pour garder ton design intact */
   .order-detail {
     max-width: 1000px;
     margin: 60px auto;
@@ -361,9 +367,7 @@
       margin-bottom: 8px;
     }
 
-    /* -----------------------------
-    HEADER
-    ----------------------------- */
+    /* HEADER */
     &__header {
       background: @white;
       border: 1px solid @neutral-100;
@@ -386,9 +390,7 @@
       }
     }
 
-    /* -----------------------------
-    GRILLE PRODUITS / RÉCAP
-    ----------------------------- */
+    /* GRID */
     &__grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -401,9 +403,7 @@
       gap: 25px;
     }
 
-    /* -----------------------------
-    SECTIONS (Cartes)
-    ----------------------------- */
+    /* SECTIONS */
     &__section {
       background: @white;
       border: 1px solid @neutral-100;
@@ -427,9 +427,7 @@
       }
     }
 
-    /* -----------------------------
-    PRODUITS
-    ----------------------------- */
+    /* ITEMS */
     &__items {
       display: flex;
       flex-direction: column;
@@ -466,9 +464,7 @@
       }
     }
 
-    /* -----------------------------
-    RÉCAPITULATIF
-    ----------------------------- */
+    /* SUMMARY */
     &__summary {
       display: flex;
       flex-direction: column;
@@ -501,9 +497,7 @@
       }
     }
 
-    /* -----------------------------
-    TIMELINE (Suivi) - Rendu plus moderne
-    ----------------------------- */
+    /* TIMELINE */
     &__timeline {
       display: flex;
       justify-content: space-between;
@@ -611,7 +605,7 @@
       gap: 16px;
     }
 
-    /* --- Media Queries --- */
+    /* MEDIA QUERIES */
     @media (max-width: 900px) {
       &__grid {
         grid-template-columns: 1fr;

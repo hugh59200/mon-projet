@@ -1,11 +1,6 @@
 // ============================================================
-// 🛒 useCartStore — version 2025 améliorée
+// 🛒 useCartStore — version 2025 V2.0 (Promo Aware)
 // ============================================================
-// ✅ Utilise la vue Supabase `user_cart_view`
-// ✅ Sync directe, sans merge local
-// ✅ Protection contre double chargement (isSyncing)
-// ============================================================
-
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabase } from '@/supabase/supabaseClient'
@@ -172,14 +167,24 @@ export const useCartStore = defineStore('cart', () => {
   )
 
   // ============================================================
-  // 🧮 Computed
+  // 🧮 Computed (V2.0 - Gestion Prix Promo)
   // ============================================================
   const totalItems = computed(() =>
     items.value.reduce((sum, i) => sum + Number(i.quantity ?? 0), 0),
   )
 
+  // ✅ CORRECTION : Utilisation du prix soldé si applicable
   const totalPrice = computed(() =>
-    items.value.reduce((sum, i) => sum + Number(i.product_price ?? 0) * Number(i.quantity ?? 0), 0),
+    items.value.reduce((sum, item) => {
+      const qty = Number(item.quantity ?? 0)
+
+      // Logique V2 : Si en solde, on prend sale_price, sinon price
+      const unitPrice = item.is_on_sale
+        ? Number(item.product_sale_price ?? item.product_price ?? 0)
+        : Number(item.product_price ?? 0)
+
+      return sum + unitPrice * qty
+    }, 0),
   )
 
   // ============================================================
