@@ -2,8 +2,8 @@
 
 export type EmailProviderId = 'resend' | 'mailgun' | 'ses'
 
-const EMAIL_PROVIDER = 'resend' as EmailProviderId
-// const EMAIL_PROVIDER = (Deno.env.get('EMAIL_PROVIDER') ?? 'resend') as EmailProviderId
+// Choix dynamique
+export const EMAIL_PROVIDER = (Deno.env.get('EMAIL_PROVIDER') ?? 'resend') as EmailProviderId
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
 const MAILGUN_API_KEY = Deno.env.get('MAILGUN_API_KEY') ?? ''
@@ -28,17 +28,13 @@ async function sendWithResend(payload: EmailPayload) {
     body: JSON.stringify(payload),
   })
 
-  if (!res.ok) {
-    throw new Error(`Resend error ${res.status}: ${await res.text()}`)
-  }
-
+  if (!res.ok) throw new Error(`Resend error ${res.status}: ${await res.text()}`)
   return res.json()
 }
 
 async function sendWithMailgun(payload: EmailPayload) {
-  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
+  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN)
     throw new Error('MAILGUN_API_KEY ou MAILGUN_DOMAIN manquant')
-  }
 
   const url = `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`
 
@@ -58,10 +54,7 @@ async function sendWithMailgun(payload: EmailPayload) {
     body,
   })
 
-  if (!res.ok) {
-    throw new Error(`Mailgun error ${res.status}: ${await res.text()}`)
-  }
-
+  if (!res.ok) throw new Error(`Mailgun error ${res.status}: ${await res.text()}`)
   return res.json()
 }
 
@@ -75,12 +68,3 @@ export function sendWithProvider(payload: EmailPayload) {
       throw new Error(`Email provider inconnu: ${EMAIL_PROVIDER}`)
   }
 }
-
-// $ curl -s --user 'api:12a77a1f814ac8b98fd4dcd7f5571c4c-e80d8b76-a2b2063d' \
-// >   https://api.mailgun.net/v3/sandboxb93ea55e02094656946885cbae43dcdc.mailgun.org/messages \
-// >   -F from='Mailgun Sandbox <postmaster@sandboxb93ea55e02094656946885cbae43dcdc.mailgun.org>' \
-// >   -F to='bogrand <h.bogrand@gmail.com>' \
-// >   -F subject='Hello bogrand' \
-// >   -F text='Congratulations bogrand, you just sent an email with Mailgun! You are truly awesome!' \
-// >
-// {"id":"<20251119085400.d527000563b0e927@sandboxb93ea55e02094656946885cbae43dcdc.mailgun.org>","message":"Queued. Thank you."}

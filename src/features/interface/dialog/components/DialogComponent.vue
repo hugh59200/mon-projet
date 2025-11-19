@@ -42,18 +42,16 @@
       </section>
     </template>
     <template #actions>
-      <div class="flex-gap-4 flex">
-        <BasicButton
-          v-for="action in actions"
-          :key="action"
-          type="secondary"
-          size="large"
-          :label="wording.actions[action]"
-          :variant="variantType(action)"
-          @click="store.triggerUserAction(action)"
-          class="flex-1"
-        />
-      </div>
+      <BasicButton
+        v-for="action in actions"
+        :key="action"
+        type="secondary"
+        size="large"
+        :label="wording.actions[action]"
+        :variant="variantType(action)"
+        @click="store.triggerUserAction(action)"
+        width="full"
+      />
     </template>
   </ModalComponent>
 </template>

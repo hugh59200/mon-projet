@@ -10,6 +10,7 @@ interface OrderConfirmationBody {
 
 Deno.serve(
   createHandler<OrderConfirmationBody>(async (_req, body) => {
+    console.log('BODY RAW:', body)
     const order_id = body.order_id ?? body.orderId
     if (!order_id) throw new Error('Missing order_id')
 

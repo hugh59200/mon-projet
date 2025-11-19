@@ -1,10 +1,25 @@
 // supabase/utils/sendEmail.ts
 
-import { sendWithProvider } from './emailProvider.ts'
+import { sendWithProvider, EMAIL_PROVIDER } from './emailProvider.ts'
 import { logEmail } from './logEmail.ts'
 
-const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN')!
-const FROM = `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>` // OBLIGATOIRE en sandbox
+const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN') ?? ''
+const RESEND_DOMAIN = Deno.env.get('RESEND_DOMAIN') ?? '' // ton domaine validé Resend
+
+// Contrôle dynamique du From
+function buildFrom() {
+  if (EMAIL_PROVIDER === 'mailgun') {
+    // Obligatoire en sandbox Mailgun
+    return `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>`
+  }
+
+  if (EMAIL_PROVIDER === 'resend') {
+    // Doit être un domaine validé dans Resend
+    return `Fast Peptides <noreply@${RESEND_DOMAIN}>`
+  }
+
+  throw new Error('Provider non supporté pour le champ From')
+}
 
 export async function sendEmail({
   to,
@@ -19,7 +34,9 @@ export async function sendEmail({
   type?: string
   order_id?: string
 }) {
-  console.log(`📧 Sending email via provider | to: ${to} | subject: ${subject}`)
+  const FROM = buildFrom()
+
+  console.log(`📧 Sending email | provider: ${EMAIL_PROVIDER} | from: ${FROM} | to: ${to}`)
 
   try {
     const providerResponse = await sendWithProvider({

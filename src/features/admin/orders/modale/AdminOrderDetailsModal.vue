@@ -95,7 +95,6 @@
           >
             Paiement Stripe
           </BasicText>
-
           <div class="info-row">
             <BasicText><b>Session :</b></BasicText>
             <template v-if="order.stripe_session_id">
@@ -118,7 +117,7 @@
             label="Renvoyer l'email de confirmation"
             type="secondary"
             size="small"
-            @click="resendConfirmation"
+            @click="renvoyerMailConfirmation"
           />
         </div>
         <div
@@ -288,7 +287,6 @@
   const trackingNumber = ref('')
   const selectedStatus = ref<OrderStatus>('pending')
 
-
   const safeProfile = computed<ProfileInfoSafe>(() => {
     const p = order.value?.profile_info
     return {
@@ -399,7 +397,7 @@
     }
   }
 
-  const resendConfirmation = async () => {
+  const renvoyerMailConfirmation = async () => {
     if (!order.value) return
 
     const { error } = await supabase.functions.invoke('order-confirmation', {
