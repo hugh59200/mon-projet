@@ -340,15 +340,16 @@
   }
 
   function toDetailedItems(json: unknown): OrderItemSafe[] {
-    if (Array.isArray(json)) {
-      return json.map((i) => ({
-        product_id: String(i.product_id ?? ''),
-        product_name: String(i.product_name ?? ''),
-        product_price: Number(i.product_price ?? 0),
-        quantity: Number(i.quantity ?? 0),
-      }))
-    }
-    return []
+    if (!Array.isArray(json)) return []
+
+    return json.map((i: any) => ({
+      product_id: String(i.product_id ?? ''),
+      product_name: String(i.product_name ?? i.name ?? 'Produit'),
+      product_price: Number(
+        i.product_price ?? i.price ?? i.unit_price ?? i.total_amount_per_unit ?? 0,
+      ),
+      quantity: Number(i.quantity ?? 1),
+    }))
   }
 
   async function loadEmails() {
@@ -363,11 +364,7 @@
 
   const handleUpdateStatus = async () => {
     if (!order.value) return
-
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
-
-    toast.show('Statut mis à jour ✅', 'success')
-
     await loadOrder()
     await loadEmails()
   }

@@ -27,8 +27,7 @@ export function baseEmailTemplate({
                      padding:14px 32px;
                      border-radius:8px;
                      text-decoration:none;
-                     display:inline-block;
-                     box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+                     display:inline-block;">
                ${ctaLabel}
             </a>
           </td>
@@ -38,53 +37,66 @@ export function baseEmailTemplate({
       : ''
 
   return `
-  <body style="margin:0;padding:0;background:#f0f4f8;font-family:'Segoe UI',Roboto,Arial,sans-serif;">
-    <center style="width:100%;background:#f0f4f8;padding:40px 0;">
-      <div style="max-width:620px;margin:0 auto;">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${title}</title>
+</head>
 
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-          style="background:#fff;border-radius:16px;overflow:hidden;
-                 box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+<body style="margin:0;padding:0;background:#f0f4f8;font-family:'Segoe UI',Roboto,Arial,sans-serif;">
 
-          <!-- ✅ Header -->
-          <tr>
-            <td align="center" style="background:${primary};padding:35px 20px;color:#fff;">
-              <img
-                src="${logoUrl}"
-                width="70"
-                alt="Fast Peptides"
-                style="display:block;margin:0 auto 16px;"
-              />
-              <h1 style="margin:0;font-size:24px;font-weight:700;color:#fff;">
-                ${title}
-              </h1>
-            </td>
-          </tr>
+  <center style="width:100%;background:#f0f4f8;padding:40px 0;">
+    <div style="max-width:620px;margin:0 auto;">
 
-          <!-- ✅ Content -->
-          <tr>
-            <td style="padding:32px 28px;color:#222;line-height:1.6;font-size:15px;">
-              ${bodyHTML}
-              ${ctaBlock}
+      <!-- Wrapper -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+        style="background:#fff;border-radius:16px;overflow:hidden;
+               box-shadow:0 4px 12px rgba(0,0,0,0.08);">
 
-              <hr style="margin:32px 0;border:none;border-top:1px solid #eee;" />
+        <!-- Header -->
+        <tr>
+          <td align="center" style="background:${primary};padding:35px 20px;color:#fff;">
+            <img
+              src="${logoUrl}"
+              width="70"
+              alt="Fast Peptides"
+              style="display:block;margin:0 auto 16px;"
+            />
+            <h1 style="margin:0;font-size:24px;font-weight:700;color:#fff;">
+              ${title}
+            </h1>
+          </td>
+        </tr>
 
-              <p style="font-size:13px;color:#777;text-align:center;margin:0;">
-                L’équipe Fast Peptides 🧬<br/>
-                <a href="https://fastpeptides.com"
-                   style="color:${accent};text-decoration:none;font-weight:500;">
-                  fastpeptides.com
-                </a>
-              </p>
-            </td>
-          </tr>
-        </table>
+        <!-- Content -->
+        <tr>
+          <td style="padding:32px 28px;color:#222;line-height:1.6;font-size:15px;">
+            ${bodyHTML}
 
-        <p style="font-size:12px;color:#999;text-align:center;margin-top:24px;">
-          © ${new Date().getFullYear()} Fast Peptides — Tous droits réservés.
-        </p>
-      </div>
-    </center>
-  </body>
+            ${ctaBlock}
+
+            <hr style="margin:32px 0;border:none;border-top:1px solid #eee;" />
+
+            <p style="font-size:13px;color:#777;text-align:center;margin:0;">
+              L’équipe Fast Peptides 🧬<br/>
+              <a href="https://fastpeptides.com"
+                 style="color:${accent};text-decoration:none;font-weight:500;">
+                fastpeptides.com
+              </a>
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <p style="font-size:12px;color:#999;text-align:center;margin-top:24px;">
+        © ${new Date().getFullYear()} Fast Peptides — Tous droits réservés.
+      </p>
+    </div>
+  </center>
+</body>
+</html>
   `
 }

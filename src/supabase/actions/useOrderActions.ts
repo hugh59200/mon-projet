@@ -14,7 +14,6 @@ export function useOrderActions(fetchData?: () => void) {
   const toast = useToastStore()
   const { showDialog } = useDialog()
 
-  /** ✅ Suppression avec confirmation UI */
   async function deleteOrder(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -54,16 +53,13 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  /** ✅ Changement de statut + webhook email */
   async function changeOrderStatus(order: MinimalOrder, status: OrderStatus) {
     const id = order.order_id ?? order.id
     if (!id) return
 
     try {
-      // ✅ Update DB
       await updateOrderStatusInDB(id, status)
 
-      // ✅ Notifier via Edge Function (envoi mail)
       await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-order-update`, {
         method: 'POST',
         headers: {

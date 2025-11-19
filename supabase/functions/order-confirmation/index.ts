@@ -27,7 +27,11 @@ Deno.serve(
     const html = renderEmailTemplate('confirmation', {
       order_id,
       order_number: orderNumber,
-      items: order.detailed_items ?? [],
+      items: (order.detailed_items ?? []).map((i: any) => ({
+        name: i.product_name ?? 'Produit',
+        quantity: i.quantity ?? 1,
+        price: Number((i.total ?? 0) / (i.quantity ?? 1)),
+      })),
       total_amount: order.total_amount,
       full_name: order.shipping_name,
       created_at: order.created_at,
