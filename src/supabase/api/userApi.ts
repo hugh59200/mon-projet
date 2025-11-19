@@ -19,53 +19,22 @@ export async function fetchUsersWithCount(search = '', limit = 20, offset = 0) {
 }
 
 export async function deleteUserById(id: string) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const { data, error } = await supabase.functions.invoke('delete-user-by-admin', {
+    body: { user_id: id },
+  })
 
-  if (!session?.access_token) {
-    throw new Error('Missing session token')
-  }
-
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user-by-admin`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ user_id: id }),
-    },
-  )
-
-  if (!res.ok) {
-    const txt = await res.text()
-    throw new Error(`Delete failed: ${txt}`)
+  if (error || !data?.success) {
+    throw new Error(data?.error ?? error?.message ?? 'Delete failed')
   }
 }
 
 export async function deleteUserSelf() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session?.access_token) {
-    throw new Error('Missing session token')
-  }
-
-  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account-self`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({}),
+  const { data, error } = await supabase.functions.invoke('delete-account-self', {
+    body: {},
   })
 
-  if (!res.ok) {
-    const txt = await res.text()
-    throw new Error(`Delete failed: ${txt}`)
+  if (error || !data?.success) {
+    throw new Error(data?.error ?? error?.message ?? 'Delete failed')
   }
 
   await supabase.auth.signOut()

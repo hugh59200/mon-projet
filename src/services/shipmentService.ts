@@ -30,27 +30,22 @@ export async function markOrderAsShipped(payload: ShipmentPayload) {
   }
 
   // 📤 2️⃣ Envoie l’email via la fonction `order-status-update`
-  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-status-update`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-    },
-    body: JSON.stringify({
+  const { data, error } = await supabase.functions.invoke('order-status-update', {
+    body: {
       order_id: payload.order_id,
       status: 'shipped',
       email: payload.email,
       full_name: payload.full_name,
       tracking_number: payload.tracking_number,
       carrier: payload.carrier,
-    }),
+    },
   })
 
-  const data = await res.json()
-
-  if (!data.success) {
-    console.error('⚠️ Erreur lors de l’envoi de l’email expédition :', data)
-    throw new Error('Erreur lors de l’envoi de l’email d’expédition')
+  if (error || !data?.success) {
+    console.error('⚠️ Erreur lors de l’envoi de l’email expédition :', error ?? data)
+    throw new Error(
+      data?.error ?? error?.message ?? 'Erreur lors de l’envoi de l’email d’expédition',
+    )
   }
 
   console.log('✅ Email expédition envoyé avec succès :', data)

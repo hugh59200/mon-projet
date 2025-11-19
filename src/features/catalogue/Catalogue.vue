@@ -113,7 +113,7 @@
               :current-page="page"
               :nb-pages="nbPages"
               :nb-pages-max="7"
-              @change="(p) => (page = p)"
+              @change="(p: any) => (page = p)"
             />
           </div>
         </WrapperLoader>

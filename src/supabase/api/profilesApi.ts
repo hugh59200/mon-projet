@@ -51,18 +51,11 @@ export async function updatePasswordApi(newPassword: string) {
 }
 
 export async function deleteAccountApi() {
-  const { data } = await supabase.auth.getSession()
-  const token = data.session?.access_token
-  if (!token) throw new Error('Utilisateur non authentifié')
-
-  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-    },
+  const { data, error } = await supabase.functions.invoke('delete-account', {
+    body: {},
   })
 
-  const json = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error || 'Erreur suppression compte')
+  if (error || !data?.success) {
+    throw new Error(data?.error ?? error?.message ?? 'Erreur suppression compte')
+  }
 }
