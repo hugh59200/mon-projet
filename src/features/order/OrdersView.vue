@@ -12,13 +12,11 @@
         weight="bold"
         class="user-orders__title"
       >
-        Mes
-        <span>commandes</span>
+        {{ splitTitle.start }}
+        <span v-if="splitTitle.end">{{ splitTitle.end }}</span>
       </BasicText>
 
-      <div class="user-orders__subtitle">
-        Retrouvez ici l’historique de toutes vos commandes passées 🧾
-      </div>
+      <div class="user-orders__subtitle">{{ description }} 🧾</div>
 
       <div class="user-orders__title-divider"></div>
     </div>
@@ -71,6 +69,7 @@
 
       <div
         v-for="(order, index) in orders"
+        :key="safeId(order)"
         class="user-orders__card"
         v-motion="{
           initial: { opacity: 0, y: 40, scale: 0.97 },
@@ -368,14 +367,40 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import FilterSection from '@/features/shared/components/FilterSection.vue'
-  import { fetchUserOrders } from '@/supabase/api/ordersApi' // ✅ API V2
-  import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types' // ✅ Types V2
+  import { fetchUserOrders } from '@/supabase/api/ordersApi'
+  import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
-  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge' // ✅ Helper V2
+  import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref, type Ref } from 'vue'
+  import { computed, onMounted, ref, type Ref } from 'vue'
+  import { useRoute } from 'vue-router'
 
-  // État typé avec les vues Supabase
+  const route = useRoute()
+
+  const splitTitle = computed(() => {
+    let rawTitle = (route.meta.heading as string) || (route.meta.label as string)
+
+    if (!rawTitle && route.meta.title) {
+      rawTitle = (route.meta.title as string).replace(' – Fast Peptides', '')
+    }
+
+    if (!rawTitle) rawTitle = 'Mes commandes'
+
+    const parts = rawTitle.trim().split(' ')
+    if (parts.length > 1) {
+      const lastWord = parts.pop()
+      return { start: parts.join(' '), end: lastWord }
+    }
+    return { start: rawTitle, end: '' }
+  })
+
+  const description = computed(() => {
+    return (
+      (route.meta.description as string) ||
+      'Retrouvez ici l’historique de toutes vos commandes passées'
+    )
+  })
+
   const orders = ref<OrdersFullView[]>([])
   const openSections = ref({}) as Ref<
     Record<string, { items: boolean; summary: boolean; tracking: boolean }>
@@ -387,7 +412,6 @@
   const toast = useToastStore()
   const hasLoaded = ref(false)
 
-  // 🛠️ Helper pour caster le JSONB en type strict TypeScript
   function getItems(order: any): OrderItemDetailed[] {
     return (order.detailed_items as unknown as OrderItemDetailed[]) || []
   }
@@ -396,12 +420,7 @@
     return (order.order_id || `temp_${Math.random().toString(36).slice(2, 8)}`) as string
   }
 
-  // 👇 Update this function
-  function setSection(
-    order: any, // <--- Change from 'OrdersFullView' to 'any'
-    key: 'items' | 'summary' | 'tracking',
-    value: boolean,
-  ) {
+  function setSection(order: any, key: 'items' | 'summary' | 'tracking', value: boolean) {
     const id = safeId(order)
     if (!openSections.value[id]) {
       openSections.value[id] = { items: true, summary: true, tracking: true }
@@ -409,7 +428,6 @@
     openSections.value[id][key] = value
   }
 
-  // ... rest of the code
   function toggleAllSections() {
     allOpen.value = !allOpen.value
     Object.keys(openSections.value).forEach((id) => {
@@ -424,12 +442,9 @@
   async function loadUserOrders() {
     try {
       if (!auth.user) return
-      // ✅ Appel API centralisé
       const data = await fetchUserOrders(auth.user.id)
-
       orders.value = data
 
-      // Initialisation des sections ouvertes par défaut
       orders.value.forEach((o) => {
         openSections.value[safeId(o)] = { items: true, summary: true, tracking: true }
       })
@@ -462,9 +477,6 @@
 </script>
 
 <style scoped lang="less">
-  /* ✅ J'ai gardé ton CSS original car il était très bien structuré.
-     Je n'ai fait aucune modification de style destructrice.
-  */
   .user-orders {
     margin: 0 auto;
     max-width: 950px;

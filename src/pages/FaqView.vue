@@ -1,29 +1,6 @@
 <template>
   <section class="faq__page">
-    <header class="faq__header">
-      <div class="faq__header-icon">
-        <BasicIconNext
-          name="HelpCircle"
-          :size="32"
-          color="primary-600"
-        />
-      </div>
-      <div class="section-title">
-        <BasicText
-          size="h2"
-          weight="bold"
-          class="section-title__text"
-        >
-          Foire aux
-          <span>questions</span>
-        </BasicText>
-
-        <div class="section-title__subtitle">
-          Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou
-          vétérinaire.
-        </div>
-      </div>
-    </header>
+    <PageHeader />
     <div class="faq__layout">
       <aside class="faq__filters">
         <div class="faq__filters-card">
@@ -49,6 +26,7 @@
           />
         </div>
       </aside>
+
       <div class="faq__content">
         <WrapperLoader
           :loading="false"
@@ -70,6 +48,7 @@
         </WrapperLoader>
       </div>
     </div>
+
     <footer class="faq__footer">
       <BasicText color="neutral-700">
         Une question restante ? Notre support vous répond rapidement.
@@ -87,7 +66,10 @@
 <script setup lang="ts">
   import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import FilterGroup from '@/features/shared/components/FilterGroup.vue'
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+  // Plus besoin de useRoute ici pour le titre, PageHeader s'en occupe
 
   type CatId = 'qualite' | 'stockage' | 'commande' | 'shipping' | 'conformite' | 'retour'
 
@@ -344,30 +326,6 @@
 </script>
 
 <style scoped lang="less">
-  .section-title {
-    text-align: center;
-    margin-bottom: 22px;
-
-    &__text {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: @neutral-900;
-      margin-bottom: 6px;
-
-      span {
-        background: linear-gradient(90deg, var(--primary-600), var(--primary-400));
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    &__subtitle {
-      font-size: 15px;
-      color: @neutral-600;
-    }
-  }
   .faq {
     /* PAGE */
     &__page {
@@ -381,76 +339,6 @@
       @media (max-width: 768px) {
         padding: 32px 16px;
         gap: 32px;
-      }
-    }
-
-    /* HEADER */
-    &__header {
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 28px 24px;
-      border-radius: 18px;
-
-      /* Glass */
-      background: color-mix(in srgb, var(--secondary-900) 6%, rgba(255, 255, 255, 0.04));
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 10px 26px rgba(0, 0, 0, 0.09),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-
-      /* Glow top */
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          circle at 50% 0%,
-          rgba(var(--primary-500-rgb), 0.2) 0%,
-          transparent 70%
-        );
-        pointer-events: none;
-      }
-
-      > * {
-        position: relative;
-        z-index: 1;
-      }
-
-      &-icon {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 4px;
-
-        /* halo doux autour de l’icône */
-        &::before {
-          content: '';
-          position: absolute;
-          width: 52px;
-          height: 52px;
-          border-radius: 50%;
-          background: radial-gradient(
-            circle,
-            rgba(var(--primary-500-rgb), 0.22) 0%,
-            transparent 75%
-          );
-        }
-      }
-
-      &-subtitle {
-        max-width: 620px;
-        margin: 0 auto;
-        font-size: 14px;
-        color: @neutral-600;
-        opacity: 0.9;
-        text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
       }
     }
 

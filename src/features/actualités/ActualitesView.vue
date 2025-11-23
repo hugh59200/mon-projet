@@ -1,5 +1,6 @@
 <template>
   <div class="actualites page">
+    <PageHeader />
     <BasicCarousel
       v-if="topics.length"
       :items="topics"
@@ -34,32 +35,6 @@
         </RouterLink>
       </template>
     </BasicCarousel>
-    <div
-      class="actualites__header"
-      v-responsive-animate.slide.once
-    >
-      <div
-        class="actualites__header-title-wrapper"
-        v-motion="{
-          initial: { opacity: 0, y: -20 },
-          enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
-        }"
-      >
-        <BasicText
-          size="h1"
-          weight="bold"
-          class="actualites__header-title"
-        >
-          Nos
-          <span>actualités</span>
-        </BasicText>
-
-        <div class="actualites__header-subtitle">
-          Derniers articles, recherches & informations importantes 📚
-        </div>
-      </div>
-      <div class="actualites__header-separator"></div>
-    </div>
     <RouterLink
       v-if="featuredArticle"
       :to="`/actualites/${featuredArticle.slug}`"
@@ -105,6 +80,7 @@
         </BasicText>
       </div>
     </RouterLink>
+
     <BasicText
       size="h2"
       weight="semibold"
@@ -164,6 +140,7 @@
 </template>
 
 <script setup lang="ts">
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
   import BasicCarousel from '@designSystem/components/basic/carousel/BasicCarousel.vue'
@@ -172,24 +149,23 @@
   import { computed, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useNewsStore } from './store/useNewsStore'
-  // Supposons que votre type Article est importé ici:
-  // import type { Article } from '@/supabase/types/supabase.types'
 
   const route = useRoute()
+
+  // --- Logique métier existante ---
 
   const newsStore = useNewsStore()
   const { loadTopics, loadArticles } = newsStore
   const { topics, articles } = storeToRefs(newsStore)
 
   const activeCategory = computed(() => route.query.categorie as string | undefined)
+
+  // Ce titre reste piloté par le store car il change selon le filtre cliqué
   const activeTopicLabel = computed(
     () => topics.value.find((t) => t.id === activeCategory.value)?.label || 'Tous nos articles',
   )
 
-  // LOGIQUE POUR L'ARTICLE VEDETTE ET LA GRILLE
-  // Le premier article est l'article en vedette
   const featuredArticle = computed(() => articles.value[0])
-  // Les autres articles forment la grille (à partir de l'index 1)
   const nonFeaturedArticles = computed(() => articles.value.slice(1))
 
   onMounted(async () => {
@@ -209,8 +185,8 @@
   .actualites {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* Augmenté l'espacement pour l'effet professionnel */
-    padding: 30px 0; /* Padding ajusté */
+    gap: 40px;
+    padding: 30px 0;
 
     // Mixin pour les ombres des cartes
     .card-shadow(@shadow) {
@@ -224,62 +200,7 @@
     .card-hover-effect() {
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); // Ombre plus forte
-      }
-    }
-
-    &__header {
-      .card-shadow(0 8px 20px rgba(0, 0, 0, 0.1));
-
-      border-radius: 18px;
-      padding: 34px 32px;
-      margin-bottom: 10px;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      background: var(--secondary-200);
-      backdrop-filter: blur(26px);
-      -webkit-backdrop-filter: blur(26px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-
-      &-title-wrapper {
-        text-align: center;
-      }
-
-      &-title {
-        font-size: 30px;
-        font-weight: 800;
-        letter-spacing: -0.3px;
-        color: @neutral-100;
-        margin-bottom: 6px;
-
-        span {
-          background: linear-gradient(
-            90deg,
-            var(--secondary-600),
-            var(--primary-500),
-            var(--primary-200)
-          );
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          filter: drop-shadow(0 1px 4px rgba(var(--primary-400-rgb), 0.18));
-        }
-      }
-
-      &-subtitle {
-        font-size: 15px;
-        color: rgba(255, 255, 255, 0.86);
-        opacity: 0.92;
-        margin-top: 2px;
-        text-shadow: 0 0 6px rgba(255, 255, 255, 0.06);
-      }
-
-      &-separator {
-        width: 100%;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.18);
-        margin: 14px auto 4px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
       }
     }
 
@@ -320,17 +241,17 @@
     // Styles du titre de la grille
     &__title {
       font-size: clamp(1.8rem, 2.5vw, 2.2rem);
-      margin-top: 10px; // Espacement clair entre featured et la grille
+      margin-top: 10px;
     }
 
-    /* --- NOUVEAUX STYLES: ARTICLE EN VEDETTE (FEATURED) --- */
+    /* --- STYLES: ARTICLE EN VEDETTE (FEATURED) --- */
     &__featured {
       display: flex;
       gap: 40px;
       padding: 30px;
       margin-bottom: 10px;
       border-radius: 20px;
-      background: @neutral-50; // Fond clair pour le contraste
+      background: @neutral-50;
 
       .card-shadow(0 8px 25px rgba(0, 0, 0, 0.08));
       .card-hover-effect();
@@ -398,7 +319,7 @@
     &__articles {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 36px 30px; /* Augmenté l'espacement entre les cartes */
+      gap: 36px 30px;
       padding: 0 12px;
 
       @media (max-width: 768px) {

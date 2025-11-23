@@ -3,31 +3,7 @@
     class="catalogue"
     v-responsive-animate.fade.once
   >
-    <header
-      class="catalogue__header"
-      v-responsive-animate.slide.once
-    >
-      <div
-        class="catalogue__title-wrapper"
-        v-motion="{
-          initial: { opacity: 0, y: -20 },
-          enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, delay: 100 } },
-        }"
-      >
-        <BasicText
-          size="h1"
-          weight="bold"
-          class="catalogue__title"
-        >
-          Notre
-          <span>catalogue</span>
-        </BasicText>
-
-        <div class="catalogue__subtitle">
-          Découvrez l’ensemble de nos peptides & produits disponibles ⚗️
-        </div>
-      </div>
-
+    <PageHeader>
       <div
         v-if="isMobile"
         class="catalogue__mobile-controls"
@@ -49,7 +25,7 @@
           @click="showFilters = true"
         />
       </div>
-    </header>
+    </PageHeader>
 
     <div class="catalogue__body">
       <aside
@@ -195,8 +171,9 @@
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import type { Products } from '@/supabase/types/supabase.types' // ✅ Type V2
+  import type { Products } from '@/supabase/types/supabase.types'
   import { BasicButton } from '@designSystem/components/basic/button'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { storeToRefs } from 'pinia'
@@ -209,13 +186,14 @@
   const productsStore = useProductsStore()
   const { products, priceRange, hasLoaded, loading } = storeToRefs(productsStore)
   const { load } = productsStore
+
   const route = useRoute()
   const { isMobile } = useDeviceBreakpoint()
   const router = useRouter()
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
 
-  // --- Logique des Filtres (Attention: vérifie bien useFilters.ts pour le stock > 0) ---
+  // --- Logique des Filtres ---
   const {
     selectedCategories,
     inStockOnly,
@@ -282,7 +260,8 @@
       selectedTags.value = [initialTag]
     }
 
-    document.title = 'Catalogue de Peptides – Fast Peptides'
+    // On garde le titre du document synchronisé avec le titre SEO de la route
+    document.title = (route.meta.title as string) || 'Catalogue de Peptides – Fast Peptides'
   })
 
   watch(
@@ -300,7 +279,6 @@
 </script>
 
 <style scoped lang="less">
-  /* Style inchangé */
   .catalogue {
     width: 100%;
     min-height: 100vh;
@@ -317,50 +295,14 @@
       }
     }
 
-    &__title-wrapper {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    &__title {
-      font-size: 38px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: @neutral-100;
-      margin-bottom: 6px;
-
-      span {
-        background: linear-gradient(90deg, var(--primary-500), var(--primary-300));
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    &__subtitle {
-      font-size: 15px;
-      color: @neutral-300;
-      opacity: 0.85;
-    }
-
-    &__header {
-      border-radius: 16px;
-      padding: 20px 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-
-      background: rgba(var(--secondary-900-rgb), 0.85);
-      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
-
-      box-shadow:
-        0 8px 28px fade(#000, 35%),
-        inset 0 0 0 1px fade(@white, 12%);
-      transition: all 0.25s ease;
-    }
-
     &__mobile-controls {
-      display: none;
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     &__search-input {
@@ -500,27 +442,9 @@
       .catalogue__search-input-desktop {
         display: none;
       }
-
-      .catalogue__mobile-controls {
-        display: flex;
-        gap: 12px;
-      }
-
-      .catalogue__title {
-        font-size: 32px;
-      }
     }
 
     @media (max-width: 600px) {
-      .catalogue__header {
-        padding: 16px;
-      }
-
-      .catalogue__mobile-controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
       .catalogue__grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         justify-content: center;

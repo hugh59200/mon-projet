@@ -11,9 +11,6 @@ import './RouteMeta'
 import { registerBaseGuard } from './registerBaseGuard'
 
 const routes: Array<RouteRecordRaw> = [
-  /* -------------------------------------------------------------------------- */
-  /* 🏠 PUBLIC                                                                 */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/',
     name: 'home',
@@ -27,10 +24,6 @@ const routes: Array<RouteRecordRaw> = [
         'Découvrez Fast Peptides, la référence européenne pour les peptides de recherche certifiés et livrés rapidement.',
     },
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* 🔐 AUTH (overlay complet)                                                  */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/auth',
     component: () => import('@/features/auth/AuthOverlay.vue'),
@@ -45,9 +38,6 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  /* -------------------------------------------------------------------------- */
-  /* 🧭 PROFIL & COMPTE                                                         */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/auth',
     component: () => import('@/features/auth/AuthOverlay.vue'),
@@ -92,13 +82,13 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Gérez vos informations personnelles, préférences et sécurité de votre compte.',
     },
   },
-
   {
     path: '/profil/commandes',
     name: 'orders',
     component: () => import('@/features/order/OrdersView.vue'),
     meta: {
       requiresAuth: true,
+      heading: 'Mes commandes',
       title: 'Mes commandes – Fast Peptides',
       description: 'Retrouvez toutes vos commandes précédentes sur Fast Peptides.',
     },
@@ -112,10 +102,6 @@ const routes: Array<RouteRecordRaw> = [
       getTitle: (route) => `Commande #${route.params.id as string} – Fast Peptides`,
     },
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* 🧾 AUTRES ROUTES AUTH                                                     */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/update-password',
     name: 'update-password',
@@ -140,10 +126,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/auth/AccessDeniedView.vue'),
     meta: { title: 'Accès refusé – Fast Peptides' },
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* 🧪 CATALOGUE                                                              */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/catalogue',
     name: 'catalogue',
@@ -153,7 +135,8 @@ const routes: Array<RouteRecordRaw> = [
       icon: 'Boxes',
       order: 2,
       title: 'Catalogue – Fast Peptides',
-      description: 'Explorez notre catalogue complet de peptides de recherche de haute qualité.',
+      heading: 'Notre catalogue',
+      description: 'Découvrez l’ensemble de nos peptides & produits disponibles pour la recherche.',
     },
   },
   {
@@ -166,10 +149,6 @@ const routes: Array<RouteRecordRaw> = [
         `Découvrez le peptide ${route.params.id as string} sur Fast Peptides.`,
     },
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* 📰 ACTUALITÉS                                                             */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/actualites',
     name: 'actualites',
@@ -178,9 +157,9 @@ const routes: Array<RouteRecordRaw> = [
       label: 'Actualités',
       icon: 'Newspaper',
       order: 3,
+      heading: 'Nos actualités',
       title: 'Actualités – Fast Peptides',
-      description:
-        'Découvrez les dernières actualités, études et innovations dans le domaine des peptides sur Fast Peptides.',
+      description: 'Derniers articles, recherches & informations importantes',
     },
   },
   {
@@ -192,18 +171,15 @@ const routes: Array<RouteRecordRaw> = [
       description: 'Découvrez les détails de cette actualité sur Fast Peptides.',
     },
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* 🛒 PANIER & PAIEMENT                                                      */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/panier',
     name: 'cart',
     component: () => import('@/pages/PanierView.vue'),
     meta: {
       requiresAuth: true,
+      heading: 'Mon panier',
       title: 'Mon panier – Fast Peptides',
-      description: 'Consultez les produits ajoutés à votre panier avant de valider votre commande.',
+      description: 'Vérifiez vos articles, ajustez les quantités et validez votre commande.',
     },
   },
   {
@@ -241,9 +217,6 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  /* -------------------------------------------------------------------------- */
-  /* 🧑‍💼 ADMIN                                                                */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/admin',
     component: () => import('@/features/admin/AdminTabsView.vue'),
@@ -312,10 +285,6 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-
-  /* -------------------------------------------------------------------------- */
-  /* ❓ FAQ                                                                     */
-  /* -------------------------------------------------------------------------- */
   {
     path: '/faq',
     name: 'faq',
@@ -324,9 +293,10 @@ const routes: Array<RouteRecordRaw> = [
       label: 'FAQ',
       icon: 'HelpCircle',
       order: 4,
+      heading: 'Foire aux questions',
       title: 'FAQ – Fast Peptides',
       description:
-        'Questions fréquentes sur la qualité, la manipulation, l’expédition et la conformité (RUO) des peptides.',
+        'Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou vétérinaire.',
     },
   },
 ]
