@@ -68,7 +68,7 @@
 
       <div class="home__hero-image">
         <img
-          src="../assets/peptides-hero.jpg"
+          src="../assets/peptides-hero.png"
           alt="Flacon de peptide pour usage recherche"
           class="home__image"
         />

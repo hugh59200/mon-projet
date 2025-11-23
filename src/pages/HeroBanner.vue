@@ -7,68 +7,71 @@
       class="hero-banner__glow"
       ref="glowLayer"
     ></div>
+
     <div
       class="hero-banner__top"
       ref="topSection"
     >
-      <!-- panneau texte à gauche -->
       <div class="hero-banner__panel">
         <div class="hero-banner__top-text">
-          <!-- EYEBROW -->
           <BasicText
             size="body-s"
-            color="primary-500"
+            color="primary-600"
             class="hero-banner__eyebrow"
           >
             Ressources pédagogiques
           </BasicText>
+
           <BasicText
             size="h3"
             weight="bold"
-            color="primary-700"
+            color="neutral-900"
           >
             Comprendre les peptides avant vos recherches.
           </BasicText>
+
           <BasicText
             size="body-m"
-            color="neutral-300"
+            color="neutral-600"
             class="hero-banner__top-sub"
           >
             Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
             peptides dans vos projets de recherche.
           </BasicText>
+
           <ul class="hero-banner__bullets">
             <li>
               <BasicIconNext
                 name="CheckCircle"
-                :size="16"
-                color="primary-500"
+                :size="18"
+                color="success-600"
               />
-              <BasicText color="neutral-100">
-                Vulgarisation claire pour équipes R&amp;D et laboratoires.
+              <BasicText color="neutral-700">
+                Vulgarisation claire pour équipes R&D et laboratoires.
               </BasicText>
             </li>
             <li>
               <BasicIconNext
                 name="BookOpenText"
-                :size="16"
-                color="primary-500"
+                :size="18"
+                color="primary-600"
               />
-              <BasicText color="neutral-50">
+              <BasicText color="neutral-700">
                 Ressources externes sélectionnées : articles, vidéos, revues.
               </BasicText>
             </li>
             <li>
               <BasicIconNext
                 name="ShieldCheck"
-                :size="16"
-                color="primary-500"
+                :size="18"
+                color="warning-600"
               />
-              <BasicText color="neutral-100">
+              <BasicText color="neutral-700">
                 Rappel constant : recherche exclusivement – aucun usage humain.
               </BasicText>
             </li>
           </ul>
+
           <div class="hero-banner__cta-row">
             <BasicButton
               label="Explorer les ressources pédagogiques"
@@ -76,7 +79,7 @@
               variant="filled"
               size="medium"
               width="full"
-              @click="$router.push('/ressources')"
+              @click="$router.push('/actualites')"
             />
             <BasicText
               size="body-s"
@@ -88,6 +91,7 @@
           </div>
         </div>
       </div>
+
       <div class="hero-banner__personas">
         <article
           v-for="persona in personas"
@@ -102,7 +106,7 @@
             />
             <BasicText
               class="persona-card__tag"
-              color="neutral-0"
+              color="neutral-700"
             >
               {{ persona.tag }}
             </BasicText>
@@ -117,7 +121,7 @@
             </BasicText>
             <BasicText
               size="body-s"
-              color="neutral-600"
+              color="neutral-500"
             >
               {{ persona.role }}
             </BasicText>
@@ -125,6 +129,7 @@
         </article>
       </div>
     </div>
+
     <div
       class="hero-banner__bottom"
       ref="carouselContainer"
@@ -133,51 +138,49 @@
         <div class="hero-banner__bottom-header">
           <BasicText
             weight="bold"
-            color="neutral-200"
+            color="neutral-800"
           >
             Quelques peptides de notre catalogue
           </BasicText>
           <BasicText
             fontStyle="italic"
-            color="neutral-400"
+            color="neutral-500"
+            size="body-s"
           >
             Research only – Not for human use
           </BasicText>
         </div>
+
         <div
           class="scroll-track"
           ref="scrollTrack"
         >
-          <div
-            v-for="p in peptides"
-            :key="p.id"
-            class="peptide-item"
-            @click="goToProduct(p)"
-            role="button"
-            tabindex="0"
-            @keyup.enter="goToProduct(p)"
+          <template
+            v-for="i in 2"
+            :key="i"
           >
-            <img
-              :src="p.image || '/images/default-peptide.png'"
-              :alt="p.name"
-            />
-            <BasicText color="white">{{ p.name }}</BasicText>
-          </div>
-          <div
-            v-for="p in peptides"
-            :key="'dup-' + p.id"
-            class="peptide-item"
-            @click="$router.push('/catalogue')"
-          >
-            <img
-              :src="p.image || '/images/default-peptide.png'"
-              :alt="p.name"
-              loading="lazy"
-            />
-            <BasicText color="white">
-              {{ p.name }}
-            </BasicText>
-          </div>
+            <div
+              v-for="p in peptides"
+              :key="p.id + '-' + i"
+              class="peptide-item"
+              @click="goToProduct(p)"
+              role="button"
+              tabindex="0"
+            >
+              <div class="peptide-item__img-wrapper">
+                <img
+                  :src="p.image || '/images/default-peptide.png'"
+                  :alt="p.name"
+                />
+              </div>
+              <BasicText
+                size="body-s"
+                color="neutral-700"
+              >
+                {{ p.name }}
+              </BasicText>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -188,6 +191,7 @@
   import personaLab from '@/assets/banners/hero/persona-lab.png'
   import personaPhd from '@/assets/banners/hero/persona-phd.png'
   import personaRd from '@/assets/banners/hero/persona-rd.png'
+  import personaQuality from '@/assets/banners/hero/persona-quality.png'
   import { useProductsStore } from '@/features/catalogue/composables/useProducts'
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -214,7 +218,6 @@
   const carouselContainer = ref<HTMLElement>()
 
   let scrollAnim: gsap.core.Tween | null = null
-  let mouseHandler: ((e: MouseEvent) => void) | null = null
 
   type Persona = {
     id: string
@@ -232,15 +235,15 @@
       role: 'Chercheuse en peptides – équipe R&D',
       tag: 'Recherche fondamentale',
       image: personaRd,
-      alt: 'Chercheuse en laboratoire souriante devant un écran de données',
+      alt: 'Chercheuse en laboratoire',
     },
     {
       id: 'lab',
       name: 'Pr. K. Almeida',
-      role: 'Responsable de laboratoire universitaire',
+      role: 'Responsable de laboratoire',
       tag: 'Laboratoire académique',
       image: personaLab,
-      alt: 'Responsable de laboratoire discutant avec un collègue dans un environnement lumineux',
+      alt: 'Responsable de laboratoire',
     },
     {
       id: 'phd',
@@ -248,15 +251,15 @@
       role: 'Doctorant en sciences du vivant',
       tag: 'Projet de thèse',
       image: personaPhd,
-      alt: 'Jeune doctorant prenant des notes avec une ambiance chaleureuse',
+      alt: 'Jeune doctorant',
     },
     {
       id: 'quality',
       name: 'Dr. S. Meyer',
       role: 'Référent qualité & conformité',
       tag: 'Qualité & conformité',
-      image: personaLab,
-      alt: 'Scientifiques discutant des résultats dans un laboratoire lumineux',
+      image: personaQuality, 
+      alt: 'Scientifiques discutant',
     },
   ])
 
@@ -282,21 +285,6 @@
       if (cards.length) {
         tl.from(cards, { y: 28, opacity: 0, stagger: 0.12, duration: 0.45 }, '-=0.2')
       }
-
-      // léger mouvement au scroll pour les personas
-      cards.forEach((el, i) => {
-        const baseShift = i % 2 === 0 ? -6 : 8
-        gsap.to(el, {
-          y: baseShift,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: heroSection.value,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        })
-      })
     }
 
     // Carrousel horizontal infini
@@ -304,7 +292,7 @@
     if (track) {
       scrollAnim = gsap.to(track, {
         xPercent: -50,
-        duration: 35,
+        duration: 45, // Plus lent pour être lisible
         ease: 'linear',
         repeat: -1,
       })
@@ -316,7 +304,7 @@
       container.addEventListener('mouseleave', () => scrollAnim?.resume())
     }
 
-    // Glow animé + parallax souris
+    // Glow animé
     if (glowLayer.value) {
       gsap.to(glowLayer.value, {
         backgroundPosition: '200% 100%',
@@ -325,441 +313,314 @@
         repeat: -1,
         yoyo: true,
       })
-
-      gsap.to(glowLayer.value, {
-        yPercent: -6,
-        scale: 1.03,
-        opacity: 0.7,
-        scrollTrigger: {
-          trigger: heroSection.value,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
-      })
-
-      if (window.innerWidth > 768) {
-        const glow = glowLayer.value
-        mouseHandler = (e: MouseEvent) => {
-          const x = (e.clientX / window.innerWidth - 0.5) * 24
-          const y = (e.clientY / window.innerHeight - 0.5) * 24
-          gsap.to(glow, { x, y, duration: 0.8, ease: 'power2.out' })
-        }
-        window.addEventListener('mousemove', mouseHandler)
-      }
     }
   })
 
   onBeforeUnmount(() => {
     scrollAnim?.kill()
     ScrollTrigger.getAll().forEach((t) => t.kill())
-
-    if (mouseHandler) {
-      window.removeEventListener('mousemove', mouseHandler)
-      mouseHandler = null
-    }
   })
 </script>
 
 <style scoped lang="less">
-  /* =========================================================
-   HERO BANNER — BEM + LESS NESTING + GLASS UI Premium
-   ========================================================= */
-
   .hero-banner {
     position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 18px;
+    border-radius: 24px;
     overflow: hidden;
+    margin-top: 40px; // Espace avec le composant précédent
 
-    /* 🔮 Glass container */
-    background: rgba(var(--secondary-900-rgb), 0.35);
+    /* ✅ Style Glassmorphism Blanc */
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(24px);
-    border: 1px solid color-mix(in srgb, @neutral-300 22%, transparent);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow:
-      0 30px 80px fade(#000, 40%),
-      inset 0 0 0 1px fade(@white, 10%);
+      0 20px 40px rgba(0, 0, 0, 0.04),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 
-    /* =========================================================
-     GLOW BACKGROUND
-     ========================================================= */
     &__glow {
       position: absolute;
-      inset: -120px;
+      inset: -50%;
       z-index: 0;
-      filter: blur(80px);
-      opacity: 0.55;
+      filter: blur(100px);
+      opacity: 0.3;
+      pointer-events: none;
 
-      /* Glow thématique Neural Blue + Sonic Indigo */
+      /* Glow plus doux (bleu ciel / blanc) */
       background:
-        radial-gradient(
-          circle at 25% 20%,
-          rgba(var(--primary-400-rgb), 0.55),
-          transparent 60%
-        ),
-        radial-gradient(
-          circle at 75% 80%,
-          color-mix(in srgb, @indigo-400 48%, transparent),
-          transparent 60%
-        );
-      background-size: 200% 200%;
-      animation: glowShift 22s ease-in-out infinite alternate;
+        radial-gradient(circle at 30% 30%, rgba(var(--primary-200-rgb), 0.4), transparent 60%),
+        radial-gradient(circle at 70% 70%, rgba(var(--secondary-200-rgb), 0.4), transparent 60%);
+      background-size: 150% 150%;
     }
 
-    /* =========================================================
-     TOP SECTION
-     ========================================================= */
+    /* --- TOP SECTION --- */
     &__top {
       position: relative;
       z-index: 2;
       display: flex;
-      gap: 32px;
-      padding: 42px 44px;
+      gap: 40px;
+      padding: 48px;
       align-items: stretch;
-      flex-wrap: nowrap;
     }
 
-    /* ---------------------------------------------------------
-     LEFT PANEL (TEXT BLOCK)
-     --------------------------------------------------------- */
+    /* --- LEFT PANEL --- */
     &__panel {
       flex: 1;
-      max-width: 440px;
-      padding: 26px;
-      border-radius: 18px;
+      max-width: 480px;
+      padding: 32px;
+      border-radius: 20px;
       position: relative;
       overflow: hidden;
 
-      /* Glass panel */
-      background: rgba(var(--secondary-800-rgb), 0.35);
-      backdrop-filter: blur(26px);
-      border: 1px solid color-mix(in srgb, @neutral-300 26%, transparent);
-      box-shadow:
-        0 20px 50px fade(#000, 25%),
-        inset 0 0 0 1px fade(@white, 12%);
+      /* Carte Blanche Propre */
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid @neutral-100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 
+      /* Accent sur la gauche */
       &::before {
         content: '';
         position: absolute;
-        top: 18px;
-        bottom: 18px;
+        top: 20px;
+        bottom: 20px;
         left: 0;
         width: 4px;
-        border-radius: 999px;
-        background: linear-gradient(
-          to bottom,
-          rgba(var(--primary-500-rgb), 0.95),
-          color-mix(in srgb, @indigo-400 85%, transparent)
-        );
-      }
-
-      /* TEXT BLOCK */
-      &__text {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-
-        .BasicText[size='h3'] {
-          color: @neutral-0 !important;
-          text-shadow: 0 2px 10px fade(#000, 40%);
-        }
-      }
-
-      &__eyebrow {
-        padding: 4px 12px;
-        border-radius: 999px;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-
-        background: rgba(var(--primary-200-rgb), 0.25);
-        border: 1px solid rgba(var(--primary-400-rgb), 0.3);
-        backdrop-filter: blur(6px);
-        color: var(--primary-600) !important;
-      }
-
-      &__sub {
-        color: @neutral-200 !important;
-      }
-
-      &__bullets {
-        margin-top: 8px;
-        padding: 0;
-        list-style: none;
-
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        li {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 13px;
-          color: @neutral-100 !important;
-        }
-      }
-
-      &__cta {
-        margin-top: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        &-disclaimer {
-          font-size: 11px;
-          color: color-mix(in srgb, @neutral-200 85%, transparent) !important;
-        }
+        border-radius: 0 4px 4px 0;
+        background: linear-gradient(to bottom, var(--primary-400), var(--primary-200));
       }
     }
 
-    /* =========================================================
-     PERSONAS
-     ========================================================= */
-    &__personas {
-      flex: 1.4;
+    &__text {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+    }
 
-      max-height: 450px;
+    &__eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: var(--primary-50);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.75rem;
+      width: fit-content;
+      margin-bottom: 8px;
+    }
+
+    &__bullets {
+      margin-top: 12px;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: 0.95rem;
+      }
+    }
+
+    &__cta-row {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    &__disclaimer {
+      font-size: 0.8rem;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    /* --- PERSONAS (DROITE) --- */
+    &__personas {
+      flex: 1.2;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      align-content: start;
+
+      max-height: 500px;
       overflow-y: auto;
-      padding-right: 6px;
+      padding-right: 4px; // Pour la scrollbar
 
-      /* Custom scrollbar */
+      /* Scrollbar fine */
       &::-webkit-scrollbar {
         width: 4px;
       }
       &::-webkit-scrollbar-track {
-        background: rgba(var(--primary-50-rgb), 0.45);
-        border-radius: 999px;
+        background: transparent;
       }
       &::-webkit-scrollbar-thumb {
-        background: rgba(var(--primary-400-rgb), 0.7);
-        border-radius: 999px;
-      }
-
-      /* PERSONA CARD */
-      .persona-card {
-        border-radius: 16px;
-        padding: 10px 10px 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        /* subtle neural glass */
-        background: linear-gradient(
-          130deg,
-          color-mix(in srgb, @neutral-0 95%, transparent),
-          rgba(var(--primary-50-rgb), 0.8)
-        );
-        box-shadow: 0 8px 22px fade(#000, 12%);
-
-        /* Image wrapper */
-        &__image-wrap {
-          position: relative;
-          border-radius: 14px;
-          overflow: hidden;
-          aspect-ratio: 4 / 3;
-
-          background: radial-gradient(
-            circle at 10% 0%,
-            rgba(var(--primary-100-rgb), 0.7),
-            color-mix(in srgb, @indigo-100 50%, transparent)
-          );
-
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-
-          .persona-card__tag {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-
-            padding: 3px 11px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-
-            border-radius: 999px;
-            background: rgba(var(--secondary-950-rgb), 0.78);
-            color: @neutral-0;
-            backdrop-filter: blur(6px);
-          }
-        }
-
-        &__info {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
+        background: @neutral-200;
+        border-radius: 4px;
       }
     }
 
-    /* =========================================================
-     BOTTOM — PEPTIDE TICKER
-     ========================================================= */
+    .persona-card {
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid @neutral-100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      }
+
+      &__image-wrap {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        background: @neutral-50;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      &__tag {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      &__info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+    }
+
+    /* --- BOTTOM CAROUSEL --- */
     &__bottom {
       position: relative;
       z-index: 2;
-
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-600-rgb), 0.75),
-        rgba(var(--secondary-700-rgb), 0.82)
-      );
-      backdrop-filter: blur(14px);
-      border-top: 4px solid rgba(var(--primary-400-rgb), 0.4);
-
-      padding: 16px 24px 18px;
+      background: rgba(255, 255, 255, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.8);
+      padding: 20px 0;
       overflow: hidden;
+    }
 
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 80px;
-        pointer-events: none;
-        z-index: 3;
-      }
+    &__bottom-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-      &::before {
-        left: 0;
-        background: linear-gradient(
-          to right,
-          rgba(var(--secondary-900-rgb), 0.8),
-          transparent
-        );
-      }
+    &__bottom-header {
+      padding: 0 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-      &::after {
-        right: 0;
-        background: linear-gradient(
-          to left,
-          rgba(var(--secondary-900-rgb), 0.8),
-          transparent
-        );
-      }
+    .scroll-track {
+      display: flex;
+      gap: 30px;
+      width: max-content; // Important pour que le scroll fonctionne
+      padding: 0 48px;
 
-      &-inner {
+      .peptide-item {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-      }
-
-      &-header {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
         align-items: center;
-      }
+        gap: 8px;
+        cursor: pointer;
+        width: 120px;
+        flex-shrink: 0;
 
-      /* SCROLL TRACK */
-      .scroll-track {
-        display: flex;
-        align-items: center;
-        gap: 40px;
-        width: 200%;
-
-        .peptide-item {
-          width: 140px;
-          flex-shrink: 0;
-          cursor: pointer;
-
+        &__img-wrapper {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: white;
+          border: 1px solid @neutral-100;
           display: flex;
-          flex-direction: column;
           align-items: center;
-          gap: 6px;
-
-          transition:
-            transform 0.25s ease,
-            box-shadow 0.25s ease;
+          justify-content: center;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+          transition: transform 0.2s ease;
 
           img {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
+            width: 60%;
+            height: 60%;
             object-fit: contain;
-            background: @neutral-0;
-            box-shadow: 0 3px 10px color-mix(in srgb, @neutral-700 16%, transparent);
           }
+        }
 
-          &:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 14px color-mix(in srgb, @neutral-700 22%, transparent);
-          }
+        &:hover &__img-wrapper {
+          transform: scale(1.05);
+          border-color: var(--primary-200);
         }
       }
     }
 
-    /* =========================================================
-     RESPONSIVE
-     ========================================================= */
-
+    /* --- RESPONSIVE --- */
     @media (max-width: 960px) {
       &__top {
-        padding: 26px 20px;
-        gap: 24px;
+        flex-direction: column;
+        padding: 32px;
       }
 
       &__panel {
         max-width: none;
       }
 
-      &__bottom {
-        padding-inline: 16px;
+      &__bottom-header,
+      .scroll-track {
+        padding: 0 24px;
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
+      border-radius: 0; // Full width sur mobile
+      margin-top: 20px;
+
       &__top {
-        flex-direction: column;
+        padding: 24px 16px;
       }
 
       &__personas {
+        display: flex;
         flex-direction: row;
         overflow-x: auto;
-        overflow-y: hidden;
-
-        gap: 12px;
-        margin: 6px -8px;
-        padding-inline: 8px;
-
         scroll-snap-type: x mandatory;
+        padding-bottom: 10px; // Espace pour scrollbar
 
         .persona-card {
-          flex: 0 0 240px;
+          min-width: 240px;
           scroll-snap-align: start;
         }
       }
-
-      &__bottom-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  }
-
-  /* =========================================================
-   ANIMATION — GLOW SHIFT
-   ========================================================= */
-
-  @keyframes glowShift {
-    0% {
-      transform: translate(-20px, -16px) scale(1);
-      opacity: 0.45;
-    }
-    100% {
-      transform: translate(26px, 26px) scale(1.15);
-      opacity: 0.75;
     }
   }
 </style>
