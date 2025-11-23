@@ -1,8 +1,8 @@
 -- ============================================================
--- 🚀 SUPABASE CLEAN BACKUP V2.0 — E-COMMERCE PRO
+-- 🚀 SUPABASE CLEAN BACKUP V2.2 — E-COMMERCE PRO
 -- ============================================================
--- ✅ Migration Structurelle Complète (Stocks, Finance, Snapshots)
--- ✅ Idempotent (Drop & Rebuild)
+-- ✅ MODIF : Séparation Champ NOM et Champ DOSAGE
+-- ✅ MODIF : Mise à jour des Vues et du Seed
 -- ============================================================
 
 -- ============================================================
@@ -37,7 +37,6 @@ CASCADE;
 -- Drop triggers & functions
 DO $$
 BEGIN
-  -- Triggers
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'tr_messages_sync_conversation') THEN DROP TRIGGER tr_messages_sync_conversation ON public.messages; END IF;
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'tr_messages_sync_conversation_admin') THEN DROP TRIGGER tr_messages_sync_conversation_admin ON public.messages; END IF;
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'tr_conversations_touch_updated_at') THEN DROP TRIGGER tr_conversations_touch_updated_at ON public.conversations; END IF;
@@ -59,7 +58,7 @@ DROP FUNCTION IF EXISTS
 CASCADE;
 
 -- ============================================================
--- ✅ BLOC 2 — TABLES (STRUCTURE V2.0)
+-- ✅ BLOC 2 — TABLES (STRUCTURE V2.2)
 -- ============================================================
 
 -- 👤 PROFILES
@@ -80,17 +79,18 @@ CREATE TABLE public.profiles (
   ui_preferences jsonb DEFAULT '{}'::jsonb
 );
 
--- 📦 PRODUCTS (Updated V2.0)
+-- 📦 PRODUCTS (Updated V2.2 - Added Dosage)
 CREATE TABLE public.products (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL UNIQUE,
+  name text NOT NULL, -- On retire la contrainte unique stricte sur le nom seul car "Semax" peut exister en 5mg et 10mg
+  dosage text,        -- ✨ NOUVEAU CHAMP : "10mg", "5mg", etc.
   category text NOT NULL,
   price numeric(10,2) NOT NULL,
   
-  -- ✨ V2.0: Gestion Stocks & Promo
-  stock integer NOT NULL DEFAULT 0, -- Remplace le boolean
-  sale_price numeric(10,2),         -- Prix barré/promo
-  is_on_sale boolean DEFAULT false, -- Trigger promo
+  -- Gestion Stocks & Promo
+  stock integer NOT NULL DEFAULT 0, 
+  sale_price numeric(10,2),         
+  is_on_sale boolean DEFAULT false, 
   
   purity numeric(5,2),
   image text,
@@ -98,6 +98,9 @@ CREATE TABLE public.products (
   tags text[] DEFAULT '{}'::text[],
   created_at timestamptz DEFAULT now()
 );
+
+-- Ajout d'une contrainte unique sur le couple Nom + Dosage pour éviter les doublons
+CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
 
 -- 💬 MESSAGES
 CREATE TABLE public.messages (
@@ -130,7 +133,7 @@ CREATE TABLE public.user_cart_items (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS uniq_cart_user_product ON public.user_cart_items (user_id, product_id);
 
--- 🧾 ORDERS (Updated V2.0)
+-- 🧾 ORDERS
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
     CREATE TYPE order_status AS ENUM ('pending', 'processing', 'paid', 'confirmed', 'shipped', 'completed', 'canceled', 'refunded', 'failed');
@@ -142,7 +145,6 @@ CREATE TABLE public.orders (
   user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   order_number text UNIQUE,
   
-  -- Infos Client
   full_name text NOT NULL,
   email text NOT NULL,
   address text,
@@ -150,23 +152,20 @@ CREATE TABLE public.orders (
   city text,
   country text,
   
-  -- Infos Paiement
   payment_method text,
   payment_intent_id text,
   stripe_session_id text,
-  paypal_order_id text, -- Intégré nativement ici
+  paypal_order_id text,
   
-  -- ✨ V2.0: Détails Financiers
-  subtotal numeric(10,2) DEFAULT 0,      -- Total produits HT/TTC avant frais
-  tax_amount numeric(10,2) DEFAULT 0,    -- Montant TVA
-  shipping_cost numeric(10,2) DEFAULT 0, -- Frais de port
-  discount_amount numeric(10,2) DEFAULT 0, -- Réductions
-  total_amount numeric(10,2) NOT NULL,   -- Total final payé
+  subtotal numeric(10,2) DEFAULT 0,
+  tax_amount numeric(10,2) DEFAULT 0,
+  shipping_cost numeric(10,2) DEFAULT 0,
+  discount_amount numeric(10,2) DEFAULT 0,
+  total_amount numeric(10,2) NOT NULL,
   
   status order_status NOT NULL DEFAULT 'pending',
   internal_notes text DEFAULT '',
   
-  -- Logistique
   carrier text,
   tracking_number text,
   shipped_at timestamptz,
@@ -175,17 +174,16 @@ CREATE TABLE public.orders (
   updated_at timestamptz DEFAULT now()
 );
 
--- 🧾 ORDER ITEMS (Updated V2.0)
+-- 🧾 ORDER ITEMS
 CREATE TABLE public.order_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id uuid NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
-  product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE RESTRICT, -- Empêche suppression produit si commande existe
+  product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE RESTRICT,
   
   quantity integer NOT NULL DEFAULT 1 CHECK (quantity > 0),
   price numeric(10,2) NOT NULL,
   
-  -- ✨ V2.0: Snapshot Historique
-  product_name_snapshot text NOT NULL, -- Nom du produit au moment de l'achat
+  product_name_snapshot text NOT NULL, -- Snapshot inclura "Nom (Dosage)"
   
   created_at timestamptz DEFAULT now()
 );
@@ -271,7 +269,7 @@ CREATE POLICY "User update own orders" ON public.orders FOR UPDATE USING (auth.u
 CREATE POLICY "Public read news" ON public.news FOR SELECT USING (true);
 CREATE POLICY "Public read topics" ON public.news_topics FOR SELECT USING (true);
 
--- ADMIN POLICIES (Function based)
+-- ADMIN POLICIES
 CREATE OR REPLACE FUNCTION public.is_admin(uid uuid) RETURNS boolean AS $$
   SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = uid AND role = 'admin');
 $$ LANGUAGE sql SECURITY DEFINER;
@@ -302,7 +300,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 2. Generate Order Number (FP-YYYY-000XXX)
+-- 2. Generate Order Number
 CREATE SEQUENCE IF NOT EXISTS orders_seq START 1;
 CREATE OR REPLACE FUNCTION public.generate_order_number() RETURNS TRIGGER AS $$
 DECLARE
@@ -316,7 +314,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER set_order_number BEFORE INSERT ON public.orders FOR EACH ROW WHEN (NEW.order_number IS NULL) EXECUTE FUNCTION public.generate_order_number();
 
--- 3. Messages & Conversations Sync Logic
+-- 3. Messages Sync
 CREATE OR REPLACE FUNCTION public.delete_user_messages() RETURNS trigger AS $$
 BEGIN DELETE FROM public.messages WHERE user_id = OLD.id; RETURN OLD; END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -345,7 +343,7 @@ BEGIN NEW.updated_at = now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 CREATE TRIGGER tr_conversations_touch_updated_at BEFORE UPDATE ON public.conversations FOR EACH ROW EXECUTE FUNCTION public.touch_conversation_updated_at();
 
--- 4. Helper JWT
+-- 4. Helpers
 CREATE OR REPLACE FUNCTION public.jwt_custom_claims() RETURNS jsonb LANGUAGE sql STABLE AS $$
   SELECT jsonb_build_object('role', (SELECT role FROM public.profiles WHERE id = auth.uid()));
 $$;
@@ -355,9 +353,8 @@ CREATE OR REPLACE FUNCTION public.user_exists_by_email(p_email text) RETURNS boo
 $$;
 GRANT EXECUTE ON FUNCTION public.user_exists_by_email(text) TO anon, authenticated;
 
-
 -- ============================================================
--- ✅ BLOC 5 — V2.0 RPC TRANSACTION (COMMANDE COMPLEXE)
+-- ✅ BLOC 5 — RPC TRANSACTION (COMMANDE) - UPDATED
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
@@ -369,7 +366,7 @@ CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
   p_city text,
   p_country text,
   p_payment_method text,
-  -- Financials V2.0
+  -- Financials
   p_subtotal numeric,
   p_tax_amount numeric,
   p_shipping_cost numeric,
@@ -384,9 +381,8 @@ AS $$
 DECLARE
   new_order_id uuid;
   item jsonb;
-  result jsonb;
 BEGIN
-  -- 1. Création Commande avec détails financiers
+  -- 1. Création Commande
   INSERT INTO public.orders (
     user_id, email, full_name, address, zip, city, country,
     payment_method, status,
@@ -399,7 +395,7 @@ BEGIN
   )
   RETURNING id INTO new_order_id;
 
-  -- 2. Insertion Produits avec Snapshot du Nom
+  -- 2. Insertion Produits avec Snapshot Intelligent (Nom + Dosage)
   FOR item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
     INSERT INTO public.order_items (order_id, product_id, quantity, price, product_name_snapshot)
@@ -408,7 +404,8 @@ BEGIN
       (item->>'product_id')::uuid,
       COALESCE((item->>'quantity')::integer, 1),
       COALESCE((item->>'product_price')::numeric, 0),
-      p.name -- 📸 Snapshot: On prend le nom actuel dans la table produits
+      -- 📸 Snapshot concaténé pour l'historique : "Semax (5mg)"
+      p.name || CASE WHEN p.dosage IS NOT NULL THEN ' (' || p.dosage || ')' ELSE '' END
     FROM public.products p
     WHERE p.id = (item->>'product_id')::uuid;
   END LOOP;
@@ -418,15 +415,14 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.create_order_with_items_full TO authenticated;
--- Permettre l'insert RPC
 CREATE POLICY "Allow insert from RPC" ON public.order_items FOR INSERT WITH CHECK (true);
 
 
 -- ============================================================
--- ✅ BLOC 6 — VUES (VIEWS) UPDATE V2.0
+-- ✅ BLOC 6 — VUES (VIEWS) UPDATE V2.2
 -- ============================================================
 
--- 1. Orders Detailed (Avec Snapshots & Finance)
+-- 1. Orders Detailed (Avec Snapshot et Dosage actuel)
 CREATE OR REPLACE VIEW public.orders_detailed_view AS
 SELECT
   o.id AS order_id,
@@ -436,7 +432,7 @@ SELECT
   o.address, o.city, o.country,
   o.status,
   o.created_at,
-  -- Finance V2.0
+  -- Finance
   o.subtotal,
   o.tax_amount,
   o.shipping_cost,
@@ -451,10 +447,10 @@ SELECT
   jsonb_agg(
     jsonb_build_object(
       'product_id', p.id,
-      'product_name', COALESCE(oi.product_name_snapshot, p.name), -- Priorité au snapshot
+      'product_name', COALESCE(oi.product_name_snapshot, p.name), -- Le snapshot contient déjà le dosage si généré par la RPC
+      'product_dosage', p.dosage, -- On renvoie aussi le dosage actuel du catalogue
       'product_price', oi.price,
       'product_image', p.image,
-      'product_stock', p.stock,
       'quantity', oi.quantity,
       'total', (oi.price * oi.quantity)
     )
@@ -475,7 +471,6 @@ SELECT
   o.paypal_order_id,
   o.order_number,
   
-  -- Shipping Info
   o.full_name AS shipping_name,
   o.email AS shipping_email,
   o.address AS shipping_address,
@@ -483,7 +478,6 @@ SELECT
   o.zip AS shipping_zip,
   o.country AS shipping_country,
 
-  -- Details
   o.status,
   o.payment_method,
   o.subtotal,
@@ -496,7 +490,6 @@ SELECT
   o.created_at, o.shipped_at, o.updated_at,
   odv.detailed_items,
 
-  -- Profile Fallback
   jsonb_build_object(
     'id', COALESCE(p.id, o.user_id),
     'email', COALESCE(p.email, o.email),
@@ -530,7 +523,7 @@ LEFT JOIN public.profiles p ON p.id = o.user_id;
 ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
 GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
 
--- 4. User Cart View (Updated for Stock Integer)
+-- 4. User Cart View (Updated with Dosage)
 CREATE OR REPLACE VIEW public.user_cart_view AS
 SELECT
   c.id AS cart_item_id,
@@ -539,19 +532,20 @@ SELECT
   COALESCE(c.quantity, 1) AS quantity,
   c.updated_at,
   p.name AS product_name,
+  p.dosage AS product_dosage,                       -- ✨ V2.2: Exposé au frontend
   p.category AS product_category,
   COALESCE(p.price, 0)::numeric(10,2) AS product_price,
-  COALESCE(p.sale_price, 0)::numeric(10,2) AS product_sale_price, -- New V2.0
-  COALESCE(p.is_on_sale, false) AS is_on_sale,                     -- New V2.0
+  COALESCE(p.sale_price, 0)::numeric(10,2) AS product_sale_price,
+  COALESCE(p.is_on_sale, false) AS is_on_sale,
   COALESCE(p.image, '') AS product_image,
-  COALESCE(p.stock, 0) AS product_stock                           -- Updated V2.0 (int)
+  COALESCE(p.stock, 0) AS product_stock
 FROM public.user_cart_items c
 JOIN public.products p ON p.id = c.product_id;
 
 ALTER VIEW public.user_cart_view SET (security_invoker = true);
 GRANT SELECT ON public.user_cart_view TO authenticated;
 
--- 5. Other Views (Conversations)
+-- 5. Other Views
 CREATE OR REPLACE VIEW public.conversation_overview AS
 SELECT p.id AS user_id, p.email AS user_email, p.full_name AS user_name,
   c.last_read_message_id, c.last_read_at, c.last_admin_message_id, c.last_admin_read_at,
@@ -580,7 +574,6 @@ INSERT INTO storage.buckets (id, name, public) SELECT 'avatars', 'avatars', true
 INSERT INTO storage.buckets (id, name, public) SELECT 'news-images', 'news-images', true WHERE NOT EXISTS (SELECT 1 FROM storage.buckets WHERE id = 'news-images');
 INSERT INTO storage.buckets (id, name, public) SELECT 'topic-images', 'topic-images', true WHERE NOT EXISTS (SELECT 1 FROM storage.buckets WHERE id = 'topic-images');
 
--- Idempotent policies drop
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view public buckets' AND tablename = 'objects') THEN EXECUTE 'DROP POLICY "Public can view public buckets" ON storage.objects'; END IF;
   IF EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can upload own files' AND tablename = 'objects') THEN EXECUTE 'DROP POLICY "Users can upload own files" ON storage.objects'; END IF;
@@ -597,9 +590,8 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles, public.products, 
 
 
 -- ============================================================
--- ✅ CORRECTIF : AJOUT RPC MANQUANTE
+-- ✅ FONCTION ADMIN UPDATE STATUS
 -- ============================================================
-
 CREATE OR REPLACE FUNCTION public.admin_update_order_status(
   p_order_id uuid,
   p_new_status text,
@@ -607,45 +599,23 @@ CREATE OR REPLACE FUNCTION public.admin_update_order_status(
 )
 RETURNS jsonb
 LANGUAGE plpgsql
-SECURITY DEFINER -- Important : s'exécute avec les droits du créateur (admin)
+SECURITY DEFINER
 AS $$
 DECLARE
   updated_order jsonb;
 BEGIN
-  -- 1. Vérification Admin
-  IF NOT public.is_admin(auth.uid()) THEN
-    RAISE EXCEPTION 'Accès refusé : Réservé aux administrateurs.';
-  END IF;
+  IF NOT public.is_admin(auth.uid()) THEN RAISE EXCEPTION 'Accès refusé.'; END IF;
 
-  -- 2. Mise à jour du statut
-  UPDATE public.orders
-  SET status = p_new_status::order_status,
-      updated_at = now()
-  WHERE id = p_order_id;
+  UPDATE public.orders SET status = p_new_status::order_status, updated_at = now() WHERE id = p_order_id;
 
-  -- 3. Log de l'email (Optionnel)
   IF p_send_email THEN
     INSERT INTO public.emails_sent(order_id, to_email, subject, body_html, type, status)
-    SELECT
-      o.id,
-      o.email,
-      'Mise à jour de votre commande',
-      '<p>Le statut de votre commande est passé à : <strong>' || p_new_status || '</strong></p>',
-      'status_update',
-      'sent'
-    FROM public.orders o
-    WHERE o.id = p_order_id;
+    SELECT o.id, o.email, 'Mise à jour de votre commande', '<p>Le statut de votre commande est passé à : <strong>' || p_new_status || '</strong></p>', 'status_update', 'sent'
+    FROM public.orders o WHERE o.id = p_order_id;
   END IF;
 
-  -- 4. Retourner la vue complète mise à jour
-  SELECT to_jsonb(ofv.*)
-  INTO updated_order
-  FROM public.orders_full_view ofv
-  WHERE ofv.order_id = p_order_id;
-
+  SELECT to_jsonb(ofv.*) INTO updated_order FROM public.orders_full_view ofv WHERE ofv.order_id = p_order_id;
   RETURN updated_order;
 END;
 $$;
-
--- Permissions
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;

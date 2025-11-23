@@ -15,50 +15,15 @@
         class="logo"
         @click="router.push('/')"
       >
-        <svg
-          viewBox="0 0 60 60"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g transform="translate(5, 5)">
-            <path
-              d="M25 0 C 25 13.8 13.8 25 0 25 C 13.8 25 25 36.2 25 50 C 25 36.2 36.2 25 50 25 C 36.2 25 25 13.8 25 0 Z"
-              fill="#ff9900"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="14"
-              fill="#FFFFFF"
-            />
-            <circle
-              cx="38"
-              cy="12"
-              r="14"
-              fill="#FFFFFF"
-            />
-            <circle
-              cx="12"
-              cy="38"
-              r="14"
-              fill="#FFFFFF"
-            />
-            <circle
-              cx="38"
-              cy="38"
-              r="14"
-              fill="#FFFFFF"
-            />
-          </g>
-        </svg>
-        <BasicText
-          size="body-l"
-          weight="bold"
-          color="white"
-          class="auth-navbar__logo"
-        >
-          Fast Peptides
-        </BasicText>
+        <BasicIconNext
+          name="fastPeptides"
+          :size="10"
+          class="logo-img"
+        />
+        <div class="logo-text-container">
+          <span class="brand-fast">Fast</span>
+          <span class="brand-peptides">Peptides</span>
+        </div>
       </div>
     </div>
     <div
@@ -189,7 +154,7 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
 
     .logo-img {
@@ -200,6 +165,29 @@
         transform: scale(1.08);
       }
     }
+  }
+
+  .logo-text-container {
+    font-size: 26px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-fast {
+    color: white;
+    font-weight: 900;
+    font-style: italic;
+    transform: skewX(-6deg);
+    padding-right: 2px;
+  }
+
+  .brand-peptides {
+    color: @yellow-400;
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 1px;
   }
 
   .guest-info {
@@ -219,6 +207,11 @@
       &__right {
         gap: 14px;
       }
+    }
+
+    /* Ajustement de la taille du logo sur mobile */
+    .logo-text-container {
+      font-size: 22px;
     }
 
     .logo {

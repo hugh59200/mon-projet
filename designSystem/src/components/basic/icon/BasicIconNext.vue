@@ -10,6 +10,7 @@
         'basic-icon-next--not-allowed': disabled && !pointer,
         'basic-icon-next--disabled': disabled,
         'basic-icon-next--active': active,
+        'basic-icon-next--custom': isCustomIcon,
       },
     ]"
   />
@@ -127,14 +128,15 @@
     active: false,
   })
 
-  // ✅ Sélection dynamique de l’icône Lucide
+  // 1. Détection Custom Icon
+  const isCustomIcon = computed(() => props.name in customIcons)
+
+  // 2. Sélection du composant
   const iconComponent = computed(() => {
-    // ✅ icône custom ?
-    if (props.name in customIcons) {
+    if (isCustomIcon.value) {
       return customIcons[props.name as CustomIconName]
     }
 
-    // ✅ icône Lucide
     const capitalizedName = props.name.charAt(0).toUpperCase() + props.name.slice(1)
     return (
       (LucideIcons[capitalizedName as keyof typeof LucideIcons] as Component) ||
@@ -142,8 +144,18 @@
     )
   })
 
-  // ✅ Props Lucide dynamiques (jamais de "fill")
+  // 3. Calcul des Props (Correction du bug de couleur)
   const computedProps = computed(() => {
+    // Si c'est custom (comme ton logo), on retourne juste la taille.
+    // On n'injecte PAS de stroke ni de color pour laisser le SVG gérer ses couleurs.
+    if (isCustomIcon.value) {
+      return {
+        width: props.size,
+        height: props.size,
+      }
+    }
+
+    // Si c'est Lucide, on garde le comportement standard
     const isHex = /^#|rgb|hsl/i.test(props.color)
     return {
       size: props.size,
@@ -153,7 +165,7 @@
     }
   })
 
-  // ✅ Classe dynamique pour tokens (primary-600, etc.)
+  // 4. Classe dynamique tokens
   const colorClass = computed(() => {
     if (!props.color) return null
     const isDesignToken = /^[a-zA-Z]+-\d{2,4}$/.test(props.color)
@@ -174,7 +186,16 @@
       transform 0.3s ease,
       stroke 0.25s ease,
       color 0.25s ease;
-    fill: transparent !important;
+
+    // CORRECTION ICI : On force le transparent uniquement si ce n'est PAS une icône custom
+    &:not(.basic-icon-next--custom) {
+      fill: transparent !important;
+    }
+
+    // Pour les icônes custom, on enlève le trait de contour par défaut
+    &--custom {
+      stroke: none;
+    }
 
     &--pointer {
       cursor: pointer;
