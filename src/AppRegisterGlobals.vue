@@ -1,39 +1,22 @@
 <template>
   <DialogComponent />
   <ToastContainer />
-  <!-- <CGU /> -->
   <ChatWidget v-if="isAuthenticated && role === 'user'" />
-  <transition name="fade">
-    <div
-      v-if="cgu.overlayActive"
-      class="cgu-overlay"
-    />
-  </transition>
 </template>
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { registerPopupAutoCGU } from '@/features/interface/cgu'
-  // import CGU from '@/features/interface/cgu/CGU.vue'
-  import { useAfficheCGUStore } from '@/features/interface/cgu/useAfficheCGUStore'
   import DialogComponent from '@/features/interface/dialog/components/DialogComponent.vue'
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
   import { storeToRefs } from 'pinia'
   import ChatWidget from './features/chat/user/ChatWidget.vue'
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 INITIALISATION                             */
-  /* -------------------------------------------------------------------------- */
-  registerPopupAutoCGU()
-
-  const cgu = useAfficheCGUStore()
   const auth = useAuthStore()
 
   const { role, isAuthenticated } = storeToRefs(auth)
 </script>
 
 <style lang="less">
-  /* ✨ Overlay CGU (flou + fondu) */
   .cgu-overlay {
     position: fixed;
     top: 0;
@@ -42,7 +25,7 @@
     height: 100vh;
     background-color: fade(black, 40%);
     backdrop-filter: blur(6px);
-    z-index: 800; /* sous le Modal mais au-dessus du reste */
+    z-index: 800;
     animation: fadeInOverlay 0.3s ease forwards;
   }
 
@@ -57,7 +40,6 @@
     }
   }
 
-  /* ✨ Transition fade globale */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;

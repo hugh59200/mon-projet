@@ -20,8 +20,7 @@ const routes: Array<RouteRecordRaw> = [
       icon: 'Home',
       order: 1,
       title: 'Accueil – Fast Peptides',
-      description:
-        'Découvrez Fast Peptides, la référence européenne pour les peptides de recherche certifiés et livrés rapidement.',
+      description: 'La référence européenne pour les peptides de recherche certifiés.',
     },
   },
   {
@@ -189,8 +188,9 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresCart: true,
       requiresAuth: true,
+      heading: 'Paiement',
       title: 'Paiement – Fast Peptides',
-      description: 'Validez et payez votre commande de peptides en toute sécurité.',
+      description: 'Finalisez votre commande en toute sécurité.',
     },
   },
   {
@@ -223,6 +223,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      heading: 'Espace administrateur',
       title: 'Espace administrateur – Fast Peptides',
       description:
         'Gérez les produits, utilisateurs, commandes, statistiques et actualités du site Fast Peptides.',

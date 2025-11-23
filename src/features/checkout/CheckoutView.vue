@@ -1,201 +1,223 @@
 <template>
-  <div class="checkout">
-    <BasicText
-      size="h4"
-      weight="bold"
-      class="checkout__title"
-    >
-      Paiement de votre commande
-    </BasicText>
-
-    <div class="checkout__cart">
-      <BasicText
-        size="h5"
-        weight="bold"
+  <div class="checkout-page">
+    <PageHeader />
+    <div class="checkout-page__content">
+      <section
+        class="checkout-card"
+        v-motion="{
+          initial: { opacity: 0, y: 20 },
+          enter: { opacity: 1, y: 0, transition: { delay: 0.1, type: 'spring' } },
+        }"
       >
-        Résumé du panier
-      </BasicText>
-
-      <div
-        v-for="item in cart.items"
-        :key="item.cart_item_id!"
-        class="checkout__item"
-      >
-        <div class="checkout__item-left">
-          <img
-            :src="item.product_image || defaultImage"
-            :alt="item.product_name!"
-            class="checkout__item-img"
-          />
-          <div class="checkout__item-info">
-            <div
-              class="checkout__item-name-trigger"
-              @click="openProductModal(item.product_id!, $event)"
-            >
-              <BasicText
-                weight="bold"
-                class="checkout__item-name checkout__item-name--interactive"
-              >
-                {{ item.product_name }}
-              </BasicText>
-              <BasicIconNext
-                name="Search"
-                :size="16"
-                class="checkout__item-name-icon"
-              />
-            </div>
-            <div class="checkout__item-line">
-              <span>{{ item.quantity ?? 1 }} ×</span>
-              <span class="checkout__item-line-price">
-                {{ formatPrice(item.product_price) }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <BasicText
-          weight="bold"
-          class="checkout__item-price"
-        >
-          {{ formatPrice((item.product_price ?? 0) * (item.quantity ?? 1)) }}
-        </BasicText>
-      </div>
-
-      <div class="checkout__summary">
-        <div class="checkout__summary-row">
-          <BasicText
-            size="body-s"
-            color="neutral-600"
-          >
-            Sous-total
-          </BasicText>
-          <BasicText
-            size="body-s"
-            color="neutral-800"
-          >
-            {{ formatPrice(cartSubtotal) }}
-          </BasicText>
-        </div>
-        <div class="checkout__summary-row">
-          <BasicText
-            size="body-s"
-            color="neutral-600"
-          >
-            Livraison
-          </BasicText>
-          <BasicText
-            size="body-s"
-            :color="shippingCost === 0 ? 'success-600' : 'neutral-800'"
-          >
-            {{ shippingCost === 0 ? 'Offerte' : formatPrice(shippingCost) }}
-          </BasicText>
-        </div>
-      </div>
-
-      <div class="checkout__total">
-        <BasicText
-          size="h5"
-          weight="bold"
-        >
-          Total à payer
-        </BasicText>
         <BasicText
           size="h4"
           weight="bold"
-          color="primary-700"
+          class="checkout-card__title"
         >
-          {{ formatPrice(finalTotal) }}
+          Résumé de la commande
         </BasicText>
-      </div>
-    </div>
-
-    <div class="checkout__infos">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        Adresse de livraison
-      </BasicText>
-
-      <div class="checkout__form">
-        <BasicInput
-          v-model="fullName"
-          label="Nom complet"
-          input-type="form"
-          placeholder="Votre nom complet"
-        />
-        <BasicInput
-          v-model="address"
-          label="Adresse"
-          input-type="form"
-          placeholder="Adresse complète"
-        />
-        <div class="checkout__row">
-          <BasicInput
-            v-model="zip"
-            label="Code postal"
-            input-type="form"
-            placeholder="59000"
-          />
-          <BasicInput
-            v-model="city"
-            label="Ville"
-            input-type="form"
-            placeholder="Lille"
-          />
-        </div>
-        <BasicInput
-          v-model="country"
-          label="Pays"
-          input-type="form"
-          placeholder="France"
-        />
-      </div>
-    </div>
-
-    <div class="checkout__payment">
-      <BasicText
-        size="h5"
-        weight="bold"
-      >
-        Méthode de paiement
-      </BasicText>
-
-      <div class="checkout__methods">
-        <div
-          v-for="method in paymentMethods"
-          :key="method.value"
-          :class="[
-            'checkout__method',
-            { 'checkout__method--active': selectedPayment === method.value },
-          ]"
-          @click="selectedPayment = method.value as PaymentProvider"
-        >
-          <div class="checkout__method-icon">
-            <component :is="method.icon" />
-          </div>
-          <div class="checkout__method-info">
-            <BasicText weight="bold">{{ method.label }}</BasicText>
+        <div class="checkout-items">
+          <div
+            v-for="item in cart.items"
+            :key="item.cart_item_id!"
+            class="checkout-item"
+          >
+            <div class="checkout-item__left">
+              <img
+                :src="item.product_image || defaultImage"
+                :alt="item.product_name!"
+                class="checkout-item__img"
+              />
+              <div class="checkout-item__info">
+                <div
+                  class="checkout-item__name-trigger"
+                  @click="openProductModal(item.product_id!, $event)"
+                >
+                  <BasicText
+                    weight="bold"
+                    class="checkout-item__name interactive"
+                  >
+                    {{ item.product_name }}
+                  </BasicText>
+                  <BasicIconNext
+                    name="Search"
+                    :size="14"
+                    class="checkout-item__icon"
+                  />
+                </div>
+                <div class="checkout-item__details">
+                  <span>{{ item.quantity ?? 1 }} ×</span>
+                  <span class="checkout-item__unit-price">
+                    {{ formatPrice(item.product_price) }}
+                  </span>
+                </div>
+              </div>
+            </div>
             <BasicText
-              size="body-s"
-              color="neutral-500"
+              weight="bold"
+              class="checkout-item__total"
             >
-              {{ method.desc }}
+              {{ formatPrice((item.product_price ?? 0) * (item.quantity ?? 1)) }}
             </BasicText>
           </div>
         </div>
-      </div>
-    </div>
 
-    <BasicButton
-      label="Valider et payer"
-      type="primary"
-      variant="filled"
-      width="full"
-      size="large"
-      class="checkout__submit"
-      :disabled="cart.items.length === 0"
-      @click="submitOrder"
-    />
+        <div class="checkout-summary">
+          <div class="checkout-summary__row">
+            <BasicText
+              size="body-s"
+              color="neutral-600"
+            >
+              Sous-total
+            </BasicText>
+            <BasicText
+              size="body-s"
+              color="neutral-800"
+            >
+              {{ formatPrice(cartSubtotal) }}
+            </BasicText>
+          </div>
+          <div class="checkout-summary__row">
+            <BasicText
+              size="body-s"
+              color="neutral-600"
+            >
+              Livraison
+            </BasicText>
+            <BasicText
+              size="body-s"
+              :color="shippingCost === 0 ? 'success-600' : 'neutral-800'"
+            >
+              {{ shippingCost === 0 ? 'Offerte' : formatPrice(shippingCost) }}
+            </BasicText>
+          </div>
+
+          <div class="checkout-summary__divider"></div>
+
+          <div class="checkout-summary__row total">
+            <BasicText
+              size="h5"
+              weight="bold"
+            >
+              Total à payer
+            </BasicText>
+            <BasicText
+              size="h4"
+              weight="bold"
+              color="primary-700"
+            >
+              {{ formatPrice(finalTotal) }}
+            </BasicText>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="checkout-card"
+        v-motion="{
+          initial: { opacity: 0, y: 20 },
+          enter: { opacity: 1, y: 0, transition: { delay: 0.2, type: 'spring' } },
+        }"
+      >
+        <BasicText
+          size="h4"
+          weight="bold"
+          class="checkout-card__title"
+        >
+          Adresse de livraison
+        </BasicText>
+
+        <div class="checkout-form">
+          <BasicInput
+            v-model="fullName"
+            label="Nom complet"
+            input-type="form"
+            placeholder="Prénom et Nom"
+          />
+          <BasicInput
+            v-model="address"
+            label="Adresse"
+            input-type="form"
+            placeholder="N° et nom de rue"
+          />
+          <div class="checkout-form__row">
+            <BasicInput
+              v-model="zip"
+              label="Code postal"
+              input-type="form"
+              placeholder="Ex: 75001"
+            />
+            <BasicInput
+              v-model="city"
+              label="Ville"
+              input-type="form"
+              placeholder="Ex: Paris"
+            />
+          </div>
+          <BasicInput
+            v-model="country"
+            label="Pays"
+            input-type="form"
+            placeholder="France"
+          />
+        </div>
+      </section>
+
+      <section
+        class="checkout-card"
+        v-motion="{
+          initial: { opacity: 0, y: 20 },
+          enter: { opacity: 1, y: 0, transition: { delay: 0.3, type: 'spring' } },
+        }"
+      >
+        <BasicText
+          size="h4"
+          weight="bold"
+          class="checkout-card__title"
+        >
+          Méthode de paiement
+        </BasicText>
+
+        <div class="checkout-payment__methods">
+          <div
+            v-for="method in paymentMethods"
+            :key="method.value"
+            :class="[
+              'payment-method',
+              { 'payment-method--active': selectedPayment === method.value },
+            ]"
+            @click="selectedPayment = method.value as PaymentProvider"
+          >
+            <div class="payment-method__icon">
+              <component :is="method.icon" />
+            </div>
+            <div class="payment-method__info">
+              <BasicText weight="bold">{{ method.label }}</BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-500"
+              >
+                {{ method.desc }}
+              </BasicText>
+            </div>
+            <div class="payment-method__radio">
+              <div class="radio-circle"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <BasicButton
+        label="Valider et payer"
+        type="primary"
+        variant="filled"
+        width="full"
+        size="large"
+        class="checkout-submit-btn"
+        :disabled="cart.items.length === 0"
+        @click="submitOrder"
+      />
+    </div>
 
     <teleport to="#app">
       <ProductModalCheckout
@@ -211,16 +233,17 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import ProductModalCheckout from '@/features/checkout/modale/ProductModalCheckout.vue'
   import {
     processPayment,
     type PaymentProvider,
   } from '@/features/checkout/paiement/service/paymentService'
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
-  import { createOrder } from '@/supabase/api/ordersApi' // ✅ IMPORT V2
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
+  import { createOrder } from '@/supabase/api/ordersApi'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, h, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import ProductModalCheckout from './modale/ProductModalCheckout.vue'
 
   const auth = useAuthStore()
   const cart = useCartStore()
@@ -238,8 +261,6 @@
   const selectedProductId = ref<string | null>(null)
 
   // --- 🎨 ICÔNES CUSTOM ---
-
-  // 1. PayPal (Ton SVG)
   const PayPalIcon = {
     render: () =>
       h('svg', { viewBox: '0 0 48 48', fill: 'none', xmlns: 'http://www.w3.org/2000/svg' }, [
@@ -261,9 +282,7 @@
       ]),
   }
 
-  // 2. Stripe (Version Zoomée pour alignement optique)
   const StripeIcon = {
-    // 🔍 Modification ici : viewBox "10 4 28 28" au lieu de "0 0 48 48"
     render: () =>
       h('svg', { viewBox: '10 4 28 28', fill: 'none', xmlns: 'http://www.w3.org/2000/svg' }, [
         h('path', {
@@ -273,7 +292,7 @@
       ]),
   }
 
-  // --- 💰 LOGIQUE FINANCIÈRE V2.0 ---
+  // --- 💰 LOGIQUE FINANCIÈRE ---
   const FREE_SHIPPING_THRESHOLD = 100
   const FLAT_SHIPPING_RATE = 9.9
 
@@ -286,8 +305,6 @@
   const finalTotal = computed(() => {
     return cartSubtotal.value + shippingCost.value
   })
-
-  // ----------------------------------
 
   const paymentMethods = [
     {
@@ -318,12 +335,9 @@
     const target = event.currentTarget as HTMLElement
     if (!target) return
 
-    const ripple = document.createElement('span')
-    ripple.className = 'checkout__ripple'
-    ripple.style.left = `${event.offsetX}px`
-    ripple.style.top = `${event.offsetY}px`
-    target.appendChild(ripple)
-    setTimeout(() => ripple.remove(), 600)
+    // Effet visuel simple au clic
+    target.style.opacity = '0.6'
+    setTimeout(() => (target.style.opacity = '1'), 200)
 
     setTimeout(() => {
       selectedProductId.value = productId
@@ -333,7 +347,6 @@
 
   async function submitOrder() {
     await withSablier(async () => {
-      // 1. Validations de base
       if (!auth.user) {
         toast.show('Veuillez vous connecter.', 'danger')
         router.push('/auth/login')
@@ -346,14 +359,12 @@
       }
 
       try {
-        // 2. Préparation du payload pour l'API V2
         const orderItemsPayload = cart.items.map((item) => ({
           product_id: item.product_id!,
           quantity: item.quantity ?? 1,
           product_price: item.product_price ?? 0,
         }))
 
-        // 3. Appel API centralisé (createOrder)
         const newOrder = await createOrder({
           userId: auth.user.id,
           email: auth.user.email ?? '',
@@ -363,17 +374,14 @@
           city: city.value,
           country: country.value,
           paymentMethod: selectedPayment.value,
-
           subtotal: cartSubtotal.value,
           shippingCost: shippingCost.value,
           taxAmount: 0,
           discountAmount: 0,
           totalAmount: finalTotal.value,
-
           items: orderItemsPayload,
         })
 
-        // 4. Traitement du Paiement
         await processPayment(
           finalTotal.value,
           selectedPayment.value,
@@ -381,8 +389,6 @@
           newOrder.order_id!,
         )
 
-        // 🛑 STOP IMPÉRATIF POUR REDIRECTION (Stripe/PayPal)
-        // On ne veut pas de code après qui redirige localement
         if (selectedPayment.value === 'stripe' || selectedPayment.value === 'paypal') {
           return
         }
@@ -395,271 +401,275 @@
 </script>
 
 <style scoped lang="less">
-  .checkout {
-    max-width: 800px;
-    margin: 20px auto;
+  .checkout-page {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 0 20px 100px;
-    box-sizing: border-box;
+    gap: 40px;
+    padding: 30px 20px;
+    max-width: 900px; // Un peu plus large pour être à l'aise
+    margin: 0 auto;
+    width: 100%;
 
-    > div {
-      background: color-mix(in srgb, @neutral-200 82%, transparent);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
-      box-shadow:
-        0 4px 14px color-mix(in srgb, @neutral-900 6%, transparent),
-        inset 0 0 0 1px color-mix(in srgb, @neutral-50 45%, transparent);
+    .card-shadow(@shadow) {
+      box-shadow: @shadow;
+      transition: all 0.25s ease;
     }
 
-    &__title {
-      text-align: center;
-    }
-
-    &__cart,
-    &__infos,
-    &__payment {
-      border-radius: 14px;
-      padding: 24px;
+    &__content {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 30px;
     }
 
-    /* --- ITEMS --- */
-    &__item {
-      position: relative;
-      overflow: hidden;
+    .checkout-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 18px;
+      padding: 28px;
+      .card-shadow(0 4px 16px rgba(0, 0, 0, 0.04));
+
+      &__title {
+        margin-bottom: 20px;
+        color: @neutral-900;
+        padding-bottom: 12px;
+        border-bottom: 1px solid @neutral-100;
+      }
+    }
+
+    .checkout-items {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .checkout-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid @neutral-100;
-      padding: 12px 16px;
-      border-radius: 8px;
-      transition: all 0.25s ease;
+      padding: 12px;
+      background: white; // Carte blanche interne
+      border-radius: 12px;
+      border: 1px solid @neutral-200;
+      transition: border-color 0.2s;
 
-      &-left {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex: 1;
-        min-width: 0;
+      &:hover {
+        border-color: var(--primary-200);
       }
 
-      &-img {
-        width: 58px;
-        height: 58px;
-        object-fit: cover;
+      &__left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      &__img {
+        width: 60px;
+        height: 60px;
         border-radius: 10px;
-        border: 1px solid color-mix(in srgb, @neutral-300 40%, transparent);
+        object-fit: cover;
+        border: 1px solid @neutral-100;
         flex-shrink: 0;
       }
 
-      &-info {
+      &__info {
         display: flex;
         flex-direction: column;
         gap: 4px;
-
-        .checkout__item-name-trigger {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          cursor: pointer;
-          position: relative;
-
-          .checkout__item-name {
-            color: @neutral-700;
-            transition: color 0.2s ease;
-
-            &--interactive:hover {
-              text-decoration: underline;
-            }
-          }
-          .checkout__item-name-icon {
-            color: color-mix(in srgb, @neutral-700 70%, transparent);
-            transition: color 0.2s ease;
-          }
-          &:hover .checkout__item-name-icon {
-            color: @neutral-600;
-          }
-        }
-
-        .checkout__item-line {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          color: color-mix(in srgb, @neutral-600 90%, transparent);
-
-          &-price {
-            color: color-mix(in srgb, @neutral-500 80%, transparent);
-            font-size: 13px;
-          }
-        }
       }
 
-      &-price {
-        width: 80px;
-        text-align: right;
-        font-weight: 600;
-        color: @neutral-900;
-        font-size: 14px;
-      }
-    }
-
-    /* 🌊 Effet ripple au clic */
-    &__ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(var(--primary-500-rgb), 0.25);
-      transform: scale(0);
-      animation: ripple 0.6s ease-out;
-      width: 150px;
-      height: 150px;
-      pointer-events: none;
-      opacity: 0.8;
-    }
-
-    @keyframes ripple {
-      to {
-        transform: scale(2.5);
-        opacity: 0;
-      }
-    }
-
-    /* ✅ NOUVEAU : Résumé Financier */
-    &__summary {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 12px 0;
-      border-bottom: 1px solid @neutral-100;
-
-      &-row {
+      &__name-trigger {
         display: flex;
-        justify-content: space-between;
-        padding: 0 16px;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover .checkout-item__name {
+          color: var(--primary-600);
+        }
+      }
+
+      &__name {
+        font-size: 15px;
+        color: @neutral-800;
+      }
+
+      &__icon {
+        color: @neutral-400;
+      }
+
+      &__details {
+        font-size: 13px;
+        color: @neutral-500;
+        display: flex;
+        gap: 6px;
+      }
+
+      &__total {
+        font-size: 15px;
+        color: @neutral-900;
       }
     }
 
-    /* --- TOTAL --- */
-    &__total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 16px 0 16px;
-    }
-
-    /* --- FORMULAIRE --- */
-    &__form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    &__row {
-      display: flex;
-      gap: 12px;
-      @media (max-width: 700px) {
-        flex-direction: column;
-      }
-    }
-
-    /* --- MÉTHODES DE PAIEMENT --- */
-    &__methods {
+    // --- RÉSUMÉ ---
+    .checkout-summary {
+      background: @neutral-50;
+      border-radius: 12px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      &__row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+
+        &.total {
+          margin-top: 6px;
+          align-items: center;
+        }
+      }
+
+      &__divider {
+        height: 1px;
+        background: @neutral-200;
+        margin: 4px 0;
+      }
     }
 
-    &__method {
+    // --- 2. FORMULAIRE ---
+    .checkout-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      &__row {
+        display: flex;
+        gap: 16px;
+        @media (max-width: 600px) {
+          flex-direction: column;
+        }
+      }
+    }
+
+    // --- 3. PAIEMENT ---
+    .checkout-payment__methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .payment-method {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      padding: 16px;
+      background: white;
       border: 1px solid @neutral-200;
-      border-radius: 10px;
-      padding: 12px 16px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
 
       &:hover {
-        border-color: var(--primary-400);
-        background: rgba(var(--primary-50-rgb), 0.4);
+        border-color: var(--primary-300);
+        background: var(--primary-50);
       }
 
       &--active {
-        border-color: var(--primary-600);
-        background: rgba(var(--primary-100-rgb), 0.6);
-        box-shadow: 0 2px 8px rgba(var(--primary-400-rgb), 0.25);
+        border-color: var(--primary-500);
+        background: var(--primary-50);
+        box-shadow: 0 0 0 2px rgba(var(--primary-500-rgb), 0.1);
+
+        .radio-circle {
+          border-color: var(--primary-600);
+          &::after {
+            transform: scale(1);
+          }
+        }
       }
 
-      &-icon {
-        width: 34px;
-        height: 34px;
+      &__icon {
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: @neutral-100;
         border-radius: 8px;
+        margin-right: 16px;
 
         svg {
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
         }
       }
 
-      &-info {
+      &__info {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        line-height: 1.2;
+      }
+
+      &__radio {
+        .radio-circle {
+          width: 20px;
+          height: 20px;
+          border: 2px solid @neutral-300;
+          border-radius: 50%;
+          position: relative;
+          transition: all 0.2s;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 10px;
+            height: 10px;
+            background: var(--primary-600);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+        }
       }
     }
 
-    /* --- BOUTON --- */
-    &__submit {
-      margin-top: 20px;
-      transition: all 0.25s ease-in-out;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(var(--primary-400-rgb), 0.25);
-      font-weight: 600;
+    // --- BOUTON ---
+    .checkout-submit-btn {
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.3);
 
       &:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(var(--primary-500-rgb), 0.4);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(var(--primary-500-rgb), 0.3);
-      }
-      &:active {
-        transform: scale(0.98);
-        box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.25);
-      }
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        box-shadow: none;
       }
     }
 
-    @media (max-width: 700px) {
-      &__cart,
-      &__infos,
-      &__payment {
-        padding: 18px;
-        gap: 14px;
+    // --- RESPONSIVE ---
+    @media (max-width: 600px) {
+      padding: 20px 16px;
+
+      .checkout-card {
+        padding: 20px;
       }
-      &__item {
-        padding: 10px 12px;
-        &-img {
-          width: 52px;
-          height: 52px;
+
+      .checkout-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        &__left {
+          width: 100%;
         }
-        &-price {
-          font-size: 13px;
+
+        &__total {
+          align-self: flex-end;
         }
-      }
-      &__submit {
-        padding: 12px 0;
-        font-size: 15px;
       }
     }
   }

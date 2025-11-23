@@ -22,7 +22,6 @@
 
         <slot name="icon"></slot>
       </div>
-
       <div
         v-if="displayDescription"
         class="page-header__subtitle"
@@ -30,12 +29,10 @@
         {{ displayDescription }}
       </div>
     </div>
-
     <div
       v-if="showSeparator"
       class="page-header__separator"
     ></div>
-
     <div
       v-if="$slots.default"
       class="page-header__content"
