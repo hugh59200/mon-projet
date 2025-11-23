@@ -90,13 +90,8 @@
           <div>
             <RouterLink to="/checkout">Paiement sécurisé</RouterLink>
             <RouterLink to="/profil/commandes">Suivi de commande</RouterLink>
-            <!-- ⚠️ Tu avais mis /access-denied pour "Confidentialité" -->
-            <!-- C'est incohérent, la route /access-denied est un message d'erreur -->
-            <!-- Je le remplace par ce qui est logique -->
-            <RouterLink to="/faq">Confidentialité</RouterLink>
-            <!-- ou / pour le moment, à toi de voir -->
-
-            <!-- Si un jour tu as une page CGU : /terms -->
+            <RouterLink to="/cgu">Conditions Générales (CGU)</RouterLink>
+            <RouterLink to="/guide-reconstitution">Guide & Calculateur</RouterLink>
           </div>
         </div>
         <div class="footer__col">
@@ -148,8 +143,11 @@
     </div>
   </footer>
 </template>
+
 <script setup lang="ts"></script>
+
 <style scoped lang="less">
+  /* Ton style original inchangé */
   .footer {
     background: linear-gradient(
       90deg,

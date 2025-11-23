@@ -16,6 +16,7 @@ export type RouteName =
   'auth-reset' |
   'cart' |
   'catalogue' |
+  'cgu' |
   'checkout' |
   'email-sent' |
   'faq' |
@@ -26,5 +27,6 @@ export type RouteName =
   'payment-success' |
   'product-detail' |
   'profil' |
+  'reconstitution' |
   'update-password' |
   'update-password-success'

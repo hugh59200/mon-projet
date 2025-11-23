@@ -300,6 +300,32 @@ const routes: Array<RouteRecordRaw> = [
         'Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou vétérinaire.',
     },
   },
+  {
+    path: '/cgu',
+    name: 'cgu',
+    component: () => import('@/features/interface/cgu/CGU.vue'),
+    meta: {
+      title: 'CGU – Fast Peptides',
+      heading: 'Conditions Générales',
+      description: 'Consultez nos conditions générales d’utilisation (CGU) en vigueur.',
+    },
+  },
+  {
+    path: '/guide-reconstitution',
+    name: 'reconstitution',
+    component: () => import('@/pages/ReconstitutionView.vue'),
+    meta: {
+      // Ces 3 lignes servent à la génération du menu
+      label: 'Calculateur', // Nom court pour le menu
+      icon: 'Calculator', // Icône (assure-toi qu'elle existe dans BasicIconNext)
+      order: 3, // Position (après Catalogue)
+
+      // Méta SEO
+      title: 'Calculateur de Dosage & Reconstitution – Fast Peptides',
+      heading: 'Reconstitution & Calculateur',
+      description: 'Outil interactif pour le dosage et protocole de mélange.',
+    },
+  },
 ]
 
 routes.push({
