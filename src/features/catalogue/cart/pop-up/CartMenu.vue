@@ -2,7 +2,7 @@
   <div class="cart">
     <FloatingDropdownWrapper
       v-model="isOpen"
-      :width="300"
+      :width="350"
       align="right"
       arrow-align="auto"
       :close-delay="800"
@@ -23,6 +23,7 @@
             <BasicText
               size="body-s"
               weight="bold"
+              style="line-height: 1"
             >
               {{ cart.totalItems }}
             </BasicText>
@@ -35,11 +36,13 @@
           v-if="cart.items.length === 0"
           class="cart__empty"
         >
-          <BasicIconNext
-            name="ShoppingBag"
-            :size="40"
-            color="neutral-400"
-          />
+          <div class="cart__empty-icon-wrapper">
+            <BasicIconNext
+              name="ShoppingBag"
+              :size="32"
+              color="neutral-400"
+            />
+          </div>
 
           <BasicText
             size="body-m"
@@ -55,11 +58,11 @@
             color="neutral-400"
             class="cart__empty-sub"
           >
-            Découvrez nos peptides et complétez votre panier.
+            Découvrez nos peptides d'exception et profitez de nos offres.
           </BasicText>
 
           <BasicButton
-            label="Voir les produits"
+            label="Parcourir le catalogue"
             type="primary"
             size="small"
             class="cart__empty-btn"
@@ -69,57 +72,84 @@
 
         <div
           v-else
-          class="cart__list-wrapper"
+          class="cart__filled"
         >
-          <div class="cart__list">
+          <div class="cart__header">
+            <BasicText
+              size="body-s"
+              weight="bold"
+              color="neutral-400"
+            >
+              Mon Panier ({{ cart.totalItems }})
+            </BasicText>
+          </div>
+
+          <div class="cart__list custom-scrollbar">
             <div
-              v-for="item in cart.items.slice(0, 3)"
+              v-for="item in cart.items"
               class="cart__item"
             >
-              <img
-                :src="item.product_image || defaultImage"
-                alt=""
-                class="cart__item-img"
-              />
+              <div class="cart__item-img-wrapper">
+                <img
+                  :src="item.product_image || defaultImage"
+                  alt="Produit"
+                  class="cart__item-img"
+                />
+              </div>
 
               <div class="cart__item-info">
-                <BasicText
-                  size="body-s"
-                  weight="semibold"
-                  color="neutral-300"
-                  class="cart__item-name"
-                >
-                  {{ item.product_name }}
-                </BasicText>
+                <div class="cart__item-top">
+                  <BasicText
+                    size="body-s"
+                    weight="semibold"
+                    color="neutral-200"
+                    class="cart__item-name"
+                  >
+                    {{ item.product_name }}
+                  </BasicText>
 
-                <div class="cart__item-price-row">
+                  <button
+                    class="cart__item-remove"
+                    @click.stop="cart.removeFromCart(item.product_id!)"
+                    title="Retirer du panier"
+                  >
+                    <BasicIconNext
+                      name="X"
+                      :size="14"
+                    />
+                  </button>
+                </div>
+
+                <div class="cart__item-bottom">
                   <BasicText
                     size="body-s"
                     color="neutral-400"
+                    class="cart__item-qty"
                   >
-                    {{ item.quantity }} ×
+                    Qté: {{ item.quantity }}
                   </BasicText>
 
-                  <BasicText
-                    size="body-s"
-                    weight="bold"
-                    color="neutral-200"
-                  >
-                    {{ formatPrice(item.product_price) }}
-                  </BasicText>
+                  <div class="cart__item-prices">
+                    <template v-if="item.is_on_sale">
+                      <span class="price-old">
+                        {{ formatPrice(item.product_price) }}
+                      </span>
+                      <span class="price-new">
+                        {{ formatPrice(item.product_sale_price) }}
+                      </span>
+                    </template>
+                    <template v-else>
+                      <span class="price-standard">
+                        {{ formatPrice(item.product_price) }}
+                      </span>
+                    </template>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div
-            v-if="cart.items.length > 3"
-            class="cart__more"
-          >
-            +{{ cart.items.length - 3 }} autres articles...
-          </div>
-
-          <div class="cart__actions">
+          <div class="cart__footer">
             <div class="cart__total-row">
               <BasicText
                 size="body-s"
@@ -127,19 +157,22 @@
               >
                 Total estimé
               </BasicText>
-              <BasicText
-                size="body-m"
-                color="primary-400"
-                weight="bold"
-              >
-                {{ formatPrice(cart.totalPrice) }}
-              </BasicText>
+              <div class="cart__total-price">
+                <BasicText
+                  size="body-l"
+                  color="primary-400"
+                  weight="bold"
+                >
+                  {{ formatPrice(cart.totalPrice) }}
+                </BasicText>
+              </div>
             </div>
 
             <div class="cart__btns">
               <BasicButton
                 label="Voir le panier"
-                type="reverse"
+                type="secondary"
+                variant="outlined"
                 size="small"
                 @click="goToCart"
               />
@@ -147,6 +180,7 @@
                 label="Paiement"
                 type="primary"
                 size="small"
+                block
                 @click="goToCheckout"
               />
             </div>
@@ -161,6 +195,9 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { BasicButton } from '@designSystem/components/basic/button'
+  import { BasicIconNext } from '@designSystem/components/basic/icon'
+  import { BasicText } from '@designSystem/components/basic/text'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -171,7 +208,7 @@
   const isOpen = ref(false)
 
   function formatPrice(value: number | null | undefined) {
-    if (value == null || isNaN(Number(value))) return '—'
+    if (value == null || isNaN(Number(value))) return '0,00 €'
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
       Number(value),
     )
@@ -199,7 +236,7 @@
     position: relative;
 
     /* ======================
-      ICON TRIGGER
+       ICON TRIGGER
     ====================== */
     &__icon {
       position: relative;
@@ -207,146 +244,228 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      transition: transform 0.25s ease;
+      color: @neutral-100;
+      transition: color 0.2s ease;
 
       &-svg {
         transition: filter 0.25s ease;
       }
 
-      &:hover &-svg {
-        filter: drop-shadow(0 0 6px rgba(var(--primary-500-rgb), 0.45));
+      &:hover {
+        color: white;
+        .cart__icon-svg {
+          filter: drop-shadow(0 0 8px rgba(var(--primary-500-rgb), 0.6));
+        }
       }
     }
 
     &__badge {
       position: absolute;
-      top: -8px;
+      top: -6px;
       right: -6px;
       background: var(--primary-600);
       color: white;
       border-radius: 50%;
       height: 18px;
-      width: 18px; /* Un peu plus grand pour lisibilité */
+      width: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
-      font-weight: bold;
       box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 1);
     }
 
     /* ======================
-      DROPDOWN CONTENT
+       DROPDOWN CONTENT
+       ✅ MODIFIÉ : Plus de background/border ici !
     ====================== */
     &__content {
-      padding: 0;
-      /* Un fond légèrement plus opaque pour le dropdown */
-      background: rgba(30, 30, 30, 0.95);
+      display: flex;
+      flex-direction: column;
+      /* Le wrapper gère déjà le padding, background, border, shadow */
     }
 
+    /* ======================
+       EMPTY STATE
+    ====================== */
     &__empty {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 30px 20px;
+      padding: 24px 12px; /* Padding réduit car le wrapper en a déjà */
       gap: 8px;
-      color: fade(white, 70%);
+
+      &-icon-wrapper {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        padding: 16px;
+        margin-bottom: 8px;
+      }
 
       &-title {
-        margin-top: 8px;
-        color: @neutral-200;
+        margin-top: 4px;
       }
 
       &-sub {
         font-size: 0.85rem;
-        line-height: 1.3;
-        color: @neutral-400;
+        line-height: 1.4;
+        max-width: 200px;
       }
 
       &-btn {
-        margin-top: 12px;
+        margin-top: 16px;
         width: 100%;
       }
     }
 
     /* ======================
-      LIST (cart filled)
+       FILLED STATE
     ====================== */
-    &__list-wrapper {
-      padding: 16px;
-    }
-
-    &__list {
+    &__filled {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      max-height: 500px;
+    }
+
+    &__header {
+      /* Padding ajusté pour s'aligner avec le wrapper */
+      padding: 0 4px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* LISTE SCROLLABLE */
+    &__list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 4px;
+      margin: 8px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      /* Scrollbar styling */
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+      }
     }
 
     &__item {
       display: flex;
-      align-items: flex-start; /* Alignement top pour multiline */
+      align-items: flex-start;
       gap: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid color-mix(in srgb, @neutral-700 50%, transparent);
+      padding: 10px 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
 
-      &:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+      &:hover {
+        background: rgba(255, 255, 255, 0.03);
+
+        .cart__item-remove {
+          opacity: 1;
+        }
       }
 
-      &-img {
+      &-img-wrapper {
         width: 48px;
         height: 48px;
         border-radius: 6px;
-        object-fit: cover;
-        background: color-mix(in srgb, @neutral-800 45%, transparent);
-        border: 1px solid color-mix(in srgb, @neutral-500 15%, transparent);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #000;
         flex-shrink: 0;
       }
 
+      &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
       &-info {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        flex: 1;
-        min-width: 0; /* Pour le truncate */
+        gap: 4px;
+        min-width: 0;
+      }
+
+      &-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
       }
 
       &-name {
+        font-size: 0.9rem;
+        line-height: 1.2;
         display: -webkit-box;
-        -webkit-line-clamp: 1;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
 
-      &-price-row {
+      &-remove {
+        background: none;
+        border: none;
+        color: @neutral-500;
+        cursor: pointer;
+        padding: 2px;
+        opacity: 0; /* Visible au hover */
+        transition: all 0.2s;
+
+        &:hover {
+          color: @red-400;
+        }
+      }
+
+      &-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 2px;
+      }
+
+      &-prices {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        font-size: 0.9rem;
+
+        .price-standard {
+          color: @neutral-100;
+          font-weight: 600;
+        }
+
+        .price-old {
+          color: @neutral-500;
+          text-decoration: line-through;
+          font-size: 0.8rem;
+        }
+
+        .price-new {
+          color: var(--primary-400);
+          font-weight: 700;
+        }
       }
     }
 
-    &__more {
-      text-align: center;
-      font-size: 12px;
-      color: color-mix(in srgb, @neutral-300 60%, transparent);
-      padding: 8px 0 4px;
-      font-style: italic;
-    }
-
     /* ======================
-      TOTAL + BUTTONS
+       FOOTER
     ====================== */
-    &__actions {
+    &__footer {
+      padding: 16px 4px 4px; /* Ajusté */
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid color-mix(in srgb, @neutral-500 30%, transparent);
+      gap: 16px;
     }
 
     &__total-row {
@@ -356,13 +475,9 @@
     }
 
     &__btns {
-      display: flex;
-      gap: 8px;
-
-      button {
-        flex: 1;
-        font-size: 13px;
-      }
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 10px;
     }
   }
 </style>
