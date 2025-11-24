@@ -11,6 +11,7 @@
       @click="prevPage"
       color="white"
     />
+
     <div
       v-for="page in pages"
       :key="page.num"
@@ -27,12 +28,15 @@
         {{ page.type === 'ellipse' ? '…' : page.num }}
       </BasicText>
     </div>
+
     <BasicIcon
       name="arrow-right"
       active
       :class="{ 'arrow--disabled': currentPage === nbPages, arrow: true }"
       @click="nextPage"
+      color="white"
     />
+
     <BasicText
       v-if="nbResults && nbResults > 0"
       class="pagination__span"
@@ -114,36 +118,74 @@
 </script>
 
 <style lang="less">
-  @import './BasicPagination.less';
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
   .arrow {
     cursor: pointer;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+
     &--disabled {
-      opacity: 0.4;
-      pointer-events: none;
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(.arrow--disabled) {
+      opacity: 0.8;
     }
   }
 
   .pagination__button {
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s;
-    padding: 4px 10px;
-    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    /* Design Carré/Rond propre */
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+
+    /* Style par défaut (Inactif) */
+    color: @neutral-300;
+    border: 1px solid transparent;
 
     &--active {
-      background: var(--primary-100);
-      color: var(--primary-800);
-      font-weight: 600;
+      /* Style Actif (Primaire) */
+      background: var(--primary-600);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-color: var(--primary-500);
     }
 
     &.pagination__ellipsis {
       pointer-events: none;
       opacity: 0.5;
+      color: @neutral-500;
     }
 
+    /* Hover sur inactif */
     &:hover:not(&--active):not(.pagination__ellipsis) {
-      background: @neutral-100;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+  }
+
+  .pagination__span {
+    margin-left: 12px;
+    font-size: 0.9rem;
+    opacity: 0.7;
+
+    @media (max-width: 600px) {
+      display: none;
     }
   }
 </style>
