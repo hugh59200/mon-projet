@@ -20,9 +20,11 @@ export function useFilters(products: Ref<Products[]>, priceRange: Ref<Range>) {
 
   // 💸 Filtrage par prix
   const priceFiltered = computed(() =>
-    products.value.filter(
-      (p) => p.price >= priceRange.value.from && p.price <= priceRange.value.to,
-    ),
+    products.value.filter((p) => {
+      // On prend le prix de vente (promo) s'il existe et est actif, sinon le prix normal
+      const effectivePrice = p.is_on_sale && p.sale_price ? p.sale_price : p.price
+      return effectivePrice >= priceRange.value.from && effectivePrice <= priceRange.value.to
+    }),
   )
 
   // 🏷️ Tags

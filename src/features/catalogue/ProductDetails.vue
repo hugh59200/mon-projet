@@ -30,6 +30,7 @@
               :moveType="'drag'"
               :zoomType="'click'"
             />
+
             <div class="product__ruo-badge">
               <BasicText
                 size="body-s"
@@ -39,6 +40,7 @@
                 USAGE RECHERCHE UNIQUEMENT (RUO)
               </BasicText>
             </div>
+
             <div
               v-if="product.is_on_sale"
               class="product__promo-badge"
@@ -51,8 +53,8 @@
             <BasicText
               size="h2"
               weight="bold"
+              color="secondary-900"
               class="product__name"
-              style="color: var(--secondary-900)"
             >
               {{ product.name }}
             </BasicText>
@@ -63,20 +65,31 @@
                 color="neutral-700"
               >
                 Catégorie :
-                <span style="font-weight: 600; color: var(--neutral-900)">
+                <BasicText
+                  size="body-m"
+                  weight="semibold"
+                  color="neutral-900"
+                >
                   {{ product.category }}
-                </span>
+                </BasicText>
               </BasicText>
+
               <span class="product__separator">|</span>
+
               <BasicText
                 size="body-m"
                 color="neutral-700"
               >
                 Pureté :
-                <span style="font-weight: 700; color: var(--success-700)">
+                <BasicText
+                  size="body-m"
+                  weight="bold"
+                  color="success-700"
+                >
                   {{ product.purity }}%
-                </span>
+                </BasicText>
               </BasicText>
+
               <template v-if="product.dosage">
                 <span class="product__separator">|</span>
                 <BasicText
@@ -84,9 +97,13 @@
                   color="neutral-700"
                 >
                   Dosage :
-                  <span style="font-weight: 700; color: var(--primary-700)">
+                  <BasicText
+                    size="body-m"
+                    weight="bold"
+                    color="primary-700"
+                  >
                     {{ product.dosage }}
-                  </span>
+                  </BasicText>
                 </BasicText>
               </template>
             </div>
@@ -97,7 +114,7 @@
                 <BasicText
                   size="h3"
                   weight="bold"
-                  class="product__price product__price--sale"
+                  color="danger-600"
                 >
                   {{ product.sale_price.toFixed(2) }} €
                 </BasicText>
@@ -106,7 +123,7 @@
                 <BasicText
                   size="h3"
                   weight="bold"
-                  class="product__price"
+                  color="primary-700"
                 >
                   {{ product.price.toFixed(2) }} €
                 </BasicText>
@@ -130,14 +147,15 @@
                 color="danger-600"
                 weight="semibold"
               >
-                Réapprovisionnement en cours.
+                Le produit est actuellement en réapprovisionnement.
               </BasicText>
+
               <BasicText
                 v-else-if="(product.stock ?? 0) < 10"
                 size="body-s"
                 color="warning-600"
               >
-                Plus que {{ product.stock }} exemplaires !
+                Plus que {{ product.stock }} exemplaires disponibles !
               </BasicText>
 
               <BasicText
@@ -146,20 +164,19 @@
                 font-style="italic"
                 class="product__disclaimer"
               >
-                * Produit destiné exclusivement à la recherche en laboratoire.
+                * Ce produit est strictement destiné à la recherche en laboratoire. Non destiné à la
+                consommation ou à l'usage humain.
               </BasicText>
             </div>
           </div>
         </div>
 
         <div class="product__bottom-section">
-          <div class="product__divider"></div>
-
           <BasicText
             size="h4"
             weight="bold"
             color="secondary-900"
-            style="margin-bottom: 16px"
+            class="product__desc-title"
           >
             Fiche Technique & Description
           </BasicText>
@@ -168,6 +185,10 @@
             class="product__desc-content"
             v-html="sanitizeHTML(product.description || 'Aucune description détaillée disponible.')"
           ></div>
+
+          <div class="product__divider"></div>
+
+          <ProductEssentials />
         </div>
       </div>
     </WrapperLoader>
@@ -175,7 +196,6 @@
 </template>
 
 <script setup lang="ts">
-  // ... (Garde tes imports et scripts identiques, rien ne change ici) ...
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
   import type { Products } from '@/supabase/types/supabase.types'
@@ -184,25 +204,33 @@
   import { onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute } from 'vue-router'
+  import ProductEssentials from '../shared/components/ProductEssentials.vue'
 
   const route = useRoute()
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
+
   const product = ref<Products | null>(null)
   const loading = ref(true)
 
   onMounted(async () => {
     const { id } = route.params
     if (typeof id !== 'string') return
+
     loading.value = true
+
     try {
       const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
+
       if (!error && data) {
         product.value = data
-        document.title = `${data.name} – Fast Peptides`
+        const productName = data.name || 'Produit Inconnu'
+        const metaTitle = `${productName} ${data.dosage ? ' - ' + data.dosage : ''} | Fast Peptides`
+        document.title = metaTitle
       }
     } catch (e) {
-      console.error(e)
+      console.error('Erreur loading product:', e)
+      product.value = null
     } finally {
       loading.value = false
     }
@@ -221,7 +249,7 @@
     flex-direction: column;
     padding: 40px 60px;
     gap: 20px;
-    max-width: 1100px; /* Un peu plus contenu pour la lisibilité */
+    max-width: 1100px;
     margin: 0 auto;
 
     &__back {
@@ -232,7 +260,7 @@
     &__container {
       display: flex;
       flex-direction: column;
-      gap: 40px; /* Espace entre le haut et la description */
+      gap: 50px;
     }
 
     /* --- SECTION HAUT --- */
@@ -246,7 +274,7 @@
       flex: 1;
       max-width: 450px;
       position: relative;
-      /* On s'assure que l'image ne devienne pas gigantesque */
+      user-select: none;
 
       .product__zoom {
         border-radius: 16px;
@@ -258,27 +286,43 @@
     }
 
     &__info-panel {
-      flex: 1; /* Prend l'espace restant à droite */
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 20px;
       padding-top: 10px;
     }
 
-    /* --- SECTION BAS (DESCRIPTION) --- */
+    /* --- SECTION BAS --- */
     &__bottom-section {
       width: 100%;
       background: color-mix(in srgb, @neutral-100 50%, transparent);
-      padding: 30px;
+      padding: 40px;
       border-radius: 16px;
       border: 1px solid @neutral-200;
     }
 
+    /* Titre style "Medical / Pro" 
+       Note: La couleur du texte est gérée par la prop color="secondary-900",
+       ici on gère juste la mise en page et la bordure */
+    &__desc-title {
+      border-left: 4px solid var(--primary-500);
+      padding-left: 16px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 1.1rem !important;
+      display: flex;
+      align-items: center;
+      height: 24px;
+    }
+
     &__desc-content {
       color: @neutral-700;
-      line-height: 1.7; /* Meilleure lisibilité */
+      line-height: 1.7;
       font-size: 1.05rem;
 
+      /* Style pour le HTML injecté (v-html) qui ne peut pas utiliser BasicText */
       :deep(p) {
         margin-bottom: 16px;
       }
@@ -293,10 +337,18 @@
       }
       :deep(li) {
         margin-bottom: 8px;
+        padding-left: 5px;
       }
     }
 
-    /* --- ELEMENTS UI --- */
+    &__divider {
+      width: 100%;
+      height: 1px;
+      background: @neutral-200;
+      margin: 40px 0;
+    }
+
+    /* --- ELEMENTS UI DIVERS --- */
     &__ruo-badge {
       position: absolute;
       top: -12px;
@@ -322,7 +374,7 @@
     }
 
     &__name {
-      font-size: clamp(2rem, 3vw, 2.5rem);
+      font-size: clamp(2rem, 3vw, 2.5rem) !important;
       line-height: 1.1;
     }
 
@@ -348,13 +400,6 @@
       margin-top: 5px;
     }
 
-    &__price {
-      color: var(--primary-700);
-      font-size: 2rem;
-      &--sale {
-        color: @red-600;
-      }
-    }
     &__old-price {
       text-decoration: line-through;
       color: @neutral-500;
@@ -365,8 +410,8 @@
       margin-top: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-width: 400px; /* Limite la largeur du bouton */
+      gap: 12px;
+      max-width: 400px;
     }
 
     &__disclaimer {
@@ -375,7 +420,7 @@
     }
 
     /* --- RESPONSIVE --- */
-    @media (max-width: 850px) {
+    @media (max-width: 900px) {
       padding: 20px;
 
       &__top-section {
@@ -399,6 +444,7 @@
       &__meta-pill {
         width: 100%;
         justify-content: center;
+        flex-wrap: wrap;
       }
     }
   }
