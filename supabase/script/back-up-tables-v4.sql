@@ -619,3 +619,22 @@ BEGIN
 END;
 $$;
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
+
+CREATE OR REPLACE VIEW public.user_cart_view AS
+SELECT
+  c.id AS cart_item_id,
+  c.user_id,
+  c.product_id,
+  COALESCE(c.quantity, 1) AS quantity,
+  c.updated_at,
+  p.name AS product_name,
+  p.dosage AS product_dosage,
+  p.category AS product_category,
+  COALESCE(p.price, 0)::numeric(10,2) AS product_price,
+  COALESCE(p.sale_price, 0)::numeric(10,2) AS product_sale_price,
+  COALESCE(p.is_on_sale, false) AS is_on_sale,
+  COALESCE(p.image, '') AS product_image,
+  COALESCE(p.stock, 0) AS product_stock,
+  p.purity AS product_purity -- ✅ AJOUT ICI
+FROM public.user_cart_items c
+JOIN public.products p ON p.id = c.product_id;

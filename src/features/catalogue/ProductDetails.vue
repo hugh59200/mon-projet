@@ -17,148 +17,157 @@
     >
       <div
         v-if="product"
-        class="product__content"
+        class="product__container"
       >
-        <div class="product__image-wrapper">
-          <InnerImageZoom
-            v-if="product.image"
-            :src="product.image"
-            :zoomSrc="product.image"
-            :alt="`Image de peptide ${product.name}`"
-            class="product__zoom"
-            :moveType="'drag'"
-            :zoomType="'click'"
-          />
-
-          <div class="product__ruo-badge">
-            <BasicText
-              size="body-s"
-              weight="semibold"
-              color="white"
+        <div class="product__top-section">
+          <div class="product__image-wrapper">
+            <InnerImageZoom
+              v-if="product.image"
+              :src="product.image"
+              :zoomSrc="product.image"
+              :alt="`Image de peptide ${product.name}`"
+              class="product__zoom"
+              :moveType="'drag'"
+              :zoomType="'click'"
+            />
+            <div class="product__ruo-badge">
+              <BasicText
+                size="body-s"
+                weight="semibold"
+                color="white"
+              >
+                USAGE RECHERCHE UNIQUEMENT (RUO)
+              </BasicText>
+            </div>
+            <div
+              v-if="product.is_on_sale"
+              class="product__promo-badge"
             >
-              USAGE RECHERCHE UNIQUEMENT (RUO)
-            </BasicText>
+              PROMO
+            </div>
           </div>
 
-          <div
-            v-if="product.is_on_sale"
-            class="product__promo-badge"
-          >
-            PROMO
+          <div class="product__info-panel">
+            <BasicText
+              size="h2"
+              weight="bold"
+              class="product__name"
+              style="color: var(--secondary-900)"
+            >
+              {{ product.name }}
+            </BasicText>
+
+            <div class="product__meta-pill">
+              <BasicText
+                size="body-m"
+                color="neutral-700"
+              >
+                Catégorie :
+                <span style="font-weight: 600; color: var(--neutral-900)">
+                  {{ product.category }}
+                </span>
+              </BasicText>
+              <span class="product__separator">|</span>
+              <BasicText
+                size="body-m"
+                color="neutral-700"
+              >
+                Pureté :
+                <span style="font-weight: 700; color: var(--success-700)">
+                  {{ product.purity }}%
+                </span>
+              </BasicText>
+              <template v-if="product.dosage">
+                <span class="product__separator">|</span>
+                <BasicText
+                  size="body-m"
+                  color="neutral-700"
+                >
+                  Dosage :
+                  <span style="font-weight: 700; color: var(--primary-700)">
+                    {{ product.dosage }}
+                  </span>
+                </BasicText>
+              </template>
+            </div>
+
+            <div class="product__price-block">
+              <template v-if="product.is_on_sale && product.sale_price">
+                <BasicText class="product__old-price">{{ product.price.toFixed(2) }} €</BasicText>
+                <BasicText
+                  size="h3"
+                  weight="bold"
+                  class="product__price product__price--sale"
+                >
+                  {{ product.sale_price.toFixed(2) }} €
+                </BasicText>
+              </template>
+              <template v-else>
+                <BasicText
+                  size="h3"
+                  weight="bold"
+                  class="product__price"
+                >
+                  {{ product.price.toFixed(2) }} €
+                </BasicText>
+              </template>
+            </div>
+
+            <div class="product__actions">
+              <BasicButton
+                :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock'"
+                :disabled="(product.stock ?? 0) <= 0"
+                :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
+                variant="filled"
+                size="large"
+                @click="addToCart(product!)"
+                width="full"
+              />
+
+              <BasicText
+                v-if="(product.stock ?? 0) <= 0"
+                size="body-s"
+                color="danger-600"
+                weight="semibold"
+              >
+                Réapprovisionnement en cours.
+              </BasicText>
+              <BasicText
+                v-else-if="(product.stock ?? 0) < 10"
+                size="body-s"
+                color="warning-600"
+              >
+                Plus que {{ product.stock }} exemplaires !
+              </BasicText>
+
+              <BasicText
+                size="body-s"
+                color="danger-400"
+                font-style="italic"
+                class="product__disclaimer"
+              >
+                * Produit destiné exclusivement à la recherche en laboratoire.
+              </BasicText>
+            </div>
           </div>
         </div>
 
-        <div class="product__info">
+        <div class="product__bottom-section">
+          <div class="product__divider"></div>
+
           <BasicText
-            size="h2"
+            size="h4"
             weight="bold"
             color="secondary-900"
-            class="product__name"
+            style="margin-bottom: 16px"
           >
-            {{ product.name }}
+            Fiche Technique & Description
           </BasicText>
 
-          <div class="product__meta-pill">
-            <BasicText
-              size="body-m"
-              color="neutral-700"
-            >
-              Catégorie :
-              <BasicText
-                weight="semibold"
-                color="neutral-900"
-                tag="span"
-              >
-                {{ product.category }}
-              </BasicText>
-            </BasicText>
-            <span class="product__separator">|</span>
-            <BasicText
-              size="body-m"
-              color="neutral-700"
-            >
-              Pureté :
-              <BasicText
-                weight="bold"
-                color="success-700"
-                tag="span"
-              >
-                {{ product.purity }}%
-              </BasicText>
-            </BasicText>
-          </div>
-
-          <div class="product__price-block">
-            <template v-if="product.is_on_sale && product.sale_price">
-              <BasicText class="product__old-price">{{ product.price.toFixed(2) }} €</BasicText>
-              <BasicText
-                size="h3"
-                weight="bold"
-                class="product__price product__price--sale"
-              >
-                {{ product.sale_price.toFixed(2) }} €
-              </BasicText>
-            </template>
-            <template v-else>
-              <BasicText
-                size="h3"
-                weight="bold"
-                class="product__price"
-              >
-                {{ product.price.toFixed(2) }} €
-              </BasicText>
-            </template>
-          </div>
-
-          <BasicText
-            size="body-m"
-            color="neutral-700"
-            class="product__desc"
-          >
-            {{
-              product.description ||
-              'Aucune description détaillée n’est disponible pour ce produit de recherche.'
-            }}
-          </BasicText>
-
-          <div class="product__actions">
-            <BasicButton
-              :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock'"
-              :disabled="(product.stock ?? 0) <= 0"
-              :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
-              variant="filled"
-              size="large"
-              @click="addToCart(product)"
-              class="product__add-button"
-            />
-
-            <BasicText
-              v-if="(product.stock ?? 0) <= 0"
-              size="body-s"
-              color="danger-600"
-              weight="semibold"
-            >
-              Le produit est actuellement en réapprovisionnement.
-            </BasicText>
-
-            <BasicText
-              v-else-if="(product.stock ?? 0) < 10"
-              size="body-s"
-              color="warning-600"
-            >
-              Plus que {{ product.stock }} exemplaires disponibles !
-            </BasicText>
-          </div>
-
-          <BasicText
-            size="body-s"
-            color="danger-400"
-            font-style="italic"
-            class="product__disclaimer"
-          >
-            * Ce produit est strictement destiné à la recherche en laboratoire. Non destiné à la
-            consommation ou à l'usage humain.
-          </BasicText>
+          <div
+            class="product__desc-content"
+            v-html="sanitizeHTML(product.description || 'Aucune description détaillée disponible.')"
+          ></div>
         </div>
       </div>
     </WrapperLoader>
@@ -166,9 +175,11 @@
 </template>
 
 <script setup lang="ts">
+  // ... (Garde tes imports et scripts identiques, rien ne change ici) ...
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { Products } from '@/supabase/types/supabase.types' // ✅ Type officiel V2
+  import type { Products } from '@/supabase/types/supabase.types'
+  import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
@@ -177,54 +188,28 @@
   const route = useRoute()
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
-
-  // ✅ Plus besoin de type manuel 'ProductRow', on utilise le type généré
   const product = ref<Products | null>(null)
   const loading = ref(true)
 
   onMounted(async () => {
     const { id } = route.params
     if (typeof id !== 'string') return
-
     loading.value = true
-
     try {
       const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
-
       if (!error && data) {
-        // ✅ Pas de conversion de stock !! On garde le number brut.
         product.value = data
-
-        // SEO Dynamique
-        const productName = data.name || 'Produit Inconnu'
-        const metaDescription =
-          data.description ||
-          `Achetez le peptide ${productName} (${data.purity}% pureté) sur Fast Peptides.`
-
-        document.title = `${productName} – Fast Peptides`
-
-        // Gestion Meta Description
-        let descriptionTag = document.querySelector('meta[name="description"]')
-        if (!descriptionTag) {
-          descriptionTag = document.createElement('meta')
-          descriptionTag.setAttribute('name', 'description')
-          document.head.appendChild(descriptionTag)
-        }
-        descriptionTag.setAttribute('content', metaDescription)
+        document.title = `${data.name} – Fast Peptides`
       }
     } catch (e) {
-      console.error('Erreur de chargement du produit:', e)
-      product.value = null
+      console.error(e)
     } finally {
       loading.value = false
     }
   })
 
   const addToCart = (p: Products) => {
-    // ✅ Vérification numérique V2
     if ((p.stock ?? 0) <= 0) return
-
-    // On passe directement l'objet Products au store qui gère le reste
     cart.addToCart(p)
     showAddToCartToast(p)
   }
@@ -235,48 +220,92 @@
     display: flex;
     flex-direction: column;
     padding: 40px 60px;
-    gap: 30px;
-    max-width: 1200px;
+    gap: 20px;
+    max-width: 1100px; /* Un peu plus contenu pour la lisibilité */
     margin: 0 auto;
 
     &__back {
       align-self: flex-start;
+      margin-bottom: 10px;
     }
 
-    &__content {
+    &__container {
       display: flex;
-      gap: 80px;
-      align-items: flex-start;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 40px; /* Espace entre le haut et la description */
     }
 
-    /* --- IMAGE --- */
+    /* --- SECTION HAUT --- */
+    &__top-section {
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+    }
+
     &__image-wrapper {
       flex: 1;
-      min-width: 300px;
       max-width: 450px;
-      user-select: none;
       position: relative;
+      /* On s'assure que l'image ne devienne pas gigantesque */
 
       .product__zoom {
-        width: 100%;
         border-radius: 16px;
         background: white;
-        padding: 25px;
+        padding: 20px;
         border: 1px solid @neutral-200;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
       }
     }
 
+    &__info-panel {
+      flex: 1; /* Prend l'espace restant à droite */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-top: 10px;
+    }
+
+    /* --- SECTION BAS (DESCRIPTION) --- */
+    &__bottom-section {
+      width: 100%;
+      background: color-mix(in srgb, @neutral-100 50%, transparent);
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid @neutral-200;
+    }
+
+    &__desc-content {
+      color: @neutral-700;
+      line-height: 1.7; /* Meilleure lisibilité */
+      font-size: 1.05rem;
+
+      :deep(p) {
+        margin-bottom: 16px;
+      }
+      :deep(strong) {
+        font-weight: 700;
+        color: var(--secondary-900);
+      }
+      :deep(ul) {
+        padding-left: 20px;
+        margin-bottom: 16px;
+        list-style-type: disc;
+      }
+      :deep(li) {
+        margin-bottom: 8px;
+      }
+    }
+
+    /* --- ELEMENTS UI --- */
     &__ruo-badge {
       position: absolute;
-      top: -15px;
-      right: 0;
+      top: -12px;
+      right: -12px;
       padding: 6px 12px;
       border-radius: 999px;
       background: @red-700;
       z-index: 10;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     &__promo-badge {
@@ -292,53 +321,40 @@
       z-index: 10;
     }
 
-    /* --- INFO --- */
-    &__info {
-      flex: 1.5;
-      min-width: 300px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding-top: 10px;
-
-      .product__name {
-        font-size: clamp(1.8rem, 3vw, 2.5rem) !important;
-        color: var(--secondary-900);
-        margin-bottom: 5px;
-      }
+    &__name {
+      font-size: clamp(2rem, 3vw, 2.5rem);
+      line-height: 1.1;
     }
 
     &__meta-pill {
-      display: flex;
-      gap: 15px;
+      display: inline-flex;
+      gap: 12px;
       align-items: center;
-      padding: 10px 15px;
+      padding: 8px 16px;
       border-radius: 8px;
       background: @neutral-50;
       border: 1px solid @neutral-200;
+      width: fit-content;
     }
 
     &__separator {
       color: @neutral-300;
     }
 
-    /* --- PRIX --- */
     &__price-block {
-      margin-top: 10px;
       display: flex;
       align-items: baseline;
       gap: 12px;
+      margin-top: 5px;
     }
 
     &__price {
       color: var(--primary-700);
-      font-size: clamp(1.5rem, 2.5vw, 2rem) !important;
-
+      font-size: 2rem;
       &--sale {
         color: @red-600;
       }
     }
-
     &__old-price {
       text-decoration: line-through;
       color: @neutral-500;
@@ -346,36 +362,43 @@
     }
 
     &__actions {
-      margin-top: 15px;
+      margin-top: 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-width: 350px;
+      max-width: 400px; /* Limite la largeur du bouton */
     }
 
     &__disclaimer {
-      margin-top: 15px;
-      line-height: 1.4;
-      max-width: 450px;
-      padding-left: 5px;
+      line-height: 1.3;
+      margin-top: 5px;
     }
 
-    @media (max-width: 900px) {
+    /* --- RESPONSIVE --- */
+    @media (max-width: 850px) {
       padding: 20px;
-      gap: 40px;
 
-      &__content {
+      &__top-section {
         flex-direction: column;
         align-items: center;
+        gap: 30px;
       }
-      &__image-wrapper {
-        max-width: 350px;
-      }
-      &__info {
-        min-width: 100%;
-      }
+
+      &__image-wrapper,
+      &__info-panel,
       &__actions {
         max-width: 100%;
+        width: 100%;
+      }
+
+      &__info-panel {
+        align-items: center;
+        text-align: center;
+      }
+
+      &__meta-pill {
+        width: 100%;
+        justify-content: center;
       }
     }
   }

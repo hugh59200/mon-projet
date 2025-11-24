@@ -505,6 +505,7 @@ export type Database = {
           category: string
           created_at: string | null
           description: string | null
+          dosage: string | null
           id: string
           image: string | null
           is_on_sale: boolean | null
@@ -519,6 +520,7 @@ export type Database = {
           category: string
           created_at?: string | null
           description?: string | null
+          dosage?: string | null
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
@@ -533,6 +535,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           description?: string | null
+          dosage?: string | null
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
@@ -874,10 +877,12 @@ export type Database = {
           cart_item_id: string | null
           is_on_sale: boolean | null
           product_category: string | null
+          product_dosage: string | null
           product_id: string | null
           product_image: string | null
           product_name: string | null
           product_price: number | null
+          product_purity: number | null
           product_sale_price: number | null
           product_stock: number | null
           quantity: number | null

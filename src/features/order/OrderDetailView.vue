@@ -118,7 +118,7 @@
           </BasicText>
           <div class="order-detail__items">
             <div
-              v-for="(item, i) in getItems(order)"
+              v-for="(item, i) in getItems(order as any)"
               :key="i"
               class="order-detail__item"
             >

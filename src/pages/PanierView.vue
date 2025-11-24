@@ -1,6 +1,7 @@
 <template>
   <div class="cart-page">
     <PageHeader />
+
     <div class="cart-page__body">
       <div
         v-if="cart.items.length === 0"
@@ -41,9 +42,10 @@
         class="cart-page__grid"
       >
         <div class="cart-page__items">
-          <div
+          <CartItemRow
             v-for="(item, index) in cart.items"
-            class="cart-item"
+            :item="item"
+            @view="viewProduct"
             v-motion="{
               initial: { opacity: 0, y: 20 },
               enter: {
@@ -52,83 +54,7 @@
                 transition: { delay: index * 0.05, type: 'spring', stiffness: 100 },
               },
             }"
-          >
-            <img
-              :src="item.product_image || defaultImage"
-              :alt="item.product_name!"
-              class="cart-item__img"
-            />
-
-            <div class="cart-item__content">
-              <div class="cart-item__header">
-                <BasicText
-                  size="body-l"
-                  weight="bold"
-                  color="neutral-900"
-                >
-                  {{ item.product_name }}
-                </BasicText>
-                <BasicText
-                  size="body-l"
-                  weight="bold"
-                  color="neutral-900"
-                  class="cart-item__total-price"
-                >
-                  {{ formatPrice(getItemTotal(item)) }}
-                </BasicText>
-              </div>
-
-              <div class="cart-item__details">
-                <div class="cart-item__unit-price">
-                  <template v-if="item.is_on_sale">
-                    <span class="old-price">{{ formatPrice(item.product_price) }}</span>
-                    <span class="sale-price">{{ formatPrice(item.product_sale_price) }}</span>
-                  </template>
-                  <template v-else>
-                    {{ formatPrice(item.product_price) }}
-                  </template>
-                  <span class="unit-label">/ unité</span>
-                </div>
-
-                <div class="cart-item__actions">
-                  <div class="cart-item__quantity">
-                    <button
-                      class="qty-btn"
-                      @click="updateQty(item, -1)"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      :value="item.quantity"
-                      @input="
-                        (e) =>
-                          cart.updateQuantity(
-                            item.product_id!,
-                            +(e.target as HTMLInputElement).value,
-                          )
-                      "
-                    />
-                    <button
-                      class="qty-btn"
-                      @click="updateQty(item, 1)"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <BasicButton
-                    label="Retirer"
-                    type="danger"
-                    variant="ghost"
-                    size="small"
-                    @click="cart.removeFromCart(item.product_id || '')"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          />
         </div>
 
         <aside class="cart-page__summary-wrapper">
@@ -206,13 +132,18 @@
 </template>
 
 <script setup lang="ts">
-  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import CartItemRow from '@/features/catalogue/cart/CartItemRow.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
-  import type { CartView } from '@/supabase/types/supabase.types'
   import { computed } from 'vue'
+  import { useRouter } from 'vue-router'
 
   const cart = useCartStore()
+  const router = useRouter()
+
+  function viewProduct(id: string) {
+    if (id) router.push(`/catalogue/${id}`)
+  }
 
   function formatPrice(value: number | null | undefined) {
     if (value == null || isNaN(Number(value))) return '0,00 €'
@@ -221,23 +152,11 @@
     )
   }
 
-  function getItemTotal(item: CartView) {
-    const price = item.is_on_sale
-      ? (item.product_sale_price ?? item.product_price ?? 0)
-      : (item.product_price ?? 0)
-    return price * (item.quantity ?? 1)
-  }
-
-  function updateQty(item: CartView, delta: number) {
-    const newQty = (item.quantity || 1) + delta
-    if (newQty < 1) return
-    cart.updateQuantity(item.product_id!, newQty)
-  }
-
   // --- Logique Livraison ---
   const FREE_SHIPPING_THRESHOLD = 100
   const FLAT_SHIPPING_RATE = 9.9
 
+  // Si le total (promo incluse) dépasse 100€, livraison offerte
   const shippingCost = computed(() => {
     return cart.totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE
   })
@@ -293,120 +212,7 @@
     &__items {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-    }
-
-    // --- ITEM CARD ---
-    .cart-item {
-      display: flex;
-      gap: 24px;
-      padding: 20px;
-      background: white;
-      border-radius: 16px;
-      border: 1px solid @neutral-200;
-      .card-shadow(0 2px 8px rgba(0, 0, 0, 0.04));
-      transition: all 0.2s ease;
-
-      &:hover {
-        border-color: var(--primary-200);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        transform: translateY(-2px);
-      }
-
-      &__img {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 12px;
-        border: 1px solid @neutral-100;
-        flex-shrink: 0;
-      }
-
-      &__content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-
-      &__header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
-      }
-
-      &__details {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 16px;
-      }
-
-      &__unit-price {
-        font-size: 14px;
-        color: @neutral-600;
-
-        .old-price {
-          text-decoration: line-through;
-          margin-right: 6px;
-          opacity: 0.7;
-        }
-        .sale-price {
-          color: @danger-600;
-          font-weight: 600;
-          margin-right: 4px;
-        }
-      }
-
-      &__actions {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-
-      &__quantity {
-        display: flex;
-        align-items: center;
-        border: 1px solid @neutral-300;
-        border-radius: 8px;
-        overflow: hidden;
-        height: 36px;
-        background: @neutral-50;
-
-        input {
-          width: 44px;
-          text-align: center;
-          border: none;
-          outline: none;
-          background: transparent;
-          font-weight: 600;
-          color: @neutral-900;
-          -moz-appearance: textfield;
-          &::-webkit-outer-spin-button,
-          &::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-          }
-        }
-
-        .qty-btn {
-          width: 32px;
-          height: 100%;
-          border: none;
-          background: transparent;
-          color: @neutral-600;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.2s;
-
-          &:hover {
-            background: @neutral-200;
-            color: var(--primary-600);
-          }
-        }
-      }
+      gap: 16px; // Espacement entre les lignes
     }
 
     // --- SUMMARY CARD ---
@@ -472,32 +278,6 @@
     // --- MOBILE ---
     @media (max-width: 600px) {
       padding: 20px 16px;
-
-      .cart-item {
-        flex-direction: column;
-        gap: 16px;
-
-        &__header {
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        &__img {
-          width: 100%;
-          height: 140px;
-        }
-
-        &__details {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
-        }
-
-        &__actions {
-          width: 100%;
-          justify-content: space-between;
-        }
-      }
     }
   }
 </style>

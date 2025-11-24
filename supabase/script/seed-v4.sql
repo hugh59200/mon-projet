@@ -14,125 +14,128 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================
--- 📦 SEED — PRODUCTS (CHEMINS IMAGES CORRIGÉS)
+-- 📦 SEED — PRODUCTS (DESCRIPTIONS DETAILLÉES V3)
 -- ============================
-INSERT INTO public.products (name, dosage, category, price, sale_price, is_on_sale, stock, purity, image, description, tags)
+-- Note: Les descriptions contiennent du HTML pour le formatage (puces, gras)
+-- ============================
+
+INSERT INTO public.products (name, dosage, category, price, sale_price, is_on_sale, stock, purity, image, tags, description)
 VALUES
 -- 1. BPC-157
 ('BPC-157', '10mg', 'Récupération', 40.00, 36.00, true, 10, 99.00,
  '/src/assets/products/bpc-157/10mg/bpc-157-10mg.png',
- 'Peptide de protection corporelle, favorise la guérison des tissus mous.',
- '{"recuperation", "articulations", "99%"}'),
+ '{"recuperation", "articulations", "99%"}',
+ '<p><strong>Le BPC-157 (Body Protection Compound-157)</strong> est un pentadécapeptide composé de 15 acides aminés, dérivé d''une protéine protectrice présente naturellement dans l''estomac humain.</p><p>Dans le cadre de la recherche, ce peptide est largement étudié pour ses propriétés potentielles de cytoprotection et d''angiogenèse (formation de nouveaux vaisseaux sanguins).</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Accélération de la cicatrisation des tendons et ligaments.</li><li>Réduction de l''inflammation intestinale.</li><li>Protection cellulaire contre les toxines.</li></ul>'),
 
 -- 2. TB-500
 ('TB-500', '5mg', 'Récupération', 45.00, 40.50, true, 10, 99.00,
  '/src/assets/products/tb-500/5mg/tb-500-5mg.png',
- 'Thymosin Beta-4 synthétique pour la réparation cellulaire et la souplesse.',
- '{"recuperation", "souplesse", "99%"}'),
+ '{"recuperation", "souplesse", "99%"}',
+ '<p><strong>Le TB-500</strong> est une version synthétique de la Thymosin Beta-4, une protéine présente dans presque toutes les cellules humaines et animales. Elle joue un rôle clé dans la régulation de l''actine cellulaire.</p><p>Les chercheurs s''intéressent à sa capacité à favoriser la migration cellulaire vers les zones lésées, facilitant ainsi la régénération tissulaire.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Réduction de l''inflammation tissulaire.</li><li>Amélioration de la flexibilité et réduction des adhérences.</li><li>Récupération musculaire post-traumatique.</li></ul>'),
 
 -- 3. Semaglutide
 ('Semaglutide', '10mg', 'Perte de poids', 75.00, 67.50, true, 10, 99.00,
  '/src/assets/products/semaglutide/10mg/semaglutide-10mg.png',
- 'Agoniste GLP-1 puissant pour la gestion du poids et le contrôle de l’appétit.',
- '{"minceur", "metabolisme", "99%"}'),
+ '{"minceur", "metabolisme", "99%"}',
+ '<p><strong>Le Semaglutide</strong> est un agoniste des récepteurs du GLP-1 (Glucagon-Like Peptide-1). Il imite l''action de l''hormone incrétine naturelle qui régule la glycémie.</p><p>En laboratoire, il est étudié pour sa capacité à ralentir la vidange gastrique et à influencer les signaux de satiété au niveau de l''hypothalamus.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Régulation de l''insuline et de la glycémie.</li><li>Études sur la réduction de la masse adipeuse.</li><li>Contrôle de l''appétit dans les modèles animaux.</li></ul>'),
 
 -- 4. Tirzepatide
 ('Tirzepatide', '10mg', 'Perte de poids', 85.00, 76.50, true, 10, 99.00,
  '/src/assets/products/tirzepatide/10mg/tirzepatide-10mg.png',
- 'Double agoniste GLP-1/GIP pour une efficacité maximale sur la perte de poids.',
- '{"minceur", "avancé", "99%"}'),
+ '{"minceur", "avancé", "99%"}',
+ '<p><strong>Le Tirzepatide</strong> est un peptide innovant à double action : il agit comme agoniste des récepteurs GIP (polypeptide insulinotrope dépendant du glucose) et GLP-1.</p><p>Cette synergie unique en fait un sujet d''étude privilégié pour le traitement des désordres métaboliques sévères, offrant une efficacité potentiellement supérieure aux agonistes GLP-1 seuls.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Synergie GIP/GLP-1 pour le métabolisme.</li><li>Amélioration de la sensibilité à l''insuline.</li><li>Impact significatif sur la composition corporelle.</li></ul>'),
 
 -- 5. Retatrutide
 ('Retatrutide', '10mg', 'Perte de poids', 60.00, 54.00, true, 10, 99.00,
  '/src/assets/products/retatrutide/10mg/retatrutide-10mg.png',
- 'Agoniste multiple nouvelle génération pour le métabolisme.',
- '{"metabolisme", "perte-de-poids", "99%"}'),
+ '{"metabolisme", "perte-de-poids", "99%"}',
+ '<p><strong>Le Retatrutide</strong> est un candidat de nouvelle génération qualifié de "triple agoniste" (GLP-1, GIP et Glucagon). C''est actuellement l''un des peptides les plus prometteurs en recherche métabolique.</p><p>L''ajout de l''agonisme du récepteur au glucagon vise à augmenter la dépense énergétique basale, en plus des effets sur la satiété.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Stimulation de la dépense énergétique.</li><li>Régulation hépatique des lipides.</li><li>Gestion avancée de l''obésité.</li></ul>'),
 
 -- 6. CJC-1295 DAC
 ('CJC-1295 DAC', '5mg', 'Croissance', 42.00, 37.80, true, 10, 98.50,
  '/src/assets/products/cjc-1295-dac/5mg/cjc-1295-dac-5mg.png',
- 'Stimulant de l’hormone de croissance à longue durée d’action.',
- '{"croissance", "masse", "98.5%"}'),
+ '{"croissance", "masse", "98.5%"}',
+ '<p><strong>Le CJC-1295 avec DAC</strong> (Drug Affinity Complex) est un analogue synthétique de la GHRH (Growth Hormone Releasing Hormone). La modification DAC permet de se lier à l''albumine sérique, prolongeant considérablement sa demi-vie.</p><p>Contrairement au CJC sans DAC, cette version permet de maintenir des niveaux physiologiques élevés d''hormone de croissance de manière continue sur plusieurs jours.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Stimulation continue de la sécrétion de GH et d''IGF-1.</li><li>Études sur l''anabolisme musculaire à long terme.</li><li>Amélioration de la synthèse protéique.</li></ul>'),
 
 -- 7. GHRP-6
 ('GHRP-6', '10mg', 'Croissance', 32.00, 28.80, true, 10, 99.00,
  '/src/assets/products/ghrp-6/10mg/ghrp-6-10mg.png',
- 'Peptide libérant l’hormone de croissance et stimulant l’appétit.',
- '{"croissance", "appetit", "99%"}'),
+ '{"croissance", "appetit", "99%"}',
+ '<p><strong>Le GHRP-6</strong> (Growth Hormone Releasing Peptide-6) est un hexapeptide sécrétagogue qui stimule la libération d''hormone de croissance par l''hypophyse.</p><p>Il est également connu pour son interaction avec les récepteurs de la ghréline, ce qui peut induire une augmentation significative de l''appétit, un effet recherché dans certains contextes de prise de masse.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Pics rapides de sécrétion de GH.</li><li>Stimulation de l''appétit et prise de masse.</li><li>Effets anti-inflammatoires systémiques.</li></ul>'),
 
 -- 8. Hexarelin
 ('Hexarelin', '5mg', 'Croissance', 38.00, 34.20, true, 10, 99.00,
  '/src/assets/products/hexarelin/5mg/hexarelin-5mg.png',
- 'Secrétagogue puissant de l’hormone de croissance.',
- '{"croissance", "force", "99%"}'),
+ '{"croissance", "force", "99%"}',
+ '<p><strong>L''Hexarelin</strong> est considéré comme l''un des sécrétagogues de GH les plus puissants disponibles, structurellement similaire au GHRP-6 mais avec un profil d''efficacité plus élevé.</p><p>Il a la particularité de ne pas augmenter l''appétit de manière aussi marquée que le GHRP-6, tout en offrant une libération massive de GH.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Augmentation maximale des niveaux plasmatiques de GH.</li><li>Propriétés cardioprotectrices potentielles.</li><li>Récupération neurale.</li></ul>'),
 
 -- 9. Sermorelin
 ('Sermorelin', '5mg', 'Anti-âge', 35.00, 31.50, true, 10, 99.00,
  '/src/assets/products/sermorelin/5mg/sermorelin-5mg.png',
- 'Analogue de la GHRH pour le bien-être et la qualité du sommeil.',
- '{"anti-age", "sommeil", "99%"}'),
+ '{"anti-age", "sommeil", "99%"}',
+ '<p><strong>La Sermorelin</strong> est un analogue biologique de la GHRH (correspondant aux 29 premiers acides aminés). C''est l''un des peptides les plus prescrits en clinique anti-âge aux États-Unis.</p><p>Il stimule l''hypophyse de manière naturelle pour produire de la GH par vagues (pulsatile), respectant ainsi le rythme circadien du corps.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Amélioration de la qualité du sommeil profond.</li><li>Effets anti-âge et vitalité générale.</li><li>Optimisation de la composition corporelle.</li></ul>'),
 
 -- 10. PEG-MGF
 ('PEG-MGF', '2mg', 'Performance', 40.00, 36.00, true, 10, 98.00,
  '/src/assets/products/peg-mgf/2mg/peg-mgf-2mg.png',
- 'Facteur de croissance mécanique pégylé pour le développement musculaire local.',
- '{"muscle", "récupération", "98%"}'),
+ '{"muscle", "récupération", "98%"}',
+ '<p><strong>Le PEG-MGF</strong> (Pegylated Mechano Growth Factor) est une variante épissée de l''IGF-1. L''ajout de polyéthylène glycol (PEG) protège le peptide de la dégradation rapide.</p><p>Il est spécifiquement étudié pour son rôle dans l''activation des cellules satellites musculaires suite à un stress mécanique (entraînement), favorisant l''hypertrophie locale.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Réparation musculaire localisée.</li><li>Activation des cellules souches musculaires.</li><li>Neuroprotection.</li></ul>'),
 
 -- 11. Melanotan 2
 ('Melanotan 2', '10mg', 'Bien-être', 35.00, 31.50, true, 10, 99.00,
  '/src/assets/products/melanothan-2/10mg/Melanotan 2-10mg.png',
- 'Peptide stimulant le bronzage et la libido.',
- '{"bronzage", "libido", "99%"}'),
+ '{"bronzage", "libido", "99%"}',
+ '<p><strong>Le Melanotan 2</strong> est un analogue synthétique de l''hormone alpha-mélanocytaire (α-MSH). Il agit principalement sur les récepteurs de la mélanocortine.</p><p>Il est célèbre pour sa capacité à stimuler la mélanogenèse (production de mélanine) sans exposition excessive aux UV, mais possède également des effets marqués sur la libido.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Stimulation de la pigmentation de la peau.</li><li>Amélioration de la fonction érectile et de la libido.</li><li>Réduction de l''appétit.</li></ul>'),
 
 -- 12. PT-141
 ('PT-141', '10mg', 'Bien-être', 45.00, 40.50, true, 10, 99.00,
  '/src/assets/products/pt-141/10mg/pt-141-10mg.png',
- 'Bremelanotide, efficace pour la libido masculine et féminine.',
- '{"libido", "sexualité", "99%"}'),
+ '{"libido", "sexualité", "99%"}',
+ '<p><strong>Le PT-141 (Bremelanotide)</strong> est un dérivé du Melanotan 2, spécifiquement affiné pour cibler les récepteurs responsables de l''excitation sexuelle, en minimisant l''effet sur la pigmentation.</p><p>Contrairement aux traitements classiques (type Viagra) qui agissent sur le système vasculaire, le PT-141 agit directement sur le système nerveux central.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Traitement des troubles du désir hypoactif.</li><li>Efficacité chez l''homme et la femme.</li><li>Action via le système nerveux central.</li></ul>'),
 
 -- 13. Kisspeptine-10
 ('Kisspeptine-10', '10mg', 'Hormonal', 38.00, 34.20, true, 10, 99.00,
  '/src/assets/products/kisspeptine/10mg/kisspeptine-10-10mg.png',
- 'Régulateur de la sécrétion de gonadotrophines.',
- '{"hormonal", "equilibre", "99%"}'),
+ '{"hormonal", "equilibre", "99%"}',
+ '<p><strong>La Kisspeptine-10</strong> est un peptide puissant qui initie la sécrétion de GnRH (Gonadotropin-releasing hormone). C''est un régulateur clé de l''axe reproducteur.</p><p>En recherche, elle est étudiée pour sa capacité à relancer la production naturelle de testostérone sans inhiber la spermatogenèse.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Stimulation de la LH et de la FSH.</li><li>Restauration de l''axe HPTA.</li><li>Recherche sur la fertilité.</li></ul>'),
 
 -- 14. Selank
 ('Selank', '5mg', 'Nootropique', 30.00, 27.00, true, 10, 99.00,
  '/src/assets/products/selank/5mg/selank-5mg.png',
- 'Peptide anxiolytique et nootropique pour la gestion du stress.',
- '{"anti-stress", "nootropique", "99%"}'),
+ '{"anti-stress", "nootropique", "99%"}',
+ '<p><strong>Le Selank</strong> est un peptide synthétique dérivé de la tuftsin, naturellement produite par le corps. Il est classé comme anxiolytique et nootropique.</p><p>Il module l''expression du facteur neurotrophique BDNF et influence l''équilibre des neurotransmetteurs (sérotonine, dopamine) pour stabiliser l''humeur.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Réduction de l''anxiété généralisée sans sédation.</li><li>Amélioration de la clarté mentale.</li><li>Renforcement du système immunitaire.</li></ul>'),
 
 -- 15. Semax
 ('Semax', '5mg', 'Nootropique', 30.00, 27.00, true, 10, 99.00,
  '/src/assets/products/semax/5mg/semax-5mg.png',
- 'Améliore les fonctions cognitives, la concentration et la mémoire.',
- '{"focus", "memoire", "99%"}'),
+ '{"focus", "memoire", "99%"}',
+ '<p><strong>Le Semax</strong> est un heptapeptide développé initialement en Russie pour traiter les accidents vasculaires cérébraux. C''est un puissant modulateur cognitif.</p><p>Il augmente significativement les niveaux de BDNF (Brain-Derived Neurotrophic Factor), favorisant la survie des neurones et la plasticité synaptique.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Amélioration de la concentration et de la mémoire.</li><li>Neuroprotection en cas d''hypoxie.</li><li>Réduction de la fatigue mentale.</li></ul>'),
 
 -- 16. GHK-Cu
 ('GHK-Cu', '100mg', 'Cosmétique', 55.00, 49.50, true, 10, 99.00,
  '/src/assets/products/ghk-cu/100mg/ghk-cu-100mg.png',
- 'Peptide de cuivre pour la régénération de la peau et des cheveux.',
- '{"peau", "cheveux", "anti-age", "99%"}'),
+ '{"peau", "cheveux", "anti-age", "99%"}',
+ '<p><strong>Le GHK-Cu</strong> est un complexe peptide-cuivre naturel présent dans le plasma humain. Sa concentration diminue drastiquement avec l''âge.</p><p>Il est célèbre pour ses propriétés régénératrices exceptionnelles sur la peau (synthèse de collagène) et les follicules pileux.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Raffermissement de la peau et réduction des rides.</li><li>Stimulation de la pousse des cheveux.</li><li>Cicatrisation avancée des plaies.</li></ul>'),
 
 -- 17. NAD+
 ('NAD+', '500mg', 'Anti-âge', 48.00, 43.20, true, 10, 98.00,
  '/src/assets/products/nad+/500mg/nad+-500mg.png',
- 'Coenzyme essentielle pour l’énergie cellulaire et la longévité.',
- '{"energie", "longevite", "98%"}'),
+ '{"energie", "longevite", "98%"}',
+ '<p><strong>Le NAD+ (Nicotinamide Adénine Dinucléotide)</strong> est une coenzyme présente dans toutes les cellules vivantes, essentielle à la production d''énergie (ATP) dans les mitochondries.</p><p>Les niveaux de NAD+ chutent avec l''âge, ce qui est lié au vieillissement cellulaire et métabolique. La supplémentation est une voie majeure de la recherche anti-âge.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Restauration de la fonction mitochondriale.</li><li>Réparation de l''ADN (activation des sirtuines).</li><li>Amélioration de l''énergie cellulaire et cognitive.</li></ul>'),
 
 -- 18. Thymosin Alpha-1
 ('Thymosin Alpha-1', '5mg', 'Santé', 52.00, 46.80, true, 10, 99.00,
  '/src/assets/products/thymosin-alpha/5mg/thymosin Alpha-1-5mg.png',
- 'Modulateur immunitaire pour renforcer les défenses naturelles.',
- '{"immunite", "sante", "99%"}')
+ '{"immunite", "sante", "99%"}',
+ '<p><strong>La Thymosin Alpha-1</strong> est un peptide thymique naturel qui joue un rôle crucial dans la modulation du système immunitaire.</p><p>Il aide à la maturation des lymphocytes T. Il est étudié pour sa capacité à renforcer la réponse immunitaire face aux infections virales et au vieillissement du système immunitaire (immunosénescence).</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Renforcement des défenses immunitaires.</li><li>Propriétés antivirales et antifongiques.</li><li>Amélioration de l''efficacité des vaccins.</li></ul>')
 
 ON CONFLICT (name, dosage) DO UPDATE SET
-  stock = EXCLUDED.stock,
-  price = EXCLUDED.price,
-  sale_price = EXCLUDED.sale_price,
-  is_on_sale = EXCLUDED.is_on_sale,
-  image = EXCLUDED.image;
-
+ stock = EXCLUDED.stock,
+ price = EXCLUDED.price,
+ sale_price = EXCLUDED.sale_price,
+ is_on_sale = EXCLUDED.is_on_sale,
+ image = EXCLUDED.image,
+ description = EXCLUDED.description;
 -- ============================
 -- 📰 SEED — NEWS TOPICS
 -- ============================
