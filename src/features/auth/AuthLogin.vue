@@ -1,26 +1,15 @@
 <template>
   <div class="auth">
-    <BasicText
-      size="h4"
-      weight="bold"
-      class="auth__title"
-    >
-      Connexion
-    </BasicText>
-
-    <BasicText
-      size="body-s"
-      color="neutral-500"
-      class="auth__subtitle"
-    >
-      Bienvenue sur Fast Peptides 🔬
-    </BasicText>
+    <h1 class="auth__title">Bon retour</h1>
+    <p class="auth__subtitle">
+      Connectez-vous pour accéder à votre espace et poursuivre vos recherches.
+    </p>
 
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
-        label="Email"
-        placeholder="exemple@domaine.com"
+        label="Email professionnel"
+        placeholder="nom@entreprise.com"
         inputmode="email"
         iconName="Mail"
         required
@@ -35,7 +24,6 @@
         label="Mot de passe"
         placeholder="••••••••"
         required
-        minStrength="weak"
         :alertLabel="errors.password"
         :touched="touched.password"
         @input="clear"
@@ -45,12 +33,30 @@
       <BasicButton
         label="Se connecter"
         variant="filled"
+        size="large"
         :disabled="loading"
         :loading="loading"
         @click="submit"
+        block
       />
 
-      <div class="auth__divider"><span>ou continuer avec</span></div>
+      <div class="auth__feedback">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
+          <BasicText
+            v-if="error"
+            size="body-s"
+            color="danger-500"
+            class="auth__error"
+          >
+            {{ error }}
+          </BasicText>
+        </transition>
+      </div>
+
+      <div class="auth__divider"><span>ou</span></div>
 
       <div class="auth__providers">
         <BasicSocialButton
@@ -66,25 +72,13 @@
           @click="provider('facebook')"
         />
       </div>
-
-      <div class="auth__feedback">
-        <BasicText
-          v-if="error"
-          size="body-m"
-          color="danger-400"
-          class="auth__error"
-          nbMaxLines="2"
-        >
-          {{ error }}
-        </BasicText>
-      </div>
     </div>
 
     <div class="auth__links">
-      <RouterLink to="/auth/register">
+      <span>
         Pas encore de compte ?
-        <b>S’inscrire</b>
-      </RouterLink>
+        <RouterLink to="/auth/register">Créer un compte</RouterLink>
+      </span>
       <RouterLink to="/auth/reset-password">Mot de passe oublié ?</RouterLink>
     </div>
   </div>
@@ -97,7 +91,7 @@
   import { useAuthStore } from './stores/useAuthStore'
 
   const auth = useAuthStore()
-
+  // On n'a pas besoin de la validation "strong" pour le login, "weak" suffit (juste check si rempli)
   const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
 
   const error = ref('')
@@ -109,13 +103,14 @@
   }
 
   async function submit() {
+    // On valide juste que les champs ne sont pas vides
     if (!validate('login')) return
 
     loading.value = true
     const success = await auth.signIn(email.value, password.value)
     loading.value = false
 
-    if (!success) error.value = auth.error ?? 'Identifiants incorrects.'
+    if (!success) error.value = auth.error ?? 'Email ou mot de passe incorrect.'
   }
 
   async function provider(name: any) {
@@ -127,5 +122,6 @@
 </script>
 
 <style scoped lang="less">
+  /* On importe le nouveau fichier de style pro */
   @import './AuthFormStyles.less';
 </style>

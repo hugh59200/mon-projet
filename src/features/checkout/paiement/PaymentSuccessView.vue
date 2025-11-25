@@ -1,223 +1,297 @@
 <template>
-  <div
-    v-motion="{
-      initial: { opacity: 0, y: 20 },
-      enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
-    }"
-    class="payment-success"
-  >
-    <div class="payment-success__icon-wrapper">
-      <BasicIconNext
-        name="CheckCircle2"
-        color="success-600"
-        :size="72"
-        class="payment-success__icon"
-      />
+  <div class="payment-page">
+    <div
+      class="payment-container"
+      v-motion-fade-visible
+    >
+      <div class="icon-wrapper">
+        <BasicIconNext
+          name="CheckCircle2"
+          color="success-600"
+          :size="80"
+        />
+      </div>
+
+      <h1 class="page-title">Paiement réussi 🎉</h1>
+
+      <p class="page-subtitle">
+        Merci pour votre commande sur
+        <strong>Fast Peptides</strong>
+        !
+        <br />
+        Un email de confirmation a été envoyé à
+        <span
+          v-if="orderEmail"
+          class="email-highlight"
+        >
+          {{ orderEmail }}
+        </span>
+        .
+      </p>
+
+      <transition
+        name="fade-slide"
+        mode="out-in"
+      >
+        <div
+          v-if="auth.user || isRedirecting"
+          class="action-box text-center"
+        >
+          <ProgressBar
+            color="success"
+            class="mb-3"
+          />
+          <p class="text-muted small">Redirection vers vos commandes...</p>
+        </div>
+
+        <div
+          v-else-if="currentOrderId && orderEmail"
+          class="guest-card"
+        >
+          <div class="guest-header">
+            <BasicIconNext
+              name="UserPlus"
+              :size="24"
+              color="primary-600"
+            />
+            <h3>Suivre ma commande</h3>
+          </div>
+
+          <p class="guest-text">
+            Créez un mot de passe pour transformer votre commande invité en compte membre et suivre
+            votre colis.
+          </p>
+
+          <form
+            @submit.prevent="handleGuestConversion"
+            class="guest-form"
+          >
+            <BasicInput
+              :model-value="orderEmail"
+              label="Votre Email"
+              readonly
+              disabled
+            />
+            <BasicInput
+              v-model="password"
+              type="password"
+              label="Créer un mot de passe"
+              placeholder="Min. 6 caractères"
+              required
+            />
+
+            <BasicButton
+              label="Créer mon compte"
+              type="primary"
+              width="full"
+              :loading="isConverting"
+              :disabled="password.length < 6"
+            />
+          </form>
+        </div>
+
+        <div
+          v-else
+          class="action-box"
+        >
+          <BasicButton
+            label="Retour à l'accueil"
+            type="secondary"
+            @click="$router.push('/')"
+          />
+        </div>
+      </transition>
     </div>
-
-    <h1 class="payment-success__title">Paiement réussi 🎉</h1>
-
-    <p class="payment-success__subtitle">
-      Merci pour votre commande sur
-      <strong>Fast Peptides</strong>
-      !
-      <br />
-      Votre commande a bien été validée.
-    </p>
-
-    <ProgressBar
-      color="success"
-      class="payment-success__progress"
-    />
-
-    <BasicButton
-      label="Voir mes commandes"
-      type="primary"
-      color="success"
-      size="large"
-      class="payment-success__cta"
-      @click="$router.push('/profil/commandes')"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-  import ProgressBar from '@/features/shared/ProgressBar.vue'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
-  import { onMounted } from 'vue'
+  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+  import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
   const router = useRouter()
   const cart = useCartStore()
   const auth = useAuthStore()
+  const toast = useToastStore()
 
-  const emit = defineEmits(['finished'])
+  const currentOrderId = ref<string | null>(null)
+  const orderEmail = ref<string | null>(null)
+  const password = ref('')
+  const isRedirecting = ref(false)
+  const isConverting = ref(false)
 
   onMounted(async () => {
-    console.log('💚 PaymentSuccess mounted')
+    await cart.clearCart() // Vide le panier immédiatement
 
-    const stripeSessionId = route.query.session_id as string | undefined
-    const paypalOrderId = route.query.order_id as string | undefined
-    const customOrderId = route.query.orderId as string | undefined // PayPal second naming
+    // Récupération ID (Stripe/Paypal)
+    const stripeId = route.query.session_id as string
+    const paypalId = route.query.order_id as string
 
-    // -----------------------------------------
-    // 1️⃣ STRIPE
-    // -----------------------------------------
-    if (stripeSessionId) {
-      console.log('🔵 Stripe detected')
-      await handleStripeSuccess(stripeSessionId)
-    }
+    if (stripeId) await fetchOrder('stripe_session_id', stripeId)
+    else if (paypalId) await fetchOrder('paypal_order_id', paypalId)
+    else if (auth.user) await fetchLastOrder()
 
-    // -----------------------------------------
-    // 2️⃣ PAYPAL
-    // -----------------------------------------
-    else if (paypalOrderId || customOrderId) {
-      console.log('🟡 PayPal detected')
-      await handlePaypalSuccess(paypalOrderId ?? customOrderId!)
-    }
-
-    // -----------------------------------------
-    // 3️⃣ Fallback utilisateur
-    // -----------------------------------------
-    else {
-      console.warn('⚠️ No identifiers → fallback user last order')
-      await fallbackLatestOrder()
-    }
-
-    // -----------------------------------------
-    // 4️⃣ Fin + clear panier
-    // -----------------------------------------
-    await cart.clearCart()
-    emit('finished')
-
-    setTimeout(() => {
-      router.push('/profil/commandes')
-    }, 2500)
+    // Timer si déjà connecté
+    if (auth.user) startRedirect()
   })
 
-  async function handleStripeSuccess(sessionId: string) {
-    // Vérification de l'existence de la commande via la session ID
-    const { data } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('stripe_session_id', sessionId)
-      .maybeSingle()
-
-    if (!data) console.error('❌ Stripe order not found')
-    else console.log('✅ Stripe order confirmed:', data.id)
-  }
-
-  async function handlePaypalSuccess(orderId: string) {
-    // Appel à l'Edge Function pour capturer le paiement PayPal
-    const { error } = await supabase.functions.invoke('capture-paypal-order', {
-      body: { orderId },
-    })
-
-    if (error) {
-      console.error('❌ PayPal capture failed', error)
-    } else {
-      console.log('✅ PayPal capture success')
+  async function fetchOrder(col: string, val: string) {
+    const { data } = await supabase.from('orders').select('id, email').eq(col, val).maybeSingle()
+    if (data) {
+      currentOrderId.value = data.id
+      orderEmail.value = data.email
     }
   }
 
-  async function fallbackLatestOrder() {
-    // Récupère la dernière commande de l'utilisateur en cas d'erreur de redirection
+  async function fetchLastOrder() {
     const { data } = await supabase
       .from('orders')
-      .select('id')
-      .eq('user_id', auth.user?.id!)
+      .select('id, email')
+      .eq('user_id', auth.user!.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
+    if (data) {
+      currentOrderId.value = data.id
+      orderEmail.value = data.email
+    }
+  }
 
-    if (!data) console.error('❌ No order found even in fallback')
-    else console.log('✅ Fallback order found:', data.id)
+  function startRedirect() {
+    isRedirecting.value = true
+    setTimeout(() => router.push('/profil/commandes'), 3500)
+  }
+
+  async function handleGuestConversion() {
+    if (!orderEmail.value || !password.value || !currentOrderId.value) return
+    isConverting.value = true
+    try {
+      // 1. SignUp
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: orderEmail.value,
+        password: password.value,
+        options: { data: { full_name: 'Nouveau Membre' } },
+      })
+      if (authError) throw authError
+      if (!authData.user) throw new Error('Erreur création compte')
+
+      // 2. Pause technique (Trigger DB)
+      await new Promise((r) => setTimeout(r, 1000))
+
+      // 3. Claim Order
+      const { data: rpcData, error: rpcError } = await supabase.rpc('claim_order_for_user', {
+        p_order_id: currentOrderId.value,
+        p_user_id: authData.user.id,
+      })
+      if (rpcError) throw rpcError
+
+      // 4. Succès
+      toast.show('Compte créé et commande liée !', 'success')
+      await auth.initAuth()
+      startRedirect()
+    } catch (err: any) {
+      console.error(err)
+      toast.show(err.message || 'Erreur lors de la conversion', 'danger')
+    } finally {
+      isConverting.value = false
+    }
   }
 </script>
 
 <style scoped lang="less">
-  .payment-success {
+  .payment-page {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc; /* Fond léger */
+    padding: 20px;
+  }
+
+  .payment-container {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  .icon-wrapper {
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .page-subtitle {
+    color: #64748b;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .email-highlight {
+    color: #0f172a;
+    font-weight: 600;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Carte Invité */
+  .guest-card {
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .guest-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #334155;
+    }
+  }
+
+  .guest-text {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+
+  .guest-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    margin-top: 40px;
+    gap: 16px;
+  }
 
-    &__icon-wrapper {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      animation:
-        popin 0.4s ease-out forwards,
-        bounce-end 3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    &__icon {
-      filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.35));
-    }
-
-    &__title {
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: @success-700;
-    }
-
-    &__subtitle {
-      font-size: 15px;
-      color: @neutral-600;
-      line-height: 1.6;
-      margin-bottom: 28px;
-
-      strong {
-        color: @neutral-800;
-        font-weight: 600;
-      }
-    }
-
-    &__cta {
-      margin-top: 24px;
-    }
-
-    &__progress {
-      width: 100%;
-      max-width: 320px;
-      margin: 12px 0 8px;
-    }
-
-    /* --- Animations --- */
-    @keyframes popin {
-      0% {
-        transform: scale(0.3);
-        opacity: 0;
-      }
-      60% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    @keyframes bounce-end {
-      0%,
-      90% {
-        transform: scale(1);
-      }
-      95% {
-        transform: scale(1.15);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
+  .text-muted {
+    color: #94a3b8;
+  }
+  .mb-3 {
+    margin-bottom: 12px;
   }
 </style>

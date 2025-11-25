@@ -3,6 +3,7 @@ import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsView.vue'
 import AdminTopicsTable from '@/features/admin/topics/AdminTopicsView.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
+import AuthLayout from '@/features/auth/AuthLayout.vue'
 import AdminChatView from '@/features/chat/admin/AdminChatView.vue'
 import AdminStatsView from '@/features/stats/AdminStatsView.vue'
 import Home from '@/pages/Home.vue'
@@ -25,49 +26,37 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/auth',
-    component: () => import('@/features/auth/AuthOverlay.vue'),
-    children: [
-      {
-        path: 'callback',
-        name: 'auth-callback',
-        component: () => import('@/features/auth/AuthCallback.vue'),
-        meta: {
-          title: 'Connexion en cours – Fast Peptides',
-        },
-      },
-    ],
-  },
-  {
-    path: '/auth',
-    component: () => import('@/features/auth/AuthOverlay.vue'),
+    component: AuthLayout, // Le Layout contient le design
     children: [
       {
         path: 'login',
         name: 'auth-login',
         component: () => import('@/features/auth/AuthLogin.vue'),
+        meta: { title: 'Connexion' },
       },
       {
         path: 'register',
         name: 'auth-register',
         component: () => import('@/features/auth/AuthRegister.vue'),
+        meta: { title: 'Inscription' },
       },
       {
         path: 'reset-password',
         name: 'auth-reset',
         component: () => import('@/features/auth/AuthReset.vue'),
+        meta: { title: 'Mot de passe oublié' },
       },
       {
         path: 'email-sent',
         name: 'email-sent',
         component: () => import('@/features/auth/AuthEmailSent.vue'),
+        meta: { title: 'Email envoyé' },
       },
       {
         path: 'callback',
         name: 'auth-callback',
-        component: () => import('@/features/auth/AuthCallback.vue'),
-        meta: {
-          title: 'Connexion en cours – Fast Peptides',
-        },
+        component: () => import('@/features/auth/AuthCallback.vue'), // La logique extraite
+        meta: { title: 'Vérification en cours...' },
       },
     ],
   },
@@ -175,7 +164,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'cart',
     component: () => import('@/pages/PanierView.vue'),
     meta: {
-      requiresAuth: true,
       heading: 'Mon panier',
       title: 'Mon panier – Fast Peptides',
       description: 'Vérifiez vos articles, ajustez les quantités et validez votre commande.',
@@ -185,37 +173,28 @@ const routes: Array<RouteRecordRaw> = [
     path: '/checkout',
     name: 'checkout',
     component: () => import('@/features/checkout/CheckoutView.vue'),
-    meta: {
-      requiresCart: true,
-      requiresAuth: true,
-      heading: 'Paiement',
-      title: 'Paiement – Fast Peptides',
-      description: 'Finalisez votre commande en toute sécurité.',
-    },
+    meta: { requiresCart: true, title: 'Paiement' },
   },
   {
-    path: '/paiement',
-    component: () => import('@/features/checkout/paiement/PaymentResultWrapper.vue'),
-    children: [
-      {
-        path: 'success',
-        name: 'payment-success',
-        component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
-        meta: {
-          title: 'Paiement réussi – Fast Peptides',
-          description: 'Votre paiement a été validé avec succès. Merci pour votre commande !',
-        },
-      },
-      {
-        path: 'cancel',
-        name: 'payment-cancel',
-        component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
-        meta: {
-          title: 'Paiement annulé – Fast Peptides',
-          description: 'Votre paiement a été interrompu ou annulé.',
-        },
-      },
-    ],
+    path: '/paiement/success',
+    name: 'payment-success',
+    component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
+    meta: { title: 'Paiement Réussi 🎉', requiresAuth: false },
+  },
+  {
+    path: '/paiement/cancel',
+    name: 'payment-cancel',
+    component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
+    meta: { title: 'Paiement Annulé' },
+  },
+  {
+    path: '/suivi-commande',
+    name: 'track-order',
+    component: () => import('@/pages/TrackOrderView.vue'),
+    meta: {
+      title: 'Suivre ma commande – Fast Peptides',
+      requiresAuth: false,
+    },
   },
   {
     path: '/admin',

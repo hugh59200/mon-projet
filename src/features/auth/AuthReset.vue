@@ -1,26 +1,16 @@
 <template>
   <div class="auth">
-    <BasicText
-      size="h4"
-      weight="bold"
-      class="auth__title"
-    >
-      Réinitialiser le mot de passe
-    </BasicText>
-
-    <BasicText
-      size="body-s"
-      color="neutral-500"
-      class="auth__subtitle"
-    >
-      Entrez votre e-mail pour recevoir un lien
-    </BasicText>
+    <h1 class="auth__title">Mot de passe oublié ?</h1>
+    <p class="auth__subtitle">
+      Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de
+      passe.
+    </p>
 
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
         label="Email"
-        placeholder="exemple@domaine.com"
+        placeholder="nom@entreprise.com"
         inputmode="email"
         iconName="Mail"
         required
@@ -31,42 +21,58 @@
       />
 
       <BasicButton
-        label="Envoyer le lien"
+        label="Envoyer le lien de réinitialisation"
         variant="filled"
+        size="large"
         :disabled="loading"
         :loading="loading"
         @click="submit"
+        block
       />
 
       <div class="auth__feedback">
-        <BasicText
-          v-if="error"
-          size="body-m"
-          color="danger-400"
-          class="auth__error"
+        <transition
+          name="fade"
+          mode="out-in"
         >
-          {{ error }}
-        </BasicText>
-
-        <BasicText
-          v-if="message"
-          size="body-m"
-          color="primary-600"
-          class="auth__message"
-        >
-          {{ message }}
-        </BasicText>
+          <BasicText
+            v-if="error"
+            size="body-s"
+            color="danger-500"
+            class="auth__error"
+          >
+            {{ error }}
+          </BasicText>
+          <BasicText
+            v-if="message"
+            size="body-s"
+            color="success-600"
+            class="auth__message"
+          >
+            {{ message }}
+          </BasicText>
+        </transition>
       </div>
     </div>
 
     <div class="auth__links">
-      <RouterLink to="/auth/login">Retour à la connexion</RouterLink>
+      <RouterLink
+        to="/auth/login"
+        class="link-back"
+      >
+        <BasicIconNext
+          name="ArrowLeft"
+          :size="14"
+        />
+        Retour à la connexion
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { supabase } from '@/supabase/supabaseClient'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
   import { useForm } from './composables/useForm'
 
@@ -84,17 +90,31 @@
   async function submit() {
     if (!validate('reset')) return
     loading.value = true
+    clear()
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
-      redirectTo: `${window.location.origin}/auth/login`,
+      redirectTo: `${window.location.origin}/auth/update-password`, // Redirige vers une page dédiée
     })
 
     loading.value = false
-    if (err) error.value = err.message
-    else message.value = 'Lien envoyé ✅'
+    if (err) {
+      error.value = "Impossible d'envoyer l'e-mail. Vérifiez l'adresse saisie."
+    } else {
+      message.value = 'Si un compte existe avec cet e-mail, vous recevrez bientôt un lien.'
+      email.value = '' // On vide le champ pour éviter le spam
+      // touched.email = false
+    }
   }
 </script>
 
 <style scoped lang="less">
   @import './AuthFormStyles.less';
+
+  /* Style spécifique pour le lien de retour */
+  .link-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
 </style>

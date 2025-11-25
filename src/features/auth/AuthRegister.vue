@@ -1,74 +1,69 @@
 <template>
   <div class="auth">
-    <BasicText
-      size="h4"
-      weight="bold"
-      class="auth__title"
-    >
-      Inscription 🎉
-    </BasicText>
-    <BasicText
-      size="body-s"
-      color="neutral-500"
-      class="auth__subtitle"
-    >
-      Créez votre compte pour rejoindre la communauté 🔗
-    </BasicText>
+    <h1 class="auth__title">Créer un compte</h1>
+    <p class="auth__subtitle">
+      Rejoignez Fast Peptides pour accéder à notre catalogue complet et à nos outils.
+    </p>
+
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
-        label="Email"
-        placeholder="exemple@domaine.com"
+        label="Email professionnel"
+        placeholder="nom@entreprise.com"
         inputmode="email"
-        iconName="email"
+        iconName="Mail"
         required
         :alertLabel="touched.email ? errors.email : ''"
         @input="clear"
         @blur="validateField('email')"
         deletable
       />
+
       <WrapperInputPassword
         v-model="password"
         label="Mot de passe"
         placeholder="••••••••"
         required
+        minStrength="strong"
         :alertLabel="errors.password"
         :touched="touched.password"
         deletable
         @input="clear"
         @blur="validateField('password')"
       />
+
       <BasicButton
-        label="Créer mon compte"
+        label="S'inscrire"
         variant="filled"
+        size="large"
         :disabled="loading"
         :loading="loading"
         @click="submit"
+        block
       />
+
       <div class="auth__feedback">
-        <BasicText
-          v-if="error"
-          size="body-m"
-          color="danger-400"
-          class="auth__error"
+        <transition
+          name="fade"
+          mode="out-in"
         >
-          {{ error }}
-        </BasicText>
-        <BasicText
-          v-if="message"
-          size="body-m"
-          color="primary-600"
-          class="auth__message"
-        >
-          {{ message }}
-        </BasicText>
+          <BasicText
+            v-if="error"
+            size="body-s"
+            color="danger-500"
+            class="auth__error"
+          >
+            {{ error }}
+          </BasicText>
+        </transition>
       </div>
     </div>
+
     <div class="auth__links">
-      <RouterLink to="/auth/login">
-        Déjà inscrit ?
-        <b>Se connecter</b>
-      </RouterLink>
+      <span>
+        Vous avez déjà un compte ?
+        <RouterLink to="/auth/login">Se connecter</RouterLink>
+      </span>
     </div>
   </div>
 </template>
@@ -82,15 +77,14 @@
   const auth = useAuthStore()
   const router = useRouter()
 
-  const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
+  // Validation 'strong' pour le mot de passe à l'inscription
+  const { email, password, errors, touched, validate, validateField } = useForm(true, 'strong')
 
   const loading = ref(false)
   const error = ref('')
-  const message = ref('')
 
   function clear() {
     error.value = ''
-    message.value = ''
     auth.clearError()
   }
 
@@ -102,7 +96,8 @@
     loading.value = false
 
     if (!success) {
-      error.value = auth.error ?? 'Inscription échouée.'
+      // Message d'erreur plus générique et pro
+      error.value = auth.error ?? "Une erreur est survenue lors de l'inscription."
       return
     }
 

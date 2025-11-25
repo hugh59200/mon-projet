@@ -11,13 +11,14 @@
         variant="ghost"
         class="burger"
       />
+
       <div
         class="logo"
         @click="router.push('/')"
       >
         <BasicIconNext
           name="fastPeptides"
-          :size="10"
+          :size="32"
           class="logo-img"
         />
         <div class="logo-text-container">
@@ -26,38 +27,60 @@
         </div>
       </div>
     </div>
+
     <div
       v-if="!isMobile"
       class="auth-navbar__center"
     >
       <MainNavLinks />
     </div>
+
     <div class="auth-navbar__right">
       <CartMenu />
-      <template v-if="auth.user">
-        <UserMenu />
-      </template>
-      <template v-else-if="hasGuestCart">
-        <div class="guest-info">
+      <UserMenu v-if="auth.user" />
+
+      <div
+        v-else-if="hasGuestCart"
+        class="guest-info"
+      >
+        <div class="guest-label">
+          <BasicIconNext
+            name="User"
+            :size="14"
+            color="neutral-400"
+          />
           <BasicText
             size="body-s"
             color="neutral-300"
           >
             Invité
           </BasicText>
-          <BasicButton
-            label="Se connecter"
-            type="primary"
-            size="small"
-            @click="router.push('/auth/login')"
-          />
         </div>
-      </template>
+        <BasicButton
+          label="J'ai un compte"
+          type="secondary"
+          size="small"
+          class="guest-login-btn"
+          @click="router.push('/auth/login')"
+        />
+      </div>
+
       <template v-else>
         <div
           v-if="isDesktop"
           class="auth-navbar__buttons"
         >
+          <BasicButton
+            label="Suivre"
+            aria-label="Suivre ma commande"
+            icon-name="PackageSearch"
+            type="secondary"
+            variant="ghost"
+            size="small"
+            class="tracking-btn"
+            @click="router.push('/suivi-commande')"
+          />
+
           <BasicButton
             label="Connexion"
             type="primary"
@@ -87,6 +110,9 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import UserMenu from '@/features/interface/layout/header/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { BasicButton } from '@designSystem/components/basic/button'
+  import { BasicIconNext } from '@designSystem/components/basic/icon'
+  import { BasicText } from '@designSystem/components/basic/text'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
@@ -117,7 +143,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 28px;
+    padding: 0 20px;
     background: linear-gradient(
       90deg,
       var(--secondary-900),
@@ -129,19 +155,24 @@
       display: flex;
       align-items: center;
       gap: 16px;
+      flex-shrink: 0; /* Empêche le logo de s'écraser */
     }
 
     &__center {
       flex: 1;
       display: flex;
       justify-content: center;
+      /* Ajout pour éviter que le menu central n'écrase la droite */
+      min-width: 0;
+      padding: 0 20px;
     }
 
     &__right {
       display: flex;
       align-items: center;
-      gap: 20px;
-      overflow: visible;
+      gap: 20px; /* Réduit légèrement l'espace global */
+      flex-shrink: 0; /* Empêche la droite de s'écraser/disparaître */
+      justify-content: flex-end;
     }
 
     &__buttons {
@@ -151,52 +182,80 @@
     }
   }
 
+  /* --- Styles du Logo (alignés sur le Header principal) --- */
   .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
+    user-select: none;
 
     .logo-img {
-      width: 38px;
-      height: 38px;
-      transition: transform 0.25s ease;
-      &:hover {
-        transform: scale(1.08);
-      }
+      color: var(--primary-500);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    &:hover .logo-img {
+      transform: scale(1.1) rotate(5deg);
     }
   }
 
   .logo-text-container {
-    font-size: 26px;
-    line-height: 1;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
+    font-size: 22px;
+    line-height: 1;
   }
 
   .brand-fast {
     color: white;
     font-weight: 900;
     font-style: italic;
-    transform: skewX(-6deg);
-    padding-right: 2px;
+    letter-spacing: -0.5px;
   }
 
   .brand-peptides {
-    color: @yellow-400;
+    color: var(--primary-400);
     font-weight: 600;
-    font-style: normal;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+  }
+
+  /* --- Boutons & Guest --- */
+  .tracking-btn {
+    color: @neutral-400;
+    margin-right: 4px;
+
+    &:hover {
+      color: @neutral-100;
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
 
   .guest-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 4px 10px;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 4px 4px 4px 12px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .guest-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .guest-login-btn {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    height: 28px;
+    border-radius: 50px;
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
 
   @media (max-width: 900px) {
@@ -209,15 +268,17 @@
       }
     }
 
-    /* Ajustement de la taille du logo sur mobile */
     .logo-text-container {
-      font-size: 22px;
+      font-size: 18px;
     }
 
-    .logo {
-      .logo-img {
-        width: 30px;
-        height: 30px;
+    .guest-info {
+      padding: 4px;
+      background: transparent;
+      border: none;
+
+      .guest-label {
+        display: none;
       }
     }
   }

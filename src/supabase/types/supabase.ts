@@ -935,6 +935,10 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_order_for_user: {
+        Args: { p_order_id: string; p_user_id: string }
+        Returns: Json
+      }
       create_full_order:
         | {
             Args: {
@@ -1017,6 +1021,10 @@ export type Database = {
           p_user_id: string
           p_zip: string
         }
+        Returns: Json
+      }
+      get_guest_order_details: {
+        Args: { p_email: string; p_order_number: string }
         Returns: Json
       }
       is_admin: { Args: { uid: string }; Returns: boolean }

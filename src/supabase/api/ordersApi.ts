@@ -1,12 +1,13 @@
 import type { OrderStatus } from '../../utils'
 import { supabase } from '../supabaseClient'
-import type { Json } from '../types/supabase' // Le type brut généré
-import type { OrdersFullView } from '../types/supabase.types' // Tes types raccourcis
+import type { Json } from '../types/supabase'
+import type { OrdersFullView } from '../types/supabase.types'
 import { handleApi, handleMutation } from './helpers/HandleError'
 
 // Type spécifique pour la création (ne vient pas de la DB directement)
 export type CreateOrderPayload = {
-  userId: string
+  // ✅ On garde le type correct ici pour ton code à toi
+  userId: string | null
   email: string
   fullName: string
   address: string
@@ -14,30 +15,29 @@ export type CreateOrderPayload = {
   city: string
   country: string
   paymentMethod: string
-  // 💰 Nouveaux champs financiers V2
   subtotal: number
   taxAmount: number
   shippingCost: number
   discountAmount: number
   totalAmount: number
-  // 🛒 Items
   items: {
     product_id: string
     quantity: number
-    product_price: number // Prix unitaire au moment de l'achat
+    product_price: number
   }[]
 }
 
-/** * ✅ CRÉATION V2.0 (Complex RPC) */
+/** ✅ CRÉATION V3.0 (Guest Compatible) */
 export async function createOrder(payload: CreateOrderPayload): Promise<OrdersFullView> {
   // Conversion explicite des items en Json
   const itemsJson = payload.items as unknown as Json
 
-  // ⚠️ CORRECTION ICI :
-  // On ne fait PAS : const { data, error } = ...
-  // On garde toute la réponse dans 'res'
   const res = await supabase.rpc('create_order_with_items_full', {
-    p_user_id: payload.userId,
+    // 🛠️ FIX SANS TOUCHER AUX TYPES GÉNÉRÉS :
+    // On force TypeScript à accepter la valeur, car on sait que la DB (V3.0) accepte NULL à l'exécution.
+    // "as any" est ici légitime pour contourner un décalage de génération de types.
+    p_user_id: payload.userId as any,
+
     p_email: payload.email,
     p_full_name: payload.fullName,
     p_address: payload.address,
@@ -55,13 +55,12 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrdersFu
     p_items: itemsJson,
   })
 
-  // Maintenant 'res' correspond parfaitement au type attendu par handleApi
   const result = handleApi(res)
 
-  // On force le cast car RPC renvoie du Json générique, mais on sait que c'est notre OrderFullView
   return result as unknown as OrdersFullView
 }
 
+// ... Le reste du fichier reste inchangé (fetchOrders, etc.)
 /** ✅ ADMIN : Récupère toutes les commandes */
 export async function fetchOrders(): Promise<OrdersFullView[]> {
   const res = await supabase
@@ -85,20 +84,33 @@ export async function fetchUserOrders(userId: string): Promise<OrdersFullView[]>
 
 /** ✅ USER/ADMIN : Récupère une commande unique par son ID */
 export async function fetchOrderById(orderId: string): Promise<OrdersFullView | null> {
-  const res = await supabase
-    .from('orders_full_view')
-    .select('*')
-    .eq('order_id', orderId) // Attention: dans la vue c'est 'order_id', pas 'id'
-    .single()
+  const res = await supabase.from('orders_full_view').select('*').eq('order_id', orderId).single()
 
   return handleApi(res)
 }
 
 /** ✅ ADMIN : Suppression sécurisée */
 export async function deleteOrderById(id: string) {
-  // Le DELETE CASCADE sur la table 'orders' nettoiera automatiquement order_items et emails_sent
   const { error } = await supabase.from('orders').delete().eq('id', id)
   handleMutation(error)
+}
+
+export async function trackGuestOrder(email: string, orderNumber: string) {
+  const { data, error } = await supabase.rpc('get_guest_order_details', {
+    p_email: email,
+    p_order_number: orderNumber,
+  })
+
+  if (error) throw error
+
+  // Typage manuel du retour JSONB
+  const result = data as { found: boolean; message?: string; order?: any }
+
+  if (!result.found) {
+    throw new Error(result.message || 'Commande introuvable')
+  }
+
+  return result.order
 }
 
 /** ✅ ADMIN : Mise à jour du statut via RPC */
@@ -106,7 +118,7 @@ export async function updateOrderStatusInDB(orderId: string, status: OrderStatus
   const { data, error } = await supabase.rpc('admin_update_order_status', {
     p_order_id: orderId,
     p_new_status: status,
-    p_send_email: true, // La RPC va créer l'entrée dans 'emails_sent'
+    p_send_email: true,
   })
 
   handleMutation(error)

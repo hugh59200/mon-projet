@@ -81,6 +81,15 @@
       <!-- 🔒 Si non connecté -->
       <template v-else>
         <NavButton
+          label="Suivre ma commande"
+          iconName="PackageSearch"
+          variant="ghost"
+          @click="goTo('/suivi-commande')"
+        />
+        
+        <div class="user-menu__content-divider user-menu__content-divider--subtle" />
+
+        <NavButton
           label="Connexion"
           iconName="LogIn"
           variant="ghost"

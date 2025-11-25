@@ -1,8 +1,9 @@
 <template>
   <div class="app-layout">
-    <HeaderApp />
+    <HeaderApp v-if="!isAuthPage" />
+
     <main
-      class="content"
+      :class="['main-wrapper', { content: !isAuthPage, 'auth-fullscreen': isAuthPage }]"
       v-responsive-animate.fade.scroll.stagger.once="{ delay: 100, speed: 600 }"
     >
       <RouterView v-slot="{ Component }">
@@ -24,6 +25,7 @@
     </main>
 
     <footer
+      v-if="!isAuthPage"
       class="footer"
       v-responsive-animate.slide.once="{ speed: 700 }"
     >
@@ -45,7 +47,8 @@
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { supabase } from '@/supabase/supabaseClient'
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
 
   defineOptions({
     directives: {
@@ -55,14 +58,23 @@
     },
   })
 
+  const route = useRoute()
   const sablier = useSablierStore()
   const cart = useCartStore()
+
+  // ✅ Détection intelligente : Est-ce une page "Standalone" (Auth, Paiement, etc.) ?
+  const isAuthPage = computed(() => {
+    // Vérifie si le chemin commence par /auth
+    // OU si c'est une page de paiement (/paiement/success, /paiement/cancel)
+    // OU si c'est la page de suivi de commande (/suivi-commande) si tu veux qu'elle soit aussi clean
+    return route.path.startsWith('/auth') || route.path.startsWith('/paiement')
+  })
 
   supabase.auth.onAuthStateChange((_event, session) => {
     if (!session) cart.items = []
   })
 
-  // HEADER dynamique
+  // HEADER dynamique (Logique existante conservée)
   const lastScroll = ref(0)
   const scrollY = ref(0)
   const isHidden = ref(false)
@@ -88,7 +100,7 @@
 
   .breadcrumb-wrapper {
     position: relative;
-    z-index: 900; /* juste sous le header */
+    z-index: 900;
   }
 
   .app-layout {
@@ -100,6 +112,7 @@
     overflow-y: auto;
   }
 
+  /* Header existant */
   .header {
     position: sticky;
     top: 0;
@@ -133,6 +146,7 @@
     opacity: 1;
   }
 
+  /* ✅ Classe standard pour le contenu de l'app (avec padding) */
   .content {
     min-width: 250px;
     flex: 1;
@@ -150,6 +164,24 @@
     }
   }
 
+  /* ✅ NOUVELLE CLASSE : Mode Plein Écran pour Auth */
+  /* Elle annule les styles de .content pour laisser AuthLayout gérer le layout */
+  .auth-fullscreen {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white; /* Ou transparent si AuthLayout a son propre fond */
+    display: flex;
+    flex-direction: column;
+
+    /* Important : S'assurer qu'il n'y a pas de marge héritée */
+    & > div {
+      flex: 1;
+    }
+  }
+
+  /* Transitions */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
     transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
