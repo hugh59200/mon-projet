@@ -1027,6 +1027,7 @@ export type Database = {
         Args: { p_email: string; p_order_number: string }
         Returns: Json
       }
+      get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
       user_exists_by_email: { Args: { p_email: string }; Returns: boolean }

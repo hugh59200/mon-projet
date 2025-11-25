@@ -149,8 +149,7 @@
   /* ✅ Classe standard pour le contenu de l'app (avec padding) */
   .content {
     min-width: 250px;
-    flex: 1;
-    min-height: 100vh;
+    min-height: 60vh;
     padding: 2.5vw 4vw;
     background-color: @neutral-400;
     color: @neutral-900;

@@ -86,34 +86,6 @@
               <strong style="color: var(--neutral-50)">{{ finalProducts.length }}</strong>
               résultat{{ finalProducts.length > 1 ? 's' : '' }}
             </BasicText>
-
-            <div class="catalogue__tools">
-              <BasicPagination
-                v-if="nbPages > 1"
-                :current-page="page"
-                :nb-pages="nbPages"
-                :nb-pages-max="5"
-                size="small"
-                @change="(p) => (page = p)"
-              />
-
-              <div
-                class="separator"
-                v-if="nbPages > 1"
-              ></div>
-
-              <div class="catalogue__page-size">
-                <span class="label">Voir :</span>
-                <WrapperDropdown
-                  v-model="pageSize"
-                  :items="pageSizeItems"
-                  force-value
-                  size="small"
-                  direction="bottom"
-                  class="catalogue__size-dropdown"
-                />
-              </div>
-            </div>
           </div>
         </div>
         <WrapperLoader

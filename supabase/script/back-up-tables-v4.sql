@@ -618,3 +618,29 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.get_guest_order_details TO anon, authenticated;
+
+
+-- ============================================================
+-- ✅ FIX : Fonction pour récupérer l'email de confirmation (Public)
+-- Permet à la page de succès d'afficher l'email même pour un invité
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.get_order_summary_public(p_order_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER -- 🔓 Contourne la RLS pour lire juste l'email
+AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  SELECT jsonb_build_object('email', email, 'status', status)
+  INTO v_result
+  FROM public.orders
+  WHERE id = p_order_id;
+  
+  RETURN v_result;
+END;
+$$;
+
+-- Autoriser tout le monde (Invité 'anon' et Connecté 'authenticated') à l'utiliser
+GRANT EXECUTE ON FUNCTION public.get_order_summary_public TO anon, authenticated;

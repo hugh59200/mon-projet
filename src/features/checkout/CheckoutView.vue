@@ -289,7 +289,7 @@
     }
   })
 
-  // --- Icons & Helpers ---
+  // --- Icons ---
   const PayPalIcon = {
     render: () =>
       h('svg', { viewBox: '0 0 48 48', fill: 'none', xmlns: 'http://www.w3.org/2000/svg' }, [
@@ -374,7 +374,7 @@
 
   async function submitOrder() {
     await withSablier(async () => {
-      // 🚫 PAS DE BLOCAGE AUTH ICI !
+      // 🚫 PAS DE BLOCAGE AUTH ICI ! (Mode Guest actif)
       if (!cart.items.length) {
         toast.show('Votre panier est vide.', 'warning')
         return
@@ -394,7 +394,6 @@
         }))
 
         const newOrder = await createOrder({
-          // ✅ userId est null si invité, sinon ID utilisateur
           userId: auth.user?.id ?? null,
           email: email.value,
           fullName: fullName.value,
@@ -426,6 +425,9 @@
 </script>
 
 <style scoped lang="less">
+  // ✅ Assure-toi que ce fichier contient bien les variables @danger-600, @neutral-100, etc.
+  @import '@/assets/Mont/Mont.less';
+
   .checkout-page {
     display: flex;
     flex-direction: column;
@@ -538,7 +540,8 @@
           font-size: 0.9em;
         }
         .price-sale {
-          color: var(--danger-600);
+          /* ✅ Correction Variable Less */
+          color: @danger-600;
           font-weight: 600;
         }
       }
