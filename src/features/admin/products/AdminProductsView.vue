@@ -16,6 +16,7 @@
         />
       </template>
     </BasicToolbar>
+
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
@@ -24,6 +25,7 @@
       :auto-fetch="fetchData"
       @change="page = $event"
     />
+
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
@@ -35,7 +37,7 @@
         <div class="cardLayoutWrapper cardLayoutWrapper--header admin-products__header">
           <BasicCell
             :span="12"
-            text="Nom"
+            text="Produit"
             :is-active="sortKey === 'name'"
             :icon-color="getSortColor('name')"
             :sort-asc="sortAsc"
@@ -67,6 +69,7 @@
           />
           <BasicCell :span="4" />
         </div>
+
         <div
           v-for="product in filteredData"
           :key="product.id"
@@ -83,30 +86,41 @@
               <img
                 v-if="product.image"
                 :src="product.image"
-                alt="Image du produit"
+                alt="Miniature"
                 class="admin-products__thumb"
               />
-              <div class="flex flex-col">
-                <span class="admin-products__name">{{ product.name || '—' }}</span>
+
+              <div class="admin-products__details">
+                <div class="admin-products__name-row">
+                  <span class="admin-products__name">{{ product.name }}</span>
+                  <span
+                    v-if="product.dosage"
+                    class="admin-products__dosage"
+                  >
+                    ({{ product.dosage }})
+                  </span>
+                </div>
+
                 <span
                   v-if="product.is_on_sale"
-                  class="text-xs font-bold text-red-600"
+                  class="admin-products__badge-promo"
                 >
                   PROMO
                 </span>
               </div>
             </BasicCell>
+
             <BasicCell :span="8">
-              <BasicText>{{ product.category || '—' }}</BasicText>
+              <BasicText size="body-s">{{ product.category || '—' }}</BasicText>
             </BasicCell>
 
             <BasicCell :span="6">
-              <div class="flex flex-col items-start">
+              <div class="admin-products__price-col">
                 <template v-if="product.is_on_sale && product.sale_price">
-                  <span class="text-xs text-neutral-400 line-through">
+                  <span class="price-old">
                     {{ formatCurrency(product.price) }}
                   </span>
-                  <span class="font-bold text-red-600">
+                  <span class="price-sale">
                     {{ formatCurrency(product.sale_price) }}
                   </span>
                 </template>
@@ -130,11 +144,12 @@
               center
               danger
               :span="4"
-              @click.stop="deleteProduct(product)"
+              @click="deleteProduct(product)"
             />
           </div>
         </div>
       </template>
+
       <template v-else>
         <ProductCardMobile
           v-for="product in filteredData"
@@ -142,7 +157,6 @@
           :product="product"
           :format-currency="formatCurrency"
           :open-product-modal="openProductModal"
-          :edit-product="openEditProduct"
           :handle-delete="deleteProduct"
           class="gridElemWrapper admin-products__mobile-card"
         />
@@ -174,7 +188,7 @@
   import { formatCurrency } from '@/utils'
   import { ref } from 'vue'
 
-  import type { BadgeType } from '@designSystem/components/basic/badge'
+  import type { BadgeType } from '@designSystem/components/basic/badge/BasicBadge.types'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
@@ -197,7 +211,8 @@
     ascending: false,
     searchFn: (p, q) =>
       (p.name?.toLowerCase()?.includes(q) ?? false) ||
-      (p.category?.toLowerCase()?.includes(q) ?? false),
+      (p.category?.toLowerCase()?.includes(q) ?? false) ||
+      (p.dosage?.toLowerCase()?.includes(q) ?? false),
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
@@ -218,23 +233,16 @@
     isModalVisible.value = true
   }
 
-  function openEditProduct(id: string) {
-    selectedProductId.value = id
-    isModalVisible.value = true
-  }
-
-  // --- Helpers Affichage Stock V2 ---
   function getProductStockLabel(stock: number | null) {
     if (!stock || stock <= 0) return 'Rupture'
     if (stock < 10) return `Faible (${stock})`
-    return `En stock (${stock})`
+    return `${stock}`
   }
 
-  // ✅ CORRECTION ICI : Retourner un type accepté par BadgeType
   function getProductStockType(stock: number | null): BadgeType {
-    if (!stock || stock <= 0) return 'error' // Rouge
-    if (stock < 10) return 'pending' // Orange (remplace 'warning')
-    return 'success' // Vert
+    if (!stock || stock <= 0) return 'error'
+    if (stock < 10) return 'pending'
+    return 'success'
   }
 </script>
 
@@ -242,32 +250,92 @@
   .admin-products {
     &__item {
       cursor: pointer;
+      transition: background 0.15s;
+      // Aération verticale des lignes
+      padding-top: 8px;
+      padding-bottom: 8px;
 
       &:hover {
-        background: var(--primary-0);
+        background: var(--neutral-50);
       }
     }
 
     &__mobile-card {
-      margin: 4px 0;
+      margin: 8px 0;
     }
 
     &__info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      // Centrage vertical global de la cellule
     }
 
     &__thumb {
-      width: 48px;
-      height: 48px;
+      width: 60px; // Image agrandie
+      height: 60px;
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid @neutral-200;
+      background: @white;
+      flex-shrink: 0;
+    }
+
+    // Conteneur texte à droite de l'image
+    &__details {
+      margin-left: 16px; // Espace horizontal
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    &__name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     &__name {
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
+      color: @neutral-900;
+    }
+
+    &__dosage {
+      font-size: 13px;
+      font-weight: 400;
+      color: @neutral-500;
+    }
+
+    &__badge-promo {
+      margin-top: 8px; // Espace vertical badge
+      width: fit-content;
+      background-color: @red-600;
+      color: @white;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    // Colonne Prix
+    &__price-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      height: 100%;
+
+      .price-old {
+        font-size: 12px;
+        color: @neutral-400;
+        text-decoration: line-through;
+      }
+
+      .price-sale {
+        font-weight: 700;
+        color: @red-600;
+      }
     }
   }
 </style>

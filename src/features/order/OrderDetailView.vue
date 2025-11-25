@@ -135,6 +135,16 @@
                 >
                   {{ item.product_name }}
                 </BasicText>
+
+                <BasicText
+                  v-if="item.product_dosage && !item.product_name.includes(item.product_dosage)"
+                  size="body-s"
+                  color="primary-700"
+                  weight="semibold"
+                >
+                  Dosage : {{ item.product_dosage }}
+                </BasicText>
+
                 <BasicText
                   size="body-s"
                   color="neutral-500"
@@ -290,7 +300,6 @@
   const route = useRoute()
   const toast = useToastStore()
 
-  // ✅ On utilise le type correct généré par Supabase
   const order = ref<OrdersFullView | null>(null)
   const hasLoaded = ref(false)
 
@@ -299,7 +308,6 @@
       const orderId = String(route.params.id ?? '')
       if (!orderId) return
 
-      // ✅ Appel propre à l'API centralisée
       const data = await fetchOrderById(orderId)
 
       if (data) {
@@ -315,7 +323,6 @@
 
   onMounted(loadOrderDetail)
 
-  // Helper pour récupérer les items typés depuis le JSON
   function getItems(order: OrdersFullView): OrderItemDetailed[] {
     return (order.detailed_items as unknown as OrderItemDetailed[]) || []
   }
@@ -350,7 +357,6 @@
 </script>
 
 <style scoped lang="less">
-  /* Je n'ai pas touché au CSS pour garder ton design intact */
   .order-detail {
     max-width: 1000px;
     margin: 60px auto;

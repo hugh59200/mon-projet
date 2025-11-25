@@ -6,7 +6,7 @@ import type { Tables, TablesInsert, TablesUpdate } from './supabase'
 export type Role = 'admin' | 'user'
 
 // ==========================================
-// 👤 TABLES (Types directs depuis supabase.ts)
+// 👤 TABLES
 // ==========================================
 
 export type Profiles = Tables<'profiles'>
@@ -18,7 +18,6 @@ export type OrderInsert = TablesInsert<'orders'>
 export type OrderUpdate = TablesUpdate<'orders'>
 
 export type OrderItem = Tables<'order_items'>
-// Note : OrderItem contient maintenant 'product_name_snapshot'
 
 export type EmailSent = Tables<'emails_sent'>
 export type EmailSentInsert = TablesInsert<'emails_sent'>
@@ -46,14 +45,9 @@ export type CartItems = Tables<'user_cart_items'>
 // 👁️ VUES (VIEWS)
 // ==========================================
 
-// Contient maintenant stock (number), sale_price, is_on_sale
 export type CartView = Tables<'user_cart_view'>
-
 export type OrdersOverviewForAdmin = Tables<'orders_overview_for_admin'>
-
-// Contient paypal_order_id, subtotal, tax_amount, etc.
 export type OrdersFullView = Tables<'orders_full_view'>
-
 export type ConversationOverview = Tables<'conversation_overview'>
 
 // ==========================================
@@ -61,18 +55,18 @@ export type ConversationOverview = Tables<'conversation_overview'>
 // ==========================================
 
 /**
- * ⚠️ IMPORTANT V2.0 :
- * Ce type correspond à l'objet JSON construit dans la vue SQL 'orders_detailed_view'.
- * Il doit matcher les clés définies dans le jsonb_build_object du script SQL.
+ * ⚠️ IMPORTANT V2.2 :
+ * Correspond à l'objet JSON construit dans 'orders_detailed_view'.
  */
 export type OrderItemDetailed = {
   product_id: string
-  product_name: string // V2: C'est le snapshot ou le nom actuel
+  product_name: string // Snapshot (ex: "Semax (5mg)") ou Nom actuel
+  product_dosage?: string | null // ✅ AJOUT V2.2
   product_price: number
   product_image: string | null
-  product_stock: number // V2: Integer maintenant
+  product_stock: number
   quantity: number
-  total: number // V2: price * quantity
+  total: number
 }
 
 /**

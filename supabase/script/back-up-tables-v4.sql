@@ -353,6 +353,7 @@ CREATE OR REPLACE FUNCTION public.user_exists_by_email(p_email text) RETURNS boo
 $$;
 GRANT EXECUTE ON FUNCTION public.user_exists_by_email(text) TO anon, authenticated;
 
+
 -- ============================================================
 -- ✅ BLOC 5 — RPC TRANSACTION (COMMANDE) - UPDATED
 -- ============================================================
@@ -395,7 +396,7 @@ BEGIN
   )
   RETURNING id INTO new_order_id;
 
-  -- 2. Insertion Produits avec Snapshot Intelligent (Nom + Dosage)
+  -- 2. Insertion Produits
   FOR item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
     INSERT INTO public.order_items (order_id, product_id, quantity, price, product_name_snapshot)
@@ -403,8 +404,15 @@ BEGIN
       new_order_id,
       (item->>'product_id')::uuid,
       COALESCE((item->>'quantity')::integer, 1),
-      COALESCE((item->>'product_price')::numeric, 0),
-      -- 📸 Snapshot concaténé pour l'historique : "Semax (5mg)"
+      
+      -- 🔥 C'EST ICI QUE CA CHANGE 🔥
+      -- On ne lit plus le JSON, on lit la table 'products' (alias p)
+      CASE 
+        WHEN p.is_on_sale = true AND p.sale_price IS NOT NULL THEN p.sale_price
+        ELSE p.price 
+      END,
+
+      -- Snapshot nom + dosage
       p.name || CASE WHEN p.dosage IS NOT NULL THEN ' (' || p.dosage || ')' ELSE '' END
     FROM public.products p
     WHERE p.id = (item->>'product_id')::uuid;

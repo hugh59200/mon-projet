@@ -101,7 +101,7 @@
               center
               danger
               :span="3"
-              @click.stop="deleteOrder(order)"
+              @click="deleteOrder(order)"
             />
           </div>
         </div>

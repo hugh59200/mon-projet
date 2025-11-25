@@ -29,7 +29,7 @@ Deno.serve(
       order_id,
       order_number: orderNumber,
       created_at: order.created_at,
-      full_name: order.shipping_name, // Utilise shipping_name de la vue
+      full_name: order.shipping_name,
 
       // 💰 Données Financières V2
       total_amount: order.total_amount,
@@ -37,11 +37,13 @@ Deno.serve(
       shipping_cost: order.shipping_cost,
       discount_amount: order.discount_amount,
 
-      // 📦 Mapping des items (depuis JSONB)
+      // 📦 Mapping des items
       items: (order.detailed_items ?? []).map((i: any) => ({
         name: i.product_name ?? 'Produit',
+        // ✅ AJOUT : On passe le dosage au template
+        dosage: i.product_dosage, 
         quantity: Number(i.quantity ?? 1),
-        price: Number(i.product_price ?? 0), // Prix unitaire direct
+        price: Number(i.product_price ?? 0),
         total: Number(i.total ?? 0),
       })),
 
@@ -51,7 +53,7 @@ Deno.serve(
 
     // 3. Envoi
     await sendEmail({
-      to: order.shipping_email, // Utilise shipping_email de la vue
+      to: order.shipping_email,
       subject: `Confirmation de votre commande ${orderNumber}`,
       html,
       type: 'confirmation',

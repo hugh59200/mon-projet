@@ -1,13 +1,11 @@
-// supabase/functions/utils/templates/orderConfirmationTemplate.ts
-
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 
 export function orderConfirmationTemplate({
   order_id,
-  order_number, // V2: Nouveau champ
+  order_number,
   full_name,
-  subtotal, // V2
-  shipping_cost, // V2
+  subtotal,
+  shipping_cost,
   total_amount,
   items = [],
   created_at,
@@ -19,18 +17,28 @@ export function orderConfirmationTemplate({
   shipping_cost?: number
   total_amount: number
   created_at: string
-  items: { name: string; quantity: number; price: number }[]
+  // ✅ AJOUT du type dosage
+  items: { name: string; dosage?: string; quantity: number; price: number }[]
 }) {
-  // Priorité au numéro FP-2025-XXX, sinon fallback UUID court
+  // Priorité au numéro FP-2025-XXX
   const displayId = order_number ?? order_id.slice(0, 8).toUpperCase()
 
   // Génération des lignes produits
   const rows = items
-    .map(
-      (i) => `
+    .map((i) => {
+      // 🧠 Logique d'affichage du dosage (comme sur le Frontend)
+      const showDosage = i.dosage && !i.name.includes(i.dosage)
+
+      // Construction du HTML pour le nom + dosage éventuel
+      const nameHtml = showDosage
+        ? `<span style="display:block;font-weight:600;color:#1e293b;">${i.name}</span>
+           <span style="display:block;font-size:12px;color:#00796B;margin-top:2px;">Dosage : ${i.dosage}</span>`
+        : `<span style="display:block;font-weight:600;color:#1e293b;">${i.name}</span>`
+
+      return `
         <tr>
           <td style="padding:12px 0;border-bottom:1px solid #e2e8f0;">
-            <span style="display:block;font-weight:600;color:#1e293b;">${i.name}</span>
+            ${nameHtml}
           </td>
           <td style="text-align:center;padding:12px 0;border-bottom:1px solid #e2e8f0;color:#64748b;">
             x${i.quantity}
@@ -39,15 +47,15 @@ export function orderConfirmationTemplate({
             ${(i.quantity * i.price).toFixed(2)} €
           </td>
         </tr>
-      `,
-    )
+      `
+    })
     .join('')
 
-  // Gestion affichage livraison (Offerte ou Prix)
+  // Gestion affichage livraison
   const shippingLabel =
     !shipping_cost || shipping_cost === 0 ? 'Offerte' : `${shipping_cost.toFixed(2)} €`
 
-  // Calcul sous-total fallback si non fourni
+  // Calcul sous-total fallback
   const subtotalDisplay = subtotal
     ? subtotal.toFixed(2)
     : items.reduce((acc, i) => acc + i.quantity * i.price, 0).toFixed(2)
@@ -99,6 +107,6 @@ export function orderConfirmationTemplate({
     title: `Commande confirmée ✅`,
     bodyHTML,
     ctaLabel: 'Suivre ma commande',
-    ctaUrl: `https://fast-peptides.com/profil/commandes/${order_id}`, // Lien vers le détail
+    ctaUrl: `https://fast-peptides.com/profil/commandes/${order_id}`,
   })
 }

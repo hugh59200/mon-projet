@@ -45,19 +45,38 @@
                     class="checkout-item__icon"
                   />
                 </div>
+
+                <BasicText
+                  v-if="item.product_dosage && !item.product_name?.includes(item.product_dosage)"
+                  size="body-s"
+                  weight="semibold"
+                  color="primary-700"
+                  class="checkout-item__dosage"
+                >
+                  Dosage : {{ item.product_dosage }}
+                </BasicText>
+
                 <div class="checkout-item__details">
                   <span>{{ item.quantity ?? 1 }} ×</span>
+
                   <span class="checkout-item__unit-price">
-                    {{ formatPrice(item.product_price) }}
+                    <template v-if="item.is_on_sale">
+                      <span class="price-striked">{{ formatPrice(item.product_price) }}</span>
+                      <span class="price-sale">{{ formatPrice(item.product_sale_price) }}</span>
+                    </template>
+                    <template v-else>
+                      {{ formatPrice(item.product_price) }}
+                    </template>
                   </span>
                 </div>
               </div>
             </div>
+
             <BasicText
               weight="bold"
               class="checkout-item__total"
             >
-              {{ formatPrice((item.product_price ?? 0) * (item.quantity ?? 1)) }}
+              {{ formatPrice(getLineTotal(item)) }}
             </BasicText>
           </div>
         </div>
@@ -241,6 +260,7 @@
   import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { createOrder } from '@/supabase/api/ordersApi'
+  import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, h, ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -330,12 +350,20 @@
     )
   }
 
+  // ✅ Helper pour calculer le total ligne (avec prix promo si applicable)
+  function getLineTotal(item: CartView) {
+    const qty = item.quantity ?? 1
+    const price = item.is_on_sale
+      ? (item.product_sale_price ?? item.product_price ?? 0)
+      : (item.product_price ?? 0)
+    return price * qty
+  }
+
   function openProductModal(productId?: string, event?: MouseEvent) {
     if (!productId || !event) return
     const target = event.currentTarget as HTMLElement
     if (!target) return
 
-    // Effet visuel simple au clic
     target.style.opacity = '0.6'
     setTimeout(() => (target.style.opacity = '1'), 200)
 
@@ -359,10 +387,13 @@
       }
 
       try {
+        // ✅ Payload cohérent V2 : On envoie le prix qui correspond à ce que l'utilisateur voit
         const orderItemsPayload = cart.items.map((item) => ({
           product_id: item.product_id!,
           quantity: item.quantity ?? 1,
-          product_price: item.product_price ?? 0,
+          product_price: item.is_on_sale
+            ? (item.product_sale_price ?? 0)
+            : (item.product_price ?? 0),
         }))
 
         const newOrder = await createOrder({
@@ -406,7 +437,7 @@
     flex-direction: column;
     gap: 40px;
     padding: 30px 20px;
-    max-width: 900px; // Un peu plus large pour être à l'aise
+    max-width: 900px;
     margin: 0 auto;
     width: 100%;
 
@@ -450,7 +481,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px;
-      background: white; // Carte blanche interne
+      background: white;
       border-radius: 12px;
       border: 1px solid @neutral-200;
       transition: border-color 0.2s;
@@ -501,11 +532,32 @@
         color: @neutral-400;
       }
 
+      &__dosage {
+        margin-top: -2px;
+      }
+
       &__details {
         font-size: 13px;
         color: @neutral-500;
         display: flex;
         gap: 6px;
+        align-items: baseline;
+      }
+
+      &__unit-price {
+        display: flex;
+        gap: 6px;
+
+        .price-striked {
+          text-decoration: line-through;
+          color: @neutral-400;
+          font-size: 0.9em;
+        }
+
+        .price-sale {
+          color: var(--danger-600);
+          font-weight: 600;
+        }
       }
 
       &__total {

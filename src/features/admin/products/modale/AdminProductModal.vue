@@ -2,44 +2,62 @@
   <ModalComponent
     v-model="visible"
     closable
+    :title="headerTitle"
   >
-    <template #header>
-      {{ headerTitle }}
-    </template>
     <template #content>
       <div class="product-form">
-        <WrapperInput
-          v-model="form.name"
-          label="Nom"
-          placeholder="Ex : IGF-1 LR3"
-          required
-        />
+        
+        <div class="form-section">
+          <BasicText size="body-s" weight="bold" color="neutral-500" class="section-title">
+            Identité du produit
+          </BasicText>
+          
+          <div class="form-row">
+            <WrapperInput
+              v-model="form.name"
+              label="Nom"
+              placeholder="Ex : BPC-157"
+              required
+              class="flex-grow-2" 
+            />
+            <WrapperInput
+              v-model="form.dosage"
+              label="Dosage"
+              placeholder="Ex : 10mg"
+              required
+              class="flex-grow-1"
+            />
+          </div>
 
-        <div class="form-row">
-          <WrapperInput
-            v-model="form.category"
-            label="Catégorie"
-            placeholder="Ex : Bien-être"
-            class="flex-1"
-          />
-          <WrapperInput
-            :model-value="form.purity?.toString()"
-            @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
-            label="Pureté (%)"
-            placeholder="Ex : 99"
-            class="w-1/3"
-          />
+          <div class="form-row">
+            <WrapperInput
+              v-model="form.category"
+              label="Catégorie"
+              placeholder="Ex : Récupération"
+              class="flex-grow-1"
+            />
+            <WrapperInput
+              :model-value="form.purity?.toString()"
+              @update:model-value="(v) => (form.purity = v ? parseFloat(v) : null)"
+              label="Pureté (%)"
+              placeholder="Ex : 99"
+              type="number"
+              class="flex-grow-1"
+            />
+          </div>
         </div>
 
         <div class="form-section">
-          <BasicText
-            size="body-s"
-            weight="bold"
-            color="neutral-500"
-            class="mb-2"
-          >
-            Tarification
-          </BasicText>
+          <div class="section-header">
+            <BasicText size="body-s" weight="bold" color="neutral-500">
+              Tarification
+            </BasicText>
+            <WrapperCheckbox
+              v-model="form.is_on_sale"
+              label="Activer la promotion"
+            />
+          </div>
+
           <div class="form-row">
             <WrapperInput
               :model-value="form.price?.toString()"
@@ -47,35 +65,25 @@
               label="Prix standard (€)"
               placeholder="0.00"
               input-type="form"
-              class="flex-1"
+              class="flex-grow-1"
             />
 
-            <div class="promo-toggle">
-              <WrapperCheckbox
-                v-model="form.is_on_sale"
-                label="En promotion"
+            <div class="flex-grow-1 promo-container">
+              <WrapperInput
+                v-if="form.is_on_sale"
+                :model-value="form.sale_price?.toString()"
+                @update:model-value="(v) => (form.sale_price = parseFloat(v || '0'))"
+                label="Prix Promo (€)"
+                placeholder="0.00"
+                input-type="form"
+                class="slide-in"
               />
             </div>
-
-            <WrapperInput
-              v-if="form.is_on_sale"
-              :model-value="form.sale_price?.toString()"
-              @update:model-value="(v) => (form.sale_price = parseFloat(v || '0'))"
-              label="Prix Promo (€)"
-              placeholder="0.00"
-              input-type="form"
-              class="slide-in flex-1"
-            />
           </div>
         </div>
 
         <div class="form-section">
-          <BasicText
-            size="body-s"
-            weight="bold"
-            color="neutral-500"
-            class="mb-2"
-          >
+          <BasicText size="body-s" weight="bold" color="neutral-500" class="section-title">
             Inventaire
           </BasicText>
           <WrapperInput
@@ -89,17 +97,17 @@
           <BasicText
             size="body-s"
             color="neutral-500"
-            class="mt-1"
+            class="helper-text"
           >
             Mettre 0 pour afficher "Rupture de stock".
           </BasicText>
         </div>
 
-        <WrapperFormElements label="Description">
+        <WrapperFormElements label="Description détaillée">
           <textarea
             v-model="form.description"
-            rows="3"
-            placeholder="Description du produit..."
+            rows="4"
+            placeholder="Description du produit (supporte HTML simple)..."
             class="custom-textarea"
           />
         </WrapperFormElements>
@@ -111,6 +119,7 @@
             icon-name="Upload"
             @click="openFilePicker()"
             :value="selectedFile?.name || extractFileName(form.image) || ''"
+            class="cursor-pointer"
           />
           <input
             ref="fileInputRef"
@@ -119,31 +128,34 @@
             class="hidden-input"
             @change="handleFileChange"
           />
-          <div
-            v-if="imagePreview"
-            class="image-preview"
-          >
-            <img
-              :src="imagePreview"
-              alt="Aperçu produit"
-            />
+          
+          <div v-if="imagePreview" class="image-preview">
+            <img :src="imagePreview" alt="Aperçu produit" />
             <BasicButton
-              label="Supprimer"
-              type="secondary"
-              variant="outlined"
+              label="Supprimer l'image"
+              type="danger"
+              variant="ghost"
               size="small"
               @click="removeImage"
             />
           </div>
         </WrapperFormElements>
 
-        <BasicButton
-          :label="isEditMode ? 'Mettre à jour le produit' : 'Créer le produit'"
-          type="primary"
-          :disabled="loading"
-          @click="handleSubmit"
-          class="mt-4"
-        />
+        <div class="form-actions">
+          <BasicButton
+            label="Annuler"
+            type="secondary"
+            variant="outlined"
+            @click="visible = false"
+          />
+          <BasicButton
+            :label="isEditMode ? 'Enregistrer' : 'Créer le produit'"
+            type="primary"
+            :disabled="loading || uploadLoading"
+            @click="handleSubmit"
+          />
+        </div>
+
       </div>
     </template>
   </ModalComponent>
@@ -153,7 +165,7 @@
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useProductActions } from '@/supabase/actions/useProductActions'
   import { supabase } from '@/supabase/supabaseClient'
-  import type { TablesInsert } from '@/supabase/types/supabase' // Type généré V2
+  import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -174,16 +186,17 @@
   const fileInputRef = ref<HTMLInputElement | null>(null)
   const oldImagePath = ref<string | null>(null)
 
-  // ✅ Initialisation compatible V2
+  // ✅ Initialisation complète (avec Dosage)
   const form = ref<TablesInsert<'products'>>({
     name: '',
+    dosage: '', // Nouveau champ V2
     category: '',
     price: 0,
-    sale_price: null, // Nouveau
-    is_on_sale: false, // Nouveau
+    sale_price: null,
+    is_on_sale: false,
     purity: null,
     description: '',
-    stock: 0, // Nouveau : Integer (0 par défaut)
+    stock: 0,
     image: null,
   })
 
@@ -209,15 +222,16 @@
 
   function extractFileName(url: string | null | undefined): string | null {
     if (!url) return null
-    const parts = url.split('/')
-    return parts[parts.length - 1] ?? null
+    // On extrait juste le nom du fichier de l'URL
+    return url.split('/').pop() ?? null
   }
 
   async function loadProduct() {
     if (!props.productId) {
-      // Reset form for creation mode
+      // Reset pour création
       form.value = {
         name: '',
+        dosage: '',
         category: '',
         price: 0,
         sale_price: null,
@@ -238,59 +252,59 @@
       .eq('id', props.productId)
       .single()
 
-    if (error) return toast.show('Erreur chargement produit', 'danger')
+    if (error) {
+      toast.show('Erreur chargement produit', 'danger')
+      visible.value = false
+      return
+    }
 
-    form.value = { ...data } // Spread pour éviter les refs liées
+    form.value = { ...data }
     imagePreview.value = data.image || null
-    if (data.image) oldImagePath.value = data.image.split('/product-images/')[1] ?? null
+    
+    // Extraction du path pour suppression future éventuelle
+    if (data.image && data.image.includes('/product-images/')) {
+      oldImagePath.value = data.image.split('/product-images/')[1] ?? null
+    }
   }
 
   async function removeImage() {
-    try {
-      if (form.value.image) {
-        const path = form.value.image.split('/product-images/')[1]
-        if (path) {
-          await supabase.storage.from('product-images').remove([path])
-          toast.show('Image supprimée du serveur 🗑️', 'info')
-        }
-        form.value.image = null
-      }
-      selectedFile.value = null
-      imagePreview.value = null
-    } catch (err: any) {
-      toast.show(`Erreur suppression image : ${(err as Error).message}`, 'danger')
-    }
+    // Note: On ne supprime pas physiquement l'image tout de suite pour éviter les erreurs si on annule
+    // On le fait juste visuellement dans le formulaire
+    form.value.image = null
+    imagePreview.value = null
+    selectedFile.value = null
   }
 
   async function uploadImage(): Promise<string | null> {
     if (!selectedFile.value || !form.value.name) return null
+    
     uploadLoading.value = true
     try {
-      const productSlug = form.value.name
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
-
-      const folderPath = `products/${productSlug}`
+      // Création d'un nom de fichier unique : slug-dosage-timestamp.ext
+      const slug = form.value.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
+      const dosageSlug = form.value.dosage?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'u'
       const fileExt = selectedFile.value.name.split('.').pop()
-      const fileName = `peptide-${productSlug}-${Date.now()}.${fileExt}` // Ajout timestamp pour éviter cache
+      const fileName = `${slug}-${dosageSlug}-${Date.now()}.${fileExt}`
+      
+      const folderPath = `products`
       const fullPath = `${folderPath}/${fileName}`
 
-      if (oldImagePath.value) {
-        await supabase.storage.from('product-images').remove([oldImagePath.value])
-      }
-
+      // Upload Supabase
       const { error } = await supabase.storage
         .from('product-images')
-        .upload(fullPath, selectedFile.value, { cacheControl: '3600', upsert: true })
+        .upload(fullPath, selectedFile.value, { 
+          cacheControl: '3600', 
+          upsert: true 
+        })
 
       if (error) throw error
 
-      const { data: publicUrlData } = supabase.storage.from('product-images').getPublicUrl(fullPath)
-      oldImagePath.value = fullPath
-      return publicUrlData.publicUrl
+      // Récupération URL publique
+      const { data } = supabase.storage.from('product-images').getPublicUrl(fullPath)
+      return data.publicUrl
+
     } catch (err: any) {
-      toast.show(`Erreur upload : ${(err as Error).message}`, 'danger')
+      toast.show(`Erreur upload : ${err.message}`, 'danger')
       return null
     } finally {
       uploadLoading.value = false
@@ -298,19 +312,25 @@
   }
 
   async function handleSubmit() {
-    if (!form.value.name || !form.value.category || !form.value.price) {
-      toast.show('Nom, catégorie et prix sont obligatoires', 'warning')
+    // Validation basique
+    if (!form.value.name || !form.value.price) {
+      toast.show('Nom et Prix sont obligatoires', 'warning')
+      return
+    }
+    if (!form.value.dosage) {
+      toast.show('Le dosage est obligatoire (ex: 10mg)', 'warning')
       return
     }
 
     loading.value = true
     try {
+      // Upload image si nouvelle sélectionnée
       if (selectedFile.value) {
         const uploadedUrl = await uploadImage()
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
-      // Nettoyage payload pour éviter d'envoyer sale_price null si pas en solde (optionnel mais propre)
+      // Nettoyage logique : Si pas en promo, on vide le prix promo
       const payload = { ...form.value }
       if (!payload.is_on_sale) {
         payload.sale_price = null
@@ -318,11 +338,17 @@
 
       if (isEditMode.value && props.productId) {
         await updateProduct(props.productId, payload)
+        toast.show('Produit mis à jour avec succès', 'success')
       } else {
         await createProduct(payload)
+        toast.show('Produit créé avec succès', 'success')
       }
 
       visible.value = false
+    } catch (err) {
+      console.error(err)
+      // Le toast d'erreur est généralement géré dans useProductActions, mais au cas où
+      toast.show('Une erreur est survenue', 'danger')
     } finally {
       loading.value = false
     }
@@ -330,8 +356,10 @@
 
   onMounted(loadProduct)
   watch(() => props.productId, loadProduct)
+  
+  // Recharger les données quand on ouvre la modale (cas création -> fermeture -> réouverture)
   watch(visible, (val) => {
-    if (val) loadProduct() // Recharger quand la modale s'ouvre
+    if (val) loadProduct()
   })
 </script>
 
@@ -339,76 +367,124 @@
   .product-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 16px 20px;
-    background: @neutral-50;
-    border-radius: 8px;
+    gap: 24px;
+    padding: 10px;
+  }
+
+  .form-section {
+    padding: 20px;
+    border: 1px solid @neutral-200;
+    border-radius: 12px;
+    background: @white;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-title {
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
   }
 
   .form-row {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     align-items: flex-start;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 12px;
+    }
   }
 
-  .form-section {
-    padding: 12px;
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
-    background: #fff;
+  // Classes utilitaires flex pour remplacer Tailwind
+  .flex-grow-1 {
+    flex: 1;
+  }
+  .flex-grow-2 {
+    flex: 2;
   }
 
-  .promo-toggle {
-    display: flex;
-    align-items: center;
-    height: 42px; /* Pour aligner avec les inputs */
-    padding: 0 8px;
+  .promo-container {
+    position: relative; // Pour l'animation slide-in
+  }
+
+  .helper-text {
+    margin-top: 4px;
+    font-size: 0.8rem;
   }
 
   .custom-textarea {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 14px;
     width: 100%;
-    resize: vertical;
+    padding: 12px;
+    border: 1px solid @neutral-300;
+    border-radius: 8px;
     font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    background: @white;
+    transition: border-color 0.2s;
 
     &:focus {
-      outline: 2px solid var(--primary-200);
+      outline: none;
       border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
     }
   }
 
-  .image-preview {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-
-    img {
-      max-width: 200px;
-      width: 100%;
-      height: auto;
-      border-radius: 6px;
-      object-fit: contain;
-    }
+  .cursor-pointer {
+    cursor: pointer;
   }
 
   .hidden-input {
     display: none;
   }
 
-  .slide-in {
-    animation: slideIn 0.2s ease-out;
+  .image-preview {
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px dashed @neutral-300;
+    border-radius: 8px;
+    background-color: @neutral-50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    img {
+      max-height: 180px;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
   }
 
-  @keyframes slideIn {
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid @neutral-100;
+    margin-top: 8px;
+  }
+
+  // Animation simple d'apparition du champ promo
+  .slide-in {
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideInRight {
     from {
       opacity: 0;
       transform: translateX(-10px);

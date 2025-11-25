@@ -1,25 +1,6 @@
 <template>
   <div class="user-orders">
-    <div
-      class="user-orders__title-wrapper"
-      v-motion="{
-        initial: { opacity: 0, y: -20 },
-        enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
-      }"
-    >
-      <BasicText
-        size="h3"
-        weight="bold"
-        class="user-orders__title"
-      >
-        {{ splitTitle.start }}
-        <span v-if="splitTitle.end">{{ splitTitle.end }}</span>
-      </BasicText>
-
-      <div class="user-orders__subtitle">{{ description }} 🧾</div>
-
-      <div class="user-orders__title-divider"></div>
-    </div>
+    <PageHeader />
 
     <WrapperLoader :loading="!hasLoaded" />
 
@@ -145,6 +126,15 @@
                   >
                     {{ item.product_name }}
                   </BasicText>
+
+                  <BasicText
+                    v-if="item.product_dosage && !item.product_name.includes(item.product_dosage)"
+                    size="body-s"
+                    color="primary-700"
+                    weight="semibold"
+                  >
+                    Dosage : {{ item.product_dosage }}
+                  </BasicText>
                 </div>
 
                 <div class="user-orders__item-meta">
@@ -152,7 +142,7 @@
                     size="body-s"
                     color="neutral-500"
                   >
-                    Quantité : {{ item.quantity }}
+                    Qté : {{ item.quantity }}
                   </BasicText>
 
                   <BasicText
@@ -372,34 +362,8 @@
   import { formatDate } from '@/utils/index'
   import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, type Ref } from 'vue'
-  import { useRoute } from 'vue-router'
-
-  const route = useRoute()
-
-  const splitTitle = computed(() => {
-    let rawTitle = (route.meta.heading as string) || (route.meta.label as string)
-
-    if (!rawTitle && route.meta.title) {
-      rawTitle = (route.meta.title as string).replace(' – Fast Peptides', '')
-    }
-
-    if (!rawTitle) rawTitle = 'Mes commandes'
-
-    const parts = rawTitle.trim().split(' ')
-    if (parts.length > 1) {
-      const lastWord = parts.pop()
-      return { start: parts.join(' '), end: lastWord }
-    }
-    return { start: rawTitle, end: '' }
-  })
-
-  const description = computed(() => {
-    return (
-      (route.meta.description as string) ||
-      'Retrouvez ici l’historique de toutes vos commandes passées'
-    )
-  })
+  import { onMounted, ref, type Ref } from 'vue'
+  import PageHeader from '../shared/components/PageHeader.vue'
 
   const orders = ref<OrdersFullView[]>([])
   const openSections = ref({}) as Ref<
@@ -412,6 +376,7 @@
   const toast = useToastStore()
   const hasLoaded = ref(false)
 
+  // Cast manuel car le type retourné par la vue est Json
   function getItems(order: any): OrderItemDetailed[] {
     return (order.detailed_items as unknown as OrderItemDetailed[]) || []
   }
@@ -483,37 +448,6 @@
     padding: 0 20px;
     display: flex;
     flex-direction: column;
-
-    &__title-wrapper {
-      text-align: center;
-    }
-
-    &__title {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: @neutral-900;
-      margin-bottom: 6px;
-
-      span {
-        background: linear-gradient(90deg, var(--primary-600), var(--primary-400));
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    &__subtitle {
-      font-size: 15px;
-      color: @neutral-600;
-    }
-
-    &__title-divider {
-      width: 100%;
-      height: 1px;
-      margin-top: 16px;
-      background: linear-gradient(90deg, rgba(var(--primary-500-rgb), 0.25), transparent);
-    }
 
     &__empty {
       text-align: center;
@@ -628,11 +562,18 @@
         justify-content: center;
       }
 
+      &-name {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
       &-meta {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
+        margin-top: 4px;
       }
     }
 

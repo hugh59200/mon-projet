@@ -15,7 +15,7 @@ export function baseEmailTemplate({
   const accent = '#00BFA5'
   const yellowPeptides = '#facc15' // Couleur proche du @yellow-400 (Tailwind)
 
-  // URL de ton logo hébergé (Assure-toi que ce lien est valide et public)
+  // URL de ton logo hébergé
   const logoUrl =
     'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-icon/fast-peptides-logo.png'
 
@@ -66,7 +66,8 @@ export function baseEmailTemplate({
                     <img src="${logoUrl}" width="38" height="38" alt="Fast Peptides" style="display:block; border:0; outline:none;" />
                 </td>
                 <td style="vertical-align: middle; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 26px; line-height: 1;">
-                    <span style="color:#ffffff; font-weight:900; font-style:italic;">Fast</span><span style="color:${yellowPeptides}; font-weight:600; letter-spacing:1px;">Peptides</span>
+                    <span style="color:#ffffff; font-weight:900; font-style:italic; padding-right: 3px;">Fast</span>
+                    <span style="color:${yellowPeptides}; font-weight:600; letter-spacing:1px;">Peptides</span>
                 </td>
             </tr>
         </table>
