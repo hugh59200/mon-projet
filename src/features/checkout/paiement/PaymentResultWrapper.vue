@@ -69,7 +69,7 @@
   const visible = ref(true)
 
   function handleFinish() {
-    setTimeout(() => (visible.value = false), 2000)
+    setTimeout(() => (visible.value = false), 1600)
   }
 </script>
 
