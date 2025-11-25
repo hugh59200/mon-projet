@@ -13,7 +13,11 @@ export function baseEmailTemplate({
 }) {
   const primary = '#00796B'
   const accent = '#00BFA5'
-  const logoUrl = 'https://mon-projet-perso.pages.dev/logo-app.png'
+  const yellowPeptides = '#facc15' // Couleur proche du @yellow-400 (Tailwind)
+
+  // URL de ton logo hébergé (Assure-toi que ce lien est valide et public)
+  const logoUrl =
+    'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-icon/fast-peptides-logo.png'
 
   const ctaBlock =
     ctaLabel && ctaUrl
@@ -48,15 +52,26 @@ export function baseEmailTemplate({
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
-  </head>
+</head>
 <body style="margin:0;padding:0;background-color:#f4f7fa;font-family:'Segoe UI', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
   
   <center style="width:100%;background-color:#f4f7fa;padding:40px 0;">
     <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
       
       <div style="background-color:${primary};padding:40px 20px;text-align:center;">
-        <img src="${logoUrl}" width="64" height="64" alt="Fast Peptides" style="display:block;margin:0 auto 16px;border-radius:12px;" />
-        <h1 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+        
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+                <td style="padding-right: 12px; vertical-align: middle;">
+                    <img src="${logoUrl}" width="38" height="38" alt="Fast Peptides" style="display:block; border:0; outline:none;" />
+                </td>
+                <td style="vertical-align: middle; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 26px; line-height: 1;">
+                    <span style="color:#ffffff; font-weight:900; font-style:italic;">Fast</span><span style="color:${yellowPeptides}; font-weight:600; letter-spacing:1px;">Peptides</span>
+                </td>
+            </tr>
+        </table>
+
+        <h1 style="margin-top:24px; margin-bottom:0; font-size:20px; font-weight:normal; color:#e0f2f1; letter-spacing:-0.5px;">
           ${title}
         </h1>
       </div>

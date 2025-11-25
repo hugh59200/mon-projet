@@ -2,13 +2,6 @@
   <footer class="footer">
     <div class="footer__main">
       <div class="footer__brand">
-        <div class="footer__brand-left">
-          <img
-            src="@/assets/logo-app.png"
-            alt="Fast Peptides Logo"
-            class="footer__logo"
-          />
-        </div>
         <div class="footer__brand-right">
           <div class="footer__disclaimer">
             <BasicIconNext

@@ -83,7 +83,6 @@
               Mon Panier ({{ cart.totalItems }})
             </BasicText>
           </div>
-
           <div class="cart__list custom-scrollbar">
             <div
               v-for="item in cart.items"
