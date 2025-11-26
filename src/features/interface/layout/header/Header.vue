@@ -1,6 +1,10 @@
 <template>
   <nav class="auth-navbar">
+    <!-- ========================================= -->
+    <!-- LEFT SECTION : Logo + Mobile Menu Toggle -->
+    <!-- ========================================= -->
     <div class="auth-navbar__left">
+      <!-- Mobile Burger Menu -->
       <BasicButton
         v-if="isMobile"
         @click="toggleMobileMenu"
@@ -12,9 +16,13 @@
         class="burger"
       />
 
+      <!-- Logo cliquable -->
       <div
         class="logo"
         @click="router.push('/')"
+        role="button"
+        tabindex="0"
+        @keypress.enter="router.push('/')"
       >
         <BasicIconNext
           name="fastPeptides"
@@ -28,6 +36,9 @@
       </div>
     </div>
 
+    <!-- ========================================= -->
+    <!-- CENTER SECTION : Main Navigation (Desktop) -->
+    <!-- ========================================= -->
     <div
       v-if="!isMobile"
       class="auth-navbar__center"
@@ -35,17 +46,28 @@
       <MainNavLinks />
     </div>
 
+    <!-- ========================================= -->
+    <!-- RIGHT SECTION : Cart + Auth/Guest Actions -->
+    <!-- ========================================= -->
     <div class="auth-navbar__right">
+      <!-- Panier (toujours visible) -->
       <CartMenu />
-      
-      <!-- USER CONNECTÉ -->
+
+      <!-- ===================== -->
+      <!-- ÉTAT 1 : USER CONNECTÉ -->
+      <!-- ===================== -->
       <UserMenu v-if="auth.user" />
 
-      <!-- 🆕 INVITÉ AVEC PANIER -->
+      <!-- ========================== -->
+      <!-- ÉTAT 2 : INVITÉ AVEC PANIER -->
+      <!-- ========================== -->
       <div
         v-else-if="hasGuestCart"
         class="guest-info"
+        role="group"
+        aria-label="Actions invité"
       >
+        <!-- Badge "Mode Invité" -->
         <div class="guest-label">
           <BasicIconNext
             name="ShoppingBag"
@@ -60,6 +82,20 @@
             Mode Invité
           </BasicText>
         </div>
+
+        <!-- 🆕 Bouton Suivi (pour retrouver ses commandes) -->
+        <BasicButton
+          label="Suivre"
+          aria-label="Suivre ma commande"
+          icon-name="PackageSearch"
+          type="secondary"
+          variant="ghost"
+          size="small"
+          class="guest-track-btn"
+          @click="router.push('/suivi-commande')"
+        />
+
+        <!-- CTA Connexion principale -->
         <BasicButton
           label="Connexion"
           type="primary"
@@ -69,13 +105,16 @@
         />
       </div>
 
-      <!-- VISITEUR (pas de panier) -->
+      <!-- ================================ -->
+      <!-- ÉTAT 3 : VISITEUR (sans panier) -->
+      <!-- ================================ -->
       <template v-else>
+        <!-- Desktop : Tous les boutons visibles -->
         <div
           v-if="isDesktop"
           class="auth-navbar__buttons"
         >
-          <!-- 🆕 Bouton Tracking toujours visible -->
+          <!-- 🆕 Bouton Tracking (accessible à tous) -->
           <BasicButton
             label="Suivre"
             aria-label="Suivre ma commande"
@@ -87,12 +126,15 @@
             @click="router.push('/suivi-commande')"
           />
 
+          <!-- Connexion -->
           <BasicButton
             label="Connexion"
             type="primary"
             size="small"
             @click="router.push('/auth/login')"
           />
+
+          <!-- Inscription -->
           <BasicButton
             label="Inscription"
             type="reverse"
@@ -101,11 +143,15 @@
             @click="router.push('/auth/register')"
           />
         </div>
+
+        <!-- Mobile : Menu dans drawer -->
         <div v-else>
           <UserMenu />
         </div>
       </template>
     </div>
+
+    <!-- Mobile Navigation Drawer -->
     <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
@@ -124,26 +170,65 @@
   import MainNavLinks from './MainNavLinks.vue'
   import MobileDrawer from './MobileDrawer.vue'
 
+  // ============================================================
+  // SETUP & STORES
+  // ============================================================
   const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()
   const { isMobile, isDesktop } = useDeviceBreakpoint()
   const isMenuOpen = ref(false)
 
-  const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
-  const closeMenu = () => (isMenuOpen.value = false)
-  router.afterEach(() => closeMenu())
+  // ============================================================
+  // COMPUTED PROPERTIES
+  // ============================================================
 
-  // 🆕 Détection invité avec panier
+  /**
+   * 🆕 Détection invité avec panier
+   * Utilisé pour afficher le badge "Mode Invité" avec actions dédiées
+   */
   const hasGuestCart = computed(() => !auth.user && cart.items.length > 0)
 
+  // ============================================================
+  // METHODS
+  // ============================================================
+
+  /**
+   * Toggle du menu mobile
+   */
+  const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
+
+  /**
+   * Fermeture du menu mobile
+   */
+  const closeMenu = () => (isMenuOpen.value = false)
+
+  // ============================================================
+  // LIFECYCLE & WATCHERS
+  // ============================================================
+
+  /**
+   * Ferme automatiquement le menu après navigation
+   */
+  router.afterEach(() => closeMenu())
+
+  /**
+   * Ferme le menu si on passe en mode desktop
+   */
   const stopWatch = watch(isMobile, (mobile) => {
     if (!mobile) closeMenu()
   })
+
+  /**
+   * Nettoyage du watcher au unmount
+   */
   onUnmounted(() => stopWatch())
 </script>
 
 <style scoped lang="less">
+  /* ============================================================
+     NAVBAR PRINCIPALE
+     ============================================================ */
   .auth-navbar {
     z-index: 1000;
     height: 64px;
@@ -158,6 +243,7 @@
     );
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
+    /* Layout des sections */
     &__left {
       display: flex;
       align-items: center;
@@ -188,20 +274,25 @@
     }
   }
 
-  /* --- Logo --- */
+  /* ============================================================
+     LOGO
+     ============================================================ */
   .logo {
     display: flex;
     align-items: center;
     gap: 12px;
     cursor: pointer;
     user-select: none;
+    outline: none; /* Pour accessibilité clavier */
 
     .logo-img {
       color: var(--primary-500);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    &:hover .logo-img {
+    /* Animation playful au hover */
+    &:hover .logo-img,
+    &:focus .logo-img {
       transform: scale(1.1) rotate(5deg);
     }
   }
@@ -227,26 +318,35 @@
     letter-spacing: 0.5px;
   }
 
-  /* --- Bouton Tracking --- */
+  /* ============================================================
+     BOUTON TRACKING (VISITEURS)
+     ============================================================ */
   .tracking-btn {
     color: @neutral-300;
+    transition: all 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus {
       color: white;
       background: rgba(255, 255, 255, 0.08);
     }
   }
 
-  /* --- 🆕 Guest Info Card --- */
+  /* ============================================================
+     GUEST INFO CARD
+     ============================================================ */
   .guest-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     background: rgba(255, 255, 255, 0.06);
     padding: 6px 6px 6px 14px;
     border-radius: 50px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+
+    /* Glassmorphism subtil */
+    backdrop-filter: blur(8px);
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
@@ -260,6 +360,24 @@
     gap: 8px;
   }
 
+  /* Bouton Suivi dans guest-info */
+  .guest-track-btn {
+    color: @neutral-300;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    border-radius: 50px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: white;
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  /* Bouton Connexion principal (CTA) */
   .guest-login-btn {
     font-size: 0.8rem;
     padding: 6px 16px;
@@ -267,13 +385,18 @@
     border-radius: 50px;
     font-weight: 600;
     white-space: nowrap;
+    transition: all 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.3);
     }
   }
 
+  /* ============================================================
+     RESPONSIVE : MOBILE & TABLET
+     ============================================================ */
   @media (max-width: 900px) {
     .auth-navbar {
       padding: 0 16px;
@@ -288,19 +411,29 @@
       font-size: 18px;
     }
 
-    /* Mobile : Version compacte du guest-info */
+    /* Mobile : Version ultra-compacte du guest-info */
     .guest-info {
       padding: 4px;
       background: transparent;
       border: none;
+      gap: 6px;
+      backdrop-filter: none;
 
       &:hover {
         background: rgba(255, 255, 255, 0.05);
       }
 
+      /* Masque le label "Mode Invité" sur mobile */
       .guest-label {
         display: none;
       }
+    }
+
+    /* Boutons réduits en mobile */
+    .guest-track-btn {
+      padding: 4px 10px;
+      height: 28px;
+      font-size: 0.7rem;
     }
 
     .guest-login-btn {
@@ -308,5 +441,29 @@
       height: 28px;
       font-size: 0.75rem;
     }
+  }
+
+  /* ============================================================
+     MICRO-ANIMATIONS & TRANSITIONS
+     ============================================================ */
+
+  /* Transition fluide pour tous les boutons */
+  .auth-navbar button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Animation de pulsation subtile pour le badge guest */
+  @keyframes subtle-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(var(--primary-400-rgb), 0);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(var(--primary-400-rgb), 0.1);
+    }
+  }
+
+  .guest-info:hover {
+    animation: subtle-pulse 2s infinite;
   }
 </style>

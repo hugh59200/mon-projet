@@ -75,6 +75,7 @@
           </div>
         </transition>
 
+        <!-- 🔍 FORMULAIRE DE RECHERCHE -->
         <div
           v-if="!order"
           class="track-card"
@@ -88,7 +89,7 @@
               <BasicInput
                 v-model="form.orderNumber"
                 label="Numéro de commande"
-                placeholder="Ex: FP-2025-XXXXXX"
+                placeholder="Ex: FP-2025-000123"
                 icon-name="Hash"
                 required
                 :error="!!errorMessage"
@@ -120,11 +121,13 @@
           </form>
         </div>
 
+        <!-- ✅ RÉSULTAT : COMMANDE TROUVÉE -->
         <div
           v-else
           class="track-card result-card"
           v-motion-fade
         >
+          <!-- Header avec statut -->
           <div class="result-header">
             <div class="header-left">
               <BasicText
@@ -150,6 +153,7 @@
             />
           </div>
 
+          <!-- Timeline moderne -->
           <div class="timeline-wrapper">
             <div class="timeline-step active">
               <div class="step-icon">
@@ -210,7 +214,9 @@
             </div>
           </div>
 
+          <!-- Grille de détails -->
           <div class="details-grid">
+            <!-- Adresse de livraison -->
             <div class="detail-box">
               <div class="box-icon">
                 <BasicIconNext
@@ -250,9 +256,10 @@
               </div>
             </div>
 
+            <!-- Tracking (si disponible) -->
             <div
               v-if="order.tracking_number"
-              class="detail-box"
+              class="detail-box tracking-box"
             >
               <div class="box-icon">
                 <BasicIconNext
@@ -268,7 +275,7 @@
                   color="neutral-500"
                   class="mb-1 uppercase"
                 >
-                  Suivi
+                  Suivi colis
                 </BasicText>
                 <BasicText
                   size="body-m"
@@ -277,7 +284,10 @@
                 >
                   {{ order.carrier || 'Standard' }}
                 </BasicText>
-                <div class="tracking-pill">
+                <div
+                  class="tracking-pill"
+                  @click="copyTracking"
+                >
                   <BasicText
                     size="body-s"
                     color="neutral-700"
@@ -286,20 +296,186 @@
                     {{ order.tracking_number }}
                   </BasicText>
                   <BasicIconNext
-                    name="Copy"
+                    :name="copied ? 'Check' : 'Copy'"
                     :size="12"
-                    color="neutral-500"
+                    :color="copied ? 'success-600' : 'neutral-500'"
                   />
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Articles commandés -->
+          <div class="items-section">
+            <BasicText
+              size="body-m"
+              weight="bold"
+              class="mb-3"
+            >
+              Articles ({{ order.detailed_items?.length || 0 }})
+            </BasicText>
+            <div class="order-items">
+              <div
+                v-for="item in order.detailed_items"
+                :key="item.product_id"
+                class="order-item"
+              >
+                <img
+                  :src="item.product_image || defaultImage"
+                  :alt="item.product_name"
+                  class="order-item__img"
+                />
+                <div class="order-item__info">
+                  <BasicText
+                    size="body-m"
+                    weight="bold"
+                  >
+                    {{ item.product_name }}
+                  </BasicText>
+                  <BasicText
+                    v-if="item.product_dosage"
+                    size="body-s"
+                    color="primary-700"
+                    weight="semibold"
+                  >
+                    {{ item.product_dosage }}
+                  </BasicText>
+                  <BasicText
+                    size="body-s"
+                    color="neutral-500"
+                  >
+                    Quantité : {{ item.quantity }} × {{ formatPrice(item.product_price) }}
+                  </BasicText>
+                </div>
+                <BasicText
+                  size="body-m"
+                  weight="bold"
+                  color="neutral-800"
+                >
+                  {{ formatPrice(item.total) }}
+                </BasicText>
+              </div>
+            </div>
+          </div>
+
+          <!-- Totaux -->
+          <div class="totals-section">
+            <div class="total-row">
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Sous-total
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-800"
+              >
+                {{ formatPrice(order.subtotal) }}
+              </BasicText>
+            </div>
+            <div class="total-row">
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Livraison
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-800"
+              >
+                {{ formatPrice(order.shipping_cost) }}
+              </BasicText>
+            </div>
+            <div
+              v-if="order.discount_amount && order.discount_amount > 0"
+              class="total-row discount"
+            >
+              <BasicText
+                size="body-s"
+                color="success-600"
+              >
+                Réduction
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="success-600"
+              >
+                -{{ formatPrice(order.discount_amount) }}
+              </BasicText>
+            </div>
+            <div class="total-divider"></div>
+            <div class="total-row total">
+              <BasicText
+                size="body-m"
+                weight="bold"
+              >
+                Total
+              </BasicText>
+              <BasicText
+                size="h5"
+                weight="bold"
+                color="primary-700"
+              >
+                {{ formatPrice(order.total_amount) }}
+              </BasicText>
+            </div>
+          </div>
+
+          <!-- 🆕 CTA Création de compte (si guest) -->
+          <div
+            v-if="order.is_guest_order && !auth.user"
+            class="conversion-cta"
+          >
+            <div class="cta-icon">
+              <BasicIconNext
+                name="UserPlus"
+                :size="20"
+                color="primary-600"
+              />
+            </div>
+            <div class="cta-content">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="neutral-900"
+                class="mb-1"
+              >
+                Suivez toutes vos commandes
+              </BasicText>
+              <BasicText
+                size="body-s"
+                color="neutral-600"
+              >
+                Créez un compte pour accéder à votre historique complet
+              </BasicText>
+            </div>
+            <BasicButton
+              label="Créer mon compte"
+              type="primary"
+              variant="filled"
+              size="small"
+              icon-name="ArrowRight"
+              @click="router.push('/auth/register')"
+            />
+          </div>
+
+          <!-- Actions -->
           <div class="result-actions">
             <BasicButton
               label="Nouvelle recherche"
-              @click="resetSearch"
+              type="secondary"
+              variant="outlined"
               width="full"
+              @click="resetSearch"
+            />
+            <BasicButton
+              label="Retour à la boutique"
+              type="reverse"
+              variant="ghost"
+              width="full"
+              @click="router.push('/')"
             />
           </div>
         </div>
@@ -309,27 +485,36 @@
 </template>
 
 <script setup lang="ts">
+  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/supabase/api/ordersApi'
+  import type { OrdersFullView } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
+  const router = useRouter()
+  const auth = useAuthStore()
+  const toast = useToastStore()
+
   const loading = ref(false)
-  const order = ref<any | null>(null)
+  const order = ref<OrdersFullView | null>(null)
   const errorMessage = ref('')
+  const copied = ref(false)
 
   const form = ref({
     orderNumber: '',
     email: '',
   })
 
-  const isShipped = computed(() => ['shipped', 'completed'].includes(order.value?.status))
+  const isShipped = computed(() => ['shipped', 'completed'].includes(order.value?.status || ''))
 
   onMounted(async () => {
     // 🆕 PRIORITÉ 1 : Tracking par token (URL de l'email)
@@ -355,8 +540,9 @@
     try {
       const data = await trackGuestOrderByToken(token)
       order.value = data
+      console.log('✅ Commande trouvée via token')
     } catch (err: any) {
-      console.error(err)
+      console.error('❌ Erreur tracking token:', err)
       errorMessage.value = err.message || 'Lien de suivi invalide ou expiré.'
       order.value = null
     } finally {
@@ -377,8 +563,9 @@
     try {
       const data = await trackGuestOrderByEmail(form.value.email, form.value.orderNumber)
       order.value = data
+      console.log('✅ Commande trouvée via email/ref')
     } catch (err: any) {
-      console.error(err)
+      console.error('❌ Erreur tracking email:', err)
       errorMessage.value = err.message || 'Commande introuvable. Vérifiez vos informations.'
       order.value = null
     } finally {
@@ -393,12 +580,34 @@
     form.value.email = ''
   }
 
-  function formatDate(date: string) {
+  function formatDate(date: string | null | undefined) {
     if (!date) return ''
     return new Date(date).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'short',
+      year: 'numeric',
     })
+  }
+
+  function formatPrice(value: number | null | undefined) {
+    if (value == null || isNaN(Number(value))) return '0,00 €'
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
+      Number(value),
+    )
+  }
+
+  async function copyTracking() {
+    if (!order.value?.tracking_number) return
+
+    try {
+      await navigator.clipboard.writeText(order.value.tracking_number)
+      copied.value = true
+      toast.show('Numéro de suivi copié !', 'success')
+      setTimeout(() => (copied.value = false), 2000)
+    } catch (err) {
+      console.error('Erreur copie:', err)
+      toast.show('Impossible de copier', 'danger')
+    }
   }
 </script>
 
@@ -419,7 +628,7 @@
     background: radial-gradient(circle at top left, var(--primary-200), var(--primary-300));
   }
 
-  /* Formes d'arrière plan décoratives (floues) */
+  /* Formes d'arrière-plan décoratives */
   .track-bg-shapes {
     position: absolute;
     inset: 0;
@@ -538,7 +747,7 @@
     }
   }
 
-  /* --- Carte Principale (Design Clean) --- */
+  /* --- Carte Principale --- */
   .track-card {
     background: white;
     padding: 40px;
@@ -687,7 +896,12 @@
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    transition: background 0.2s;
+    transition: all 0.2s;
+
+    &:hover {
+      background: @neutral-100;
+      transform: translateY(-2px);
+    }
 
     .box-icon {
       background: white;
@@ -699,8 +913,14 @@
     .box-content {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
+      flex: 1;
     }
+  }
+
+  .tracking-box {
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    border: 1px solid var(--primary-200);
   }
 
   .tracking-pill {
@@ -713,10 +933,141 @@
     border: 1px solid @neutral-200;
     margin-top: 6px;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    max-width: fit-content;
+
+    &:hover {
+      border-color: var(--primary-300);
+      background: var(--primary-50);
+      transform: translateY(-1px);
+    }
   }
 
-  /* Utilitaire interne */
+  /* Articles */
+  .items-section {
+    padding: 20px;
+    background: @neutral-50;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid @neutral-200;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--primary-200);
+      transform: translateX(4px);
+    }
+
+    &__img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid @neutral-100;
+    }
+
+    &__info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  /* Totaux */
+  .totals-section {
+    background: @neutral-100;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+
+    &.discount {
+      background: @success-50;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 4px 0;
+    }
+
+    &.total {
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 2px solid @neutral-300;
+    }
+  }
+
+  .total-divider {
+    height: 1px;
+    background: @neutral-300;
+    margin: 8px 0;
+  }
+
+  /* CTA Conversion Guest */
+  .conversion-cta {
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    border-radius: 16px;
+    border: 1px solid var(--primary-200);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(var(--primary-500-rgb), 0.2);
+    }
+
+    .cta-icon {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cta-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  /* Actions */
+  .result-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Utilitaires */
   .uppercase {
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -726,6 +1077,9 @@
   }
   .mb-1 {
     margin-bottom: 4px;
+  }
+  .mb-3 {
+    margin-bottom: 12px;
   }
   .mono {
     font-family: 'Courier New', monospace;
@@ -740,5 +1094,47 @@
   .pop-down-leave-to {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .track-page {
+      padding: 20px 16px;
+    }
+
+    .track-container {
+      gap: 30px;
+    }
+
+    .track-header {
+      .icon-wrapper {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
+    .track-card {
+      padding: 24px;
+    }
+
+    .order-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      &__img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    .conversion-cta {
+      flex-direction: column;
+      text-align: center;
+
+      .cta-content {
+        align-items: center;
+      }
+    }
   }
 </style>

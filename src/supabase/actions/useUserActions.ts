@@ -1,8 +1,8 @@
 import { useDialog } from '@/features/interface/dialog'
+import { deleteUserById, deleteUserSelf, updateUserRole } from '@/supabase/api/userApi'
 import type { Profiles, Role } from '@/supabase/types/supabase.types'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { deleteUserById, deleteUserSelf, updateUserRole } from '../api/userApi'
 
 export function useUserActions(fetchData?: () => void) {
   const toast = useToastStore()

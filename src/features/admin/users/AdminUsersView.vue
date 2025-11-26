@@ -5,20 +5,48 @@
       search-placeholder="Rechercher un utilisateur..."
       :show-reset="true"
       @reset="reset"
-    />
+    >
+      <template #filters>
+        <div class="admin-users__filters">
+          <BasicButton
+            :label="`Tous (${total})`"
+            :type="userFilter === 'all' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="userFilter = 'all'"
+          />
+          <BasicButton
+            :label="`Clients (${userCount})`"
+            :type="userFilter === 'user' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="userFilter = 'user'"
+          />
+          <BasicButton
+            :label="`Admins (${adminCount})`"
+            :type="userFilter === 'admin' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="userFilter = 'admin'"
+          />
+        </div>
+      </template>
+    </BasicToolbar>
+
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
-      :nb-results="total"
+      :nb-results="displayedTotal"
       :nb-pages-max="5"
       :auto-fetch="fetchData"
       @change="page = $event"
       size="small"
     />
+
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
-      :is-empty="hasLoaded && filteredData.length === 0"
+      :is-empty="hasLoaded && displayedUsers.length === 0"
       message="Chargement des utilisateurs..."
       empty-message="Aucun utilisateur trouvé 😅"
     >
@@ -58,7 +86,7 @@
           <BasicCell :span="4" />
         </div>
         <div
-          v-for="user in filteredData"
+          v-for="user in displayedUsers"
           :key="user.id"
           class="gridElemWrapper admin-users__row"
         >
@@ -68,11 +96,11 @@
           >
             <BasicCell
               :span="8"
-              :text="user.full_name || '—'"
+              :text="user.email || '—'"
             />
             <BasicCell
               :span="10"
-              :text="user.email || '—'"
+              :text="user.full_name || '—'"
             />
             <BasicCell :span="6">
               <BasicBadge
@@ -96,34 +124,33 @@
           </div>
         </div>
       </template>
+
       <template v-else>
         <UserCardMobile
-          v-for="user in filteredData"
+          v-for="user in displayedUsers"
           :key="user.id"
-          :role="localRoles[user.id] ?? 'user'"
-          @update:role="(newRole: Role) => (localRoles[user.id] = newRole)"
+          :role="user.role as Role"
           :user="user"
-          :roles="ROLES"
           :format-date="formatDate"
-          :handle-role-change="changeUserRole"
           :open-user-modal="openUserModal"
           :handle-delete="deleteUser"
           class="gridElemWrapper admin-users__mobile-card"
         />
       </template>
     </WrapperLoader>
+
     <teleport to="#app">
       <AdminUserDetailsModal
         v-if="selectedUserId"
         v-model="isModalVisible"
         :user-id="selectedUserId"
+        @refresh="fetchData"
       />
     </teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ROLES } from '@/features/admin/constants/users'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
@@ -131,11 +158,12 @@
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
-  import { ref, watch } from 'vue'
+  import { computed, ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
 
+  // 1. Hook Admin Table
   const {
     filteredData,
     total,
@@ -152,37 +180,36 @@
     table: 'profiles',
     orderBy: 'created_at',
     ascending: false,
-    filters: { role: 'all' },
+    filters: { role: 'all' }, // Initial request param
     searchFn: (u, q) =>
       (u.email?.toLowerCase()?.includes(q) ?? false) ||
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
-
-  const { deleteUser, changeUserRole } = useUserActions(fetchData)
+  const { deleteUser } = useUserActions(fetchData)
   const { toggleSort, getSortColor } = useSortableTable<Tables<'profiles'>>(
     sortKey,
     sortAsc,
     filteredData,
   )
 
-  const localRoles = ref<Record<string, Role>>({})
+  // 🆕 Filtres Local (User/Admin)
+  const userFilter = ref<'all' | 'user' | 'admin'>('all')
 
-  watch(
-    filteredData,
-    (rows) => {
-      const roles: Record<string, Role> = {}
-      const validRoles: Role[] = ['user', 'admin']
-      for (const u of rows) {
-        const role = (u.role as Role) ?? 'user'
-        roles[u.id] = validRoles.includes(role) ? role : 'user'
-      }
-      localRoles.value = roles
-    },
-    { immediate: true },
-  )
+  const displayedUsers = computed(() => {
+    if (userFilter.value === 'all') return filteredData.value
+    if (userFilter.value === 'admin') {
+      return filteredData.value.filter((u) => u.role === 'admin')
+    }
+    return filteredData.value.filter((u) => u.role !== 'admin')
+  })
 
+  const userCount = computed(() => filteredData.value.filter((u) => u.role !== 'admin').length)
+  const adminCount = computed(() => filteredData.value.filter((u) => u.role === 'admin').length)
+  const displayedTotal = computed(() => displayedUsers.value.length)
+
+  // Modale
   const isModalVisible = ref(false)
   const selectedUserId = ref<string | null>(null)
 
@@ -191,8 +218,15 @@
     isModalVisible.value = true
   }
 </script>
+
 <style scoped lang="less">
   .admin-users {
+    &__filters {
+      display: flex;
+      gap: 8px;
+      margin-left: 16px;
+    }
+
     &__item {
       cursor: pointer;
 

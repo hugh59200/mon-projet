@@ -5,12 +5,39 @@
       search-placeholder="Rechercher une commande..."
       :show-reset="true"
       @reset="reset"
-    />
+    >
+      <!-- 🆕 Filtre Guest/User -->
+      <template #filters>
+        <div class="admin-orders__filters">
+          <BasicButton
+            :label="`Toutes (${total})`"
+            :type="orderFilter === 'all' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="orderFilter = 'all'"
+          />
+          <BasicButton
+            :label="`Membres (${userOrdersCount})`"
+            :type="orderFilter === 'user' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="orderFilter = 'user'"
+          />
+          <BasicButton
+            :label="`Invités (${guestOrdersCount})`"
+            :type="orderFilter === 'guest' ? 'primary' : 'secondary'"
+            size="small"
+            variant="ghost"
+            @click="orderFilter = 'guest'"
+          />
+        </div>
+      </template>
+    </BasicToolbar>
 
     <BasicPagination
       :current-page="page"
       :nb-pages="nbPages"
-      :nb-results="total"
+      :nb-results="displayedTotal"
       :nb-pages-max="5"
       :auto-fetch="fetchData"
       @change="page = $event"
@@ -19,7 +46,7 @@
     <WrapperLoader
       :loading="loading"
       :has-loaded="hasLoaded"
-      :is-empty="hasLoaded && filteredData.length === 0"
+      :is-empty="hasLoaded && displayedOrders.length === 0"
       message="Chargement des commandes..."
       empty-message="Aucune commande trouvée 😅"
     >
@@ -63,7 +90,7 @@
           <BasicCell :span="3" />
         </div>
         <div
-          v-for="order in filteredData"
+          v-for="order in displayedOrders"
           :key="order.order_id!"
           class="gridElemWrapper admin-orders__row"
         >
@@ -73,7 +100,17 @@
           >
             <BasicCell :span="10">
               <div class="admin-orders__client">
-                <span class="admin-orders__client-name">{{ order.customer_name || '—' }}</span>
+                <div class="admin-orders__client-header">
+                  <span class="admin-orders__client-name">{{ order.customer_name || '—' }}</span>
+                  <!-- 🆕 Badge Invité -->
+                  <BasicBadge
+                    v-if="order.is_guest_order"
+                    label="Invité"
+                    type="info"
+                    size="small"
+                    class="admin-orders__guest-badge"
+                  />
+                </div>
                 <span class="admin-orders__client-subtext">{{ order.customer_email || '—' }}</span>
                 <span class="admin-orders__client-subtext text-xs text-neutral-400">
                   {{ order.order_number }}
@@ -109,7 +146,7 @@
 
       <template v-else>
         <OrderCardMobile
-          v-for="order in filteredData"
+          v-for="order in displayedOrders"
           :key="order.order_id!"
           :order="order"
           :format-date="formatDate"
@@ -138,7 +175,7 @@
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
   import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
@@ -167,17 +204,29 @@
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
-
-  // 🧹 NETTOYAGE ICI : On ne garde que deleteOrder
   const { deleteOrder } = useOrderActions(fetchData)
-
   const { toggleSort, getSortColor } = useSortableTable<OrdersOverviewForAdmin>(
     sortKey,
     sortAsc,
     filteredData,
   )
 
-  // 🧹 J'ai supprimé 'localStatuses' et 'watchEffect' qui ne servent plus à rien
+  // 🆕 Filtre Guest/User
+  const orderFilter = ref<'all' | 'user' | 'guest'>('all')
+
+  // 🆕 Computed: Filtrage par type
+  const displayedOrders = computed(() => {
+    if (orderFilter.value === 'all') return filteredData.value
+    if (orderFilter.value === 'guest') {
+      return filteredData.value.filter((o) => o.is_guest_order)
+    }
+    return filteredData.value.filter((o) => !o.is_guest_order)
+  })
+
+  // 🆕 Computed: Compteurs
+  const guestOrdersCount = computed(() => filteredData.value.filter((o) => o.is_guest_order).length)
+  const userOrdersCount = computed(() => filteredData.value.filter((o) => !o.is_guest_order).length)
+  const displayedTotal = computed(() => displayedOrders.value.length)
 
   const isModalVisible = ref(false)
   const selectedOrderId = ref<string | null>(null)
@@ -187,8 +236,15 @@
     isModalVisible.value = true
   }
 </script>
+
 <style scoped lang="less">
   .admin-orders {
+    &__filters {
+      display: flex;
+      gap: 8px;
+      margin-left: 16px;
+    }
+
     &__item {
       cursor: pointer;
 
@@ -207,6 +263,12 @@
       gap: 2px;
     }
 
+    &__client-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     &__client-name {
       font-weight: 500;
     }
@@ -214,6 +276,13 @@
     &__client-subtext {
       font-size: 13px;
       color: @neutral-500;
+    }
+
+    /* 🆕 Badge invité */
+    &__guest-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
   }
 </style>

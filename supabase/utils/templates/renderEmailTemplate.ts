@@ -1,4 +1,4 @@
-// supabase/functions/utils/templates/renderEmailTemplate.ts
+// supabase/functions/utils/templates/renderEmailTemplate.ts (Modifié)
 
 import { accountDeletedTemplate } from './accountDeletedTemplate.ts'
 import { emailChangeTemplate } from './emailChangeTemplate.ts'
@@ -27,12 +27,16 @@ export function renderEmailTemplate(type: string, data: any) {
           Votre commande est maintenant validée et partira en préparation.
         `,
         ctaLabel: 'Voir ma commande',
+        // Utilise l'URL par défaut pour un membre (puisque le paiement est souvent le point de départ)
         ctaUrl: `https://fast-peptides.com/profil/commandes/${data.order_id}`,
       })
     }
 
     case 'status_update': {
       const displayId = data.order_number ?? String(data.order_id).slice(0, 8)
+      // 🆕 Récupère ctaUrl depuis les données passées par l'Edge Function
+      const ctaUrl = data.ctaUrl ?? `https://fast-peptides.com/profil/commandes/${data.order_id}`
+
       return genericTemplate({
         title: `Mise à jour commande ${displayId}`,
         message: `
@@ -40,7 +44,8 @@ export function renderEmailTemplate(type: string, data: any) {
           ${data.message ?? ''}
         `,
         ctaLabel: 'Voir les détails',
-        ctaUrl: `https://fast-peptides.com/profil/commandes/${data.order_id}`,
+        // 🆕 Utilise l'URL dynamique
+        ctaUrl: ctaUrl,
       })
     }
 

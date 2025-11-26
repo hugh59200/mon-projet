@@ -26,10 +26,18 @@
             >
               Informations commande
             </BasicText>
-            <BasicBadge
-              :label="getLabelBadge(order.status)"
-              :type="getTypeBadge(order.status)"
-            />
+            <div class="header-badges">
+              <BasicBadge
+                v-if="order.is_guest_order"
+                label="Invité"
+                type="info"
+                size="small"
+              />
+              <BasicBadge
+                :label="getLabelBadge(order.status)"
+                :type="getTypeBadge(order.status)"
+              />
+            </div>
           </div>
 
           <div class="info-grid">
@@ -39,7 +47,13 @@
             </div>
             <div class="info-item">
               <span class="label">Email</span>
-              <span class="value">{{ profileInfo.email }}</span>
+              <span class="value">
+                {{
+                  order.is_guest_order
+                    ? order.customer_email || profileInfo.email
+                    : profileInfo.email
+                }}
+              </span>
             </div>
             <div class="info-item">
               <span class="label">Date</span>
@@ -67,6 +81,14 @@
               variant="outlined"
               icon-name="Download"
               @click="downloadInvoice"
+            />
+            <BasicButton
+              label="Copier lien de suivi"
+              size="small"
+              type="secondary"
+              variant="outlined"
+              icon-name="Link"
+              @click="copyTrackingLink({ order_id: order.order_id })"
             />
           </div>
         </div>
@@ -258,7 +280,8 @@
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
-  const { changeOrderStatus } = useOrderActions()
+  // 🆕 Ajout de copyTrackingLink
+  const { changeOrderStatus, copyTrackingLink } = useOrderActions()
 
   // État local typé
   const order = ref<OrdersFullView | null>(null)
@@ -278,6 +301,14 @@
     // 🛠️ CORRECTION : On casse le typage dès la racine pour éviter l'erreur de récursion
     const rawOrder = order.value as any
     const info = rawOrder.profile_info
+
+    // 🆕 Si Guest, on utilise le nom/email du formulaire de commande
+    if (rawOrder.is_guest_order) {
+      return {
+        full_name: rawOrder.customer_name || 'Invité',
+        email: rawOrder.customer_email || '-',
+      }
+    }
 
     return {
       full_name: info?.full_name || 'Inconnu',
@@ -445,6 +476,12 @@
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid @neutral-100;
+
+      .header-badges {
+        display: flex;
+        gap: 8px; /* Espace entre le badge Invité et le badge Statut */
+        align-items: center;
+      }
     }
   }
 
@@ -519,5 +556,13 @@
         border-bottom: none;
       }
     }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid @neutral-100;
   }
 </style>

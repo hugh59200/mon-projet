@@ -5,7 +5,17 @@
   >
     <div class="row">
       <div class="client-info">
-        <BasicText weight="bold">{{ order.customer_name || 'Client Inconnu' }}</BasicText>
+        <div class="client-name-row">
+          <BasicText weight="bold">{{ order.customer_name || 'Client Inconnu' }}</BasicText>
+          <!-- 🆕 Badge Invité -->
+          <BasicBadge
+            v-if="order.is_guest_order"
+            label="Invité"
+            type="info"
+            size="small"
+            class="guest-badge-mobile"
+          />
+        </div>
         <BasicText
           size="body-s"
           color="neutral-500"
@@ -56,7 +66,7 @@
 
 <script setup lang="ts">
   import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
-  import { getLabelBadge, getTypeBadge } from '@/utils' // Helper V2
+  import { getLabelBadge, getTypeBadge } from '@/utils'
 
   defineProps<{
     order: OrdersOverviewForAdmin
@@ -103,6 +113,22 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+
+  /* 🆕 Ligne avec nom + badge */
+  .client-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* 🆕 Badge invité version mobile */
+  .guest-badge-mobile {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
   }
 
   .status-actions {
