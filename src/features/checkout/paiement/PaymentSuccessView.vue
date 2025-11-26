@@ -98,6 +98,7 @@
             v-if="!isLoading"
             class="guest-conversion"
           >
+            <!-- 🆕 GUEST : Conversion OU Suivi par token -->
             <div
               v-if="!auth.user && currentOrderId && !isError"
               class="conversion-box"
@@ -127,10 +128,7 @@
                 </div>
               </div>
 
-              <form
-                @submit.prevent="handleGuestConversion"
-                class="conversion-form"
-              >
+              <form class="conversion-form">
                 <div class="input-group-readonly">
                   <BasicText
                     size="body-s"
@@ -168,10 +166,56 @@
                   :loading="isConverting"
                   :disabled="password.length < 6"
                   icon-name="ArrowRight"
+                  @click.prevent="handleGuestConversion"
                 />
               </form>
+
+              <!-- 🆕 Lien de tracking direct pour invité (sans créer de compte) -->
+              <div
+                v-if="trackingToken"
+                class="tracking-alternative"
+              >
+                <BasicText
+                  size="body-s"
+                  color="neutral-500"
+                  class="text-center"
+                >
+                  Ou suivez votre colis sans compte :
+                </BasicText>
+                <BasicButton
+                  :label="`Suivi commande ${orderNumber || ''}`"
+                  type="secondary"
+                  variant="outlined"
+                  width="full"
+                  icon-name="ExternalLink"
+                  @click="goToGuestTracking"
+                  class="mt-2"
+                />
+              </div>
             </div>
 
+            <!-- USER CONNECTÉ : Confirmation simple -->
+            <div
+              v-else-if="auth.user"
+              class="state-box"
+            >
+              <BasicText
+                size="body-m"
+                color="neutral-600"
+                class="mb-4 block text-center"
+              >
+                Votre commande est bien enregistrée.
+              </BasicText>
+              <BasicButton
+                label="Voir ma commande"
+                type="primary"
+                variant="filled"
+                width="full"
+                @click="$router.push(`/profil/commandes/${currentOrderId}`)"
+              />
+            </div>
+
+            <!-- ERREUR -->
             <div
               v-else
               class="state-box"
@@ -181,7 +225,7 @@
                 color="neutral-600"
                 class="mb-4 block text-center"
               >
-                Votre commande est bien enregistrée.
+                Une erreur s'est produite lors du traitement.
               </BasicText>
             </div>
 
@@ -223,12 +267,17 @@
   interface OrderSummary {
     email: string
     status: string
+    order_number?: string
+    tracking_token?: string
+    total_amount?: number
   }
 
   const isLoading = ref(true)
   const isError = ref(false)
   const currentOrderId = ref<string | null>(null)
   const orderEmail = ref<string>('')
+  const orderNumber = ref<string>('')
+  const trackingToken = ref<string>('') // 🆕
   const password = ref('')
   const isConverting = ref(false)
 
@@ -260,19 +309,19 @@
   })
 
   async function fetchOrderDetails(id: string) {
-    // Utilisation du RPC pour les invités
     const { data } = await supabase.rpc('get_order_summary_public', {
       p_order_id: id,
     })
 
     if (data) {
-      // Typage manuel car RPC renvoie jsonb
       const orderData = data as unknown as OrderSummary
       currentOrderId.value = id
       orderEmail.value = orderData.email
+      orderNumber.value = orderData.order_number || ''
+      trackingToken.value = orderData.tracking_token || '' // 🆕
       console.log('Order Details Found:', orderData)
     } else {
-      console.warn('Impossible de lire la commande (RLS ou ID invalide)')
+      console.warn('Impossible de lire la commande')
     }
   }
 
@@ -285,7 +334,6 @@
   }
 
   async function handleStripeSuccess(sessionId: string) {
-    // Fallback au cas où le webhook traîne
     if (currentOrderId.value) {
       await supabase.functions.invoke('order-confirmation', {
         body: { order_id: currentOrderId.value },
@@ -296,19 +344,21 @@
   async function fetchOrderByStripe(sessionId: string) {
     const { data } = await supabase
       .from('orders')
-      .select('id, email')
+      .select('id, email, order_number, tracking_token')
       .eq('stripe_session_id', sessionId)
       .maybeSingle()
     if (data) {
       currentOrderId.value = data.id
       orderEmail.value = data.email
+      orderNumber.value = data.order_number || ''
+      trackingToken.value = data.tracking_token || ''
     }
   }
 
   async function fetchLastOrder() {
     const { data } = await supabase
       .from('orders')
-      .select('id, email')
+      .select('id, email, order_number, tracking_token')
       .eq('user_id', auth.user!.id)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -316,6 +366,8 @@
     if (data) {
       currentOrderId.value = data.id
       orderEmail.value = data.email
+      orderNumber.value = data.order_number || ''
+      trackingToken.value = data.tracking_token || ''
     }
   }
 
@@ -348,6 +400,15 @@
     } finally {
       isConverting.value = false
     }
+  }
+
+  // 🆕 Navigation vers le tracking invité (via token)
+  function goToGuestTracking() {
+    if (!trackingToken.value) {
+      toast.show('Token de suivi introuvable', 'danger')
+      return
+    }
+    router.push(`/suivi-commande?token=${trackingToken.value}`)
   }
 </script>
 
@@ -423,7 +484,6 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  /* ✅ BADGE PRO : Style Glassmorphism */
   .email-badge-container {
     display: flex;
     justify-content: center;
@@ -433,11 +493,11 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.15); /* Fond semi-transparent */
+    background: rgba(255, 255, 255, 0.15);
     padding: 8px 20px;
-    border-radius: 50px; /* Forme pilule moderne */
-    border: 1px solid rgba(255, 255, 255, 0.25); /* Bordure subtile */
-    backdrop-filter: blur(8px); /* Effet verre */
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
 
@@ -482,10 +542,6 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-      :deep(svg) {
-        color: var(--primary-600);
-      }
     }
 
     .conversion-titles {
@@ -514,6 +570,16 @@
     }
   }
 
+  /* 🆕 Section alternative de tracking */
+  .tracking-alternative {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed @neutral-200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .state-box {
     text-align: center;
     padding: 10px 0;
@@ -533,6 +599,9 @@
   .mb-1 {
     margin-bottom: 4px;
   }
+  .mb-4 {
+    margin-bottom: 16px;
+  }
   .mt-2 {
     margin-top: 8px;
   }
@@ -544,6 +613,12 @@
   }
   .opacity-90 {
     opacity: 0.9;
+  }
+  .block {
+    display: block;
+  }
+  .text-center {
+    text-align: center;
   }
 
   @keyframes pulse {

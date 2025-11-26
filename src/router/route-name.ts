@@ -28,5 +28,6 @@ export type RouteName =
   'product-detail' |
   'profil' |
   'reconstitution' |
+  'track-order' |
   'update-password' |
   'update-password-success'

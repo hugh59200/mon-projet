@@ -1,9 +1,11 @@
 -- ============================================================
--- 🚀 SUPABASE CLEAN BACKUP V3.0 — GUEST CHECKOUT READY
+-- 🚀 SUPABASE CLEAN BACKUP V3.1 — GUEST CHECKOUT SECURED
 -- ============================================================
--- ✅ MODIF : Support des commandes "Invité" (user_id NULL)
--- ✅ MODIF : Séparation Champ NOM et Champ DOSAGE
--- ✅ MODIF : Mise à jour des Vues et du Seed
+-- ✅ NOUVEAU : Token de tracking sécurisé pour invités
+-- ✅ NOUVEAU : Index de performance
+-- ✅ NOUVEAU : Distinction explicite guest/user
+-- ✅ FIX : RLS plus stricte sur order_items
+-- ✅ FIX : Contraintes de sécurité renforcées
 -- ============================================================
 
 -- ============================================================
@@ -55,11 +57,14 @@ DROP FUNCTION IF EXISTS
   public.jwt_custom_claims,
   public.user_exists_by_email,
   public.create_order_with_items_full,
-  public.admin_update_order_status
+  public.admin_update_order_status,
+  public.claim_order_for_user,
+  public.get_guest_order_details,
+  public.get_order_summary_public
 CASCADE;
 
 -- ============================================================
--- ✅ BLOC 2 — TABLES (STRUCTURE V3.0)
+-- ✅ BLOC 2 — TABLES (STRUCTURE V3.1)
 -- ============================================================
 
 -- 👤 PROFILES
@@ -86,17 +91,19 @@ CREATE TABLE public.products (
   name text NOT NULL, 
   dosage text,        
   category text NOT NULL,
-  price numeric(10,2) NOT NULL,
-  stock integer NOT NULL DEFAULT 0, 
-  sale_price numeric(10,2),         
+  price numeric(10,2) NOT NULL CHECK (price >= 0),
+  stock integer NOT NULL DEFAULT 0 CHECK (stock >= 0), 
+  sale_price numeric(10,2) CHECK (sale_price >= 0),         
   is_on_sale boolean DEFAULT false, 
-  purity numeric(5,2),
+  purity numeric(5,2) CHECK (purity >= 0 AND purity <= 100),
   image text,
   description text,
   tags text[] DEFAULT '{}'::text[],
   created_at timestamptz DEFAULT now()
 );
 CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
+CREATE INDEX idx_products_category ON public.products (category);
+CREATE INDEX idx_products_on_sale ON public.products (is_on_sale) WHERE is_on_sale = true;
 
 -- 💬 MESSAGES & CONVERSATIONS
 CREATE TABLE public.messages (
@@ -108,6 +115,8 @@ CREATE TABLE public.messages (
   is_read boolean DEFAULT false,
   read_at timestamptz
 );
+CREATE INDEX idx_messages_user_id ON public.messages (user_id);
+CREATE INDEX idx_messages_unread ON public.messages (user_id, is_read) WHERE is_read = false;
 
 CREATE TABLE public.conversations (
   user_id uuid PRIMARY KEY REFERENCES public.profiles (id) ON DELETE CASCADE,
@@ -126,9 +135,9 @@ CREATE TABLE public.user_cart_items (
   quantity integer NOT NULL DEFAULT 1 CHECK (quantity > 0),
   updated_at timestamptz DEFAULT now()
 );
-CREATE UNIQUE INDEX IF NOT EXISTS uniq_cart_user_product ON public.user_cart_items (user_id, product_id);
+CREATE UNIQUE INDEX uniq_cart_user_product ON public.user_cart_items (user_id, product_id);
 
--- 🧾 ORDERS (Guest Ready)
+-- 🧾 ORDERS (Guest Ready + Secured)
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
     CREATE TYPE order_status AS ENUM ('pending', 'processing', 'paid', 'confirmed', 'shipped', 'completed', 'canceled', 'refunded', 'failed');
@@ -137,31 +146,51 @@ END $$;
 
 CREATE TABLE public.orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL, -- NULLABLE pour Guest
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL, -- NULL = Guest
   order_number text UNIQUE,
+  
+  -- 🆕 Token de tracking sécurisé pour invités
+  tracking_token text UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+  
+  -- 🆕 Flag pour distinguer Guest vs User
+  is_guest_order boolean GENERATED ALWAYS AS (user_id IS NULL) STORED,
+  
   full_name text NOT NULL,
   email text NOT NULL,
   address text,
   zip text,
   city text,
   country text,
+  
   payment_method text,
   payment_intent_id text,
   stripe_session_id text,
   paypal_order_id text,
-  subtotal numeric(10,2) DEFAULT 0,
-  tax_amount numeric(10,2) DEFAULT 0,
-  shipping_cost numeric(10,2) DEFAULT 0,
-  discount_amount numeric(10,2) DEFAULT 0,
-  total_amount numeric(10,2) NOT NULL,
+  
+  subtotal numeric(10,2) DEFAULT 0 CHECK (subtotal >= 0),
+  tax_amount numeric(10,2) DEFAULT 0 CHECK (tax_amount >= 0),
+  shipping_cost numeric(10,2) DEFAULT 0 CHECK (shipping_cost >= 0),
+  discount_amount numeric(10,2) DEFAULT 0 CHECK (discount_amount >= 0),
+  total_amount numeric(10,2) NOT NULL CHECK (total_amount >= 0),
+  
   status order_status NOT NULL DEFAULT 'pending',
   internal_notes text DEFAULT '',
+  
   carrier text,
   tracking_number text,
   shipped_at timestamptz,
+  
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
+
+-- Index de performance critiques
+CREATE INDEX idx_orders_user_id ON public.orders (user_id) WHERE user_id IS NOT NULL;
+CREATE INDEX idx_orders_email ON public.orders (lower(email));
+CREATE INDEX idx_orders_status ON public.orders (status);
+CREATE INDEX idx_orders_created_at ON public.orders (created_at DESC);
+CREATE INDEX idx_orders_tracking_token ON public.orders (tracking_token);
+CREATE INDEX idx_orders_guest ON public.orders (is_guest_order) WHERE is_guest_order = true;
 
 -- 🧾 ORDER ITEMS
 CREATE TABLE public.order_items (
@@ -169,10 +198,12 @@ CREATE TABLE public.order_items (
   order_id uuid NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
   product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE RESTRICT,
   quantity integer NOT NULL DEFAULT 1 CHECK (quantity > 0),
-  price numeric(10,2) NOT NULL,
+  price numeric(10,2) NOT NULL CHECK (price >= 0),
   product_name_snapshot text NOT NULL, 
   created_at timestamptz DEFAULT now()
 );
+CREATE INDEX idx_order_items_order_id ON public.order_items (order_id);
+CREATE INDEX idx_order_items_product_id ON public.order_items (product_id);
 
 -- 📧 EMAILS SENT
 CREATE TABLE public.emails_sent (
@@ -186,6 +217,8 @@ CREATE TABLE public.emails_sent (
   provider_response jsonb,
   sent_at timestamptz DEFAULT now()
 );
+CREATE INDEX idx_emails_order_id ON public.emails_sent (order_id);
+CREATE INDEX idx_emails_sent_at ON public.emails_sent (sent_at DESC);
 
 -- 📜 PAYMENT EVENTS
 CREATE TABLE public.payment_events (
@@ -195,6 +228,7 @@ CREATE TABLE public.payment_events (
   payload jsonb,
   created_at timestamptz DEFAULT now()
 );
+CREATE INDEX idx_payment_events_order_id ON public.payment_events (order_id);
 
 -- 📰 NEWS & TOPICS
 CREATE TABLE public.news_topics (
@@ -218,6 +252,8 @@ CREATE TABLE public.news (
   topic_id uuid REFERENCES public.news_topics(id) ON DELETE SET NULL,
   created_at timestamptz DEFAULT now()
 );
+CREATE INDEX idx_news_published_at ON public.news (published_at DESC);
+CREATE INDEX idx_news_topic_id ON public.news (topic_id);
 
 -- ============================================================
 -- ✅ BLOC 3 — RLS POLICIES (SECURITY)
@@ -237,33 +273,54 @@ ALTER TABLE public.emails_sent ENABLE ROW LEVEL SECURITY;
 -- Profiles
 CREATE POLICY "Select own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
--- Products
+
+-- Products (Public)
 CREATE POLICY "Public read products" ON public.products FOR SELECT USING (true);
+
 -- Messages
 CREATE POLICY "User read own" ON public.messages FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "User insert own" ON public.messages FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "User update read" ON public.messages FOR UPDATE USING (auth.uid() = user_id AND sender_role = 'admin');
+
 -- Conversations
 CREATE POLICY "User manage own conversation" ON public.conversations FOR ALL USING (auth.uid() = user_id);
+
 -- Cart
 CREATE POLICY "User manage cart" ON public.user_cart_items FOR ALL USING (auth.uid() = user_id);
+
 -- Orders
 CREATE POLICY "User view own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "User update own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id);
--- News
+
+-- Order Items - 🔒 FIX: Plus restrictif
+CREATE POLICY "Users view own order items" ON public.order_items 
+  FOR SELECT 
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.orders o 
+      WHERE o.id = order_items.order_id 
+      AND o.user_id = auth.uid()
+    )
+  );
+
+-- News (Public)
 CREATE POLICY "Public read news" ON public.news FOR SELECT USING (true);
 CREATE POLICY "Public read topics" ON public.news_topics FOR SELECT USING (true);
 
--- ADMIN POLICIES
+-- ============================================================
+-- 🛡️ ADMIN POLICIES
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION public.is_admin(uid uuid) RETURNS boolean AS $$
   SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = uid AND role = 'admin');
-$$ LANGUAGE sql SECURITY DEFINER;
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 CREATE POLICY "Admin full profiles" ON public.profiles FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full products" ON public.products FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full messages" ON public.messages FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full conversations" ON public.conversations FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full orders" ON public.orders FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admin full order_items" ON public.order_items FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full news" ON public.news FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin full topics" ON public.news_topics FOR ALL TO authenticated USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin read emails" ON public.emails_sent FOR SELECT TO authenticated USING (public.is_admin(auth.uid()));
@@ -339,11 +396,11 @@ $$;
 GRANT EXECUTE ON FUNCTION public.user_exists_by_email(text) TO anon, authenticated;
 
 -- ============================================================
--- ✅ BLOC 5 — RPC TRANSACTION (COMMANDE) - GUEST READY
+-- ✅ BLOC 5 — RPC TRANSACTION (COMMANDE) - GUEST READY V3.1
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
-  p_user_id uuid, -- Peut être NULL (Guest)
+  p_user_id uuid, -- NULL pour Guest
   p_email text,
   p_full_name text,
   p_address text,
@@ -360,13 +417,24 @@ CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
 )
 RETURNS jsonb
 LANGUAGE plpgsql
-SECURITY DEFINER -- 🔓 PERMET AUX INVITES D'INSERER SANS RLS
+SECURITY DEFINER
 AS $$
 DECLARE
   new_order_id uuid;
+  new_tracking_token text;
   item jsonb;
+  product_record RECORD;
 BEGIN
-  -- 1. Création Commande
+  -- Validation des données
+  IF p_email IS NULL OR p_email = '' THEN
+    RAISE EXCEPTION 'Email requis';
+  END IF;
+  
+  IF p_total_amount <= 0 THEN
+    RAISE EXCEPTION 'Montant invalide';
+  END IF;
+
+  -- 1. Création Commande (le tracking_token est auto-généré)
   INSERT INTO public.orders (
     user_id, email, full_name, address, zip, city, country,
     payment_method, status,
@@ -375,47 +443,266 @@ BEGIN
   VALUES (
     p_user_id, p_email, p_full_name, p_address, p_zip, p_city, p_country,
     p_payment_method, 'pending',
-    COALESCE(p_subtotal, 0), COALESCE(p_tax_amount, 0), COALESCE(p_shipping_cost, 0), COALESCE(p_discount_amount, 0), p_total_amount
+    COALESCE(p_subtotal, 0), COALESCE(p_tax_amount, 0), 
+    COALESCE(p_shipping_cost, 0), COALESCE(p_discount_amount, 0), 
+    p_total_amount
   )
-  RETURNING id INTO new_order_id;
+  RETURNING id, tracking_token INTO new_order_id, new_tracking_token;
 
-  -- 2. Insertion Produits
+  -- 2. Insertion Produits avec vérification de stock
   FOR item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
-    INSERT INTO public.order_items (order_id, product_id, quantity, price, product_name_snapshot)
-    SELECT 
-      new_order_id,
-      (item->>'product_id')::uuid,
-      COALESCE((item->>'quantity')::integer, 1),
-      -- Sécurisation Prix Promo
-      CASE 
-        WHEN p.is_on_sale = true AND p.sale_price IS NOT NULL THEN p.sale_price
-        ELSE p.price 
-      END,
-      -- Snapshot
-      p.name || CASE WHEN p.dosage IS NOT NULL THEN ' (' || p.dosage || ')' ELSE '' END
+    -- Récupération du produit
+    SELECT * INTO product_record
     FROM public.products p
     WHERE p.id = (item->>'product_id')::uuid;
+    
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Produit introuvable: %', item->>'product_id';
+    END IF;
+    
+    -- Vérification stock
+    IF product_record.stock < COALESCE((item->>'quantity')::integer, 1) THEN
+      RAISE EXCEPTION 'Stock insuffisant pour: %', product_record.name;
+    END IF;
+    
+    -- Insertion order_item
+    INSERT INTO public.order_items (order_id, product_id, quantity, price, product_name_snapshot)
+    VALUES (
+      new_order_id,
+      product_record.id,
+      COALESCE((item->>'quantity')::integer, 1),
+      CASE 
+        WHEN product_record.is_on_sale AND product_record.sale_price IS NOT NULL 
+        THEN product_record.sale_price
+        ELSE product_record.price 
+      END,
+      product_record.name || CASE 
+        WHEN product_record.dosage IS NOT NULL 
+        THEN ' (' || product_record.dosage || ')' 
+        ELSE '' 
+      END
+    );
+    
+    -- 🆕 Décrémentation du stock
+    UPDATE public.products 
+    SET stock = stock - COALESCE((item->>'quantity')::integer, 1)
+    WHERE id = product_record.id;
   END LOOP;
 
-  RETURN jsonb_build_object('order_id', new_order_id, 'status', 'success');
+  -- 🆕 Si user connecté, vider son panier
+  IF p_user_id IS NOT NULL THEN
+    DELETE FROM public.user_cart_items WHERE user_id = p_user_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'order_id', new_order_id, 
+    'tracking_token', new_tracking_token,
+    'status', 'success'
+  );
 END;
 $$;
 
--- Autoriser l'exécution publique (y compris anonymes)
 GRANT EXECUTE ON FUNCTION public.create_order_with_items_full TO anon, authenticated;
-CREATE POLICY "Allow insert from RPC" ON public.order_items FOR INSERT WITH CHECK (true);
 
 -- ============================================================
--- ✅ BLOC 6 — VUES (VIEWS) V3.0
+-- ✅ BLOC 6 — GUEST ORDER FUNCTIONS (SECURED)
+-- ============================================================
+
+-- 🔍 Tracking sécurisé par TOKEN (plus email + order_number)
+CREATE OR REPLACE FUNCTION public.get_guest_order_by_token(
+  p_tracking_token text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_order_data jsonb;
+BEGIN
+  SELECT to_jsonb(ofv.*)
+  INTO v_order_data
+  FROM public.orders_full_view ofv
+  WHERE ofv.tracking_token = p_tracking_token
+  AND ofv.is_guest_order = true; -- Sécurité: seulement les commandes guest
+  
+  IF v_order_data IS NULL THEN
+    RETURN jsonb_build_object('found', false, 'message', 'Commande introuvable.');
+  END IF;
+  
+  RETURN jsonb_build_object('found', true, 'order', v_order_data);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_guest_order_by_token TO anon, authenticated;
+
+-- 🔐 Fallback: Tracking par Email + Order Number (moins sécurisé mais pratique)
+CREATE OR REPLACE FUNCTION public.get_guest_order_details(
+  p_email text,
+  p_order_number text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_order_data jsonb;
+BEGIN
+  SELECT to_jsonb(ofv.*)
+  INTO v_order_data
+  FROM public.orders_full_view ofv
+  WHERE lower(ofv.shipping_email) = lower(p_email) 
+  AND ofv.order_number = p_order_number
+  AND ofv.is_guest_order = true;
+
+  IF v_order_data IS NULL THEN
+    RETURN jsonb_build_object('found', false, 'message', 'Commande introuvable ou informations incorrectes.');
+  END IF;
+
+  RETURN jsonb_build_object('found', true, 'order', v_order_data);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_guest_order_details TO anon, authenticated;
+
+-- 🔗 Migration Guest → User (avec vérification stricte)
+CREATE OR REPLACE FUNCTION public.claim_order_for_user(
+  p_order_id uuid,
+  p_user_id uuid
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_order_email text;
+  v_user_email text;
+  v_rows_affected int;
+BEGIN
+  -- Vérifier que c'est bien une commande guest
+  SELECT email INTO v_order_email
+  FROM public.orders
+  WHERE id = p_order_id AND user_id IS NULL;
+
+  IF v_order_email IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Commande introuvable ou déjà attribuée.');
+  END IF;
+
+  -- Récupérer l'email du user
+  SELECT email INTO v_user_email
+  FROM public.profiles
+  WHERE id = p_user_id;
+
+  -- 🛡️ Sécurité critique: vérification email
+  IF LOWER(v_order_email) != LOWER(v_user_email) THEN
+    RETURN jsonb_build_object('success', false, 'message', 'L''email du compte ne correspond pas à la commande.');
+  END IF;
+
+  -- Attribution
+  UPDATE public.orders
+  SET user_id = p_user_id, updated_at = now()
+  WHERE id = p_order_id AND user_id IS NULL;
+
+  GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
+
+  IF v_rows_affected > 0 THEN
+    RETURN jsonb_build_object('success', true, 'message', 'Commande liée avec succès.');
+  ELSE
+    RETURN jsonb_build_object('success', false, 'message', 'Erreur lors de la mise à jour.');
+  END IF;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.claim_order_for_user TO authenticated;
+
+-- 📧 Récupération email pour confirmation (public)
+CREATE OR REPLACE FUNCTION public.get_order_summary_public(p_order_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  SELECT jsonb_build_object(
+    'email', email, 
+    'status', status,
+    'order_number', order_number,
+    'tracking_token', tracking_token,
+    'total_amount', total_amount
+  )
+  INTO v_result
+  FROM public.orders
+  WHERE id = p_order_id;
+  
+  RETURN v_result;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_order_summary_public TO anon, authenticated;
+
+-- ============================================================
+-- ✅ BLOC 7 — ADMIN FUNCTIONS
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.admin_update_order_status(
+  p_order_id uuid,
+  p_new_status text,
+  p_send_email boolean DEFAULT true
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  updated_order jsonb;
+BEGIN
+  IF NOT public.is_admin(auth.uid()) THEN 
+    RAISE EXCEPTION 'Accès refusé.'; 
+  END IF;
+
+  UPDATE public.orders 
+  SET 
+    status = p_new_status::order_status, 
+    updated_at = now(),
+    shipped_at = CASE WHEN p_new_status = 'shipped' THEN now() ELSE shipped_at END
+  WHERE id = p_order_id;
+
+  IF p_send_email THEN
+    INSERT INTO public.emails_sent(order_id, to_email, subject, body_html, type, status)
+    SELECT 
+      o.id, 
+      o.email, 
+      'Mise à jour de votre commande ' || o.order_number, 
+      '<p>Le statut de votre commande est passé à : <strong>' || p_new_status || '</strong></p>', 
+      'status_update', 
+      'sent'
+    FROM public.orders o 
+    WHERE o.id = p_order_id;
+  END IF;
+
+  SELECT to_jsonb(ofv.*) INTO updated_order 
+  FROM public.orders_full_view ofv 
+  WHERE ofv.order_id = p_order_id;
+  
+  RETURN updated_order;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
+
+-- ============================================================
+-- ✅ BLOC 8 — VUES (VIEWS) V3.1
 -- ============================================================
 
 -- 1. Orders Detailed
 CREATE OR REPLACE VIEW public.orders_detailed_view AS
 SELECT
-  o.id AS order_id, o.user_id, o.email, o.full_name, o.address, o.city, o.country, o.status, o.created_at,
+  o.id AS order_id, o.user_id, o.email, o.full_name, 
+  o.address, o.city, o.country, o.status, o.created_at,
   o.subtotal, o.tax_amount, o.shipping_cost, o.discount_amount, o.total_amount,
   o.payment_method, o.tracking_number, o.carrier, o.shipped_at,
+  o.is_guest_order, -- 🆕
   jsonb_agg(
     jsonb_build_object(
       'product_id', p.id,
@@ -435,17 +722,38 @@ GROUP BY o.id;
 -- 2. Orders Full View
 CREATE OR REPLACE VIEW public.orders_full_view AS
 SELECT
-  o.id AS order_id, o.user_id, o.stripe_session_id, o.payment_intent_id, o.paypal_order_id, o.order_number,
-  o.full_name AS shipping_name, o.email AS shipping_email, o.address AS shipping_address,
-  o.city AS shipping_city, o.zip AS shipping_zip, o.country AS shipping_country,
-  o.status, o.payment_method, o.subtotal, o.tax_amount, o.shipping_cost, o.discount_amount, o.total_amount,
-  o.carrier, o.tracking_number, o.created_at, o.shipped_at, o.updated_at,
+  o.id AS order_id, 
+  o.user_id, 
+  o.stripe_session_id, 
+  o.payment_intent_id, 
+  o.paypal_order_id, 
+  o.order_number,
+  o.tracking_token, -- 🆕
+  o.is_guest_order, -- 🆕
+  o.full_name AS shipping_name, 
+  o.email AS shipping_email, 
+  o.address AS shipping_address,
+  o.city AS shipping_city, 
+  o.zip AS shipping_zip, 
+  o.country AS shipping_country,
+  o.status, 
+  o.payment_method, 
+  o.subtotal, 
+  o.tax_amount, 
+  o.shipping_cost, 
+  o.discount_amount, 
+  o.total_amount,
+  o.carrier, 
+  o.tracking_number, 
+  o.created_at, 
+  o.shipped_at, 
+  o.updated_at,
   odv.detailed_items,
   jsonb_build_object(
     'id', COALESCE(p.id, o.user_id),
     'email', COALESCE(p.email, o.email),
     'full_name', COALESCE(p.full_name, o.full_name),
-    'role', COALESCE(p.role, 'user')
+    'role', COALESCE(p.role, 'guest')
   ) AS profile_info
 FROM public.orders o
 LEFT JOIN public.profiles p ON p.id = o.user_id
@@ -457,13 +765,20 @@ GRANT SELECT ON public.orders_full_view TO authenticated;
 -- 3. Admin Overview
 CREATE OR REPLACE VIEW public.orders_overview_for_admin AS
 SELECT
-  o.id AS order_id, o.order_number, o.user_id,
+  o.id AS order_id, 
+  o.order_number, 
+  o.user_id,
+  o.is_guest_order, -- 🆕
   o.full_name AS customer_name,
   o.email AS customer_email,
-  o.status, o.total_amount, o.created_at, o.shipped_at,
+  o.status, 
+  o.total_amount, 
+  o.created_at, 
+  o.shipped_at,
   (SELECT COUNT(*) FROM public.emails_sent e WHERE e.order_id = o.id) AS emails_count
 FROM public.orders o
-LEFT JOIN public.profiles p ON p.id = o.user_id;
+LEFT JOIN public.profiles p ON p.id = o.user_id
+ORDER BY o.created_at DESC;
 
 ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
 GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
@@ -471,8 +786,14 @@ GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
 -- 4. User Cart View
 CREATE OR REPLACE VIEW public.user_cart_view AS
 SELECT
-  c.id AS cart_item_id, c.user_id, c.product_id, COALESCE(c.quantity, 1) AS quantity, c.updated_at,
-  p.name AS product_name, p.dosage AS product_dosage, p.category AS product_category,
+  c.id AS cart_item_id, 
+  c.user_id, 
+  c.product_id, 
+  COALESCE(c.quantity, 1) AS quantity, 
+  c.updated_at,
+  p.name AS product_name, 
+  p.dosage AS product_dosage, 
+  p.category AS product_category,
   COALESCE(p.price, 0)::numeric(10,2) AS product_price,
   COALESCE(p.sale_price, 0)::numeric(10,2) AS product_sale_price,
   COALESCE(p.is_on_sale, false) AS is_on_sale,
@@ -487,160 +808,65 @@ GRANT SELECT ON public.user_cart_view TO authenticated;
 
 -- 5. Other Views
 CREATE OR REPLACE VIEW public.conversation_overview AS
-SELECT p.id AS user_id, p.email AS user_email, p.full_name AS user_name,
-  c.last_read_message_id, c.last_read_at, c.last_admin_message_id, c.last_admin_read_at,
-  m.content AS last_message, m.created_at AS last_message_at,
-  (SELECT COUNT(*) FROM public.messages mu WHERE mu.user_id = p.id AND mu.sender_role = 'user' AND (c.last_admin_message_id IS NULL OR mu.id > c.last_admin_message_id)) AS unread_count_admin
+SELECT 
+  p.id AS user_id, 
+  p.email AS user_email, 
+  p.full_name AS user_name,
+  c.last_read_message_id, 
+  c.last_read_at, 
+  c.last_admin_message_id, 
+  c.last_admin_read_at,
+  m.content AS last_message, 
+  m.created_at AS last_message_at,
+  (SELECT COUNT(*) 
+   FROM public.messages mu 
+   WHERE mu.user_id = p.id 
+   AND mu.sender_role = 'user' 
+   AND (c.last_admin_message_id IS NULL OR mu.id > c.last_admin_message_id)
+  ) AS unread_count_admin
 FROM public.profiles p
 LEFT JOIN public.conversations c ON c.user_id = p.id
-LEFT JOIN LATERAL (SELECT content, created_at FROM public.messages WHERE messages.user_id = p.id ORDER BY created_at DESC LIMIT 1) m ON TRUE;
+LEFT JOIN LATERAL (
+  SELECT content, created_at 
+  FROM public.messages 
+  WHERE messages.user_id = p.id 
+  ORDER BY created_at DESC 
+  LIMIT 1
+) m ON TRUE;
 
 CREATE OR REPLACE VIEW public.messages_unread_view AS
-SELECT user_id, COUNT(*) AS count FROM public.messages WHERE is_read = false AND sender_role = 'user' GROUP BY user_id;
+SELECT user_id, COUNT(*) AS count 
+FROM public.messages 
+WHERE is_read = false AND sender_role = 'user' 
+GROUP BY user_id;
 
 CREATE OR REPLACE VIEW public.messages_by_conversation_view AS
-SELECT m.id AS message_id, m.user_id, p.email AS user_email, p.full_name AS user_name, m.sender_role, m.content, m.created_at, m.is_read, m.read_at
-FROM public.messages m LEFT JOIN public.profiles p ON p.id = m.user_id ORDER BY m.user_id, m.created_at ASC;
+SELECT 
+  m.id AS message_id, 
+  m.user_id, 
+  p.email AS user_email, 
+  p.full_name AS user_name, 
+  m.sender_role, 
+  m.content, 
+  m.created_at, 
+  m.is_read, 
+  m.read_at
+FROM public.messages m 
+LEFT JOIN public.profiles p ON p.id = m.user_id 
+ORDER BY m.user_id, m.created_at ASC;
 
 CREATE OR REPLACE VIEW public.user_overview AS
-SELECT u.id, u.email, u.raw_user_meta_data->>'name' AS display_name, u.created_at AS auth_created_at, p.full_name, p.role, p.cgu_accepted
-FROM auth.users u LEFT JOIN public.profiles p ON u.id = p.id;
+SELECT 
+  u.id, 
+  u.email, 
+  u.raw_user_meta_data->>'name' AS display_name, 
+  u.created_at AS auth_created_at, 
+  p.full_name, 
+  p.role, 
+  p.cgu_accepted
+FROM auth.users u 
+LEFT JOIN public.profiles p ON u.id = p.id;
 
 -- ============================================================
--- ✅ FONCTION ADMIN UPDATE STATUS
+-- 🎉 FIN DU BACKUP V3.1 - READY TO DEPLOY
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.admin_update_order_status(
-  p_order_id uuid,
-  p_new_status text,
-  p_send_email boolean DEFAULT true
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  updated_order jsonb;
-BEGIN
-  IF NOT public.is_admin(auth.uid()) THEN RAISE EXCEPTION 'Accès refusé.'; END IF;
-
-  UPDATE public.orders SET status = p_new_status::order_status, updated_at = now() WHERE id = p_order_id;
-
-  IF p_send_email THEN
-    INSERT INTO public.emails_sent(order_id, to_email, subject, body_html, type, status)
-    SELECT o.id, o.email, 'Mise à jour de votre commande', '<p>Le statut de votre commande est passé à : <strong>' || p_new_status || '</strong></p>', 'status_update', 'sent'
-    FROM public.orders o WHERE o.id = p_order_id;
-  END IF;
-
-  SELECT to_jsonb(ofv.*) INTO updated_order FROM public.orders_full_view ofv WHERE ofv.order_id = p_order_id;
-  RETURN updated_order;
-END;
-$$;
-GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
-
-
--- 🛠️ A exécuter dans l'éditeur SQL Supabase
-
-CREATE OR REPLACE FUNCTION public.claim_order_for_user(
-  p_order_id uuid,
-  p_user_id uuid
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER -- 🔓 Nécessaire car l'utilisateur n'est pas encore propriétaire de la commande
-AS $$
-DECLARE
-  v_order_email text;
-  v_user_email text;
-  v_rows_affected int;
-BEGIN
-  -- 1. Récupérer l'email de la commande (si user_id est NULL)
-  SELECT email INTO v_order_email
-  FROM public.orders
-  WHERE id = p_order_id AND user_id IS NULL;
-
-  IF v_order_email IS NULL THEN
-    RETURN jsonb_build_object('success', false, 'message', 'Commande introuvable ou déjà attribuée.');
-  END IF;
-
-  -- 2. Récupérer l'email du nouvel utilisateur (depuis auth.users ou profiles)
-  -- Note: On regarde dans profiles car auth.users est protégé.
-  -- Assure-toi que le profil est créé (via le trigger handle_new_user) avant d'appeler ceci.
-  SELECT email INTO v_user_email
-  FROM public.profiles
-  WHERE id = p_user_id;
-
-  -- 3. Vérification de correspondance (Sécurité Critique 🛡️)
-  IF LOWER(v_order_email) != LOWER(v_user_email) THEN
-     RETURN jsonb_build_object('success', false, 'message', 'L''email du compte ne correspond pas à la commande.');
-  END IF;
-
-  -- 4. Attribution de la commande
-  UPDATE public.orders
-  SET user_id = p_user_id
-  WHERE id = p_order_id;
-
-  GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
-
-  IF v_rows_affected > 0 THEN
-    RETURN jsonb_build_object('success', true);
-  ELSE
-    RETURN jsonb_build_object('success', false, 'message', 'Erreur lors de la mise à jour.');
-  END IF;
-END;
-$$;
-
-
--- 🔍 Fonction de suivi de commande invité
-CREATE OR REPLACE FUNCTION public.get_guest_order_details(
-  p_email text,
-  p_order_number text
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER -- Permet de contourner le RLS pour cette vérification précise
-AS $$
-DECLARE
-  v_order_data jsonb;
-BEGIN
-  -- On cherche la commande qui matche EXACTEMENT l'email et le numéro
-  SELECT to_jsonb(ofv.*)
-  INTO v_order_data
-  FROM public.orders_full_view ofv
-  WHERE lower(ofv.shipping_email) = lower(p_email) 
-  AND ofv.order_number = p_order_number;
-
-  IF v_order_data IS NULL THEN
-     RETURN jsonb_build_object('found', false, 'message', 'Commande introuvable ou informations incorrectes.');
-  END IF;
-
-  RETURN jsonb_build_object('found', true, 'order', v_order_data);
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.get_guest_order_details TO anon, authenticated;
-
-
--- ============================================================
--- ✅ FIX : Fonction pour récupérer l'email de confirmation (Public)
--- Permet à la page de succès d'afficher l'email même pour un invité
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.get_order_summary_public(p_order_id uuid)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER -- 🔓 Contourne la RLS pour lire juste l'email
-AS $$
-DECLARE
-  v_result jsonb;
-BEGIN
-  SELECT jsonb_build_object('email', email, 'status', status)
-  INTO v_result
-  FROM public.orders
-  WHERE id = p_order_id;
-  
-  RETURN v_result;
-END;
-$$;
-
--- Autoriser tout le monde (Invité 'anon' et Connecté 'authenticated') à l'utiliser
-GRANT EXECUTE ON FUNCTION public.get_order_summary_public TO anon, authenticated;

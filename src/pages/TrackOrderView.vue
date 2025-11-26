@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-  import { trackGuestOrder } from '@/supabase/api/ordersApi'
+  import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/supabase/api/ordersApi'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
@@ -331,14 +331,40 @@
 
   const isShipped = computed(() => ['shipped', 'completed'].includes(order.value?.status))
 
-  onMounted(() => {
+  onMounted(async () => {
+    // 🆕 PRIORITÉ 1 : Tracking par token (URL de l'email)
+    const token = route.query.token as string
+    if (token) {
+      await handleTokenTracking(token)
+      return
+    }
+
+    // 🔙 FALLBACK : Tracking par email + ref (ancienne méthode)
     if (route.query.email && route.query.ref) {
       form.value.email = route.query.email as string
       form.value.orderNumber = route.query.ref as string
-      handleSearch()
+      await handleSearch()
     }
   })
 
+  // 🆕 Nouvelle méthode : tracking sécurisé par token
+  async function handleTokenTracking(token: string) {
+    loading.value = true
+    errorMessage.value = ''
+
+    try {
+      const data = await trackGuestOrderByToken(token)
+      order.value = data
+    } catch (err: any) {
+      console.error(err)
+      errorMessage.value = err.message || 'Lien de suivi invalide ou expiré.'
+      order.value = null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 🔙 Ancienne méthode : fallback email + order_number
   async function handleSearch() {
     errorMessage.value = ''
 
@@ -349,7 +375,7 @@
 
     loading.value = true
     try {
-      const data = await trackGuestOrder(form.value.email, form.value.orderNumber)
+      const data = await trackGuestOrderByEmail(form.value.email, form.value.orderNumber)
       order.value = data
     } catch (err: any) {
       console.error(err)
@@ -377,11 +403,9 @@
 </script>
 
 <style scoped lang="less">
-  @import '@/assets/Mont/Mont.less';
-
   /* --- Layout Global --- */
   .track-page {
-    max-width: 900px; // largeur souhaitée
+    max-width: 900px;
     margin: 0 auto;
     padding: 30px;
     display: flex;
@@ -430,7 +454,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 40px; /* Espace entre Header et Carte */
+    gap: 40px;
   }
 
   .card-wrapper {
@@ -453,7 +477,6 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 24px;
-      /* Ombre très douce pour l'icône */
       box-shadow:
         0 10px 25px -5px rgba(var(--primary-500-rgb), 0.15),
         0 4px 10px -2px rgba(0, 0, 0, 0.02);
@@ -477,20 +500,18 @@
   /* --- Error Toast (FLOTTANT) --- */
   .error-toast {
     position: absolute;
-    top: -85px; /* Flotte au-dessus */
+    top: -85px;
     left: 0;
     right: 0;
     z-index: 10;
 
     background: white;
-    /* Petite ligne rouge à gauche */
     border-left: 4px solid @danger-500;
     border-radius: 12px;
     padding: 16px;
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    /* Ombre marquée pour bien détacher l'alerte */
     box-shadow: 0 12px 30px -10px rgba(220, 38, 38, 0.2);
 
     .icon-error {
@@ -519,8 +540,7 @@
   .track-card {
     background: white;
     padding: 40px;
-    border-radius: 32px; /* Arrondis modernes */
-    /* Pas de bordure, juste une ombre diffuse */
+    border-radius: 32px;
     box-shadow:
       0 20px 40px -10px rgba(0, 0, 0, 0.06),
       0 0 0 1px rgba(0, 0, 0, 0.01);
@@ -624,7 +644,7 @@
     height: 3px;
     background: @neutral-100;
     margin: 0 -20px;
-    margin-bottom: 46px; /* Alignement précis avec les icônes */
+    margin-bottom: 46px;
     position: relative;
     z-index: 1;
     border-radius: 2px;

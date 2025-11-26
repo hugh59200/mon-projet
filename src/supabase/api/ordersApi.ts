@@ -1,12 +1,14 @@
+// ============================================================
+// 🛒 ordersApi.ts — V3.1 (Token Tracking)
+// ============================================================
 import type { OrderStatus } from '../../utils'
 import { supabase } from '../supabaseClient'
 import type { Json } from '../types/supabase'
 import type { OrdersFullView } from '../types/supabase.types'
 import { handleApi, handleMutation } from './helpers/HandleError'
 
-// Type spécifique pour la création (ne vient pas de la DB directement)
+// Type spécifique pour la création
 export type CreateOrderPayload = {
-  // ✅ On garde le type correct ici pour ton code à toi
   userId: string | null
   email: string
   fullName: string
@@ -27,17 +29,19 @@ export type CreateOrderPayload = {
   }[]
 }
 
-/** ✅ CRÉATION V3.0 (Guest Compatible) */
-export async function createOrder(payload: CreateOrderPayload): Promise<OrdersFullView> {
-  // Conversion explicite des items en Json
+// Type pour la réponse de création (inclut le token)
+export type CreateOrderResponse = {
+  order_id: string
+  tracking_token: string
+  status: string
+}
+
+/** ✅ CRÉATION V3.1 (Guest Compatible + Token Retourné) */
+export async function createOrder(payload: CreateOrderPayload): Promise<CreateOrderResponse> {
   const itemsJson = payload.items as unknown as Json
 
   const res = await supabase.rpc('create_order_with_items_full', {
-    // 🛠️ FIX SANS TOUCHER AUX TYPES GÉNÉRÉS :
-    // On force TypeScript à accepter la valeur, car on sait que la DB (V3.0) accepte NULL à l'exécution.
-    // "as any" est ici légitime pour contourner un décalage de génération de types.
     p_user_id: payload.userId as any,
-
     p_email: payload.email,
     p_full_name: payload.fullName,
     p_address: payload.address,
@@ -45,22 +49,20 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrdersFu
     p_city: payload.city,
     p_country: payload.country,
     p_payment_method: payload.paymentMethod,
-
     p_subtotal: payload.subtotal,
     p_tax_amount: payload.taxAmount,
     p_shipping_cost: payload.shippingCost,
     p_discount_amount: payload.discountAmount,
     p_total_amount: payload.totalAmount,
-
     p_items: itemsJson,
   })
 
   const result = handleApi(res)
 
-  return result as unknown as OrdersFullView
+  // Le RPC V3.1 retourne { order_id, tracking_token, status }
+  return result as unknown as CreateOrderResponse
 }
 
-// ... Le reste du fichier reste inchangé (fetchOrders, etc.)
 /** ✅ ADMIN : Récupère toutes les commandes */
 export async function fetchOrders(): Promise<OrdersFullView[]> {
   const res = await supabase
@@ -95,7 +97,40 @@ export async function deleteOrderById(id: string) {
   handleMutation(error)
 }
 
-export async function trackGuestOrder(email: string, orderNumber: string) {
+// ============================================================
+// 🆕 GUEST TRACKING V3.1 - Par Token (RECOMMANDÉ)
+// ============================================================
+/**
+ * 🔐 Méthode SÉCURISÉE : Tracking par token unique
+ * À utiliser dans l'email de confirmation et la page de succès
+ */
+export async function trackGuestOrderByToken(trackingToken: string): Promise<OrdersFullView> {
+  const { data, error } = await supabase.rpc('get_guest_order_by_token', {
+    p_tracking_token: trackingToken,
+  })
+
+  if (error) throw error
+
+  const result = data as { found: boolean; message?: string; order?: OrdersFullView }
+
+  if (!result.found || !result.order) {
+    throw new Error(result.message || 'Commande introuvable')
+  }
+
+  return result.order
+}
+
+// ============================================================
+// 🔙 FALLBACK : Tracking par Email + Order Number (Compatibilité)
+// ============================================================
+/**
+ * ⚠️ Moins sécurisé, à utiliser uniquement si l'utilisateur
+ * n'a pas le lien avec le token (email perdu, etc.)
+ */
+export async function trackGuestOrderByEmail(
+  email: string,
+  orderNumber: string,
+): Promise<OrdersFullView> {
   const { data, error } = await supabase.rpc('get_guest_order_details', {
     p_email: email,
     p_order_number: orderNumber,
@@ -103,11 +138,10 @@ export async function trackGuestOrder(email: string, orderNumber: string) {
 
   if (error) throw error
 
-  // Typage manuel du retour JSONB
-  const result = data as { found: boolean; message?: string; order?: any }
+  const result = data as { found: boolean; message?: string; order?: OrdersFullView }
 
-  if (!result.found) {
-    throw new Error(result.message || 'Commande introuvable')
+  if (!result.found || !result.order) {
+    throw new Error(result.message || 'Commande introuvable ou informations incorrectes.')
   }
 
   return result.order

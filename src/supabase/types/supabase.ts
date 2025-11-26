@@ -360,6 +360,7 @@ export type Database = {
           full_name: string
           id: string
           internal_notes: string | null
+          is_guest_order: boolean | null
           order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
@@ -372,6 +373,7 @@ export type Database = {
           tax_amount: number | null
           total_amount: number
           tracking_number: string | null
+          tracking_token: string | null
           updated_at: string | null
           user_id: string | null
           zip: string | null
@@ -387,6 +389,7 @@ export type Database = {
           full_name: string
           id?: string
           internal_notes?: string | null
+          is_guest_order?: boolean | null
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
@@ -399,6 +402,7 @@ export type Database = {
           tax_amount?: number | null
           total_amount: number
           tracking_number?: string | null
+          tracking_token?: string | null
           updated_at?: string | null
           user_id?: string | null
           zip?: string | null
@@ -414,6 +418,7 @@ export type Database = {
           full_name?: string
           id?: string
           internal_notes?: string | null
+          is_guest_order?: boolean | null
           order_number?: string | null
           payment_intent_id?: string | null
           payment_method?: string | null
@@ -426,6 +431,7 @@ export type Database = {
           tax_amount?: number | null
           total_amount?: number
           tracking_number?: string | null
+          tracking_token?: string | null
           updated_at?: string | null
           user_id?: string | null
           zip?: string | null
@@ -768,6 +774,7 @@ export type Database = {
           discount_amount: number | null
           email: string | null
           full_name: string | null
+          is_guest_order: boolean | null
           order_id: string | null
           payment_method: string | null
           shipped_at: string | null
@@ -802,6 +809,7 @@ export type Database = {
           created_at: string | null
           detailed_items: Json | null
           discount_amount: number | null
+          is_guest_order: boolean | null
           order_id: string | null
           order_number: string | null
           payment_intent_id: string | null
@@ -822,6 +830,7 @@ export type Database = {
           tax_amount: number | null
           total_amount: number | null
           tracking_number: string | null
+          tracking_token: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -848,6 +857,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string | null
           emails_count: number | null
+          is_guest_order: boolean | null
           order_id: string | null
           order_number: string | null
           shipped_at: string | null
@@ -1021,6 +1031,10 @@ export type Database = {
           p_user_id: string
           p_zip: string
         }
+        Returns: Json
+      }
+      get_guest_order_by_token: {
+        Args: { p_tracking_token: string }
         Returns: Json
       }
       get_guest_order_details: {

@@ -3,7 +3,6 @@
 import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
-// ✅ On importe ton client existant qui est déjà ADMIN (Service Role)
 import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
 
 interface OrderConfirmationBody {
@@ -18,8 +17,7 @@ Deno.serve(
 
     console.log(`🔍 Recherche commande: ${order_id}`)
 
-    // 1. Récupération via le client ADMIN importé de clients.ts
-    // Cela contourne la RLS car clients.ts utilise la Service Role Key
+    // 1. Récupération via le client ADMIN (Service Role Key)
     const { data: order, error } = await supabase
       .from('orders_full_view')
       .select('*')
@@ -37,15 +35,27 @@ Deno.serve(
     }
 
     const orderNumber = order.order_number ?? order_id
+    const isGuest = !order.user_id
 
-    // 2. Logique intelligente pour le lien dans l'email
-    // Si user_id est NULL (Invité) -> Lien Public de suivi
-    // Si user_id existe (Membre) -> Lien Profil privé
-    const ctaUrl = order.user_id
-      ? `${APP_BASE_URL}/profil/commandes/${order_id}`
-      : `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
+    // 🆕 2. Construction du lien intelligent selon le type d'utilisateur
+    let ctaUrl: string
+    let ctaLabel: string
 
-    const ctaLabel = order.user_id ? 'Voir ma commande' : 'Suivre mon colis'
+    if (isGuest) {
+      // INVITÉ : Lien de tracking public avec TOKEN sécurisé
+      if (!order.tracking_token) {
+        console.error('⚠️ Token manquant pour commande invité')
+        // Fallback sur email + ref (moins sécurisé mais fonctionnel)
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
+      } else {
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
+      }
+      ctaLabel = 'Suivre ma commande'
+    } else {
+      // MEMBRE : Lien vers le profil privé
+      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
+      ctaLabel = 'Voir ma commande'
+    }
 
     // 3. Préparation des données pour le template
     const html = renderEmailTemplate('confirmation', {
@@ -69,6 +79,7 @@ Deno.serve(
         total: Number(i.total ?? 0),
       })),
 
+      // 🆕 Liens intelligents
       ctaLabel,
       ctaUrl,
     })
@@ -85,7 +96,8 @@ Deno.serve(
     return {
       success: true,
       email_sent_to: order.shipping_email,
-      mode: order.user_id ? 'auth' : 'guest',
+      mode: isGuest ? 'guest' : 'authenticated',
+      tracking_link: ctaUrl,
     }
   }),
 )
