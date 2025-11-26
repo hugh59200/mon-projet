@@ -874,3 +874,39 @@ LEFT JOIN public.profiles p ON u.id = p.id;
 -- ============================================================
 -- 🎉 FIN DU BACKUP V3.1 - READY TO DEPLOY
 -- ============================================================
+
+-- ============================================================
+-- 🆕 BULK CLAIM : Récupérer toutes les commandes invités par email
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.claim_guest_orders(
+  p_email text,
+  p_user_id uuid
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_count int;
+BEGIN
+  -- 1. Mise à jour des commandes
+  -- On ne touche pas à 'is_guest_order' car c'est une colonne générée automatiquement
+  UPDATE public.orders
+  SET 
+    user_id = p_user_id,
+    updated_at = now()
+  WHERE 
+    lower(email) = lower(p_email) -- Email insensible à la casse
+    AND user_id IS NULL;          -- Seulement les commandes sans propriétaire
+
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+
+  RETURN jsonb_build_object(
+    'success', true, 
+    'count', v_count, 
+    'message', v_count || ' commande(s) récupérée(s).'
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.claim_guest_orders TO authenticated;

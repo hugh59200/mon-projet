@@ -1,5 +1,6 @@
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import {
+  claimGuestOrders, // 🆕 Ajout de l'import
   getLastOrders,
   getProfile,
   updatePasswordApi,
@@ -15,7 +16,15 @@ export function useProfileActions() {
 
   async function loadProfile(id: string) {
     try {
-      return await getProfile(id)
+      const profile = await getProfile(id)
+
+      // 🆕 AUTOMATISATION : Récupération des commandes invités
+      // Si le profil est chargé et possède un email, on tente de lier les commandes orphelines
+      if (profile && profile.email) {
+        await claimGuestOrders(profile.email, id)
+      }
+
+      return profile
     } catch (err: any) {
       toast.show(`Erreur profil : ${err.message}`, 'danger')
       return null

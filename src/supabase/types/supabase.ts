@@ -945,6 +945,10 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_guest_orders: {
+        Args: { p_email: string; p_user_id: string }
+        Returns: Json
+      }
       claim_order_for_user: {
         Args: { p_order_id: string; p_user_id: string }
         Returns: Json

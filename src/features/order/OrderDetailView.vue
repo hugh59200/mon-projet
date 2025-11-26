@@ -56,34 +56,52 @@
         >
           Suivi de la commande
         </BasicText>
+
         <div class="order-detail__timeline">
-          <div
-            v-for="(step, index) in orderSteps"
+          <template
+            v-for="(step, index) in TIMELINE_STEPS"
             :key="step.key"
-            :class="[
-              'order-detail__timeline-step',
-              {
-                'order-detail__timeline-step--active':
-                  index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status)),
-              },
-            ]"
           >
-            <div class="order-detail__timeline-dot">
-              <BasicIconNext
-                v-if="index <= orderSteps.findIndex((s) => s.key === mapStatus(order?.status))"
-                name="Check"
-                :size="10"
-                color="white"
-              />
-            </div>
-            <BasicText
-              size="body-s"
-              color="neutral-600"
-              class="order-detail__timeline-label"
+            <div
+              class="order-detail__timeline-step"
+              :class="{ 'order-detail__timeline-step--active': isStepActive(step.statuses) }"
             >
-              {{ step.label }}
-            </BasicText>
-          </div>
+              <div class="order-detail__timeline-dot">
+                <BasicIconNext
+                  v-if="isStepActive(step.statuses)"
+                  :name="step.icon as IconNameNext"
+                  :size="12"
+                  color="white"
+                />
+                <div
+                  v-else
+                  class="dot-inner"
+                ></div>
+              </div>
+              <BasicText
+                size="body-s"
+                :color="isStepActive(step.statuses) ? 'neutral-900' : 'neutral-500'"
+                :weight="isStepActive(step.statuses) ? 'bold' : 'regular'"
+                class="order-detail__timeline-label"
+              >
+                {{ step.label }}
+              </BasicText>
+              <BasicText
+                v-if="step.dateField && (order as any)[step.dateField]"
+                size="body-s"
+                color="neutral-400"
+                class="mt-1"
+              >
+                {{ formatDate((order as any)[step.dateField] as string) }}
+              </BasicText>
+            </div>
+
+            <div
+              v-if="index < TIMELINE_STEPS.length - 1"
+              class="order-detail__timeline-line"
+              :class="{ 'order-detail__timeline-line--active': isLineActive(index) }"
+            ></div>
+          </template>
         </div>
 
         <div class="order-detail__tracking-actions">
@@ -293,6 +311,7 @@
   import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { formatDate } from '@/utils/index'
+  import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
@@ -302,6 +321,61 @@
 
   const order = ref<OrdersFullView | null>(null)
   const hasLoaded = ref(false)
+
+  // ✅ Définition du type pour un Step de timeline
+  // Cela permet à TypeScript de comprendre que dateField est une clé valide de OrdersFullView
+  type TimelineStep = {
+    key: string
+    label: string
+    icon: string
+    statuses: string[]
+    dateField: keyof OrdersFullView | null
+  }
+
+  // 🆕 CONFIGURATION DE LA TIMELINE (Typée)
+  const TIMELINE_STEPS: TimelineStep[] = [
+    {
+      key: 'step1',
+      label: 'Validée',
+      icon: 'Check',
+      statuses: ['paid', 'confirmed', 'processing', 'shipped', 'completed'],
+      dateField: 'created_at',
+    },
+    {
+      key: 'step2',
+      label: 'Préparation',
+      icon: 'Package',
+      statuses: ['processing', 'shipped', 'completed'],
+      dateField: null,
+    },
+    {
+      key: 'step3',
+      label: 'Expédiée',
+      icon: 'Truck',
+      statuses: ['shipped', 'completed'],
+      dateField: 'shipped_at',
+    },
+    {
+      key: 'step4',
+      label: 'Livrée',
+      icon: 'Home',
+      statuses: ['completed'],
+      dateField: null,
+    },
+  ]
+
+  // Helper pour savoir si une étape est active
+  function isStepActive(validStatuses: string[]) {
+    if (!order.value?.status) return false
+    return validStatuses.includes(order.value.status)
+  }
+
+  // Helper pour savoir si la ligne suivante doit être colorée
+  function isLineActive(index: number) {
+    const nextStep = TIMELINE_STEPS[index + 1]
+    if (!nextStep) return false
+    return isStepActive(nextStep.statuses)
+  }
 
   async function loadOrderDetail() {
     try {
@@ -325,19 +399,6 @@
 
   function getItems(order: OrdersFullView): OrderItemDetailed[] {
     return (order.detailed_items as unknown as OrderItemDetailed[]) || []
-  }
-
-  const orderSteps = [
-    { key: 'paid', label: 'Commande Confirmée' },
-    { key: 'processing', label: 'En préparation' },
-    { key: 'shipped', label: 'Expédiée' },
-    { key: 'completed', label: 'Livrée' },
-  ]
-
-  function mapStatus(status: string | null | undefined) {
-    if (!status) return 'paid'
-    if (['pending', 'paid'].includes(status)) return 'paid'
-    return status
   }
 
   function formatPrice(value: number | null | undefined) {
@@ -503,86 +564,77 @@
       }
     }
 
-    /* TIMELINE */
+    /* 🆕 TIMELINE STYLE - Horizontal Only */
     &__timeline {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
       position: relative;
-      padding: 15px 0 25px 0;
+      padding: 10px 0 20px 0;
+      margin-top: 10px;
+    }
 
-      &:before {
+    &__timeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+      min-width: 80px;
+      text-align: center;
+      flex: 1; /* Distribue l'espace équitablement */
+    }
+
+    &__timeline-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: @white;
+      border: 4px solid @neutral-200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+
+      .dot-inner {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: @neutral-300;
+      }
+    }
+
+    /* État Actif */
+    &__timeline-step--active {
+      .order-detail__timeline-dot {
+        background: var(--primary-500);
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 4px var(--primary-50);
+      }
+    }
+
+    /* Correction Ligne : */
+    &__timeline-line {
+      /* Pour simplifier : On utilise une ligne flex entre les items */
+      flex-grow: 1;
+      height: 4px;
+      background: @neutral-200;
+      margin-top: 10px; /* Aligné avec le centre des dots */
+      position: relative;
+
+      &::after {
         content: '';
         position: absolute;
-        top: 10px;
+        top: 0;
         left: 0;
-        right: 0;
-        height: 4px;
-        background: @neutral-200;
-        z-index: 1;
+        bottom: 0;
+        width: 0%;
+        background: var(--primary-500);
+        transition: width 0.5s ease;
       }
 
-      &-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        position: relative;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 10px;
-          left: -50%;
-          height: 4px;
-          width: 100%;
-          background: transparent;
-          z-index: 2;
-          transition: background 0.4s ease;
-        }
-
-        &:first-child::before {
-          content: none;
-        }
-
-        &--active {
-          color: var(--primary-700);
-
-          &:not(:first-child)::before {
-            background: var(--primary-500);
-          }
-
-          .order-detail__timeline-dot {
-            background: var(--primary-500);
-            border-color: var(--primary-500);
-            box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-500) 20%, transparent);
-          }
-          .order-detail__timeline-label {
-            color: @neutral-900;
-            font-weight: 600;
-          }
-        }
-      }
-
-      &-dot {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: @white;
-        border: 4px solid @neutral-300;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 3;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.4s ease;
-      }
-
-      &-label {
-        text-align: center;
-        max-width: 80px;
-        color: @neutral-600;
-        transition: color 0.4s ease;
+      &--active::after {
+        width: 100%;
       }
     }
 
@@ -643,15 +695,9 @@
         }
       }
 
-      &__timeline {
-        padding: 10px 0 20px 0;
-      }
-
-      &__timeline-step {
-        max-width: 70px;
-      }
+      /* Timeline mobile adaptation */
       &__timeline-label {
-        font-size: 12px;
+        font-size: 11px;
       }
     }
   }

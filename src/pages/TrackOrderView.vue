@@ -292,7 +292,7 @@
                 size="body-m"
                 weight="bold"
               >
-                Récapitulatif ({{ order.detailed_items?.length || 0 }})
+                Récapitulatif ({{ detailedItemsCount }})
               </BasicText>
               <button
                 class="reset-link"
@@ -304,7 +304,7 @@
 
             <div class="items-list custom-scrollbar">
               <div
-                v-for="item in order.detailed_items"
+                v-for="item in (order as any)?.detailed_items"
                 :key="item.product_id"
                 class="mini-item"
               >
@@ -473,6 +473,15 @@
   const order = ref<OrdersFullView | null>(null)
   const errorMessage = ref('')
   const copied = ref(false)
+
+  // Computed property for detailed items count
+  import { computed } from 'vue'
+  const detailedItemsCount = computed(() => {
+    const orderValue = order.value as any
+    return orderValue && Array.isArray(orderValue.detailed_items)
+      ? orderValue.detailed_items.length
+      : 0
+  })
 
   // Inscription rapide
   const newPassword = ref('')

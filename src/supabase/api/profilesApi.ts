@@ -15,10 +15,10 @@ export async function updateProfileInfo(id: string, payload: Partial<Profiles>) 
 export async function getLastOrders(userId: string): Promise<Partial<Orders>[]> {
   const res = await supabase
     .from('orders')
-    .select('id, total_amount, created_at, status')
+    .select('id, total_amount, created_at, status, order_number') // J'ai ajouté order_number c'est souvent utile
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(3)
+    .limit(5) // Passé à 5 pour voir un peu plus d'historique
 
   return handleApi(res)
 }
@@ -57,5 +57,19 @@ export async function deleteAccountApi() {
 
   if (error || !data?.success) {
     throw new Error(data?.error ?? error?.message ?? 'Erreur suppression compte')
+  }
+}
+
+// 🆕 AJOUT : La fonction qui appelle le RPC SQL qu'on vient de créer
+export async function claimGuestOrders(email: string, userId: string) {
+  const { data, error } = await supabase.rpc('claim_guest_orders', {
+    p_email: email,
+    p_user_id: userId,
+  })
+
+  if (error) {
+    console.error('Erreur lors de la récupération des commandes:', error)
+  } else {
+    console.log('Récupération commandes:', data)
   }
 }

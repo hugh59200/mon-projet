@@ -340,7 +340,6 @@
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
-  // --- Stores et Hooks ---
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
@@ -351,32 +350,25 @@
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
 
-  // --- États Locaux ---
   const isBrownTheme = ref(false)
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
 
-  // Données Personnelles Éditables (pour le formulaire)
   const editableName = ref('')
   const phone = ref('')
   const address = ref('')
   const avatarPreview = ref<string | null>(null)
 
-  // Données d'Origine (pour vérifier si des changements ont été faits)
   const originalProfile = ref<{ full_name?: string; phone?: string; address?: string }>({})
   const originalNewsletter = ref(false)
 
-  // Préférences
   const newsletter = ref(false)
-  const preferencesLoading = ref(false) // Nouveau loader pour les préférences
+  const preferencesLoading = ref(false)
 
-  // Sécurité
   const loading = ref(false) // Loader pour le profil
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
-
-  // --- Computed pour l'UX des boutons ---
 
   const hasPersonalChanges = computed(() => {
     return (
@@ -393,8 +385,6 @@
         (localStorage.getItem('theme-preference') === 'brown').toString()
     )
   })
-
-  // --- Watchers et Logique de Thème Persistant ---
 
   const THEME_STORAGE_KEY = 'theme-preference'
 
@@ -415,8 +405,6 @@
     html.classList.add(isBrown ? 'theme-brown' : 'theme-blue')
   }
 
-  // --- Fonctions Utilitaires ---
-
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
   }
@@ -426,8 +414,6 @@
     router.push(`/profil/commandes/${id}`)
   }
 
-  // --- Actions Profil ---
-
   async function fetchProfileData() {
     if (!auth.user) return
 
@@ -436,7 +422,6 @@
 
     profile.value = data
 
-    // Initialisation des données éditables et de l'état d'origine
     editableName.value = data.full_name ?? ''
     phone.value = data.phone ?? ''
     address.value = data.address ?? ''
@@ -447,17 +432,9 @@
       address: address.value,
     }
 
-    // Avatar
     avatarPreview.value = data.avatar_url ? data.avatar_url : null
-
-    // Commandes
     lastOrders.value = await loadLastOrdersAction(auth.user.id)
-
-    // Préférences (à charger également depuis la BDD si implémenté, ou via un défaut)
-    // Simuler le chargement des préférences depuis le profil si elles y étaient stockées
-    // TODO: remplacer par les vraies données
     newsletter.value = false
-
     originalNewsletter.value = newsletter.value
   }
 
@@ -487,10 +464,8 @@
     const success = await updateProfile(auth.user.id, updatedData)
 
     if (success) {
-      // Mettre à jour l'état d'origine pour désactiver le bouton de sauvegarde
       originalProfile.value = updatedData
 
-      // Mettre à jour les données d'affichage dans le header
       if (profile.value) {
         profile.value.full_name = editableName.value
         profile.value.phone = phone.value
@@ -513,7 +488,6 @@
 
     passwordLoading.value = true
 
-    // Dans un scénario réel, on demanderait le mot de passe ACTUEL ici.
     const success = await updatePassword(newPassword.value)
 
     if (success) {
@@ -529,16 +503,13 @@
     if (!hasPreferenceChanges.value) return
     preferencesLoading.value = true
 
-    // Logique de sauvegarde des préférences dans la BDD (si implémentée)
     const preferencesData = {
       newsletter: newsletter.value,
-      // theme_preference est géré par localStorage et le watch
     }
 
     const success = await updateProfile(auth.user!.id, preferencesData)
 
     if (success) {
-      // Mettre à jour l'état d'origine pour désactiver le bouton
       originalNewsletter.value = newsletter.value
       toast.show('Préférences sauvegardées 👍', 'success')
     }
@@ -554,7 +525,6 @@
     }
   }
 
-  // --- Lifecycle Hook ---
   onMounted(async () => {
     loadThemePreference()
     await sections.loadFromSupabase()
