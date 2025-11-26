@@ -90,7 +90,7 @@
             <WrapperInput
               v-model="editableName"
               label="Nom complet"
-              placeholder="Entrez votre nom"
+              placeholder="Prénom et Nom"
               input-type="form"
               icon-left="User"
             />
@@ -102,13 +102,49 @@
               icon-left="Phone"
             />
           </div>
+
+          <div class="profil__form-divider"></div>
+          <BasicText
+            size="body-s"
+            weight="bold"
+            color="neutral-400"
+            class="profil__form-subtitle"
+          >
+            ADRESSE DE LIVRAISON PAR DÉFAUT
+          </BasicText>
+
           <WrapperInput
             v-model="address"
-            label="Adresse postale"
-            placeholder="12 rue du Peptide, 75000 Paris"
+            label="Adresse (N° et Rue)"
+            placeholder="12 rue du Peptide"
             input-type="form"
             icon-left="MapPin"
+            class="mb-4"
           />
+
+          <div class="profil__form-grid">
+            <WrapperInput
+              v-model="zip"
+              label="Code postal"
+              placeholder="75000"
+              input-type="form"
+            />
+            <WrapperInput
+              v-model="city"
+              label="Ville"
+              placeholder="Paris"
+              input-type="form"
+            />
+          </div>
+
+          <WrapperInput
+            v-model="country"
+            label="Pays"
+            placeholder="France"
+            input-type="form"
+            icon-left="Globe"
+          />
+
           <div class="profil__actions">
             <BasicButton
               label="Enregistrer les modifications"
@@ -340,6 +376,7 @@
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
+  // --- Stores et Hooks ---
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()
@@ -350,31 +387,51 @@
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
 
+  // --- États Locaux ---
   const isBrownTheme = ref(false)
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
 
+  // Données Personnelles Éditables (pour le formulaire)
   const editableName = ref('')
   const phone = ref('')
   const address = ref('')
+  const zip = ref('') // 🆕
+  const city = ref('') // 🆕
+  const country = ref('') // 🆕
   const avatarPreview = ref<string | null>(null)
 
-  const originalProfile = ref<{ full_name?: string; phone?: string; address?: string }>({})
+  // Données d'Origine (pour vérifier si des changements ont été faits)
+  const originalProfile = ref<{
+    full_name?: string
+    phone?: string
+    address?: string
+    zip?: string
+    city?: string
+    country?: string
+  }>({})
   const originalNewsletter = ref(false)
 
+  // Préférences
   const newsletter = ref(false)
   const preferencesLoading = ref(false)
 
-  const loading = ref(false) // Loader pour le profil
+  // Sécurité
+  const loading = ref(false)
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
+
+  // --- Computed pour l'UX des boutons ---
 
   const hasPersonalChanges = computed(() => {
     return (
       editableName.value !== originalProfile.value.full_name ||
       phone.value !== originalProfile.value.phone ||
-      address.value !== originalProfile.value.address
+      address.value !== originalProfile.value.address ||
+      zip.value !== originalProfile.value.zip ||
+      city.value !== originalProfile.value.city ||
+      country.value !== originalProfile.value.country
     )
   })
 
@@ -385,6 +442,8 @@
         (localStorage.getItem('theme-preference') === 'brown').toString()
     )
   })
+
+  // --- Watchers et Logique de Thème Persistant ---
 
   const THEME_STORAGE_KEY = 'theme-preference'
 
@@ -401,9 +460,10 @@
     isBrownTheme.value = isBrown
 
     const html = document.documentElement
-    // Application immédiate de la classe au montage
     html.classList.add(isBrown ? 'theme-brown' : 'theme-blue')
   }
+
+  // --- Fonctions Utilitaires ---
 
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
@@ -414,6 +474,8 @@
     router.push(`/profil/commandes/${id}`)
   }
 
+  // --- Actions Profil ---
+
   async function fetchProfileData() {
     if (!auth.user) return
 
@@ -422,18 +484,32 @@
 
     profile.value = data
 
+    // Initialisation des données éditables et de l'état d'origine
     editableName.value = data.full_name ?? ''
     phone.value = data.phone ?? ''
     address.value = data.address ?? ''
+    // @ts-ignore - Pour éviter les erreurs TS tant que les types ne sont pas régénérés
+    zip.value = data.zip ?? ''
+    // @ts-ignore
+    city.value = data.city ?? ''
+    country.value = data.country ?? ''
 
     originalProfile.value = {
       full_name: editableName.value,
       phone: phone.value,
       address: address.value,
+      zip: zip.value,
+      city: city.value,
+      country: country.value,
     }
 
+    // Avatar
     avatarPreview.value = data.avatar_url ? data.avatar_url : null
+
+    // Commandes
     lastOrders.value = await loadLastOrdersAction(auth.user.id)
+
+    // Préférences
     newsletter.value = false
     originalNewsletter.value = newsletter.value
   }
@@ -459,8 +535,12 @@
       full_name: editableName.value,
       phone: phone.value,
       address: address.value,
+      zip: zip.value,
+      city: city.value,
+      country: country.value,
     }
 
+    // @ts-ignore - Bypass TS pour les nouveaux champs
     const success = await updateProfile(auth.user.id, updatedData)
 
     if (success) {
@@ -525,6 +605,7 @@
     }
   }
 
+  // --- Lifecycle Hook ---
   onMounted(async () => {
     loadThemePreference()
     await sections.loadFromSupabase()
@@ -543,6 +624,20 @@
       &.two-cols {
         grid-template-columns: 1fr 1fr;
       }
+    }
+
+    &__form-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 20px 0 12px;
+    }
+
+    &__form-subtitle {
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 11px;
+      margin-bottom: 12px;
+      display: block;
     }
 
     &__actions {

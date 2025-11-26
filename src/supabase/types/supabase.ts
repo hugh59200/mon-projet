@@ -561,6 +561,7 @@ export type Database = {
           birthdate: string | null
           cgu_accepted: boolean | null
           cgu_accepted_at: string | null
+          city: string | null
           country: string | null
           created_at: string | null
           email: string | null
@@ -570,6 +571,7 @@ export type Database = {
           phone: string | null
           role: string | null
           ui_preferences: Json | null
+          zip: string | null
         }
         Insert: {
           address?: string | null
@@ -577,6 +579,7 @@ export type Database = {
           birthdate?: string | null
           cgu_accepted?: boolean | null
           cgu_accepted_at?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string | null
           email?: string | null
@@ -586,6 +589,7 @@ export type Database = {
           phone?: string | null
           role?: string | null
           ui_preferences?: Json | null
+          zip?: string | null
         }
         Update: {
           address?: string | null
@@ -593,6 +597,7 @@ export type Database = {
           birthdate?: string | null
           cgu_accepted?: boolean | null
           cgu_accepted_at?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string | null
           email?: string | null
@@ -602,6 +607,7 @@ export type Database = {
           phone?: string | null
           role?: string | null
           ui_preferences?: Json | null
+          zip?: string | null
         }
         Relationships: [
           {

@@ -129,13 +129,26 @@
           enter: { opacity: 1, y: 0, transition: { delay: 0.2, type: 'spring' } },
         }"
       >
-        <BasicText
-          size="h4"
-          weight="bold"
-          class="checkout-card__title"
-        >
-          Coordonnées de livraison
-        </BasicText>
+        <div class="checkout-card__header-row">
+          <BasicText
+            size="h4"
+            weight="bold"
+            class="checkout-card__title mb-0"
+          >
+            Coordonnées de livraison
+          </BasicText>
+
+          <div
+            v-if="auth.user"
+            class="checkout-profile-toggle"
+          >
+            <BasicCheckbox
+              v-model="useProfileAddress"
+              label="Utiliser mon adresse enregistrée"
+              size="small"
+            />
+          </div>
+        </div>
 
         <div class="checkout-form">
           <BasicInput
@@ -154,6 +167,9 @@
             placeholder="Prénom et Nom"
             required
           />
+
+          <div class="checkout-form__divider"></div>
+
           <BasicInput
             v-model="address"
             label="Adresse"
@@ -262,54 +278,116 @@
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { createOrder } from '@/supabase/api/ordersApi'
   import type { CartView } from '@/supabase/types/supabase.types'
+  import BasicCheckbox from '@designSystem/components/basic/checkbox/BasicCheckbox.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, h, onMounted, ref, watchEffect } from 'vue'
+  import { computed, h, onMounted, ref, watch, watchEffect } from 'vue'
 
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
   const { withSablier } = useManualSablier()
 
-  // 🆕 Valeurs par défaut VIDES (pas de données de test en prod)
-  const email = ref('h.bogrand@yopmail.com')
-  const fullName = ref('BOGRAND Hugo')
-  const address = ref('11 rue du général leclerc')
-  const zip = ref('59126')
-  const city = ref('Linselles')
+  // 🆕 Switch pour utiliser l'adresse du profil (Défaut: true si connecté)
+  const useProfileAddress = ref(true)
+
+  // Champs du formulaire (valeurs par défaut)
+  const email = ref('')
+  const fullName = ref('')
+  const address = ref('')
+  const zip = ref('')
+  const city = ref('')
   const country = ref('France')
 
   const isModalVisible = ref(false)
   const selectedProductId = ref<string | null>(null)
 
-  // --- Sync Email si connecté ---
-  watchEffect(() => {
-    if (auth.user) {
-      email.value = auth.user.email || ''
-      if (auth.profile) {
-        fullName.value = auth.profile.full_name || ''
-        address.value = auth.profile.address || ''
-        country.value = auth.profile.country || 'France'
+  // --- LOGIQUE DE REMPLISSAGE ---
+
+  function fillFromProfile() {
+    if (!auth.user || !auth.profile) return
+
+    // Email et Nom toujours synchronisés avec le compte
+    email.value = auth.user.email || ''
+    fullName.value = auth.profile.full_name || ''
+
+    // Adresse synchronisée seulement si le switch est actif
+    if (useProfileAddress.value) {
+      address.value = auth.profile.address || ''
+      // ✅ Ajout des champs Zip et Ville depuis le profil
+      zip.value = auth.profile.zip || ''
+      city.value = auth.profile.city || ''
+      country.value = auth.profile.country || 'France'
+    }
+  }
+
+  // 1. Initialisation : Profil ou Sauvegarde locale
+  onMounted(() => {
+    // On tente de récupérer une sauvegarde locale (cas du refresh)
+    const saved = localStorage.getItem('fp-checkout-form')
+
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        // On restaure seulement si les champs ne sont pas vides,
+        // ou si l'utilisateur n'est pas connecté (priorité profil si connecté)
+        if (!auth.user || !useProfileAddress.value) {
+          email.value = data.email || ''
+          fullName.value = data.fullName || ''
+          address.value = data.address || ''
+          zip.value = data.zip || ''
+          city.value = data.city || ''
+          country.value = data.country || 'France'
+        }
+      } catch (e) {
+        /* ignore */
       }
+    }
+
+    // Si connecté et switch actif, on force le profil (écrase le local storage potentiellement obsolète)
+    if (auth.user && useProfileAddress.value) {
+      fillFromProfile()
     }
   })
 
-  // 🆕 Récupération des données de formulaire sauvegardées (localStorage)
-  onMounted(() => {
-    const saved = localStorage.getItem('fp-checkout-form')
-    if (saved && !auth.user) {
-      try {
-        const data = JSON.parse(saved)
-        email.value = data.email || ''
-        fullName.value = data.fullName || ''
-        address.value = data.address || ''
-        zip.value = data.zip || ''
-        city.value = data.city || ''
-        country.value = data.country || 'France'
-      } catch (e) {
-        console.warn('Impossible de charger les données sauvegardées')
-      }
+  // 2. Surveillance du profil (si chargement asynchrone)
+  watchEffect(() => {
+    if (auth.user && useProfileAddress.value) {
+      fillFromProfile()
     }
   })
+
+  // 3. Gestion du switch ON/OFF
+  watch(useProfileAddress, (isUsing) => {
+    if (isUsing) {
+      fillFromProfile()
+      toast.show('Adresse du profil chargée', 'info')
+    } else {
+      // Si on décoche, on vide l'adresse pour permettre une saisie "Autre"
+      // On garde Nom/Email car c'est toujours le même utilisateur
+      address.value = ''
+      zip.value = ''
+      city.value = ''
+      country.value = 'France'
+    }
+  })
+
+  // 4. 🆕 SAUVEGARDE AUTOMATIQUE (Auto-save)
+  // Sauvegarde dans le localStorage à chaque frappe pour résister au refresh
+  watch(
+    [email, fullName, address, zip, city, country],
+    () => {
+      const dataToSave = {
+        email: email.value,
+        fullName: fullName.value,
+        address: address.value,
+        zip: zip.value,
+        city: city.value,
+        country: country.value,
+      }
+      localStorage.setItem('fp-checkout-form', JSON.stringify(dataToSave))
+    },
+    { deep: true },
+  )
 
   // --- Icons ---
   const PayPalIcon = {
@@ -406,21 +484,6 @@
         return
       }
 
-      // 🆕 Sauvegarde du formulaire (pour invités uniquement)
-      if (!auth.user) {
-        localStorage.setItem(
-          'fp-checkout-form',
-          JSON.stringify({
-            email: email.value,
-            fullName: fullName.value,
-            address: address.value,
-            zip: zip.value,
-            city: city.value,
-            country: country.value,
-          }),
-        )
-      }
-
       try {
         const orderItemsPayload = cart.items.map((item) => ({
           product_id: item.product_id!,
@@ -430,7 +493,6 @@
             : (item.product_price ?? 0),
         }))
 
-        // 🆕 Appel API avec récupération du tracking_token
         const orderResponse = await createOrder({
           userId: auth.user?.id ?? null,
           email: email.value,
@@ -448,16 +510,14 @@
           items: orderItemsPayload,
         })
 
-        // 🆕 Stockage du tracking_token pour la page de succès
         if (orderResponse.tracking_token) {
           localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
         }
         localStorage.setItem('fp-last-order-id', orderResponse.order_id)
 
-        // 🆕 Nettoyage du formulaire sauvegardé
+        // Une fois la commande validée, on vide le formulaire de secours
         localStorage.removeItem('fp-checkout-form')
 
-        // Redirection vers le paiement
         await processPayment(
           finalTotal.value,
           selectedPayment.value,
@@ -502,11 +562,28 @@
       padding: 28px;
       .card-shadow(0 4px 16px rgba(0, 0, 0, 0.04));
 
-      &__title {
+      &__header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
-        color: @neutral-900;
         padding-bottom: 12px;
         border-bottom: 1px solid @neutral-100;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      &__title {
+        color: @neutral-900;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid @neutral-100;
+
+        &.mb-0 {
+          margin-bottom: 0;
+          padding-bottom: 0;
+          border-bottom: none;
+        }
       }
     }
 
@@ -623,6 +700,13 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+
+      &__divider {
+        height: 1px;
+        background: @neutral-100;
+        margin: 4px 0;
+      }
+
       &__row {
         display: flex;
         gap: 16px;
@@ -630,6 +714,16 @@
           flex-direction: column;
         }
       }
+    }
+
+    /* Toggle Switch Style (si BasicCheckbox ne suffit pas, on peut customiser) */
+    .checkout-profile-toggle {
+      display: flex;
+      align-items: center;
+      background: @neutral-50;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid @neutral-200;
     }
 
     .checkout-payment__methods {

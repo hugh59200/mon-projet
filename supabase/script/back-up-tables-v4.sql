@@ -910,3 +910,7 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.claim_guest_orders TO authenticated;
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS zip text,
+ADD COLUMN IF NOT EXISTS city text;
