@@ -37,39 +37,45 @@
 
     <div class="auth-navbar__right">
       <CartMenu />
+      
+      <!-- USER CONNECTÉ -->
       <UserMenu v-if="auth.user" />
 
+      <!-- 🆕 INVITÉ AVEC PANIER -->
       <div
         v-else-if="hasGuestCart"
         class="guest-info"
       >
         <div class="guest-label">
           <BasicIconNext
-            name="User"
-            :size="14"
-            color="neutral-400"
+            name="ShoppingBag"
+            :size="16"
+            color="primary-400"
           />
           <BasicText
             size="body-s"
-            color="neutral-300"
+            color="neutral-200"
+            weight="semibold"
           >
-            Invité
+            Mode Invité
           </BasicText>
         </div>
         <BasicButton
-          label="J'ai un compte"
-          type="secondary"
+          label="Connexion"
+          type="primary"
           size="small"
           class="guest-login-btn"
           @click="router.push('/auth/login')"
         />
       </div>
 
+      <!-- VISITEUR (pas de panier) -->
       <template v-else>
         <div
           v-if="isDesktop"
           class="auth-navbar__buttons"
         >
+          <!-- 🆕 Bouton Tracking toujours visible -->
           <BasicButton
             label="Suivre"
             aria-label="Suivre ma commande"
@@ -128,6 +134,7 @@
   const closeMenu = () => (isMenuOpen.value = false)
   router.afterEach(() => closeMenu())
 
+  // 🆕 Détection invité avec panier
   const hasGuestCart = computed(() => !auth.user && cart.items.length > 0)
 
   const stopWatch = watch(isMobile, (mobile) => {
@@ -155,14 +162,13 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      flex-shrink: 0; /* Empêche le logo de s'écraser */
+      flex-shrink: 0;
     }
 
     &__center {
       flex: 1;
       display: flex;
       justify-content: center;
-      /* Ajout pour éviter que le menu central n'écrase la droite */
       min-width: 0;
       padding: 0 20px;
     }
@@ -170,8 +176,8 @@
     &__right {
       display: flex;
       align-items: center;
-      gap: 20px; /* Réduit légèrement l'espace global */
-      flex-shrink: 0; /* Empêche la droite de s'écraser/disparaître */
+      gap: 16px;
+      flex-shrink: 0;
       justify-content: flex-end;
     }
 
@@ -182,7 +188,7 @@
     }
   }
 
-  /* --- Styles du Logo (alignés sur le Header principal) --- */
+  /* --- Logo --- */
   .logo {
     display: flex;
     align-items: center;
@@ -221,40 +227,50 @@
     letter-spacing: 0.5px;
   }
 
-  /* --- Boutons & Guest --- */
+  /* --- Bouton Tracking --- */
   .tracking-btn {
-    color: @neutral-400;
-    margin-right: 4px;
+    color: @neutral-300;
 
     &:hover {
-      color: @neutral-100;
+      color: white;
       background: rgba(255, 255, 255, 0.08);
     }
   }
 
+  /* --- 🆕 Guest Info Card --- */
   .guest-info {
     display: flex;
     align-items: center;
     gap: 12px;
     background: rgba(255, 255, 255, 0.06);
-    padding: 4px 4px 4px 12px;
+    padding: 6px 6px 6px 14px;
     border-radius: 50px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
   }
 
   .guest-label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .guest-login-btn {
     font-size: 0.8rem;
-    padding: 4px 12px;
-    height: 28px;
+    padding: 6px 16px;
+    height: 32px;
     border-radius: 50px;
+    font-weight: 600;
+    white-space: nowrap;
+
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.3);
     }
   }
 
@@ -264,7 +280,7 @@
       height: 58px;
 
       &__right {
-        gap: 14px;
+        gap: 12px;
       }
     }
 
@@ -272,14 +288,25 @@
       font-size: 18px;
     }
 
+    /* Mobile : Version compacte du guest-info */
     .guest-info {
       padding: 4px;
       background: transparent;
       border: none;
 
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
       .guest-label {
         display: none;
       }
+    }
+
+    .guest-login-btn {
+      padding: 4px 12px;
+      height: 28px;
+      font-size: 0.75rem;
     }
   }
 </style>

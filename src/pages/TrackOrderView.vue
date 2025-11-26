@@ -403,6 +403,8 @@
 </script>
 
 <style scoped lang="less">
+  @import '@/assets/Mont/Mont.less';
+
   /* --- Layout Global --- */
   .track-page {
     max-width: 900px;

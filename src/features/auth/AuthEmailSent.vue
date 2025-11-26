@@ -19,7 +19,7 @@
       weight="bold"
       color="neutral-900"
     >
-      Vérifiez votre e-mail 📧
+      Vérifiez votre e-mail
     </BasicText>
 
     <BasicText

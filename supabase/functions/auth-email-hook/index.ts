@@ -1,8 +1,7 @@
+import { APP_BASE_URL } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
-
-const FRONT_URL = Deno.env.get('FRONT_URL') ?? 'https://fast-peptides.com'
 
 // Typage du payload envoyé par Supabase Auth Webhooks
 interface SupabaseAuthEmailHookPayload {
@@ -13,6 +12,7 @@ interface SupabaseAuthEmailHookPayload {
   }
   email_data: {
     token: string
+    token_hash: string // 👈 Valeur complète maintenant utilisée
     email_action_type: 'signup' | 'recovery' | 'email_change'
   }
 }
@@ -35,10 +35,10 @@ export default Deno.serve(
     }
 
     const action = email_data.email_action_type
-    const subject = TITLES[action]
+    const subject = TITLES[action] // 🔑 CORRECTION : Utiliser email_data.token_hash pour le paramètre token_hash de l'URL.
 
     const confirmation_url =
-      `${FRONT_URL}/auth/callback?token=${encodeURIComponent(email_data.token)}` +
+      `${APP_BASE_URL}/auth/callback?token_hash=${encodeURIComponent(email_data.token_hash)}` +
       `&type=${encodeURIComponent(action)}&email=${encodeURIComponent(user.email)}`
 
     const html = renderEmailTemplate(action, {
@@ -53,6 +53,9 @@ export default Deno.serve(
       html,
       type: `auth_${action}`,
     })
+
+    // ⚠️ Si vous loguez toujours l'email, assurez-vous que la valeur 'type' insérée est valide (ex: 'confirmation', pas 'auth_signup').
+    // Ex: logEmailInDb({ ..., type: 'confirmation' })
 
     return { success: true, result }
   }),

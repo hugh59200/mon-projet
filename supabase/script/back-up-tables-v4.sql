@@ -588,10 +588,14 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'message', 'Commande introuvable ou déjà attribuée.');
   END IF;
 
-  -- Récupérer l'email du user
+  -- Récupérer l'email du user depuis auth.users (le profil sera créé à la confirmation)
   SELECT email INTO v_user_email
-  FROM public.profiles
+  FROM auth.users
   WHERE id = p_user_id;
+
+  IF v_user_email IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Utilisateur introuvable.');
+  END IF;
 
   -- 🛡️ Sécurité critique: vérification email
   IF LOWER(v_order_email) != LOWER(v_user_email) THEN

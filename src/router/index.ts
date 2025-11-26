@@ -55,7 +55,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'callback',
         name: 'auth-callback',
-        component: () => import('@/features/auth/AuthCallback.vue'), // La logique extraite
+        component: () => import('@/features/auth/AuthCallback.vue'),
         meta: { title: 'Vérification en cours...' },
       },
     ],

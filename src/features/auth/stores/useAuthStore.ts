@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
-  // ✅ SignUp via notre service
+  // ✅ SignUp via notre service (flux classique)
   async function signUp(email: string, password: string): Promise<boolean> {
     loading.value = true
     error.value = null
@@ -96,7 +96,6 @@ export const useAuthStore = defineStore('auth', () => {
       error.value = result.message!
       return false
     }
-    // router.push({ path: '/auth/callback' })
     return true
   }
 

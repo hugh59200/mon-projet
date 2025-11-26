@@ -73,23 +73,6 @@
       </div>
 
       <div class="content-area">
-        <div
-          v-if="isLoading"
-          class="loader-box"
-        >
-          <ProgressBar
-            color="primary"
-            class="progress-bar"
-          />
-          <BasicText
-            size="body-s"
-            color="neutral-500"
-            class="redirect-text"
-          >
-            Sécurisation du paiement...
-          </BasicText>
-        </div>
-
         <transition
           name="fade-slide"
           mode="out-in"
@@ -248,7 +231,6 @@
   import bgImage from '@/assets/bg-success.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import ProgressBar from '@/features/shared/ProgressBar.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
@@ -285,14 +267,12 @@
     await cart.clearCart()
 
     const stripeSessionId = route.query.session_id as string
-    const paypalOrderId = route.query.orderId as string
+    const paypalOrderId = route.query.orderId as string // 1. Récupération Initiale
 
-    // 1. Récupération Initiale
     if (paypalOrderId) await fetchOrderDetails(paypalOrderId)
     else if (stripeSessionId) await fetchOrderByStripe(stripeSessionId)
-    else if (auth.user) await fetchLastOrder()
+    else if (auth.user) await fetchLastOrder() // 2. Capture du paiement
 
-    // 2. Capture du paiement
     try {
       if (paypalOrderId) {
         await handlePayPalCapture(paypalOrderId)
@@ -373,36 +353,49 @@
 
   async function handleGuestConversion() {
     if (!orderEmail.value || !password.value || !currentOrderId.value) return
-    isConverting.value = true
+    isConverting.value = true // ⚠️ URL utilisée pour le retour après l'activation (doit correspondre à la page où vous êtes)
+
+    const activationRedirectUrl = `${window.location.origin}/auth/callback`
+
     try {
+      // 1. Création du compte (simple signUp)
+      // AJOUT de l'option redirectTo
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: orderEmail.value,
         password: password.value,
-        options: { data: { full_name: 'Nouveau Membre' } },
+        options: {
+          data: { full_name: 'Nouveau Membre' }, // Ceci est CRUCIAL pour que le lien généré par Supabase soit correct
+          emailRedirectTo: activationRedirectUrl,
+        },
       })
-      if (authError) throw authError
-      if (!authData.user) throw new Error('Erreur création compte')
 
-      await new Promise((r) => setTimeout(r, 1000))
+      if (authError) throw authError
+      if (!authData.user) throw new Error('Erreur lors de la création du compte') // 2. Migration de la commande avec le user_id (pas besoin du profil)
 
       const { error: rpcError } = await supabase.rpc('claim_order_for_user', {
         p_order_id: currentOrderId.value,
         p_user_id: authData.user.id,
       })
-      if (rpcError) throw rpcError
 
-      toast.show('Compte créé et commande liée !', 'success')
-      await auth.initAuth()
-      router.push('/profil/commandes')
+      if (rpcError) {
+        console.error('Erreur RPC:', rpcError)
+        throw new Error('Impossible de lier la commande. Veuillez contacter le support.')
+      } // 3. Succès - Afficher message avec instruction
+
+      toast.show(
+        '📧 Un email de confirmation vous a été envoyé. Cliquez sur le lien pour activer votre compte !',
+        'success',
+      ) // Redirection vers la page d'info email
+
+      router.push('/auth/email-sent')
     } catch (err: any) {
-      console.error(err)
+      console.error('❌ Erreur conversion:', err)
       toast.show(err.message || 'Erreur lors de la conversion', 'danger')
     } finally {
       isConverting.value = false
     }
-  }
+  } // 🆕 Navigation vers le tracking invité (via token)
 
-  // 🆕 Navigation vers le tracking invité (via token)
   function goToGuestTracking() {
     if (!trackingToken.value) {
       toast.show('Token de suivi introuvable', 'danger')
@@ -584,14 +577,6 @@
     text-align: center;
     padding: 10px 0;
   }
-  .loader-box {
-    text-align: center;
-    padding: 20px 0;
-  }
-  .redirect-text {
-    margin-top: 12px;
-    animation: pulse 2s infinite;
-  }
 
   .mb-2 {
     margin-bottom: 8px;
@@ -619,18 +604,6 @@
   }
   .text-center {
     text-align: center;
-  }
-
-  @keyframes pulse {
-    0% {
-      opacity: 0.6;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.6;
-    }
   }
 
   .fade-slide-enter-active,

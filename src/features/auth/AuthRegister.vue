@@ -39,7 +39,6 @@
         :disabled="loading"
         :loading="loading"
         @click="submit"
-        block
       />
 
       <div class="auth__feedback">
@@ -90,7 +89,7 @@
 
   async function submit() {
     if (!validate('register')) return
-
+    
     loading.value = true
     const success = await auth.signUp(email.value, password.value)
     loading.value = false

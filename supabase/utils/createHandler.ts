@@ -19,9 +19,8 @@ export function createHandler<T = unknown>(handler: HandlerFn<T>) {
         } catch {
           body = undefined
         }
-      }
+      } // 🟦 Telling TS: "trust me, runtime is fine"
 
-      // 🟦 Telling TS: "trust me, runtime is fine"
       const typedBody = body as T
 
       const result = await handler(req, typedBody)

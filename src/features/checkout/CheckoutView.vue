@@ -263,15 +263,15 @@
   import { createOrder } from '@/supabase/api/ordersApi'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, h, ref, watchEffect } from 'vue'
+  import { computed, h, onMounted, ref, watchEffect } from 'vue'
 
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
   const { withSablier } = useManualSablier()
 
-  // 📧 Email par défaut
-  const email = ref('h.bogrand@gmail.com')
+  // 🆕 Valeurs par défaut VIDES (pas de données de test en prod)
+  const email = ref('h.bogrand@yopmail.com')
   const fullName = ref('BOGRAND Hugo')
   const address = ref('11 rue du général leclerc')
   const zip = ref('59126')
@@ -285,7 +285,29 @@
   watchEffect(() => {
     if (auth.user) {
       email.value = auth.user.email || ''
-      if (auth.profile) fullName.value = auth.profile.full_name || ''
+      if (auth.profile) {
+        fullName.value = auth.profile.full_name || ''
+        address.value = auth.profile.address || ''
+        country.value = auth.profile.country || 'France'
+      }
+    }
+  })
+
+  // 🆕 Récupération des données de formulaire sauvegardées (localStorage)
+  onMounted(() => {
+    const saved = localStorage.getItem('fp-checkout-form')
+    if (saved && !auth.user) {
+      try {
+        const data = JSON.parse(saved)
+        email.value = data.email || ''
+        fullName.value = data.fullName || ''
+        address.value = data.address || ''
+        zip.value = data.zip || ''
+        city.value = data.city || ''
+        country.value = data.country || 'France'
+      } catch (e) {
+        console.warn('Impossible de charger les données sauvegardées')
+      }
     }
   })
 
@@ -374,7 +396,7 @@
 
   async function submitOrder() {
     await withSablier(async () => {
-      // 🚫 PAS DE BLOCAGE AUTH ICI ! (Mode Guest actif)
+      // Validation
       if (!cart.items.length) {
         toast.show('Votre panier est vide.', 'warning')
         return
@@ -382,6 +404,21 @@
       if (!email.value || !fullName.value || !address.value || !zip.value || !city.value) {
         toast.show('Veuillez remplir toutes les coordonnées.', 'warning')
         return
+      }
+
+      // 🆕 Sauvegarde du formulaire (pour invités uniquement)
+      if (!auth.user) {
+        localStorage.setItem(
+          'fp-checkout-form',
+          JSON.stringify({
+            email: email.value,
+            fullName: fullName.value,
+            address: address.value,
+            zip: zip.value,
+            city: city.value,
+            country: country.value,
+          }),
+        )
       }
 
       try {
@@ -393,7 +430,8 @@
             : (item.product_price ?? 0),
         }))
 
-        const newOrder = await createOrder({
+        // 🆕 Appel API avec récupération du tracking_token
+        const orderResponse = await createOrder({
           userId: auth.user?.id ?? null,
           email: email.value,
           fullName: fullName.value,
@@ -410,11 +448,21 @@
           items: orderItemsPayload,
         })
 
+        // 🆕 Stockage du tracking_token pour la page de succès
+        if (orderResponse.tracking_token) {
+          localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
+        }
+        localStorage.setItem('fp-last-order-id', orderResponse.order_id)
+
+        // 🆕 Nettoyage du formulaire sauvegardé
+        localStorage.removeItem('fp-checkout-form')
+
+        // Redirection vers le paiement
         await processPayment(
           finalTotal.value,
           selectedPayment.value,
           email.value,
-          newOrder.order_id!,
+          orderResponse.order_id,
         )
       } catch (err: any) {
         console.error(err)
@@ -425,9 +473,6 @@
 </script>
 
 <style scoped lang="less">
-  // ✅ Assure-toi que ce fichier contient bien les variables @danger-600, @neutral-100, etc.
-  @import '@/assets/Mont/Mont.less';
-
   .checkout-page {
     display: flex;
     flex-direction: column;
@@ -540,7 +585,6 @@
           font-size: 0.9em;
         }
         .price-sale {
-          /* ✅ Correction Variable Less */
           color: @danger-600;
           font-weight: 600;
         }
