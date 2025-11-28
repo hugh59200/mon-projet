@@ -212,11 +212,11 @@
 
     &__badge {
       position: absolute;
-      top: 2px;
-      right: 2px;
+      top: -5px;
+      right: -4px;
       min-width: 18px;
       height: 18px;
-      padding: 0 5px;
+      padding: 0 2px;
       background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
       color: @neutral-50;
       border-radius: 100px;

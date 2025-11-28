@@ -192,7 +192,7 @@
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { storeToRefs } from 'pinia'
-  import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+  import { onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   gsap.registerPlugin(ScrollTrigger)
@@ -316,14 +316,14 @@
   }
 
   // Recréer l'animation quand les produits changent
-  watch(
-    peptides,
-    () => {
-      // Attendre que le DOM soit mis à jour
-      setTimeout(createPingPongAnimation, 100)
-    },
-    { deep: true },
-  )
+  // watch(
+  //   peptides,
+  //   () => {
+  //     // Attendre que le DOM soit mis à jour
+  //     setTimeout(createPingPongAnimation, 100)
+  //   },
+  //   { deep: true },
+  // )
 
   onMounted(() => {
     load()
@@ -680,7 +680,6 @@
 
       &__panel {
         flex: none;
-        width: 100%;
       }
 
       &__personas {
@@ -720,7 +719,7 @@
     }
 
     // Mobile
-    @media (max-width: 600px) {
+    @media (max-width: 500px) {
       border-radius: 16px;
       margin-top: 20px;
 
@@ -739,28 +738,8 @@
       &__personas {
         grid-template-columns: 1fr;
         gap: 10px;
-      }
-
-      .persona-card {
-        flex-direction: row;
-        align-items: center;
-        padding: 10px;
-        gap: 12px;
-
-        &__image-wrap {
-          width: 70px;
-          height: 70px;
-          aspect-ratio: 1;
-          flex-shrink: 0;
-          border-radius: 10px;
-        }
-
-        &__tag {
-          display: none;
-        }
-
-        &__info {
-          flex: 1;
+        .persona-card {
+          min-width: 100%;
         }
       }
 

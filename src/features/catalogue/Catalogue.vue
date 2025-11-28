@@ -229,9 +229,7 @@
     sortItems,
     page,
     pageSize,
-    pageSizeItems,
     paginatedProducts,
-    nbPages,
     filteredProducts: finalProducts,
   } = usePagination(filteredProducts)
   const { filterOpen, allOpen, toggleAll } = useFilterSections()
@@ -343,6 +341,8 @@
     }
 
     &__body {
+      align-self: center;
+      max-width: 1400px;
       display: flex;
       width: 100%;
       gap: 24px;
@@ -356,7 +356,8 @@
       background: rgba(var(--secondary-900-rgb), 0.95);
       border: 1px solid color-mix(in srgb, @neutral-300 20%, transparent);
       padding: 20px;
-      border-radius: 12px;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
       height: fit-content;
       position: sticky;
       top: 20px;
@@ -384,7 +385,8 @@
       flex-direction: column;
       background: rgba(var(--secondary-900-rgb), 0.95);
       border: 1px solid color-mix(in srgb, @neutral-300 20%, transparent);
-      border-radius: 16px;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
     /* Ligne du Haut (Recherche + Tri) CORRIGÉE */

@@ -2,6 +2,7 @@
   <DialogComponent />
   <ToastContainer />
   <ChatWidget v-if="isAuthenticated && role === 'user'" />
+  <CatalogueDock />
 </template>
 
 <script setup lang="ts">
@@ -10,6 +11,7 @@
   import ToastContainer from '@designSystem/components/basic/toast/ToastContainer.vue'
   import { storeToRefs } from 'pinia'
   import ChatWidget from './features/chat/user/ChatWidget.vue'
+  import CatalogueDock from './features/shared/components/CatalogueDock.vue'
 
   const auth = useAuthStore()
 

@@ -92,7 +92,6 @@
       0 8px 28px fade(#000, 35%),
       inset 0 0 0 1px fade(@white, 12%);
 
-    border-radius: 18px;
     padding: 34px 32px;
     position: relative;
     overflow: hidden;

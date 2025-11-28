@@ -107,43 +107,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
-
-    /* ✨ OPTION 1: "Soft Pearl" - Élégant et lumineux */
     background: linear-gradient(180deg, #f8f9fc 0%, #f1f4f9 40%, #e8edf5 100%);
-
-    /* ✨ OPTION 2: "Biotech Fresh" - Avec touche verte subtile 
-    background: 
-      linear-gradient(180deg, 
-        #f7faf9 0%,
-        #f0f5f3 40%,
-        #e6eeeb 100%
-      );
-    */
-
-    /* ✨ OPTION 3: "Mesh Premium" - Moderne avec depth 
-    background: 
-      radial-gradient(ellipse 100% 80% at 20% 0%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
-      linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
-    */
-
-    /* ✨ OPTION 4: "Warm Neutral" - Chaleureux 
-    background: 
-      linear-gradient(180deg, 
-        #fafaf9 0%,
-        #f5f5f4 40%,
-        #e7e5e4 100%
-      );
-    */
-
-    /* ✨ OPTION 5: "Arctic Clean" - Très léger, presque blanc 
-    background: 
-      linear-gradient(180deg, 
-        #ffffff 0%,
-        #f9fafb 30%,
-        #f3f4f6 100%
-      );
-    */
   }
 
   /* Overlay décoratif subtil (optionnel) */
