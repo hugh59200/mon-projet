@@ -8,9 +8,7 @@
     </section>
     <HomeStats />
     <HomeProcess />
-    <div class="category-wrapper">
-      <HeroBanner />
-    </div>
+    <HeroBanner />
     <HomeQuality />
     <HomeFaq />
     <HomeCta />

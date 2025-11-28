@@ -155,32 +155,28 @@
           class="scroll-track"
           ref="scrollTrack"
         >
-          <template
-            v-for="i in 2"
-            :key="i"
+          <!-- Une seule boucle, pas de duplication -->
+          <div
+            v-for="p in peptides"
+            :key="p.id"
+            class="peptide-item"
+            @click="goToProduct(p)"
+            role="button"
+            tabindex="0"
           >
-            <div
-              v-for="p in peptides"
-              :key="p.id + '-' + i"
-              class="peptide-item"
-              @click="goToProduct(p)"
-              role="button"
-              tabindex="0"
-            >
-              <div class="peptide-item__img-wrapper">
-                <img
-                  :src="p.image || '/images/default-peptide.png'"
-                  :alt="p.name"
-                />
-              </div>
-              <BasicText
-                size="body-s"
-                color="neutral-700"
-              >
-                {{ p.name }}
-              </BasicText>
+            <div class="peptide-item__img-wrapper">
+              <img
+                :src="p.image || '/images/default-peptide.png'"
+                :alt="p.name"
+              />
             </div>
-          </template>
+            <BasicText
+              size="body-s"
+              color="neutral-700"
+            >
+              {{ p.name }}
+            </BasicText>
+          </div>
         </div>
       </div>
     </div>
@@ -196,7 +192,7 @@
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { storeToRefs } from 'pinia'
-  import { onBeforeUnmount, onMounted, ref } from 'vue'
+  import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
 
   gsap.registerPlugin(ScrollTrigger)
@@ -207,17 +203,14 @@
   const { load } = productsStore
   const peptides = products
 
-  onMounted(() => {
-    load()
-  })
-
   const heroSection = ref<HTMLElement>()
   const glowLayer = ref<HTMLElement>()
   const topSection = ref<HTMLElement>()
   const scrollTrack = ref<HTMLElement>()
   const carouselContainer = ref<HTMLElement>()
 
-  let scrollAnim: gsap.core.Tween | null = null
+  let scrollTimeline: gsap.core.Timeline | null = null
+  let isPaused = false
 
   type Persona = {
     id: string
@@ -267,7 +260,75 @@
     router.push(`/catalogue/${p.id}`)
   }
 
+  /**
+   * Crée l'animation ping-pong du carousel
+   * - Défile vers la gauche
+   * - Pause 3 secondes
+   * - Défile vers la droite (retour)
+   * - Pause 3 secondes
+   * - Répète
+   */
+  function createPingPongAnimation() {
+    const track = scrollTrack.value
+    const container = carouselContainer.value
+
+    if (!track || !container) return
+
+    // Kill l'ancienne animation si elle existe
+    if (scrollTimeline) {
+      scrollTimeline.kill()
+      gsap.set(track, { x: 0 })
+    }
+
+    // Calcul du déplacement nécessaire
+    const trackWidth = track.scrollWidth
+    const containerWidth = container.clientWidth
+    const maxScroll = trackWidth - containerWidth
+
+    // Si le contenu ne dépasse pas, pas besoin d'animation
+    if (maxScroll <= 0) return
+
+    // Durée basée sur la distance (~40px/seconde pour une vitesse confortable)
+    const scrollDuration = Math.max(12, maxScroll / 40)
+
+    // Création de la timeline ping-pong
+    scrollTimeline = gsap.timeline({ repeat: -1 })
+
+    // 1. Défilement vers la gauche (début -> fin)
+    scrollTimeline.to(track, {
+      x: -maxScroll,
+      duration: scrollDuration,
+      ease: 'none',
+    })
+
+    // 2. Pause de 3 secondes à la fin
+    scrollTimeline.to({}, { duration: 3 })
+
+    // 3. Défilement vers la droite (fin -> début)
+    scrollTimeline.to(track, {
+      x: 0,
+      duration: scrollDuration,
+      ease: 'none',
+    })
+
+    // 4. Pause de 3 secondes au début
+    scrollTimeline.to({}, { duration: 3 })
+  }
+
+  // Recréer l'animation quand les produits changent
+  watch(
+    peptides,
+    () => {
+      // Attendre que le DOM soit mis à jour
+      setTimeout(createPingPongAnimation, 100)
+    },
+    { deep: true },
+  )
+
   onMounted(() => {
+    load()
+
+    // Animation d'entrée
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
 
     if (heroSection.value) {
@@ -287,21 +348,24 @@
       }
     }
 
-    // Carrousel horizontal infini
-    const track = scrollTrack.value
-    if (track) {
-      scrollAnim = gsap.to(track, {
-        xPercent: -50,
-        duration: 45, // Plus lent pour être lisible
-        ease: 'linear',
-        repeat: -1,
-      })
-    }
+    // Initialiser l'animation du carousel (sera recréée quand les produits arrivent)
+    setTimeout(createPingPongAnimation, 500)
 
+    // Pause/Resume au hover
     const container = carouselContainer.value
-    if (container && scrollAnim) {
-      container.addEventListener('mouseenter', () => scrollAnim?.pause())
-      container.addEventListener('mouseleave', () => scrollAnim?.resume())
+    if (container) {
+      container.addEventListener('mouseenter', () => {
+        if (scrollTimeline && !isPaused) {
+          scrollTimeline.pause()
+          isPaused = true
+        }
+      })
+      container.addEventListener('mouseleave', () => {
+        if (scrollTimeline && isPaused) {
+          scrollTimeline.resume()
+          isPaused = false
+        }
+      })
     }
 
     // Glow animé
@@ -317,34 +381,31 @@
   })
 
   onBeforeUnmount(() => {
-    scrollAnim?.kill()
+    scrollTimeline?.kill()
     ScrollTrigger.getAll().forEach((t) => t.kill())
   })
 </script>
 
 <style scoped lang="less">
   .hero-banner {
+    max-width: 1200px;
+    align-self: center;
     position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
     border-radius: 24px;
     overflow: hidden;
-    margin-top: 40px; // Espace avec le composant précédent
-
+    margin-top: 40px;
     background: linear-gradient(135deg, var(--secondary-600), var(--secondary-600));
 
     &::before {
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: var(--radius);
+      border-radius: 24px;
       padding: 1px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--neutral-100-rgb), 0.1),
-        rgba(var(--neutral-100-rgb), 0.05)
-      );
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
       -webkit-mask:
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
@@ -364,39 +425,35 @@
       filter: blur(100px);
       opacity: 0.3;
       pointer-events: none;
-
-      /* Glow plus doux (bleu ciel / blanc) */
       background:
         radial-gradient(circle at 30% 30%, rgba(var(--primary-200-rgb), 0.4), transparent 60%),
         radial-gradient(circle at 70% 70%, rgba(var(--secondary-200-rgb), 0.4), transparent 60%);
       background-size: 150% 150%;
     }
 
-    /* --- TOP SECTION --- */
+    // ═══════════════════════════════════════════════════════════════
+    // TOP SECTION
+    // ═══════════════════════════════════════════════════════════════
     &__top {
       position: relative;
       z-index: 2;
       display: flex;
-      gap: 40px;
-      padding: 48px;
-      align-items: stretch;
+      gap: 24px;
+      padding: 32px;
     }
 
-    /* --- LEFT PANEL --- */
+    // ═══════════════════════════════════════════════════════════════
+    // LEFT PANEL
+    // ═══════════════════════════════════════════════════════════════
     &__panel {
-      flex: 1;
-      max-width: 480px;
-      padding: 32px;
+      flex: 0 0 360px;
+      padding: 28px;
       border-radius: 20px;
       position: relative;
-      overflow: hidden;
-
-      /* Carte Blanche Propre */
       background: rgba(255, 255, 255, 0.5);
       border: 1px solid @neutral-100;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 
-      /* Accent sur la gauche */
       &::before {
         content: '';
         position: absolute;
@@ -409,10 +466,10 @@
       }
     }
 
-    &__text {
+    &__top-text {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     &__eyebrow {
@@ -423,77 +480,61 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       width: fit-content;
-      margin-bottom: 8px;
     }
 
     &__bullets {
-      margin-top: 12px;
+      margin-top: 8px;
       padding: 0;
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
 
       li {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        font-size: 0.95rem;
+        gap: 10px;
+        font-size: 0.9rem;
+        line-height: 1.4;
       }
     }
 
     &__cta-row {
-      margin-top: 20px;
+      margin-top: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     &__disclaimer {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       text-align: center;
-      opacity: 0.8;
+      opacity: 0.7;
     }
 
-    /* --- PERSONAS (DROITE) --- */
+    // ═══════════════════════════════════════════════════════════════
+    // PERSONAS GRID - Approche simple avec aspect-ratio
+    // ═══════════════════════════════════════════════════════════════
     &__personas {
-      flex: 1.2;
+      flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-      align-content: start;
-
-      max-height: 500px;
-      overflow-y: auto;
-      padding-right: 4px; // Pour la scrollbar
-
-      /* Scrollbar fine */
-      &::-webkit-scrollbar {
-        width: 4px;
-      }
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: @neutral-200;
-        border-radius: 4px;
-      }
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
     }
 
     .persona-card {
+      max-width: 320px;
+      max-height: 220px;
       background: white;
-      border-radius: 16px;
-      padding: 12px;
+      border-radius: 14px;
+      padding: 10px;
       border: 1px solid @neutral-100;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+      gap: 8px;
 
       &:hover {
         transform: translateY(-2px);
@@ -502,10 +543,10 @@
 
       &__image-wrap {
         position: relative;
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
-        aspect-ratio: 4/3;
         background: @neutral-50;
+        aspect-ratio: 4 / 3;
 
         img {
           width: 100%;
@@ -516,15 +557,16 @@
 
       &__tag {
         position: absolute;
-        bottom: 8px;
-        left: 8px;
-        background: rgba(255, 255, 255, 0.9);
+        bottom: 6px;
+        left: 6px;
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(4px);
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 0.55rem;
         font-weight: 600;
         text-transform: uppercase;
+        letter-spacing: 0.02em;
       }
 
       &__info {
@@ -534,7 +576,9 @@
       }
     }
 
-    /* --- BOTTOM CAROUSEL --- */
+    // ═══════════════════════════════════════════════════════════════
+    // BOTTOM CAROUSEL
+    // ═══════════════════════════════════════════════════════════════
     &__bottom {
       position: relative;
       z-index: 2;
@@ -551,19 +595,20 @@
     }
 
     &__bottom-header {
-      padding: 0 48px;
+      padding: 0 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
     }
 
     .scroll-track {
       display: flex;
-      gap: 30px;
-      width: max-content; // Important pour que le scroll fonctionne
-      padding: 0 48px;
+      gap: 24px;
+      width: max-content;
+      padding: 0 32px;
+      will-change: transform;
 
       .peptide-item {
         display: flex;
@@ -571,44 +616,82 @@
         align-items: center;
         gap: 8px;
         cursor: pointer;
-        width: 120px;
+        width: 100px;
         flex-shrink: 0;
 
         &__img-wrapper {
-          width: 80px;
-          height: 80px;
+          width: 72px;
+          height: 72px;
           border-radius: 50%;
-          background: white;
-          border: 1px solid @neutral-100;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-          transition: transform 0.2s ease;
+          overflow: hidden;
+          background: linear-gradient(135deg, @neutral-100, @neutral-50);
+          border: 3px solid white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
 
           img {
-            width: 60%;
-            height: 60%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
           }
         }
 
         &:hover &__img-wrapper {
-          transform: scale(1.05);
-          border-color: var(--primary-200);
+          transform: scale(1.1);
+          border-color: var(--primary-300);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
       }
     }
 
-    /* --- RESPONSIVE --- */
-    @media (max-width: 960px) {
+    // ═══════════════════════════════════════════════════════════════
+    // RESPONSIVE
+    // ═══════════════════════════════════════════════════════════════
+
+    // Tablet landscape
+    @media (max-width: 1100px) {
+      &__top {
+        gap: 20px;
+        padding: 28px;
+      }
+      &__panel {
+        flex: 0 0 320px;
+        padding: 24px;
+      }
+      &__personas {
+        gap: 10px;
+      }
+      .persona-card {
+        padding: 8px;
+        border-radius: 12px;
+      }
+    }
+
+    // Tablet portrait - Stack
+    @media (max-width: 900px) {
+      border-radius: 20px;
+
       &__top {
         flex-direction: column;
-        padding: 32px;
+        padding: 24px;
       }
 
       &__panel {
-        max-width: none;
+        flex: none;
+        width: 100%;
+      }
+
+      &__personas {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .persona-card {
+        &__tag {
+          font-size: 0.5rem;
+          padding: 2px 6px;
+        }
       }
 
       &__bottom-header,
@@ -617,24 +700,87 @@
       }
     }
 
+    // Small tablet
+    @media (max-width: 768px) {
+      &__personas {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .scroll-track {
+        gap: 20px;
+        .peptide-item {
+          width: 90px;
+          &__img-wrapper {
+            width: 64px;
+            height: 64px;
+          }
+        }
+      }
+    }
+
+    // Mobile
     @media (max-width: 600px) {
-      border-radius: 0; // Full width sur mobile
+      border-radius: 16px;
       margin-top: 20px;
 
       &__top {
-        padding: 24px 16px;
+        padding: 20px;
+        gap: 16px;
+      }
+
+      &__panel {
+        padding: 20px;
+        &::before {
+          width: 3px;
+        }
       }
 
       &__personas {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-bottom: 10px; // Espace pour scrollbar
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
 
-        .persona-card {
-          min-width: 240px;
-          scroll-snap-align: start;
+      .persona-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+        gap: 12px;
+
+        &__image-wrap {
+          width: 70px;
+          height: 70px;
+          aspect-ratio: 1;
+          flex-shrink: 0;
+          border-radius: 10px;
+        }
+
+        &__tag {
+          display: none;
+        }
+
+        &__info {
+          flex: 1;
+        }
+      }
+
+      &__bottom-header {
+        padding: 0 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .scroll-track {
+        padding: 0 20px;
+        gap: 16px;
+        .peptide-item {
+          width: 80px;
+          &__img-wrapper {
+            width: 56px;
+            height: 56px;
+            border-width: 2px;
+          }
         }
       }
     }
