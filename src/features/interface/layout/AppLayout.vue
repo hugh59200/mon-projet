@@ -62,11 +62,7 @@
   const sablier = useSablierStore()
   const cart = useCartStore()
 
-  // ✅ Détection intelligente : Est-ce une page "Standalone" (Auth, Paiement, etc.) ?
   const isAuthPage = computed(() => {
-    // Vérifie si le chemin commence par /auth
-    // OU si c'est une page de paiement (/paiement/success, /paiement/cancel)
-    // OU si c'est la page de suivi de commande (/suivi-commande) si tu veux qu'elle soit aussi clean
     return route.path.startsWith('/auth') || route.path.startsWith('/paiement')
   })
 
@@ -74,7 +70,6 @@
     if (!session) cart.items = []
   })
 
-  // HEADER dynamique (Logique existante conservée)
   const lastScroll = ref(0)
   const scrollY = ref(0)
   const isHidden = ref(false)
@@ -103,13 +98,70 @@
     z-index: 900;
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     APP LAYOUT - Premium Background
+     ═══════════════════════════════════════════════════════════════ */
   .app-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: linear-gradient(180deg, @neutral-200, @neutral-100);
     overflow-x: hidden;
     overflow-y: auto;
+
+    /* ✨ OPTION 1: "Soft Pearl" - Élégant et lumineux */
+    background: linear-gradient(180deg, #f8f9fc 0%, #f1f4f9 40%, #e8edf5 100%);
+
+    /* ✨ OPTION 2: "Biotech Fresh" - Avec touche verte subtile 
+    background: 
+      linear-gradient(180deg, 
+        #f7faf9 0%,
+        #f0f5f3 40%,
+        #e6eeeb 100%
+      );
+    */
+
+    /* ✨ OPTION 3: "Mesh Premium" - Moderne avec depth 
+    background: 
+      radial-gradient(ellipse 100% 80% at 20% 0%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+      linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    */
+
+    /* ✨ OPTION 4: "Warm Neutral" - Chaleureux 
+    background: 
+      linear-gradient(180deg, 
+        #fafaf9 0%,
+        #f5f5f4 40%,
+        #e7e5e4 100%
+      );
+    */
+
+    /* ✨ OPTION 5: "Arctic Clean" - Très léger, presque blanc 
+    background: 
+      linear-gradient(180deg, 
+        #ffffff 0%,
+        #f9fafb 30%,
+        #f3f4f6 100%
+      );
+    */
+  }
+
+  /* Overlay décoratif subtil (optionnel) */
+  .app-layout::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+
+    /* Mesh gradient très subtil pour ajouter de la profondeur */
+    background:
+      radial-gradient(
+        ellipse 60% 40% at 10% 0%,
+        rgba(var(--primary-500-rgb), 0.02) 0%,
+        transparent 50%
+      ),
+      radial-gradient(ellipse 50% 30% at 90% 100%, rgba(16, 185, 129, 0.015) 0%, transparent 50%);
   }
 
   /* Header existant */
@@ -146,35 +198,38 @@
     opacity: 1;
   }
 
-  /* ✅ Classe standard pour le contenu de l'app (avec padding) */
+  /* ✅ Contenu principal */
   .content {
+    position: relative;
+    z-index: 1;
     min-width: 250px;
     min-height: 60vh;
-    padding: 2.5vw 4vw;
-    background-color: @neutral-400;
+
+    /* Fond transparent pour laisser voir le gradient de l'app-layout */
+    background: transparent;
+
     color: @neutral-900;
     transition: padding 0.3s ease;
+    padding: 2.5vw 0;
 
     @media (max-width: 900px) {
-      padding: 16px 20px;
+      padding: 16px 0;
     }
     @media (min-width: 1400px) {
-      padding: 50px 80px;
+      padding: 50px 0;
     }
   }
 
-  /* ✅ NOUVELLE CLASSE : Mode Plein Écran pour Auth */
-  /* Elle annule les styles de .content pour laisser AuthLayout gérer le layout */
+  /* Mode Auth plein écran */
   .auth-fullscreen {
     width: 100%;
     min-height: 100vh;
     padding: 0 !important;
     margin: 0 !important;
-    background: white; /* Ou transparent si AuthLayout a son propre fond */
+    background: white;
     display: flex;
     flex-direction: column;
 
-    /* Important : S'assurer qu'il n'y a pas de marge héritée */
     & > div {
       flex: 1;
     }
@@ -202,14 +257,15 @@
     opacity: 0;
   }
 
+  /* Scrollbar */
   .app-layout::-webkit-scrollbar {
     width: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, @neutral-600 25%, transparent);
+    background: rgba(100, 116, 139, 0.25);
     border-radius: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, @neutral-600 45%, transparent);
+    background: rgba(100, 116, 139, 0.4);
   }
 </style>

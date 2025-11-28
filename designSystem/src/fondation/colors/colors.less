@@ -1,5 +1,254 @@
+/* ══════════════════════════════════════════════════════════════
+   COLORS SYSTEM — FastPeptides Design Tokens
+   ══════════════════════════════════════════════════════════════
+   
+   Ce fichier définit toutes les couleurs du design system.
+   Chaque couleur a une variable LESS (@color) et une variable CSS (--color).
+   Les variantes RGB (--color-rgb) permettent l'utilisation avec rgba().
+   
+   Usage:
+   - LESS:  background: @danger-500;
+   - CSS:   background: var(--danger-500);
+   - RGBA:  background: rgba(var(--danger-500-rgb), 0.5);
+   
+   ══════════════════════════════════════════════════════════════ */
+
 /* Thèmes CSS */
 @import "./theme-variables.less";
+
+/* ══════════════════════════════════════════════════════════════
+   UTILITY MIXIN — Generate RGB variables
+   ══════════════════════════════════════════════════════════════ */
+.declare-color-vars(@name, @color) {
+  --@{name}: @color;
+  --@{name}-rgb: red(@color), green(@color), blue(@color);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ROOT — CSS Custom Properties
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* ─────────────────────────────────────────────────────────────
+     DANGER (Red)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(danger-900, #881414);
+  .declare-color-vars(danger-800, #a50f0f);
+  .declare-color-vars(danger-700, #993a3a);
+  .declare-color-vars(danger-600, #eb1515);
+  .declare-color-vars(danger-500, #ff4d4d);
+  .declare-color-vars(danger-400, #ff6464);
+  .declare-color-vars(danger-300, #ff9d9d);
+  .declare-color-vars(danger-200, #ffc5c5);
+  .declare-color-vars(danger-100, #ffdfdf);
+  .declare-color-vars(danger-50, #fff1f1);
+
+  /* ─────────────────────────────────────────────────────────────
+     WARNING (Orange)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(warning-900, #7a2e05);
+  .declare-color-vars(warning-800, #9a3b07);
+  .declare-color-vars(warning-700, #b94808);
+  .declare-color-vars(warning-600, #d9580a);
+  .declare-color-vars(warning-500, #f97316);
+  .declare-color-vars(warning-400, #fb923c);
+  .declare-color-vars(warning-300, #fdba74);
+  .declare-color-vars(warning-200, #fed7aa);
+  .declare-color-vars(warning-100, #ffedd5);
+  .declare-color-vars(warning-50, #fff7ed);
+
+  /* ─────────────────────────────────────────────────────────────
+     NEUTRAL (Neural Gray)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(neutral-950, #1a1e26);
+  .declare-color-vars(neutral-900, #2b303a);
+  .declare-color-vars(neutral-800, #3c414c);
+  .declare-color-vars(neutral-700, #4d5462);
+  .declare-color-vars(neutral-600, #647184);
+  .declare-color-vars(neutral-500, #94a2b8);
+  .declare-color-vars(neutral-400, #b4bfce);
+  .declare-color-vars(neutral-300, #cdd5e0);
+  .declare-color-vars(neutral-200, #e2e7ef);
+  .declare-color-vars(neutral-100, #edf1f5);
+  .declare-color-vars(neutral-50, #f8f9fb);
+
+  /* ─────────────────────────────────────────────────────────────
+     SUCCESS (Green)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(success-900, #184f30);
+  .declare-color-vars(success-800, #1b6038);
+  .declare-color-vars(success-700, #1c7942);
+  .declare-color-vars(success-600, #1f9a50);
+  .declare-color-vars(success-500, #2cbb66);
+  .declare-color-vars(success-400, #3ccf77);
+  .declare-color-vars(success-300, #8de8b1);
+  .declare-color-vars(success-200, #bff3d3);
+  .declare-color-vars(success-100, #ddfae6);
+  .declare-color-vars(success-50, #f1fcf4);
+
+  /* ─────────────────────────────────────────────────────────────
+     INFO (Blue)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(info-950, #0a2647);
+  .declare-color-vars(info-900, #064874);
+  .declare-color-vars(info-800, #00568d);
+  .declare-color-vars(info-700, #046498);
+  .declare-color-vars(info-600, #0080d4);
+  .declare-color-vars(info-500, #14adff);
+  .declare-color-vars(info-400, #2cbaff);
+  .declare-color-vars(info-300, #75d1ff);
+  .declare-color-vars(info-200, #b6e4ff);
+  .declare-color-vars(info-100, #d7edff);
+  .declare-color-vars(info-50, #eff8ff);
+
+  /* ─────────────────────────────────────────────────────────────
+     PERSIAN GREEN
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(persian-950, #003333);
+  .declare-color-vars(persian-900, #0d5450);
+  .declare-color-vars(persian-800, #0a6561);
+  .declare-color-vars(persian-700, #058078);
+  .declare-color-vars(persian-600, #00a79b);
+  .declare-color-vars(persian-500, #04c8b5);
+  .declare-color-vars(persian-400, #1de4ce);
+  .declare-color-vars(persian-300, #51f7e0);
+  .declare-color-vars(persian-200, #90ffeb);
+  .declare-color-vars(persian-100, #c7fff5);
+  .declare-color-vars(persian-50, #effefb);
+
+  /* ─────────────────────────────────────────────────────────────
+     INDIGO
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(indigo-950, #10343c);
+  .declare-color-vars(indigo-900, #1d4851);
+  .declare-color-vars(indigo-800, #215f69);
+  .declare-color-vars(indigo-700, #1f747f);
+  .declare-color-vars(indigo-600, #1e919c);
+  .declare-color-vars(indigo-500, #20b2ba);
+  .declare-color-vars(indigo-400, #3ccfd4);
+  .declare-color-vars(indigo-300, #7ae5e6);
+  .declare-color-vars(indigo-200, #b0f0f1);
+  .declare-color-vars(indigo-100, #d5f8f8);
+  .declare-color-vars(indigo-50, #eefdfd);
+
+  /* ─────────────────────────────────────────────────────────────
+     PINK
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(pink-950, #4e031d);
+  .declare-color-vars(pink-900, #8b103f);
+  .declare-color-vars(pink-800, #a30e42);
+  .declare-color-vars(pink-700, #c30d46);
+  .declare-color-vars(pink-600, #e71754);
+  .declare-color-vars(pink-500, #f93a69);
+  .declare-color-vars(pink-400, #ff708f);
+  .declare-color-vars(pink-300, #ffa1b4);
+  .declare-color-vars(pink-200, #ffccd6);
+  .declare-color-vars(pink-100, #ffe3e7);
+  .declare-color-vars(pink-50, #fff1f3);
+
+  /* ─────────────────────────────────────────────────────────────
+     BLUE (Ghost)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(blue-900, #012133);
+  .declare-color-vars(blue-800, #034366);
+  .declare-color-vars(blue-700, #046498);
+  .declare-color-vars(blue-600, #0686cb);
+  .declare-color-vars(blue-500, #07a7fe);
+  .declare-color-vars(blue-400, #39b9fe);
+  .declare-color-vars(blue-300, #6acafe);
+  .declare-color-vars(blue-200, #9cdcff);
+  .declare-color-vars(blue-100, #ceeeff);
+  .declare-color-vars(blue-50, #e7f7ff);
+
+  /* ─────────────────────────────────────────────────────────────
+     ORANGE
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(orange-950, #451205);
+  .declare-color-vars(orange-900, #7f290f);
+  .declare-color-vars(orange-800, #9e2f0e);
+  .declare-color-vars(orange-700, #c73b07);
+  .declare-color-vars(orange-600, #f05106);
+  .declare-color-vars(orange-500, #ff6707);
+  .declare-color-vars(orange-400, #ff8c37);
+  .declare-color-vars(orange-300, #ffb770);
+  .declare-color-vars(orange-200, #ffd5a8);
+  .declare-color-vars(orange-100, #ffecd4);
+  .declare-color-vars(orange-50, #fff7ed);
+
+  /* ─────────────────────────────────────────────────────────────
+     YELLOW
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(yellow-950, #481b00);
+  .declare-color-vars(yellow-900, #7c360b);
+  .declare-color-vars(yellow-800, #984208);
+  .declare-color-vars(yellow-700, #bb5602);
+  .declare-color-vars(yellow-600, #e27d00);
+  .declare-color-vars(yellow-500, #ffa807);
+  .declare-color-vars(yellow-400, #ffc81b);
+  .declare-color-vars(yellow-300, #ffdb46);
+  .declare-color-vars(yellow-200, #ffec85);
+  .declare-color-vars(yellow-100, #fff5c5);
+  .declare-color-vars(yellow-50, #fffcea);
+
+  /* ─────────────────────────────────────────────────────────────
+     BRICK RED
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(brick-red-950, #430e1d);
+  .declare-color-vars(brick-red-900, #79223d);
+  .declare-color-vars(brick-red-800, #8d2440);
+  .declare-color-vars(brick-red-700, #a82846);
+  .declare-color-vars(brick-red-600, #c93857);
+  .declare-color-vars(brick-red-500, #dd566c);
+  .declare-color-vars(brick-red-400, #e98391);
+  .declare-color-vars(brick-red-300, #f2afb8);
+  .declare-color-vars(brick-red-200, #f8d3d8);
+  .declare-color-vars(brick-red-100, #fce7e9);
+  .declare-color-vars(brick-red-50, #fdf3f4);
+
+  /* ─────────────────────────────────────────────────────────────
+     GREY
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(grey-950, #30323b);
+  .declare-color-vars(grey-900, #4b4f5d);
+  .declare-color-vars(grey-800, #5a5f73);
+  .declare-color-vars(grey-700, #6b718a);
+  .declare-color-vars(grey-600, #788098);
+  .declare-color-vars(grey-500, #8993a8);
+  .declare-color-vars(grey-400, #a0aaba);
+  .declare-color-vars(grey-300, #bfc7d1);
+  .declare-color-vars(grey-200, #d0d5dd);
+  .declare-color-vars(grey-100, #eaecef);
+  .declare-color-vars(grey-50, #f6f7f8);
+
+  /* ─────────────────────────────────────────────────────────────
+     RED (alias for danger)
+     ───────────────────────────────────────────────────────────── */
+  .declare-color-vars(red-900, #881414);
+  .declare-color-vars(red-800, #a50f0f);
+  .declare-color-vars(red-700, #993a3a);
+  .declare-color-vars(red-600, #eb1515);
+  .declare-color-vars(red-500, #ff4d4d);
+  .declare-color-vars(red-400, #ff6464);
+  .declare-color-vars(red-300, #ff9d9d);
+  .declare-color-vars(red-200, #ffc5c5);
+  .declare-color-vars(red-100, #ffdfdf);
+  .declare-color-vars(red-50, #fff1f1);
+
+  /* ─────────────────────────────────────────────────────────────
+     BASICS
+     ───────────────────────────────────────────────────────────── */
+  --white: #ffffff;
+  --white-rgb: 255, 255, 255;
+  --black: #000000;
+  --black-rgb: 0, 0, 0;
+  --light-blue: #f6fbff;
+  --light-blue-rgb: 246, 251, 255;
+  --dark-jungle-green: #0d1e22;
+  --dark-jungle-green-rgb: 13, 30, 34;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LESS VARIABLES — For direct usage in LESS files
+   ══════════════════════════════════════════════════════════════ */
 
 /* Danger */
 @danger-900: #881414;
@@ -32,12 +281,12 @@
 @neutral-800: #3c414c;
 @neutral-700: #4d5462;
 @neutral-600: #647184;
-@neutral-500: #94a2b8; // couleur exacte de “Neural Gray”
-@neutral-400: lighten(@neutral-500, 15%);
-@neutral-300: lighten(@neutral-500, 30%);
-@neutral-200: #e2e7ef; // dérivé du bas de ton image
-@neutral-100: lighten(@neutral-200, 8%);
-@neutral-50: lighten(@neutral-200, 16%);
+@neutral-500: #94a2b8;
+@neutral-400: #b4bfce;
+@neutral-300: #cdd5e0;
+@neutral-200: #e2e7ef;
+@neutral-100: #edf1f5;
+@neutral-50: #f8f9fb;
 @neutral-0: @neutral-50;
 
 /* Persian Green */
@@ -88,6 +337,7 @@
 @blue-400: #39b9fe;
 @blue-300: #6acafe;
 @blue-200: #9cdcff;
+@blue-100: #ceeeff;
 @blue-50: #e7f7ff;
 
 /* Blue (Info) */
@@ -104,28 +354,40 @@
 
 /* Info (Blue) */
 @info-950: #0a2647;
-@info-900: #0d3c66;
-@info-800: #115a8c;
-@info-700: #1579b3;
-@info-600: #1998d9;
-@info-500: #33b2f0;
-@info-400: #5cc8f7;
-@info-300: #8ddcfb;
-@info-200: #bae9fc;
-@info-100: #ddf5fe;
-@info-50: #f2fbff;
+@info-900: #064874;
+@info-800: #00568d;
+@info-700: #046498;
+@info-600: #0080d4;
+@info-500: #14adff;
+@info-400: #2cbaff;
+@info-300: #75d1ff;
+@info-200: #b6e4ff;
+@info-100: #d7edff;
+@info-50: #eff8ff;
 
-/* Green (Success) */
-@green-success-900: #184f30;
-@green-success-800: #1b6038;
-@green-success-700: #1c7942;
-@green-success-600: #1f9a50;
-@green-success-500: #2cbb66;
-@green-success-400: #3ccf77;
-@green-success-300: #8de8b1;
-@green-success-200: #bff3d3;
-@green-success-100: #dbffe5;
-@green-success-50: #f1fcf4;
+/* Success (Green) */
+@success-900: #184f30;
+@success-800: #1b6038;
+@success-700: #1c7942;
+@success-600: #1f9a50;
+@success-500: #2cbb66;
+@success-400: #3ccf77;
+@success-300: #8de8b1;
+@success-200: #bff3d3;
+@success-100: #ddfae6;
+@success-50: #f1fcf4;
+
+/* Green (alias) */
+@green-success-900: @success-900;
+@green-success-800: @success-800;
+@green-success-700: @success-700;
+@green-success-600: @success-600;
+@green-success-500: @success-500;
+@green-success-400: @success-400;
+@green-success-300: @success-300;
+@green-success-200: @success-200;
+@green-success-100: @success-100;
+@green-success-50: @success-50;
 
 /* Orange */
 @orange-950: #451205;
@@ -188,56 +450,61 @@
 @red-400: #ff6464;
 @red-300: #ff9d9d;
 @red-200: #ffc5c5;
+@red-100: #ffdfdf;
 @red-50: #fff1f1;
 
-/* Neutral */
-@info-900: rgba(6, 72, 116, 1);
-@info-800: rgba(0, 86, 141, 1);
-@info-700: rgba(4, 100, 152, 1);
-@info-600: rgba(0, 128, 212, 1);
-@info-500: rgba(20, 173, 255, 1);
-@info-400: rgba(44, 186, 255, 1);
-@info-300: rgba(117, 209, 255, 1);
-@info-200: rgba(182, 228, 255, 1);
-@info-50: rgba(239, 248, 255, 1);
-
-/* Green */
-@success-900: rgba(24, 79, 48, 1);
-@success-800: rgba(27, 96, 56, 1);
-@success-700: rgba(28, 121, 66, 1);
-@success-600: rgba(31, 154, 80, 1);
-@success-500: rgba(44, 187, 102, 1);
-@success-400: rgba(60, 207, 119, 1);
-@success-300: rgba(141, 232, 177, 1);
-@success-200: rgba(191, 243, 211, 1);
-@success-50: rgba(241, 252, 244, 1);
-
-/* Status Orange */
-/* Green (Success) */
-@success-900: rgba(24, 79, 48, 1);
-@success-800: rgba(27, 96, 56, 1);
-@success-700: rgba(28, 121, 66, 1);
-@success-600: rgba(31, 154, 80, 1);
-@success-500: rgba(44, 187, 102, 1);
-@success-400: rgba(60, 207, 119, 1);
-@success-300: rgba(141, 232, 177, 1);
-@success-200: rgba(191, 243, 211, 1);
-@success-100: rgba(221, 250, 230, 1); /* ✅ nouvelle teinte intermédiaire */
-@success-50: rgba(241, 252, 244, 1);
-
-/* danger (Error) */
-@error-900: #881414;
-@error-800: #a50f0f;
-@error-700: #993a3a;
-@error-600: #eb1515;
-@error-500: #ff4d4d;
-@error-400: #ff6464;
-@error-300: #ff9d9d;
-@error-200: #ffc5c5;
-@error-50: #fff1f1;
+/* Error (alias for danger) */
+@error-900: @danger-900;
+@error-800: @danger-800;
+@error-700: @danger-700;
+@error-600: @danger-600;
+@error-500: @danger-500;
+@error-400: @danger-400;
+@error-300: @danger-300;
+@error-200: @danger-200;
+@error-100: @danger-100;
+@error-50: @danger-50;
 
 /* Basics */
 @white: #ffffff;
-@black: black;
+@black: #000000;
 @light-blue: #f6fbff;
 @dark-jungle-green: #0d1e22;
+
+/* ══════════════════════════════════════════════════════════════
+   SEMANTIC COLOR MAPPINGS
+   ══════════════════════════════════════════════════════════════
+   
+   Ces variables mappent les couleurs fonctionnelles pour
+   une utilisation cohérente dans l'application.
+   
+   ══════════════════════════════════════════════════════════════ */
+
+/* Text Colors */
+@text-primary: @neutral-50;
+@text-secondary: @neutral-200;
+@text-tertiary: @neutral-300;
+@text-muted: @neutral-400;
+@text-disabled: @neutral-500;
+
+/* Background Colors */
+@bg-primary: var(--secondary-950);
+@bg-secondary: var(--secondary-900);
+@bg-tertiary: var(--secondary-800);
+@bg-elevated: var(--secondary-700);
+
+/* Border Colors */
+@border-subtle: rgba(var(--neutral-100-rgb), 0.06);
+@border-default: rgba(var(--neutral-100-rgb), 0.1);
+@border-strong: rgba(var(--neutral-100-rgb), 0.15);
+
+/* Interactive States */
+@hover-overlay: rgba(var(--neutral-100-rgb), 0.04);
+@active-overlay: rgba(var(--neutral-100-rgb), 0.08);
+@focus-ring: rgba(var(--primary-500-rgb), 0.4);
+
+/* Status Colors (semantic) */
+@status-success: @success-500;
+@status-warning: @warning-500;
+@status-danger: @danger-500;
+@status-info: @info-500;

@@ -1,106 +1,158 @@
 <template>
   <FloatingDropdownWrapper
     v-model="isOpen"
-    :width="260"
+    :width="280"
     align="right"
     arrow-align="auto"
     :close-delay="800"
     trigger-mode="click"
   >
-    <!-- 👤 Avatar utilisateur -->
     <template #trigger>
-      <div class="user-menu__avatar">
-        <BasicIconNext
-          name="User"
-          :size="22"
-          class="user-menu__avatar-icon"
-        />
-        <div
-          v-if="totalUnread > 0"
-          class="user-menu__avatar-badge"
-        >
-          <BasicText
-            size="body-s"
-            weight="bold"
+      <div class="user-trigger">
+        <div class="user-trigger__avatar">
+          <BasicIconNext
+            name="User"
+            :size="20"
+          />
+        </div>
+        <Transition name="badge">
+          <div
+            v-if="totalUnread > 0"
+            class="user-trigger__badge"
           >
             {{ totalUnread }}
-          </BasicText>
-        </div>
+          </div>
+        </Transition>
+        <div class="user-trigger__glow"></div>
       </div>
     </template>
 
-    <!-- 📋 Contenu du menu -->
-    <div class="user-menu__content">
+    <div class="user-menu">
       <template v-if="user">
-        <!-- 🧠 En-tête utilisateur -->
+        <!-- User Header -->
         <UserHeader />
 
-        <div class="user-menu__content-divider user-menu__content-divider--subtle" />
+        <div class="user-menu__divider"></div>
 
-        <!-- 🔗 Liens rapides -->
-        <div class="user-menu__content-list">
-          <NavButton
-            label="Mon profil"
-            iconName="UserCog"
-            variant="ghost"
+        <!-- Navigation -->
+        <nav class="user-menu__nav">
+          <button
+            class="user-menu__link"
             @click="goTo('/profil')"
-          />
-          <NavButton
-            label="Messagerie"
-            iconName="MessageSquare"
-            variant="ghost"
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="UserCog"
+                :size="18"
+              />
+            </span>
+            <span>Mon profil</span>
+          </button>
+          <button
+            class="user-menu__link"
             @click="goTo('/admin/messagerie')"
-          />
-          <NavButton
-            label="Statistiques"
-            iconName="BarChart3"
-            variant="ghost"
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="MessageSquare"
+                :size="18"
+              />
+            </span>
+            <span>Messagerie</span>
+            <span
+              v-if="totalUnread > 0"
+              class="user-menu__link-badge"
+            >
+              {{ totalUnread }}
+            </span>
+          </button>
+          <button
+            class="user-menu__link"
             @click="goTo('/admin/statistiques')"
-          />
-          <NavButton
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="BarChart3"
+                :size="18"
+              />
+            </span>
+            <span>Statistiques</span>
+          </button>
+          <button
             v-if="isAdmin"
-            label="Espace Admin"
-            iconName="Settings"
-            variant="ghost"
+            class="user-menu__link user-menu__link--accent"
             @click="goToAdmin"
-          />
-        </div>
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="Settings"
+                :size="18"
+              />
+            </span>
+            <span>Espace Admin</span>
+          </button>
+        </nav>
 
-        <div class="user-menu__content-divider" />
+        <div class="user-menu__divider"></div>
 
-        <!-- 🚪 Déconnexion -->
-        <NavButton
-          label="Se déconnecter"
-          iconName="LogOut"
-          variant="ghost"
-          class="text-red"
+        <!-- Logout -->
+        <button
+          class="user-menu__logout"
           @click="handleLogout"
-        />
+        >
+          <BasicIconNext
+            name="LogOut"
+            :size="18"
+          />
+          <span>Se déconnecter</span>
+        </button>
       </template>
 
-      <!-- 🔒 Si non connecté -->
+      <!-- Guest -->
       <template v-else>
-        <NavButton
-          label="Suivre ma commande"
-          iconName="PackageSearch"
-          variant="ghost"
-          @click="goTo('/suivi-commande')"
-        />
-        
-        <div class="user-menu__content-divider user-menu__content-divider--subtle" />
+        <nav class="user-menu__nav">
+          <button
+            class="user-menu__link"
+            @click="goTo('/suivi-commande')"
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="PackageSearch"
+                :size="18"
+              />
+            </span>
+            <span>Suivre ma commande</span>
+          </button>
+        </nav>
 
-        <NavButton
-          label="Connexion"
-          iconName="LogIn"
-          variant="ghost"
-          @click="goTo('/auth/login')"
-        />
-        <NavButton
-          label="Inscription"
-          iconName="UserPlus"
-          variant="ghost"
-          @click="goTo('/auth/register')"
-        />
+        <div class="user-menu__divider user-menu__divider--subtle"></div>
+
+        <nav class="user-menu__nav">
+          <button
+            class="user-menu__link user-menu__link--accent"
+            @click="goTo('/auth/login')"
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="LogIn"
+                :size="18"
+              />
+            </span>
+            <span>Connexion</span>
+          </button>
+          <button
+            class="user-menu__link"
+            @click="goTo('/auth/register')"
+          >
+            <span class="user-menu__link-icon">
+              <BasicIconNext
+                name="UserPlus"
+                :size="18"
+              />
+            </span>
+            <span>Créer un compte</span>
+          </button>
+        </nav>
       </template>
     </div>
   </FloatingDropdownWrapper>
@@ -110,6 +162,7 @@
   import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
+  import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import UserHeader from './UserHeader.vue'
@@ -124,18 +177,15 @@
     Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
   )
 
-  function goTo(path: string) {
+  const goTo = (path: string) => {
     isOpen.value = false
     router.push(path)
   }
-
-  function goToAdmin() {
+  const goToAdmin = () => {
     isOpen.value = false
-    const target = adminTabStore.getRedirectRoute(true)
-    router.push(target)
+    router.push(adminTabStore.getRedirectRoute(true))
   }
-
-  async function handleLogout() {
+  const handleLogout = async () => {
     isOpen.value = false
     adminTabStore.clearLastTab()
     await signOut()
@@ -143,114 +193,195 @@
 </script>
 
 <style scoped lang="less">
-  /* ==========================================================
-   👤 USER MENU — Neural Glass v2
-   ========================================================== */
+  @ease: cubic-bezier(0.16, 1, 0.3, 1);
 
-  .user-menu {
-    /* -----------------------------
-     🔵 AVATAR (trigger)
-  ----------------------------- */
+  // Trigger
+  .user-trigger {
+    position: relative;
+    cursor: pointer;
+    padding: 4px;
+
     &__avatar {
-      position: relative;
       width: 36px;
       height: 36px;
-
+      border-radius: 50%;
+      background: rgba(var(--secondary-800-rgb), 0.8);
+      border: 1px solid rgba(var(--neutral-100-rgb), 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
+      color: @neutral-200;
+      transition: all 0.3s @ease;
+      position: relative;
+      z-index: 1;
+    }
 
+    &__badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      background: var(--primary-600);
+      color: @neutral-50;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px var(--secondary-900);
+      z-index: 2;
+    }
+
+    &__glow {
+      position: absolute;
+      inset: -4px;
       border-radius: 50%;
-      cursor: pointer;
+      background: radial-gradient(circle, rgba(var(--primary-500-rgb), 0.2), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 0;
+    }
 
-      background: rgba(var(--secondary-900-rgb), 0.55);
-      backdrop-filter: blur(6px);
-
-      border: 1px solid color-mix(in srgb, @neutral-500 8%, transparent);
-
-      transition: all 0.25s ease;
-
-      /* ✨ Glow hover */
-      &:hover {
-        background: rgba(var(--secondary-900-rgb), 0.7);
-        box-shadow: 0 0 8px rgba(var(--primary-500-rgb), 0.25);
-        transform: translateY(-1px);
+    &:hover {
+      .user-trigger__avatar {
+        background: rgba(var(--secondary-700-rgb), 0.9);
+        border-color: rgba(var(--primary-500-rgb), 0.3);
+        color: @neutral-50;
+        transform: scale(1.05);
       }
 
-      &-icon {
-        color: white;
-        transition: opacity 0.25s ease;
-        opacity: 0.9;
+      .user-trigger__glow {
+        opacity: 1;
       }
+    }
+  }
 
-      /* 🔵 Badge messages non lus */
-      &-badge {
-        position: absolute;
-        top: -2px;
-        right: -2px;
+  // Menu
+  .user-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-        background: var(--primary-700);
-        color: white;
+    &__divider {
+      height: 1px;
+      background: rgba(var(--neutral-100-rgb), 0.08);
+      margin: 4px 0;
 
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 11px;
-        font-weight: bold;
-
-        box-shadow: 0 0 0 2px rgba(var(--secondary-900-rgb), 0.8);
+      &--subtle {
+        background: rgba(var(--neutral-100-rgb), 0.04);
       }
     }
 
-    /* -----------------------------
-     📋 CONTENU DU MENU
-  ----------------------------- */
-    &__content {
+    &__nav {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding-bottom: 4px;
+      gap: 2px;
+    }
 
-      /* -------------------------
-       Dividers
-    ------------------------- */
-      &-divider {
-        height: 1px;
-        background: fade(white, 8%);
-        margin: 8px 0;
+    &__link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: @neutral-300;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+      text-align: left;
 
-        &--subtle {
-          height: 1px;
-          background: fade(white, 4%);
-          margin: 4px 0 6px 0;
+      &:hover {
+        background: rgba(var(--neutral-100-rgb), 0.04);
+        color: @neutral-100;
+
+        .user-menu__link-icon {
+          color: var(--primary-400);
         }
       }
 
-      /* -------------------------
-       Listes (liens rapides)
-    ------------------------- */
-      &-list {
+      &-icon {
         display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 2px 0;
+        align-items: center;
+        justify-content: center;
+        color: @neutral-500;
+        transition: color 0.2s;
       }
 
-      /* -------------------------
-       Bouton rouge (Déconnexion)
-    ------------------------- */
-      .text-red {
-        color: @danger-400 !important;
+      &-badge {
+        margin-left: auto;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        background: rgba(var(--primary-500-rgb), 0.15);
+        color: var(--primary-400);
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &--accent {
+        color: var(--primary-400);
+
+        .user-menu__link-icon {
+          color: var(--primary-400);
+        }
 
         &:hover {
-          background: color-mix(in srgb, @danger-400 10%, transparent);
+          background: rgba(var(--primary-500-rgb), 0.1);
+          color: var(--primary-300);
         }
       }
+    }
+
+    &__logout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: @danger-400;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+
+      &:hover {
+        background: rgba(@danger-500, 0.1);
+        color: @danger-300;
+      }
+    }
+  }
+
+  // Badge Animation
+  .badge-enter-active {
+    animation: badgePop 0.4s @ease;
+  }
+  .badge-leave-active {
+    animation: badgePop 0.3s @ease reverse;
+  }
+
+  @keyframes badgePop {
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
     }
   }
 </style>
