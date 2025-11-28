@@ -60,12 +60,13 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = false
   }
 
-  // ✅ Login → utilise authService
-  async function signIn(email: string, password: string): Promise<boolean> {
+  async function signIn(email: string, password: string, captchaToken?: string): Promise<boolean> {
     loading.value = true
     error.value = null
 
-    const result = await signInWithPassword(email, password)
+    // Appel au SERVICE (et non plus directement supabase)
+    const result = await signInWithPassword(email, password, captchaToken)
+
     loading.value = false
 
     if (!result.success) {
@@ -73,23 +74,27 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    user.value = result.user
-    await fetchProfile()
-    startAutoRefresh()
+    // Si success, TypeScript sait que result.user existe
+    if (result.user) {
+      user.value = result.user
+      await fetchProfile()
+      startAutoRefresh()
 
-    const redirect = router.currentRoute.value.query.redirect as string | undefined
-    sessionStorage.setItem('redirectAfterOAuth', redirect || '')
-    router.push('/auth/callback')
+      const redirect = router.currentRoute.value.query.redirect as string | undefined
+      sessionStorage.setItem('redirectAfterOAuth', redirect || '')
+      router.push(redirect || '/')
+    }
 
     return true
   }
 
-  // ✅ SignUp via notre service (flux classique)
-  async function signUp(email: string, password: string): Promise<boolean> {
+  async function signUp(email: string, password: string, captchaToken?: string): Promise<boolean> {
     loading.value = true
     error.value = null
 
-    const result = await serviceSignUp(email, password)
+    // Appel au SERVICE
+    const result = await serviceSignUp(email, password, captchaToken)
+
     loading.value = false
 
     if (!result.success) {

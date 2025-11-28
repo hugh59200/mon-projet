@@ -13,6 +13,7 @@ const baseClient = createClient<Database>(supabaseUrl, supabaseKey, {
     detectSessionInUrl: true,
   },
 })
+
 /**
  * 🧠 Proxy Supabase sélectif et “chain-safe”
  * - Gère le sablier UNIQUEMENT sur les appels finaux (pas sur le chainage)
@@ -97,7 +98,40 @@ export const supabase = new Proxy(baseClient, {
       })
     }
 
-    // 🔹 Ne touche pas à auth, storage, channel, etc.
+    // 🔐 GESTION AUTHENTIFICATION (Nouveau)
+    // On ajoute le sablier sur signIn, signUp, etc.
+    if (prop === 'auth') {
+      return new Proxy(value, {
+        get(authTarget, authProp, authReceiver) {
+          const authFn = Reflect.get(authTarget, authProp, authReceiver)
+          const trackedAuthMethods = [
+            'signInWithPassword',
+            'signUp',
+            'signOut',
+            'resetPasswordForEmail',
+            'signInWithOAuth',
+            'verifyOtp',
+          ]
+
+          if (typeof authFn === 'function' && trackedAuthMethods.includes(authProp.toString())) {
+            return async (...args: any[]) => {
+              sablier.debutSablier()
+              const start = performance.now()
+              try {
+                return await authFn.apply(authTarget, args)
+              } finally {
+                const duration = performance.now() - start
+                if (duration > 300) sablier.finSablier()
+                else sablier.finSablier()
+              }
+            }
+          }
+          return authFn
+        },
+      })
+    }
+
+    // 🔹 Ne touche pas à storage, channel, etc.
     return value
   },
 })

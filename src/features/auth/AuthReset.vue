@@ -20,11 +20,17 @@
         deletable
       />
 
+      <Turnstile
+        ref="turnstileWidget"
+        @verify="onCaptchaVerify"
+        @expire="onCaptchaExpire"
+      />
+
       <BasicButton
         label="Envoyer le lien de réinitialisation"
         variant="filled"
         size="large"
-        :disabled="loading"
+        :disabled="loading || !captchaToken"
         :loading="loading"
         @click="submit"
         block
@@ -71,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+  import Turnstile from '@/pages/Turnstile.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
@@ -82,6 +89,19 @@
   const error = ref('')
   const message = ref('')
 
+  // 🔐 Logique Captcha
+  const captchaToken = ref('')
+  const turnstileWidget = ref()
+
+  function onCaptchaVerify(token: string) {
+    captchaToken.value = token
+    error.value = ''
+  }
+
+  function onCaptchaExpire() {
+    captchaToken.value = ''
+  }
+
   function clear() {
     error.value = ''
     message.value = ''
@@ -89,20 +109,31 @@
 
   async function submit() {
     if (!validate('reset')) return
+
+    if (!captchaToken.value) {
+      error.value = 'Veuillez valider la sécurité.'
+      return
+    }
+
     loading.value = true
     clear()
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
-      redirectTo: `${window.location.origin}/auth/update-password`, // Redirige vers une page dédiée
+      redirectTo: `${window.location.origin}/auth/update-password`,
+      captchaToken: captchaToken.value, // ✅ Ajout crucial
     })
 
     loading.value = false
+
     if (err) {
-      error.value = "Impossible d'envoyer l'e-mail. Vérifiez l'adresse saisie."
+      error.value = "Impossible d'envoyer l'e-mail. Veuillez réessayer plus tard."
+      // Reset du captcha en cas d'erreur
+      captchaToken.value = ''
+      turnstileWidget.value?.reset()
     } else {
       message.value = 'Si un compte existe avec cet e-mail, vous recevrez bientôt un lien.'
-      email.value = '' // On vide le champ pour éviter le spam
-      // touched.email = false
+      email.value = ''
+      // Optionnel : on peut reset le captcha ici aussi, mais comme l'utilisateur a réussi, c'est moins grave.
     }
   }
 </script>
@@ -110,7 +141,6 @@
 <style scoped lang="less">
   @import './AuthFormStyles.less';
 
-  /* Style spécifique pour le lien de retour */
   .link-back {
     display: inline-flex;
     align-items: center;

@@ -32,11 +32,17 @@
         @blur="validateField('password')"
       />
 
+      <Turnstile
+        ref="turnstileWidget"
+        @verify="onCaptchaVerify"
+        @expire="onCaptchaExpire"
+      />
+
       <BasicButton
         label="S'inscrire"
         variant="filled"
         size="large"
-        :disabled="loading"
+        :disabled="loading || !captchaToken"
         :loading="loading"
         @click="submit"
       />
@@ -68,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+  import Turnstile from '@/pages/Turnstile.vue'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useForm } from './composables/useForm'
@@ -76,11 +83,23 @@
   const auth = useAuthStore()
   const router = useRouter()
 
-  // Validation 'strong' pour le mot de passe à l'inscription
   const { email, password, errors, touched, validate, validateField } = useForm(true, 'strong')
 
   const loading = ref(false)
   const error = ref('')
+
+  // 🔐 État du Captcha
+  const captchaToken = ref('')
+  const turnstileWidget = ref()
+
+  function onCaptchaVerify(token: string) {
+    captchaToken.value = token
+    error.value = ''
+  }
+
+  function onCaptchaExpire() {
+    captchaToken.value = ''
+  }
 
   function clear() {
     error.value = ''
@@ -89,14 +108,24 @@
 
   async function submit() {
     if (!validate('register')) return
-    
+
+    if (!captchaToken.value) {
+      error.value = 'Veuillez valider que vous êtes humain.'
+      return
+    }
+
     loading.value = true
-    const success = await auth.signUp(email.value, password.value)
+
+    // Appel au store mis à jour avec le token
+    const success = await auth.signUp(email.value, password.value, captchaToken.value)
+
     loading.value = false
 
     if (!success) {
-      // Message d'erreur plus générique et pro
       error.value = auth.error ?? "Une erreur est survenue lors de l'inscription."
+      // Reset du widget en cas d'échec (ex: email déjà pris)
+      captchaToken.value = ''
+      turnstileWidget.value?.reset()
       return
     }
 

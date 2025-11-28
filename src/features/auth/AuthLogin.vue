@@ -30,11 +30,17 @@
         @blur="validateField('password')"
       />
 
+      <Turnstile
+        ref="turnstileWidget"
+        @verify="onCaptchaVerify"
+        @expire="onCaptchaExpire"
+      />
+
       <BasicButton
         label="Se connecter"
         variant="filled"
         size="large"
-        :disabled="loading"
+        :disabled="loading || !captchaToken"
         :loading="loading"
         @click="submit"
         block
@@ -85,17 +91,30 @@
 </template>
 
 <script setup lang="ts">
+  import Turnstile from '@/pages/Turnstile.vue'
   import { ref } from 'vue'
   import BasicSocialButton from './BasicSocialButton.vue'
   import { useForm } from './composables/useForm'
   import { useAuthStore } from './stores/useAuthStore'
 
   const auth = useAuthStore()
-  // On n'a pas besoin de la validation "strong" pour le login, "weak" suffit (juste check si rempli)
   const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
 
   const error = ref('')
   const loading = ref(false)
+
+  // 🔐 État du Captcha
+  const captchaToken = ref('')
+  const turnstileWidget = ref() // Référence pour reset le widget
+
+  function onCaptchaVerify(token: string) {
+    captchaToken.value = token
+    error.value = '' // On nettoie les erreurs visuelles quand l'utilisateur valide
+  }
+
+  function onCaptchaExpire() {
+    captchaToken.value = ''
+  }
 
   function clear() {
     error.value = ''
@@ -103,17 +122,34 @@
   }
 
   async function submit() {
-    // On valide juste que les champs ne sont pas vides
+    // 1. Validation formulaire
     if (!validate('login')) return
 
+    // 2. Sécurité Bot
+    if (!captchaToken.value) {
+      error.value = 'Veuillez valider la sécurité.'
+      return
+    }
+
     loading.value = true
-    const success = await auth.signIn(email.value, password.value)
+
+    // 3. Appel au store (Mise à jour requise dans useAuthStore pour accepter le 3ème argument)
+    const success = await auth.signIn(email.value, password.value, captchaToken.value)
+
     loading.value = false
 
-    if (!success) error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+    if (!success) {
+      error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+
+      // ⚠️ IMPORTANT : Si le login échoue, le token est brûlé.
+      // Il faut forcer le widget à se recharger pour obtenir un nouveau token.
+      captchaToken.value = ''
+      turnstileWidget.value?.reset()
+    }
   }
 
   async function provider(name: any) {
+    // Les providers OAuth gèrent leur propre sécurité, pas besoin du token ici
     loading.value = true
     await auth.signInWithProvider(name)
     loading.value = false
@@ -122,6 +158,5 @@
 </script>
 
 <style scoped lang="less">
-  /* On importe le nouveau fichier de style pro */
   @import './AuthFormStyles.less';
 </style>

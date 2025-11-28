@@ -1,0 +1,134 @@
+<template>
+  <div class="turnstile-wrapper">
+    <div
+      ref="widgetContainer"
+      class="cf-turnstile"
+    ></div>
+    <p
+      v-if="error"
+      class="error-text"
+    >
+      Veuillez valider la sécurité.
+    </p>
+  </div>
+</template>
+
+<script setup lang="ts">
+  import { onMounted, onUnmounted, ref } from 'vue'
+
+  // Props & Emits
+  const emit = defineEmits<{
+    (e: 'verify', token: string): void
+    (e: 'expire'): void
+    (e: 'error'): void
+  }>()
+
+  const widgetContainer = ref<HTMLElement | null>(null)
+  const widgetId = ref<string | null>(null)
+  const error = ref(false)
+
+  // Récupération de la clé publique depuis le .env
+  const SITE_KEY = import.meta.env.VITE_CLOUDFLARE_SITE_KEY
+
+  // Déclaration globale pour TypeScript (évite les erreurs de linter)
+  declare global {
+    interface Window {
+      turnstile?: {
+        render: (
+          element: HTMLElement | string,
+          options: {
+            sitekey: string
+            callback: (token: string) => void
+            'error-callback': () => void
+            'expired-callback': () => void
+            theme?: 'light' | 'dark' | 'auto'
+          },
+        ) => string
+        remove: (widgetId: string) => void
+        reset: (widgetId: string) => void
+      }
+      onloadTurnstileCallback?: () => void
+    }
+  }
+
+  const renderWidget = () => {
+    if (!window.turnstile || !widgetContainer.value) return
+
+    // Nettoyage préventif
+    if (widgetId.value) {
+      window.turnstile.remove(widgetId.value)
+    }
+
+    try {
+      if (!SITE_KEY) {
+        console.error('VITE_CLOUDFLARE_SITE_KEY est manquant dans le .env')
+        return
+      }
+
+      widgetId.value = window.turnstile.render(widgetContainer.value, {
+        sitekey: SITE_KEY,
+        theme: 'auto',
+        callback: (token: string) => {
+          error.value = false
+          emit('verify', token)
+        },
+        'error-callback': () => {
+          error.value = true
+          emit('error')
+        },
+        'expired-callback': () => {
+          emit('expire')
+        },
+      })
+    } catch (e) {
+      console.error('Erreur chargement Turnstile:', e)
+    }
+  }
+
+  onMounted(() => {
+    // Chargement dynamique du script Cloudflare s'il n'est pas là
+    if (window.turnstile) {
+      renderWidget()
+    } else {
+      window.onloadTurnstileCallback = renderWidget
+      const script = document.createElement('script')
+      script.src =
+        'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback'
+      script.async = true
+      script.defer = true
+      document.head.appendChild(script)
+    }
+  })
+
+  onUnmounted(() => {
+    if (window.turnstile && widgetId.value) {
+      window.turnstile.remove(widgetId.value)
+    }
+  })
+
+  // Exposer une méthode reset pour le parent (en cas d'erreur de login)
+  defineExpose({
+    reset: () => {
+      if (window.turnstile && widgetId.value) {
+        window.turnstile.reset(widgetId.value)
+      }
+    },
+  })
+</script>
+
+<style scoped>
+  .turnstile-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem 0;
+    min-height: 65px; /* Évite que le formulaire saute quand le widget charge */
+  }
+
+  .error-text {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+</style>

@@ -239,7 +239,7 @@
     background: linear-gradient(
       90deg,
       var(--secondary-900),
-      color-mix(in srgb, black 4%, var(--secondary-900))
+      color-mix(in srgb, black 4%, var(--secondary-800))
     );
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
