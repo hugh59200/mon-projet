@@ -8,6 +8,9 @@
     </section>
     <HomeStats />
     <HomeProcess />
+    <div class="category-wrapper">
+      <HeroBanner />
+    </div>
     <HomeQuality />
     <HomeFaq />
     <HomeCta />
@@ -17,6 +20,7 @@
 
 <script setup lang="ts">
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
+  import HeroBanner from './HeroBanner.vue'
   import HomeCta from './HomeCta.vue'
   import HomeDisclaimer from './HomeDisclaimer.vue'
   import HomeFaq from './HomeFaq.vue'
