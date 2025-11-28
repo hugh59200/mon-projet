@@ -89,87 +89,34 @@
         </div>
       </div>
 
+      <!-- NOUVELLE SECTION : Image des peptides -->
       <div class="hero__visual">
-        <div class="molecule-visual">
-          <div class="molecule-visual__glow"></div>
-          <div class="molecule-visual__ring molecule-visual__ring--1"></div>
-          <div class="molecule-visual__ring molecule-visual__ring--2"></div>
-          <div class="molecule-visual__ring molecule-visual__ring--3"></div>
-          <div class="molecule-visual__center">
-            <svg
-              viewBox="0 0 200 200"
-              fill="none"
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="12"
-                class="molecule-visual__atom"
-              />
-              <g class="molecule-visual__orbit molecule-visual__orbit--1">
-                <ellipse
-                  cx="100"
-                  cy="100"
-                  rx="45"
-                  ry="20"
-                  class="molecule-visual__path"
-                  transform="rotate(-30 100 100)"
-                />
-                <circle
-                  cx="145"
-                  cy="100"
-                  r="4"
-                  class="molecule-visual__dot molecule-visual__dot--1"
-                  transform="rotate(-30 100 100)"
-                />
-              </g>
-              <g class="molecule-visual__orbit molecule-visual__orbit--2">
-                <ellipse
-                  cx="100"
-                  cy="100"
-                  rx="45"
-                  ry="20"
-                  class="molecule-visual__path"
-                  transform="rotate(30 100 100)"
-                />
-                <circle
-                  cx="145"
-                  cy="100"
-                  r="4"
-                  class="molecule-visual__dot molecule-visual__dot--2"
-                  transform="rotate(30 100 100)"
-                />
-              </g>
-              <g class="molecule-visual__orbit molecule-visual__orbit--3">
-                <ellipse
-                  cx="100"
-                  cy="100"
-                  rx="45"
-                  ry="20"
-                  class="molecule-visual__path"
-                  transform="rotate(90 100 100)"
-                />
-                <circle
-                  cx="145"
-                  cy="100"
-                  r="4"
-                  class="molecule-visual__dot molecule-visual__dot--3"
-                  transform="rotate(90 100 100)"
-                />
-              </g>
-            </svg>
+        <div class="hero__image-wrapper">
+          <!-- Glow effect derrière l'image -->
+          <div class="hero__image-glow"></div>
+
+          <!-- Image principale -->
+          <img
+            :src="peptidesHeroImage"
+            alt="Fioles de peptides Fast Peptides - BPC-157, TB-500, CJC-1295, PT-141"
+            class="hero__image"
+          />
+
+          <!-- Overlay gradient pour fusion avec le fond -->
+          <div class="hero__image-overlay"></div>
+
+          <!-- Badges flottants animés -->
+          <div class="hero__floating-badge hero__floating-badge--1">
+            <span class="hero__floating-badge-icon">⚗️</span>
+            <span>Pureté 99%+</span>
           </div>
-          <div class="molecule-visual__card molecule-visual__card--1">
-            <span>⚗️</span>
-            <span>BPC-157</span>
+          <div class="hero__floating-badge hero__floating-badge--2">
+            <span class="hero__floating-badge-icon">🇪🇺</span>
+            <span>Made in EU</span>
           </div>
-          <div class="molecule-visual__card molecule-visual__card--2">
-            <span>🧬</span>
-            <span>TB-500</span>
-          </div>
-          <div class="molecule-visual__card molecule-visual__card--3">
-            <span>🔬</span>
-            <span>Semaglutide</span>
+          <div class="hero__floating-badge hero__floating-badge--3">
+            <span class="hero__floating-badge-icon">📋</span>
+            <span>COA fourni</span>
           </div>
         </div>
       </div>
@@ -179,6 +126,9 @@
 
 <script setup lang="ts">
   import BaseButton from './shared/BaseButton.vue'
+
+  // Import de l'image locale
+  import peptidesHeroImage from '@/assets/peptides-hero.png'
 </script>
 
 <style scoped lang="less">
@@ -204,6 +154,7 @@
       var(--secondary-900) 50%,
       var(--secondary-950) 100%
     );
+    overflow: hidden;
 
     &__bg {
       position: absolute;
@@ -362,6 +313,7 @@
       transform: translate(30px, -30px);
     }
   }
+
   @keyframes particleFloat {
     0%,
     100% {
@@ -456,6 +408,7 @@
       max-width: 520px;
       margin: 0;
     }
+
     &__actions {
       display: flex;
       gap: 16px;
@@ -483,147 +436,138 @@
       }
     }
 
+    // ============================================
+    // NOUVELLE SECTION : Visual avec image
+    // ============================================
     &__visual {
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
     }
-  }
 
-  .molecule-visual {
-    position: relative;
-    width: 360px;
-    height: 360px;
-    &__glow {
+    &__image-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    &__image-glow {
       position: absolute;
       inset: -20%;
-      background: radial-gradient(circle, rgba(var(--primary-500-rgb), 0.15) 0%, transparent 70%);
+      background: radial-gradient(
+        ellipse 60% 50% at 50% 60%,
+        rgba(var(--primary-500-rgb), 0.2) 0%,
+        rgba(var(--primary-600-rgb), 0.1) 40%,
+        transparent 70%
+      );
       filter: blur(40px);
+      z-index: 0;
+      animation: glowPulse 4s ease-in-out infinite;
     }
 
-    &__ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1px solid;
-      opacity: 0.3;
-      &--1 {
-        border-color: var(--primary-500);
-        animation: ringPulse 4s infinite ease-in-out;
-      }
-      &--2 {
-        inset: 15%;
-        border-color: var(--primary-400);
-        animation: ringPulse 4s infinite ease-in-out 0.5s;
-      }
-      &--3 {
-        inset: 30%;
-        border-color: var(--primary-300);
-        animation: ringPulse 4s infinite ease-in-out 1s;
-      }
-    }
-
-    @keyframes ringPulse {
+    @keyframes glowPulse {
       0%,
       100% {
+        opacity: 0.6;
         transform: scale(1);
-        opacity: 0.3;
       }
       50% {
+        opacity: 0.8;
         transform: scale(1.05);
-        opacity: 0.5;
       }
     }
 
-    &__center {
-      position: absolute;
-      inset: 25%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    &__orbit {
-      transform-origin: 100px 100px;
-      &--1 {
-        animation: orbit 8s linear infinite;
-      }
-      &--2 {
-        animation: orbit 10s linear infinite reverse;
-      }
-      &--3 {
-        animation: orbit 12s linear infinite;
-      }
+    &__image {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      // Masque pour fusionner avec le fond sombre
+      mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 85%, transparent 100%);
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 5%,
+        black 85%,
+        transparent 100%
+      );
+      // Légère ombre pour la profondeur
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
+      // Animation d'entrée
+      animation: imageReveal 1s ease-out 0.3s both;
     }
 
-    @keyframes orbit {
+    @keyframes imageReveal {
       from {
-        transform: rotate(0deg);
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
       }
       to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0) scale(1);
       }
     }
 
-    &__atom {
-      fill: var(--primary-500);
-    }
-    &__path {
-      stroke: rgba(var(--primary-400-rgb), 0.4);
-      stroke-width: 1;
-      fill: none;
-    }
-    &__dot {
-      &--1 {
-        fill: @success-500;
-      }
-      &--2 {
-        fill: var(--primary-400);
-      }
-      &--3 {
-        fill: @warning-500;
-      }
-    }
-
-    &__card {
+    &__image-overlay {
       position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: 16px;
+      pointer-events: none;
+      // Gradient subtil pour harmoniser avec le fond
+      background: linear-gradient(
+        135deg,
+        rgba(var(--primary-500-rgb), 0.05) 0%,
+        transparent 50%,
+        rgba(var(--secondary-950-rgb), 0.1) 100%
+      );
+    }
+
+    // Badges flottants animés
+    &__floating-badge {
+      position: absolute;
+      z-index: 3;
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: rgba(var(--secondary-800-rgb), 0.7);
+      background: rgba(var(--secondary-800-rgb), 0.85);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.2);
       border-radius: 12px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
       color: @neutral-100;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      span:first-child {
+      white-space: nowrap;
+
+      &-icon {
         font-size: 16px;
       }
+
       &--1 {
-        top: 10%;
-        right: 5%;
-        animation: floatCard 6s ease-in-out infinite;
+        top: 5%;
+        right: -5%;
+        animation: floatBadge 6s ease-in-out infinite;
       }
+
       &--2 {
-        bottom: 25%;
-        left: 5%;
-        animation: floatCard 7s ease-in-out infinite 1s;
+        bottom: 30%;
+        left: -8%;
+        animation: floatBadge 7s ease-in-out infinite 1s;
       }
+
       &--3 {
         bottom: 10%;
-        right: 15%;
-        animation: floatCard 8s ease-in-out infinite 2s;
+        right: 5%;
+        animation: floatBadge 8s ease-in-out infinite 2s;
       }
     }
 
-    @keyframes floatCard {
+    @keyframes floatBadge {
       0%,
       100% {
         transform: translateY(0);
@@ -634,6 +578,9 @@
     }
   }
 
+  // ============================================
+  // RESPONSIVE
+  // ============================================
   @media (max-width: 1100px) {
     .layout-section__inner--two-cols {
       grid-template-columns: 1fr;
@@ -652,9 +599,19 @@
     .hero__visual {
       order: 1;
     }
-    .molecule-visual {
-      width: 320px;
-      height: 320px;
+    .hero__image-wrapper {
+      max-width: 450px;
+    }
+    .hero__floating-badge {
+      &--1 {
+        right: 0;
+      }
+      &--2 {
+        left: 0;
+      }
+      &--3 {
+        right: 10%;
+      }
     }
   }
 

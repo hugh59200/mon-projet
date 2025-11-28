@@ -65,7 +65,7 @@
                   {{ slide.eyebrow }}
                 </span>
                 <h2 class="category-hero__title">
-                  <span>{{ slide.titleMain }} {{ slide.titleAccent }}</span>
+                  <span>{{ slide.titleMain }}</span>
                   <span class="category-hero__title-accent">{{ slide.titleAccent }}</span>
                 </h2>
                 <p class="category-hero__desc">{{ slide.description }}</p>
@@ -118,6 +118,7 @@
                       :src="`https://img.youtube.com/vi/${slide.youtubeId}/maxresdefault.jpg`"
                       :alt="slide.titleMain"
                       loading="lazy"
+                      @error="handleImageError"
                     />
                     <div class="category-hero__card-shine"></div>
                   </div>
@@ -227,7 +228,9 @@
           :class="[{ active: i === activeIndex }, `category-hero__progress-btn--${slide.variant}`]"
           @click="goToSlide(i)"
         >
-          <span :style="{ animationDuration: i === activeIndex ? '9s' : '0s' }"></span>
+          <span
+            :style="{ animationDuration: i === activeIndex ? `${autoplayDuration}ms` : '0s' }"
+          ></span>
         </button>
       </div>
     </div>
@@ -267,6 +270,11 @@
   import { h, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
+  // ═══════════════════════════════════════════════════════════════
+  // ICONS (Composants SVG inline)
+  // ═══════════════════════════════════════════════════════════════
+
+  // Perte de poids / Métabolisme
   const MetabolismIcon = () =>
     h(
       'svg',
@@ -277,6 +285,8 @@
         }),
       ],
     )
+
+  // Bien-être
   const WellbeingIcon = () =>
     h(
       'svg',
@@ -287,6 +297,8 @@
         }),
       ],
     )
+
+  // Performance
   const PerformanceIcon = () =>
     h(
       'svg',
@@ -294,84 +306,362 @@
       [h('path', { d: 'M13 10V3L4 14h7v7l9-11h-7z' })],
     )
 
+  // Récupération
+  const RecoveryIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('path', {
+          d: 'M4.5 12.75l6 6 9-13.5',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ],
+    )
+
+  // Croissance
+  const GrowthIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('path', {
+          d: 'M2 20h.01M7 20v-4M12 20v-8M17 20v-6M22 20v-10',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ],
+    )
+
+  // Anti-âge
+  const AntiAgingIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('circle', { cx: '12', cy: '12', r: '10' }),
+        h('path', { d: 'M12 6v6l4 2', 'stroke-linecap': 'round' }),
+      ],
+    )
+
+  // Nootropique
+  const NootropicIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('path', {
+          d: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ],
+    )
+
+  // Cosmétique
+  const CosmeticIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('path', {
+          d: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ],
+    )
+
+  // Santé / Immunité
+  const HealthIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('path', {
+          d: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ],
+    )
+
+  // Hormonal
+  const HormonalIcon = () =>
+    h(
+      'svg',
+      { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+      [
+        h('circle', { cx: '12', cy: '8', r: '5' }),
+        h('path', { d: 'M12 13v8M9 18h6', 'stroke-linecap': 'round' }),
+      ],
+    )
+
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIGURATION
+  // ═══════════════════════════════════════════════════════════════
+
   const router = useRouter()
+  const autoplayDuration = 9000
+
+  type SlideVariant =
+    | 'success'
+    | 'primary'
+    | 'warning'
+    | 'info'
+    | 'purple'
+    | 'pink'
+    | 'teal'
+    | 'orange'
+    | 'indigo'
+    | 'emerald'
 
   type Slide = {
     id: string
     label: string
-    tag: string
+    category: string // Nom exact de la catégorie pour le filtre
     eyebrow: string
     titleMain: string
     titleAccent: string
     description: string
     youtubeId: string
     videoLabel: string
-    variant: 'success' | 'primary' | 'warning'
+    variant: SlideVariant
     bgImage: string
     icon: ReturnType<typeof h>
     stats: { value: string; label: string }[]
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // SLIDES DATA - Toutes les catégories de Fast Peptides
+  // ═══════════════════════════════════════════════════════════════
+
   const slides = ref<Slide[]>([
+    // 1. Perte de poids (Semaglutide, Tirzepatide, Retatrutide)
     {
-      id: 'metabolism',
-      label: 'Métabolisme',
-      tag: 'Métabolisme',
+      id: 'weight-loss',
+      label: 'Perte de poids',
+      category: 'Perte de poids',
       eyebrow: 'Voies métaboliques',
       titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'le métabolisme',
+      titleAccent: 'la perte de poids',
       description:
-        "Modulation des voies métaboliques, sensibilité à l'insuline et gestion de l'énergie sur modèles précliniques.",
+        "Modulation des voies métaboliques, sensibilité à l'insuline et gestion de l'énergie avec les agonistes GLP-1.",
       youtubeId: '5OjqLrbuA8Y',
-      videoLabel: 'Bases des peptides & métabolisme',
+      videoLabel: 'Comprendre les peptides GLP-1',
       variant: 'success',
-      bgImage: '/images/metabolism-bg.jpg',
+      bgImage: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80',
       icon: MetabolismIcon(),
       stats: [
-        { value: '24+', label: 'Peptides' },
+        { value: '3+', label: 'Peptides' },
         { value: '99%', label: 'Pureté' },
         { value: '48h', label: 'Livraison' },
       ],
     },
+
+    // 2. Récupération (BPC-157, TB-500)
     {
-      id: 'wellbeing',
-      label: 'Bien-être',
-      tag: 'Bien-être',
-      eyebrow: 'Neuro & axes du stress',
+      id: 'recovery',
+      label: 'Récupération',
+      category: 'Récupération',
+      eyebrow: 'Régénération tissulaire',
       titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'le bien-être',
-      description: 'Étude des voies neurobiologiques et de la réponse au stress.',
+      titleAccent: 'la récupération',
+      description:
+        'BPC-157 et TB-500 : le duo "Wolverine Stack" pour la réparation tissulaire et la récupération accélérée.',
       youtubeId: 'qKHknxLvsDY',
-      videoLabel: 'Peptides & réponses immunitaires',
-      variant: 'primary',
-      bgImage: '/images/wellbeing-bg.jpg',
-      icon: WellbeingIcon(),
+      videoLabel: 'BPC-157 & TB-500 expliqués',
+      variant: 'emerald',
+      bgImage: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1600&q=80',
+      icon: RecoveryIcon(),
       stats: [
-        { value: '18+', label: 'Peptides' },
+        { value: '2+', label: 'Peptides' },
         { value: '99%', label: 'Pureté' },
         { value: '48h', label: 'Livraison' },
       ],
     },
+
+    // 3. Croissance (CJC-1295 DAC, GHRP-6, Hexarelin)
+    {
+      id: 'growth',
+      label: 'Croissance',
+      category: 'Croissance',
+      eyebrow: 'Sécrétagogues GH',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: 'la croissance',
+      description:
+        "CJC-1295, GHRP-6, Ipamorelin : stimulation de l'axe GH/IGF-1 pour la croissance et la récupération musculaire.",
+      youtubeId: 'e4V55I45uO8',
+      videoLabel: 'GHRP & CJC-1295 : le guide',
+      variant: 'info',
+      bgImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80',
+      icon: GrowthIcon(),
+      stats: [
+        { value: '4+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 4. Anti-âge (Sermorelin, NAD+)
+    {
+      id: 'anti-aging',
+      label: 'Anti-âge',
+      category: 'Anti-âge',
+      eyebrow: 'Longévité cellulaire',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: "l'anti-âge",
+      description:
+        'Sermorelin et NAD+ : restauration des niveaux de GH et soutien de la réparation cellulaire liée au vieillissement.',
+      youtubeId: 'QRt7LjqJ45k',
+      videoLabel: 'NAD+ & Sermorelin : anti-aging',
+      variant: 'purple',
+      bgImage: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80',
+      icon: AntiAgingIcon(),
+      stats: [
+        { value: '2+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 5. Performance (PEG-MGF)
     {
       id: 'performance',
       label: 'Performance',
-      tag: 'Performance',
-      eyebrow: 'Physiologie de la performance',
+      category: 'Performance',
+      eyebrow: 'Physiologie musculaire',
       titleMain: 'Peptides pour la recherche sur',
       titleAccent: 'la performance',
-      description: 'Exploration de la récupération et des adaptations physiologiques.',
-      youtubeId: 'e4V55I45uO8',
-      videoLabel: 'Panorama des peptides performance',
+      description:
+        'PEG-MGF : facteur de croissance mécanique pour la réparation et le développement des fibres musculaires.',
+      youtubeId: 'Fg3XasXgXjA',
+      videoLabel: 'MGF & performance musculaire',
       variant: 'warning',
-      bgImage: '/images/performance-bg.jpg',
+      bgImage: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600&q=80',
       icon: PerformanceIcon(),
       stats: [
-        { value: '32+', label: 'Peptides' },
+        { value: '1+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 6. Bien-être (Melanotan 2, PT-141)
+    {
+      id: 'wellbeing',
+      label: 'Bien-être',
+      category: 'Bien-être',
+      eyebrow: 'Neuro & axes du stress',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: 'le bien-être',
+      description:
+        'Melanotan 2 et PT-141 : étude des voies mélanocortines et de la réponse neurobiologique.',
+      youtubeId: 'dQw4w9WgXcQ',
+      videoLabel: 'Peptides & bien-être',
+      variant: 'primary',
+      bgImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1600&q=80',
+      icon: WellbeingIcon(),
+      stats: [
+        { value: '2+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 7. Nootropique (Selank, Semax)
+    {
+      id: 'nootropic',
+      label: 'Nootropique',
+      category: 'Nootropique',
+      eyebrow: 'Cognition & neuroprotection',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: 'la cognition',
+      description:
+        "Selank et Semax : peptides nootropiques russes pour la mémoire, le focus et la réduction de l'anxiété.",
+      youtubeId: 'Go3xnyZnPdE',
+      videoLabel: 'Semax & Selank : nootropiques',
+      variant: 'teal',
+      bgImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1600&q=80',
+      icon: NootropicIcon(),
+      stats: [
+        { value: '2+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 8. Cosmétique (GHK-Cu)
+    {
+      id: 'cosmetic',
+      label: 'Cosmétique',
+      category: 'Cosmétique',
+      eyebrow: 'Régénération cutanée',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: 'la peau',
+      description:
+        "GHK-Cu : peptide cuivré pour la synthèse de collagène, l'élasticité cutanée et la cicatrisation.",
+      youtubeId: 'J7DT7TfT8eE',
+      videoLabel: 'GHK-Cu : peptide anti-âge',
+      variant: 'pink',
+      bgImage: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1600&q=80',
+      icon: CosmeticIcon(),
+      stats: [
+        { value: '1+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 9. Santé / Immunité (Thymosin Alpha-1)
+    {
+      id: 'health',
+      label: 'Santé',
+      category: 'Santé',
+      eyebrow: 'Système immunitaire',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: "l'immunité",
+      description:
+        "Thymosin Alpha-1 : modulation immunitaire et soutien des défenses naturelles de l'organisme.",
+      youtubeId: 'xLORsLlcT48',
+      videoLabel: 'Thymosin & immunité',
+      variant: 'emerald',
+      bgImage: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1600&q=80',
+      icon: HealthIcon(),
+      stats: [
+        { value: '1+', label: 'Peptides' },
+        { value: '99%', label: 'Pureté' },
+        { value: '48h', label: 'Livraison' },
+      ],
+    },
+
+    // 10. Hormonal (Kisspeptine-10)
+    {
+      id: 'hormonal',
+      label: 'Hormonal',
+      category: 'Hormonal',
+      eyebrow: 'Axe hypothalamo-hypophysaire',
+      titleMain: 'Peptides pour la recherche sur',
+      titleAccent: 'les hormones',
+      description:
+        "Kisspeptine-10 : régulation de l'axe gonadotrope et étude des mécanismes de fertilité.",
+      youtubeId: 'KDQrMokJ4MQ',
+      videoLabel: 'Kisspeptine & fertilité',
+      variant: 'indigo',
+      bgImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&q=80',
+      icon: HormonalIcon(),
+      stats: [
+        { value: '1+', label: 'Peptides' },
         { value: '99%', label: 'Pureté' },
         { value: '48h', label: 'Livraison' },
       ],
     },
   ])
+
+  // ═══════════════════════════════════════════════════════════════
+  // STATE
+  // ═══════════════════════════════════════════════════════════════
 
   const activeIndex = ref(0)
   const activeVideo = ref<string | null>(null)
@@ -380,49 +670,76 @@
   let autoplayTimer: number | null = null
   let observer: IntersectionObserver | null = null
 
+  // ═══════════════════════════════════════════════════════════════
+  // METHODS
+  // ═══════════════════════════════════════════════════════════════
+
   function goToSlide(i: number) {
     if (i !== activeIndex.value) {
       activeIndex.value = i
       restartAutoplay()
     }
   }
+
   function openVideo(slide: Slide) {
     activeVideo.value = slide.youtubeId
     document.body.style.overflow = 'hidden'
   }
+
   function closeModal() {
     activeVideo.value = null
     document.body.style.overflow = ''
   }
+
   function goToCatalogue() {
     router.push('/catalogue')
   }
+
   function goToCategory(slide: Slide) {
-    router.push({ path: '/catalogue', query: { tag: slide.tag } })
+    // Utilise le nom exact de la catégorie encodé
+    router.push({ path: '/catalogue', query: { categories: slide.category } })
   }
+
+  function handleImageError(event: Event) {
+    // Fallback si la miniature YouTube n'existe pas
+    const img = event.target as HTMLImageElement
+    img.src = 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80'
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // AUTOPLAY
+  // ═══════════════════════════════════════════════════════════════
 
   function startAutoplay() {
     if (autoplayTimer || !isHeroVisible.value) return
     autoplayTimer = window.setInterval(() => {
       activeIndex.value = (activeIndex.value + 1) % slides.value.length
-    }, 9000)
+    }, autoplayDuration)
   }
+
   function stopAutoplay() {
     if (autoplayTimer) {
       clearInterval(autoplayTimer)
       autoplayTimer = null
     }
   }
+
   function restartAutoplay() {
     stopAutoplay()
     if (isHeroVisible.value) startAutoplay()
   }
+
   function pauseAutoplay() {
     stopAutoplay()
   }
+
   function resumeAutoplay() {
     if (isHeroVisible.value) startAutoplay()
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════
 
   onMounted(() => {
     if ('IntersectionObserver' in window && heroSection.value) {
@@ -438,7 +755,9 @@
         { threshold: 0.25 },
       )
       observer.observe(heroSection.value)
-    } else startAutoplay()
+    } else {
+      startAutoplay()
+    }
   })
 
   onBeforeUnmount(() => {
@@ -633,11 +952,18 @@
       min-height: 520px;
     }
 
-    // Nav
+    // Nav - Scrollable horizontally
     &__nav {
       display: flex;
       gap: 8px;
       margin-bottom: 32px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
     &__nav-btn {
       display: flex;
@@ -653,15 +979,51 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s @ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+
+      // Variants
       &--success {
         --nav-color: @success-500;
+        --nav-color-rgb: var(--success-500-rgb);
       }
       &--primary {
         --nav-color: var(--primary-500);
+        --nav-color-rgb: var(--primary-500-rgb);
       }
       &--warning {
         --nav-color: @warning-500;
+        --nav-color-rgb: var(--warning-500-rgb);
       }
+      &--info {
+        --nav-color: #3b82f6;
+        --nav-color-rgb: 59, 130, 246;
+      }
+      &--purple {
+        --nav-color: #8b5cf6;
+        --nav-color-rgb: 139, 92, 246;
+      }
+      &--pink {
+        --nav-color: #ec4899;
+        --nav-color-rgb: 236, 72, 153;
+      }
+      &--teal {
+        --nav-color: #14b8a6;
+        --nav-color-rgb: 20, 184, 166;
+      }
+      &--orange {
+        --nav-color: #f97316;
+        --nav-color-rgb: 249, 115, 22;
+      }
+      &--indigo {
+        --nav-color: #6366f1;
+        --nav-color-rgb: 99, 102, 241;
+      }
+      &--emerald {
+        --nav-color: #10b981;
+        --nav-color-rgb: 16, 185, 129;
+      }
+
       &:hover {
         background: rgba(var(--secondary-600-rgb), 0.6);
         color: @neutral-200;
@@ -714,15 +1076,46 @@
       align-items: center;
     }
 
-    // Variants
+    // Slide Variants
     &__slide--success {
       --slide-color: @success-500;
+      --slide-color-rgb: var(--success-500-rgb);
     }
     &__slide--primary {
       --slide-color: var(--primary-500);
+      --slide-color-rgb: var(--primary-500-rgb);
     }
     &__slide--warning {
       --slide-color: @warning-500;
+      --slide-color-rgb: var(--warning-500-rgb);
+    }
+    &__slide--info {
+      --slide-color: #3b82f6;
+      --slide-color-rgb: 59, 130, 246;
+    }
+    &__slide--purple {
+      --slide-color: #8b5cf6;
+      --slide-color-rgb: 139, 92, 246;
+    }
+    &__slide--pink {
+      --slide-color: #ec4899;
+      --slide-color-rgb: 236, 72, 153;
+    }
+    &__slide--teal {
+      --slide-color: #14b8a6;
+      --slide-color-rgb: 20, 184, 166;
+    }
+    &__slide--orange {
+      --slide-color: #f97316;
+      --slide-color-rgb: 249, 115, 22;
+    }
+    &__slide--indigo {
+      --slide-color: #6366f1;
+      --slide-color-rgb: 99, 102, 241;
+    }
+    &__slide--emerald {
+      --slide-color: #10b981;
+      --slide-color-rgb: 16, 185, 129;
     }
 
     // Text
@@ -765,6 +1158,7 @@
         background: linear-gradient(135deg, var(--slide-color), rgba(var(--slide-color-rgb), 0.7));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
     &__desc {
@@ -1008,6 +1402,7 @@
       gap: 8px;
       margin-top: 28px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     &__progress-btn {
       width: 48px;
@@ -1019,6 +1414,8 @@
       padding: 0;
       border: none;
       transition: all 0.3s @ease;
+
+      // Variants
       &--success {
         --prog-color: @success-500;
       }
@@ -1028,13 +1425,35 @@
       &--warning {
         --prog-color: @warning-500;
       }
+      &--info {
+        --prog-color: #3b82f6;
+      }
+      &--purple {
+        --prog-color: #8b5cf6;
+      }
+      &--pink {
+        --prog-color: #ec4899;
+      }
+      &--teal {
+        --prog-color: #14b8a6;
+      }
+      &--orange {
+        --prog-color: #f97316;
+      }
+      &--indigo {
+        --prog-color: #6366f1;
+      }
+      &--emerald {
+        --prog-color: #10b981;
+      }
+
       &:hover {
         background: rgba(var(--neutral-100-rgb), 0.2);
       }
       &.active {
         width: 72px;
         span {
-          animation: progress 9s linear forwards;
+          animation: progress linear forwards;
         }
       }
       span {
@@ -1145,7 +1564,8 @@
         min-height: auto;
       }
       &__nav {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
       }
       &__slide-inner {
         grid-template-columns: 1fr;
