@@ -82,7 +82,7 @@
   .loader-overlay {
     position: absolute;
     inset: 0;
-    background: color-mix(in srgb, @neutral-50 70%, transparent);
+    // background: color-mix(in srgb, @neutral-50 70%, transparent);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -93,6 +93,6 @@
   /* ✨ Transition fade douce */
   .fade-enter-from,
   .fade-leave-to {
-    opacity: 0;
+    // opacity: 0;
   }
 </style>

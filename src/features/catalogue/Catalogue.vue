@@ -1,143 +1,449 @@
 <template>
-  <div
-    class="catalogue"
-    v-responsive-animate.fade.once
-  >
-    <PageHeader>
-      <div
-        v-if="isMobile"
-        class="catalogue__mobile-controls"
-      >
-        <WrapperInput
-          v-model="searchTerm"
-          placeholder="Rechercher..."
-          icon-left="search"
-          size="small"
-          class="catalogue__search-input"
-        />
-        <WrapperButton
-          button-label="Filtres"
-          type="primary"
-          variant="outlined"
-          size="small"
-          icon-left="SlidersHorizontal"
-          aria-controls="mobile-filter-modal"
-          @click="showFilters = true"
-        />
-      </div>
-    </PageHeader>
-
-    <div class="catalogue__body">
-      <aside
-        v-if="!isMobile"
-        class="catalogue__filters"
-        aria-label="Panneau de filtres"
-      >
-        <FilterPanel
-          :all-open="allOpen"
-          v-model:filterOpen="filterOpen"
-          v-model:priceRange="priceRange"
-          v-model:selectedCategories="selectedCategories"
-          v-model:inStockOnly="inStockOnly"
-          v-model:selectedTags="selectedTags"
-          :categoryItems="categoryItemsWithCounts"
-          :stockCount="stockCount"
-          :tagItems="tagItemsWithCounts"
-          :tags="allTags"
-          @toggleAll="toggleAll"
-          @resetAll="resetAll"
-          @toggleTag="toggleTag"
-        />
-      </aside>
-
-      <section
-        class="catalogue__list"
-        aria-live="polite"
-      >
-        <div class="catalogue__interface">
-          <div class="catalogue__interface-top">
-            <WrapperInput
-              v-if="!isMobile"
-              v-model="searchTerm"
-              placeholder="Rechercher un peptide..."
-              icon-left="search"
-              size="small"
-              class="catalogue__search-input-desktop"
-            />
-            <WrapperDropdown
-              v-model="sortBy"
-              :items="sortItems"
-              force-value
-              size="small"
-              aria-label="Trier"
-              class="catalogue__sort-dropdown"
-            />
-          </div>
-
-          <div
-            class="catalogue__interface-bottom"
-            v-if="hasLoaded && finalProducts.length > 0"
-          >
-            <BasicText
-              size="body-s"
-              color="neutral-400"
-              class="catalogue__count"
-            >
-              <strong style="color: var(--neutral-50)">{{ finalProducts.length }}</strong>
-              résultat{{ finalProducts.length > 1 ? 's' : '' }}
-            </BasicText>
-          </div>
-        </div>
-        <WrapperLoader
-          :loading="loading"
-          :has-loaded="hasLoaded"
-          :is-empty="hasLoaded && finalProducts.length === 0"
-          message="Chargement..."
-        >
-          <template #empty>
-            <div class="catalogue__empty-state">
-              <div class="catalogue__empty-icon">
-                <BasicIcon
-                  name="search"
-                  size="48"
-                  color="neutral-400"
-                />
-              </div>
-              <BasicText
-                size="h4"
-                weight="bold"
-                color="neutral-100"
-              >
-                Aucun résultat trouvé
-              </BasicText>
-              <BasicButton
-                label="Réinitialiser les filtres"
-                type="primary"
-                size="small"
-                @click="resetAll"
-                class="catalogue__empty-btn"
-              />
-            </div>
-          </template>
-
-          <div
-            v-if="finalProducts.length"
-            class="catalogue__grid"
-            v-responsive-animate.zoom.scroll.stagger="{ delay: 50, speed: 500 }"
-          >
-            <ProductCart
-              v-for="product in paginatedProducts"
-              :key="product.id"
-              :product="product"
-              @view="viewProduct"
-              @add="addToCart"
-              @buy="handleBuyNow"
-            />
-          </div>
-        </WrapperLoader>
-      </section>
+  <div class="catalogue-page">
+    <!-- Background décoratif -->
+    <div class="catalogue-page__bg">
+      <div class="catalogue-page__gradient"></div>
+      <div class="catalogue-page__gradient catalogue-page__gradient--2"></div>
+      <div class="catalogue-page__pattern"></div>
     </div>
 
+    <div class="catalogue-page__container">
+      <!-- Header existant -->
+      <PageHeader>
+        <!-- Quick Category Filters (sous le header) -->
+        <div class="catalogue-quick-nav">
+          <button
+            class="catalogue-chip"
+            :class="{ 'catalogue-chip--active': selectedCategories.length === 0 }"
+            @click="selectedCategories = []"
+          >
+            <span class="catalogue-chip__icon">✨</span>
+            Tous
+            <span class="catalogue-chip__count">{{ products.length }}</span>
+          </button>
+          <button
+            v-for="cat in topCategories"
+            :key="cat.id"
+            class="catalogue-chip"
+            :class="{ 'catalogue-chip--active': selectedCategories.includes(cat.id) }"
+            @click="toggleCategory(cat.id)"
+          >
+            <span
+              class="catalogue-chip__dot"
+              :style="{ background: getCategoryColor(cat.id) }"
+            ></span>
+            {{ cat.label }}
+            <span class="catalogue-chip__count">{{ cat.count }}</span>
+          </button>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div
+          v-if="isMobile"
+          class="catalogue-mobile-bar"
+        >
+          <div class="catalogue-search catalogue-search--mobile">
+            <svg
+              class="catalogue-search__icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle
+                cx="11"
+                cy="11"
+                r="8"
+              />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              v-model="searchTerm"
+              type="text"
+              class="catalogue-search__input"
+              placeholder="Rechercher..."
+            />
+          </div>
+          <button
+            class="catalogue-filter-btn"
+            @click="showFilters = true"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+            </svg>
+            Filtres
+            <span
+              v-if="activeFiltersCount"
+              class="catalogue-filter-btn__badge"
+            >
+              {{ activeFiltersCount }}
+            </span>
+          </button>
+        </div>
+      </PageHeader>
+
+      <!-- Main Content -->
+      <div class="catalogue-body">
+        <!-- Sidebar avec FilterPanel existant -->
+        <aside
+          v-if="!isMobile"
+          class="catalogue-sidebar"
+        >
+          <FilterPanel
+            :all-open="allOpen"
+            v-model:filterOpen="filterOpen"
+            v-model:priceRange="priceRange"
+            v-model:selectedCategories="selectedCategories"
+            v-model:inStockOnly="inStockOnly"
+            v-model:selectedTags="selectedTags"
+            :categoryItems="categoryItemsWithCounts"
+            :stockCount="stockCount"
+            :tagItems="tagItemsWithCounts"
+            :tags="allTags"
+            @toggleAll="toggleAll"
+            @resetAll="resetAll"
+            @toggleTag="toggleTag"
+          />
+        </aside>
+
+        <!-- Products Section -->
+        <main class="catalogue-main">
+          <!-- Toolbar -->
+          <div class="catalogue-toolbar">
+            <!-- Search Desktop -->
+            <div
+              v-if="!isMobile"
+              class="catalogue-search"
+            >
+              <svg
+                class="catalogue-search__icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="8"
+                />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                v-model="searchTerm"
+                type="text"
+                class="catalogue-search__input"
+                placeholder="Rechercher un peptide..."
+              />
+              <button
+                v-if="searchTerm"
+                class="catalogue-search__clear"
+                @click="searchTerm = ''"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Results count - bien séparé -->
+            <div class="catalogue-toolbar__results">
+              <span class="catalogue-toolbar__count">{{ finalProducts.length }}</span>
+              <span class="catalogue-toolbar__label">
+                résultat{{ finalProducts.length > 1 ? 's' : '' }}
+              </span>
+            </div>
+
+            <!-- Right side controls -->
+            <div class="catalogue-toolbar__right">
+              <!-- Sort -->
+              <select
+                v-model="sortBy"
+                class="catalogue-toolbar__select"
+              >
+                <option
+                  v-for="item in sortItems"
+                  :value="item"
+                >
+                  {{ item.label }}
+                </option>
+              </select>
+
+              <!-- View Mode Toggle -->
+              <div class="catalogue-toolbar__view">
+                <button
+                  class="catalogue-toolbar__view-btn"
+                  :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }"
+                  @click="viewMode = 'grid'"
+                  title="Vue grille"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="7"
+                      height="7"
+                      rx="1"
+                    />
+                    <rect
+                      x="14"
+                      y="3"
+                      width="7"
+                      height="7"
+                      rx="1"
+                    />
+                    <rect
+                      x="3"
+                      y="14"
+                      width="7"
+                      height="7"
+                      rx="1"
+                    />
+                    <rect
+                      x="14"
+                      y="14"
+                      width="7"
+                      height="7"
+                      rx="1"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="catalogue-toolbar__view-btn"
+                  :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'list' }"
+                  @click="viewMode = 'list'"
+                  title="Vue liste"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Filters Pills -->
+          <div
+            v-if="hasActiveFilters"
+            class="catalogue-active-filters"
+          >
+            <div class="catalogue-active-filters__list">
+              <span class="catalogue-active-filters__label">Filtres:</span>
+
+              <button
+                v-for="cat in selectedCategories"
+                :key="`cat-${cat}`"
+                class="catalogue-pill"
+                @click="toggleCategory(cat)"
+              >
+                <span
+                  class="catalogue-pill__dot"
+                  :style="{ background: getCategoryColor(cat) }"
+                ></span>
+                {{ cat }}
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+
+              <button
+                v-for="tag in selectedTags"
+                :key="`tag-${tag}`"
+                class="catalogue-pill"
+                @click="toggleTag(tag)"
+              >
+                {{ tag }}
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+
+              <button
+                v-if="inStockOnly"
+                class="catalogue-pill"
+                @click="inStockOnly = false"
+              >
+                En stock uniquement
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <button
+              class="catalogue-active-filters__clear"
+              @click="resetAll"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              Tout effacer
+            </button>
+          </div>
+
+          <!-- Products Grid -->
+          <WrapperLoader
+            :loading="loading"
+            :has-loaded="hasLoaded"
+            :is-empty="hasLoaded && finalProducts.length === 0"
+            message="Chargement des peptides..."
+          >
+            <template #empty>
+              <div class="catalogue-empty">
+                <div class="catalogue-empty__icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <circle
+                      cx="11"
+                      cy="11"
+                      r="8"
+                    />
+                    <path d="M21 21l-4.35-4.35" />
+                  </svg>
+                </div>
+                <h3 class="catalogue-empty__title">Aucun peptide trouvé</h3>
+                <p class="catalogue-empty__text">
+                  Essayez de modifier vos filtres ou votre recherche
+                </p>
+                <button
+                  class="catalogue-empty__btn"
+                  @click="resetAll"
+                >
+                  Réinitialiser les filtres
+                </button>
+              </div>
+            </template>
+
+            <div
+              class="catalogue-grid"
+              :class="{ 'catalogue-grid--list': viewMode === 'list' }"
+            >
+              <ProductCart
+                v-for="product in paginatedProducts"
+                :key="product.id"
+                :product="product"
+                @view="viewProduct"
+                @add="addToCart"
+                @buy="handleBuyNow"
+              />
+            </div>
+          </WrapperLoader>
+
+          <!-- Pagination -->
+          <div
+            v-if="totalPages > 1"
+            class="catalogue-pagination"
+          >
+            <button
+              class="catalogue-pagination__btn"
+              :disabled="page === 1"
+              @click="page--"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              Précédent
+            </button>
+
+            <span class="catalogue-pagination__info">Page {{ page }} sur {{ totalPages }}</span>
+
+            <button
+              class="catalogue-pagination__btn"
+              :disabled="page === totalPages"
+              @click="page++"
+            >
+              Suivant
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Mobile Filter Modal -->
     <ModalComponent
       id="mobile-filter-modal"
       v-model="showFilters"
@@ -163,21 +469,16 @@
         />
       </template>
       <template #actions>
-        <div
-          class="justify-content-center flex"
-          style="width: 100%"
-        >
+        <div class="catalogue-modal-actions">
           <BasicButton
-            label="Reset"
+            label="Réinitialiser"
             type="secondary"
             variant="outlined"
             @click="resetAll"
-            style="margin-right: 10px"
           />
           <BasicButton
-            label="Voir les produits"
+            :label="`Voir ${finalProducts.length} résultats`"
             type="primary"
-            block
             @click="showFilters = false"
           />
         </div>
@@ -199,7 +500,7 @@
   import { BasicButton } from '@designSystem/components/basic/button'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { storeToRefs } from 'pinia'
-  import { onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
@@ -208,10 +509,10 @@
   const { products, priceRange, hasLoaded, loading } = storeToRefs(productsStore)
   const { load } = productsStore
   const route = useRoute()
-  const { isMobile } = useDeviceBreakpoint()
   const router = useRouter()
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
+  const { isMobile } = useDeviceBreakpoint()
 
   const {
     selectedCategories,
@@ -224,6 +525,7 @@
     filteredProducts,
     toggleTag,
   } = useFilters(products, priceRange)
+
   const {
     searchTerm,
     sortBy,
@@ -233,8 +535,75 @@
     paginatedProducts,
     filteredProducts: finalProducts,
   } = usePagination(filteredProducts)
+
   const { filterOpen, allOpen, toggleAll } = useFilterSections()
+
+  // UI State
   const showFilters = ref(false)
+  const viewMode = ref<'grid' | 'list'>('grid')
+
+  // Category colors
+  const categoryColors: Record<string, string> = {
+    Récupération: '#10B981',
+    'Perte de poids': '#F59E0B',
+    Croissance: '#3B82F6',
+    'Anti-âge': '#8B5CF6',
+    Performance: '#EF4444',
+    'Bien-être': '#EC4899',
+    Hormonal: '#6366F1',
+    Nootropique: '#14B8A6',
+    Cosmétique: '#F472B6',
+    Santé: '#22C55E',
+  }
+
+  const getCategoryColor = (category: string): string => {
+    return categoryColors[category] || 'var(--primary-500)'
+  }
+
+  // Extraire le count depuis le label (format: "Category (X)")
+  const extractCount = (label: string): number => {
+    const match = label.match(/\((\d+)\)$/)
+    return match ? parseInt(match[1]!, 10) : 0
+  }
+
+  // Extraire le nom de catégorie sans le count
+  const extractCategoryName = (label: string): string => {
+    return label.replace(/\s*\(\d+\)$/, '')
+  }
+
+  // Top categories for quick nav (avec count extrait du label)
+  const topCategories = computed(() => {
+    return categoryItemsWithCounts.value
+      .map((cat) => ({
+        id: cat.id,
+        label: extractCategoryName(cat.label),
+        count: extractCount(cat.label),
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6)
+  })
+
+  // Active filters
+  const hasActiveFilters = computed(() => {
+    return selectedCategories.value.length > 0 || selectedTags.value.length > 0 || inStockOnly.value
+  })
+
+  const activeFiltersCount = computed(() => {
+    return selectedCategories.value.length + selectedTags.value.length + (inStockOnly.value ? 1 : 0)
+  })
+
+  // Pagination
+  const totalPages = computed(() => Math.ceil(finalProducts.value.length / pageSize.value))
+
+  // Methods
+  function toggleCategory(id: string) {
+    const idx = selectedCategories.value.indexOf(id)
+    if (idx >= 0) {
+      selectedCategories.value.splice(idx, 1)
+    } else {
+      selectedCategories.value.push(id)
+    }
+  }
 
   function resetAll() {
     selectedCategories.value = []
@@ -256,32 +625,24 @@
     showAddToCartToast(p)
   }
 
-  const handleBuyNow = async (product: Products) => {
+  async function handleBuyNow(product: Products) {
     await cart.addToCart(product)
     router.push('/checkout')
   }
 
   function scrollToProductList() {
-    const listElement = document.querySelector('.catalogue__list')
-    if (listElement) listElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const el = document.querySelector('.catalogue-main')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   function updateUrl() {
-    const query: any = {}
+    const query: Record<string, string> = {}
     if (searchTerm.value) query.search = searchTerm.value
     if (selectedCategories.value.length) query.categories = selectedCategories.value.join(',')
     if (selectedTags.value.length) query.tags = selectedTags.value.join(',')
     if (inStockOnly.value) query.stock = 'true'
     if (sortBy.value !== 'default') query.sort = sortBy.value
     if (page.value > 1) query.page = page.value.toString()
-    if (pageSize.value !== 24) query.size = pageSize.value.toString()
-    if (
-      priceRange.value.from > priceRange.value.min ||
-      priceRange.value.to < priceRange.value.max
-    ) {
-      query.minPrice = priceRange.value.from
-      query.maxPrice = priceRange.value.to
-    }
     router.replace({ query })
   }
 
@@ -291,27 +652,27 @@
     if (q.categories) selectedCategories.value = (q.categories as string).split(',')
     if (q.tags) selectedTags.value = (q.tags as string).split(',')
     if (q.stock === 'true') inStockOnly.value = true
-    if (q.sort) sortBy.value = q.sort as any
+    if (q.sort) sortBy.value = q.sort as 'default' | 'price-asc' | 'price-desc' | 'new'
     if (q.page) page.value = parseInt(q.page as string)
-    if (q.size) pageSize.value = parseInt(q.size as string)
   }
 
   onMounted(async () => {
     await load()
     loadFromUrl()
-    document.title = (route.meta.title as string) || 'Catalogue'
+    document.title = (route.meta.title as string) || 'Catalogue – Fast Peptides'
   })
 
+  // ⚠️ PAS de scrollToProductList() ici - c'est ça qui causait le scroll brutal
   watch(
     [selectedCategories, inStockOnly, selectedTags, priceRange, sortBy, searchTerm, pageSize],
     () => {
       page.value = 1
-      scrollToProductList()
       updateUrl()
     },
     { deep: true },
   )
 
+  // Scroll uniquement lors du changement de PAGE (pagination)
   watch(page, () => {
     scrollToProductList()
     updateUrl()
@@ -319,205 +680,618 @@
 </script>
 
 <style scoped lang="less">
-  .catalogue {
-    width: 100%;
+  @font-display:
+    'Instrument Sans',
+    'SF Pro Display',
+    -apple-system,
+    sans-serif;
+  @font-body:
+    'Inter',
+    'SF Pro Text',
+    -apple-system,
+    sans-serif;
+  @ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  .catalogue-page {
+    position: relative;
     min-height: 100vh;
+    padding-bottom: 80px;
+    // background: var(--secondary-100);
+
+    &__bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    &__gradient {
+      position: absolute;
+      top: 0;
+      left: 10%;
+      width: 50%;
+      height: 50%;
+      background: radial-gradient(
+        ellipse at top left,
+        rgba(var(--primary-500-rgb), 0.08) 0%,
+        transparent 60%
+      );
+      filter: blur(80px);
+
+      &--2 {
+        top: auto;
+        bottom: 0;
+        left: auto;
+        right: 10%;
+        background: radial-gradient(
+          ellipse at bottom right,
+          rgba(var(--primary-600-rgb), 0.06) 0%,
+          transparent 60%
+        );
+      }
+    }
+
+    &__pattern {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
+    }
+
+    &__container {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 24px 0;
+    }
+  }
+
+  // Quick Nav
+  .catalogue-quick-nav {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px 0;
-    opacity: 0;
-    animation: fadeIn 0.6s ease forwards;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
 
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
+  .catalogue-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    font-family: @font-body;
+    font-size: 13px;
+    font-weight: 500;
+    color: @neutral-400;
+    cursor: pointer;
+    transition: all 0.2s @ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: @neutral-200;
     }
 
-    &__mobile-controls {
-      display: flex;
-      gap: 12px;
-      margin-top: 10px;
-      @media (max-width: 600px) {
-        flex-direction: column;
-      }
+    &--active {
+      background: rgba(var(--primary-500-rgb), 0.12);
+      border-color: rgba(var(--primary-500-rgb), 0.3);
+      color: var(--primary-300);
     }
 
-    &__search-input {
-      flex-grow: 1;
+    &__icon {
+      font-size: 14px;
     }
 
-    &__body {
-      align-self: center;
-      max-width: 1400px;
-      display: flex;
-      width: 100%;
-      gap: 24px;
-      justify-content: center;
-    }
-
-    /* SIDEBAR FILTERS */
-    &__filters {
-      width: 250px;
+    &__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       flex-shrink: 0;
-      background: rgba(var(--secondary-900-rgb), 0.95);
-      border: 1px solid color-mix(in srgb, @neutral-300 20%, transparent);
-      padding: 20px;
-      border-top-right-radius: 12px;
-      border-bottom-right-radius: 12px;
-      height: fit-content;
-      position: sticky;
-      top: 20px;
-
-      :deep(.FilterPanel__head .BasicText) {
-        color: @neutral-50 !important;
-      }
-      :deep(.FilterSection__content .BasicText) {
-        color: @neutral-200 !important;
-      }
-    }
-
-    /* LISTE PRINCIPALE */
-    &__list {
-      flex: 1;
-      min-height: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* === INTERFACE UNIFIÉE === */
-    &__interface {
-      display: flex;
-      flex-direction: column;
-      background: rgba(var(--secondary-900-rgb), 0.95);
-      border: 1px solid color-mix(in srgb, @neutral-300 20%, transparent);
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-    }
-
-    /* Ligne du Haut (Recherche + Tri) CORRIGÉE */
-    &__interface-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 20px; /* Padding augmenté pour aérer */
-
-      .catalogue__search-input-desktop {
-        flex: 1; /* Prend tout l'espace disponible */
-        max-width: none; /* Suppression de la limite qui créait le trou */
-      }
-
-      .catalogue__sort-dropdown {
-        width: 200px; /* Largeur fixe propre */
-        flex-shrink: 0;
-      }
-    }
-
-    /* Ligne du Bas (Pagination) */
-    &__interface-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-    }
-
-    &__tools {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
     }
 
     &__count {
-      opacity: 0.8;
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: @neutral-500;
     }
 
-    .separator {
-      width: 1px;
-      height: 16px;
+    &--active &__count {
+      background: rgba(var(--primary-500-rgb), 0.2);
+      color: var(--primary-400);
+    }
+  }
+
+  // Mobile Bar
+  .catalogue-mobile-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .catalogue-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: rgba(var(--primary-500-rgb), 0.1);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.3);
+    border-radius: 12px;
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-400);
+    cursor: pointer;
+    white-space: nowrap;
+
+    &__badge {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: var(--primary-500);
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // Body Layout
+  .catalogue-body {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  // Sidebar
+  .catalogue-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    height: fit-content;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    padding: 20px;
+    background: rgba(var(--secondary-900-rgb), 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+  }
+
+  // Main
+  .catalogue-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // =============================================
+  // TOOLBAR - Design clair et bien séparé
+  // =============================================
+  .catalogue-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    background: rgba(var(--secondary-900-rgb), 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 16px;
+
+    &__results {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(var(--primary-500-rgb), 0.1);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.2);
+      border-radius: 10px;
+      flex-shrink: 0; // ✅ Important !
+    }
+
+    &__count {
+      font-family: @font-display;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-400);
+    }
+
+    &__label {
+      font-family: @font-body;
+      font-size: 14px;
+      color: @neutral-400;
+    }
+
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    &__select {
+      padding: 10px 36px 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      font-family: @font-body;
+      font-size: 13px;
+      color: @neutral-200;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-500);
+      }
+
+      option {
+        background: var(--secondary-900);
+        color: @neutral-200;
+      }
+    }
+
+    &__view {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+    }
+
+    &__view-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: @neutral-500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        color: @neutral-300;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      &--active {
+        background: rgba(var(--primary-500-rgb), 0.15);
+        color: var(--primary-400);
+      }
+    }
+  }
+
+  // Search
+  .catalogue-search {
+    position: relative;
+    flex: 1;
+    display: flex;
+    max-width: 320px;
+    min-width: 180px;
+
+    &--mobile {
+      flex: 1;
+      max-width: none;
+    }
+
+    &__icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: @neutral-500;
+      pointer-events: none;
+    }
+
+    &__input {
+      width: 100%;
+      padding: 10px 14px 10px 42px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      font-family: @font-body;
+      font-size: 14px;
+      color: @neutral-100;
+      outline: none;
+
+      &::placeholder {
+        color: @neutral-600;
+      }
+
+      &:focus {
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
+      }
+    }
+
+    &__clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
       background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 6px;
+      color: @neutral-400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: @neutral-100;
+      }
+    }
+  }
+
+  // Active Filters
+  .catalogue-active-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(var(--secondary-900-rgb), 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    margin-bottom: 16px;
+
+    &__list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
     }
 
-    &__page-size {
+    &__label {
+      font-family: @font-body;
+      font-size: 13px;
+      font-weight: 500;
+      color: @neutral-400;
+    }
+
+    &__clear {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-family: @font-body;
+      font-size: 12px;
+      color: @neutral-400;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: @neutral-200;
+      }
+    }
+  }
+
+  .catalogue-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(var(--primary-500-rgb), 0.1);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.25);
+    border-radius: 8px;
+    font-family: @font-body;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary-300);
+    cursor: pointer;
+
+    &__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    svg {
+      color: var(--primary-400);
+      opacity: 0.7;
+    }
+
+    &:hover {
+      background: rgba(var(--primary-500-rgb), 0.15);
+    }
+  }
+
+  // Grid
+  .catalogue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+
+    &--list {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  // Empty State
+  .catalogue-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 40px;
+    text-align: center;
+
+    &__icon {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: @neutral-600;
+      margin-bottom: 24px;
+    }
+
+    &__title {
+      font-family: @font-display;
+      font-size: 22px;
+      font-weight: 600;
+      color: @neutral-200;
+      margin: 0 0 8px;
+    }
+
+    &__text {
+      font-family: @font-body;
+      font-size: 15px;
+      color: @neutral-500;
+      margin: 0 0 24px;
+    }
+
+    &__btn {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      border: none;
+      border-radius: 12px;
+      font-family: @font-body;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // Pagination
+  .catalogue-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+    &__btn {
       display: flex;
       align-items: center;
       gap: 8px;
-      .label {
-        font-size: 0.85rem;
-        color: @neutral-400;
-      }
-      .catalogue__size-dropdown {
-        width: 150px;
-      }
-    }
-
-    /* GRID */
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 24px;
-      padding-bottom: 40px;
-    }
-
-    /* EMPTY STATE */
-    &__empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 40px;
-      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
-      border: 1px dashed rgba(255, 255, 255, 0.1);
-    }
-    &__empty-icon {
-      margin-bottom: 4px;
-    }
-    &__empty-btn {
-      margin-top: 8px;
+      font-family: @font-body;
+      font-size: 14px;
+      color: @neutral-300;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      .catalogue__body {
-        flex-direction: column;
-      }
-      .catalogue__filters {
+    &__info {
+      font-family: @font-body;
+      font-size: 14px;
+      color: @neutral-500;
+    }
+  }
+
+  // Modal Actions
+  .catalogue-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  // Responsive
+  @media (max-width: 1100px) {
+    .catalogue-quick-nav {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      padding-bottom: 8px;
+
+      &::-webkit-scrollbar {
         display: none;
       }
+    }
 
-      &__interface-top {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
+    .catalogue-chip {
+      flex-shrink: 0;
+    }
+  }
 
-      /* On s'assure que sur mobile/tablette l'input s'affiche correctement si activé */
-      .catalogue__search-input-desktop {
-        display: none;
-      }
+  @media (max-width: 900px) {
+    .catalogue-sidebar {
+      display: none;
+    }
 
-      .catalogue__sort-dropdown {
+    .catalogue-toolbar {
+      flex-wrap: wrap;
+
+      &__results {
+        order: -1;
         width: 100%;
+        justify-content: center;
       }
 
-      &__interface-bottom {
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-      }
-      &__tools {
+      &__right {
+        margin-left: 0;
         width: 100%;
         justify-content: space-between;
       }
+    }
+
+    .catalogue-search {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .catalogue-page__container {
+      padding: 16px 16px 0;
+    }
+    .catalogue-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .catalogue-pagination {
+      flex-direction: column;
+      gap: 12px;
     }
   }
 </style>

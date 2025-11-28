@@ -34,6 +34,7 @@
     flex-direction: column;
     gap: 0;
     overflow-x: hidden;
+    padding: 50px 0;
   }
 
   .category-section {

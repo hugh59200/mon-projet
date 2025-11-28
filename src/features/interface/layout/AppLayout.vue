@@ -174,14 +174,6 @@
 
     color: @neutral-900;
     transition: padding 0.3s ease;
-    padding: 2.5vw 0;
-
-    @media (max-width: 900px) {
-      padding: 16px 0;
-    }
-    @media (min-width: 1400px) {
-      padding: 50px 0;
-    }
   }
 
   /* Mode Auth plein écran */
