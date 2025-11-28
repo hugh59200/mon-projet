@@ -131,6 +131,7 @@
               :product="product"
               @view="viewProduct"
               @add="addToCart"
+              @buy="handleBuyNow"
             />
           </div>
         </WrapperLoader>
@@ -249,10 +250,17 @@
   function viewProduct(id: string) {
     router.push(`/catalogue/${id}`)
   }
+
   function addToCart(p: Products) {
     cart.addToCart(p)
     showAddToCartToast(p)
   }
+
+  const handleBuyNow = async (product: Products) => {
+    await cart.addToCart(product)
+    router.push('/checkout')
+  }
+
   function scrollToProductList() {
     const listElement = document.querySelector('.catalogue__list')
     if (listElement) listElement.scrollIntoView({ behavior: 'smooth', block: 'start' })

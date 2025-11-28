@@ -66,12 +66,23 @@
       </div>
 
       <div class="product-cart__footer">
+        <!-- Bouton Ajouter au panier -->
         <BasicButton
           :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture'"
           :disabled="(product.stock ?? 0) <= 0"
           :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
           width="full"
           @click.stop="$emit('add', product)"
+        />
+
+        <!-- 🆕 Bouton Acheter (accès direct checkout) -->
+        <BasicButton
+          v-if="(product.stock ?? 0) > 0"
+          label="Acheter"
+          type="secondary"
+          variant="outlined"
+          width="full"
+          @click.stop="$emit('buy', product)"
         />
       </div>
     </div>
@@ -85,7 +96,7 @@
     product: Products
   }>()
 
-  defineEmits(['view', 'add'])
+  defineEmits(['view', 'add', 'buy'])
 </script>
 
 <style scoped lang="less">
@@ -94,7 +105,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 12px;
-    position: relative; // Pour le badge promo
+    position: relative;
 
     background: color-mix(in srgb, @neutral-200 82%, transparent);
     backdrop-filter: blur(12px);
@@ -110,7 +121,7 @@
     transition: all 0.28s ease;
     cursor: pointer;
     user-select: none;
-    min-height: 340px;
+    min-height: 380px; // 🆕 Augmenté pour accueillir le 2ème bouton
 
     &:hover {
       transform: translateY(-4px);
@@ -172,14 +183,13 @@
       overflow: hidden;
     }
 
-    /* Prix V2 */
     &__price-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       margin-top: 2px;
-      min-height: 28px; // Evite le saut de ligne
+      min-height: 28px;
     }
 
     &__old-price {
@@ -191,9 +201,9 @@
     &__footer {
       margin-top: auto;
       padding-top: 10px;
-
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      gap: 8px; // 🆕 Espacement entre les 2 boutons
     }
   }
 

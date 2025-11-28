@@ -131,15 +131,30 @@
             </div>
 
             <div class="product__actions">
-              <BasicButton
-                :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock'"
-                :disabled="(product.stock ?? 0) <= 0"
-                :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
-                variant="filled"
-                size="large"
-                @click="addToCart(product!)"
-                width="full"
-              />
+              <!-- 🆕 Conteneur pour les 2 boutons côte à côte -->
+              <div class="product__buttons-row">
+                <!-- Bouton Ajouter au panier -->
+                <BasicButton
+                  :label="(product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock'"
+                  :disabled="(product.stock ?? 0) <= 0"
+                  :type="(product.stock ?? 0) > 0 ? 'primary' : 'secondary'"
+                  variant="filled"
+                  size="large"
+                  @click="addToCart(product!)"
+                  width="full"
+                />
+
+                <!-- 🆕 Bouton Acheter maintenant -->
+                <BasicButton
+                  v-if="(product.stock ?? 0) > 0"
+                  label="Acheter maintenant"
+                  type="secondary"
+                  variant="outlined"
+                  size="large"
+                  @click="buyNow(product!)"
+                  width="full"
+                />
+              </div>
 
               <BasicText
                 v-if="(product.stock ?? 0) <= 0"
@@ -203,10 +218,11 @@
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import ProductEssentials from '../shared/components/ProductEssentials.vue'
 
   const route = useRoute()
+  const router = useRouter()
   const cart = useCartStore()
   const { showAddToCartToast } = useSmartToast()
 
@@ -236,10 +252,22 @@
     }
   })
 
+  // Ajouter au panier classique
   const addToCart = (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
     cart.addToCart(p)
     showAddToCartToast(p)
+  }
+
+  // 🆕 Acheter maintenant : Ajoute au panier + redirige vers checkout
+  const buyNow = async (p: Products) => {
+    if ((p.stock ?? 0) <= 0) return
+
+    // Ajouter au panier (si pas déjà présent, sinon +1)
+    await cart.addToCart(p)
+
+    // Redirection directe vers le checkout
+    router.push('/checkout')
   }
 </script>
 
@@ -302,9 +330,6 @@
       border: 1px solid @neutral-200;
     }
 
-    /* Titre style "Medical / Pro" 
-       Note: La couleur du texte est gérée par la prop color="secondary-900",
-       ici on gère juste la mise en page et la bordure */
     &__desc-title {
       border-left: 4px solid var(--primary-500);
       padding-left: 16px;
@@ -322,7 +347,6 @@
       line-height: 1.7;
       font-size: 1.05rem;
 
-      /* Style pour le HTML injecté (v-html) qui ne peut pas utiliser BasicText */
       :deep(p) {
         margin-bottom: 16px;
       }
@@ -411,7 +435,18 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-width: 400px;
+      max-width: 500px; // 🆕 Augmenté pour les 2 boutons
+    }
+
+    // 🆕 Conteneur pour les 2 boutons côte à côte
+    &__buttons-row {
+      display: flex;
+      gap: 12px;
+
+      // Sur mobile, on empile verticalement
+      @media (max-width: 500px) {
+        flex-direction: column;
+      }
     }
 
     &__disclaimer {
@@ -445,6 +480,10 @@
         width: 100%;
         justify-content: center;
         flex-wrap: wrap;
+      }
+
+      &__buttons-row {
+        width: 100%;
       }
     }
   }
