@@ -118,7 +118,7 @@
     display: flex;
     justify-content: center;
     padding: 0 24px;
-    background: var(--secondary-950);
+    background: #020202;
   }
 
   // ============================================
@@ -145,18 +145,29 @@
         height: 100%;
         object-fit: cover;
         object-position: center right;
+        mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          black 10%,
+          black 90%,
+          transparent 100%
+        );
       }
     }
 
+    // Overlay - DESKTOP (le plus clair)
     &__bg-overlay {
       position: absolute;
       inset: 0;
       background: linear-gradient(
         90deg,
-        rgba(var(--secondary-950-rgb), 0.97) 0%,
-        rgba(var(--secondary-950-rgb), 0.9) 35%,
-        rgba(var(--secondary-950-rgb), 0.5) 65%,
-        rgba(var(--secondary-950-rgb), 0.2) 100%
+        rgba(2, 2, 2, 0.9) 0%,
+        rgba(2, 2, 2, 0.7) 25%,
+        rgba(2, 2, 2, 0.2) 50%,
+        rgba(2, 2, 2, 0.1) 70%,
+        rgba(2, 2, 2, 0.5) 95%,
+        rgba(2, 2, 2, 0.9) 100%
       );
 
       &::after {
@@ -165,10 +176,10 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          rgba(var(--secondary-950-rgb), 0.3) 0%,
+          rgba(2, 2, 2, 0.6) 0%,
           transparent 15%,
           transparent 85%,
-          rgba(var(--secondary-950-rgb), 0.4) 100%
+          rgba(2, 2, 2, 0.6) 100%
         );
       }
     }
@@ -293,16 +304,26 @@
   }
 
   // ============================================
-  // RESPONSIVE
+  // RESPONSIVE - Assombrissement progressif
   // ============================================
+
+  // TABLETTE LARGE (1100px) - Un peu plus sombre
   @media (max-width: 1100px) {
     .hero-section {
+      &__bg-image img {
+        object-position: 70% center;
+        mask-image: none;
+        -webkit-mask-image: none;
+      }
+
       &__bg-overlay {
         background: linear-gradient(
           90deg,
-          rgba(var(--secondary-950-rgb), 0.97) 0%,
-          rgba(var(--secondary-950-rgb), 0.92) 50%,
-          rgba(var(--secondary-950-rgb), 0.7) 100%
+          rgba(2, 2, 2, 0.95) 0%,
+          rgba(2, 2, 2, 0.8) 25%,
+          rgba(2, 2, 2, 0.4) 50%,
+          rgba(2, 2, 2, 0.3) 70%,
+          rgba(2, 2, 2, 0.6) 100%
         );
       }
 
@@ -313,6 +334,26 @@
     }
   }
 
+  // TABLETTE (900px) - Plus sombre
+  @media (max-width: 900px) {
+    .hero-section {
+      &__bg-overlay {
+        background: linear-gradient(
+          90deg,
+          rgba(2, 2, 2, 0.97) 0%,
+          rgba(2, 2, 2, 0.85) 30%,
+          rgba(2, 2, 2, 0.5) 60%,
+          rgba(2, 2, 2, 0.7) 100%
+        );
+      }
+
+      &__content {
+        padding: 40px;
+      }
+    }
+  }
+
+  // MOBILE LARGE (768px) - Encore plus sombre
   @media (max-width: 768px) {
     .hero-wrapper {
       padding: 0 16px;
@@ -322,8 +363,22 @@
       min-height: auto;
       border-radius: 20px;
 
+      &__bg-image img {
+        object-position: center center;
+      }
+
       &__bg-overlay {
-        background: rgba(var(--secondary-950-rgb), 0.88);
+        background: rgba(2, 2, 2, 0.8);
+
+        &::after {
+          background: linear-gradient(
+            180deg,
+            rgba(2, 2, 2, 0.2) 0%,
+            transparent 20%,
+            transparent 80%,
+            rgba(2, 2, 2, 0.2) 100%
+          );
+        }
       }
 
       &__content {
@@ -335,6 +390,13 @@
     }
 
     .hero {
+      &__badge {
+        &-sep,
+        & > span:last-of-type {
+          display: none;
+        }
+      }
+
       &__actions {
         flex-direction: column;
         width: 100%;
@@ -349,6 +411,38 @@
         flex-direction: column;
         gap: 12px;
         align-items: center;
+      }
+    }
+  }
+
+  // MOBILE PETIT (480px) - Le plus sombre
+  @media (max-width: 480px) {
+    .hero-section {
+      &__bg-overlay {
+        background: rgba(2, 2, 2, 0.85);
+      }
+
+      &__content {
+        padding: 32px 20px;
+        gap: 20px;
+      }
+    }
+
+    .hero {
+      &__title {
+        font-size: 32px;
+      }
+
+      &__desc {
+        font-size: 14px;
+      }
+
+      &__trust {
+        gap: 10px;
+
+        &-item {
+          font-size: 12px;
+        }
       }
     }
   }

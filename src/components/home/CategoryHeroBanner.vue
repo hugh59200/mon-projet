@@ -536,7 +536,7 @@
       titleAccent: 'la performance',
       description:
         'PEG-MGF : facteur de croissance mécanique pour la réparation et le développement des fibres musculaires.',
-      youtubeId: 'Fg3XasXgXjA',
+      youtubeId: 'LNV0CMCAFMs',
       videoLabel: 'MGF & performance musculaire',
       variant: 'warning',
       bgImage: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600&q=80',
@@ -558,7 +558,7 @@
       titleAccent: 'le bien-être',
       description:
         'Melanotan 2 et PT-141 : étude des voies mélanocortines et de la réponse neurobiologique.',
-      youtubeId: 'dQw4w9WgXcQ',
+      youtubeId: 'csSW4whR9vc',
       videoLabel: 'Peptides & bien-être',
       variant: 'primary',
       bgImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1600&q=80',
@@ -580,7 +580,7 @@
       titleAccent: 'la cognition',
       description:
         "Selank et Semax : peptides nootropiques russes pour la mémoire, le focus et la réduction de l'anxiété.",
-      youtubeId: 'Go3xnyZnPdE',
+      youtubeId: 'p3GOtQmPPFo',
       videoLabel: 'Semax & Selank : nootropiques',
       variant: 'teal',
       bgImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1600&q=80',
@@ -602,7 +602,7 @@
       titleAccent: 'la peau',
       description:
         "GHK-Cu : peptide cuivré pour la synthèse de collagène, l'élasticité cutanée et la cicatrisation.",
-      youtubeId: 'J7DT7TfT8eE',
+      youtubeId: '5pAWczByUyg',
       videoLabel: 'GHK-Cu : peptide anti-âge',
       variant: 'pink',
       bgImage: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1600&q=80',
@@ -646,7 +646,7 @@
       titleAccent: 'les hormones',
       description:
         "Kisspeptine-10 : régulation de l'axe gonadotrope et étude des mécanismes de fertilité.",
-      youtubeId: 'KDQrMokJ4MQ',
+      youtubeId: '_3kmSsmQiRU',
       videoLabel: 'Kisspeptine & fertilité',
       variant: 'indigo',
       bgImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&q=80',

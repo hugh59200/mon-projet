@@ -50,7 +50,7 @@
               <span class="value">
                 {{
                   order.is_guest_order
-                    ? order.customer_email || profileInfo.email
+                    ? (order as any).customer_email || profileInfo.email
                     : profileInfo.email
                 }}
               </span>

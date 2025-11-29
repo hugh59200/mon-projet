@@ -1,447 +1,425 @@
 <template>
-  <div class="track-page">
-    <div class="track-bg-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
+  <div class="track">
+    <!-- Background -->
+    <div class="track__bg">
+      <div class="track__bg-gradient"></div>
+      <div class="track__bg-pattern"></div>
+      <div class="track__bg-orb track__bg-orb--1"></div>
+      <div class="track__bg-orb track__bg-orb--2"></div>
     </div>
 
-    <div
-      class="track-container"
-      :class="{ 'is-result': !!order }"
-    >
-      <div
-        class="track-header"
-        :class="{ 'compact-header': !!order }"
-        v-motion-slide-visible-once-top
-      >
-        <div class="icon-wrapper">
-          <BasicIconNext
-            name="PackageSearch"
-            :size="order ? 32 : 42"
-            color="primary-600"
-          />
+    <div class="track__container">
+      <!-- Header -->
+      <header class="track__header" :class="{ 'track__header--compact': !!order }">
+        <div class="track__header-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 8V21H3V8" />
+            <path d="M1 3H23V8H1V3Z" />
+            <path d="M10 12H14" />
+          </svg>
         </div>
-        <div class="header-texts">
-          <BasicText
-            :size="order ? 'h3' : 'h2'"
-            weight="bold"
-            color="neutral-900"
-            class="track-title"
-          >
-            Suivi de commande
-          </BasicText>
-          <BasicText
-            v-if="!order"
-            size="body-l"
-            color="neutral-600"
-            class="track-subtitle text-center"
-          >
-            Consultez l'état d'avancement de votre livraison en un instant.
-          </BasicText>
+        <div class="track__header-text">
+          <h1 class="track__title">Suivi de commande</h1>
+          <p v-if="!order" class="track__subtitle">
+            Consultez l'état d'avancement de votre livraison en temps réel
+          </p>
         </div>
-      </div>
+      </header>
 
-      <transition name="pop-down">
-        <div
-          v-if="errorMessage"
-          class="error-toast"
-        >
-          <div class="icon-error">
-            <BasicIconNext
-              name="AlertCircle"
-              color="danger-600"
-              :size="20"
-            />
+      <!-- Error Toast -->
+      <transition name="slide-down">
+        <div v-if="errorMessage" class="track__error">
+          <div class="track__error-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
           </div>
-          <div class="error-text">
-            <BasicText
-              size="body-s"
-              weight="bold"
-              color="danger-700"
-            >
-              Attention
-            </BasicText>
-            <BasicText
-              size="body-s"
-              color="danger-600"
-            >
-              {{ errorMessage }}
-            </BasicText>
+          <div class="track__error-content">
+            <strong>Attention</strong>
+            <span>{{ errorMessage }}</span>
           </div>
-          <button
-            class="close-btn"
-            @click="errorMessage = ''"
-          >
-            <BasicIconNext
-              name="X"
-              :size="16"
-              color="neutral-500"
-            />
+          <button class="track__error-close" @click="errorMessage = ''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
           </button>
         </div>
       </transition>
 
-      <div
-        v-if="!order"
-        class="search-card"
-        v-motion-pop-visible
-      >
-        <form
-          @submit.prevent="handleSearch"
-          class="form-content"
-        >
-          <div class="inputs-wrapper">
-            <BasicInput
-              v-model="form.orderNumber"
-              label="Numéro de commande"
-              placeholder="Ex: FP-2025-000123"
-              icon-name="Hash"
-              required
-              :error="!!errorMessage"
-              @input="errorMessage = ''"
-            />
-            <BasicInput
-              v-model="form.email"
-              label="Adresse Email"
-              type="email"
-              icon-name="Mail"
-              placeholder="exemple@email.com"
-              required
-              :error="!!errorMessage"
-              @input="errorMessage = ''"
-            />
+      <!-- Search Form -->
+      <div v-if="!order" class="track__search">
+        <div class="track__search-card">
+          <div class="track__search-header">
+            <div class="track__search-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="track__search-title">Localiser ma commande</h2>
+              <p class="track__search-subtitle">Entrez vos informations pour accéder au suivi</p>
+            </div>
           </div>
 
-          <BasicButton
-            label="Localiser mon colis"
-            type="primary"
-            width="full"
-            size="large"
-            :loading="loading"
-            icon-name="ArrowRight"
-            variant="filled"
-            class="search-btn"
-            @click="handleSearch"
-          />
-        </form>
-      </div>
-
-      <div
-        v-else
-        class="result-grid"
-        v-motion-fade
-      >
-        <div class="left-column">
-          <div class="track-widget main-status-widget">
-            <div class="widget-header">
-              <div>
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="neutral-500"
-                  class="mb-1 uppercase"
-                >
-                  Commande
-                </BasicText>
-                <BasicText
-                  size="h3"
-                  weight="bold"
-                  color="neutral-900"
-                >
-                  {{ order.order_number }}
-                </BasicText>
-              </div>
-              <BasicBadge
-                :label="getLabelBadge(order.status)"
-                :type="getTypeBadge(order.status)"
-                class="status-badge-lg"
+          <form @submit.prevent="handleSearch" class="track__form">
+            <div class="track__form-group">
+              <label class="track__label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 7V4h16v3M9 20h6M12 4v16" />
+                </svg>
+                Numéro de commande
+              </label>
+              <input
+                v-model="form.orderNumber"
+                type="text"
+                class="track__input"
+                placeholder="Ex: FP-2025-000123"
+                required
+                :class="{ 'track__input--error': !!errorMessage }"
+                @input="errorMessage = ''"
               />
             </div>
 
-            <div class="timeline-wrapper">
-              <template
-                v-for="(step, index) in TIMELINE_STEPS"
-                :key="step.key"
-              >
-                <div
-                  class="timeline-step"
-                  :class="{ active: isStepActive(step.statuses) }"
-                >
-                  <div class="step-icon">
-                    <BasicIconNext
-                      v-if="isStepActive(step.statuses)"
-                      :name="step.icon as IconNameNext"
-                      :size="14"
-                      color="white"
-                    />
-                    <div
-                      v-else
-                      class="dot"
-                    ></div>
-                  </div>
-                  <BasicText
-                    size="body-s"
-                    weight="bold"
-                    :color="isStepActive(step.statuses) ? 'neutral-900' : 'neutral-400'"
-                  >
-                    {{ step.label }}
-                  </BasicText>
-                  <BasicText
-                    v-if="step.dateField && (order as Record<string, any>)[step.dateField]"
-                    size="body-s"
-                    color="neutral-500"
-                  >
-                    {{ formatDate((order as Record<string, any>)[step.dateField]) }}
-                  </BasicText>
-                </div>
+            <div class="track__form-group">
+              <label class="track__label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                Adresse email
+              </label>
+              <input
+                v-model="form.email"
+                type="email"
+                class="track__input"
+                placeholder="exemple@email.com"
+                required
+                :class="{ 'track__input--error': !!errorMessage }"
+                @input="errorMessage = ''"
+              />
+            </div>
 
-                <div
-                  v-if="index < TIMELINE_STEPS.length - 1"
-                  class="step-line"
-                  :class="{ active: isLineActive(index) }"
-                ></div>
+            <button type="submit" class="track__submit" :disabled="loading">
+              <span v-if="loading" class="track__submit-loader"></span>
+              <template v-else>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                Localiser mon colis
               </template>
-            </div>
+            </button>
+          </form>
+
+          <div class="track__search-footer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>Vos données sont protégées et sécurisées</span>
           </div>
+        </div>
 
-          <div class="details-row">
-            <div class="track-widget detail-widget">
-              <div class="widget-icon">
-                <BasicIconNext
-                  name="MapPin"
-                  :size="20"
-                  color="primary-600"
-                />
+        <!-- Help Section -->
+        <div class="track__help">
+          <h3 class="track__help-title">Besoin d'aide ?</h3>
+          <div class="track__help-items">
+            <div class="track__help-item">
+              <div class="track__help-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
               </div>
-              <div class="widget-content">
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="neutral-500"
-                  class="uppercase"
-                >
-                  Livraison
-                </BasicText>
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="neutral-900"
-                  class="mt-1"
-                >
-                  {{ order.shipping_name }}
-                </BasicText>
-                <BasicText
-                  size="body-s"
-                  color="neutral-600"
-                >
-                  {{ order.shipping_address }}
-                  <br />
-                  {{ order.shipping_zip }} {{ order.shipping_city }}
-                </BasicText>
+              <div>
+                <strong>Email de confirmation</strong>
+                <span>Le numéro de commande se trouve dans votre email de confirmation</span>
               </div>
             </div>
-
-            <div
-              v-if="order.tracking_number"
-              class="track-widget detail-widget tracking-widget"
-            >
-              <div class="widget-icon">
-                <BasicIconNext
-                  name="Box"
-                  :size="20"
-                  color="primary-600"
-                />
+            <div class="track__help-item">
+              <div class="track__help-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg>
               </div>
-              <div class="widget-content">
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="neutral-500"
-                  class="uppercase"
-                >
-                  Transporteur
-                </BasicText>
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="neutral-900"
-                  class="mt-1"
-                >
-                  {{ order.carrier || 'Standard' }}
-                </BasicText>
-                <div
-                  class="tracking-pill"
-                  @click="copyTracking"
-                >
-                  <span class="mono">{{ order.tracking_number }}</span>
-                  <BasicIconNext
-                    :name="copied ? 'Check' : 'Copy'"
-                    :size="12"
-                    :color="copied ? 'success-600' : 'neutral-500'"
-                  />
-                </div>
+              <div>
+                <strong>Contacter le support</strong>
+                <span>Notre équipe répond sous 24h</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="right-column">
-          <div class="track-widget summary-widget">
-            <div class="mb-3 flex justify-content-space-between">
-              <BasicText
-                size="body-m"
-                weight="bold"
-              >
-                Récapitulatif ({{ detailedItemsCount }})
-              </BasicText>
-              <button
-                class="reset-link"
-                @click="resetSearch"
-              >
-                Nouvelle recherche
-              </button>
-            </div>
+      <!-- Results -->
+      <div v-else class="track__results">
+        <!-- Navigation -->
+        <div class="track__nav">
+          <button class="track__nav-back" @click="resetSearch">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Nouvelle recherche
+          </button>
+        </div>
 
-            <div class="items-list custom-scrollbar">
-              <div
-                v-for="item in (order as any)?.detailed_items"
-                :key="item.product_id"
-                class="mini-item"
-              >
-                <img
-                  :src="item.product_image || defaultImage"
-                  class="mini-item__img"
-                />
-                <div class="mini-item__info">
-                  <div class="mini-item__top">
-                    <span class="name">{{ item.product_name }}</span>
-                    <span class="price">{{ formatPrice(item.total) }}</span>
+        <div class="track__grid">
+          <!-- Left Column -->
+          <div class="track__main">
+            <!-- Status Card -->
+            <div class="track__status-card">
+              <div class="track__status-header">
+                <div class="track__status-info">
+                  <span class="track__status-label">Commande</span>
+                  <span class="track__status-number">{{ order.order_number }}</span>
+                </div>
+                <div class="track__status-badge" :class="`track__status-badge--${order.status}`">
+                  <span class="track__status-dot"></span>
+                  {{ getLabelBadge(order.status) }}
+                </div>
+              </div>
+
+              <!-- Timeline -->
+              <div class="track__timeline">
+                <div
+                  v-for="(step, index) in TIMELINE_STEPS"
+                  :key="step.key"
+                  class="track__timeline-step"
+                  :class="{ 'track__timeline-step--active': isStepActive(step.statuses) }"
+                >
+                  <div class="track__timeline-icon">
+                    <svg v-if="isStepActive(step.statuses)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span v-else class="track__timeline-dot"></span>
                   </div>
-                  <div class="mini-item__bot">
-                    <span class="qty">Qté: {{ item.quantity }}</span>
-                    <span
-                      v-if="item.product_dosage"
-                      class="dosage"
-                    >
-                      {{ item.product_dosage }}
+                  <div class="track__timeline-content">
+                    <span class="track__timeline-label">{{ step.label }}</span>
+                    <span v-if="step.dateField && (order as Record<string, any>)[step.dateField]" class="track__timeline-date">
+                      {{ formatDate((order as Record<string, any>)[step.dateField]) }}
                     </span>
                   </div>
+                  <div
+                    v-if="index < TIMELINE_STEPS.length - 1"
+                    class="track__timeline-line"
+                    :class="{ 'track__timeline-line--active': isLineActive(index) }"
+                  ></div>
                 </div>
               </div>
             </div>
 
-            <div class="divider"></div>
+            <!-- Details Cards -->
+            <div class="track__details">
+              <!-- Shipping Address -->
+              <div class="track__detail-card">
+                <div class="track__detail-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </div>
+                <div class="track__detail-content">
+                  <span class="track__detail-label">Adresse de livraison</span>
+                  <strong class="track__detail-name">{{ order.shipping_name }}</strong>
+                  <p class="track__detail-address">
+                    {{ order.shipping_address }}<br />
+                    {{ order.shipping_zip }} {{ order.shipping_city }}
+                  </p>
+                </div>
+              </div>
 
-            <div class="totals-compact">
-              <div class="row">
-                <span>Sous-total</span>
-                <span>{{ formatPrice(order.subtotal) }}</span>
-              </div>
-              <div class="row">
-                <span>Livraison</span>
-                <span>{{ formatPrice(order.shipping_cost) }}</span>
-              </div>
-              <div
-                class="row discount"
-                v-if="order.discount_amount"
-              >
-                <span>Réduction</span>
-                <span>-{{ formatPrice(order.discount_amount) }}</span>
-              </div>
-              <div class="row total">
-                <span>Total</span>
-                <span>{{ formatPrice(order.total_amount) }}</span>
+              <!-- Carrier Info -->
+              <div v-if="order.tracking_number" class="track__detail-card track__detail-card--carrier">
+                <div class="track__detail-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="3" width="15" height="13" rx="2" />
+                    <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
+                    <circle cx="5.5" cy="18.5" r="2.5" />
+                    <circle cx="18.5" cy="18.5" r="2.5" />
+                  </svg>
+                </div>
+                <div class="track__detail-content">
+                  <span class="track__detail-label">Transporteur</span>
+                  <strong class="track__detail-name">{{ order.carrier || 'Colissimo' }}</strong>
+                  <button class="track__tracking-copy" @click="copyTracking">
+                    <span class="track__tracking-number">{{ order.tracking_number }}</span>
+                    <svg v-if="!copied" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                    </svg>
+                    <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div
-            v-if="order.is_guest_order && !auth.user && !registerSuccess"
-            class="track-widget cta-widget"
-          >
-            <div class="cta-header">
-              <div class="cta-icon">
-                <BasicIconNext
-                  name="UserPlus"
-                  :size="20"
-                  color="primary-600"
-                />
+          <!-- Right Column - Suite dans la partie 2 -->
+           <!-- Right Column -->
+          <aside class="track__sidebar">
+            <!-- Order Summary -->
+            <div class="track__summary">
+              <div class="track__summary-header">
+                <h3 class="track__summary-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
+                  </svg>
+                  Récapitulatif
+                </h3>
+                <span class="track__summary-count">{{ detailedItemsCount }} article{{ detailedItemsCount > 1 ? 's' : '' }}</span>
               </div>
-              <div class="cta-texts">
-                <BasicText
-                  size="body-s"
-                  weight="bold"
-                  color="primary-900"
+
+              <!-- Items List -->
+              <div class="track__items">
+                <div
+                  v-for="item in (order as any)?.detailed_items"
+                  :key="item.product_id"
+                  class="track__item"
                 >
-                  Sauvegarder ma commande
-                </BasicText>
-                <BasicText
-                  size="body-s"
-                  color="neutral-600"
+                  <div class="track__item-image">
+                    <img :src="item.product_image || defaultImage" :alt="item.product_name" />
+                  </div>
+                  <div class="track__item-info">
+                    <div class="track__item-top">
+                      <span class="track__item-name">{{ item.product_name }}</span>
+                      <span class="track__item-price">{{ formatPrice(item.total) }}</span>
+                    </div>
+                    <div class="track__item-bottom">
+                      <span class="track__item-qty">Qté: {{ item.quantity }}</span>
+                      <span v-if="item.product_dosage" class="track__item-dosage">
+                        {{ item.product_dosage }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Totals -->
+              <div class="track__totals">
+                <div class="track__totals-row">
+                  <span>Sous-total</span>
+                  <span>{{ formatPrice(order.subtotal) }}</span>
+                </div>
+                <div class="track__totals-row">
+                  <span>Livraison</span>
+                  <span :class="{ 'track__totals-free': order.shipping_cost === 0 }">
+                    {{ order.shipping_cost === 0 ? 'Offerte' : formatPrice(order.shipping_cost) }}
+                  </span>
+                </div>
+                <div v-if="order.discount_amount" class="track__totals-row track__totals-row--discount">
+                  <span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                      <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                    Réduction
+                  </span>
+                  <span>-{{ formatPrice(order.discount_amount) }}</span>
+                </div>
+                <div class="track__totals-divider"></div>
+                <div class="track__totals-row track__totals-row--total">
+                  <span>Total payé</span>
+                  <span>{{ formatPrice(order.total_amount) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guest Registration CTA -->
+            <div
+              v-if="order.is_guest_order && !auth.user && !registerSuccess"
+              class="track__register"
+            >
+              <div class="track__register-header">
+                <div class="track__register-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
+                </div>
+                <div class="track__register-text">
+                  <strong>Créer mon compte</strong>
+                  <span>Retrouvez facilement toutes vos commandes</span>
+                </div>
+              </div>
+
+              <div class="track__register-form">
+                <div class="track__register-email">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  <span>{{ order.shipping_email }}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="track__register-check">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+
+                <div class="track__register-input-wrapper">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                  <input
+                    v-model="newPassword"
+                    type="password"
+                    class="track__register-input"
+                    placeholder="Choisissez un mot de passe"
+                  />
+                </div>
+
+                <button
+                  class="track__register-btn"
+                  :disabled="registerLoading"
+                  @click="handleQuickRegister"
                 >
-                  Définissez un mot de passe pour y accéder plus tard.
-                </BasicText>
+                  <span v-if="registerLoading" class="track__register-loader"></span>
+                  <template v-else>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                      <polyline points="17 11 19 13 23 9" />
+                    </svg>
+                    Créer mon compte
+                  </template>
+                </button>
               </div>
             </div>
 
-            <div class="cta-form">
-              <div class="read-only-email">
-                <BasicIconNext
-                  name="Mail"
-                  :size="14"
-                  color="neutral-500"
-                />
-                <span>{{ order.shipping_email }}</span>
-                <BasicIconNext
-                  name="CheckCircle"
-                  :size="14"
-                  color="success-500"
-                />
+            <!-- Success Message -->
+            <div v-else-if="registerSuccess" class="track__success">
+              <div class="track__success-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
               </div>
-
-              <BasicInput
-                v-model="newPassword"
-                type="password"
-                placeholder="Choisissez un mot de passe"
-                icon-name="Lock"
-                size="small"
-              />
-
-              <BasicButton
-                label="Créer mon compte"
-                type="primary"
-                size="small"
-                width="full"
-                :loading="registerLoading"
-                @click="handleQuickRegister"
-              />
+              <strong class="track__success-title">Compte créé avec succès !</strong>
+              <p class="track__success-text">Un email de confirmation vous a été envoyé.</p>
             </div>
-          </div>
 
-          <div
-            v-else-if="registerSuccess"
-            class="track-widget success-widget"
-          >
-            <BasicIconNext
-              name="CheckCircle"
-              :size="32"
-              color="success-500"
-            />
-            <BasicText
-              size="body-m"
-              weight="bold"
-              color="success-700"
-            >
-              Compte créé !
-            </BasicText>
-            <BasicText
-              size="body-s"
-              color="success-600"
-              class="text-center"
-            >
-              Un email de confirmation vous a été envoyé.
-            </BasicText>
-          </div>
+            <!-- Trust Badges -->
+            <div class="track__trust">
+              <div class="track__trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Données sécurisées</span>
+              </div>
+              <div class="track__trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg>
+                <span>Support 24/7</span>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -449,548 +427,1102 @@
 </template>
 
 <script setup lang="ts">
-  import defaultImage from '@/assets/products/default/default-product-image.png'
-  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/supabase/api/ordersApi'
-  import { supabase } from '@/supabase/supabaseClient'
-  import type { OrdersFullView } from '@/supabase/types/supabase.types'
-  import { getLabelBadge, getTypeBadge } from '@/utils'
-  import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext, { type IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
-  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
-  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { onMounted, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+import defaultImage from '@/assets/products/default/default-product-image.png'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/supabase/api/ordersApi'
+import { supabase } from '@/supabase/supabaseClient'
+import type { OrdersFullView } from '@/supabase/types/supabase.types'
+import { getLabelBadge } from '@/utils'
+import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-  const route = useRoute()
-  const router = useRouter()
-  const auth = useAuthStore()
-  const toast = useToastStore()
+const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+const toast = useToastStore()
 
-  const loading = ref(false)
-  const order = ref<OrdersFullView | null>(null)
-  const errorMessage = ref('')
-  const copied = ref(false)
+// State
+const loading = ref(false)
+const order = ref<OrdersFullView | null>(null)
+const errorMessage = ref('')
+const copied = ref(false)
+const newPassword = ref('')
+const registerLoading = ref(false)
+const registerSuccess = ref(false)
 
-  // Computed property for detailed items count
-  import { computed } from 'vue'
-  const detailedItemsCount = computed(() => {
-    const orderValue = order.value as any
-    return orderValue && Array.isArray(orderValue.detailed_items)
-      ? orderValue.detailed_items.length
-      : 0
+const form = ref({
+  orderNumber: '',
+  email: '',
+})
+
+// Computed
+const detailedItemsCount = computed(() => {
+  const orderValue = order.value as any
+  return orderValue && Array.isArray(orderValue.detailed_items)
+    ? orderValue.detailed_items.length
+    : 0
+})
+
+// Timeline Configuration
+const TIMELINE_STEPS = [
+  {
+    key: 'step1',
+    label: 'Confirmée',
+    icon: 'Check',
+    statuses: ['paid', 'confirmed', 'processing', 'shipped', 'completed'],
+    dateField: 'created_at',
+  },
+  {
+    key: 'step2',
+    label: 'En préparation',
+    icon: 'Package',
+    statuses: ['processing', 'shipped', 'completed'],
+    dateField: null,
+  },
+  {
+    key: 'step3',
+    label: 'Expédiée',
+    icon: 'Truck',
+    statuses: ['shipped', 'completed'],
+    dateField: 'shipped_at',
+  },
+  {
+    key: 'step4',
+    label: 'Livrée',
+    icon: 'Home',
+    statuses: ['completed'],
+    dateField: null,
+  },
+]
+
+// Helpers
+function isStepActive(validStatuses: string[]) {
+  if (!order.value?.status) return false
+  return validStatuses.includes(order.value.status)
+}
+
+function isLineActive(index: number) {
+  const nextStep = TIMELINE_STEPS[index + 1]
+  if (!nextStep) return false
+  return isStepActive(nextStep.statuses)
+}
+
+function formatDate(date: string | null | undefined) {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   })
+}
 
-  // Inscription rapide
-  const newPassword = ref('')
-  const registerLoading = ref(false)
-  const registerSuccess = ref(false)
+function formatPrice(value: number | null | undefined) {
+  if (value == null || isNaN(Number(value))) return '0,00 €'
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(value))
+}
 
-  const form = ref({
-    orderNumber: '',
-    email: '',
-  })
-
-  // 🆕 CONFIGURATION DE LA TIMELINE
-  // Mapping des statuts techniques vers 4 étapes visuelles
-  const TIMELINE_STEPS = [
-    {
-      key: 'step1',
-      label: 'Validée',
-      icon: 'Check',
-      statuses: ['paid', 'confirmed', 'processing', 'shipped', 'completed'],
-      dateField: 'created_at', // La date à afficher sous l'étape
-    },
-    {
-      key: 'step2',
-      label: 'Préparation',
-      icon: 'Package',
-      statuses: ['processing', 'shipped', 'completed'],
-      dateField: null,
-    },
-    {
-      key: 'step3',
-      label: 'Expédiée',
-      icon: 'Truck',
-      statuses: ['shipped', 'completed'],
-      dateField: 'shipped_at',
-    },
-    {
-      key: 'step4',
-      label: 'Livrée',
-      icon: 'Home',
-      statuses: ['completed'],
-      dateField: null,
-    },
-  ]
-
-  // Helper pour savoir si une étape est active
-  function isStepActive(validStatuses: string[]) {
-    if (!order.value?.status) return false
-    return validStatuses.includes(order.value.status)
+// Actions
+onMounted(async () => {
+  const token = route.query.token as string
+  if (token) {
+    await handleTokenTracking(token)
+    return
   }
-
-  // Helper pour savoir si la ligne entre l'étape i et i+1 doit être colorée
-  function isLineActive(index: number) {
-    // La ligne est active si l'étape SUIVANTE est active
-    const nextStep = TIMELINE_STEPS[index + 1]
-    if (!nextStep) return false
-    return isStepActive(nextStep.statuses)
+  if (route.query.email && route.query.ref) {
+    form.value.email = route.query.email as string
+    form.value.orderNumber = route.query.ref as string
+    await handleSearch()
   }
+})
 
-  onMounted(async () => {
-    const token = route.query.token as string
-    if (token) {
-      await handleTokenTracking(token)
-      return
-    }
-    if (route.query.email && route.query.ref) {
-      form.value.email = route.query.email as string
-      form.value.orderNumber = route.query.ref as string
-      await handleSearch()
-    }
-  })
-
-  async function handleTokenTracking(token: string) {
-    loading.value = true
-    errorMessage.value = ''
-    try {
-      const data = await trackGuestOrderByToken(token)
-      order.value = data
-    } catch (err: any) {
-      errorMessage.value = err.message || 'Lien invalide.'
-      order.value = null
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function handleSearch() {
-    errorMessage.value = ''
-    if (!form.value.email || !form.value.orderNumber) {
-      errorMessage.value = 'Champs requis.'
-      return
-    }
-
-    loading.value = true
-    try {
-      const data = await trackGuestOrderByEmail(form.value.email, form.value.orderNumber)
-      order.value = data
-
-      await router.replace({
-        query: {
-          ...route.query,
-          email: form.value.email,
-          ref: form.value.orderNumber,
-          token: undefined,
-        },
-      })
-    } catch (err: any) {
-      errorMessage.value = err.message || 'Introuvable.'
-      order.value = null
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function handleQuickRegister() {
-    if (!newPassword.value || newPassword.value.length < 6) {
-      toast.show('Le mot de passe doit faire au moins 6 caractères', 'warning')
-      return
-    }
-    if (!order.value?.shipping_email) return
-
-    registerLoading.value = true
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: order.value.shipping_email,
-        password: newPassword.value,
-        options: {
-          data: {
-            full_name: order.value.shipping_name || '',
-          },
-        },
-      })
-
-      if (error) throw error
-
-      registerSuccess.value = true
-      toast.show('Compte créé avec succès ! ✅', 'success')
-    } catch (err: any) {
-      console.error(err)
-      toast.show(err.message || 'Erreur lors de la création', 'danger')
-    } finally {
-      registerLoading.value = false
-    }
-  }
-
-  function resetSearch() {
+async function handleTokenTracking(token: string) {
+  loading.value = true
+  errorMessage.value = ''
+  try {
+    const data = await trackGuestOrderByToken(token)
+    order.value = data
+  } catch (err: any) {
+    errorMessage.value = err.message || 'Lien invalide ou expiré.'
     order.value = null
-    errorMessage.value = ''
-    form.value.orderNumber = ''
-    form.value.email = ''
-    newPassword.value = ''
-    registerSuccess.value = false
-    router.replace({ query: {} })
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleSearch() {
+  errorMessage.value = ''
+  if (!form.value.email || !form.value.orderNumber) {
+    errorMessage.value = 'Veuillez remplir tous les champs.'
+    return
   }
 
-  function formatDate(date: string | null | undefined) {
-    if (!date) return ''
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
+  loading.value = true
+  try {
+    const data = await trackGuestOrderByEmail(form.value.email, form.value.orderNumber)
+    order.value = data
+
+    await router.replace({
+      query: {
+        ...route.query,
+        email: form.value.email,
+        ref: form.value.orderNumber,
+        token: undefined,
+      },
     })
+  } catch (err: any) {
+    errorMessage.value = err.message || 'Commande introuvable.'
+    order.value = null
+  } finally {
+    loading.value = false
   }
+}
 
-  function formatPrice(value: number | null | undefined) {
-    if (value == null || isNaN(Number(value))) return '0,00 €'
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(
-      Number(value),
-    )
+async function handleQuickRegister() {
+  if (!newPassword.value || newPassword.value.length < 6) {
+    toast.show('Le mot de passe doit contenir au moins 6 caractères', 'warning')
+    return
   }
+  if (!order.value?.shipping_email) return
 
-  async function copyTracking() {
-    if (!order.value?.tracking_number) return
-    try {
-      await navigator.clipboard.writeText(order.value.tracking_number)
-      copied.value = true
-      toast.show('Copié !', 'success')
-      setTimeout(() => (copied.value = false), 2000)
-    } catch (err) {
-      toast.show('Erreur', 'danger')
-    }
+  registerLoading.value = true
+  try {
+    const { error } = await supabase.auth.signUp({
+      email: order.value.shipping_email,
+      password: newPassword.value,
+      options: {
+        data: {
+          full_name: order.value.shipping_name || '',
+        },
+      },
+    })
+
+    if (error) throw error
+
+    registerSuccess.value = true
+    toast.show('Compte créé avec succès !', 'success')
+  } catch (err: any) {
+    console.error(err)
+    toast.show(err.message || 'Erreur lors de la création du compte', 'danger')
+  } finally {
+    registerLoading.value = false
   }
+}
+
+function resetSearch() {
+  order.value = null
+  errorMessage.value = ''
+  form.value.orderNumber = ''
+  form.value.email = ''
+  newPassword.value = ''
+  registerSuccess.value = false
+  router.replace({ query: {} })
+}
+
+async function copyTracking() {
+  if (!order.value?.tracking_number) return
+  try {
+    await navigator.clipboard.writeText(order.value.tracking_number)
+    copied.value = true
+    toast.show('Numéro de suivi copié !', 'success')
+    setTimeout(() => (copied.value = false), 2000)
+  } catch (err) {
+    toast.show('Erreur lors de la copie', 'danger')
+  }
+}
 </script>
-
 <style scoped lang="less">
-  @import '@/assets/Mont/Mont.less';
+@font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
+@font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
+@ease: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* --- Layout Global --- */
-  .track-page {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
-    display: flex;
-    justify-content: center;
-    position: relative;
-    border-radius: 16px;
-    background: radial-gradient(
-      circle at top left,
-      rgba(var(--primary-200-rgb), 0.5),
-      rgba(var(--primary-300-rgb), 0.3)
-    );
-    min-height: 80vh;
-    align-items: center;
+.track {
+  position: relative;
+  min-height: 100vh;
+  background: @neutral-50;
+  padding: 40px 24px 80px;
+
+  // ============================================
+  // BACKGROUND
+  // ============================================
+  &__bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
   }
 
-  .track-bg-shapes {
+  &__bg-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70%;
+    height: 70%;
+    background: radial-gradient(
+      ellipse at top left,
+      rgba(var(--primary-500-rgb), 0.08) 0%,
+      transparent 60%
+    );
+  }
+
+  &__bg-pattern {
     position: absolute;
     inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
+    background-image: radial-gradient(rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
+  }
 
-    .shape {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
-    }
-    .shape-1 {
-      top: -10%;
-      left: -5%;
+  &__bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.4;
+
+    &--1 {
+      top: -100px;
+      right: 10%;
       width: 400px;
       height: 400px;
-      background: var(--primary-200);
+      background: rgba(var(--primary-400-rgb), 0.3);
     }
-    .shape-2 {
-      bottom: -10%;
-      right: -5%;
+
+    &--2 {
+      bottom: 10%;
+      left: -100px;
       width: 300px;
       height: 300px;
-      background: var(--secondary-200);
+      background: rgba(var(--primary-300-rgb), 0.2);
     }
   }
 
-  /* --- Container Dynamique --- */
-  .track-container {
-    width: 100%;
-    max-width: 500px;
+  // ============================================
+  // CONTAINER
+  // ============================================
+  &__container {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    transition: max-width 0.4s ease-in-out;
-
-    &.is-result {
-      max-width: 1000px;
-      align-self: flex-start;
-      margin-top: 20px;
-    }
+    max-width: 1100px;
+    margin: 0 auto;
   }
 
-  /* --- Header --- */
-  .track-header {
-    text-align: center;
+  // ============================================
+  // HEADER
+  // ============================================
+  &__header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.3s ease;
+    text-align: center;
+    margin-bottom: 40px;
+    transition: all 0.3s @ease;
 
-    .icon-wrapper {
-      width: 70px;
-      height: 70px;
-      background: white;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px -5px rgba(var(--primary-500-rgb), 0.15);
-      transition: all 0.3s ease;
-    }
-
-    &.compact-header {
+    &--compact {
       flex-direction: row;
+      text-align: left;
       gap: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 24px;
 
-      .icon-wrapper {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 0;
-        border-radius: 12px;
+      .track__header-icon {
+        width: 56px;
+        height: 56px;
       }
-      .header-texts {
-        text-align: left;
+
+      .track__title {
+        font-size: 24px;
       }
-      .track-title {
-        margin: 0;
+
+      .track__subtitle {
+        display: none;
       }
     }
   }
 
-  /* --- Carte Recherche --- */
-  .search-card {
-    background: white;
-    padding: 32px;
-    border-radius: 24px;
-    box-shadow:
-      0 15px 35px -5px rgba(0, 0, 0, 0.05),
-      0 0 0 1px rgba(0, 0, 0, 0.02);
-  }
-
-  .form-content {
+  &__header-icon {
+    width: 80px;
+    height: 80px;
     display: flex;
-    flex-direction: column;
-    gap: 24px;
-    .inputs-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-  }
-
-  /* --- RESULT GRID LAYOUT --- */
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 24px;
-    align-items: start;
-
-    @media (max-width: 850px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* --- Widgets Génériques --- */
-  .track-widget {
+    align-items: center;
+    justify-content: center;
     background: white;
     border-radius: 20px;
-    padding: 24px;
-    box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.03),
-      0 0 0 1px rgba(0, 0, 0, 0.02);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(var(--primary-500-rgb), 0.15);
+    color: var(--primary-600);
+    transition: all 0.3s @ease;
 
-    &:last-child {
+    .track__header--compact & {
       margin-bottom: 0;
+      border-radius: 16px;
     }
   }
 
-  /* --- Colonne Gauche --- */
-  .left-column {
-    display: flex;
-    flex-direction: column;
+  &__title {
+    font-family: @font-display;
+    font-size: 32px;
+    font-weight: 700;
+    color: @neutral-900;
+    margin: 0 0 8px;
+    transition: font-size 0.3s @ease;
   }
 
-  .widget-header {
+  &__subtitle {
+    font-family: @font-body;
+    font-size: 16px;
+    color: @neutral-500;
+    margin: 0;
+    max-width: 400px;
+  }
+
+  // ============================================
+  // ERROR TOAST
+  // ============================================
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: white;
+    border-radius: 14px;
+    border-left: 4px solid #ef4444;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  &__error-icon {
+    flex-shrink: 0;
+    color: #ef4444;
+  }
+
+  &__error-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: @font-body;
+    font-size: 14px;
+
+    strong {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    span {
+      color: #dc2626;
+    }
+  }
+
+  &__error-close {
+    padding: 6px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: @neutral-400;
+    cursor: pointer;
+    transition: all 0.2s @ease;
+
+    &:hover {
+      background: @neutral-100;
+      color: @neutral-600;
+    }
+  }
+
+  // ============================================
+  // SEARCH SECTION
+  // ============================================
+  &__search {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  &__search-card {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.06);
+    border: 1px solid @neutral-100;
+  }
+
+  &__search-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid @neutral-100;
+  }
+
+  &__search-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    border-radius: 14px;
+    color: var(--primary-600);
+    flex-shrink: 0;
+  }
+
+  &__search-title {
+    font-family: @font-display;
+    font-size: 18px;
+    font-weight: 600;
+    color: @neutral-900;
+    margin: 0 0 4px;
+  }
+
+  &__search-subtitle {
+    font-family: @font-body;
+    font-size: 14px;
+    color: @neutral-500;
+    margin: 0;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: @font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: @neutral-700;
+
+    svg {
+      color: @neutral-400;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    padding: 14px 16px;
+    background: @neutral-50;
+    border: 1px solid @neutral-200;
+    border-radius: 12px;
+    font-family: @font-body;
+    font-size: 15px;
+    color: @neutral-900;
+    transition: all 0.2s @ease;
+
+    &::placeholder {
+      color: @neutral-400;
+    }
+
+    &:focus {
+      outline: none;
+      background: white;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 4px rgba(var(--primary-500-rgb), 0.1);
+    }
+
+    &--error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+
+      &:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+
+  &__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 24px;
+    margin-top: 8px;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border: none;
+    border-radius: 14px;
+    font-family: @font-body;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s @ease;
+    box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(var(--primary-500-rgb), 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  &__submit-loader {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  &__search-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid @neutral-100;
+    font-family: @font-body;
+    font-size: 13px;
+    color: @neutral-500;
+
+    svg {
+      color: #10b981;
+    }
+  }
+
+  // ============================================
+  // HELP SECTION
+  // ============================================
+  &__help {
+    margin-top: 32px;
+  }
+
+  &__help-title {
+    font-family: @font-body;
+    font-size: 12px;
+    font-weight: 600;
+    color: @neutral-400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px;
+    text-align: center;
+  }
+
+  &__help-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__help-item {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid @neutral-100;
+    transition: all 0.2s @ease;
+
+    &:hover {
+      border-color: var(--primary-200);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    div:last-child {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      strong {
+        font-family: @font-body;
+        font-size: 14px;
+        font-weight: 600;
+        color: @neutral-900;
+      }
+
+      span {
+        font-family: @font-body;
+        font-size: 13px;
+        color: @neutral-500;
+      }
+    }
+  }
+
+  &__help-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: @neutral-50;
+    border-radius: 10px;
+    color: var(--primary-600);
+    flex-shrink: 0;
+  }
+
+  // ============================================
+  // RESULTS SECTION
+  // ============================================
+  &__results {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  &__nav {
+    margin-bottom: 24px;
+  }
+
+  &__nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: white;
+    border: 1px solid @neutral-200;
+    border-radius: 10px;
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 500;
+    color: @neutral-600;
+    cursor: pointer;
+    transition: all 0.2s @ease;
+
+    &:hover {
+      background: @neutral-50;
+      border-color: var(--primary-300);
+      color: var(--primary-700);
+      transform: translateX(-4px);
+
+      svg {
+        transform: translateX(-2px);
+      }
+    }
+
+    svg {
+      transition: transform 0.2s @ease;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  // ============================================
+  // MAIN COLUMN
+  // ============================================
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  // ============================================
+  // STATUS CARD
+  // ============================================
+  &__status-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.04);
+    border: 1px solid @neutral-100;
+  }
+
+  &__status-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
   }
 
-  /* Timeline */
-  .timeline-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    background: @neutral-50;
-    border-radius: 16px;
-  }
-
-  .timeline-step {
+  &__status-info {
     display: flex;
     flex-direction: column;
+    gap: 4px;
+  }
+
+  &__status-label {
+    font-family: @font-body;
+    font-size: 12px;
+    font-weight: 600;
+    color: @neutral-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__status-number {
+    font-family: @font-display;
+    font-size: 24px;
+    font-weight: 700;
+    color: @neutral-900;
+  }
+
+  &__status-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    z-index: 2;
-    min-width: 70px;
-    text-align: center;
-    flex: 1; /* Distribution équitable */
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: @font-body;
+    font-size: 13px;
+    font-weight: 600;
 
-    .step-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: white;
-      border: 1px solid @neutral-200;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
+    &--paid,
+    &--confirmed {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+      color: #059669;
 
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: @neutral-300;
+      .track__status-dot {
+        background: #10b981;
       }
     }
 
-    &.active .step-icon {
-      background: var(--primary-500);
-      border-color: var(--primary-500);
-      box-shadow: 0 0 0 4px var(--primary-50);
+    &--processing {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      color: #2563eb;
+
+      .track__status-dot {
+        background: #3b82f6;
+      }
+    }
+
+    &--shipped {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+      color: #7c3aed;
+
+      .track__status-dot {
+        background: #8b5cf6;
+      }
+    }
+
+    &--completed {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+      color: #047857;
+
+      .track__status-dot {
+        background: #10b981;
+      }
+    }
+
+    &--cancelled {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      color: #dc2626;
+
+      .track__status-dot {
+        background: #ef4444;
+      }
     }
   }
 
-  .step-line {
+  &__status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  // ============================================
+  // TIMELINE
+  // ============================================
+  &__timeline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 24px;
+    background: @neutral-50;
+    border-radius: 16px;
+    position: relative;
+  }
+
+  &__timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     flex: 1;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+
+    &--active {
+      .track__timeline-icon {
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+        border-color: var(--primary-500);
+        color: white;
+        box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.3);
+      }
+
+      .track__timeline-label {
+        color: @neutral-900;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__timeline-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid @neutral-200;
+    border-radius: 50%;
+    color: @neutral-400;
+    transition: all 0.3s @ease;
+  }
+
+  &__timeline-dot {
+    width: 10px;
+    height: 10px;
+    background: @neutral-300;
+    border-radius: 50%;
+  }
+
+  &__timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__timeline-label {
+    font-family: @font-body;
+    font-size: 13px;
+    font-weight: 500;
+    color: @neutral-400;
+    transition: all 0.3s @ease;
+  }
+
+  &__timeline-date {
+    font-family: @font-body;
+    font-size: 11px;
+    color: @neutral-500;
+  }
+
+  &__timeline-line {
+    position: absolute;
+    top: 44px;
+    left: calc(50% + 28px);
+    width: calc(100% - 56px);
     height: 3px;
     background: @neutral-200;
-    margin: 0 -10px;
-    margin-bottom: 38px;
-    position: relative;
     border-radius: 2px;
     overflow: hidden;
+    z-index: 1;
 
     &::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
-      bottom: 0;
-      width: 0%;
-      background: var(--primary-500);
-      transition: width 0.8s ease-out;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary-500), var(--primary-400));
+      transition: width 0.6s @ease;
     }
-    &.active::after {
+
+    &--active::after {
       width: 100%;
     }
   }
 
-  /* Details Row */
-  .details-row {
+  // ============================================
+  // DETAILS CARDS
+  // ============================================
+  &__details {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
+    gap: 16px;
   }
 
-  .detail-widget {
+  &__detail-card {
     display: flex;
     gap: 16px;
     padding: 20px;
-    margin-bottom: 0;
-    align-items: flex-start;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+    border: 1px solid @neutral-100;
+    transition: all 0.2s @ease;
 
-    .widget-icon {
-      background: @neutral-100;
-      padding: 10px;
-      border-radius: 12px;
+    &:hover {
+      border-color: var(--primary-200);
     }
-    .widget-content {
-      display: flex;
-      flex-direction: column;
+
+    &--carrier {
+      background: linear-gradient(135deg, white 0%, rgba(var(--primary-500-rgb), 0.02) 100%);
     }
   }
 
-  .tracking-pill {
-    margin-top: 6px;
+  &__detail-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    border-radius: 12px;
+    color: var(--primary-600);
+    flex-shrink: 0;
+  }
+
+  &__detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__detail-label {
+    font-family: @font-body;
+    font-size: 11px;
+    font-weight: 600;
+    color: @neutral-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__detail-name {
+    font-family: @font-display;
+    font-size: 15px;
+    font-weight: 600;
+    color: @neutral-900;
+  }
+
+  &__detail-address {
+    font-family: @font-body;
+    font-size: 13px;
+    color: @neutral-600;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__tracking-copy {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 6px 12px;
     background: @neutral-100;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 13px;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
-    font-family: monospace;
-    width: fit-content;
+    transition: all 0.2s @ease;
 
     &:hover {
       background: @neutral-200;
+
+      svg {
+        color: var(--primary-600);
+      }
+    }
+
+    svg {
+      color: @neutral-500;
+      transition: color 0.2s @ease;
     }
   }
 
-  /* --- Colonne Droite --- */
-  .right-column {
+  &__tracking-number {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: @neutral-700;
+  }
+
+  // ============================================
+  // SIDEBAR
+  // ============================================
+  &__sidebar {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
+    position: sticky;
+    top: 24px;
   }
 
-  .reset-link {
-    background: none;
-    border: none;
-    color: @neutral-500;
-    font-size: 12px;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.2s;
-
-    &:hover {
-      color: var(--primary-600);
-    }
+  // ============================================
+  // SUMMARY CARD
+  // ============================================
+  &__summary {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.04);
+    border: 1px solid @neutral-100;
   }
 
-  .items-list {
-    max-height: 250px;
-    overflow-y: auto;
+  &__summary-header {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding-right: 4px;
-  }
-
-  .mini-item {
-    display: flex;
-    gap: 12px;
+    justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid @neutral-100;
+  }
+
+  &__summary-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: @font-display;
+    font-size: 16px;
+    font-weight: 600;
+    color: @neutral-900;
+    margin: 0;
+
+    svg {
+      color: var(--primary-500);
+    }
+  }
+
+  &__summary-count {
+    font-family: @font-body;
+    font-size: 13px;
+    color: @neutral-500;
+    padding: 4px 10px;
+    background: @neutral-100;
+    border-radius: 12px;
+  }
+
+  // ============================================
+  // ITEMS LIST
+  // ============================================
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    padding-right: 8px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: @neutral-100;
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: @neutral-300;
+      border-radius: 2px;
+    }
+  }
+
+  &__item {
+    display: flex;
+    gap: 12px;
     padding-bottom: 12px;
     border-bottom: 1px solid @neutral-100;
 
@@ -998,205 +1530,482 @@
       border-bottom: none;
       padding-bottom: 0;
     }
+  }
 
-    &__img {
-      width: 42px;
-      height: 42px;
-      border-radius: 8px;
+  &__item-image {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
+      border-radius: 10px;
       border: 1px solid @neutral-100;
     }
-
-    &__info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    &__top,
-    &__bot {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-    }
-
-    .name {
-      font-weight: 600;
-      color: @neutral-900;
-    }
-    .price {
-      font-weight: 700;
-      color: @neutral-900;
-    }
-    .qty,
-    .dosage {
-      color: @neutral-500;
-      font-size: 12px;
-    }
-    .dosage {
-      color: var(--primary-600);
-      background: var(--primary-50);
-      padding: 1px 6px;
-      border-radius: 4px;
-    }
   }
 
-  .divider {
-    height: 1px;
-    background: @neutral-200;
-    margin: 16px 0;
-  }
-
-  .totals-compact {
+  &__item-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     gap: 8px;
+  }
+
+  &__item-name {
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 600;
+    color: @neutral-900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__item-price {
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 700;
+    color: @neutral-900;
+    flex-shrink: 0;
+  }
+
+  &__item-bottom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__item-qty {
+    font-family: @font-body;
+    font-size: 12px;
+    color: @neutral-500;
+  }
+
+  &__item-dosage {
+    font-family: @font-body;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--primary-700);
+    background: var(--primary-50);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  // ============================================
+  // TOTALS
+  // ============================================
+  &__totals {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid @neutral-100;
+  }
+
+  &__totals-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: @font-body;
     font-size: 14px;
     color: @neutral-600;
 
-    .row {
-      display: flex;
-      justify-content: space-between;
+    &--discount {
+      color: #10b981;
+
+      span:first-child {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
     }
-    .discount {
-      color: @success-600;
-    }
-    .total {
+
+    &--total {
+      padding-top: 12px;
+      margin-top: 4px;
+      border-top: 1px dashed @neutral-200;
+      font-size: 16px;
       font-weight: 700;
       color: @neutral-900;
-      font-size: 16px;
-      margin-top: 8px;
-      padding-top: 12px;
-      border-top: 1px dashed @neutral-300;
+
+      span:last-child {
+        color: var(--primary-700);
+        font-size: 20px;
+      }
     }
   }
 
-  /* CTA WIDGET */
-  .cta-widget {
-    background: linear-gradient(145deg, #ffffff 0%, var(--primary-50) 100%);
+  &__totals-free {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  &__totals-divider {
+    display: none;
+  }
+
+  // ============================================
+  // REGISTER CTA
+  // ============================================
+  &__register {
+    background: linear-gradient(135deg, white 0%, var(--primary-50) 100%);
     border: 1px solid var(--primary-200);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    border-radius: 20px;
+    padding: 24px;
   }
 
-  .cta-header {
+  &__register-header {
     display: flex;
-    gap: 12px;
-    align-items: flex-start;
-
-    .cta-icon {
-      background: white;
-      padding: 8px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      flex-shrink: 0;
-    }
-
-    .cta-texts {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    gap: 14px;
+    margin-bottom: 20px;
   }
 
-  .cta-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-top: 4px;
-  }
-
-  .read-only-email {
+  &__register-icon {
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.6);
+    justify-content: center;
+    background: white;
+    border-radius: 14px;
+    color: var(--primary-600);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+  }
+
+  &__register-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    strong {
+      font-family: @font-display;
+      font-size: 15px;
+      font-weight: 600;
+      color: @neutral-900;
+    }
+
+    span {
+      font-family: @font-body;
+      font-size: 13px;
+      color: @neutral-500;
+    }
+  }
+
+  &__register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__register-email {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.7);
     border: 1px solid @neutral-200;
-    padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: 12px;
+    font-family: @font-body;
     font-size: 13px;
     color: @neutral-600;
 
     span {
       flex: 1;
-      font-family: monospace;
+      font-family: 'SF Mono', 'Fira Code', monospace;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    svg:first-child {
+      color: @neutral-400;
+    }
   }
 
-  .success-widget {
-    background: @success-50;
-    border: 1px solid @success-200;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    text-align: center;
-    padding: 30px 20px;
+  &__register-check {
+    color: #10b981;
   }
 
-  /* Error Toast */
-  .error-toast {
-    position: absolute;
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 400px;
-    background: white;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border-left: 4px solid @danger-500;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  &__register-input-wrapper {
     display: flex;
     align-items: center;
     gap: 12px;
-    z-index: 10;
+    padding: 12px 14px;
+    background: white;
+    border: 1px solid @neutral-200;
+    border-radius: 12px;
+    transition: all 0.2s @ease;
 
-    .error-text {
-      flex: 1;
-      display: flex;
+    &:focus-within {
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 4px rgba(var(--primary-500-rgb), 0.1);
+    }
+
+    svg {
+      color: @neutral-400;
+      flex-shrink: 0;
+    }
+  }
+
+  &__register-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: @font-body;
+    font-size: 14px;
+    color: @neutral-900;
+
+    &::placeholder {
+      color: @neutral-400;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__register-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: @font-body;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s @ease;
+    box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(var(--primary-500-rgb), 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  &__register-loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  // ============================================
+  // SUCCESS MESSAGE
+  // ============================================
+  &__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    border-radius: 20px;
+    text-align: center;
+  }
+
+  &__success-icon {
+    color: #10b981;
+  }
+
+  &__success-title {
+    font-family: @font-display;
+    font-size: 16px;
+    font-weight: 600;
+    color: #065f46;
+  }
+
+  &__success-text {
+    font-family: @font-body;
+    font-size: 14px;
+    color: #047857;
+    margin: 0;
+  }
+
+  // ============================================
+  // TRUST BADGES
+  // ============================================
+  &__trust {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid @neutral-100;
+  }
+
+  &__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: @font-body;
+    font-size: 12px;
+    color: @neutral-500;
+
+    svg {
+      color: #10b981;
+    }
+  }
+
+  // ============================================
+  // ANIMATIONS
+  // ============================================
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(0.9);
+    }
+  }
+
+  .slide-down-enter-active,
+  .slide-down-leave-active {
+    transition: all 0.3s @ease;
+  }
+
+  .slide-down-enter-from,
+  .slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  // ============================================
+  // RESPONSIVE
+  // ============================================
+  @media (max-width: 900px) {
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__sidebar {
+      position: static;
+      order: -1;
+    }
+  }
+
+  @media (max-width: 700px) {
+    padding: 24px 16px 60px;
+
+    &__header {
+      margin-bottom: 28px;
+
+      &--compact {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+      }
+    }
+
+    &__header-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+
+      .track__header--compact & {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 0;
+      }
+    }
+
+    &__title {
+      font-size: 26px;
+    }
+
+    &__search-card {
+      padding: 24px 20px;
+    }
+
+    &__details {
+      grid-template-columns: 1fr;
+    }
+
+    &__timeline {
+      padding: 20px 12px;
+      overflow-x: auto;
+    }
+
+    &__timeline-step {
+      min-width: 70px;
+    }
+
+    &__timeline-label {
+      font-size: 11px;
+    }
+
+    &__timeline-line {
+      left: calc(50% + 24px);
+      width: calc(100% - 48px);
+    }
+
+    &__trust {
       flex-direction: column;
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
+      align-items: center;
+      gap: 12px;
     }
   }
 
-  /* Utils */
-  .uppercase {
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .mb-1 {
-    margin-bottom: 4px;
-  }
-  .mb-2 {
-    margin-bottom: 8px;
-  }
-  .mb-3 {
-    margin-bottom: 12px;
-  }
-  .mt-1 {
-    margin-top: 4px;
-  }
+  @media (max-width: 480px) {
+    &__status-header {
+      flex-direction: column;
+      gap: 16px;
+    }
 
-  /* Custom Scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+    &__status-badge {
+      align-self: flex-start;
+    }
+
+    &__timeline {
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    &__timeline-step {
+      width: 45%;
+    }
+
+    &__timeline-line {
+      display: none;
+    }
+
+    &__nav-back {
+      width: 100%;
+      justify-content: center;
+    }
   }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: @neutral-100;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: @neutral-300;
-    border-radius: 4px;
-  }
+}
 </style>

@@ -1,110 +1,197 @@
 <template>
   <nav class="navbar">
-    <!-- Left -->
-    <div class="navbar__left">
-      <BasicButton
-        v-if="isMobile"
-        @click="toggleMobileMenu"
-        :icon-name="isMenuOpen ? 'X' : 'Menu'"
-        size="small"
-        type="reverse"
-        variant="ghost"
-        class="navbar__burger"
-      />
-      <div
-        class="navbar__logo"
-        @click="router.push('/')"
-        role="button"
-        tabindex="0"
-        @keypress.enter="router.push('/')"
-      >
-        <BasicIconNext
-          name="fastPeptides"
-          :size="32"
-          class="navbar__logo-icon"
-        />
-        <div class="navbar__logo-text">
-          <span class="navbar__logo-fast">Fast</span>
-          <span class="navbar__logo-peptides">Peptides</span>
-        </div>
-      </div>
+    <!-- Background Effects -->
+    <div class="navbar__bg">
+      <div class="navbar__bg-gradient"></div>
+      <div class="navbar__bg-shine"></div>
     </div>
 
-    <!-- Center -->
-    <div
-      v-if="!isMobile"
-      class="navbar__center"
-    >
-      <MainNavLinks />
-    </div>
-
-    <!-- Right -->
-    <div class="navbar__right">
-      <CartMenu />
-
-      <!-- Connected User -->
-      <UserMenu v-if="auth.user" />
-
-      <!-- Guest with Cart -->
-      <div
-        v-else-if="hasGuestCart"
-        class="navbar__guest"
-      >
-        <div class="navbar__guest-badge">
-          <BasicIconNext
-            name="ShoppingBag"
-            :size="16"
-          />
-          <span>Mode Invité</span>
-        </div>
-        <BasicButton
-          label="Suivre"
-          icon-name="PackageSearch"
-          type="secondary"
-          variant="ghost"
-          size="small"
-          @click="router.push('/suivi-commande')"
-        />
-        <BasicButton
-          label="Connexion"
-          type="primary"
-          size="small"
-          @click="router.push('/auth/login')"
-        />
-      </div>
-
-      <!-- Visitor -->
-      <template v-else>
-        <div
-          v-if="isDesktop"
-          class="navbar__actions"
+    <div class="navbar__container">
+      <!-- Left Section -->
+      <div class="navbar__left">
+        <!-- Mobile Menu Toggle -->
+        <button
+          v-if="isMobile"
+          class="navbar__burger"
+          @click="toggleMobileMenu"
+          :aria-expanded="isMenuOpen"
+          aria-label="Menu"
         >
-          <BasicButton
-            label="Suivre"
-            icon-name="PackageSearch"
-            type="secondary"
-            variant="ghost"
-            size="small"
-            @click="router.push('/suivi-commande')"
-          />
-          <BasicButton
-            label="Connexion"
-            type="primary"
-            size="small"
-            @click="router.push('/auth/login')"
-          />
-          <BasicButton
-            label="Inscription"
-            type="reverse"
-            variant="outlined"
-            size="small"
-            @click="router.push('/auth/register')"
-          />
+          <span
+            class="navbar__burger-line"
+            :class="{ 'navbar__burger-line--open': isMenuOpen }"
+          ></span>
+          <span
+            class="navbar__burger-line"
+            :class="{ 'navbar__burger-line--open': isMenuOpen }"
+          ></span>
+          <span
+            class="navbar__burger-line"
+            :class="{ 'navbar__burger-line--open': isMenuOpen }"
+          ></span>
+        </button>
+
+        <!-- Logo -->
+        <div
+          class="navbar__logo"
+          @click="router.push('/')"
+          role="button"
+          tabindex="0"
+          @keypress.enter="router.push('/')"
+        >
+          <div class="navbar__logo-icon">
+            <BasicIconNext
+              name="fastPeptides"
+              :size="28"
+            />
+          </div>
+          <div class="navbar__logo-text">
+            <span class="navbar__logo-fast">Fast</span>
+            <span class="navbar__logo-peptides">Peptides</span>
+          </div>
         </div>
-        <div v-else><UserMenu /></div>
-      </template>
+      </div>
+
+      <!-- Center Section - Navigation -->
+      <div
+        v-if="!isMobile"
+        class="navbar__center"
+      >
+        <MainNavLinks />
+      </div>
+
+      <!-- Right Section -->
+      <div class="navbar__right">
+        <!-- Cart -->
+        <CartMenu />
+
+        <!-- Connected User -->
+        <template v-if="auth.user">
+          <UserMenu />
+        </template>
+
+        <!-- Guest with Cart Items -->
+        <template v-else-if="hasGuestCart">
+          <div class="navbar__guest">
+            <div class="navbar__guest-indicator">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle
+                  cx="12"
+                  cy="7"
+                  r="4"
+                />
+              </svg>
+              <span>Invité</span>
+            </div>
+
+            <button
+              class="navbar__btn navbar__btn--ghost"
+              @click="router.push('/suivi-commande')"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle
+                  cx="12"
+                  cy="10"
+                  r="3"
+                />
+              </svg>
+              <span>Suivre</span>
+            </button>
+
+            <button
+              class="navbar__btn navbar__btn--primary"
+              @click="router.push('/auth/login')"
+            >
+              Connexion
+            </button>
+          </div>
+        </template>
+
+        <!-- Visitor (not logged in, no cart) -->
+        <template v-else>
+          <div
+            v-if="isDesktop"
+            class="navbar__actions"
+          >
+            <button
+              class="navbar__btn navbar__btn--ghost"
+              @click="router.push('/suivi-commande')"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle
+                  cx="12"
+                  cy="10"
+                  r="3"
+                />
+              </svg>
+              <span>Suivi</span>
+            </button>
+
+            <button
+              class="navbar__btn navbar__btn--primary"
+              @click="router.push('/auth/login')"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line
+                  x1="15"
+                  y1="12"
+                  x2="3"
+                  y2="12"
+                />
+              </svg>
+              Connexion
+            </button>
+
+            <button
+              class="navbar__btn navbar__btn--outline"
+              @click="router.push('/auth/register')"
+            >
+              Inscription
+            </button>
+          </div>
+
+          <!-- Mobile: Show UserMenu for visitors too -->
+          <div v-else>
+            <UserMenu />
+          </div>
+        </template>
+      </div>
     </div>
 
+    <!-- Mobile Drawer -->
     <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
@@ -115,7 +202,6 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import UserMenu from '@/features/interface/layout/header/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { BasicButton } from '@designSystem/components/basic/button'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
@@ -126,53 +212,166 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const { isMobile, isDesktop } = useDeviceBreakpoint()
+
+  // State
   const isMenuOpen = ref(false)
 
+  // Computed
   const hasGuestCart = computed(() => !auth.user && cart.items.length > 0)
-  const toggleMobileMenu = () => (isMenuOpen.value = !isMenuOpen.value)
-  const closeMenu = () => (isMenuOpen.value = false)
 
+  // Methods
+  const toggleMobileMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value
+  }
+
+  const closeMenu = () => {
+    isMenuOpen.value = false
+  }
+
+  // Close menu on route change
   router.afterEach(() => closeMenu())
-  const stopWatch = watch(isMobile, (m) => {
-    if (!m) closeMenu()
+
+  // Close menu when switching to desktop
+  const stopWatch = watch(isMobile, (mobile) => {
+    if (!mobile) closeMenu()
   })
+
   onUnmounted(() => stopWatch())
 </script>
-
 <style scoped lang="less">
+  @font-display:
+    'Instrument Sans',
+    'SF Pro Display',
+    -apple-system,
+    sans-serif;
+  @font-body:
+    'Inter',
+    'SF Pro Text',
+    -apple-system,
+    sans-serif;
+  @ease: cubic-bezier(0.4, 0, 0.2, 1);
+  @bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   .navbar {
     position: relative;
     z-index: 1000;
-    height: 64px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px;
-    background: linear-gradient(
-      90deg,
-      var(--secondary-900),
-      color-mix(in srgb, black 4%, var(--secondary-800))
-    );
-    border-bottom: 1px solid rgba(var(--neutral-100-rgb), 0.06);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    height: 68px;
 
-    &__left,
-    &__right {
+    // ============================================
+    // BACKGROUND
+    // ============================================
+    &__bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    &__bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        var(--secondary-900) 0%,
+        color-mix(in srgb, var(--secondary-800), black 8%) 50%,
+        var(--secondary-900) 100%
+      );
+    }
+
+    &__bg-shine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.06) 20%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.06) 80%,
+        transparent 100%
+      );
+    }
+
+    // ============================================
+    // CONTAINER
+    // ============================================
+    &__container {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    // ============================================
+    // LEFT SECTION
+    // ============================================
+    &__left {
       display: flex;
       align-items: center;
       gap: 16px;
       flex-shrink: 0;
     }
 
-    &__center {
-      flex: 1;
+    // ============================================
+    // BURGER MENU
+    // ============================================
+    &__burger {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      min-width: 0;
-      padding: 0 24px;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
     }
 
-    // Logo
+    &__burger-line {
+      width: 100%;
+      height: 2px;
+      background: @neutral-200;
+      border-radius: 1px;
+      transition: all 0.3s @ease;
+      transform-origin: center;
+
+      &--open {
+        &:nth-child(1) {
+          transform: translateY(7px) rotate(45deg);
+        }
+
+        &:nth-child(2) {
+          opacity: 0;
+          transform: scaleX(0);
+        }
+
+        &:nth-child(3) {
+          transform: translateY(-7px) rotate(-45deg);
+        }
+      }
+    }
+
+    // ============================================
+    // LOGO
+    // ============================================
     &__logo {
       display: flex;
       align-items: center;
@@ -180,94 +379,240 @@
       cursor: pointer;
       user-select: none;
       outline: none;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-decoration: none;
 
-      &:hover,
-      &:focus {
+      &:focus-visible {
+        outline: 2px solid var(--primary-500);
+        outline-offset: 4px;
+        border-radius: 8px;
+      }
+
+      &:hover {
         .navbar__logo-icon {
-          transform: scale(1.1) rotate(5deg);
-          filter: drop-shadow(0 0 12px rgba(var(--primary-500-rgb), 0.5));
+          transform: scale(1.08) rotate(3deg);
+          box-shadow:
+            0 0 20px rgba(var(--primary-500-rgb), 0.4),
+            0 0 40px rgba(var(--primary-500-rgb), 0.2);
         }
-      }
 
-      &-icon {
-        color: var(--primary-500);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
+        .navbar__logo-fast {
+          text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
 
-      &-text {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 22px;
-        line-height: 1;
-      }
-
-      &-fast {
-        color: @neutral-50;
-        font-weight: 900;
-        font-style: italic;
-        letter-spacing: -0.5px;
-      }
-
-      &-peptides {
-        color: var(--primary-400);
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        .navbar__logo-peptides {
+          text-shadow: 0 0 20px rgba(var(--primary-400-rgb), 0.5);
+        }
       }
     }
 
-    // Actions
+    &__logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(
+        135deg,
+        rgba(var(--primary-500-rgb), 0.15) 0%,
+        rgba(var(--primary-600-rgb), 0.1) 100%
+      );
+      border: 1px solid rgba(var(--primary-500-rgb), 0.2);
+      border-radius: 12px;
+      color: var(--primary-400);
+      transition: all 0.3s @bounce;
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    &__logo-text {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    &__logo-fast {
+      font-family: @font-display;
+      font-size: 22px;
+      font-weight: 800;
+      font-style: italic;
+      color: @neutral-50;
+      letter-spacing: -0.5px;
+      transition: text-shadow 0.3s @ease;
+    }
+
+    &__logo-peptides {
+      font-family: @font-display;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--primary-400);
+      letter-spacing: 0.5px;
+      transition: text-shadow 0.3s @ease;
+    }
+
+    // ============================================
+    // CENTER SECTION
+    // ============================================
+    &__center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 40px;
+      min-width: 0;
+    }
+
+    // ============================================
+    // RIGHT SECTION
+    // ============================================
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    // ============================================
+    // ACTIONS
+    // ============================================
     &__actions {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    // Guest Badge
-    &__guest {
-      display: flex;
+    // ============================================
+    // BUTTONS
+    // ============================================
+    &__btn {
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      padding: 6px 6px 6px 16px;
-      background: rgba(var(--neutral-100-rgb), 0.04);
-      border: 1px solid rgba(var(--neutral-100-rgb), 0.08);
-      border-radius: 100px;
-      backdrop-filter: blur(12px);
-      transition: all 0.3s ease;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-family: @font-body;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s @ease;
+      white-space: nowrap;
 
-      &:hover {
-        background: rgba(var(--neutral-100-rgb), 0.06);
-        border-color: rgba(var(--neutral-100-rgb), 0.12);
-        box-shadow: 0 0 20px rgba(var(--primary-500-rgb), 0.1);
+      svg {
+        flex-shrink: 0;
       }
 
-      &-badge {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--primary-400);
+      &--primary {
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+        border: none;
+        color: white;
+        box-shadow:
+          0 2px 8px rgba(var(--primary-500-rgb), 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
-        span {
-          font-size: 13px;
-          font-weight: 600;
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            0 4px 16px rgba(var(--primary-500-rgb), 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+
+      &--outline {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: @neutral-200;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(255, 255, 255, 0.25);
+          color: white;
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+
+      &--ghost {
+        background: transparent;
+        border: 1px solid transparent;
+        color: @neutral-400;
+        padding: 10px 14px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.06);
           color: @neutral-200;
         }
       }
     }
 
-    &__burger {
-      color: @neutral-200;
+    // ============================================
+    // GUEST INDICATOR
+    // ============================================
+    &__guest {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px 6px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s @ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+      }
     }
-  }
 
-  // Responsive
-  @media (max-width: 900px) {
-    .navbar {
-      padding: 0 16px;
-      height: 58px;
+    &__guest-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-right: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
 
-      &__logo-text {
+      svg {
+        color: var(--primary-400);
+      }
+
+      span {
+        font-family: @font-body;
+        font-size: 13px;
+        font-weight: 600;
+        color: @neutral-300;
+      }
+    }
+
+    // ============================================
+    // RESPONSIVE
+    // ============================================
+    @media (max-width: 1100px) {
+      &__center {
+        padding: 0 24px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      height: 60px;
+
+      &__container {
+        padding: 0 16px;
+      }
+
+      &__logo-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      &__logo-fast,
+      &__logo-peptides {
         font-size: 18px;
       }
 
@@ -276,24 +621,103 @@
         background: transparent;
         border: none;
         backdrop-filter: none;
+        gap: 6px;
+      }
 
-        &-badge {
+      &__guest-indicator {
+        display: none;
+      }
+
+      &__btn {
+        padding: 8px 14px;
+        font-size: 13px;
+
+        span {
           display: none;
         }
+
+        svg {
+          margin: 0;
+        }
+
+        &--primary,
+        &--outline {
+          span {
+            display: inline;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 480px) {
+      &__logo-text {
+        display: none;
+      }
+
+      &__logo-icon {
+        width: 40px;
+        height: 40px;
       }
     }
   }
 
-  // Button animations
-  .navbar :deep(button) {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  // ============================================
+  // DEEP STYLES FOR CHILD COMPONENTS
+  // ============================================
+  .navbar :deep(.nav-links) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .navbar :deep(.nav-link) {
+    position: relative;
+    padding: 10px 16px;
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 500;
+    color: @neutral-400;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s @ease;
 
     &:hover {
-      transform: translateY(-1px);
+      color: @neutral-200;
+      background: rgba(255, 255, 255, 0.04);
     }
 
-    &:active {
-      transform: translateY(0);
+    &.router-link-active,
+    &--active {
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--primary-400);
+        border-radius: 50%;
+      }
+    }
+  }
+
+  // Cart & User menu styling overrides
+  .navbar :deep(.cart-menu),
+  .navbar :deep(.user-menu) {
+    button {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      transition: all 0.2s @ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.12);
+      }
     }
   }
 </style>
