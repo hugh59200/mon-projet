@@ -1,6 +1,13 @@
 import { supabase } from '@/supabase/supabaseClient'
 
-export type PaymentProvider = 'stripe' | 'paypal'
+export type PaymentProvider =
+  | 'stripe'
+  | 'paypal'
+  | 'apple_pay'
+  | 'alma'
+  | 'afterpay'
+  | 'klarna'
+  | 'google_pay'
 
 export interface PaymentIntent {
   id: string

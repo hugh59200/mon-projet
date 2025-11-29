@@ -287,7 +287,6 @@
               </div>
             </div>
           </section>
-
           <!-- Shipping Info -->
           <section class="checkout__section">
             <div class="checkout__section-header">
@@ -524,86 +523,440 @@
             </div>
 
             <div class="checkout__payment-methods">
-              <button
-                class="payment-card"
-                :class="{ 'payment-card--active': selectedPayment === 'stripe' }"
-                @click="selectedPayment = 'stripe'"
-              >
-                <div class="payment-card__radio">
-                  <div class="payment-card__radio-inner"></div>
-                </div>
-                <div class="payment-card__icon payment-card__icon--stripe">
-                  <svg
-                    viewBox="0 0 48 48"
-                    fill="none"
-                  >
-                    <rect
-                      width="48"
-                      height="48"
-                      rx="8"
-                      fill="#635BFF"
-                    />
-                    <path
-                      d="M24 14C21.3 14 19.5 15.1 19.5 17.3C19.5 20.2 23.7 20.7 23.7 22.2C23.7 22.8 23.1 23.3 22 23.3C20.4 23.3 19.1 22.6 19.1 22.6L18.5 25.2C18.5 25.2 19.9 26 22.1 26C25 26 26.8 24.7 26.8 22.5C26.8 19.4 22.6 18.9 22.6 17.5C22.6 17 23.1 16.5 24.1 16.5C25.4 16.5 26.5 17 26.5 17L27.1 14.5C27.1 14.5 25.9 14 24 14Z"
-                      fill="white"
-                    />
-                  </svg>
-                </div>
-                <div class="payment-card__content">
-                  <span class="payment-card__title">Carte bancaire</span>
-                  <span class="payment-card__desc">Visa, Mastercard, Amex</span>
-                </div>
-                <div class="payment-card__cards">
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/visa.svg"
-                    alt="Visa"
-                  />
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/mastercard.svg"
-                    alt="Mastercard"
-                  />
-                </div>
-              </button>
+              <!-- Méthodes disponibles -->
+              <div class="payment-methods__available">
+                <!-- Stripe / Carte bancaire -->
+                <button
+                  class="payment-card"
+                  :class="{ 'payment-card--active': selectedPayment === 'stripe' }"
+                  @click="selectedPayment = 'stripe'"
+                >
+                  <div class="payment-card__radio">
+                    <div class="payment-card__radio-inner"></div>
+                  </div>
+                  <div class="payment-card__icon payment-card__icon--stripe">
+                    <svg
+                      viewBox="0 0 48 48"
+                      fill="none"
+                    >
+                      <rect
+                        width="48"
+                        height="48"
+                        rx="10"
+                        fill="#635BFF"
+                      />
+                      <path
+                        d="M24.5 18.5C22.5 18.5 21 19.3 21 20.9C21 23 24 23.4 24 24.5C24 24.9 23.6 25.2 22.8 25.2C21.6 25.2 20.5 24.7 20.5 24.7L20 26.7C20 26.7 21.1 27.2 22.9 27.2C25.1 27.2 26.6 26.2 26.6 24.4C26.6 22.2 23.6 21.8 23.6 20.8C23.6 20.4 24 20.1 24.7 20.1C25.7 20.1 26.5 20.4 26.5 20.4L27 18.5C27 18.5 26.1 18.5 24.5 18.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </div>
+                  <div class="payment-card__content">
+                    <span class="payment-card__title">Carte bancaire</span>
+                    <span class="payment-card__desc">Visa, Mastercard, Amex</span>
+                  </div>
+                  <div class="payment-card__cards">
+                    <svg
+                      class="payment-card__card-icon"
+                      viewBox="0 0 48 32"
+                      fill="none"
+                    >
+                      <rect
+                        width="48"
+                        height="32"
+                        rx="4"
+                        fill="#1A1F71"
+                      />
+                      <path
+                        d="M19.5 21H17.3L18.7 11H20.9L19.5 21Z"
+                        fill="white"
+                      />
+                      <path
+                        d="M28.5 11.2C28 11 27.3 10.8 26.4 10.8C24.2 10.8 22.6 12 22.6 13.7C22.6 15 23.7 15.7 24.6 16.1C25.5 16.5 25.8 16.8 25.8 17.2C25.8 17.8 25.1 18.1 24.4 18.1C23.4 18.1 22.9 18 22.1 17.6L21.8 17.5L21.5 19.4C22.1 19.7 23.1 19.9 24.2 19.9C26.5 19.9 28.1 18.7 28.1 16.9C28.1 15.9 27.5 15.1 26.2 14.5C25.4 14.1 24.9 13.8 24.9 13.4C24.9 13 25.3 12.6 26.2 12.6C26.9 12.6 27.5 12.7 27.9 12.9L28.1 13L28.5 11.2Z"
+                        fill="white"
+                      />
+                      <path
+                        d="M32.3 11H30.5C30 11 29.5 11.1 29.3 11.7L26 21H28.3L28.8 19.5H31.5L31.8 21H33.9L32.3 11ZM29.4 17.7C29.6 17.1 30.4 14.9 30.4 14.9C30.4 14.9 30.6 14.3 30.7 14L30.9 14.9C30.9 14.9 31.4 17.1 31.5 17.7H29.4Z"
+                        fill="white"
+                      />
+                      <path
+                        d="M16.4 11L14.2 17.8L14 16.7C13.5 15.2 12.1 13.6 10.5 12.8L12.5 21H14.8L18.7 11H16.4Z"
+                        fill="white"
+                      />
+                      <path
+                        d="M12.5 11H9.1L9 11.2C11.7 11.9 13.5 13.6 14 16.7L13.4 11.7C13.3 11.2 12.9 11 12.5 11Z"
+                        fill="#F9A51A"
+                      />
+                    </svg>
+                    <svg
+                      class="payment-card__card-icon"
+                      viewBox="0 0 48 32"
+                      fill="none"
+                    >
+                      <rect
+                        width="48"
+                        height="32"
+                        rx="4"
+                        fill="#000"
+                      />
+                      <circle
+                        cx="18"
+                        cy="16"
+                        r="8"
+                        fill="#EB001B"
+                      />
+                      <circle
+                        cx="30"
+                        cy="16"
+                        r="8"
+                        fill="#F79E1B"
+                      />
+                      <path
+                        d="M24 9.8C25.8 11.2 27 13.5 27 16C27 18.5 25.8 20.8 24 22.2C22.2 20.8 21 18.5 21 16C21 13.5 22.2 11.2 24 9.8Z"
+                        fill="#FF5F00"
+                      />
+                    </svg>
+                    <svg
+                      class="payment-card__card-icon"
+                      viewBox="0 0 48 32"
+                      fill="none"
+                    >
+                      <rect
+                        width="48"
+                        height="32"
+                        rx="4"
+                        fill="#006FCF"
+                      />
+                      <path
+                        d="M14 13L17 16L14 19M17 13H22M17 16H21M17 19H22"
+                        fill="white"
+                        stroke="white"
+                        stroke-width="1.5"
+                      />
+                      <text
+                        x="26"
+                        y="18"
+                        fill="white"
+                        font-size="8"
+                        font-weight="bold"
+                      >
+                        AMEX
+                      </text>
+                    </svg>
+                  </div>
+                </button>
 
-              <button
-                class="payment-card"
-                :class="{ 'payment-card--active': selectedPayment === 'paypal' }"
-                @click="selectedPayment = 'paypal'"
-              >
-                <div class="payment-card__radio">
-                  <div class="payment-card__radio-inner"></div>
-                </div>
-                <div class="payment-card__icon payment-card__icon--paypal">
+                <!-- PayPal -->
+                <button
+                  class="payment-card"
+                  :class="{ 'payment-card--active': selectedPayment === 'paypal' }"
+                  @click="selectedPayment = 'paypal'"
+                >
+                  <div class="payment-card__radio">
+                    <div class="payment-card__radio-inner"></div>
+                  </div>
+                  <div class="payment-card__icon payment-card__icon--paypal">
+                    <svg
+                      viewBox="0 0 48 48"
+                      fill="none"
+                    >
+                      <rect
+                        width="48"
+                        height="48"
+                        rx="10"
+                        fill="#003087"
+                      />
+                      <path
+                        d="M32.33 18.1C32.31 18.24 32.28 18.39 32.25 18.54C31.27 23.59 27.9 25.33 23.61 25.33H21.42C20.89 25.33 20.45 25.71 20.37 26.23L19.25 33.34L18.93 35.35C18.88 35.69 19.14 36 19.48 36H23.36C23.82 36 24.21 35.67 24.29 35.21L24.32 35.02L25.06 30.38L25.1 30.12C25.17 29.67 25.56 29.33 26.02 29.33H26.61C30.37 29.33 33.31 27.81 34.17 23.39C34.53 21.54 34.34 20 33.39 18.92C33.11 18.59 32.75 18.32 32.33 18.1Z"
+                        fill="white"
+                        fill-opacity="0.6"
+                      />
+                      <path
+                        d="M21.65 18.12C21.69 17.81 21.9 17.56 22.16 17.43C22.29 17.37 22.42 17.33 22.57 17.33H28.41C29.11 17.33 29.75 17.38 30.34 17.48C30.51 17.5 30.68 17.53 30.84 17.57C31 17.6 31.15 17.64 31.3 17.69C31.38 17.71 31.45 17.73 31.52 17.76C31.81 17.85 32.08 17.97 32.33 18.1C32.62 16.23 32.33 14.96 31.32 13.81C30.21 12.54 28.2 12 25.63 12H18.17C17.64 12 17.2 12.38 17.12 12.9L14.01 32.6C13.95 32.99 14.25 33.34 14.64 33.34H19.25L20.4 26L21.65 18.12Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </div>
+                  <div class="payment-card__content">
+                    <span class="payment-card__title">PayPal</span>
+                    <span class="payment-card__desc">Paiement sécurisé PayPal</span>
+                  </div>
+                  <div class="payment-card__paypal-logo">
+                    <svg
+                      viewBox="0 0 80 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M7.5 4.5C6.5 4.5 5.7 5.2 5.5 6.2L3.5 17.5H6.5L7 14.5H9.5C12.5 14.5 14.8 12.5 15.3 9.5C15.8 6.8 13.8 4.5 11 4.5H7.5ZM9.5 7.5H10.5C11.5 7.5 12.2 8.3 12 9.3C11.8 10.5 10.8 11.5 9.5 11.5H8L9.5 7.5Z"
+                        fill="#003087"
+                      />
+                      <path
+                        d="M18.5 8C17 8 15.7 8.8 15.2 10L15 8.2H12.2L10.5 17.5H13.5L14.3 13C14.5 11.8 15.5 11 16.7 11C17.7 11 18.3 11.6 18.1 12.8L17.3 17.5H20.3L21.2 12.3C21.6 10 20.5 8 18.5 8Z"
+                        fill="#003087"
+                      />
+                      <path
+                        d="M27.5 4.5C26.5 4.5 25.7 5.2 25.5 6.2L23.5 17.5H26.5L27 14.5H29.5C32.5 14.5 34.8 12.5 35.3 9.5C35.8 6.8 33.8 4.5 31 4.5H27.5ZM29.5 7.5H30.5C31.5 7.5 32.2 8.3 32 9.3C31.8 10.5 30.8 11.5 29.5 11.5H28L29.5 7.5Z"
+                        fill="#0070BA"
+                      />
+                      <path
+                        d="M38.5 8C37 8 35.7 8.8 35.2 10L35 8.2H32.2L30.5 17.5H33.5L34.3 13C34.5 11.8 35.5 11 36.7 11C37.7 11 38.3 11.6 38.1 12.8L37.3 17.5H40.3L41.2 12.3C41.6 10 40.5 8 38.5 8Z"
+                        fill="#0070BA"
+                      />
+                      <path
+                        d="M44.5 8C42 8 40 10.3 39.5 13C39 15.7 40.5 17.7 43 17.7C44.5 17.7 45.8 17 46.5 15.8L46.7 17.5H49.5L51.2 8.2H48.2L48 9.5C47.3 8.5 46 8 44.5 8ZM44.5 11C45.7 11 46.5 12 46.3 13.3C46.1 14.7 44.9 15.7 43.7 15.7C42.5 15.7 41.8 14.7 42 13.3C42.2 12 43.3 11 44.5 11Z"
+                        fill="#0070BA"
+                      />
+                      <path
+                        d="M52.5 4.5L50 17.5H53L55.5 4.5H52.5Z"
+                        fill="#0070BA"
+                      />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Section Bientôt disponible (collapsible) -->
+              <div class="payment-methods__coming-soon">
+                <button
+                  class="payment-methods__coming-header"
+                  @click="showComingSoon = !showComingSoon"
+                  type="button"
+                >
+                  <div class="payment-methods__coming-left">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                      />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    <span>Autres méthodes</span>
+                    <span class="payment-methods__coming-badge">Bientôt</span>
+                  </div>
                   <svg
-                    viewBox="0 0 48 48"
+                    class="payment-methods__coming-chevron"
+                    :class="{ 'payment-methods__coming-chevron--open': showComingSoon }"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
                     fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
                   >
-                    <rect
-                      width="48"
-                      height="48"
-                      rx="8"
-                      fill="#003087"
-                    />
-                    <path
-                      d="M32.33 18.1C32.31 18.24 32.28 18.39 32.25 18.54C31.27 23.59 27.9 25.33 23.61 25.33H21.42C20.89 25.33 20.45 25.71 20.37 26.23L19.25 33.34L18.93 35.35C18.88 35.69 19.14 36 19.48 36H23.36C23.82 36 24.21 35.67 24.29 35.21L24.32 35.02L25.06 30.38L25.1 30.12C25.17 29.67 25.56 29.33 26.02 29.33H26.61C30.37 29.33 33.31 27.81 34.17 23.39C34.53 21.54 34.34 20 33.39 18.92C33.11 18.59 32.75 18.32 32.33 18.1Z"
-                      fill="white"
-                      fill-opacity="0.6"
-                    />
-                    <path
-                      d="M21.65 18.12C21.69 17.81 21.9 17.56 22.16 17.43C22.29 17.37 22.42 17.33 22.57 17.33H28.41C29.11 17.33 29.75 17.38 30.34 17.48C30.51 17.5 30.68 17.53 30.84 17.57C31 17.6 31.15 17.64 31.3 17.69C31.38 17.71 31.45 17.73 31.52 17.76C31.81 17.85 32.08 17.97 32.33 18.1C32.62 16.23 32.33 14.96 31.32 13.81C30.21 12.54 28.2 12 25.63 12H18.17C17.64 12 17.2 12.38 17.12 12.9L14.01 32.6C13.95 32.99 14.25 33.34 14.64 33.34H19.25L20.4 26L21.65 18.12Z"
-                      fill="white"
-                    />
+                    <path d="M6 9l6 6 6-6" />
                   </svg>
-                </div>
-                <div class="payment-card__content">
-                  <span class="payment-card__title">PayPal</span>
-                  <span class="payment-card__desc">Paiement sécurisé PayPal</span>
-                </div>
-              </button>
+                </button>
+
+                <Transition name="slide">
+                  <div
+                    v-if="showComingSoon"
+                    class="payment-methods__coming-content"
+                  >
+                    <!-- Google Pay -->
+                    <div class="payment-card payment-card--disabled">
+                      <div class="payment-card__icon payment-card__icon--google">
+                        <svg
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <rect
+                            width="48"
+                            height="48"
+                            rx="10"
+                            fill="#fff"
+                          />
+                          <path
+                            d="M35.76 24.27c0-.79-.07-1.54-.2-2.27H24v4.3h6.59c-.28 1.53-1.14 2.83-2.43 3.69v3.07h3.94c2.3-2.12 3.66-5.24 3.66-8.79z"
+                            fill="#4285F4"
+                          />
+                          <path
+                            d="M24 36c3.29 0 6.04-1.09 8.06-2.94l-3.94-3.07c-1.09.73-2.48 1.16-4.12 1.16-3.17 0-5.85-2.14-6.81-5.02h-4.07v3.17C15.09 33.14 19.21 36 24 36z"
+                            fill="#34A853"
+                          />
+                          <path
+                            d="M17.19 26.13c-.24-.73-.38-1.51-.38-2.31s.14-1.58.38-2.31v-3.17h-4.07C12.38 20.01 12 21.93 12 24s.38 3.99 1.12 5.66l4.07-3.53z"
+                            fill="#FBBC05"
+                          />
+                          <path
+                            d="M24 16.85c1.79 0 3.4.62 4.66 1.82l3.5-3.5C30.02 13.17 27.27 12 24 12c-4.79 0-8.91 2.86-10.88 6.66l4.07 3.17c.96-2.88 3.64-5.02 6.81-5.02z"
+                            fill="#EA4335"
+                          />
+                        </svg>
+                      </div>
+                      <div class="payment-card__content">
+                        <span class="payment-card__title">Google Pay</span>
+                        <span class="payment-card__desc">Paiement rapide avec Google</span>
+                      </div>
+                    </div>
+
+                    <!-- Apple Pay -->
+                    <div class="payment-card payment-card--disabled">
+                      <div class="payment-card__icon payment-card__icon--apple">
+                        <svg
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <rect
+                            width="48"
+                            height="48"
+                            rx="10"
+                            fill="#000"
+                          />
+                          <path
+                            d="M30.2 16.5C29.1 17.8 27.6 18.8 26 18.6C25.8 17 26.5 15.3 27.5 14.2C28.6 13 30.2 12.1 31.6 12C31.8 13.7 31.2 15.3 30.2 16.5ZM31.6 19C29.4 18.9 27.5 20.3 26.4 20.3C25.3 20.3 23.7 19.1 21.9 19.1C19.1 19.1 16 21.1 16 25.6C16 28.4 17.1 31.3 18.5 33.1C19.7 34.6 20.7 36 22.3 36C23.8 36 24.5 35 26.5 35C28.5 35 29.1 36 30.7 36C32.3 36 33.4 34.5 34.5 33.1C35.4 31.9 35.8 30.7 35.8 30.6C35.8 30.6 33 29.4 33 26.2C33 23.5 35.2 22.2 35.3 22.1C33.9 20.1 31.8 19 31.6 19Z"
+                            fill="white"
+                          />
+                        </svg>
+                      </div>
+                      <div class="payment-card__content">
+                        <span class="payment-card__title">Apple Pay</span>
+                        <span class="payment-card__desc">Paiement rapide et sécurisé</span>
+                      </div>
+                    </div>
+
+                    <!-- Divider BNPL -->
+                    <div class="payment-methods__divider-mini">
+                      <span>Paiement fractionné</span>
+                    </div>
+
+                    <!-- Klarna -->
+                    <div class="payment-card payment-card--disabled">
+                      <div class="payment-card__icon payment-card__icon--klarna">
+                        <svg
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <rect
+                            width="48"
+                            height="48"
+                            rx="10"
+                            fill="#FFB3C7"
+                          />
+                          <path
+                            d="M18 15H21C21 18.5 19.5 21.5 17 24L14 27V15H18Z"
+                            fill="#0A0B09"
+                          />
+                          <path
+                            d="M23 15H26V27H23V15Z"
+                            fill="#0A0B09"
+                          />
+                          <circle
+                            cx="30"
+                            cy="24"
+                            r="2.5"
+                            fill="#0A0B09"
+                          />
+                          <circle
+                            cx="36"
+                            cy="24"
+                            r="2.5"
+                            fill="#0A0B09"
+                          />
+                        </svg>
+                      </div>
+                      <div class="payment-card__content">
+                        <span class="payment-card__title">Klarna</span>
+                        <span class="payment-card__desc">Payez en 3x sans frais</span>
+                      </div>
+                      <div class="payment-card__bnpl-preview">
+                        <span>3 × {{ formatPrice(finalTotal / 3) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Alma -->
+                    <div class="payment-card payment-card--disabled">
+                      <div class="payment-card__icon payment-card__icon--alma">
+                        <svg
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <rect
+                            width="48"
+                            height="48"
+                            rx="10"
+                            fill="#FA5022"
+                          />
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r="10"
+                            stroke="white"
+                            stroke-width="2.5"
+                            fill="none"
+                          />
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r="5"
+                            stroke="white"
+                            stroke-width="2"
+                            fill="none"
+                          />
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r="1.5"
+                            fill="white"
+                          />
+                        </svg>
+                      </div>
+                      <div class="payment-card__content">
+                        <span class="payment-card__title">Alma</span>
+                        <span class="payment-card__desc">Payez en 2x, 3x ou 4x</span>
+                      </div>
+                      <div class="payment-card__bnpl-preview">
+                        <span>4 × {{ formatPrice(finalTotal / 4) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Clearpay -->
+                    <div class="payment-card payment-card--disabled">
+                      <div class="payment-card__icon payment-card__icon--afterpay">
+                        <svg
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <rect
+                            width="48"
+                            height="48"
+                            rx="10"
+                            fill="#B2FCE4"
+                          />
+                          <path
+                            d="M24 14L14 31H34L24 14Z"
+                            fill="#000"
+                          />
+                          <path
+                            d="M24 20L18 30H30L24 20Z"
+                            fill="#B2FCE4"
+                          />
+                          <circle
+                            cx="24"
+                            cy="36"
+                            r="3"
+                            fill="#000"
+                          />
+                        </svg>
+                      </div>
+                      <div class="payment-card__content">
+                        <span class="payment-card__title">Clearpay</span>
+                        <span class="payment-card__desc">Payez en 4x sans frais</span>
+                      </div>
+                    </div>
+                  </div>
+                </Transition>
+              </div>
             </div>
           </section>
         </div>
-
         <!-- Right Column - Order Summary -->
         <aside class="checkout__sidebar">
           <div class="checkout__summary">
@@ -680,7 +1033,6 @@
                 Payer {{ formatPrice(finalTotal) }}
               </template>
             </button>
-
             <!-- Trust Badges -->
             <div class="checkout__trust">
               <div class="checkout__trust-item">
@@ -761,6 +1113,7 @@
   const currentStep = ref(2)
   const isSubmitting = ref(false)
   const useProfileAddress = ref(true)
+  const showComingSoon = ref(false)
   const selectedPayment = ref<PaymentProvider>('stripe')
 
   // Form fields
@@ -878,6 +1231,12 @@
   async function submitOrder() {
     if (isSubmitting.value) return
 
+    // Seuls Stripe et PayPal sont disponibles
+    if (selectedPayment.value !== 'stripe' && selectedPayment.value !== 'paypal') {
+      toast.show('Cette méthode de paiement sera bientôt disponible', 'info')
+      return
+    }
+
     await withSablier(async () => {
       isSubmitting.value = true
 
@@ -942,7 +1301,6 @@
     })
   }
 </script>
-
 <style scoped lang="less">
   @font-display:
     'Instrument Sans',
@@ -955,6 +1313,7 @@
     -apple-system,
     sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
+  @bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   .checkout {
     position: relative;
@@ -1333,8 +1692,8 @@
     }
 
     &__form-row {
-      display: flex; /* Remplacer grid par flex */
-      flex-wrap: wrap; /* Permet le passage à la ligne */
+      display: flex;
+      flex-wrap: wrap;
       gap: 16px;
 
       &--3 {
@@ -1352,11 +1711,10 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      flex: 1; /* Prend l'espace disponible */
-      min-width: 240px; /* EMPÊCHE le chevauchement en forçant une largeur min */
+      flex: 1;
 
       &--grow {
-        flex: 1000; /* Force ce champ à prendre plus de place si possible */
+        flex: 1000;
       }
     }
 
@@ -1375,6 +1733,7 @@
     }
 
     &__input {
+      width: auto;
       padding: 14px 16px;
       background: @neutral-50;
       border: 1px solid @neutral-200;
@@ -1759,42 +2118,301 @@
   // ============================================
   // PAYMENT CARD
   // ============================================
+
+  // ============================================
+  // PAYMENT METHODS - Structure optimisée
+  // ============================================
+  .payment-methods__available {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // ============================================
+  // SECTION "BIENTÔT DISPONIBLE" - Collapsible
+  // ============================================
+  .payment-methods__coming-soon {
+    margin-top: 16px;
+    border: 1px solid @neutral-200;
+    border-radius: 14px;
+    overflow: hidden;
+    background: @neutral-50;
+  }
+
+  .payment-methods__coming-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s @ease;
+
+    &:hover {
+      background: @neutral-100;
+    }
+  }
+
+  .payment-methods__coming-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: @font-body;
+    font-size: 14px;
+    font-weight: 500;
+    color: @neutral-600;
+
+    svg {
+      color: @neutral-400;
+    }
+  }
+
+  .payment-methods__coming-badge {
+    padding: 3px 8px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-100) 0%,
+      rgba(var(--primary-500-rgb), 0.1) 100%
+    );
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--primary-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .payment-methods__coming-chevron {
+    color: @neutral-400;
+    transition: transform 0.25s @ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  .payment-methods__coming-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+
+  // ============================================
+  // PAYMENT CARD - État désactivé
+  // ============================================
+  .payment-card--disabled {
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid @neutral-200;
+    border-radius: 12px;
+    opacity: 0.7;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      background: white;
+    }
+
+    .payment-card__icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+    }
+
+    .payment-card__title {
+      font-size: 14px;
+      color: @neutral-700;
+    }
+
+    .payment-card__desc {
+      font-size: 12px;
+      color: @neutral-400;
+    }
+  }
+
+  // ============================================
+  // BNPL Preview (pour les méthodes désactivées)
+  // ============================================
+  .payment-card__bnpl-preview {
+    margin-left: auto;
+    padding: 6px 10px;
+    background: @neutral-100;
+    border-radius: 8px;
+
+    span {
+      font-family: @font-body;
+      font-size: 12px;
+      font-weight: 600;
+      color: @neutral-500;
+    }
+  }
+
+  // ============================================
+  // Mini divider (dans la section collapsible)
+  // ============================================
+  .payment-methods__divider-mini {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 4px;
+    padding: 0 6px;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: @neutral-200;
+    }
+
+    span {
+      font-family: @font-body;
+      font-size: 10px;
+      font-weight: 600;
+      color: @neutral-400;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+  }
+
+  // ============================================
+  // Animation slide pour le collapse
+  // ============================================
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: all 0.3s @ease;
+    overflow: hidden;
+  }
+
+  .slide-enter-from,
+  .slide-leave-to {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .slide-enter-to,
+  .slide-leave-from {
+    opacity: 1;
+    max-height: 500px;
+  }
+
+  // ============================================
+  // PAYMENT CARD - Icônes (garder les existants + ajouts)
+  // ============================================
+  .payment-card {
+    &__icon--google {
+      background: white;
+      border: 1px solid @neutral-200;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    &__icon--klarna {
+      background: #ffb3c7;
+      box-shadow: 0 2px 8px rgba(255, 179, 199, 0.3);
+    }
+
+    &__icon--alma {
+      background: #fa5022;
+      box-shadow: 0 2px 8px rgba(250, 80, 34, 0.3);
+    }
+
+    &__icon--afterpay {
+      background: #b2fce4;
+      box-shadow: 0 2px 8px rgba(178, 252, 228, 0.3);
+    }
+  }
+
+  // ============================================
+  // RESPONSIVE
+  // ============================================
+  @media (max-width: 768px) {
+    .payment-methods__coming-header {
+      padding: 12px 14px;
+    }
+
+    .payment-methods__coming-content {
+      padding: 0 8px 8px;
+    }
+
+    .payment-card--disabled {
+      padding: 12px 14px;
+      gap: 12px;
+
+      .payment-card__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
+
+      .payment-card__bnpl-preview {
+        display: none;
+      }
+    }
+
+    .payment-methods__divider-mini {
+      margin: 4px 0;
+    }
+  }
   .payment-card {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px 20px;
-    background: @neutral-50;
+    padding: 20px 24px;
+    background: white;
     border: 2px solid @neutral-200;
-    border-radius: 14px;
+    border-radius: 16px;
     cursor: pointer;
-    transition: all 0.2s @ease;
+    transition: all 0.25s @ease;
     text-align: left;
 
     &:hover {
       border-color: @neutral-300;
-      background: white;
+      background: @neutral-50;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
 
     &--active {
-      background: rgba(var(--primary-500-rgb), 0.05);
+      background: linear-gradient(
+        135deg,
+        rgba(var(--primary-500-rgb), 0.04) 0%,
+        rgba(var(--primary-500-rgb), 0.02) 100%
+      );
       border-color: var(--primary-500);
+      box-shadow: 0 0 0 4px rgba(var(--primary-500-rgb), 0.1);
 
       .payment-card__radio-inner {
         transform: scale(1);
       }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 0 4px rgba(var(--primary-500-rgb), 0.1),
+          0 4px 16px rgba(0, 0, 0, 0.06);
+      }
     }
 
     &__radio {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
       border: 2px solid @neutral-300;
       border-radius: 50%;
       flex-shrink: 0;
-      transition: all 0.2s @ease;
+      transition: all 0.25s @ease;
 
       .payment-card--active & {
         border-color: var(--primary-500);
@@ -1804,25 +2422,40 @@
     &__radio-inner {
       width: 12px;
       height: 12px;
-      background: var(--primary-500);
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
       border-radius: 50%;
       transform: scale(0);
-      transition: transform 0.2s @ease;
+      transition: transform 0.25s @bounce;
     }
 
     &__icon {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 14px;
       flex-shrink: 0;
+      overflow: hidden;
 
       svg {
         width: 100%;
         height: 100%;
-        border-radius: 10px;
+      }
+
+      &--stripe {
+        background: #635bff;
+        box-shadow: 0 2px 8px rgba(99, 91, 255, 0.3);
+      }
+
+      &--paypal {
+        background: #003087;
+        box-shadow: 0 2px 8px rgba(0, 48, 135, 0.3);
+      }
+
+      &--apple {
+        background: #000;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
     }
 
@@ -1830,14 +2463,15 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
+      min-width: 0;
     }
 
     &__title {
-      font-family: @font-body;
-      font-size: 15px;
+      font-family: @font-display;
+      font-size: 16px;
       font-weight: 600;
-      color: @neutral-800;
+      color: @neutral-900;
     }
 
     &__desc {
@@ -1848,11 +2482,41 @@
 
     &__cards {
       display: flex;
-      gap: 6px;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
 
-      img {
+    &__card-icon {
+      height: 28px;
+      width: auto;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    &__paypal-logo {
+      flex-shrink: 0;
+
+      svg {
         height: 24px;
-        border-radius: 4px;
+        width: auto;
+      }
+    }
+
+    &__apple-badge {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, @neutral-100 0%, @neutral-50 100%);
+      border: 1px solid @neutral-200;
+      border-radius: 20px;
+
+      span {
+        font-family: @font-body;
+        font-size: 11px;
+        font-weight: 600;
+        color: @neutral-500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
     }
   }
@@ -1953,6 +2617,188 @@
 
       &__price {
         align-items: center;
+      }
+    }
+
+    .payment-card {
+      flex-wrap: wrap;
+      padding: 16px;
+
+      &__cards {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px solid @neutral-100;
+      }
+
+      &__paypal-logo,
+      &__apple-badge {
+        margin-left: auto;
+      }
+    }
+  }
+
+  // ============================================
+  // PAYMENT METHODS DIVIDER
+  // ============================================
+  .payment-methods__divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0 12px;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, @neutral-200, transparent);
+    }
+
+    span {
+      font-family: @font-body;
+      font-size: 12px;
+      font-weight: 600;
+      color: @neutral-400;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+  }
+
+  // ============================================
+  // PAYMENT CARD - Ajouts pour les nouveaux providers
+  // ============================================
+  .payment-card {
+    // ... (garder les styles existants)
+
+    // Google Pay icon
+    &__icon--google {
+      background: white;
+      border: 1px solid @neutral-200;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    // Klarna icon
+    &__icon--klarna {
+      background: #ffb3c7;
+      box-shadow: 0 2px 8px rgba(255, 179, 199, 0.4);
+    }
+
+    // Alma icon
+    &__icon--alma {
+      background: #fa5022;
+      box-shadow: 0 2px 8px rgba(250, 80, 34, 0.4);
+    }
+
+    // Afterpay icon
+    &__icon--afterpay {
+      background: #b2fce4;
+      box-shadow: 0 2px 8px rgba(178, 252, 228, 0.4);
+    }
+
+    // Google Pay logo
+    &__google-logo {
+      flex-shrink: 0;
+
+      svg {
+        height: 20px;
+        width: auto;
+      }
+    }
+
+    // Badge "Bientôt" unifié
+    &__coming-badge {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, @neutral-100 0%, @neutral-50 100%);
+      border: 1px solid @neutral-200;
+      border-radius: 20px;
+
+      span {
+        font-family: @font-body;
+        font-size: 11px;
+        font-weight: 600;
+        color: @neutral-500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    // BNPL specific styles
+    &--bnpl {
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: 20px;
+        right: 20px;
+        height: 3px;
+        background: linear-gradient(90deg, #ffb3c7, #fa5022, #b2fce4);
+        border-radius: 0 0 3px 3px;
+        opacity: 0;
+        transition: opacity 0.25s @ease;
+      }
+
+      &.payment-card--active::before {
+        opacity: 1;
+      }
+    }
+
+    // BNPL info (montant par échéance)
+    &__bnpl-info {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: linear-gradient(
+        135deg,
+        rgba(var(--primary-500-rgb), 0.08) 0%,
+        rgba(var(--primary-500-rgb), 0.04) 100%
+      );
+      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+      border-radius: 10px;
+    }
+
+    &__bnpl-amount {
+      font-family: @font-display;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-700);
+    }
+  }
+
+  // ============================================
+  // RESPONSIVE - Ajouts pour les nouveaux éléments
+  // ============================================
+  @media (max-width: 768px) {
+    .payment-methods__divider {
+      margin: 16px 0 8px;
+
+      span {
+        font-size: 11px;
+      }
+    }
+
+    .payment-card {
+      &__google-logo {
+        display: none;
+      }
+
+      &__bnpl-info {
+        width: 100%;
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px solid @neutral-100;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        text-align: center;
+      }
+
+      &__coming-badge {
+        margin-left: auto;
       }
     }
   }
