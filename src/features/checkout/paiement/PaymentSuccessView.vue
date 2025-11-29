@@ -6,100 +6,439 @@
       <div class="success__bg-pattern"></div>
       <div class="success__bg-orb success__bg-orb--1"></div>
       <div class="success__bg-orb success__bg-orb--2"></div>
-      <div class="success__bg-orb success__bg-orb--3"></div>
     </div>
 
     <div class="success__container">
-      <!-- Main Card -->
+      <!-- Main Card - Horizontal Layout -->
       <div class="success__card">
-        <!-- Header -->
+        <!-- Top Section: Status -->
         <div
-          class="success__header"
-          :class="{ 'success__header--error': isError }"
+          class="success__status"
+          :class="{ 'success__status--error': isError }"
         >
-          <!-- Animated Icon -->
-          <div class="success__icon-wrapper">
-            <div class="success__icon-bg">
+          <!-- Back button top right -->
+          <button
+            class="success__back-top"
+            @click="$router.push('/')"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Boutique
+          </button>
+
+          <div class="success__status-main">
+            <!-- Icon -->
+            <div class="success__icon-wrapper">
               <div class="success__icon-ring success__icon-ring--1"></div>
               <div class="success__icon-ring success__icon-ring--2"></div>
+              <div
+                class="success__icon"
+                :class="{ 'success__icon--error': isError }"
+              >
+                <svg
+                  v-if="!isError"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <svg
+                  v-else
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  />
+                  <line
+                    x1="12"
+                    y1="9"
+                    x2="12"
+                    y2="13"
+                  />
+                  <line
+                    x1="12"
+                    y1="17"
+                    x2="12.01"
+                    y2="17"
+                  />
+                </svg>
+              </div>
             </div>
+
+            <!-- Title & Subtitle -->
+            <div class="success__status-text">
+              <h1 class="success__title">
+                {{ isError ? 'Erreur' : 'Paiement confirmé !' }}
+              </h1>
+              <p
+                v-if="isLoading"
+                class="success__subtitle"
+              >
+                <span class="success__loading-dots">
+                  Finalisation
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </span>
+              </p>
+              <p
+                v-else
+                class="success__subtitle"
+              >
+                {{ isError ? 'Vérification nécessaire' : 'Votre commande a bien été enregistrée' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Bottom row: Email + Trust -->
+          <div
+            v-if="!isLoading && !isError"
+            class="success__status-meta"
+          >
             <div
-              class="success__icon"
-              :class="{ 'success__icon--error': isError }"
+              v-if="orderEmail"
+              class="success__email"
             >
               <svg
-                v-if="!isError"
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <svg
-                v-else
-                width="40"
-                height="40"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
               >
                 <path
-                  d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
                 />
-                <line
-                  x1="12"
-                  y1="9"
-                  x2="12"
-                  y2="13"
-                />
-                <line
-                  x1="12"
-                  y1="17"
-                  x2="12.01"
-                  y2="17"
-                />
+                <polyline points="22,6 12,13 2,6" />
               </svg>
+              <span>{{ orderEmail }}</span>
+            </div>
+            <div class="success__trust">
+              <div class="success__trust-item">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Sécurisé</span>
+              </div>
+              <div class="success__trust-item">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect
+                    x="1"
+                    y="3"
+                    width="15"
+                    height="13"
+                    rx="2"
+                  />
+                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
+                </svg>
+                <span>Rapide</span>
+              </div>
             </div>
           </div>
+        </div>
 
-          <h1 class="success__title">
-            {{ isError ? 'Une erreur est survenue' : 'Paiement confirmé !' }}
-          </h1>
-
-          <p
-            v-if="isLoading"
-            class="success__subtitle"
+        <!-- Right Column: Action -->
+        <div class="success__action">
+          <transition
+            name="fade-slide"
+            mode="out-in"
           >
-            <span class="success__loading-dots">
-              Finalisation en cours
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-            </span>
-          </p>
-
-          <template v-else>
-            <p class="success__subtitle">
-              {{
-                isError
-                  ? 'Le paiement a été reçu mais le statut nécessite une vérification.'
-                  : 'Votre commande a bien été enregistrée'
-              }}
-            </p>
-
-            <!-- Email Badge -->
+            <!-- Loading State -->
+            <!-- Loading State - Skeleton -->
             <div
-              v-if="orderEmail && !isError"
-              class="success__email"
+              v-if="isLoading"
+              key="loading"
+              class="success__skeleton"
             >
-              <div class="success__email-badge">
+              <div class="success__skeleton-header">
+                <div class="success__skeleton-icon"></div>
+                <div class="success__skeleton-text">
+                  <div class="success__skeleton-line success__skeleton-line--title"></div>
+                  <div class="success__skeleton-line success__skeleton-line--subtitle"></div>
+                </div>
+              </div>
+              <div class="success__skeleton-form">
+                <div class="success__skeleton-row">
+                  <div class="success__skeleton-field">
+                    <div class="success__skeleton-label"></div>
+                    <div class="success__skeleton-input"></div>
+                  </div>
+                  <div class="success__skeleton-field">
+                    <div class="success__skeleton-label"></div>
+                    <div class="success__skeleton-input"></div>
+                  </div>
+                </div>
+                <div class="success__skeleton-actions">
+                  <div class="success__skeleton-btn success__skeleton-btn--primary"></div>
+                  <div class="success__skeleton-btn success__skeleton-btn--outline"></div>
+                </div>
+              </div>
+              <div class="success__skeleton-benefits">
+                <div class="success__skeleton-benefit"></div>
+                <div class="success__skeleton-benefit"></div>
+                <div class="success__skeleton-benefit"></div>
+              </div>
+            </div>
+
+            <!-- Guest: Conversion Form -->
+            <div
+              v-else-if="!auth.user && currentOrderId && !isError"
+              key="guest"
+              class="success__conversion"
+            >
+              <div class="success__conversion-header">
                 <svg
-                  width="18"
-                  height="18"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle
+                    cx="8.5"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="20"
+                    y1="8"
+                    x2="20"
+                    y2="14"
+                  />
+                  <line
+                    x1="23"
+                    y1="11"
+                    x2="17"
+                    y2="11"
+                  />
+                </svg>
+                <div>
+                  <h3>Créer mon compte</h3>
+                  <p>Suivez vos commandes facilement</p>
+                </div>
+              </div>
+
+              <form
+                class="success__form"
+                @submit.prevent="handleGuestConversion"
+              >
+                <!-- Email (readonly) -->
+                <div class="success__form-row">
+                  <div class="success__form-group success__form-group--readonly">
+                    <label class="success__label">Email</label>
+                    <div class="success__input-readonly">
+                      <span>{{ orderEmail }}</span>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="success__form-group">
+                    <label class="success__label">Mot de passe</label>
+                    <input
+                      v-model="password"
+                      type="password"
+                      class="success__input"
+                      placeholder="Min. 6 caractères"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="success__form-actions">
+                  <button
+                    type="submit"
+                    class="success__btn success__btn--primary"
+                    :disabled="password.length < 6 || isConverting"
+                  >
+                    <span
+                      v-if="isConverting"
+                      class="success__btn-loader"
+                    ></span>
+                    <template v-else>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="17 11 19 13 23 9" />
+                      </svg>
+                      Activer
+                    </template>
+                  </button>
+
+                  <button
+                    v-if="trackingToken"
+                    type="button"
+                    class="success__btn success__btn--outline"
+                    @click="goToGuestTracking"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle
+                        cx="12"
+                        cy="10"
+                        r="3"
+                      />
+                    </svg>
+                    Suivre
+                  </button>
+                </div>
+              </form>
+
+              <!-- Benefits inline -->
+              <div class="success__benefits">
+                <div class="success__benefit">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Historique
+                </div>
+                <div class="success__benefit">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Suivi temps réel
+                </div>
+                <div class="success__benefit">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Offres exclusives
+                </div>
+              </div>
+            </div>
+
+            <!-- Logged in User -->
+            <div
+              v-else-if="auth.user && !isError"
+              key="logged"
+              class="success__logged"
+            >
+              <div class="success__logged-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 8V21H3V8" />
+                  <path d="M1 3H23V8H1V3Z" />
+                  <path d="M10 12H14" />
+                </svg>
+              </div>
+              <h3>Commande enregistrée</h3>
+              <p>Retrouvez-la dans votre espace</p>
+              <button
+                class="success__btn success__btn--primary"
+                @click="$router.push(`/profil/commandes/${currentOrderId}`)"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                  />
+                </svg>
+                Voir ma commande
+              </button>
+            </div>
+
+            <!-- Error State -->
+            <div
+              v-else-if="isError"
+              key="error"
+              class="success__error"
+            >
+              <p>Un problème est survenu. Notre équipe a été notifiée.</p>
+              <div class="success__error-contact">
+                <svg
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -110,438 +449,10 @@
                   />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
-                <span>{{ orderEmail }}</span>
+                <span>support@fastpeptides.com</span>
               </div>
-              <p class="success__email-hint">Un email de confirmation vous a été envoyé</p>
             </div>
-          </template>
-        </div>
-
-        <!-- Content -->
-        <div class="success__content">
-          <transition
-            name="fade-slide"
-            mode="out-in"
-          >
-            <div
-              v-if="isLoading"
-              class="success__loader"
-            >
-              <div class="success__loader-spinner"></div>
-              <p>Traitement de votre commande...</p>
-            </div>
-
-            <template v-else>
-              <!-- Guest: Conversion Form -->
-              <div
-                v-if="!auth.user && currentOrderId && !isError"
-                class="success__section"
-              >
-                <div class="success__conversion">
-                  <div class="success__conversion-header">
-                    <div class="success__conversion-icon">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                        <circle
-                          cx="8.5"
-                          cy="7"
-                          r="4"
-                        />
-                        <line
-                          x1="20"
-                          y1="8"
-                          x2="20"
-                          y2="14"
-                        />
-                        <line
-                          x1="23"
-                          y1="11"
-                          x2="17"
-                          y2="11"
-                        />
-                      </svg>
-                    </div>
-                    <div class="success__conversion-text">
-                      <h3>Créer mon compte</h3>
-                      <p>Suivez vos commandes et profitez d'avantages exclusifs</p>
-                    </div>
-                  </div>
-
-                  <form
-                    class="success__form"
-                    @submit.prevent="handleGuestConversion"
-                  >
-                    <!-- Email (readonly) -->
-                    <div class="success__form-group">
-                      <label class="success__label">Email associé</label>
-                      <div class="success__input-readonly">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path
-                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                          />
-                          <polyline points="22,6 12,13 2,6" />
-                        </svg>
-                        <span>{{ orderEmail }}</span>
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          class="success__input-check"
-                        >
-                          <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                          <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="success__form-group">
-                      <label class="success__label">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <rect
-                            x="3"
-                            y="11"
-                            width="18"
-                            height="11"
-                            rx="2"
-                          />
-                          <path d="M7 11V7a5 5 0 0110 0v4" />
-                        </svg>
-                        Mot de passe
-                      </label>
-                      <div class="success__input-wrapper">
-                        <input
-                          v-model="password"
-                          type="password"
-                          class="success__input"
-                          placeholder="Minimum 6 caractères"
-                          required
-                        />
-                      </div>
-                      <span class="success__input-hint">
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                          />
-                          <line
-                            x1="12"
-                            y1="16"
-                            x2="12"
-                            y2="12"
-                          />
-                          <line
-                            x1="12"
-                            y1="8"
-                            x2="12.01"
-                            y2="8"
-                          />
-                        </svg>
-                        Choisissez un mot de passe sécurisé
-                      </span>
-                    </div>
-
-                    <button
-                      type="submit"
-                      class="success__btn success__btn--primary"
-                      :disabled="password.length < 6 || isConverting"
-                    >
-                      <span
-                        v-if="isConverting"
-                        class="success__btn-loader"
-                      ></span>
-                      <template v-else>
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                          <circle
-                            cx="8.5"
-                            cy="7"
-                            r="4"
-                          />
-                          <polyline points="17 11 19 13 23 9" />
-                        </svg>
-                        Activer mon compte
-                      </template>
-                    </button>
-                  </form>
-
-                  <!-- Alternative: Guest Tracking -->
-                  <div
-                    v-if="trackingToken"
-                    class="success__alternative"
-                  >
-                    <div class="success__alternative-divider">
-                      <span>ou</span>
-                    </div>
-                    <button
-                      class="success__btn success__btn--outline"
-                      @click="goToGuestTracking"
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                        <circle
-                          cx="12"
-                          cy="10"
-                          r="3"
-                        />
-                      </svg>
-                      Suivre sans créer de compte
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Benefits -->
-                <div class="success__benefits">
-                  <h4 class="success__benefits-title">Avantages du compte</h4>
-                  <div class="success__benefits-list">
-                    <div class="success__benefit">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                      </svg>
-                      <span>Historique des commandes</span>
-                    </div>
-                    <div class="success__benefit">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                      </svg>
-                      <span>Suivi en temps réel</span>
-                    </div>
-                    <div class="success__benefit">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                      </svg>
-                      <span>Offres exclusives</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Logged in User -->
-              <div
-                v-else-if="auth.user && !isError"
-                class="success__section"
-              >
-                <div class="success__logged">
-                  <div class="success__logged-icon">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M21 8V21H3V8" />
-                      <path d="M1 3H23V8H1V3Z" />
-                      <path d="M10 12H14" />
-                    </svg>
-                  </div>
-                  <h3 class="success__logged-title">Commande enregistrée</h3>
-                  <p class="success__logged-text">
-                    Retrouvez tous les détails dans votre espace personnel
-                  </p>
-                  <button
-                    class="success__btn success__btn--primary"
-                    @click="$router.push(`/profil/commandes/${currentOrderId}`)"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                      />
-                    </svg>
-                    Voir ma commande
-                  </button>
-                </div>
-              </div>
-
-              <!-- Error State -->
-              <div
-                v-else-if="isError"
-                class="success__section"
-              >
-                <div class="success__error-content">
-                  <p class="success__error-text">
-                    Un problème est survenu lors du traitement de votre commande. Notre équipe a été
-                    notifiée et reviendra vers vous rapidement.
-                  </p>
-                  <div class="success__error-contact">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                      />
-                      <polyline points="22,6 12,13 2,6" />
-                    </svg>
-                    <span>support@fastpeptides.com</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Back to Shop -->
-              <button
-                class="success__btn success__btn--ghost"
-                @click="$router.push('/')"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                Retour à la boutique
-              </button>
-            </template>
           </transition>
-        </div>
-      </div>
-
-      <!-- Trust Footer -->
-      <div class="success__footer">
-        <div class="success__footer-item">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          <span>Paiement sécurisé</span>
-        </div>
-        <div class="success__footer-item">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect
-              x="1"
-              y="3"
-              width="15"
-              height="13"
-              rx="2"
-            />
-            <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-            <circle
-              cx="5.5"
-              cy="18.5"
-              r="2.5"
-            />
-            <circle
-              cx="18.5"
-              cy="18.5"
-              r="2.5"
-            />
-          </svg>
-          <span>Livraison rapide</span>
-        </div>
-        <div class="success__footer-item">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-          </svg>
-          <span>Support 24/7</span>
         </div>
       </div>
     </div>
@@ -638,16 +549,15 @@
   }
 
   async function fetchOrderByStripe(sessionId: string) {
-    const { data } = await supabase
-      .from('orders')
-      .select('id, email, order_number, tracking_token')
-      .eq('stripe_session_id', sessionId)
-      .maybeSingle()
-    if (data) {
-      currentOrderId.value = data.id
-      orderEmail.value = data.email
-      orderNumber.value = data.order_number || ''
-      trackingToken.value = data.tracking_token || ''
+    const { data, error } = await supabase.rpc('get_order_by_stripe_session', {
+      p_session_id: sessionId,
+    })
+
+    if (data && typeof data === 'object' && 'id' in data) {
+      currentOrderId.value = (data as { id: string }).id
+      orderEmail.value = (data as { email?: string }).email || ''
+      orderNumber.value = (data as { order_number?: string }).order_number || ''
+      trackingToken.value = (data as { tracking_token?: string }).tracking_token || ''
     }
   }
 
@@ -715,6 +625,7 @@
     router.push(`/suivi-commande?token=${trackingToken.value}`)
   }
 </script>
+
 <style scoped lang="less">
   @font-display:
     'Instrument Sans',
@@ -734,7 +645,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 24px;
     overflow: hidden;
 
     // ============================================
@@ -758,6 +669,126 @@
       );
     }
 
+    // ============================================
+    // SKELETON LOADER
+    // ============================================
+    &__skeleton {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__skeleton-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid @neutral-100;
+    }
+
+    &__skeleton-icon {
+      width: 20px;
+      height: 20px;
+      background: @neutral-200;
+      border-radius: 6px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    &__skeleton-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__skeleton-line {
+      background: @neutral-200;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+
+      &--title {
+        width: 140px;
+        height: 18px;
+      }
+
+      &--subtitle {
+        width: 200px;
+        height: 14px;
+      }
+    }
+
+    &__skeleton-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    &__skeleton-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    &__skeleton-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    &__skeleton-label {
+      width: 60px;
+      height: 12px;
+      background: @neutral-200;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    &__skeleton-input {
+      height: 44px;
+      background: @neutral-100;
+      border-radius: 10px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    &__skeleton-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    &__skeleton-btn {
+      height: 44px;
+      border-radius: 10px;
+      animation: shimmer 1.5s infinite;
+
+      &--primary {
+        flex: 1;
+        background: @neutral-200;
+      }
+
+      &--outline {
+        width: 100px;
+        background: @neutral-100;
+        border: 1px solid @neutral-200;
+      }
+    }
+
+    &__skeleton-benefits {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid @neutral-100;
+    }
+
+    &__skeleton-benefit {
+      width: 80px;
+      height: 16px;
+      background: @neutral-200;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+    }
+
     &__bg-pattern {
       position: absolute;
       inset: 0;
@@ -773,31 +804,20 @@
       animation: float 20s ease-in-out infinite;
 
       &--1 {
-        top: 10%;
-        left: 10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(var(--primary-400-rgb), 0.15);
-        animation-delay: 0s;
+        top: 20%;
+        left: 5%;
+        width: 350px;
+        height: 350px;
+        background: rgba(var(--primary-400-rgb), 0.12);
       }
 
       &--2 {
-        bottom: 20%;
-        right: 10%;
-        width: 300px;
-        height: 300px;
-        background: rgba(16, 185, 129, 0.1);
-        animation-delay: -7s;
-      }
-
-      &--3 {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 500px;
-        height: 500px;
-        background: rgba(var(--primary-300-rgb), 0.08);
-        animation-delay: -14s;
+        bottom: 10%;
+        right: 5%;
+        width: 280px;
+        height: 280px;
+        background: rgba(16, 185, 129, 0.08);
+        animation-delay: -10s;
       }
     }
 
@@ -808,34 +828,37 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 520px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+      max-width: 820px;
     }
 
     // ============================================
-    // CARD
+    // CARD - VERTICAL LAYOUT
     // ============================================
     &__card {
+      display: flex;
+      flex-direction: column;
       background: white;
-      border-radius: 28px;
+      border-radius: 24px;
       box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.04),
         0 8px 32px rgba(0, 0, 0, 0.06),
         0 24px 64px rgba(0, 0, 0, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.8);
       overflow: hidden;
+      max-width: 520px;
+      margin: 0 auto;
     }
 
     // ============================================
-    // HEADER
+    // TOP SECTION - STATUS
     // ============================================
-    &__header {
-      position: relative;
-      padding: 48px 32px 40px;
+    &__status {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px 28px;
       background: linear-gradient(160deg, var(--secondary-900) 0%, var(--secondary-800) 100%);
-      text-align: center;
+      position: relative;
       overflow: hidden;
 
       &::before {
@@ -847,7 +870,7 @@
         bottom: 0;
         background: radial-gradient(
           circle at 30% 20%,
-          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.06) 0%,
           transparent 50%
         );
       }
@@ -857,21 +880,55 @@
       }
     }
 
-    &__icon-wrapper {
-      position: relative;
-      display: inline-flex;
-      margin-bottom: 24px;
+    &__back-top {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      font-family: @font-body;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.2s @ease;
+      z-index: 1;
+
+      svg {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+
+        svg {
+          color: white;
+        }
+      }
     }
 
-    &__icon-bg {
-      position: absolute;
-      inset: -20px;
+    &__status-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    &__icon-wrapper {
+      position: relative;
+      flex-shrink: 0;
     }
 
     &__icon-ring {
       position: absolute;
-      inset: 0;
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      inset: -12px;
+      border: 2px solid rgba(255, 255, 255, 0.08);
       border-radius: 50%;
 
       &--1 {
@@ -885,8 +942,8 @@
 
     &__icon {
       position: relative;
-      width: 80px;
-      height: 80px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -894,43 +951,42 @@
       border-radius: 50%;
       color: #34d399;
       box-shadow:
-        0 0 0 8px rgba(16, 185, 129, 0.1),
-        0 8px 32px rgba(0, 0, 0, 0.2);
+        0 0 0 4px rgba(16, 185, 129, 0.1),
+        0 6px 20px rgba(0, 0, 0, 0.2);
       animation: icon-pop 0.5s @ease;
 
       &--error {
         background: rgba(239, 68, 68, 0.2);
         color: #f87171;
         box-shadow:
-          0 0 0 8px rgba(239, 68, 68, 0.1),
-          0 8px 32px rgba(0, 0, 0, 0.2);
+          0 0 0 4px rgba(239, 68, 68, 0.1),
+          0 6px 20px rgba(0, 0, 0, 0.2);
       }
     }
 
+    &__status-text {
+      flex: 1;
+      min-width: 0;
+    }
+
     &__title {
-      position: relative;
       font-family: @font-display;
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 700;
       color: white;
-      margin: 0 0 12px;
+      margin: 0 0 2px;
     }
 
     &__subtitle {
-      position: relative;
       font-family: @font-body;
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
-      max-width: 360px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     &__loading-dots {
       span {
         animation: blink 1.4s infinite both;
-
         &:nth-child(2) {
           animation-delay: 0.2s;
         }
@@ -940,76 +996,89 @@
       }
     }
 
-    // ============================================
-    // EMAIL BADGE
-    // ============================================
-    &__email {
+    &__status-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       position: relative;
-      margin-top: 24px;
     }
 
-    &__email-badge {
-      display: inline-flex;
+    &__email {
+      display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50px;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
       backdrop-filter: blur(8px);
-      transition: all 0.2s @ease;
 
       svg {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.6);
+        flex-shrink: 0;
       }
 
       span {
         font-family: @font-body;
-        font-size: 15px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 500;
         color: white;
       }
+    }
 
-      &:hover {
-        background: rgba(255, 255, 255, 0.18);
-        transform: translateY(-2px);
+    &__trust {
+      display: flex;
+      gap: 16px;
+    }
+
+    &__trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: @font-body;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+
+      svg {
+        color: #34d399;
+        flex-shrink: 0;
       }
     }
 
-    &__email-hint {
-      font-family: @font-body;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      margin: 12px 0 0;
-    }
-
     // ============================================
-    // CONTENT
+    // RIGHT COLUMN - ACTION
     // ============================================
-    &__content {
-      padding: 32px;
-    }
-
-    &__section {
+    &__action {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      padding: 28px;
     }
 
     // ============================================
     // LOADER
     // ============================================
     &__loader {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      padding: 40px 0;
+      justify-content: center;
+      gap: 16px;
+
+      p {
+        font-family: @font-body;
+        font-size: 14px;
+        color: @neutral-500;
+        margin: 0;
+      }
     }
 
     &__loader-spinner {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border: 3px solid @neutral-100;
       border-top-color: var(--primary-500);
       border-radius: 50%;
@@ -1020,45 +1089,36 @@
     // CONVERSION FORM
     // ============================================
     &__conversion {
-      background: @neutral-50;
-      border: 1px solid @neutral-100;
-      border-radius: 20px;
-      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     &__conversion-header {
       display: flex;
-      gap: 16px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid @neutral-200;
-    }
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid @neutral-100;
 
-    &__conversion-icon {
-      width: 52px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      border-radius: 14px;
-      color: var(--primary-600);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      flex-shrink: 0;
-    }
+      > svg {
+        flex-shrink: 0;
+        color: var(--primary-600);
+        margin-top: 2px;
+      }
 
-    &__conversion-text {
       h3 {
         font-family: @font-display;
-        font-size: 18px;
+        font-size: 17px;
         font-weight: 600;
         color: @neutral-900;
-        margin: 0 0 4px;
+        margin: 0 0 2px;
       }
 
       p {
         font-family: @font-body;
-        font-size: 14px;
+        font-size: 13px;
         color: @neutral-500;
         margin: 0;
       }
@@ -1067,67 +1127,71 @@
     &__form {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+    }
+
+    &__form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
     &__form-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+
+      &--readonly {
+        .success__input-readonly {
+          background: @neutral-50;
+        }
+      }
     }
 
     &__label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-family: @font-body;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      color: @neutral-700;
-
-      svg {
-        color: @neutral-400;
-      }
+      color: @neutral-600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     &__input-readonly {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
+      justify-content: space-between;
+      padding: 12px 14px;
       background: white;
       border: 1px solid @neutral-200;
-      border-radius: 12px;
-
-      svg:first-child {
-        color: @neutral-400;
-      }
+      border-radius: 10px;
+      height: 44px;
 
       span {
-        flex: 1;
-        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-family: @font-body;
         font-size: 14px;
-        color: @neutral-700;
+        color: @neutral-600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
-    }
 
-    &__input-check {
-      color: #10b981;
-    }
-
-    &__input-wrapper {
-      position: relative;
+      svg {
+        color: #10b981;
+        flex-shrink: 0;
+      }
     }
 
     &__input {
-      width: 100%;
-      padding: 14px 16px;
+      width: auto;
+      padding: 12px 14px;
       background: white;
       border: 1px solid @neutral-200;
-      border-radius: 12px;
+      border-radius: 10px;
       font-family: @font-body;
-      font-size: 15px;
+      font-size: 14px;
       color: @neutral-900;
+      height: 44px;
       transition: all 0.2s @ease;
 
       &::placeholder {
@@ -1137,11 +1201,26 @@
       &:focus {
         outline: none;
         border-color: var(--primary-400);
-        box-shadow: 0 0 0 4px rgba(var(--primary-500-rgb), 0.1);
+        box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
       }
     }
 
-    &__input-hint {
+    &__form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    &__benefits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid @neutral-100;
+    }
+
+    &__benefit {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1150,81 +1229,7 @@
       color: @neutral-500;
 
       svg {
-        color: @neutral-400;
-      }
-    }
-
-    // ============================================
-    // ALTERNATIVE TRACKING
-    // ============================================
-    &__alternative {
-      margin-top: 8px;
-    }
-
-    &__alternative-divider {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin: 20px 0;
-
-      &::before,
-      &::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: @neutral-200;
-      }
-
-      span {
-        font-family: @font-body;
-        font-size: 12px;
-        color: @neutral-400;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-    }
-
-    // ============================================
-    // BENEFITS
-    // ============================================
-    &__benefits {
-      padding: 20px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-500-rgb), 0.04) 0%,
-        rgba(var(--primary-500-rgb), 0.02) 100%
-      );
-      border: 1px solid rgba(var(--primary-500-rgb), 0.1);
-      border-radius: 16px;
-    }
-
-    &__benefits-title {
-      font-family: @font-body;
-      font-size: 12px;
-      font-weight: 600;
-      color: @neutral-500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 0 0 16px;
-    }
-
-    &__benefits-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    &__benefit {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: @font-body;
-      font-size: 14px;
-      color: @neutral-700;
-
-      svg {
         color: #10b981;
-        flex-shrink: 0;
       }
     }
 
@@ -1232,73 +1237,73 @@
     // LOGGED IN STATE
     // ============================================
     &__logged {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 24px;
-      background: @neutral-50;
-      border: 1px solid @neutral-100;
-      border-radius: 20px;
+      padding: 20px;
     }
 
     &__logged-icon {
-      width: 72px;
-      height: 72px;
+      width: 60px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
-      border-radius: 20px;
+      border-radius: 16px;
       color: var(--primary-600);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    &__logged-title {
+    &__logged h3 {
       font-family: @font-display;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       color: @neutral-900;
-      margin: 0 0 8px;
+      margin: 0 0 6px;
     }
 
-    &__logged-text {
+    &__logged p {
       font-family: @font-body;
-      font-size: 15px;
+      font-size: 14px;
       color: @neutral-500;
-      margin: 0 0 24px;
+      margin: 0 0 20px;
     }
 
     // ============================================
     // ERROR STATE
     // ============================================
-    &__error-content {
-      padding: 24px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 16px;
+    &__error {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-    }
+      padding: 20px;
 
-    &__error-text {
-      font-family: @font-body;
-      font-size: 15px;
-      color: #991b1b;
-      margin: 0 0 20px;
-      line-height: 1.6;
+      p {
+        font-family: @font-body;
+        font-size: 14px;
+        color: #991b1b;
+        margin: 0 0 16px;
+        line-height: 1.5;
+      }
     }
 
     &__error-contact {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 16px;
-      background: white;
+      padding: 10px 14px;
+      background: #fef2f2;
       border: 1px solid #fecaca;
-      border-radius: 10px;
+      border-radius: 8px;
       font-family: @font-body;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
       color: #dc2626;
 
       svg {
@@ -1313,25 +1318,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px 24px;
-      border-radius: 14px;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
       font-family: @font-body;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s @ease;
+      transition: all 0.2s @ease;
+      white-space: nowrap;
 
       &--primary {
+        flex: 1;
+        min-width: 0;
         background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
         border: none;
         color: white;
-        box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
+        box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.25);
 
         &:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(var(--primary-500-rgb), 0.4);
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(var(--primary-500-rgb), 0.35);
         }
 
         &:disabled {
@@ -1342,9 +1349,11 @@
       }
 
       &--outline {
+        flex-shrink: 0;
         background: white;
         border: 1px solid @neutral-200;
         color: @neutral-700;
+        padding: 12px 18px;
 
         &:hover {
           background: @neutral-50;
@@ -1352,50 +1361,15 @@
           color: var(--primary-700);
         }
       }
-
-      &--ghost {
-        background: transparent;
-        border: none;
-        color: @neutral-500;
-        padding: 14px 24px;
-
-        &:hover {
-          color: var(--primary-600);
-          background: rgba(var(--primary-500-rgb), 0.05);
-        }
-      }
     }
 
     &__btn-loader {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-    }
-
-    // ============================================
-    // FOOTER
-    // ============================================
-    &__footer {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-
-    &__footer-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: @font-body;
-      font-size: 13px;
-      color: @neutral-500;
-
-      svg {
-        color: #10b981;
-      }
     }
 
     // ============================================
@@ -1412,24 +1386,18 @@
       100% {
         transform: translateY(0) translateX(0);
       }
-      25% {
-        transform: translateY(-20px) translateX(10px);
-      }
       50% {
-        transform: translateY(0) translateX(20px);
-      }
-      75% {
-        transform: translateY(20px) translateX(10px);
+        transform: translateY(-20px) translateX(10px);
       }
     }
 
     @keyframes pulse-ring {
       0% {
         transform: scale(1);
-        opacity: 0.5;
+        opacity: 0.4;
       }
       100% {
-        transform: scale(1.5);
+        transform: scale(1.4);
         opacity: 0;
       }
     }
@@ -1460,91 +1428,85 @@
 
     .fade-slide-enter-active,
     .fade-slide-leave-active {
-      transition: all 0.4s @ease;
+      transition: all 0.3s @ease;
     }
 
     .fade-slide-enter-from {
       opacity: 0;
-      transform: translateY(16px);
+      transform: translateY(10px);
     }
 
     .fade-slide-leave-to {
       opacity: 0;
-      transform: translateY(-16px);
+      transform: translateY(-10px);
     }
 
     // ============================================
     // RESPONSIVE
     // ============================================
     @media (max-width: 600px) {
-      padding: 24px 16px;
+      padding: 16px;
 
       &__card {
-        border-radius: 24px;
+        border-radius: 20px;
       }
 
-      &__header {
-        padding: 40px 24px 32px;
+      &__status {
+        flex-wrap: wrap;
+        padding: 20px;
+        gap: 16px;
       }
 
-      &__icon {
-        width: 70px;
-        height: 70px;
-
-        svg {
-          width: 32px;
-          height: 32px;
-        }
+      &__status-content {
+        flex: 1 1 calc(100% - 76px);
       }
 
       &__title {
-        font-size: 24px;
+        font-size: 18px;
       }
 
-      &__subtitle {
-        font-size: 15px;
+      &__status-right {
+        flex: 1 1 100%;
+        justify-content: space-between;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      &__content {
-        padding: 24px;
-      }
-
-      &__conversion {
+      &__action {
         padding: 20px;
       }
 
-      &__conversion-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 12px;
+      &__form-row {
+        grid-template-columns: 1fr;
       }
 
-      &__conversion-icon {
-        margin: 0 auto;
+      &__form-actions {
+        flex-direction: column;
       }
 
-      &__footer {
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
+      &__btn--outline {
+        width: 100%;
+      }
+
+      &__benefits {
+        flex-wrap: wrap;
+        gap: 10px;
       }
     }
 
     @media (max-width: 400px) {
-      &__email-badge {
-        padding: 10px 16px;
-
-        span {
-          font-size: 13px;
-        }
+      &__email span {
+        max-width: 120px;
+        font-size: 12px;
       }
 
-      &__benefits-list {
-        gap: 10px;
+      &__trust {
+        gap: 8px;
       }
 
-      &__benefit {
-        font-size: 13px;
+      &__benefits {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   }

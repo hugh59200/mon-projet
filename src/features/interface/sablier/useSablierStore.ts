@@ -6,16 +6,17 @@ export const useSablierStore = defineStore('sablier', () => {
   const estVisible = ref(false)
   let timeoutId: ReturnType<typeof setTimeout> | null = null
   let graceDelayId: ReturnType<typeof setTimeout> | number | null = null
+  let showTime: number | null = null // ⬅️ Nouveau: quand le sablier est apparu
 
   /** 🔥 Lance le sablier (avec délai d'affichage UX-friendly) */
   function debutSablier() {
     compteur.value++
 
-    // 🧠 Si c’est la première requête, on attend un peu avant d’afficher
     if (compteur.value === 1) {
       graceDelayId = window.setTimeout(() => {
         estVisible.value = true
-      }, 200) // délai d’affichage minimal
+        showTime = Date.now() // ⬅️ On note quand il apparaît
+      }, 200)
     }
   }
 
@@ -23,22 +24,26 @@ export const useSablierStore = defineStore('sablier', () => {
   function finSablier() {
     if (compteur.value > 0) compteur.value--
 
-    // 👇 Quand toutes les requêtes sont finies
     if (compteur.value === 0) {
-      // ⛔ Annule l’affichage s’il n’a pas encore commencé
       if (graceDelayId) {
         clearTimeout(graceDelayId)
         graceDelayId = null
       }
 
-      // ✨ Laisse un léger délai pour fluidifier la disparition
       if (timeoutId) {
         clearTimeout(timeoutId)
         timeoutId = null
       }
+
+      // ⬅️ Nouveau: on calcule combien de temps il a été visible
+      const minDisplayTime = 400 // Affichage minimum si visible
+      const visibleDuration = showTime ? Date.now() - showTime : 0
+      const remainingTime = estVisible.value ? Math.max(0, minDisplayTime - visibleDuration) : 0
+
       timeoutId = setTimeout(() => {
         estVisible.value = false
-      }, 200)
+        showTime = null
+      }, remainingTime + 100) // +100ms pour transition fluide
     }
   }
 

@@ -1051,6 +1051,10 @@ export type Database = {
         Args: { p_email: string; p_order_number: string }
         Returns: Json
       }
+      get_order_by_stripe_session: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }

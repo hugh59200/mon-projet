@@ -626,12 +626,6 @@
     &__bg-gradient {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        170deg,
-        @neutral-50 0%,
-        white 35%,
-        rgba(var(--primary-500-rgb), 0.02) 100%
-      );
     }
 
     &__bg-pattern {

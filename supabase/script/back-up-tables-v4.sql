@@ -914,3 +914,31 @@ GRANT EXECUTE ON FUNCTION public.claim_guest_orders TO authenticated;
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS zip text,
 ADD COLUMN IF NOT EXISTS city text;
+
+CREATE OR REPLACE FUNCTION public.get_order_by_stripe_session(p_session_id text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  SELECT jsonb_build_object(
+    'id', id,
+    'email', email,
+    'order_number', order_number,
+    'tracking_token', tracking_token,
+    'status', status,
+    'total_amount', total_amount,
+    'is_guest_order', is_guest_order
+  )
+  INTO v_result
+  FROM public.orders
+  WHERE stripe_session_id = p_session_id
+  LIMIT 1;
+  
+  RETURN v_result;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_order_by_stripe_session TO anon, authenticated;

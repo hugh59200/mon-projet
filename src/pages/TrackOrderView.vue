@@ -10,7 +10,7 @@
 
     <div class="track__container">
       <!-- Header -->
-      <header class="track__header" :class="{ 'track__header--compact': !!order }">
+      <header class="track__header" :class="{ 'track__header--compact': !!order || loading }">
         <div class="track__header-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 8V21H3V8" />
@@ -20,7 +20,7 @@
         </div>
         <div class="track__header-text">
           <h1 class="track__title">Suivi de commande</h1>
-          <p v-if="!order" class="track__subtitle">
+          <p v-if="!order && !loading" class="track__subtitle">
             Consultez l'état d'avancement de votre livraison en temps réel
           </p>
         </div>
@@ -48,8 +48,77 @@
         </div>
       </transition>
 
+      <!-- Loading Skeleton (quand on arrive avec un token) -->
+      <div v-if="loading && !order" class="track__skeleton">
+        <div class="track__skeleton-nav">
+          <div class="track__skeleton-btn"></div>
+        </div>
+        <div class="track__skeleton-grid">
+          <!-- Main Column -->
+          <div class="track__skeleton-main">
+            <!-- Status Card -->
+            <div class="track__skeleton-card track__skeleton-card--status">
+              <div class="track__skeleton-header">
+                <div>
+                  <div class="track__skeleton-line track__skeleton-line--label"></div>
+                  <div class="track__skeleton-line track__skeleton-line--number"></div>
+                </div>
+                <div class="track__skeleton-badge"></div>
+              </div>
+              <div class="track__skeleton-timeline">
+                <div class="track__skeleton-step" v-for="i in 4" :key="i">
+                  <div class="track__skeleton-step-icon"></div>
+                  <div class="track__skeleton-step-label"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Details -->
+            <div class="track__skeleton-details">
+              <div class="track__skeleton-card track__skeleton-card--detail">
+                <div class="track__skeleton-detail-icon"></div>
+                <div class="track__skeleton-detail-content">
+                  <div class="track__skeleton-line track__skeleton-line--small"></div>
+                  <div class="track__skeleton-line track__skeleton-line--medium"></div>
+                  <div class="track__skeleton-line track__skeleton-line--large"></div>
+                </div>
+              </div>
+              <div class="track__skeleton-card track__skeleton-card--detail">
+                <div class="track__skeleton-detail-icon"></div>
+                <div class="track__skeleton-detail-content">
+                  <div class="track__skeleton-line track__skeleton-line--small"></div>
+                  <div class="track__skeleton-line track__skeleton-line--medium"></div>
+                  <div class="track__skeleton-line track__skeleton-line--large"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Sidebar -->
+          <div class="track__skeleton-sidebar">
+            <div class="track__skeleton-card track__skeleton-card--summary">
+              <div class="track__skeleton-summary-header">
+                <div class="track__skeleton-line track__skeleton-line--title"></div>
+                <div class="track__skeleton-line track__skeleton-line--count"></div>
+              </div>
+              <div class="track__skeleton-items">
+                <div class="track__skeleton-item" v-for="i in 2" :key="i">
+                  <div class="track__skeleton-item-img"></div>
+                  <div class="track__skeleton-item-info">
+                    <div class="track__skeleton-line track__skeleton-line--name"></div>
+                    <div class="track__skeleton-line track__skeleton-line--qty"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="track__skeleton-totals">
+                <div class="track__skeleton-total-row"></div>
+                <div class="track__skeleton-total-row"></div>
+                <div class="track__skeleton-total-row track__skeleton-total-row--main"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Search Form -->
-      <div v-if="!order" class="track__search">
+      <div v-if="!order && !loading" class="track__search">
         <div class="track__search-card">
           <div class="track__search-header">
             <div class="track__search-icon">
@@ -154,7 +223,7 @@
       </div>
 
       <!-- Results -->
-      <div v-else class="track__results">
+      <div v-else-if="order" class="track__results">
         <!-- Navigation -->
         <div class="track__nav">
           <button class="track__nav-back" @click="resetSearch">
@@ -257,9 +326,7 @@
               </div>
             </div>
           </div>
-
-          <!-- Right Column - Suite dans la partie 2 -->
-           <!-- Right Column -->
+          <!-- Right Column -->
           <aside class="track__sidebar">
             <!-- Order Summary -->
             <div class="track__summary">
@@ -776,6 +843,255 @@ async function copyTracking() {
   }
 
   // ============================================
+  // SKELETON LOADER
+  // ============================================
+  &__skeleton {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  &__skeleton-nav {
+    margin-bottom: 24px;
+  }
+
+  &__skeleton-btn {
+    width: 180px;
+    height: 42px;
+    background: @neutral-200;
+    border-radius: 10px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  &__skeleton-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__skeleton-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__skeleton-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid @neutral-100;
+    overflow: hidden;
+
+    &--status {
+      padding: 28px;
+    }
+
+    &--detail {
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    &--summary {
+      padding: 24px;
+    }
+  }
+
+  &__skeleton-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+
+  &__skeleton-badge {
+    width: 100px;
+    height: 36px;
+    background: @neutral-100;
+    border-radius: 20px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-line {
+    background: @neutral-200;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite;
+
+    &--label {
+      width: 80px;
+      height: 12px;
+      margin-bottom: 8px;
+    }
+
+    &--number {
+      width: 180px;
+      height: 28px;
+    }
+
+    &--small {
+      width: 60px;
+      height: 10px;
+      margin-bottom: 6px;
+    }
+
+    &--medium {
+      width: 120px;
+      height: 16px;
+      margin-bottom: 6px;
+    }
+
+    &--large {
+      width: 100%;
+      height: 14px;
+    }
+
+    &--title {
+      width: 120px;
+      height: 18px;
+    }
+
+    &--count {
+      width: 60px;
+      height: 24px;
+      border-radius: 12px;
+    }
+
+    &--name {
+      width: 140px;
+      height: 14px;
+      margin-bottom: 6px;
+    }
+
+    &--qty {
+      width: 60px;
+      height: 12px;
+    }
+  }
+
+  &__skeleton-timeline {
+    display: flex;
+    justify-content: space-between;
+    padding: 24px;
+    background: @neutral-50;
+    border-radius: 16px;
+  }
+
+  &__skeleton-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  &__skeleton-step-icon {
+    width: 40px;
+    height: 40px;
+    background: @neutral-200;
+    border-radius: 50%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-step-label {
+    width: 70px;
+    height: 14px;
+    background: @neutral-200;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  &__skeleton-detail-icon {
+    width: 44px;
+    height: 44px;
+    background: @neutral-100;
+    border-radius: 12px;
+    flex-shrink: 0;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-detail-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__skeleton-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid @neutral-100;
+  }
+
+  &__skeleton-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__skeleton-item {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid @neutral-100;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__skeleton-item-img {
+    width: 48px;
+    height: 48px;
+    background: @neutral-100;
+    border-radius: 10px;
+    flex-shrink: 0;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__skeleton-totals {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid @neutral-100;
+  }
+
+  &__skeleton-total-row {
+    height: 16px;
+    background: @neutral-100;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite;
+
+    &--main {
+      height: 24px;
+      margin-top: 8px;
+      background: @neutral-200;
+    }
+  }
+
+  // ============================================
   // ERROR TOAST
   // ============================================
   &__error {
@@ -830,7 +1146,6 @@ async function copyTracking() {
       color: @neutral-600;
     }
   }
-
   // ============================================
   // SEARCH SECTION
   // ============================================
@@ -1229,6 +1544,7 @@ async function copyTracking() {
     border-radius: 50%;
     animation: pulse-dot 2s ease-in-out infinite;
   }
+
   // ============================================
   // TIMELINE
   // ============================================
@@ -1880,6 +2196,12 @@ async function copyTracking() {
     }
   }
 
+  @keyframes shimmer {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
   @keyframes pulse-dot {
     0%, 100% {
       opacity: 1;
@@ -1906,11 +2228,13 @@ async function copyTracking() {
   // RESPONSIVE
   // ============================================
   @media (max-width: 900px) {
-    &__grid {
+    &__grid,
+    &__skeleton-grid {
       grid-template-columns: 1fr;
     }
 
-    &__sidebar {
+    &__sidebar,
+    &__skeleton-sidebar {
       position: static;
       order: -1;
     }
@@ -1949,7 +2273,8 @@ async function copyTracking() {
       padding: 24px 20px;
     }
 
-    &__details {
+    &__details,
+    &__skeleton-details {
       grid-template-columns: 1fr;
     }
 
@@ -2005,6 +2330,15 @@ async function copyTracking() {
     &__nav-back {
       width: 100%;
       justify-content: center;
+    }
+
+    &__skeleton-timeline {
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    &__skeleton-step {
+      width: 45%;
     }
   }
 }
