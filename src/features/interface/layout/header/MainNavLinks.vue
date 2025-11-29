@@ -54,24 +54,14 @@
 
   defineEmits(['navigate'])
 
-  // Computed
   const showIcon = computed(() => isMobile.value || props.direction === 'column')
   const navClass = computed(() =>
     props.direction === 'column' ? 'nav--vertical' : 'nav--horizontal',
   )
 </script>
-
 <style scoped lang="less">
-  @font-display:
-    'Instrument Sans',
-    'SF Pro Display',
-    -apple-system,
-    sans-serif;
-  @font-body:
-    'Inter',
-    'SF Pro Text',
-    -apple-system,
-    sans-serif;
+  @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
+  @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
   @bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -79,20 +69,21 @@
     display: flex;
     align-items: center;
 
-    // ============================================
+    // ==========================================
     // HORIZONTAL MODE (Desktop Navbar)
-    // ============================================
+    // ==========================================
     &--horizontal {
       flex-direction: row;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
+      flex-wrap: nowrap;
 
       .nav__link {
         position: relative;
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 18px;
+        padding: 10px 16px;
         border-radius: 10px;
         text-decoration: none;
         font-family: @font-body;
@@ -101,6 +92,7 @@
         color: @neutral-400;
         transition: all 0.25s @ease;
         overflow: hidden;
+        white-space: nowrap;
 
         &::before {
           content: '';
@@ -157,7 +149,7 @@
         bottom: 6px;
         left: 0;
         right: 0;
-        margin: 0 auto; // Centre automatiquement
+        margin: 0 auto;
         width: 20px;
         height: 3px;
         background: linear-gradient(90deg, var(--primary-400), var(--primary-500));
@@ -168,20 +160,58 @@
         transition: all 0.3s @bounce;
       }
 
-      // Compact mode for medium screens
-      @media (max-width: 1200px) {
+      // ========================================
+      // RESPONSIVE - XL (> 1300px)
+      // ========================================
+      @media (min-width: 1301px) {
+        gap: 6px;
+
+        .nav__link {
+          padding: 10px 18px;
+          font-size: 14px;
+        }
+      }
+
+      // ========================================
+      // RESPONSIVE - L (1101-1300px)
+      // ========================================
+      @media (max-width: 1300px) and (min-width: 1101px) {
         gap: 4px;
 
         .nav__link {
-          padding: 8px 14px;
+          padding: 10px 14px;
           font-size: 13px;
+        }
+      }
+
+      // ========================================
+      // RESPONSIVE - M (1001-1100px)
+      // ========================================
+      @media (max-width: 1100px) and (min-width: 1001px) {
+        gap: 2px;
+
+        .nav__link {
+          padding: 8px 10px;
+          font-size: 12px;
+        }
+      }
+
+      // ========================================
+      // RESPONSIVE - S (751-1000px)
+      // ========================================
+      @media (max-width: 1000px) and (min-width: 751px) {
+        gap: 0;
+
+        .nav__link {
+          padding: 8px 8px;
+          font-size: 11px;
         }
       }
     }
 
-    // ============================================
+    // ==========================================
     // VERTICAL MODE (Mobile Drawer / Sidebar)
-    // ============================================
+    // ==========================================
     &--vertical {
       flex-direction: column;
       gap: 8px;
@@ -250,7 +280,7 @@
           }
 
           .nav__indicator {
-            transform: scaleY(1);
+            transform: translateY(-50%) scaleY(1);
             opacity: 1;
           }
         }
@@ -260,9 +290,9 @@
         position: absolute;
         top: 50%;
         left: 0;
-        right: auto; // Reset explicite
-        bottom: auto; // Reset explicite
-        margin: 0; // Reset explicite
+        right: auto;
+        bottom: auto;
+        margin: 0;
         transform: translateY(-50%) scaleY(0);
         width: 4px;
         height: 24px;
@@ -271,16 +301,11 @@
         opacity: 0;
         transition: all 0.3s @bounce;
       }
-
-      .nav__link--active .nav__indicator {
-        transform: translateY(-50%) scaleY(1);
-        opacity: 1;
-      }
     }
 
-    // ============================================
+    // ==========================================
     // SHARED ELEMENTS
-    // ============================================
+    // ==========================================
     &__icon {
       display: flex;
       align-items: center;
@@ -304,7 +329,11 @@
       transform: translate(-50%, -50%);
       width: 100px;
       height: 100px;
-      background: radial-gradient(circle, rgba(var(--primary-500-rgb), 0.15) 0%, transparent 70%);
+      background: radial-gradient(
+        circle,
+        rgba(var(--primary-500-rgb), 0.15) 0%,
+        transparent 70%
+      );
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s @ease;

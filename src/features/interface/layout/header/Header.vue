@@ -7,36 +7,30 @@
     </div>
 
     <div class="navbar__container">
-      <!-- Left Section -->
+      <!-- ======================== -->
+      <!-- LEFT SECTION            -->
+      <!-- ======================== -->
       <div class="navbar__left">
         <!-- Mobile Menu Toggle -->
         <button
           v-if="isMobile"
           class="navbar__burger"
-          @click="toggleMobileMenu"
+          :class="{ 'navbar__burger--open': isMenuOpen }"
           :aria-expanded="isMenuOpen"
           aria-label="Menu"
+          @click="toggleMobileMenu"
         >
-          <span
-            class="navbar__burger-line"
-            :class="{ 'navbar__burger-line--open': isMenuOpen }"
-          ></span>
-          <span
-            class="navbar__burger-line"
-            :class="{ 'navbar__burger-line--open': isMenuOpen }"
-          ></span>
-          <span
-            class="navbar__burger-line"
-            :class="{ 'navbar__burger-line--open': isMenuOpen }"
-          ></span>
+          <span class="navbar__burger-line"></span>
+          <span class="navbar__burger-line"></span>
+          <span class="navbar__burger-line"></span>
         </button>
 
         <!-- Logo -->
         <div
           class="navbar__logo"
-          @click="router.push('/')"
           role="button"
           tabindex="0"
+          @click="router.push('/')"
           @keypress.enter="router.push('/')"
         >
           <div class="navbar__logo-icon">
@@ -52,7 +46,9 @@
         </div>
       </div>
 
-      <!-- Center Section - Navigation -->
+      <!-- ======================== -->
+      <!-- CENTER SECTION          -->
+      <!-- ======================== -->
       <div
         v-if="!isMobile"
         class="navbar__center"
@@ -60,7 +56,9 @@
         <MainNavLinks />
       </div>
 
-      <!-- Right Section -->
+      <!-- ======================== -->
+      <!-- RIGHT SECTION           -->
+      <!-- ======================== -->
       <div class="navbar__right">
         <!-- Cart -->
         <CartMenu />
@@ -125,8 +123,9 @@
 
         <!-- Visitor (not logged in, no cart) -->
         <template v-else>
+          <!-- Desktop/Tablet: Boutons visibles -->
           <div
-            v-if="isDesktop"
+            v-if="!isMobile"
             class="navbar__actions"
           >
             <button
@@ -172,7 +171,7 @@
                   y2="12"
                 />
               </svg>
-              Connexion
+              <span>Connexion</span>
             </button>
 
             <button
@@ -183,10 +182,8 @@
             </button>
           </div>
 
-          <!-- Mobile: Show UserMenu for visitors too -->
-          <div v-else>
-            <UserMenu />
-          </div>
+          <!-- Mobile: UserMenu dropdown -->
+          <UserMenu v-else />
         </template>
       </div>
     </div>
@@ -195,31 +192,25 @@
     <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
-
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import UserMenu from '@/features/interface/layout/header/pop-up/UserMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
-  import MobileDrawer from './MobileDrawer.vue'
+  import UserMenu from './pop-up/UserMenu.vue'
 
   const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()
-  const { isMobile, isDesktop } = useDeviceBreakpoint()
+  const { isMobile } = useDeviceBreakpoint()
 
-  // State
   const isMenuOpen = ref(false)
 
-  // Computed
   const hasGuestCart = computed(() => !auth.user && cart.items.length > 0)
 
-  // Methods
   const toggleMobileMenu = () => {
     isMenuOpen.value = !isMenuOpen.value
   }
@@ -228,10 +219,8 @@
     isMenuOpen.value = false
   }
 
-  // Close menu on route change
   router.afterEach(() => closeMenu())
 
-  // Close menu when switching to desktop
   const stopWatch = watch(isMobile, (mobile) => {
     if (!mobile) closeMenu()
   })
@@ -257,9 +246,9 @@
     z-index: 1000;
     height: 68px;
 
-    // ============================================
+    // ==========================================
     // BACKGROUND
-    // ============================================
+    // ==========================================
     &__bg {
       position: absolute;
       inset: 0;
@@ -293,24 +282,25 @@
       );
     }
 
-    // ============================================
+    // ==========================================
     // CONTAINER
-    // ============================================
+    // ==========================================
     &__container {
       position: relative;
       z-index: 1;
       height: 100%;
       max-width: 1400px;
       margin: 0 auto;
-      padding: 0 32px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 20px;
     }
 
-    // ============================================
+    // ==========================================
     // LEFT SECTION
-    // ============================================
+    // ==========================================
     &__left {
       display: flex;
       align-items: center;
@@ -318,9 +308,9 @@
       flex-shrink: 0;
     }
 
-    // ============================================
+    // ==========================================
     // BURGER MENU
-    // ============================================
+    // ==========================================
     &__burger {
       display: flex;
       flex-direction: column;
@@ -343,35 +333,33 @@
       &:active {
         transform: scale(0.95);
       }
-    }
 
-    &__burger-line {
-      width: 100%;
-      height: 2px;
-      background: @neutral-200;
-      border-radius: 1px;
-      transition: all 0.3s @ease;
-      transform-origin: center;
+      &-line {
+        width: 100%;
+        height: 2px;
+        background: @neutral-200;
+        border-radius: 1px;
+        transition: all 0.3s @ease;
+        transform-origin: center;
+      }
 
-      &--open {
+      &--open &-line {
         &:nth-child(1) {
           transform: translateY(7px) rotate(45deg);
         }
-
         &:nth-child(2) {
           opacity: 0;
           transform: scaleX(0);
         }
-
         &:nth-child(3) {
           transform: translateY(-7px) rotate(-45deg);
         }
       }
     }
 
-    // ============================================
+    // ==========================================
     // LOGO
-    // ============================================
+    // ==========================================
     &__logo {
       display: flex;
       align-items: center;
@@ -450,20 +438,19 @@
       transition: text-shadow 0.3s @ease;
     }
 
-    // ============================================
+    // ==========================================
     // CENTER SECTION
-    // ============================================
+    // ==========================================
     &__center {
       flex: 1;
       display: flex;
       justify-content: center;
-      padding: 0 40px;
       min-width: 0;
     }
 
-    // ============================================
+    // ==========================================
     // RIGHT SECTION
-    // ============================================
+    // ==========================================
     &__right {
       display: flex;
       align-items: center;
@@ -471,18 +458,18 @@
       flex-shrink: 0;
     }
 
-    // ============================================
+    // ==========================================
     // ACTIONS
-    // ============================================
+    // ==========================================
     &__actions {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    // ============================================
+    // ==========================================
     // BUTTONS
-    // ============================================
+    // ==========================================
     &__btn {
       display: inline-flex;
       align-items: center;
@@ -551,9 +538,9 @@
       }
     }
 
-    // ============================================
+    // ==========================================
     // GUEST INDICATOR
-    // ============================================
+    // ==========================================
     &__guest {
       display: flex;
       align-items: center;
@@ -590,20 +577,104 @@
       }
     }
 
-    // ============================================
-    // RESPONSIVE
-    // ============================================
-    @media (max-width: 1100px) {
-      &__center {
-        padding: 0 24px;
+    // ==========================================
+    // RESPONSIVE - XL (> 1300px)
+    // ==========================================
+    @media (min-width: 1301px) {
+      &__container {
+        padding: 0 32px;
+        gap: 32px;
       }
     }
 
-    @media (max-width: 900px) {
+    // ==========================================
+    // RESPONSIVE - L (1101-1300px)
+    // ==========================================
+    @media (max-width: 1300px) and (min-width: 1101px) {
+      &__container {
+        gap: 24px;
+      }
+
+      &__btn {
+        padding: 9px 14px;
+        font-size: 13px;
+      }
+    }
+
+    // ==========================================
+    // RESPONSIVE - M (1001-1100px)
+    // ==========================================
+    @media (max-width: 1100px) and (min-width: 1001px) {
+      &__container {
+        gap: 16px;
+        padding: 0 20px;
+      }
+
+      &__logo-fast,
+      &__logo-peptides {
+        font-size: 20px;
+      }
+
+      &__actions {
+        gap: 6px;
+      }
+
+      &__btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        gap: 6px;
+
+        &--ghost span {
+          display: none;
+        }
+      }
+    }
+
+    // ==========================================
+    // RESPONSIVE - S (751-1000px)
+    // ==========================================
+    @media (max-width: 1000px) and (min-width: 751px) {
+      &__container {
+        gap: 12px;
+        padding: 0 16px;
+      }
+
+      &__logo-fast,
+      &__logo-peptides {
+        font-size: 18px;
+      }
+
+      &__actions {
+        gap: 6px;
+      }
+
+      &__btn {
+        padding: 8px 10px;
+        font-size: 12px;
+
+        &--ghost span {
+          display: none;
+        }
+
+        &--outline {
+          display: none;
+        }
+
+        &--primary span {
+          display: none;
+        }
+      }
+    }
+
+    // ==========================================
+    // RESPONSIVE - Mobile (≤ 750px)
+    // ==========================================
+    @media (max-width: 750px) {
       height: 60px;
 
       &__container {
         padding: 0 16px;
+        gap: 12px;
       }
 
       &__logo-icon {
@@ -640,15 +711,15 @@
           margin: 0;
         }
 
-        &--primary,
-        &--outline {
-          span {
-            display: inline;
-          }
+        &--primary span {
+          display: inline;
         }
       }
     }
 
+    // ==========================================
+    // RESPONSIVE - XS (≤ 480px)
+    // ==========================================
     @media (max-width: 480px) {
       &__logo-text {
         display: none;
@@ -662,50 +733,8 @@
   }
 
   // ============================================
-  // DEEP STYLES FOR CHILD COMPONENTS
+  // DEEP STYLES
   // ============================================
-  .navbar :deep(.nav-links) {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .navbar :deep(.nav-link) {
-    position: relative;
-    padding: 10px 16px;
-    font-family: @font-body;
-    font-size: 14px;
-    font-weight: 500;
-    color: @neutral-400;
-    text-decoration: none;
-    border-radius: 10px;
-    transition: all 0.2s @ease;
-
-    &:hover {
-      color: @neutral-200;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    &.router-link-active,
-    &--active {
-      color: white;
-      background: rgba(255, 255, 255, 0.08);
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 6px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 4px;
-        height: 4px;
-        background: var(--primary-400);
-        border-radius: 50%;
-      }
-    }
-  }
-
-  // Cart & User menu styling overrides
   .navbar :deep(.cart-menu),
   .navbar :deep(.user-menu) {
     button {
