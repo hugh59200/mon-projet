@@ -127,7 +127,47 @@ VALUES
 ('Thymosin Alpha-1', '5mg', 'Santé', 52.00, 46.80, true, 10, 99.00,
  '/src/assets/products/thymosin-alpha/5mg/thymosin Alpha-1-5mg.png',
  '{"immunite", "sante", "99%"}',
- '<p><strong>La Thymosin Alpha-1</strong> est un peptide thymique naturel qui joue un rôle crucial dans la modulation du système immunitaire.</p><p>Il aide à la maturation des lymphocytes T. Il est étudié pour sa capacité à renforcer la réponse immunitaire face aux infections virales et au vieillissement du système immunitaire (immunosénescence).</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Renforcement des défenses immunitaires.</li><li>Propriétés antivirales et antifongiques.</li><li>Amélioration de l''efficacité des vaccins.</li></ul>')
+ '<p><strong>La Thymosin Alpha-1</strong> est un peptide thymique naturel qui joue un rôle crucial dans la modulation du système immunitaire.</p><p>Il aide à la maturation des lymphocytes T. Il est étudié pour sa capacité à renforcer la réponse immunitaire face aux infections virales et au vieillissement du système immunitaire (immunosénescence).</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Renforcement des défenses immunitaires.</li><li>Propriétés antivirales et antifongiques.</li><li>Amélioration de l''efficacité des vaccins.</li></ul>'),
+ -- ========================================
+-- NOUVEAUX PRODUITS À AJOUTER AU CATALOGUE
+-- ========================================
+-- Ajouter ces entrées à la suite de votre fichier seed existant
+
+-- 19. DSIP (Delta Sleep Inducing Peptide)
+('DSIP', '5mg', 'Anti-âge', 38.00, 34.20, true, 10, 99.00,
+ '/src/assets/products/dsip/5mg/dsip-5mg.png',
+ '{"sommeil", "stress", "neuroprotection", "99%"}',
+ '<p><strong>Le DSIP (Delta Sleep-Inducing Peptide)</strong> est un nonapeptide neuromodulateur découvert pour sa capacité à induire le sommeil à ondes lentes (delta). Il est naturellement présent dans l''hypothalamus et le système limbique.</p><p>Ce peptide régule le cycle veille-sommeil, module la réponse au stress via l''axe HPA et possède des propriétés antioxydantes au niveau mitochondrial.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Amélioration de la qualité du sommeil profond.</li><li>Réduction du cortisol et modulation du stress.</li><li>Propriétés neuroprotectrices et antioxydantes.</li></ul>'),
+
+-- 20. Ipamorelin
+('Ipamorelin', '5mg', 'Croissance', 40.00, 36.00, true, 10, 99.00,
+ '/src/assets/products/ipamorelin/5mg/ipamorelin-5mg.png',
+ '{"croissance", "selectif", "99%"}',
+ '<p><strong>L''Ipamorelin</strong> est un pentapeptide sécrétagogue de GH de 3ème génération, reconnu comme le premier agoniste du récepteur GHRP avec une sélectivité comparable à la GHRH.</p><p>Contrairement au GHRP-6 et GHRP-2, l''Ipamorelin ne stimule pas la libération d''ACTH ni de cortisol, même à des doses 200 fois supérieures à l''ED50 pour la GH.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Libération sélective de GH sans effets sur le cortisol.</li><li>Pas d''augmentation significative de l''appétit.</li><li>Amélioration de la densité osseuse et récupération musculaire.</li></ul>'),
+
+-- 21. Klow Blend
+('Klow', '80mg', 'Récupération', 95.00, 85.50, true, 10, 99.00,
+ '/src/assets/products/klow/80mg/klow-80mg.png',
+ '{"regeneration", "anti-inflammatoire", "blend", "99%"}',
+ '<p><strong>Le Klow Blend</strong> est une formulation synergique combinant quatre peptides régénératifs : GHK-Cu (50mg), BPC-157 (10mg), TB-500 (10mg) et KPV (10mg).</p><p>Cette combinaison cible des voies complémentaires : réparation tissulaire, modulation de l''inflammation, angiogenèse et remodelage de la matrice extracellulaire.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Régénération tissulaire et cicatrisation accélérée.</li><li>Modulation anti-inflammatoire via inhibition NF-κB.</li><li>Stimulation de la production de collagène et élastine.</li></ul>'),
+
+-- 22. SLU-PP-332
+('SLU-PP-332', '10mg', 'Performance', 65.00, 58.50, true, 10, 99.00,
+ '/src/assets/products/slu-pp-332/10mg/slu-pp-332-10mg.png',
+ '{"metabolisme", "exercice-mimetique", "mitochondrie", "99%"}',
+ '<p><strong>Le SLU-PP-332</strong> est un agoniste pan-ERR (Estrogen-Related Receptor) qualifié de "mimétique de l''exercice". Il cible les trois isoformes ERRα, ERRβ et ERRγ avec une préférence pour ERRα.</p><p>Ce composé active un programme génétique d''exercice aérobie aigu, augmentant la fonction mitochondriale et la respiration cellulaire dans le muscle squelettique.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Augmentation de l''endurance et des fibres musculaires oxydatives.</li><li>Amélioration de l''oxydation des acides gras.</li><li>Réduction de la masse adipeuse viscérale.</li></ul>'),
+
+-- 23. SS-31 (Elamipretide)
+('SS-31', '10mg', 'Anti-âge', 70.00, 63.00, true, 10, 99.00,
+ '/src/assets/products/ss-31/10mg/ss-31-10mg.png',
+ '{"mitochondrie", "energie", "cardioprotection", "99%"}',
+ '<p><strong>Le SS-31 (Elamipretide)</strong> est un tétrapeptide synthétique ciblant spécifiquement les mitochondries. Il interagit avec la cardiolipine de la membrane mitochondriale interne pour stabiliser la chaîne de transport d''électrons.</p><p>Ce peptide améliore la production d''ATP tout en réduisant le stress oxydatif à la source, dans les mitochondries elles-mêmes.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Restauration de la bioénergétique mitochondriale.</li><li>Protection contre le stress oxydatif cellulaire.</li><li>Amélioration de la fonction cardiaque et musculaire liée à l''âge.</li></ul>'),
+
+-- 24. Tesamorelin
+('Tesamorelin', '10mg', 'Perte de poids', 80.00, 72.00, true, 10, 99.00,
+ '/src/assets/products/tesamorelin/10mg/tesamorelin-10mg.png',
+ '{"ghrh", "adiposite", "cognition", "99%"}',
+ '<p><strong>Le Tesamorelin</strong> est un analogue synthétique de 44 acides aminés de la GHRH, modifié par l''ajout d''un groupe trans-3-hexanoïque qui le protège de la dégradation par la DPP-4.</p><p>C''est le seul peptide GHRH approuvé par la FDA pour le traitement de la lipodystrophie associée au VIH, avec une réduction de la graisse viscérale d''environ 18%.</p><p><strong>Axes de recherche principaux :</strong></p><ul><li>Réduction significative du tissu adipeux viscéral.</li><li>Amélioration du profil lipidique et de la stéatose hépatique.</li><li>Effets nootropiques et amélioration cognitive.</li></ul>')
 
 ON CONFLICT (name, dosage) DO UPDATE SET
  stock = EXCLUDED.stock,
