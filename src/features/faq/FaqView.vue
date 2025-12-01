@@ -20,7 +20,7 @@
       </template>
     </PageHeader>
 
-    <PageContent size="lg" :no-padding-top="true">
+    <PageContent size="lg">
       <!-- Main Layout -->
       <div class="faq__layout">
         <!-- Sidebar -->

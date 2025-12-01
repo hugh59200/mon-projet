@@ -1,67 +1,33 @@
 <template>
-  <div
+  <Container
     class="page-content"
-    :class="[
-      `page-content--${size}`,
-      { 'page-content--no-padding-top': noPaddingTop },
-    ]"
+    :size="size"
+    :padding="padding"
   >
     <slot></slot>
-  </div>
+  </Container>
 </template>
 
 <script setup lang="ts">
-export type PageContentSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+import Container, {
+  type ContainerSize,
+  type ContainerPadding,
+} from './Container.vue'
 
 withDefaults(
   defineProps<{
-    size?: PageContentSize
-    noPaddingTop?: boolean
+    size?: ContainerSize
+    padding?: ContainerPadding
   }>(),
   {
     size: 'lg',
-    noPaddingTop: false,
+    padding: 'lg',
   },
 )
 </script>
 
 <style scoped lang="less">
 .page-content {
-  position: relative;
   z-index: 1;
-  width: 100%;
-  margin: 0 auto;
-  padding: 32px 24px 80px;
-
-  // Sizes
-  &--sm {
-    max-width: 720px;
-  }
-
-  &--md {
-    max-width: 960px;
-  }
-
-  &--lg {
-    max-width: 1200px;
-  }
-
-  &--xl {
-    max-width: 1400px;
-  }
-
-  &--full {
-    max-width: none;
-  }
-
-  // Modifiers
-  &--no-padding-top {
-    padding-top: 0;
-  }
-
-  // Responsive
-  @media (max-width: 768px) {
-    padding: 24px 16px 60px;
-  }
 }
 </style>

@@ -450,8 +450,14 @@
     &__container {
       position: relative;
       z-index: 1;
-      max-width: 1200px;
+      width: 100%;
+      max-width: min(1200px, 100%);
       margin: 0 auto;
+      padding: 0 24px;
+
+      @media (max-width: 768px) {
+        padding: 0 16px;
+      }
     }
 
     // ========================================
