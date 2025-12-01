@@ -728,24 +728,26 @@
 
   function updateQuantity(item: CartView, delta: number) {
     const newQty = (item.quantity ?? 1) + delta
-    if (newQty >= 1) {
-      cart.updateQuantity(item.cart_item_id!, newQty)
+    if (newQty >= 1 && item.product_id) {
+      cart.updateQuantity(item.product_id, newQty)
     }
   }
 
   function handleQuantityChange(item: CartView, event: Event) {
     const input = event.target as HTMLInputElement
     const newQty = parseInt(input.value)
-    if (newQty >= 1) {
-      cart.updateQuantity(item.cart_item_id!, newQty)
+    if (newQty >= 1 && item.product_id) {
+      cart.updateQuantity(item.product_id, newQty)
     } else {
       input.value = String(item.quantity ?? 1)
     }
   }
 
   function removeItem(item: CartView) {
-    cart.removeFromCart(item.cart_item_id!)
-    toast.show(`${item.product_name} retiré du panier`, 'info')
+    if (item.product_id) {
+      cart.removeFromCart(item.product_id)
+      toast.show(`${item.product_name} retiré du panier`, 'info')
+    }
   }
 
   function confirmClearCart() {

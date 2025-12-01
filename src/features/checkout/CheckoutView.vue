@@ -179,7 +179,7 @@
                     </div>
                     <button
                       class="checkout-item__remove"
-                      @click="cart.removeFromCart(item.cart_item_id!)"
+                      @click="cart.removeFromCart(item.product_id!)"
                       title="Supprimer"
                     >
                       <svg
@@ -1084,8 +1084,8 @@
 
   function updateQuantity(item: CartView, delta: number) {
     const newQty = (item.quantity ?? 1) + delta
-    if (newQty >= 1) {
-      cart.updateQuantity(item.cart_item_id!, newQty)
+    if (newQty >= 1 && item.product_id) {
+      cart.updateQuantity(item.product_id, newQty)
     }
   }
 
