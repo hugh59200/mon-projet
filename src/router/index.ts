@@ -6,7 +6,7 @@ import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import AuthLayout from '@/features/auth/AuthLayout.vue'
 import AdminChatView from '@/features/chat/admin/AdminChatView.vue'
 import AdminStatsView from '@/features/stats/AdminStatsView.vue'
-import Home from '@/components/home/Home.vue'
+import Home from '@/features/home/Home.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import './RouteMeta'
 import { registerBaseGuard } from './registerBaseGuard'
@@ -162,7 +162,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/panier',
     name: 'cart',
-    component: () => import('@/pages/PanierView.vue'),
+    component: () => import('@/features/catalogue/cart/CartView.vue'),
     meta: {
       heading: 'Mon panier',
       title: 'Mon panier – Fast Peptides',
@@ -190,7 +190,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/suivi-commande',
     name: 'track-order',
-    component: () => import('@/pages/TrackOrderView.vue'),
+    component: () => import('@/features/tracking/TrackOrderView.vue'),
     meta: {
       title: 'Suivre ma commande – Fast Peptides',
       requiresAuth: false,
@@ -268,7 +268,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/faq',
     name: 'faq',
-    component: () => import('@/pages/FaqView.vue'),
+    component: () => import('@/features/faq/FaqView.vue'),
     meta: {
       label: 'FAQ',
       icon: 'HelpCircle',
@@ -292,7 +292,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/guide-reconstitution',
     name: 'reconstitution',
-    component: () => import('@/pages/ReconstitutionView.vue'),
+    component: () => import('@/features/reconstitution/ReconstitutionView.vue'),
     meta: {
       // Ces 3 lignes servent à la génération du menu
       label: 'Calculateur', // Nom court pour le menu

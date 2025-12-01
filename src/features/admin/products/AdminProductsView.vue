@@ -183,7 +183,7 @@
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { useProductActions } from '@/supabase/actions/useProductActions'
+  import { useProductActions } from './composables/useProductActions'
   import type { Tables } from '@/supabase/types/supabase'
   import { formatCurrency } from '@/utils'
   import { ref } from 'vue'

@@ -1,4 +1,4 @@
-import { useProfilePreferencesActions } from '@/supabase/actions/useProfilePreferencesActions'
+import { useProfilePreferencesActions } from './composables/useProfilePreferencesActions'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAuthStore } from '../auth/stores/useAuthStore'

@@ -2,7 +2,7 @@ import { supabase } from '@/supabase/supabaseClient'
 import type { Messages } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { ref } from 'vue'
-import { chatApi } from '../services/chatApi'
+import { chatApi } from '@/api/supabase/chat'
 import type { ChatRole } from '../types/chat'
 import type { useScrollMessages } from './useScrollMessages'
 

@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-  import Turnstile from '@/pages/Turnstile.vue'
+  import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import { ref } from 'vue'
   import BasicSocialButton from './BasicSocialButton.vue'
   import { useForm } from './composables/useForm'

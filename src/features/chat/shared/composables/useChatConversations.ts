@@ -4,7 +4,7 @@ import type { Database } from '@/supabase/types/supabase'
 import type { Messages } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { computed, ref } from 'vue'
-import { chatApi } from '../services/chatApi'
+import { chatApi } from '@/api/supabase/chat'
 
 type ConversationRow = Database['public']['Views']['conversation_overview']['Row']
 

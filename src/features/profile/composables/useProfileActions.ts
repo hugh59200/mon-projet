@@ -1,14 +1,13 @@
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import {
-  claimGuestOrders, // 🆕 Ajout de l'import
+  claimGuestOrders,
   getLastOrders,
   getProfile,
   updatePasswordApi,
   updateProfileInfo,
   uploadAvatar,
-} from '../api/profilesApi'
+} from '@/api/supabase/profiles'
 
-// Type de retour pour les fonctions de mise à jour
 type ActionResponse = Promise<boolean>
 
 export function useProfileActions() {
@@ -18,8 +17,7 @@ export function useProfileActions() {
     try {
       const profile = await getProfile(id)
 
-      // 🆕 AUTOMATISATION : Récupération des commandes invités
-      // Si le profil est chargé et possède un email, on tente de lier les commandes orphelines
+      // Récupération automatique des commandes invités
       if (profile && profile.email) {
         await claimGuestOrders(profile.email, id)
       }
@@ -34,7 +32,6 @@ export function useProfileActions() {
   async function updateProfile(id: string, payload: any): ActionResponse {
     try {
       await updateProfileInfo(id, payload)
-      // On retire le toast de succès ici pour le laisser au composant qui fait une action spécifique
       return true
     } catch (err: any) {
       toast.show(`Erreur mise à jour : ${err.message}`, 'danger')
@@ -45,7 +42,6 @@ export function useProfileActions() {
   async function changeAvatar(id: string, file: File) {
     try {
       const publicUrl = await uploadAvatar(id, file)
-      // On retire le toast de succès ici pour le laisser au composant qui fait une action spécifique
       return publicUrl
     } catch (err: any) {
       toast.show(`Erreur avatar : ${err.message}`, 'danger')
@@ -65,7 +61,6 @@ export function useProfileActions() {
   async function updatePassword(newPassword: string): ActionResponse {
     try {
       await updatePasswordApi(newPassword)
-      // On retire le toast de succès ici pour le laisser au composant
       return true
     } catch (err: any) {
       toast.show(err.message, 'danger')

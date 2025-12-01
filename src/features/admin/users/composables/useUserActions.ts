@@ -8,7 +8,7 @@ export function useUserActions(fetchData?: () => void) {
   const toast = useToastStore()
   const { showDialog } = useDialog()
 
-  /** ✅ Suppression par un admin */
+  /** Suppression par un admin */
   async function deleteUser(user: Profiles) {
     const safeEmail = sanitizeHTML(user.email)
 
@@ -42,14 +42,14 @@ export function useUserActions(fetchData?: () => void) {
 
     try {
       await deleteUserById(user.id)
-      toast.show('Utilisateur supprimé ✅', 'success')
+      toast.show('Utilisateur supprimé', 'success')
       fetchData?.()
     } catch (err: any) {
       toast.show(`Erreur suppression : ${err.message}`, 'danger')
     }
   }
 
-  /** ✅ Suppression du propre compte (utilisateur) */
+  /** Suppression du propre compte (utilisateur) */
   async function deleteOwnAccount() {
     const result = await showDialog({
       type: 'YesNo',
@@ -77,19 +77,18 @@ export function useUserActions(fetchData?: () => void) {
 
     try {
       await deleteUserSelf()
-      toast.show('Compte supprimé ✅', 'success')
+      toast.show('Compte supprimé', 'success')
       window.location.href = '/'
     } catch (err: any) {
       toast.show(`Erreur suppression : ${err.message}`, 'danger')
     }
   }
 
-  /** ✅ Changement de rôle admin */
+  /** Changement de rôle admin */
   async function changeUserRole(user: Profiles, role: Role) {
     try {
       await updateUserRole(user.id, role)
-      toast.show('Rôle mis à jour ✅', 'success')
-
+      toast.show('Rôle mis à jour', 'success')
       fetchData?.()
     } catch (err: any) {
       toast.show(`Erreur rôle : ${err.message}`, 'danger')

@@ -176,7 +176,7 @@
 <script setup lang="ts">
   import { ROLES } from '@/features/admin/constants/users'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { useUserActions } from '@/supabase/actions/useUserActions'
+  import { useUserActions } from '../composables/useUserActions'
   import { supabase } from '@/supabase/supabaseClient'
   import type { Orders, Profiles, Role } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils/index'

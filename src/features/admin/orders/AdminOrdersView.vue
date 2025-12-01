@@ -172,7 +172,7 @@
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { useOrderActions } from '@/supabase/actions/useOrderActions'
+  import { useOrderActions } from '@/features/order/composables/useOrderActions'
   import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import { computed, ref } from 'vue'

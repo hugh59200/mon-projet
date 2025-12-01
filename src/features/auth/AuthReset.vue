@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-  import Turnstile from '@/pages/Turnstile.vue'
+  import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import { supabase } from '@/supabase/supabaseClient'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'

@@ -364,8 +364,8 @@
 
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
-  import { useProfileActions } from '@/supabase/actions/useProfileActions'
-  import { useUserActions } from '@/supabase/actions/useUserActions'
+  import { useProfileActions } from './composables/useProfileActions'
+  import { useUserActions } from '@/features/admin/users/composables/useUserActions'
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

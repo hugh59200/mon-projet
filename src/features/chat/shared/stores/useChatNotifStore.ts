@@ -4,7 +4,7 @@ import type { Messages } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useChatWidgetStore } from '../../user/useChatWidgetStore'
-import { chatApi } from '../services/chatApi'
+import { chatApi } from '@/api/supabase/chat'
 import type { ChatRole } from '../types/chat'
 
 export const useChatNotifStore = defineStore('chatNotif', () => {

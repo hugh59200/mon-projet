@@ -1,6 +1,5 @@
-// ✅ src/supabase/actions/useProfilePreferencesActions.ts
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { getUiPreferences, updateUiPreferences } from '../api/profilePreferencesApi'
+import { getUiPreferences, updateUiPreferences } from '@/api/supabase/profiles'
 
 export function useProfilePreferencesActions() {
   const toast = useToastStore()

@@ -1,4 +1,4 @@
-// useOrderActions.ts — V3.2 (Relay Support)
+// useOrderActions.ts — Relay Support
 import { useDialog } from '@/features/interface/dialog'
 import {
   deleteOrderById,
@@ -8,7 +8,7 @@ import {
 import type { OrderStatus } from '@/utils'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { supabase } from '../supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 
 // Type minimaliste qui accepte Vue ou Table
 type MinimalOrder = {
@@ -17,7 +17,6 @@ type MinimalOrder = {
   order_number?: string | null
   is_guest_order?: boolean | null
   customer_email?: string | null
-  // 🆕 Champs relay
   relay_id?: string | null
   relay_name?: string | null
   relay_city?: string | null
@@ -28,7 +27,7 @@ export function useOrderActions(fetchData?: () => void) {
   const toast = useToastStore()
   const { showDialog } = useDialog()
 
-  // 🗑️ SUPPRESSION V3.2 (Guest-aware + Relay info)
+  // Suppression (Guest-aware + Relay info)
   async function deleteOrder(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -41,9 +40,8 @@ export function useOrderActions(fetchData?: () => void) {
       ? `<br/><span class="text-sm text-neutral-600">(${sanitizeHTML(order.customer_email)})</span>`
       : ''
 
-    // 🆕 Info point relais
     const relayInfo = isRelay && order.relay_name
-      ? `<p class="text-sm text-green-600 mb-2">📍 Point Relais : ${sanitizeHTML(order.relay_name)}</p>`
+      ? `<p class="text-sm text-green-600 mb-2">Point Relais : ${sanitizeHTML(order.relay_name)}</p>`
       : ''
 
     const result = await showDialog({
@@ -51,7 +49,7 @@ export function useOrderActions(fetchData?: () => void) {
       title: 'Supprimer cette commande ?',
       message: [
         `<p class="mb-2">Voulez-vous vraiment supprimer la commande <strong>${safeId}</strong> ?</p>`,
-        isGuest ? `<p class="text-sm text-info-600 mb-2">👤 Commande invité${guestEmail}</p>` : '',
+        isGuest ? `<p class="text-sm text-info-600 mb-2">Commande invité${guestEmail}</p>` : '',
         relayInfo,
         `<p class="text-sm text-red-600">Cette action est irréversible.</p>`,
       ],
@@ -63,7 +61,7 @@ export function useOrderActions(fetchData?: () => void) {
 
     try {
       await deleteOrderById(id)
-      toast.show('Commande supprimée ✅', 'success')
+      toast.show('Commande supprimée', 'success')
       fetchData?.()
     } catch (err: any) {
       console.error(err)
@@ -71,7 +69,7 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  // 🔄 STATUT V3.2 (RPC + Email avec tracking token)
+  // Changement de statut (RPC + Email avec tracking token)
   async function changeOrderStatus(order: MinimalOrder, status: OrderStatus) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -85,12 +83,12 @@ export function useOrderActions(fetchData?: () => void) {
         await supabase.functions.invoke('send-order-update', {
           body: { order_id: id, status },
         })
-        console.log('✅ Email de mise à jour envoyé')
+        console.log('Email de mise à jour envoyé')
       } catch (emailErr) {
-        console.warn('⚠️ Erreur envoi email (non bloquant):', emailErr)
+        console.warn('Erreur envoi email (non bloquant):', emailErr)
       }
 
-      toast.show(`Statut mis à jour : ${status} 📧`, 'success')
+      toast.show(`Statut mis à jour : ${status}`, 'success')
       fetchData?.()
     } catch (err: any) {
       console.error(err)
@@ -98,7 +96,7 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  // 🆕 FONCTION UTILITAIRE : Récupérer le lien de tracking
+  // Récupérer le lien de tracking
   async function getOrderTrackingLink(orderId: string): Promise<string | null> {
     try {
       const { data, error } = await supabase.rpc('get_order_summary_public', {
@@ -123,7 +121,7 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  // 🆕 COPIER LE LIEN DE TRACKING
+  // Copier le lien de tracking
   async function copyTrackingLink(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -136,14 +134,14 @@ export function useOrderActions(fetchData?: () => void) {
 
     try {
       await navigator.clipboard.writeText(link)
-      toast.show('Lien de tracking copié ! 📋', 'success')
+      toast.show('Lien de tracking copié', 'success')
     } catch (err) {
       console.error('Erreur copie:', err)
       toast.show('Impossible de copier le lien', 'danger')
     }
   }
 
-  // 🆕 AFFICHER LES DÉTAILS DE LIVRAISON
+  // Afficher les détails de livraison
   async function showDeliveryDetails(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -163,8 +161,8 @@ export function useOrderActions(fetchData?: () => void) {
       const delivery = getDeliveryAddress(data)
       if (!delivery) return
 
-      const title = delivery.isRelay ? '📍 Point Relais' : '🏠 Livraison à domicile'
-      
+      const title = delivery.isRelay ? 'Point Relais' : 'Livraison à domicile'
+
       await showDialog({
         type: 'Ok',
         title,
@@ -174,8 +172,8 @@ export function useOrderActions(fetchData?: () => void) {
           `<p>${sanitizeHTML(delivery.address)}</p>`,
           `<p>${sanitizeHTML(delivery.zip)} ${sanitizeHTML(delivery.city)}</p>`,
           `<p>${sanitizeHTML(delivery.country)}</p>`,
-          delivery.isRelay 
-            ? `<p class="text-sm text-green-600 mt-4">✅ Livraison gratuite en Point Relais</p>` 
+          delivery.isRelay
+            ? `<p class="text-sm text-green-600 mt-4">Livraison gratuite en Point Relais</p>`
             : '',
           `</div>`,
         ],
@@ -192,6 +190,6 @@ export function useOrderActions(fetchData?: () => void) {
     changeOrderStatus,
     getOrderTrackingLink,
     copyTrackingLink,
-    showDeliveryDetails, // 🆕
+    showDeliveryDetails,
   }
 }

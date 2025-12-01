@@ -2,13 +2,13 @@ import { useDialog } from '@/features/interface/dialog'
 import type { Products, ProductsInsert, ProductsUpdate } from '@/supabase/types/supabase.types'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { createProductInDB, deleteProductById, updateProductInDB } from '../api/productsApi'
+import { createProductInDB, deleteProductById, updateProductInDB } from '@/api/supabase/products'
 
 export function useProductActions(fetchData?: () => void) {
   const toast = useToastStore()
   const { showDialog } = useDialog()
 
-  /** ✅ Suppression avec confirmation professionnelle */
+  /** Suppression avec confirmation */
   async function deleteProduct(product: Products) {
     const safeName = sanitizeHTML(product.name)
 
@@ -38,29 +38,29 @@ export function useProductActions(fetchData?: () => void) {
 
     try {
       await deleteProductById(product.id as string)
-      toast.show('Produit supprimé ✅', 'success')
+      toast.show('Produit supprimé', 'success')
       fetchData?.()
     } catch (err: any) {
       toast.show(`Erreur suppression : ${err.message}`, 'danger')
     }
   }
 
-  /** ✅ Mise à jour */
+  /** Mise à jour */
   async function updateProduct(id: string, data: ProductsUpdate) {
     try {
       await updateProductInDB(id, data)
-      toast.show('Produit mis à jour ✅', 'success')
+      toast.show('Produit mis à jour', 'success')
       fetchData?.()
     } catch (err: any) {
       toast.show(`Erreur mise à jour : ${err.message}`, 'danger')
     }
   }
 
-  /** ✅ Création */
+  /** Création */
   async function createProduct(data: ProductsInsert) {
     try {
       await createProductInDB(data)
-      toast.show('Produit créé ✅', 'success')
+      toast.show('Produit créé', 'success')
       fetchData?.()
     } catch (err: any) {
       toast.show(`Erreur création : ${err.message}`, 'danger')
