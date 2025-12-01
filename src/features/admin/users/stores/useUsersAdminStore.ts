@@ -1,5 +1,5 @@
 import { useUserActions } from '../composables/useUserActions'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Profiles } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'

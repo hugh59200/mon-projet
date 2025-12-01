@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { ProductsInsert, ProductsUpdate } from '@/supabase/types/supabase.types'
 import { handleApi, handleMutation } from '../helpers/handleError'
 

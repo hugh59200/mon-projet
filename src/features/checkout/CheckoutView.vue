@@ -998,7 +998,6 @@
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { processPayment, type PaymentProvider } from '@/api/external/payment'
-  import { useManualSablier } from '@/features/interface/sablier/useManualSablier'
   import { createOrder } from '@/api/supabase/orders'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -1009,7 +1008,6 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
-  const { withSablier } = useManualSablier()
 
   // State
   const currentStep = ref(2)
@@ -1195,70 +1193,68 @@
       return
     }
 
-    await withSablier(async () => {
-      isSubmitting.value = true
+    isSubmitting.value = true
 
-      try {
-        currentStep.value = 3
+    try {
+      currentStep.value = 3
 
-        const orderItemsPayload = cart.items.map((item) => ({
-          product_id: item.product_id!,
-          quantity: item.quantity ?? 1,
-          product_price: item.is_on_sale
-            ? (item.product_sale_price ?? 0)
-            : (item.product_price ?? 0),
-        }))
+      const orderItemsPayload = cart.items.map((item) => ({
+        product_id: item.product_id!,
+        quantity: item.quantity ?? 1,
+        product_price: item.is_on_sale
+          ? (item.product_sale_price ?? 0)
+          : (item.product_price ?? 0),
+      }))
 
-        // 🆕 Préparer les données avec relay si applicable
-        const orderPayload: any = {
-          userId: auth.user?.id ?? null,
-          email: email.value,
-          fullName: fullName.value,
-          address: deliveryMode.value === 'home' ? address.value : '',
-          zip: deliveryMode.value === 'home' ? zip.value : '',
-          city: deliveryMode.value === 'home' ? city.value : '',
-          country: deliveryMode.value === 'home' ? country.value : 'France',
-          paymentMethod: selectedPayment.value,
-          subtotal: cartSubtotal.value,
-          shippingCost: shippingCost.value,
-          taxAmount: 0,
-          discountAmount: 0,
-          totalAmount: finalTotal.value,
-          items: orderItemsPayload,
-        }
-
-        // 🆕 Ajouter les données relay si en mode point relais
-        if (deliveryMode.value === 'relay' && relayOrderData.value) {
-          orderPayload.relayId = relayOrderData.value.relay_id
-          orderPayload.relayName = relayOrderData.value.relay_name
-          orderPayload.relayAddress = relayOrderData.value.relay_address
-          orderPayload.relayZipcode = relayOrderData.value.relay_zipcode
-          orderPayload.relayCity = relayOrderData.value.relay_city
-          orderPayload.relayCountry = relayOrderData.value.relay_country
-        }
-
-        const orderResponse = await createOrder(orderPayload)
-
-        if (orderResponse.tracking_token) {
-          localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
-        }
-        localStorage.setItem('fp-last-order-id', orderResponse.order_id)
-        localStorage.removeItem('fp-checkout-form')
-
-        await processPayment(
-          finalTotal.value,
-          selectedPayment.value,
-          email.value,
-          orderResponse.order_id,
-        )
-      } catch (err: any) {
-        console.error(err)
-        toast.show(`Erreur : ${err.message || 'Impossible de créer la commande'}`, 'danger')
-        currentStep.value = 2
-      } finally {
-        isSubmitting.value = false
+      // 🆕 Préparer les données avec relay si applicable
+      const orderPayload: any = {
+        userId: auth.user?.id ?? null,
+        email: email.value,
+        fullName: fullName.value,
+        address: deliveryMode.value === 'home' ? address.value : '',
+        zip: deliveryMode.value === 'home' ? zip.value : '',
+        city: deliveryMode.value === 'home' ? city.value : '',
+        country: deliveryMode.value === 'home' ? country.value : 'France',
+        paymentMethod: selectedPayment.value,
+        subtotal: cartSubtotal.value,
+        shippingCost: shippingCost.value,
+        taxAmount: 0,
+        discountAmount: 0,
+        totalAmount: finalTotal.value,
+        items: orderItemsPayload,
       }
-    })
+
+      // 🆕 Ajouter les données relay si en mode point relais
+      if (deliveryMode.value === 'relay' && relayOrderData.value) {
+        orderPayload.relayId = relayOrderData.value.relay_id
+        orderPayload.relayName = relayOrderData.value.relay_name
+        orderPayload.relayAddress = relayOrderData.value.relay_address
+        orderPayload.relayZipcode = relayOrderData.value.relay_zipcode
+        orderPayload.relayCity = relayOrderData.value.relay_city
+        orderPayload.relayCountry = relayOrderData.value.relay_country
+      }
+
+      const orderResponse = await createOrder(orderPayload)
+
+      if (orderResponse.tracking_token) {
+        localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
+      }
+      localStorage.setItem('fp-last-order-id', orderResponse.order_id)
+      localStorage.removeItem('fp-checkout-form')
+
+      await processPayment(
+        finalTotal.value,
+        selectedPayment.value,
+        email.value,
+        orderResponse.order_id,
+      )
+    } catch (err: any) {
+      console.error(err)
+      toast.show(`Erreur : ${err.message || 'Impossible de créer la commande'}`, 'danger')
+      currentStep.value = 2
+    } finally {
+      isSubmitting.value = false
+    }
   }
 </script>
 

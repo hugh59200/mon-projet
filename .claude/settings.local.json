@@ -7,5 +7,6 @@
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "maxFileTokens": 50000
 }

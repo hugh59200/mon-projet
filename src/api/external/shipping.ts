@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 
 export interface ShipmentPayload {
   order_id: string

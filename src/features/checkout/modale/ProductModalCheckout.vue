@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref, watch } from 'vue'
 

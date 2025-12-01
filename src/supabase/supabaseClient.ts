@@ -5,7 +5,7 @@ import type { Database } from './types/supabase.ts'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// 🔗 Client Supabase de base
+// Client Supabase de base (sans sablier)
 const baseClient = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
@@ -15,17 +15,26 @@ const baseClient = createClient<Database>(supabaseUrl, supabaseKey, {
 })
 
 /**
- * 🧠 Proxy Supabase sélectif et “chain-safe”
- * - Gère le sablier UNIQUEMENT sur les appels finaux (pas sur le chainage)
- * - Compatible avec `.eq()`, `.order()`, etc.
- * - Compatible Vue 3 + Pinia
+ * Client Supabase SILENCIEUX (sans sablier global)
+ * À utiliser dans les composants qui gèrent leur propre loading :
+ * - Pages avec skeletons (TrackOrderView, PaymentSuccessView)
+ * - Pages avec WrapperLoader (Catalogue, Admin, Orders)
+ * - Composants avec loading sur bouton (CheckoutView)
+ */
+export const supabaseSilent = baseClient
+
+/**
+ * Client Supabase avec SABLIER GLOBAL
+ * À utiliser uniquement pour :
+ * - Actions d'authentification (login, register, logout)
+ * - Actions critiques sans feedback visuel local
  */
 export const supabase = new Proxy(baseClient, {
   get(target, prop, receiver) {
     const value = Reflect.get(target, prop, receiver)
     const sablier = useSablierStore()
 
-    // 🎯 Interception des requêtes principales : from(), rpc()
+    // Interception des requêtes principales : from(), rpc()
     if (prop === 'from' || prop === 'rpc') {
       return (...args: [string, ...unknown[]]) => {
         const query = value.apply(target, args)
@@ -46,7 +55,7 @@ export const supabase = new Proxy(baseClient, {
               'maybeSingle',
             ]
 
-            // 🔚 Gestion du sablier uniquement sur les appels finaux
+            // Gestion du sablier uniquement sur les appels finaux
             if (finalMethods.includes(qProp.toString())) {
               return (...opArgs: unknown[]) => {
                 sablier.debutSablier()
@@ -56,7 +65,6 @@ export const supabase = new Proxy(baseClient, {
                 if (result instanceof Promise) {
                   return result.finally(() => {
                     const duration = performance.now() - start
-                    // ⏱️ Ne montre le sablier que si la requête dure > 300ms
                     if (duration > 300) sablier.finSablier()
                     else sablier.finSablier()
                   })
@@ -67,14 +75,14 @@ export const supabase = new Proxy(baseClient, {
               }
             }
 
-            // 🧩 Toutes les autres méthodes (eq, order, range...) restent inchangées
+            // Toutes les autres méthodes (eq, order, range...) restent inchangées
             return qValue
           },
         })
       }
     }
 
-    // ⚙️ Gestion spéciale pour supabase.functions.invoke()
+    // Gestion spéciale pour supabase.functions.invoke()
     if (prop === 'functions') {
       return new Proxy(value, {
         get(fnTarget, fnProp, fnReceiver) {
@@ -98,8 +106,8 @@ export const supabase = new Proxy(baseClient, {
       })
     }
 
-    // 🔐 GESTION AUTHENTIFICATION (Nouveau)
-    // On ajoute le sablier sur signIn, signUp, etc.
+    // GESTION AUTHENTIFICATION
+    // On garde le sablier sur signIn, signUp, etc. car ce sont des actions critiques
     if (prop === 'auth') {
       return new Proxy(value, {
         get(authTarget, authProp, authReceiver) {
@@ -131,7 +139,7 @@ export const supabase = new Proxy(baseClient, {
       })
     }
 
-    // 🔹 Ne touche pas à storage, channel, etc.
+    // Ne touche pas à storage, channel, etc.
     return value
   },
 })

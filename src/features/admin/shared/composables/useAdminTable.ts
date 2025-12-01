@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Database, Tables } from '@/supabase/types/supabase'
 import { onMounted, ref, watch, type Ref } from 'vue'
 

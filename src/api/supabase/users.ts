@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Role } from '@/supabase/types/supabase.types'
 import { handleMutation } from '../helpers/handleError'
 

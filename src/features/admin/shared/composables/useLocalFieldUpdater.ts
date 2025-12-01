@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Database } from '@/supabase/types/supabase'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { ref, watch } from 'vue'

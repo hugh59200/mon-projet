@@ -591,7 +591,7 @@
 
 <script setup lang="ts">
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'

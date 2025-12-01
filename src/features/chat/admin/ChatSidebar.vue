@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import type { ConversationOverview } from '@/supabase/types/supabase.types'
   import { computed, onMounted, ref } from 'vue'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'

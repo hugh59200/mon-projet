@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Messages } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { ref } from 'vue'

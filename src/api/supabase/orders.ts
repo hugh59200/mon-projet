@@ -1,6 +1,6 @@
 // API Commandes - V3.2 (Mondial Relay Support)
 import type { OrderStatus } from '@/utils'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Json } from '@/supabase/types/supabase'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
 import { handleApi, handleMutation } from '../helpers/handleError'

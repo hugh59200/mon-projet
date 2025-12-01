@@ -46,7 +46,7 @@
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 

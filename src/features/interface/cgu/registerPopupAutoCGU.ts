@@ -1,5 +1,5 @@
 import { registerPopupAuto } from '@/features/application/popup-auto/PopupAuto'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import { useAfficheCGUStore } from './useAfficheCGUStore'
 import { useVersionCGUStore } from './useVersionCGUStore'
 

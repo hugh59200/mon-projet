@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Database } from '@/supabase/types/supabase'
 import type { PostgrestSingleResponse } from '@supabase/supabase-js'
 import { computed, onMounted, ref, watch } from 'vue'

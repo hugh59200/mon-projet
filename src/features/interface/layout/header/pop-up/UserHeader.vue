@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 

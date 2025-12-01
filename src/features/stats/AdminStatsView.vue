@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/supabase/supabaseClient'
+  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { formatDate } from '@/utils/index'
   import {
     BarElement,

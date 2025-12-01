@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { TablesInsert } from '@/supabase/types/supabase'
 import type { NewsTopics } from '@/supabase/types/supabase.types'
 

@@ -3,7 +3,7 @@
 // ============================================================
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { CartItems, CartView, Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
 import { defineStore } from 'pinia'

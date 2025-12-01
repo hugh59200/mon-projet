@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Messages } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'

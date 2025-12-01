@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Products } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'

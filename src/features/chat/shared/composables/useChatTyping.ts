@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { ref } from 'vue'
 import type { ChatRole } from '../types/chat'

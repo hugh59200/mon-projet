@@ -627,7 +627,7 @@
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/api/supabase/orders'
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
 import { getLabelBadge } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
