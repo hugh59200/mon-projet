@@ -447,7 +447,7 @@
 
     &__actions {
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
   }

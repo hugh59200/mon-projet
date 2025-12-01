@@ -8,23 +8,14 @@
       class="language-selector__trigger"
       :aria-expanded="isOpen"
       aria-haspopup="listbox"
+      :title="currentLocaleInfo?.name"
       @click="toggleDropdown"
     >
-      <span class="language-selector__flag">{{ currentLocaleInfo?.flag }}</span>
-      <span class="language-selector__code">{{ currentLocaleInfo?.code.toUpperCase() }}</span>
-      <svg
-        class="language-selector__chevron"
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
+      <BasicIconNext
+        :name="flagIcons[locale]"
+        :size="20"
+        class="language-selector__flag"
+      />
     </button>
 
     <Transition name="dropdown">
@@ -33,31 +24,6 @@
         class="language-selector__dropdown"
         role="listbox"
       >
-        <div class="language-selector__header">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-            />
-            <line
-              x1="2"
-              y1="12"
-              x2="22"
-              y2="12"
-            />
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-          <span>{{ t('language.select') }}</span>
-        </div>
-
         <div class="language-selector__list">
           <button
             v-for="localeItem in availableLocales"
@@ -68,22 +34,19 @@
             :aria-selected="localeItem.code === locale"
             @click="selectLocale(localeItem.code)"
           >
-            <span class="language-selector__option-flag">{{ localeItem.flag }}</span>
+            <BasicIconNext
+              :name="flagIcons[localeItem.code]"
+              :size="20"
+              class="language-selector__option-flag"
+            />
             <span class="language-selector__option-name">{{ localeItem.name }}</span>
-            <svg
+            <BasicIconNext
               v-if="localeItem.code === locale"
+              name="Check"
+              :size="16"
+              color="primary-400"
               class="language-selector__option-check"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+            />
           </button>
         </div>
       </div>
@@ -94,10 +57,18 @@
 <script setup lang="ts">
 import { useLanguage } from '@/composables/useLanguage'
 import type { SupportedLocale } from '@/i18n'
+import { BasicIconNext } from '@designSystem/components/basic/icon'
+import type { CustomIconName } from '@designSystem/components/basic/icon/customIcons'
 import { onClickOutside } from '@vueuse/core'
 import { ref } from 'vue'
 
-const { t, locale, currentLocaleInfo, availableLocales, changeLocale } = useLanguage()
+const { locale, currentLocaleInfo, availableLocales, changeLocale } = useLanguage()
+
+const flagIcons: Record<SupportedLocale, CustomIconName> = {
+  fr: 'flagFR',
+  en: 'flagEN',
+  de: 'flagDE',
+}
 
 const isOpen = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
@@ -134,8 +105,10 @@ function selectLocale(newLocale: SupportedLocale) {
   &__trigger {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
@@ -145,6 +118,7 @@ function selectLocale(newLocale: SupportedLocale) {
     &:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.12);
+      transform: scale(1.05);
     }
 
     &:active {
@@ -158,26 +132,10 @@ function selectLocale(newLocale: SupportedLocale) {
   }
 
   &__flag {
-    font-size: 16px;
-    line-height: 1;
-  }
-
-  &__code {
-    font-family: @font-body;
-    font-size: 12px;
-    font-weight: 600;
-    color: @neutral-200;
-    letter-spacing: 0.5px;
-  }
-
-  &__chevron {
-    color: @neutral-400;
-    transition: transform 0.2s @ease;
-  }
-
-  &--open &__chevron {
-    transform: rotate(180deg);
-    color: var(--primary-400);
+    width: 16px;
+    height: 12px;
+    border-radius: 1px;
+    overflow: hidden;
   }
 
   // ==========================================
@@ -187,15 +145,15 @@ function selectLocale(newLocale: SupportedLocale) {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    min-width: 180px;
+    min-width: 160px;
     background: linear-gradient(
       135deg,
       rgba(30, 32, 40, 0.98) 0%,
       rgba(24, 26, 32, 0.98) 100%
     );
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    padding: 8px;
+    border-radius: 12px;
+    padding: 6px;
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.4),
       0 4px 16px rgba(0, 0, 0, 0.2),
@@ -203,28 +161,6 @@ function selectLocale(newLocale: SupportedLocale) {
     backdrop-filter: blur(20px);
     z-index: 100;
     overflow: hidden;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-
-    svg {
-      color: var(--primary-400);
-    }
-
-    span {
-      font-family: @font-body;
-      font-size: 11px;
-      font-weight: 600;
-      color: @neutral-400;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
   }
 
   &__list {
@@ -240,10 +176,10 @@ function selectLocale(newLocale: SupportedLocale) {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     background: transparent;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s @ease;
     width: 100%;
@@ -263,14 +199,17 @@ function selectLocale(newLocale: SupportedLocale) {
   }
 
   &__option-flag {
-    font-size: 18px;
-    line-height: 1;
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    overflow: hidden;
   }
 
   &__option-name {
     flex: 1;
     font-family: @font-body;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: @neutral-200;
   }
@@ -322,12 +261,13 @@ function selectLocale(newLocale: SupportedLocale) {
   // RESPONSIVE
   // ==========================================
   @media (max-width: 750px) {
-    &__code {
-      display: none;
+    &__trigger {
+      width: 32px;
+      height: 32px;
     }
 
-    &__trigger {
-      padding: 8px 10px;
+    &__flag {
+      font-size: 16px;
     }
 
     &__dropdown {
