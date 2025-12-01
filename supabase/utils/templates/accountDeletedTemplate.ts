@@ -6,7 +6,7 @@ export function accountDeletedTemplate({ email }: { email: string }) {
     bodyHTML: `
       <p>Bonjour,</p>
       <p>Nous confirmons que votre compte associé à l’adresse 
-        <strong>${email}</strong> a bien été supprimé de notre site Fast Peptides.</p>
+        <strong>${email}</strong> a bien été supprimé de notre plateforme.</p>
 
       <p>Si cette action n’a pas été effectuée par vous,
          merci de contacter notre support dans les plus brefs délais.</p>

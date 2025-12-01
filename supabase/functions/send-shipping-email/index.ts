@@ -1,5 +1,7 @@
-import { supabase } from '../../utils/clients.ts'
-import { createHandler } from '../../utils/createHandler.ts' // Je l'ai passé en createHandler par cohérence
+// supabase/functions/send-shipping-email/index.ts
+
+import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
+import { createHandler } from '../../utils/createHandler.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
@@ -20,29 +22,41 @@ Deno.serve(
 
     if (!order) throw new Error('Order not found')
 
+    const orderNumber = order.order_number ?? order_id
+    const isGuest = !order.user_id
+
+    // Calcul du nombre d'articles (sans les noms de produits)
+    const detailedItems = order.detailed_items ?? []
+    const itemCount = detailedItems.reduce((acc: number, item: any) => acc + Number(item.quantity ?? 1), 0)
+
+    // URL de suivi transporteur
     const tracking_url = order.tracking_number
       ? `https://www.laposte.fr/outils/suivre-vos-envois?code=${order.tracking_number}`
       : undefined
 
-    // Mapping items simple pour le mail d'expédition
-    const itemsMap = (order.detailed_items ?? []).map((i: any) => ({
-      name: i.product_name,
-      quantity: i.quantity,
-    }))
+    // URL vers la commande sur le site (guest ou membre)
+    let ctaUrl: string
+    if (isGuest && order.tracking_token) {
+      ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
+    } else if (isGuest) {
+      ctaUrl = `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
+    } else {
+      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
+    }
 
     const html = renderEmailTemplate('shipping', {
-      order_id,
-      order_number: order.order_number, // Ajout V2
+      order_number: orderNumber,
       full_name: order.shipping_name,
+      item_count: itemCount,
       carrier: order.carrier,
       tracking_number: order.tracking_number,
       tracking_url,
-      items: itemsMap,
+      ctaUrl,
     })
 
     await sendEmail({
       to: order.shipping_email,
-      subject: `Votre commande ${order.order_number ?? order_id} est expédiée 🚀`,
+      subject: `Votre commande #${orderNumber} est en route`,
       html,
       type: 'shipping',
       order_id,

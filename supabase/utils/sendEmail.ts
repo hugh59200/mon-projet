@@ -10,13 +10,13 @@ const RESEND_DOMAIN = Deno.env.get('RESEND_DOMAIN') ?? ''
 function buildFrom() {
   if (EMAIL_PROVIDER === 'resend') {
     // Resend impose d'utiliser le domaine vérifié
-    return `Fast Peptides <contact@${RESEND_DOMAIN}>`
+    return `FP Store <contact@${RESEND_DOMAIN}>`
   }
   if (EMAIL_PROVIDER === 'mailgun') {
-    return `Fast Peptides <postmaster@${MAILGUN_DOMAIN}>`
+    return `FP Store <postmaster@${MAILGUN_DOMAIN}>`
   }
   // Fallback générique pour dev
-  return 'Fast Peptides <noreply@fast-peptides.com>'
+  return 'FP Store <noreply@fast-peptides.com>'
 }
 
 export async function sendEmail({

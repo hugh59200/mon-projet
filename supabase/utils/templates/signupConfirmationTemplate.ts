@@ -8,7 +8,7 @@ export function signupConfirmationTemplate({
   url: string
 }) {
   return baseEmailTemplate({
-    title: 'Bienvenue chez Fast Peptides 🚀',
+    title: 'Bienvenue chez FP Store',
     bodyHTML: `
       <p>Bonjour ${full_name || ''},</p>
       <p>Merci de votre inscription !</p>

@@ -67,7 +67,7 @@ export function renderEmailTemplate(type: string, data: any) {
 
     default: {
       return genericTemplate({
-        title: 'Notification Fast Peptides',
+        title: 'Notification FP Store',
         message: 'Vous avez reçu une nouvelle notification.',
       })
     }

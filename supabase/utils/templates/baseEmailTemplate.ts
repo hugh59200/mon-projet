@@ -13,7 +13,7 @@ export function baseEmailTemplate({
 }) {
   const primary = '#00796B'
   const accent = '#00BFA5'
-  const yellowPeptides = '#facc15' // Couleur proche du @yellow-400 (Tailwind)
+  const accentYellow = '#facc15' // Couleur accent jaune
 
   // URL de ton logo hébergé
   const logoUrl =
@@ -63,11 +63,11 @@ export function baseEmailTemplate({
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">
             <tr>
                 <td style="padding-right: 12px; vertical-align: middle;">
-                    <img src="${logoUrl}" width="38" height="38" alt="Fast Peptides" style="display:block; border:0; outline:none;" />
+                    <img src="${logoUrl}" width="38" height="38" alt="FP Store" style="display:block; border:0; outline:none;" />
                 </td>
                 <td style="vertical-align: middle; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 26px; line-height: 1;">
-                    <span style="color:#ffffff; font-weight:900; font-style:italic; padding-right: 3px;">Fast</span>
-                    <span style="color:${yellowPeptides}; font-weight:600; letter-spacing:1px;">Peptides</span>
+                    <span style="color:#ffffff; font-weight:900; font-style:italic; padding-right: 3px;">FP</span>
+                    <span style="color:${accentYellow}; font-weight:600; letter-spacing:1px;">Store</span>
                 </td>
             </tr>
         </table>
@@ -85,14 +85,14 @@ export function baseEmailTemplate({
         <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e2e8f0;text-align:center;font-size:14px;color:#64748b;">
           <p style="margin:0 0 8px;">Besoin d'aide ? Contactez notre support.</p>
           <p style="margin:0;">
-            L’équipe Fast Peptides 🧬<br/>
-            <a href="https://fastpeptides.com" style="color:${accent};text-decoration:none;font-weight:600;">fastpeptides.com</a>
+            L'équipe Atlas Lab (FP)<br/>
+            <a href="https://fast-peptides.com" style="color:${accent};text-decoration:none;">fp-store.com</a>
           </p>
         </div>
       </div>
 
       <div style="background-color:#f8fafc;padding:20px;text-align:center;font-size:12px;color:#94a3b8;">
-        <p style="margin:0;">© ${new Date().getFullYear()} Fast Peptides — Tous droits réservés.</p>
+        <p style="margin:0;">© ${new Date().getFullYear()} Atlas Lab Solutions LLC</p>
       </div>
 
     </div>
