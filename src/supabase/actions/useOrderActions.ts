@@ -1,11 +1,10 @@
 // useOrderActions.ts — V3.2 (Relay Support)
 import { useDialog } from '@/features/interface/dialog'
-import { 
-  deleteOrderById, 
+import {
+  deleteOrderById,
   updateOrderStatusInDB,
   getDeliveryAddress,
-  isRelayDelivery 
-} from '@/supabase/api/ordersApi'
+} from '@/api/supabase/orders'
 import type { OrderStatus } from '@/utils'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

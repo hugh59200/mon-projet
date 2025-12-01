@@ -143,12 +143,12 @@
 </template>
 
 <script setup lang="ts">
-  import { deleteNews } from '@/features/actualités/api/news'
+  import { deleteNews } from '@/api/supabase/news'
   import { useAdminTable } from '@/features/admin/shared/composables/useAdminTable'
   import { useSortableTable } from '@/features/admin/shared/composables/useSortableTable'
   import { useDialog } from '@/features/interface/dialog'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { fetchTopics } from '@/supabase/api/topics'
+  import { fetchTopics } from '@/api/supabase/topics'
   import type { Tables } from '@/supabase/types/supabase'
   import type { News } from '@/supabase/types/supabase.types'
   import { formatDate, sanitizeHTML } from '@/utils'

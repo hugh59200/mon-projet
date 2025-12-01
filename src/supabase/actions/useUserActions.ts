@@ -1,5 +1,5 @@
 import { useDialog } from '@/features/interface/dialog'
-import { deleteUserById, deleteUserSelf, updateUserRole } from '@/supabase/api/userApi'
+import { deleteUserById, deleteUserSelf, updateUserRole } from '@/api/supabase/users'
 import type { Profiles, Role } from '@/supabase/types/supabase.types'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'

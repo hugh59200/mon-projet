@@ -626,7 +626,7 @@
 <script setup lang="ts">
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/supabase/api/ordersApi'
+import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/api/supabase/orders'
 import { supabase } from '@/supabase/supabaseClient'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
 import { getLabelBadge } from '@/utils'

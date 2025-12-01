@@ -10,7 +10,7 @@ import {
   signInWithProvider as serviceProviderLogin,
   signUp as serviceSignUp,
   signInWithPassword,
-} from '@/features/auth/services/authService'
+} from '@/api/external/auth'
 
 export type Providers = 'google' | 'github' | 'facebook'
 

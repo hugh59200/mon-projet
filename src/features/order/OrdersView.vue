@@ -357,7 +357,7 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import FilterSection from '@/features/shared/components/FilterSection.vue'
-  import { fetchUserOrders } from '@/supabase/api/ordersApi'
+  import { fetchUserOrders } from '@/api/supabase/orders'
   import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'

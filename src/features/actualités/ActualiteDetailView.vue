@@ -458,13 +458,13 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { fetchNews, fetchNewsBySlug } from '@/features/actualités/api/news'
+  import { fetchNews, fetchNewsBySlug } from '@/api/supabase/news'
   import type { News } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
   import { parseAndSanitize } from '@/utils/sanitize'
   import { computed, onMounted, ref, watch } from 'vue'
   import InnerImageZoom from 'vue-inner-image-zoom'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
 
   // ===========================
   // TYPES
@@ -481,7 +481,6 @@
   // COMPOSABLES
   // ===========================
   const route = useRoute()
-  const router = useRouter()
 
   // ===========================
   // STATE

@@ -84,7 +84,7 @@
 <script setup lang="ts">
   import { useTopicImageHandler } from '@/features/admin/topics/composables/useTopicImageHandler'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { createTopic, fetchTopicById, updateTopic } from '@/supabase/api/topics'
+  import { createTopic, fetchTopicById, updateTopic } from '@/api/supabase/topics'
   import type { NewsTopics } from '@/supabase/types/supabase.types'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'

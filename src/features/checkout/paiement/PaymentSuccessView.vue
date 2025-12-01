@@ -549,7 +549,7 @@
   }
 
   async function fetchOrderByStripe(sessionId: string) {
-    const { data, error } = await supabase.rpc('get_order_by_stripe_session', {
+    const { data } = await supabase.rpc('get_order_by_stripe_session', {
       p_session_id: sessionId,
     })
 

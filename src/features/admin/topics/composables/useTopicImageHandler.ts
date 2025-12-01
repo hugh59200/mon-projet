@@ -1,4 +1,4 @@
-import { deleteTopicImage, uploadTopicImage } from '../../../../supabase/api/topicImages'
+import { deleteTopicImage, uploadTopicImage } from '@/api/supabase/storage'
 import { useImageHandler } from '../../shared/composables/useImageHandler'
 
 export function useTopicImageHandler(readonly: () => boolean) {

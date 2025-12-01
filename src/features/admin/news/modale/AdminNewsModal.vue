@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
-  import { createNews, createTopic, fetchNewsById, fetchTopics, updateNews } from '@/supabase/api'
+  import { createNews, createTopic, fetchNewsById, fetchTopics, updateNews } from '@/api/supabase'
   import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { InputModel } from '@designSystem/index'

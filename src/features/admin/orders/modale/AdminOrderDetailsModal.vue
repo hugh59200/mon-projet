@@ -263,7 +263,7 @@
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useOrderActions } from '@/supabase/actions/useOrderActions'
-  import { fetchOrderById } from '@/supabase/api/ordersApi' // ✅ API V2
+  import { fetchOrderById } from '@/api/supabase/orders'
   import { supabase } from '@/supabase/supabaseClient'
   import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types' // ✅ Types V2
   import {

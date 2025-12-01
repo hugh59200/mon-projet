@@ -307,7 +307,7 @@
 
 <script setup lang="ts">
   import defaultImage from '@/assets/products/default/default-product-image.png'
-  import { fetchOrderById } from '@/supabase/api/ordersApi'
+  import { fetchOrderById } from '@/api/supabase/orders'
   import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { formatDate } from '@/utils/index'

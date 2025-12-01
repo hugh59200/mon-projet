@@ -1,4 +1,4 @@
-import { fetchNews, fetchNewsTopics } from '@/features/actualités/api/news'
+import { fetchNews, fetchNewsTopics } from '@/api/supabase/news'
 import type { News, NewsTopics } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
