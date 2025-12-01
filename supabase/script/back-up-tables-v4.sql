@@ -942,3 +942,429 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.get_order_by_stripe_session TO anon, authenticated;
+
+-- ============================================================
+-- 🚚 MIGRATION: Ajout colonnes Mondial Relay à la table orders
+-- Version: 3.2
+-- Date: 2025
+-- ============================================================
+
+-- ============================================================
+-- BLOC 1: AJOUT DES COLONNES RELAY
+-- ============================================================
+
+-- Ajouter les colonnes pour stocker les infos du point relais
+ALTER TABLE public.orders
+ADD COLUMN IF NOT EXISTS relay_id text,
+ADD COLUMN IF NOT EXISTS relay_name text,
+ADD COLUMN IF NOT EXISTS relay_address text,
+ADD COLUMN IF NOT EXISTS relay_zipcode text,
+ADD COLUMN IF NOT EXISTS relay_city text,
+ADD COLUMN IF NOT EXISTS relay_country text DEFAULT 'FR';
+
+-- Colonne calculée pour savoir si c'est une livraison relais
+-- Note: PostgreSQL ne supporte pas GENERATED pour des conditions complexes,
+-- on utilisera une fonction ou on laissera NULL = domicile, NOT NULL = relais
+
+-- Index pour les recherches par point relais (utile pour les stats)
+CREATE INDEX IF NOT EXISTS idx_orders_relay_id ON public.orders (relay_id) WHERE relay_id IS NOT NULL;
+
+-- ============================================================
+-- BLOC 2: MISE À JOUR DES VUES
+-- ============================================================
+
+-- Recréer orders_detailed_view avec les colonnes relay
+DROP VIEW IF EXISTS public.orders_detailed_view CASCADE;
+
+CREATE OR REPLACE VIEW public.orders_detailed_view AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+  o.email,
+  o.full_name,
+  o.address,
+  o.city,
+  o.country,
+  o.status,
+  o.created_at,
+  o.subtotal,
+  o.tax_amount,
+  o.shipping_cost,
+  o.discount_amount,
+  o.total_amount,
+  o.payment_method,
+  o.tracking_number,
+  o.carrier,
+  o.shipped_at,
+  o.is_guest_order,
+  -- 🆕 Colonnes Relay
+  o.relay_id,
+  o.relay_name,
+  o.relay_address,
+  o.relay_zipcode,
+  o.relay_city,
+  o.relay_country,
+  -- Flag calculé: livraison en point relais ?
+  (o.relay_id IS NOT NULL) AS is_relay_delivery,
+  jsonb_agg(
+    jsonb_build_object(
+      'product_id', p.id,
+      'product_name', COALESCE(oi.product_name_snapshot, p.name),
+      'product_dosage', p.dosage,
+      'product_price', oi.price,
+      'product_image', p.image,
+      'quantity', oi.quantity,
+      'total', (oi.price * oi.quantity)
+    )
+  ) AS detailed_items
+FROM public.orders o
+LEFT JOIN public.order_items oi ON oi.order_id = o.id
+LEFT JOIN public.products p ON p.id = oi.product_id
+GROUP BY o.id;
+
+-- Recréer orders_full_view avec les colonnes relay
+DROP VIEW IF EXISTS public.orders_full_view CASCADE;
+
+CREATE OR REPLACE VIEW public.orders_full_view AS
+SELECT
+  o.id AS order_id,
+  o.user_id,
+  o.stripe_session_id,
+  o.payment_intent_id,
+  o.paypal_order_id,
+  o.order_number,
+  o.tracking_token,
+  o.is_guest_order,
+  -- Adresse de facturation/domicile
+  o.full_name AS shipping_name,
+  o.email AS shipping_email,
+  o.address AS shipping_address,
+  o.city AS shipping_city,
+  o.zip AS shipping_zip,
+  o.country AS shipping_country,
+  -- 🆕 Point Relais
+  o.relay_id,
+  o.relay_name,
+  o.relay_address,
+  o.relay_zipcode,
+  o.relay_city,
+  o.relay_country,
+  (o.relay_id IS NOT NULL) AS is_relay_delivery,
+  -- Adresse de livraison effective (relais ou domicile)
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_name
+    ELSE o.full_name
+  END AS delivery_name,
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_address
+    ELSE o.address
+  END AS delivery_address,
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_zipcode
+    ELSE o.zip
+  END AS delivery_zip,
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_city
+    ELSE o.city
+  END AS delivery_city,
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_country
+    ELSE o.country
+  END AS delivery_country,
+  -- Autres champs
+  o.status,
+  o.payment_method,
+  o.subtotal,
+  o.tax_amount,
+  o.shipping_cost,
+  o.discount_amount,
+  o.total_amount,
+  o.carrier,
+  o.tracking_number,
+  o.created_at,
+  o.shipped_at,
+  o.updated_at,
+  odv.detailed_items,
+  jsonb_build_object(
+    'id', COALESCE(p.id, o.user_id),
+    'email', COALESCE(p.email, o.email),
+    'full_name', COALESCE(p.full_name, o.full_name),
+    'role', COALESCE(p.role, 'guest')
+  ) AS profile_info
+FROM public.orders o
+LEFT JOIN public.profiles p ON p.id = o.user_id
+LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
+
+ALTER VIEW public.orders_full_view SET (security_invoker = true);
+GRANT SELECT ON public.orders_full_view TO authenticated;
+
+-- Recréer orders_overview_for_admin avec info relay
+DROP VIEW IF EXISTS public.orders_overview_for_admin CASCADE;
+
+CREATE OR REPLACE VIEW public.orders_overview_for_admin AS
+SELECT
+  o.id AS order_id,
+  o.order_number,
+  o.user_id,
+  o.is_guest_order,
+  o.full_name AS customer_name,
+  o.email AS customer_email,
+  o.status,
+  o.total_amount,
+  o.created_at,
+  o.shipped_at,
+  -- 🆕 Info relay pour l'admin
+  o.relay_id,
+  o.relay_name,
+  (o.relay_id IS NOT NULL) AS is_relay_delivery,
+  -- Adresse de livraison effective
+  CASE 
+    WHEN o.relay_id IS NOT NULL THEN o.relay_city
+    ELSE o.city
+  END AS delivery_city,
+  (SELECT COUNT(*) FROM public.emails_sent e WHERE e.order_id = o.id) AS emails_count
+FROM public.orders o
+LEFT JOIN public.profiles p ON p.id = o.user_id
+ORDER BY o.created_at DESC;
+
+ALTER VIEW public.orders_overview_for_admin SET (security_invoker = true);
+GRANT SELECT ON public.orders_overview_for_admin TO authenticated;
+
+-- ============================================================
+-- BLOC 3: MISE À JOUR DE LA FONCTION DE CRÉATION DE COMMANDE
+-- ============================================================
+
+-- Supprimer l'ancienne fonction
+DROP FUNCTION IF EXISTS public.create_order_with_items_full;
+
+-- Recréer avec les paramètres relay
+CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
+  p_user_id uuid,
+  p_email text,
+  p_full_name text,
+  p_address text,
+  p_zip text,
+  p_city text,
+  p_country text,
+  p_payment_method text,
+  p_subtotal numeric,
+  p_tax_amount numeric,
+  p_shipping_cost numeric,
+  p_discount_amount numeric,
+  p_total_amount numeric,
+  p_items jsonb,
+  -- 🆕 Paramètres optionnels pour le point relais
+  p_relay_id text DEFAULT NULL,
+  p_relay_name text DEFAULT NULL,
+  p_relay_address text DEFAULT NULL,
+  p_relay_zipcode text DEFAULT NULL,
+  p_relay_city text DEFAULT NULL,
+  p_relay_country text DEFAULT 'FR'
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  new_order_id uuid;
+  new_tracking_token text;
+  item jsonb;
+  product_record RECORD;
+BEGIN
+  -- Validation des données
+  IF p_email IS NULL OR p_email = '' THEN
+    RAISE EXCEPTION 'Email requis';
+  END IF;
+  
+  IF p_total_amount <= 0 THEN
+    RAISE EXCEPTION 'Montant invalide';
+  END IF;
+
+  -- 1. Création Commande avec infos relay optionnelles
+  INSERT INTO public.orders (
+    user_id, email, full_name, address, zip, city, country,
+    payment_method, status,
+    subtotal, tax_amount, shipping_cost, discount_amount, total_amount,
+    -- Colonnes relay
+    relay_id, relay_name, relay_address, relay_zipcode, relay_city, relay_country
+  )
+  VALUES (
+    p_user_id, p_email, p_full_name, p_address, p_zip, p_city, p_country,
+    p_payment_method, 'pending',
+    COALESCE(p_subtotal, 0), COALESCE(p_tax_amount, 0),
+    COALESCE(p_shipping_cost, 0), COALESCE(p_discount_amount, 0),
+    p_total_amount,
+    -- Relay (peut être NULL pour livraison domicile)
+    p_relay_id, p_relay_name, p_relay_address, p_relay_zipcode, p_relay_city,
+    CASE WHEN p_relay_id IS NOT NULL THEN COALESCE(p_relay_country, 'FR') ELSE NULL END
+  )
+  RETURNING id, tracking_token INTO new_order_id, new_tracking_token;
+
+  -- 2. Insertion Produits avec vérification de stock
+  FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    SELECT * INTO product_record
+    FROM public.products p
+    WHERE p.id = (item->>'product_id')::uuid;
+    
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Produit introuvable: %', item->>'product_id';
+    END IF;
+    
+    IF product_record.stock < COALESCE((item->>'quantity')::integer, 1) THEN
+      RAISE EXCEPTION 'Stock insuffisant pour: %', product_record.name;
+    END IF;
+    
+    INSERT INTO public.order_items (order_id, product_id, quantity, price, product_name_snapshot)
+    VALUES (
+      new_order_id,
+      product_record.id,
+      COALESCE((item->>'quantity')::integer, 1),
+      CASE
+        WHEN product_record.is_on_sale AND product_record.sale_price IS NOT NULL
+        THEN product_record.sale_price
+        ELSE product_record.price
+      END,
+      product_record.name || CASE
+        WHEN product_record.dosage IS NOT NULL
+        THEN ' (' || product_record.dosage || ')'
+        ELSE ''
+      END
+    );
+    
+    UPDATE public.products
+    SET stock = stock - COALESCE((item->>'quantity')::integer, 1)
+    WHERE id = product_record.id;
+  END LOOP;
+
+  -- Si user connecté, vider son panier
+  IF p_user_id IS NOT NULL THEN
+    DELETE FROM public.user_cart_items WHERE user_id = p_user_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'order_id', new_order_id,
+    'tracking_token', new_tracking_token,
+    'is_relay_delivery', (p_relay_id IS NOT NULL),
+    'status', 'success'
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_order_with_items_full TO anon, authenticated;
+
+-- ============================================================
+-- BLOC 4: FONCTION HELPER POUR METTRE À JOUR LE RELAY
+-- ============================================================
+
+-- Fonction pour changer le point relais d'une commande (avant expédition)
+CREATE OR REPLACE FUNCTION public.update_order_relay(
+  p_order_id uuid,
+  p_relay_id text,
+  p_relay_name text,
+  p_relay_address text,
+  p_relay_zipcode text,
+  p_relay_city text,
+  p_relay_country text DEFAULT 'FR'
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_order_status text;
+  v_order_user_id uuid;
+BEGIN
+  -- Vérifier que la commande existe et n'est pas encore expédiée
+  SELECT status, user_id INTO v_order_status, v_order_user_id
+  FROM public.orders
+  WHERE id = p_order_id;
+  
+  IF v_order_status IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Commande introuvable.');
+  END IF;
+  
+  IF v_order_status IN ('shipped', 'completed', 'canceled', 'refunded') THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Impossible de modifier une commande expédiée ou terminée.');
+  END IF;
+  
+  -- Vérifier les droits (soit admin, soit propriétaire)
+  IF NOT (public.is_admin(auth.uid()) OR v_order_user_id = auth.uid()) THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Accès refusé.');
+  END IF;
+  
+  -- Mise à jour
+  UPDATE public.orders
+  SET
+    relay_id = p_relay_id,
+    relay_name = p_relay_name,
+    relay_address = p_relay_address,
+    relay_zipcode = p_relay_zipcode,
+    relay_city = p_relay_city,
+    relay_country = COALESCE(p_relay_country, 'FR'),
+    updated_at = now()
+  WHERE id = p_order_id;
+  
+  RETURN jsonb_build_object(
+    'success', true,
+    'message', 'Point relais mis à jour.',
+    'relay_id', p_relay_id
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.update_order_relay TO authenticated;
+
+-- Fonction pour supprimer le point relais (revenir à livraison domicile)
+CREATE OR REPLACE FUNCTION public.remove_order_relay(p_order_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_order_status text;
+  v_order_user_id uuid;
+BEGIN
+  SELECT status, user_id INTO v_order_status, v_order_user_id
+  FROM public.orders
+  WHERE id = p_order_id;
+  
+  IF v_order_status IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Commande introuvable.');
+  END IF;
+  
+  IF v_order_status IN ('shipped', 'completed', 'canceled', 'refunded') THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Impossible de modifier une commande expédiée ou terminée.');
+  END IF;
+  
+  IF NOT (public.is_admin(auth.uid()) OR v_order_user_id = auth.uid()) THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Accès refusé.');
+  END IF;
+  
+  UPDATE public.orders
+  SET
+    relay_id = NULL,
+    relay_name = NULL,
+    relay_address = NULL,
+    relay_zipcode = NULL,
+    relay_city = NULL,
+    relay_country = NULL,
+    updated_at = now()
+  WHERE id = p_order_id;
+  
+  RETURN jsonb_build_object('success', true, 'message', 'Livraison changée en domicile.');
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.remove_order_relay TO authenticated;
+
+-- ============================================================
+-- 🎉 FIN DE LA MIGRATION MONDIAL RELAY
+-- ============================================================
+
+COMMENT ON COLUMN public.orders.relay_id IS 'ID du point relais Mondial Relay (ex: FR-12345). NULL = livraison domicile.';
+COMMENT ON COLUMN public.orders.relay_name IS 'Nom commercial du point relais';
+COMMENT ON COLUMN public.orders.relay_address IS 'Adresse du point relais';
+COMMENT ON COLUMN public.orders.relay_zipcode IS 'Code postal du point relais';
+COMMENT ON COLUMN public.orders.relay_city IS 'Ville du point relais';
+COMMENT ON COLUMN public.orders.relay_country IS 'Code pays ISO du point relais (FR par défaut)';

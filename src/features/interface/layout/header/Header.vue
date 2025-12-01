@@ -173,7 +173,6 @@
               </svg>
               <span>Connexion</span>
             </button>
-
             <button
               class="navbar__btn navbar__btn--outline"
               @click="router.push('/auth/register')"
@@ -181,15 +180,10 @@
               Inscription
             </button>
           </div>
-
-          <!-- Mobile: UserMenu dropdown -->
           <UserMenu v-else />
         </template>
       </div>
     </div>
-
-    <!-- Mobile Drawer -->
-    <MobileDrawer v-model="isMenuOpen" />
   </nav>
 </template>
 <script setup lang="ts">

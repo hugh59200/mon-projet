@@ -1,5 +1,11 @@
+// useOrderActions.ts — V3.2 (Relay Support)
 import { useDialog } from '@/features/interface/dialog'
-import { deleteOrderById, updateOrderStatusInDB } from '@/supabase/api/ordersApi'
+import { 
+  deleteOrderById, 
+  updateOrderStatusInDB,
+  getDeliveryAddress,
+  isRelayDelivery 
+} from '@/supabase/api/ordersApi'
 import type { OrderStatus } from '@/utils'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -10,23 +16,35 @@ type MinimalOrder = {
   order_id?: string | null
   id?: string | null
   order_number?: string | null
-  is_guest_order?: boolean | null // 🆕 Pour affichage dans dialog
-  customer_email?: string | null // 🆕 Pour affichage dans dialog
+  is_guest_order?: boolean | null
+  customer_email?: string | null
+  // 🆕 Champs relay
+  relay_id?: string | null
+  relay_name?: string | null
+  relay_city?: string | null
+  is_relay_delivery?: boolean | null
 }
 
 export function useOrderActions(fetchData?: () => void) {
   const toast = useToastStore()
   const { showDialog } = useDialog()
 
-  // 🗑️ SUPPRESSION V3 (Guest-aware)
+  // 🗑️ SUPPRESSION V3.2 (Guest-aware + Relay info)
   async function deleteOrder(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
 
     const safeId = sanitizeHTML(order.order_number || id)
     const isGuest = order.is_guest_order ?? false
+    const isRelay = order.is_relay_delivery ?? !!order.relay_id
+
     const guestEmail = order.customer_email
       ? `<br/><span class="text-sm text-neutral-600">(${sanitizeHTML(order.customer_email)})</span>`
+      : ''
+
+    // 🆕 Info point relais
+    const relayInfo = isRelay && order.relay_name
+      ? `<p class="text-sm text-green-600 mb-2">📍 Point Relais : ${sanitizeHTML(order.relay_name)}</p>`
       : ''
 
     const result = await showDialog({
@@ -35,6 +53,7 @@ export function useOrderActions(fetchData?: () => void) {
       message: [
         `<p class="mb-2">Voulez-vous vraiment supprimer la commande <strong>${safeId}</strong> ?</p>`,
         isGuest ? `<p class="text-sm text-info-600 mb-2">👤 Commande invité${guestEmail}</p>` : '',
+        relayInfo,
         `<p class="text-sm text-red-600">Cette action est irréversible.</p>`,
       ],
       isHtml: true,
@@ -53,7 +72,7 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  // 🔄 STATUT V3 (RPC + Email avec tracking token)
+  // 🔄 STATUT V3.2 (RPC + Email avec tracking token)
   async function changeOrderStatus(order: MinimalOrder, status: OrderStatus) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -63,7 +82,6 @@ export function useOrderActions(fetchData?: () => void) {
       await updateOrderStatusInDB(id, status)
 
       // 2. EDGE FUNCTION : Envoie l'email au client avec lien de tracking
-      // 🆕 L'email contiendra le tracking_token pour les guests
       try {
         await supabase.functions.invoke('send-order-update', {
           body: { order_id: id, status },
@@ -71,7 +89,6 @@ export function useOrderActions(fetchData?: () => void) {
         console.log('✅ Email de mise à jour envoyé')
       } catch (emailErr) {
         console.warn('⚠️ Erreur envoi email (non bloquant):', emailErr)
-        // Non bloquant : le statut est déjà mis à jour
       }
 
       toast.show(`Statut mis à jour : ${status} 📧`, 'success')
@@ -107,7 +124,7 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
-  // 🆕 COPIER LE LIEN DE TRACKING (pour partage manuel)
+  // 🆕 COPIER LE LIEN DE TRACKING
   async function copyTrackingLink(order: MinimalOrder) {
     const id = order.order_id ?? order.id
     if (!id) return
@@ -127,10 +144,55 @@ export function useOrderActions(fetchData?: () => void) {
     }
   }
 
+  // 🆕 AFFICHER LES DÉTAILS DE LIVRAISON
+  async function showDeliveryDetails(order: MinimalOrder) {
+    const id = order.order_id ?? order.id
+    if (!id) return
+
+    try {
+      const { data, error } = await supabase
+        .from('orders_full_view')
+        .select('*')
+        .eq('order_id', id)
+        .single()
+
+      if (error || !data) {
+        toast.show('Impossible de charger les détails', 'danger')
+        return
+      }
+
+      const delivery = getDeliveryAddress(data)
+      if (!delivery) return
+
+      const title = delivery.isRelay ? '📍 Point Relais' : '🏠 Livraison à domicile'
+      
+      await showDialog({
+        type: 'Ok',
+        title,
+        message: [
+          `<div class="space-y-2">`,
+          `<p class="font-semibold">${sanitizeHTML(delivery.name)}</p>`,
+          `<p>${sanitizeHTML(delivery.address)}</p>`,
+          `<p>${sanitizeHTML(delivery.zip)} ${sanitizeHTML(delivery.city)}</p>`,
+          `<p>${sanitizeHTML(delivery.country)}</p>`,
+          delivery.isRelay 
+            ? `<p class="text-sm text-green-600 mt-4">✅ Livraison gratuite en Point Relais</p>` 
+            : '',
+          `</div>`,
+        ],
+        isHtml: true,
+      })
+    } catch (err) {
+      console.error(err)
+      toast.show('Erreur chargement détails', 'danger')
+    }
+  }
+
   return {
     deleteOrder,
     changeOrderStatus,
     getOrderTrackingLink,
     copyTrackingLink,
+    showDeliveryDetails, // 🆕
   }
 }

@@ -365,6 +365,12 @@ export type Database = {
           payment_intent_id: string | null
           payment_method: string | null
           paypal_order_id: string | null
+          relay_address: string | null
+          relay_city: string | null
+          relay_country: string | null
+          relay_id: string | null
+          relay_name: string | null
+          relay_zipcode: string | null
           shipped_at: string | null
           shipping_cost: number | null
           status: Database["public"]["Enums"]["order_status"]
@@ -394,6 +400,12 @@ export type Database = {
           payment_intent_id?: string | null
           payment_method?: string | null
           paypal_order_id?: string | null
+          relay_address?: string | null
+          relay_city?: string | null
+          relay_country?: string | null
+          relay_id?: string | null
+          relay_name?: string | null
+          relay_zipcode?: string | null
           shipped_at?: string | null
           shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -423,6 +435,12 @@ export type Database = {
           payment_intent_id?: string | null
           payment_method?: string | null
           paypal_order_id?: string | null
+          relay_address?: string | null
+          relay_city?: string | null
+          relay_country?: string | null
+          relay_id?: string | null
+          relay_name?: string | null
+          relay_zipcode?: string | null
           shipped_at?: string | null
           shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -781,8 +799,15 @@ export type Database = {
           email: string | null
           full_name: string | null
           is_guest_order: boolean | null
+          is_relay_delivery: boolean | null
           order_id: string | null
           payment_method: string | null
+          relay_address: string | null
+          relay_city: string | null
+          relay_country: string | null
+          relay_id: string | null
+          relay_name: string | null
+          relay_zipcode: string | null
           shipped_at: string | null
           shipping_cost: number | null
           status: Database["public"]["Enums"]["order_status"] | null
@@ -813,15 +838,27 @@ export type Database = {
         Row: {
           carrier: string | null
           created_at: string | null
+          delivery_address: string | null
+          delivery_city: string | null
+          delivery_country: string | null
+          delivery_name: string | null
+          delivery_zip: string | null
           detailed_items: Json | null
           discount_amount: number | null
           is_guest_order: boolean | null
+          is_relay_delivery: boolean | null
           order_id: string | null
           order_number: string | null
           payment_intent_id: string | null
           payment_method: string | null
           paypal_order_id: string | null
           profile_info: Json | null
+          relay_address: string | null
+          relay_city: string | null
+          relay_country: string | null
+          relay_id: string | null
+          relay_name: string | null
+          relay_zipcode: string | null
           shipped_at: string | null
           shipping_address: string | null
           shipping_city: string | null
@@ -862,10 +899,14 @@ export type Database = {
           created_at: string | null
           customer_email: string | null
           customer_name: string | null
+          delivery_city: string | null
           emails_count: number | null
           is_guest_order: boolean | null
+          is_relay_delivery: boolean | null
           order_id: string | null
           order_number: string | null
+          relay_id: string | null
+          relay_name: string | null
           shipped_at: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_amount: number | null
@@ -1034,6 +1075,12 @@ export type Database = {
           p_full_name: string
           p_items: Json
           p_payment_method: string
+          p_relay_address?: string
+          p_relay_city?: string
+          p_relay_country?: string
+          p_relay_id?: string
+          p_relay_name?: string
+          p_relay_zipcode?: string
           p_shipping_cost: number
           p_subtotal: number
           p_tax_amount: number
@@ -1058,6 +1105,19 @@ export type Database = {
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
+      remove_order_relay: { Args: { p_order_id: string }; Returns: Json }
+      update_order_relay: {
+        Args: {
+          p_order_id: string
+          p_relay_address: string
+          p_relay_city: string
+          p_relay_country?: string
+          p_relay_id: string
+          p_relay_name: string
+          p_relay_zipcode: string
+        }
+        Returns: Json
+      }
       user_exists_by_email: { Args: { p_email: string }; Returns: boolean }
     }
     Enums: {

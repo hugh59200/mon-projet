@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 ordersApi.ts — V3.1 (Token Tracking)
+// 🛒 ordersApi.ts — V3.2 (Mondial Relay Support)
 // ============================================================
 import type { OrderStatus } from '../../utils'
 import { supabase } from '../supabaseClient'
@@ -7,7 +7,21 @@ import type { Json } from '../types/supabase'
 import type { OrdersFullView } from '../types/supabase.types'
 import { handleApi, handleMutation } from './helpers/HandleError'
 
-// Type spécifique pour la création
+// ============================================================
+// 📦 TYPES
+// ============================================================
+
+// Type pour les données relay
+export type RelayData = {
+  relayId: string
+  relayName: string
+  relayAddress: string
+  relayZipcode: string
+  relayCity: string
+  relayCountry?: string
+}
+
+// Type spécifique pour la création (V3.2 avec Relay)
 export type CreateOrderPayload = {
   userId: string | null
   email: string
@@ -27,41 +41,156 @@ export type CreateOrderPayload = {
     quantity: number
     product_price: number
   }[]
+  // 🆕 Données Point Relais (optionnelles)
+  relayId?: string
+  relayName?: string
+  relayAddress?: string
+  relayZipcode?: string
+  relayCity?: string
+  relayCountry?: string
 }
 
-// Type pour la réponse de création (inclut le token)
+// Type pour la réponse de création (V3.2 avec relay flag)
 export type CreateOrderResponse = {
   order_id: string
   tracking_token: string
+  is_relay_delivery: boolean
   status: string
 }
 
-/** ✅ CRÉATION V3.1 (Guest Compatible + Token Retourné) */
+// Type pour la réponse de mise à jour relay
+export type UpdateRelayResponse = {
+  success: boolean
+  message: string
+  relay_id?: string
+}
+
+// ============================================================
+// 🛒 CRÉATION DE COMMANDE
+// ============================================================
+
+/** ✅ CRÉATION V3.2 (Guest Compatible + Relay Support) */
 export async function createOrder(payload: CreateOrderPayload): Promise<CreateOrderResponse> {
   const itemsJson = payload.items as unknown as Json
 
   const res = await supabase.rpc('create_order_with_items_full', {
-    p_user_id: payload.userId as any,
-    p_email: payload.email,
-    p_full_name: payload.fullName,
+    // Paramètres dans l'ordre ALPHABÉTIQUE (requis par Supabase)
     p_address: payload.address,
-    p_zip: payload.zip,
     p_city: payload.city,
     p_country: payload.country,
+    p_discount_amount: payload.discountAmount,
+    p_email: payload.email,
+    p_full_name: payload.fullName,
+    p_items: itemsJson,
     p_payment_method: payload.paymentMethod,
+    p_relay_address: payload.relayAddress ?? undefined,
+    p_relay_city: payload.relayCity ?? undefined,
+    p_relay_country: payload.relayCountry ?? undefined,
+    p_relay_id: payload.relayId ?? undefined,
+    p_relay_name: payload.relayName ?? undefined,
+    p_relay_zipcode: payload.relayZipcode ?? undefined,
+    p_shipping_cost: payload.shippingCost,
     p_subtotal: payload.subtotal,
     p_tax_amount: payload.taxAmount,
-    p_shipping_cost: payload.shippingCost,
-    p_discount_amount: payload.discountAmount,
     p_total_amount: payload.totalAmount,
-    p_items: itemsJson,
+    p_user_id: payload.userId!,
+    p_zip: payload.zip,
   })
 
   const result = handleApi(res)
-
-  // Le RPC V3.1 retourne { order_id, tracking_token, status }
   return result as unknown as CreateOrderResponse
 }
+
+// ============================================================
+// 📍 GESTION POINT RELAIS
+// ============================================================
+
+/**
+ * 🆕 Mettre à jour le point relais d'une commande
+ * (utilisable avant expédition uniquement)
+ */
+export async function updateOrderRelay(
+  orderId: string,
+  relay: RelayData,
+): Promise<UpdateRelayResponse> {
+  const { data, error } = await supabase.rpc('update_order_relay', {
+    p_order_id: orderId,
+    p_relay_id: relay.relayId,
+    p_relay_name: relay.relayName,
+    p_relay_address: relay.relayAddress,
+    p_relay_zipcode: relay.relayZipcode,
+    p_relay_city: relay.relayCity,
+    p_relay_country: relay.relayCountry || 'FR',
+  })
+
+  if (error) throw error
+
+  return data as UpdateRelayResponse
+}
+
+/**
+ * 🆕 Supprimer le point relais d'une commande (revenir à domicile)
+ * (utilisable avant expédition uniquement)
+ */
+export async function removeOrderRelay(orderId: string): Promise<UpdateRelayResponse> {
+  const { data, error } = await supabase.rpc('remove_order_relay', {
+    p_order_id: orderId,
+  })
+
+  if (error) throw error
+
+  return data as UpdateRelayResponse
+}
+
+/**
+ * 🆕 Vérifier si une commande est en livraison relay
+ */
+export function isRelayDelivery(order: OrdersFullView | null): boolean {
+  if (!order) return false
+  return !!(order as any).relay_id || !!(order as any).is_relay_delivery
+}
+
+/**
+ * 🆕 Obtenir l'adresse de livraison effective (relay ou domicile)
+ */
+export function getDeliveryAddress(order: OrdersFullView | null): {
+  name: string
+  address: string
+  zip: string
+  city: string
+  country: string
+  isRelay: boolean
+} | null {
+  if (!order) return null
+
+  const orderAny = order as any
+
+  // Si livraison en point relais
+  if (orderAny.relay_id) {
+    return {
+      name: orderAny.relay_name || orderAny.delivery_name || '',
+      address: orderAny.relay_address || orderAny.delivery_address || '',
+      zip: orderAny.relay_zipcode || orderAny.delivery_zip || '',
+      city: orderAny.relay_city || orderAny.delivery_city || '',
+      country: orderAny.relay_country || orderAny.delivery_country || 'FR',
+      isRelay: true,
+    }
+  }
+
+  // Sinon, adresse domicile
+  return {
+    name: orderAny.shipping_name || '',
+    address: orderAny.shipping_address || '',
+    zip: orderAny.shipping_zip || '',
+    city: orderAny.shipping_city || '',
+    country: orderAny.shipping_country || 'FR',
+    isRelay: false,
+  }
+}
+
+// ============================================================
+// 📋 LECTURE DES COMMANDES
+// ============================================================
 
 /** ✅ ADMIN : Récupère toutes les commandes */
 export async function fetchOrders(): Promise<OrdersFullView[]> {
@@ -100,6 +229,7 @@ export async function deleteOrderById(id: string) {
 // ============================================================
 // 🆕 GUEST TRACKING V3.1 - Par Token (RECOMMANDÉ)
 // ============================================================
+
 /**
  * 🔐 Méthode SÉCURISÉE : Tracking par token unique
  * À utiliser dans l'email de confirmation et la page de succès
@@ -123,6 +253,7 @@ export async function trackGuestOrderByToken(trackingToken: string): Promise<Ord
 // ============================================================
 // 🔙 FALLBACK : Tracking par Email + Order Number (Compatibilité)
 // ============================================================
+
 /**
  * ⚠️ Moins sécurisé, à utiliser uniquement si l'utilisateur
  * n'a pas le lien avec le token (email perdu, etc.)
@@ -147,6 +278,10 @@ export async function trackGuestOrderByEmail(
   return result.order
 }
 
+// ============================================================
+// 🔄 MISE À JOUR STATUT
+// ============================================================
+
 /** ✅ ADMIN : Mise à jour du statut via RPC */
 export async function updateOrderStatusInDB(orderId: string, status: OrderStatus) {
   const { data, error } = await supabase.rpc('admin_update_order_status', {
@@ -157,4 +292,33 @@ export async function updateOrderStatusInDB(orderId: string, status: OrderStatus
 
   handleMutation(error)
   return data as unknown as OrdersFullView
+}
+
+// ============================================================
+// 🔍 STRIPE SESSION LOOKUP
+// ============================================================
+
+/**
+ * Récupérer une commande par son stripe_session_id
+ * Utile sur la page de confirmation après paiement
+ */
+export async function fetchOrderByStripeSession(sessionId: string): Promise<{
+  id: string
+  email: string
+  order_number: string
+  tracking_token: string
+  status: string
+  total_amount: number
+  is_guest_order: boolean
+} | null> {
+  const { data, error } = await supabase.rpc('get_order_by_stripe_session', {
+    p_session_id: sessionId,
+  })
+
+  if (error) {
+    console.error('Erreur fetchOrderByStripeSession:', error)
+    return null
+  }
+
+  return data as any
 }
