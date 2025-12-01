@@ -1626,7 +1626,6 @@
 
       &__sidebar {
         position: static;
-        order: -1;
       }
     }
   }

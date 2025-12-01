@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 useCartStore — V3.0 (Guest Checkout + Pinia Persist)
+// 🛒 useCartStore — V4.0 (Guest Checkout + Pinia Persist - Simplified)
 // ============================================================
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
@@ -7,7 +7,8 @@ import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { CartItems, CartView, Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
+
 
 export const useCartStore = defineStore(
   'cart',
@@ -17,14 +18,21 @@ export const useCartStore = defineStore(
     // ============================================================
     // 💾 État
     // ============================================================
-    // items : La liste active affichée dans l'UI (soit DB, soit Guest)
-    const items = ref<CartView[]>([])
-    
-    // guestCart : La liste persistée dans le localStorage (Source de vérité pour l'invité)
+    // dbCart : Items depuis la DB (utilisateur connecté)
+    const dbCart = ref<CartView[]>([])
+
+    // guestCart : Items persistés dans localStorage (invité)
     const guestCart = ref<CartView[]>([])
 
     const isSyncing = ref(false)
     let channel: RealtimeChannel | null = null
+
+    // ============================================================
+    // 🎯 items = computed qui choisit la bonne source
+    // ============================================================
+    const items = computed(() => {
+      return auth.user?.id ? dbCart.value : guestCart.value
+    })
 
     // ============================================================
     // 🧰 Helpers
@@ -34,15 +42,15 @@ export const useCartStore = defineStore(
     }
 
     // ============================================================
-    // 📥 Charger le panier (DB ou Local)
+    // 📥 Charger le panier (DB uniquement, guestCart est auto-hydraté)
     // ============================================================
     async function loadCart() {
       if (auth.user?.id) {
         await loadCartFromSupabase()
-      } else {
-        // Mode invité : on charge depuis le state persisté
-        items.value = [...guestCart.value]
+        setupRealtime()
       }
+      // Pour le mode invité, guestCart est déjà hydraté par pinia-persist
+      // et items est un computed qui le lit directement
     }
 
     async function loadCartFromSupabase() {
@@ -56,7 +64,7 @@ export const useCartStore = defineStore(
 
         if (error) throw error
 
-        items.value = (data ?? []).map((i) => ({
+        dbCart.value = (data ?? []).map((i) => ({
           ...i,
           product_image: safeImage(i.product_image),
         }))
@@ -73,7 +81,7 @@ export const useCartStore = defineStore(
     async function addToCart(product: Products) {
       // 1. Mode Connecté (DB)
       if (auth.user?.id) {
-        const existing = items.value.find((i) => i.product_id === product.id)
+        const existing = dbCart.value.find((i) => i.product_id === product.id)
         if (existing) {
           await updateQuantity(product.id, (existing.quantity ?? 0) + 1)
         } else {
@@ -85,11 +93,11 @@ export const useCartStore = defineStore(
           await supabase.from('user_cart_items').insert(payload)
           await loadCartFromSupabase()
         }
-      } 
+      }
       // 2. Mode Invité (Local)
       else {
         const existingIndex = guestCart.value.findIndex((i) => i.product_id === product.id)
-        
+
         if (existingIndex >= 0) {
           guestCart.value[existingIndex]!.quantity = (guestCart.value[existingIndex]!.quantity ?? 0) + 1
         } else {
@@ -111,8 +119,7 @@ export const useCartStore = defineStore(
             updated_at: new Date().toISOString()
           })
         }
-        // Synchro vers items pour l'affichage
-        items.value = [...guestCart.value]
+        // Pas besoin de synchro, items est un computed de guestCart
       }
     }
 
@@ -130,7 +137,6 @@ export const useCartStore = defineStore(
         const index = guestCart.value.findIndex((i) => i.product_id === productId)
         if (index >= 0) {
           guestCart.value[index]!.quantity = quantity
-          items.value = [...guestCart.value]
         }
       }
     }
@@ -145,7 +151,6 @@ export const useCartStore = defineStore(
         await loadCartFromSupabase()
       } else {
         guestCart.value = guestCart.value.filter((i) => i.product_id !== productId)
-        items.value = [...guestCart.value]
       }
     }
 
@@ -155,7 +160,6 @@ export const useCartStore = defineStore(
         await loadCartFromSupabase()
       } else {
         guestCart.value = []
-        items.value = []
       }
     }
 
@@ -219,20 +223,29 @@ export const useCartStore = defineStore(
     }
 
     // ============================================================
-    // 👀 Watch Auth State
+    // 👀 Watch Auth State (login/logout)
     // ============================================================
-    watch(() => auth.user, async (user) => {
-      if (user) {
+    // Note: On utilise un watch simple car items est un computed
+    // qui switch automatiquement entre dbCart et guestCart
+    let isFirstAuthChange = true
+    auth.$subscribe(async () => {
+      // Ignorer le premier appel (initialisation)
+      if (isFirstAuthChange) {
+        isFirstAuthChange = false
+        return
+      }
+
+      if (auth.user?.id) {
         // Connexion : Fusionner le panier local vers la DB
         await mergeGuestCart()
         await loadCartFromSupabase()
         setupRealtime()
       } else {
-        // Déconnexion : On affiche le panier invité (s'il en reste un, sinon vide)
+        // Déconnexion : cleanup realtime, guestCart reste intact
         cleanupRealtime()
-        items.value = [...guestCart.value]
+        dbCart.value = []
       }
-    }, { immediate: true })
+    })
 
     // ============================================================
     // 🧮 Computed
@@ -263,11 +276,11 @@ export const useCartStore = defineStore(
   },
   {
     persist: {
-      key: 'fp-cart-storage', // Clé dans le localStorage
+      key: 'fp-cart-storage',
       storage: localStorage,
       // ⚠️ IMPORTANT : On ne persiste QUE 'guestCart'.
       // 'items' est recalculé à chaque chargement (soit depuis DB, soit depuis guestCart).
-      pick: ['guestCart'], 
+      pick: ['guestCart'],
     },
   },
 )

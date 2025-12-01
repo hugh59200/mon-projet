@@ -1474,7 +1474,7 @@
     // ============================================
     &__content {
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: 1fr minmax(320px, 380px);
       gap: 32px;
       align-items: start;
     }
@@ -2495,7 +2495,7 @@
   // ============================================
   // RESPONSIVE
   // ============================================
-  @media (max-width: 1024px) {
+  @media (max-width: 1100px) {
     .checkout {
       &__content {
         grid-template-columns: 1fr;
@@ -2510,8 +2510,34 @@
 
   @media (max-width: 768px) {
     .checkout {
+      // Bouton sticky en bas sur mobile
+      &__sidebar {
+        .checkout__submit {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: 0;
+          border-radius: 0;
+          padding: 18px 24px;
+          z-index: 100;
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        // Masquer les trust badges en mobile pour alléger
+        .checkout__trust {
+          display: none;
+        }
+
+        // Ajouter du padding en bas pour compenser le bouton sticky
+        .checkout__summary {
+          padding-bottom: 80px;
+        }
+      }
+
       &__container {
         padding: 16px;
+        padding-bottom: 100px; // Extra padding pour le bouton sticky
       }
 
       &__header {

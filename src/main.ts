@@ -1,5 +1,6 @@
 import directives from '@/directives'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
 import i18n from '@/i18n'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
 import { RegistrationDSComponents } from '@/plugin/registration'
@@ -14,6 +15,9 @@ import router from './router'
 const app = createApp(App)
 const pinia = createPinia()
 
+// ⚠️ IMPORTANT : Ajouter le plugin persist AVANT d'utiliser pinia
+pinia.use(piniaPluginPersistedstate)
+
 app.use(pinia)
 app.use(router)
 app.use(i18n)
@@ -23,10 +27,13 @@ app.use(deviceBreakpointPlugin)
 app.use(Vue3GoogleOauth, {
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
 })
-pinia.use(piniaPluginPersistedstate)
 app.use(directives)
+
+// Initialisation des stores
 const auth = useAuthStore()
+const cart = useCartStore()
 
 await auth.initAuth()
+await cart.loadCart()
 
 app.mount('#app')
