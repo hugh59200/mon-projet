@@ -9,17 +9,16 @@
       
       <div class="cta__inner">
         <div class="cta__content">
-          <h2>Prêt à démarrer votre<br><span>recherche ?</span></h2>
+          <h2>{{ t('home.cta.title.line1') }}<br><span>{{ t('home.cta.title.accent') }}</span></h2>
           <p>
-            Accédez au catalogue complet et aux stocks disponibles en temps réel. 
-            Livraison prioritaire pour tous les laboratoires européens.
+            {{ t('home.cta.description') }}
           </p>
           <div class="cta__actions">
             <BaseButton variant="white" arrow @click="$router.push('/catalogue')">
-              Voir le catalogue
+              {{ t('home.cta.buttons.catalogue') }}
             </BaseButton>
             <BaseButton variant="outline" @click="$router.push('/contact')">
-              Nous contacter
+              {{ t('home.cta.buttons.contact') }}
             </BaseButton>
           </div>
         </div>
@@ -44,8 +43,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BaseButton from './shared/BaseButton.vue'
 
+const { t } = useI18n()
 const sectionRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {

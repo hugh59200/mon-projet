@@ -4,9 +4,9 @@
     ref="sectionRef"
   >
     <SectionHeader
-      badge="Processus simplifié"
-      title="Comment ça marche ?"
-      description="Un parcours pensé pour les laboratoires et équipes R&D"
+      :badge="t('home.process.badge')"
+      :title="t('home.process.title')"
+      :description="t('home.process.description')"
       light
     />
 
@@ -34,9 +34,11 @@
 </template>
 
 <script setup lang="ts">
-  import { h, onMounted, ref } from 'vue'
+  import { computed, h, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import SectionHeader from './shared/SectionHeader.vue'
 
+  const { t } = useI18n()
   const sectionRef = ref<HTMLElement | null>(null)
 
   const icon = (d: string) => () =>
@@ -54,26 +56,26 @@
     'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0',
   )
 
-  const steps = [
+  const steps = computed(() => [
     {
-      title: 'Sélectionnez',
-      description: 'Parcourez notre catalogue et filtrez par catégorie, cible ou application.',
+      title: t('home.process.steps.step1.title'),
+      description: t('home.process.steps.step1.description'),
       variant: 'success',
       icon: SearchIcon,
     },
     {
-      title: 'Analysez',
-      description: "Consultez les fiches techniques et certificats d'analyse (COA).",
+      title: t('home.process.steps.step2.title'),
+      description: t('home.process.steps.step2.description'),
       variant: 'primary',
       icon: DocumentIcon,
     },
     {
-      title: 'Recevez',
-      description: 'Livraison prioritaire sécurisée depuis notre stock européen sous 24-48h.',
+      title: t('home.process.steps.step3.title'),
+      description: t('home.process.steps.step3.description'),
       variant: 'warning',
       icon: TruckIcon,
     },
-  ]
+  ])
 
   onMounted(() => {
     if ('IntersectionObserver' in window && sectionRef.value) {

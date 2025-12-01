@@ -37,6 +37,259 @@ export default {
   },
 
   // ============================================
+  // HOME PAGE
+  // ============================================
+  home: {
+    hero: {
+      badge: {
+        certified: 'Fournisseur européen certifié',
+        researchOnly: 'Usage recherche exclusif',
+      },
+      title: {
+        line1: 'Peptides de recherche',
+        accent: 'haute pureté',
+        line2: 'pour laboratoires',
+      },
+      description: "Catalogue sélectionné de peptides certifiés ≥99% de pureté. Certificats d'analyse disponibles. Expédition 24h depuis l'Union Européenne.",
+      cta: {
+        explore: 'Explorer le catalogue',
+        learnMore: 'En savoir plus',
+      },
+      trust: {
+        purity: 'Pureté ≥99%',
+        coa: 'COA inclus',
+        delivery: 'Livraison 24h',
+      },
+    },
+    stats: {
+      peptides: 'Peptides disponibles',
+      purity: 'Pureté garantie',
+      shipping: 'Expédition rapide',
+      stock: 'Stock européen',
+    },
+    process: {
+      badge: 'Processus simplifié',
+      title: 'Comment ça marche ?',
+      description: 'Un parcours pensé pour les laboratoires et équipes R&D',
+      steps: {
+        select: {
+          title: 'Sélectionnez',
+          description: 'Parcourez notre catalogue et filtrez par catégorie, cible ou application.',
+        },
+        analyze: {
+          title: 'Analysez',
+          description: "Consultez les fiches techniques et certificats d'analyse (COA).",
+        },
+        receive: {
+          title: 'Recevez',
+          description: 'Livraison prioritaire sécurisée depuis notre stock européen sous 24-48h.',
+        },
+      },
+    },
+    quality: {
+      badge: 'Engagement qualité',
+      title: {
+        line1: 'Des standards',
+        accent: 'pharmaceutiques',
+      },
+      description: 'Chaque peptide est soumis à un contrôle qualité rigoureux. Analyses HPLC et spectrométrie de masse pour garantir une pureté optimale.',
+      coa: {
+        title: "Certificat d'analyse",
+        reference: 'Référence',
+        batch: 'Lot',
+        purity: 'Pureté HPLC',
+        mass: 'Masse moléculaire',
+        appearance: 'Apparence',
+        whitePowder: 'Poudre blanche',
+        verified: 'Vérifié & Authentique',
+      },
+      features: {
+        purity: {
+          title: 'Pureté HPLC ≥99%',
+          description: 'Analyse chromatographique haute performance.',
+        },
+        mass: {
+          title: 'Spectrométrie de masse',
+          description: "Vérification de la masse moléculaire et de l'identité.",
+        },
+        stock: {
+          title: 'Stock européen',
+          description: "Expédition depuis l'UE, sans frais de douane.",
+        },
+        pure: {
+          title: 'Formulation pure',
+          description: 'Sans excipients inutiles ni additifs.',
+        },
+      },
+    },
+    faq: {
+      badge: 'Support',
+      title: 'Questions fréquentes',
+      items: {
+        q1: {
+          question: 'Vendez-vous aux particuliers ?',
+          answer: 'Nos produits sont destinés aux laboratoires, institutions de recherche et professionnels qualifiés.',
+        },
+        q2: {
+          question: 'Les produits sont-ils à usage humain ?',
+          answer: 'Non. Tous nos peptides sont vendus exclusivement pour la recherche scientifique in vitro (RUO).',
+        },
+        q3: {
+          question: "Fournissez-vous des certificats d'analyse ?",
+          answer: 'Oui, chaque lot est accompagné de son COA complet (HPLC, MS).',
+        },
+        q4: {
+          question: "D'où expédiez-vous ?",
+          answer: 'Depuis nos entrepôts en Union Européenne (livraison 24-48h).',
+        },
+        q5: {
+          question: 'Quels moyens de paiement acceptez-vous ?',
+          answer: 'Virements bancaires, cartes (Visa, Mastercard) et facturation institutions.',
+        },
+      },
+    },
+    cta: {
+      title: {
+        line1: 'Prêt à démarrer votre',
+        accent: 'recherche ?',
+      },
+      description: 'Accédez au catalogue complet et aux stocks disponibles en temps réel. Livraison prioritaire pour tous les laboratoires européens.',
+      buttons: {
+        catalogue: 'Voir le catalogue',
+        contact: 'Nous contacter',
+      },
+    },
+    disclaimer: {
+      title: 'Usage recherche uniquement (RUO)',
+      text: 'Les produits proposés sont destinés exclusivement à la recherche scientifique in vitro.',
+    },
+    banner: {
+      eyebrow: 'Ressources pédagogiques',
+      title: 'Comprendre les peptides avant vos recherches.',
+      description: 'Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des peptides dans vos projets de recherche.',
+      bullets: {
+        clear: 'Vulgarisation claire pour équipes R&D et laboratoires.',
+        resources: 'Ressources externes sélectionnées : articles, vidéos, revues.',
+        reminder: 'Rappel constant : recherche exclusivement – aucun usage humain.',
+      },
+      cta: 'Explorer les ressources pédagogiques',
+      disclaimerText: 'Sélection neutre, sans recommandation médicale.',
+      carousel: {
+        title: 'Quelques peptides de notre catalogue',
+        ruo: 'Research only – Not for human use',
+      },
+      personas: {
+        rd: {
+          name: 'Dr. L. Moreau',
+          role: 'Chercheuse en peptides – équipe R&D',
+          tag: 'Recherche fondamentale',
+          alt: 'Chercheuse en laboratoire',
+        },
+        lab: {
+          name: 'Pr. K. Almeida',
+          role: 'Responsable de laboratoire',
+          tag: 'Laboratoire académique',
+          alt: 'Responsable de laboratoire',
+        },
+        phd: {
+          name: 'Noah',
+          role: 'Doctorant en sciences du vivant',
+          tag: 'Projet de thèse',
+          alt: 'Jeune doctorant',
+        },
+        quality: {
+          name: 'Dr. S. Meyer',
+          role: 'Référent qualité & conformité',
+          tag: 'Qualité & conformité',
+          alt: 'Scientifiques discutant',
+        },
+      },
+    },
+    categories: {
+      fullCatalogue: 'Catalogue complet',
+      videoExplainer: 'Vidéo explicative',
+      disclaimer: 'Produits destinés exclusivement à la recherche scientifique',
+      explore: 'Explorer',
+      researchFor: 'Peptides pour la recherche sur',
+      weightLoss: {
+        label: 'Perte de poids',
+        eyebrow: 'Voies métaboliques',
+        titleAccent: 'la perte de poids',
+        description: "Modulation des voies métaboliques, sensibilité à l'insuline et gestion de l'énergie avec les agonistes GLP-1.",
+        videoLabel: 'Comprendre les peptides GLP-1',
+      },
+      recovery: {
+        label: 'Récupération',
+        eyebrow: 'Régénération tissulaire',
+        titleAccent: 'la récupération',
+        description: 'BPC-157 et TB-500 : le duo "Wolverine Stack" pour la réparation tissulaire et la récupération accélérée.',
+        videoLabel: 'BPC-157 & TB-500 expliqués',
+      },
+      growth: {
+        label: 'Croissance',
+        eyebrow: 'Sécrétagogues GH',
+        titleAccent: 'la croissance',
+        description: "CJC-1295, GHRP-6, Ipamorelin : stimulation de l'axe GH/IGF-1 pour la croissance et la récupération musculaire.",
+        videoLabel: 'GHRP & CJC-1295 : le guide',
+      },
+      antiAging: {
+        label: 'Anti-âge',
+        eyebrow: 'Longévité cellulaire',
+        titleAccent: "l'anti-âge",
+        description: 'Sermorelin et NAD+ : restauration des niveaux de GH et soutien de la réparation cellulaire liée au vieillissement.',
+        videoLabel: 'NAD+ & Sermorelin : anti-aging',
+      },
+      performance: {
+        label: 'Performance',
+        eyebrow: 'Physiologie musculaire',
+        titleAccent: 'la performance',
+        description: 'PEG-MGF : facteur de croissance mécanique pour la réparation et le développement des fibres musculaires.',
+        videoLabel: 'MGF & performance musculaire',
+      },
+      wellbeing: {
+        label: 'Bien-être',
+        eyebrow: 'Neuro & axes du stress',
+        titleAccent: 'le bien-être',
+        description: 'Melanotan 2 et PT-141 : étude des voies mélanocortines et de la réponse neurobiologique.',
+        videoLabel: 'Peptides & bien-être',
+      },
+      nootropic: {
+        label: 'Nootropique',
+        eyebrow: 'Cognition & neuroprotection',
+        titleAccent: 'la cognition',
+        description: "Selank et Semax : peptides nootropiques russes pour la mémoire, le focus et la réduction de l'anxiété.",
+        videoLabel: 'Semax & Selank : nootropiques',
+      },
+      cosmetic: {
+        label: 'Cosmétique',
+        eyebrow: 'Régénération cutanée',
+        titleAccent: 'la peau',
+        description: "GHK-Cu : peptide cuivré pour la synthèse de collagène, l'élasticité cutanée et la cicatrisation.",
+        videoLabel: 'GHK-Cu : peptide anti-âge',
+      },
+      health: {
+        label: 'Santé',
+        eyebrow: 'Système immunitaire',
+        titleAccent: "l'immunité",
+        description: "Thymosin Alpha-1 : modulation immunitaire et soutien des défenses naturelles de l'organisme.",
+        videoLabel: 'Thymosin & immunité',
+      },
+      hormonal: {
+        label: 'Hormonal',
+        eyebrow: 'Axe hypothalamo-hypophysaire',
+        titleAccent: 'les hormones',
+        description: "Kisspeptine-10 : régulation de l'axe gonadotrope et étude des mécanismes de fertilité.",
+        videoLabel: 'Kisspeptine & fertilité',
+      },
+      stats: {
+        peptides: 'Peptides',
+        purity: 'Pureté',
+        delivery: 'Livraison',
+      },
+    },
+  },
+
+  // ============================================
   // NAVIGATION
   // ============================================
   nav: {
@@ -446,6 +699,80 @@ export default {
     needHelp: "Besoin d'aide ?",
     contactSupport: 'Contacter le support',
     responseTime: 'Réponse sous 24h',
+    items: {
+      q1: {
+        q: "Fournissez-vous un certificat d'analyse (CoA) ?",
+        a: "Oui. Chaque lot est fourni avec un CoA comprenant selon les cas : chromatogramme <strong>HPLC</strong>, masse observée (<strong>LC-MS</strong>), pureté et informations de lot.",
+      },
+      q2: {
+        q: 'Quelle pureté ciblez-vous ?',
+        a: "Selon la séquence, nos partenaires visent une pureté élevée (ex. ≥ 98&nbsp;% quand réalisable). La pureté est distincte du <i>contenu net en peptide</i> (taux réel de matière peptidique dans la poudre lyophilisée).",
+      },
+      q3: {
+        q: 'Vos peptides sont-ils stériles ?',
+        a: "Les flacons sont livrés <strong>lyophilisés</strong> pour <strong>usage recherche</strong>. Ils ne sont pas destinés à un usage humain et ne constituent pas un médicament.",
+      },
+      q4: {
+        q: 'Comment stocker la poudre lyophilisée ?',
+        a: "Conserver au <strong>sec</strong>, à l'abri de la lumière, idéalement à <strong>≤ −20&nbsp;°C</strong>. Éviter l'humidité&nbsp;: refermer soigneusement et utiliser un dessiccant si possible.",
+      },
+      q5: {
+        q: 'Et les solutions reconstituées en laboratoire ?',
+        a: "Préparer dans une solution/tampon stérile compatible avec votre protocole (pH ~5–7), <strong>aliquoter</strong> et limiter les cycles de congélation/décongélation. Stockage conseillé à ≤ −20&nbsp;°C.",
+      },
+      q6: {
+        q: 'Dois-je laisser revenir le flacon à température avant ouverture ?',
+        a: "Oui. Laisser revenir à température ambiante avant ouverture pour limiter la <strong>condensation</strong> et l'humidité.",
+      },
+      q7: {
+        q: 'Puis-je modifier ou annuler ma commande ?',
+        a: "Nous préparons rapidement les commandes. Une fois la préparation lancée, nous ne pouvons pas toujours modifier/annuler. Contactez-nous au plus tôt et nous ferons le maximum.",
+      },
+      q8: {
+        q: 'Quels moyens de paiement acceptez-vous ?',
+        a: "Cartes bancaires majeures et autres solutions sécurisées selon la région. Les paiements sont traités via des prestataires conformes <strong>PCI-DSS</strong>.",
+      },
+      q9: {
+        q: 'Proposez-vous des factures avec TVA/TVA intracom ?',
+        a: "Oui. Renseignez votre société et, le cas échéant, votre numéro de TVA intracommunautaire.",
+      },
+      q10: {
+        q: "Quel est le délai d'expédition ?",
+        a: "Les commandes validées partent rapidement. Un <strong>numéro de suivi</strong> est envoyé à l'expédition.",
+      },
+      q11: {
+        q: 'Le transport nécessite-t-il du froid ?',
+        a: "Les peptides <strong>lyophilisés</strong> sont généralement <strong>stables à température ambiante</strong> pendant le transport. À réception, placer au réfrigérateur (2–8&nbsp;°C) ou au congélateur pour stockage long terme.",
+      },
+      q12: {
+        q: 'Conditionnement et discrétion',
+        a: "Emballages <strong>discrets</strong> et protecteurs, flacons scellés et protections antichocs.",
+      },
+      q13: {
+        q: "Expédiez-vous à l'international ?",
+        a: "Oui, selon zones desservies. Le client est responsable des éventuelles contraintes et droits locaux. Déclaration comme <i>réactifs de laboratoire – usage recherche</i>.",
+      },
+      q14: {
+        q: 'Vos produits sont-ils destinés à un usage humain ?',
+        a: "<strong>Non</strong>. Produits RUO : non destinés à l'usage humain ni vétérinaire. Aucun conseil d'administration ou posologie n'est fourni.",
+      },
+      q15: {
+        q: 'Fournissez-vous des recommandations de reconstitution/administration ?',
+        a: "Nous ne donnons <strong>aucune</strong> recommandation d'administration. Pour la reconstitution, référez-vous à vos procédures internes et aux informations du CoA.",
+      },
+      q16: {
+        q: 'Traçabilité et contrôles qualité',
+        a: "Traçabilité des lots et contrôles analytiques (HPLC, LC-MS, pureté) fournis sur le CoA.",
+      },
+      q17: {
+        q: 'Puis-je retourner un article ?',
+        a: "Pour des raisons d'intégrité produit, <strong>aucun retour</strong> n'est accepté pour les flacons ouverts/altérés. Les retours d'articles non ouverts peuvent être envisagés sous conditions (délai, état, autorisation préalable).",
+      },
+      q18: {
+        q: 'Comment vous contacter ?',
+        a: "Depuis votre espace client (messagerie), par email ou via le formulaire de contact. Nous répondons rapidement aux questions techniques <i>(cadre RUO)</i>.",
+      },
+    },
   },
 
   // ============================================

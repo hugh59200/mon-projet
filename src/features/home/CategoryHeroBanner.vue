@@ -84,7 +84,7 @@
                     class="category-hero__btn category-hero__btn--primary"
                     @click="goToCategory(slide)"
                   >
-                    <span>Explorer {{ slide.label }}</span>
+                    <span>{{ t('home.categories.common.explore') }} {{ slide.label }}</span>
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -98,11 +98,11 @@
                     class="category-hero__btn category-hero__btn--ghost"
                     @click="goToCatalogue"
                   >
-                    Catalogue complet
+                    {{ t('home.cta.buttons.catalogue') }}
                   </button>
                 </div>
                 <p class="category-hero__disclaimer">
-                  ℹ️ Produits destinés exclusivement à la recherche scientifique
+                  ℹ️ {{ t('home.disclaimer.text') }}
                 </p>
               </div>
 
@@ -123,7 +123,7 @@
                     <div class="category-hero__card-shine"></div>
                   </div>
                   <div class="category-hero__card-content">
-                    <span class="category-hero__card-badge">▶ Vidéo explicative</span>
+                    <span class="category-hero__card-badge">▶ {{ t('home.banner.carousel.guides') }}</span>
                     <h3>{{ slide.videoLabel }}</h3>
                     <span class="category-hero__card-play">
                       <svg
@@ -267,8 +267,11 @@
 </template>
 
 <script setup lang="ts">
-  import { h, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, h, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  const { t } = useI18n()
 
   // ═══════════════════════════════════════════════════════════════
   // ICONS (Composants SVG inline)
@@ -437,224 +440,204 @@
   // SLIDES DATA - Toutes les catégories de Fast Peptides
   // ═══════════════════════════════════════════════════════════════
 
-  const slides = ref<Slide[]>([
+  const slides = computed<Slide[]>(() => [
     // 1. Perte de poids (Semaglutide, Tirzepatide, Retatrutide)
     {
       id: 'weight-loss',
-      label: 'Perte de poids',
-      category: 'Perte de poids',
-      eyebrow: 'Voies métaboliques',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la perte de poids',
-      description:
-        "Modulation des voies métaboliques, sensibilité à l'insuline et gestion de l'énergie avec les agonistes GLP-1.",
+      label: t('home.categories.weightLoss.label'),
+      category: t('home.categories.weightLoss.label'),
+      eyebrow: t('home.categories.weightLoss.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.weightLoss.label'),
+      description: t('home.categories.weightLoss.description'),
       youtubeId: '5OjqLrbuA8Y',
-      videoLabel: 'Comprendre les peptides GLP-1',
+      videoLabel: t('home.categories.weightLoss.videoLabel'),
       variant: 'success',
       bgImage: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80',
       icon: MetabolismIcon(),
       stats: [
-        { value: '3+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.weightLoss.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.weightLoss.stat2Label') },
       ],
     },
 
     // 2. Récupération (BPC-157, TB-500)
     {
       id: 'recovery',
-      label: 'Récupération',
-      category: 'Récupération',
-      eyebrow: 'Régénération tissulaire',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la récupération',
-      description:
-        'BPC-157 et TB-500 : le duo "Wolverine Stack" pour la réparation tissulaire et la récupération accélérée.',
+      label: t('home.categories.recovery.label'),
+      category: t('home.categories.recovery.label'),
+      eyebrow: t('home.categories.recovery.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.recovery.label'),
+      description: t('home.categories.recovery.description'),
       youtubeId: 'qKHknxLvsDY',
-      videoLabel: 'BPC-157 & TB-500 expliqués',
+      videoLabel: t('home.categories.recovery.videoLabel'),
       variant: 'emerald',
       bgImage: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1600&q=80',
       icon: RecoveryIcon(),
       stats: [
-        { value: '2+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.recovery.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.recovery.stat2Label') },
       ],
     },
 
     // 3. Croissance (CJC-1295 DAC, GHRP-6, Hexarelin)
     {
       id: 'growth',
-      label: 'Croissance',
-      category: 'Croissance',
-      eyebrow: 'Sécrétagogues GH',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la croissance',
-      description:
-        "CJC-1295, GHRP-6, Ipamorelin : stimulation de l'axe GH/IGF-1 pour la croissance et la récupération musculaire.",
+      label: t('home.categories.growth.label'),
+      category: t('home.categories.growth.label'),
+      eyebrow: t('home.categories.growth.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.growth.label'),
+      description: t('home.categories.growth.description'),
       youtubeId: 'e4V55I45uO8',
-      videoLabel: 'GHRP & CJC-1295 : le guide',
+      videoLabel: t('home.categories.growth.videoLabel'),
       variant: 'info',
       bgImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80',
       icon: GrowthIcon(),
       stats: [
-        { value: '4+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.growth.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.growth.stat2Label') },
       ],
     },
 
     // 4. Anti-âge (Sermorelin, NAD+)
     {
       id: 'anti-aging',
-      label: 'Anti-âge',
-      category: 'Anti-âge',
-      eyebrow: 'Longévité cellulaire',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: "l'anti-âge",
-      description:
-        'Sermorelin et NAD+ : restauration des niveaux de GH et soutien de la réparation cellulaire liée au vieillissement.',
+      label: t('home.categories.antiAging.label'),
+      category: t('home.categories.antiAging.label'),
+      eyebrow: t('home.categories.antiAging.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.antiAging.label'),
+      description: t('home.categories.antiAging.description'),
       youtubeId: 'QRt7LjqJ45k',
-      videoLabel: 'NAD+ & Sermorelin : anti-aging',
+      videoLabel: t('home.categories.antiAging.videoLabel'),
       variant: 'purple',
       bgImage: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80',
       icon: AntiAgingIcon(),
       stats: [
-        { value: '2+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.antiAging.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.antiAging.stat2Label') },
       ],
     },
 
     // 5. Performance (PEG-MGF)
     {
       id: 'performance',
-      label: 'Performance',
-      category: 'Performance',
-      eyebrow: 'Physiologie musculaire',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la performance',
-      description:
-        'PEG-MGF : facteur de croissance mécanique pour la réparation et le développement des fibres musculaires.',
+      label: t('home.categories.performance.label'),
+      category: t('home.categories.performance.label'),
+      eyebrow: t('home.categories.performance.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.performance.label'),
+      description: t('home.categories.performance.description'),
       youtubeId: 'LNV0CMCAFMs',
-      videoLabel: 'MGF & performance musculaire',
+      videoLabel: t('home.categories.performance.videoLabel'),
       variant: 'warning',
       bgImage: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600&q=80',
       icon: PerformanceIcon(),
       stats: [
-        { value: '1+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.performance.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.performance.stat2Label') },
       ],
     },
 
     // 6. Bien-être (Melanotan 2, PT-141)
     {
       id: 'wellbeing',
-      label: 'Bien-être',
-      category: 'Bien-être',
-      eyebrow: 'Neuro & axes du stress',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'le bien-être',
-      description:
-        'Melanotan 2 et PT-141 : étude des voies mélanocortines et de la réponse neurobiologique.',
+      label: t('home.categories.wellbeing.label'),
+      category: t('home.categories.wellbeing.label'),
+      eyebrow: t('home.categories.wellbeing.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.wellbeing.label'),
+      description: t('home.categories.wellbeing.description'),
       youtubeId: 'csSW4whR9vc',
-      videoLabel: 'Peptides & bien-être',
+      videoLabel: t('home.categories.wellbeing.videoLabel'),
       variant: 'primary',
       bgImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1600&q=80',
       icon: WellbeingIcon(),
       stats: [
-        { value: '2+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.wellbeing.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.wellbeing.stat2Label') },
       ],
     },
 
     // 7. Nootropique (Selank, Semax)
     {
       id: 'nootropic',
-      label: 'Nootropique',
-      category: 'Nootropique',
-      eyebrow: 'Cognition & neuroprotection',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la cognition',
-      description:
-        "Selank et Semax : peptides nootropiques russes pour la mémoire, le focus et la réduction de l'anxiété.",
+      label: t('home.categories.nootropic.label'),
+      category: t('home.categories.nootropic.label'),
+      eyebrow: t('home.categories.nootropic.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.nootropic.label'),
+      description: t('home.categories.nootropic.description'),
       youtubeId: 'p3GOtQmPPFo',
-      videoLabel: 'Semax & Selank : nootropiques',
+      videoLabel: t('home.categories.nootropic.videoLabel'),
       variant: 'teal',
       bgImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1600&q=80',
       icon: NootropicIcon(),
       stats: [
-        { value: '2+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.nootropic.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.nootropic.stat2Label') },
       ],
     },
 
     // 8. Cosmétique (GHK-Cu)
     {
       id: 'cosmetic',
-      label: 'Cosmétique',
-      category: 'Cosmétique',
-      eyebrow: 'Régénération cutanée',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'la peau',
-      description:
-        "GHK-Cu : peptide cuivré pour la synthèse de collagène, l'élasticité cutanée et la cicatrisation.",
+      label: t('home.categories.cosmetic.label'),
+      category: t('home.categories.cosmetic.label'),
+      eyebrow: t('home.categories.cosmetic.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.cosmetic.label'),
+      description: t('home.categories.cosmetic.description'),
       youtubeId: '5pAWczByUyg',
-      videoLabel: 'GHK-Cu : peptide anti-âge',
+      videoLabel: t('home.categories.cosmetic.videoLabel'),
       variant: 'pink',
       bgImage: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1600&q=80',
       icon: CosmeticIcon(),
       stats: [
-        { value: '1+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.cosmetic.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.cosmetic.stat2Label') },
       ],
     },
 
     // 9. Santé / Immunité (Thymosin Alpha-1)
     {
       id: 'health',
-      label: 'Santé',
-      category: 'Santé',
-      eyebrow: 'Système immunitaire',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: "l'immunité",
-      description:
-        "Thymosin Alpha-1 : modulation immunitaire et soutien des défenses naturelles de l'organisme.",
+      label: t('home.categories.health.label'),
+      category: t('home.categories.health.label'),
+      eyebrow: t('home.categories.health.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.health.label'),
+      description: t('home.categories.health.description'),
       youtubeId: 'xLORsLlcT48',
-      videoLabel: 'Thymosin & immunité',
+      videoLabel: t('home.categories.health.videoLabel'),
       variant: 'emerald',
       bgImage: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1600&q=80',
       icon: HealthIcon(),
       stats: [
-        { value: '1+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.health.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.health.stat2Label') },
       ],
     },
 
     // 10. Hormonal (Kisspeptine-10)
     {
       id: 'hormonal',
-      label: 'Hormonal',
-      category: 'Hormonal',
-      eyebrow: 'Axe hypothalamo-hypophysaire',
-      titleMain: 'Peptides pour la recherche sur',
-      titleAccent: 'les hormones',
-      description:
-        "Kisspeptine-10 : régulation de l'axe gonadotrope et étude des mécanismes de fertilité.",
+      label: t('home.categories.hormonal.label'),
+      category: t('home.categories.hormonal.label'),
+      eyebrow: t('home.categories.hormonal.eyebrow'),
+      titleMain: t('home.categories.common.research'),
+      titleAccent: t('home.categories.hormonal.label'),
+      description: t('home.categories.hormonal.description'),
       youtubeId: '_3kmSsmQiRU',
-      videoLabel: 'Kisspeptine & fertilité',
+      videoLabel: t('home.categories.hormonal.videoLabel'),
       variant: 'indigo',
       bgImage: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&q=80',
       icon: HormonalIcon(),
       stats: [
-        { value: '1+', label: 'Peptides' },
-        { value: '99%', label: 'Pureté' },
-        { value: '48h', label: 'Livraison' },
+        { value: t('home.categories.stats.stat1Value'), label: t('home.categories.hormonal.stat1Label') },
+        { value: t('home.categories.stats.stat2Value'), label: t('home.categories.hormonal.stat2Label') },
       ],
     },
   ])

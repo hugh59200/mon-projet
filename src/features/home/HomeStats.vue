@@ -21,8 +21,10 @@
 </template>
 
 <script setup lang="ts">
-  import { h, onMounted, ref } from 'vue'
+  import { computed, h, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const sectionRef = ref<HTMLElement | null>(null)
 
   const icon = (d: string) => () =>
@@ -45,12 +47,12 @@
     'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
   )
 
-  const stats = [
-    { value: '50+', label: 'Peptides disponibles', variant: 'success', icon: BeakerIcon },
-    { value: '99%', label: 'Pureté garantie', variant: 'primary', icon: ShieldIcon },
-    { value: '24h', label: 'Expédition rapide', variant: 'warning', icon: TruckIcon },
-    { value: '100%', label: 'Stock européen', variant: 'info', icon: GlobeIcon },
-  ]
+  const stats = computed(() => [
+    { value: t('home.stats.peptides.value'), label: t('home.stats.peptides.label'), variant: 'success', icon: BeakerIcon },
+    { value: t('home.stats.purity.value'), label: t('home.stats.purity.label'), variant: 'primary', icon: ShieldIcon },
+    { value: t('home.stats.shipping.value'), label: t('home.stats.shipping.label'), variant: 'warning', icon: TruckIcon },
+    { value: t('home.stats.stock.value'), label: t('home.stats.stock.label'), variant: 'info', icon: GlobeIcon },
+  ])
 
   onMounted(() => {
     if ('IntersectionObserver' in window && sectionRef.value) {

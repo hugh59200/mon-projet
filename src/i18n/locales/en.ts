@@ -5,6 +5,267 @@ export default {
   // ============================================
   // COMMON / SHARED
   // ============================================
+  // ============================================
+  // HOME
+  // ============================================
+  home: {
+    hero: {
+      badge: {
+        certified: 'Certified European Supplier',
+        researchOnly: 'Research Use Only',
+      },
+      title: {
+        line1: 'Research peptides',
+        accent: 'high purity',
+        line2: 'for laboratories',
+      },
+      description:
+        'Curated catalog of certified peptides with ≥99% purity. Certificates of analysis available. 24h shipping from the European Union.',
+      cta: {
+        explore: 'Explore the catalog',
+        learnMore: 'Learn more',
+      },
+      trust: {
+        purity: 'Purity ≥99%',
+        coa: 'CoA included',
+        delivery: '24h delivery',
+      },
+    },
+    stats: {
+      peptides: {
+        value: '50+',
+        label: 'Available peptides',
+      },
+      purity: {
+        value: '99%',
+        label: 'Guaranteed purity',
+      },
+      shipping: {
+        value: '24h',
+        label: 'Fast shipping',
+      },
+      stock: {
+        value: '100%',
+        label: 'European stock',
+      },
+    },
+    process: {
+      badge: 'Simplified process',
+      title: 'How does it work?',
+      description:
+        'From selection to delivery, we simplify each step to allow you to focus on what matters: your research.',
+      steps: {
+        step1: {
+          title: 'Select',
+          description: 'Browse and add products to your selection',
+        },
+        step2: {
+          title: 'Analyze',
+          description: 'Consult our CoA and technical specifications',
+        },
+        step3: {
+          title: 'Receive',
+          description: 'Express delivery with complete documentation',
+        },
+      },
+    },
+    quality: {
+      badge: 'Quality commitment',
+      title: {
+        line1: 'Standards',
+        accent: 'pharmaceutical',
+      },
+      description:
+        'Each peptide in our catalog meets the most rigorous standards in terms of purity and traceability.',
+      coa: {
+        title: 'Certificate of Analysis',
+        subtitle: 'Complete documentation',
+        hplc: 'HPLC chromatogram',
+        lcms: 'LC-MS mass',
+        purity: 'Purity ≥99%',
+        batch: 'Batch traceability',
+        download: 'Download CoA',
+      },
+      features: {
+        f1: {
+          title: 'Purity control',
+          description: 'Analysis by HPLC and LC-MS for each batch',
+        },
+        f2: {
+          title: 'Complete traceability',
+          description: 'Tracking from synthesis to delivery',
+        },
+        f3: {
+          title: 'Secure shipping',
+          description: 'Optimized packaging for peptide preservation',
+        },
+        f4: {
+          title: 'Technical support',
+          description: 'Dedicated team for your questions',
+        },
+      },
+    },
+    faq: {
+      badge: 'Support',
+      title: 'Frequently Asked Questions',
+      items: {
+        q1: {
+          q: 'Are your peptides intended for human use?',
+          a: 'No. Our products are exclusively intended for laboratory research (RUO - Research Use Only). They should not be used on humans or animals.',
+        },
+        q2: {
+          q: 'Do you provide Certificates of Analysis?',
+          a: 'Yes, a CoA is provided with each batch, including HPLC chromatogram, observed mass (LC-MS), and purity.',
+        },
+        q3: {
+          q: 'What are the shipping times?',
+          a: 'Orders validated before 2pm are shipped the same day. Delivery in 24-48h in France, 2-4 days in Europe.',
+        },
+        q4: {
+          q: 'How should peptides be stored?',
+          a: 'Lyophilized peptides should be stored dry, protected from light, at -20°C for optimal shelf life.',
+        },
+        q5: {
+          q: 'Do you accept B2B orders?',
+          a: 'Yes, we serve laboratories, research institutes and pharmaceutical companies. Contact us for a personalized quote.',
+        },
+      },
+    },
+    cta: {
+      title: {
+        line1: 'Ready to start your',
+        accent: 'research?',
+      },
+      description:
+        'Explore our complete catalog and order your first peptides today.',
+      buttons: {
+        catalogue: 'Browse the catalog',
+        contact: 'Contact us',
+      },
+    },
+    disclaimer: {
+      title: 'Research Use Only (RUO)',
+      text: 'All products presented on this site are intended exclusively for laboratory research. They are not intended for diagnostic, therapeutic, preventive or any other medical use on humans or animals.',
+    },
+    banner: {
+      eyebrow: 'Educational resources',
+      title: {
+        line1: 'Explore Our',
+        accent: 'Research',
+        line2: 'Library',
+      },
+      description:
+        'Scientific articles, dosage guides and practical protocols for your peptide research.',
+      bullets: {
+        b1: 'Peer-reviewed publications',
+        b2: 'Dosage guides',
+        b3: 'Lab protocols',
+      },
+      cta: 'View all resources',
+      personas: {
+        rd: { title: 'R&D', subtitle: 'Advanced Research' },
+        lab: { title: 'Laboratory', subtitle: 'Experimental Protocols' },
+        phd: { title: 'Researchers', subtitle: 'Academic Studies' },
+        quality: { title: 'Quality', subtitle: 'Controls & CoA' },
+      },
+      carousel: {
+        scientific: 'Scientific articles',
+        protocols: 'Protocols',
+        guides: 'Guides',
+      },
+    },
+    categories: {
+      weightLoss: {
+        label: 'Weight Loss',
+        eyebrow: 'Weight Control',
+        description: 'Peptides studied for their effects on metabolism and weight regulation in vitro.',
+        videoLabel: 'Molecular visualization',
+        stat1Label: 'In clinical trial',
+        stat2Label: 'Publications',
+      },
+      recovery: {
+        label: 'Recovery',
+        eyebrow: 'Tissue Repair',
+        description: 'Explore peptides associated with tissue regeneration and healing mechanisms.',
+        videoLabel: 'Healing visualization',
+        stat1Label: 'Research articles',
+        stat2Label: 'In vitro studies',
+      },
+      growth: {
+        label: 'Growth',
+        eyebrow: 'Development',
+        description: 'Peptides related to cellular growth and tissue development mechanisms.',
+        videoLabel: 'Cellular development',
+        stat1Label: 'Preclinical studies',
+        stat2Label: 'Publications',
+      },
+      antiAging: {
+        label: 'Anti-aging',
+        eyebrow: 'Longevity',
+        description: 'Peptide research on cellular aging mechanisms and longevity.',
+        videoLabel: 'Cellular regeneration',
+        stat1Label: 'Studies in progress',
+        stat2Label: 'Discoveries',
+      },
+      performance: {
+        label: 'Performance',
+        eyebrow: 'Optimization',
+        description: 'Peptides studied for their effects on energy metabolism and physical performance.',
+        videoLabel: 'Energy metabolism',
+        stat1Label: 'Research protocols',
+        stat2Label: 'Analyses',
+      },
+      wellbeing: {
+        label: 'Wellbeing',
+        eyebrow: 'Balance',
+        description: 'Explore peptides associated with stress regulation and mood modulation.',
+        videoLabel: 'Neural balance',
+        stat1Label: 'Neuro studies',
+        stat2Label: 'Publications',
+      },
+      nootropic: {
+        label: 'Nootropic',
+        eyebrow: 'Cognition',
+        description: 'Peptides studied for their effects on cognitive functions and neuroplasticity.',
+        videoLabel: 'Neural connections',
+        stat1Label: 'Cognitive studies',
+        stat2Label: 'Analyses',
+      },
+      cosmetic: {
+        label: 'Cosmetic',
+        eyebrow: 'Dermatology',
+        description: 'Peptides studied for their effects on skin structure and cellular regeneration.',
+        videoLabel: 'Cutaneous structure',
+        stat1Label: 'Derma studies',
+        stat2Label: 'In vitro tests',
+      },
+      health: {
+        label: 'Health',
+        eyebrow: 'Prevention',
+        description: 'Explore peptides associated with protective mechanisms and homeostasis.',
+        videoLabel: 'Cellular protection',
+        stat1Label: 'Publications',
+        stat2Label: 'Preclinical studies',
+      },
+      hormonal: {
+        label: 'Hormonal',
+        eyebrow: 'Regulation',
+        description: 'Peptides studied for their interaction with endocrine systems and hormonal regulation.',
+        videoLabel: 'Hormonal system',
+        stat1Label: 'Endo studies',
+        stat2Label: 'Analyses',
+      },
+      stats: {
+        stat1Value: '150+',
+        stat2Value: '50+',
+      },
+      common: {
+        explore: 'Explore',
+        research: 'RESEARCH',
+      },
+    },
+  },
+
   common: {
     loading: 'Loading...',
     error: 'An error occurred',
@@ -440,6 +701,80 @@ export default {
     needHelp: 'Need help?',
     contactSupport: 'Contact support',
     responseTime: 'Response within 24h',
+    items: {
+      q1: {
+        q: 'Do you provide a Certificate of Analysis (CoA)?',
+        a: 'Yes. Each batch is provided with a CoA including, as applicable: <strong>HPLC</strong> chromatogram, observed mass (<strong>LC-MS</strong>), purity and batch information.',
+      },
+      q2: {
+        q: 'What purity do you target?',
+        a: 'Depending on the sequence, our partners aim for high purity (e.g. ≥ 98% when achievable). Purity is distinct from <i>net peptide content</i> (actual peptide material rate in the lyophilized powder).',
+      },
+      q3: {
+        q: 'Are your peptides sterile?',
+        a: 'The vials are delivered <strong>lyophilized</strong> for <strong>research use</strong>. They are not intended for human use and do not constitute a medicinal product.',
+      },
+      q4: {
+        q: 'How should I store lyophilized powder?',
+        a: 'Store <strong>dry</strong>, away from light, ideally at <strong>≤ −20°C</strong>. Avoid humidity: reseal carefully and use a desiccant if possible.',
+      },
+      q5: {
+        q: 'What about reconstituted solutions in the laboratory?',
+        a: 'Prepare in a sterile solution/buffer compatible with your protocol (pH ~5–7), <strong>aliquot</strong> and limit freeze/thaw cycles. Recommended storage at ≤ −20°C.',
+      },
+      q6: {
+        q: 'Should I let the vial reach room temperature before opening?',
+        a: 'Yes. Allow the vial to reach room temperature before opening to limit <strong>condensation</strong> and moisture.',
+      },
+      q7: {
+        q: 'Can I modify or cancel my order?',
+        a: 'We process orders quickly. Once preparation has started, we may not always be able to modify/cancel. Contact us as soon as possible and we will do our best.',
+      },
+      q8: {
+        q: 'What payment methods do you accept?',
+        a: 'Major credit cards and other secure payment solutions depending on region. Payments are processed through <strong>PCI-DSS</strong> compliant providers.',
+      },
+      q9: {
+        q: 'Do you offer invoices with VAT/Intra-Community VAT?',
+        a: 'Yes. Enter your company details and, if applicable, your intra-community VAT number.',
+      },
+      q10: {
+        q: 'What is the shipping time?',
+        a: 'Validated orders ship quickly. A <strong>tracking number</strong> is sent upon shipment.',
+      },
+      q11: {
+        q: 'Does shipping require cold storage?',
+        a: 'Lyophilized peptides are generally <strong>stable at room temperature</strong> during transport. Upon receipt, store in the refrigerator (2–8°C) or freezer for long-term storage.',
+      },
+      q12: {
+        q: 'Packaging and discretion',
+        a: '<strong>Discreet</strong> and protective packaging, sealed vials and shock protection.',
+      },
+      q13: {
+        q: 'Do you ship internationally?',
+        a: 'Yes, depending on service areas. The customer is responsible for any local constraints and duties. Declared as <i>laboratory reagents – research use</i>.',
+      },
+      q14: {
+        q: 'Are your products intended for human use?',
+        a: '<strong>No</strong>. RUO products: not intended for human or veterinary use. No administration or dosage advice is provided.',
+      },
+      q15: {
+        q: 'Do you provide reconstitution/administration recommendations?',
+        a: 'We provide <strong>no</strong> administration recommendations. For reconstitution, refer to your internal procedures and CoA information.',
+      },
+      q16: {
+        q: 'Traceability and quality controls',
+        a: 'Batch traceability and analytical controls (HPLC, LC-MS, purity) provided on the CoA.',
+      },
+      q17: {
+        q: 'Can I return an item?',
+        a: 'For product integrity reasons, <strong>no returns</strong> are accepted for opened/altered vials. Returns of unopened items may be considered under conditions (time limit, condition, prior authorization).',
+      },
+      q18: {
+        q: 'How can I contact you?',
+        a: 'From your customer area (messaging), by email or via the contact form. We respond quickly to technical questions <i>(RUO framework)</i>.',
+      },
+    },
   },
 
   // ============================================

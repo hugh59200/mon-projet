@@ -526,132 +526,37 @@
     { id: 'retour', label: t('faq.categories.returns'), icon: 'Undo2' },
   ])
 
-  const faqs: FaqItem[] = [
-    {
-      id: 'q1',
-      cat: 'qualite',
-      q: "Fournissez-vous un certificat d'analyse (CoA) ?",
-      a: `Oui. Chaque lot est fourni avec un CoA comprenant selon les cas : chromatogramme <strong>HPLC</strong>,
-      masse observée (<strong>LC-MS</strong>), pureté et informations de lot.`,
-    },
-    {
-      id: 'q2',
-      cat: 'qualite',
-      q: 'Quelle pureté ciblez-vous ?',
-      a: `Selon la séquence, nos partenaires visent une pureté élevée (ex. ≥ 98&nbsp;% quand réalisable).
-      La pureté est distincte du <i>contenu net en peptide</i> (taux réel de matière peptidique dans la
-      poudre lyophilisée).`,
-    },
-    {
-      id: 'q3',
-      cat: 'qualite',
-      q: 'Vos peptides sont-ils stériles ?',
-      a: `Les flacons sont livrés <strong>lyophilisés</strong> pour <strong>usage recherche</strong>.
-      Ils ne sont pas destinés à un usage humain et ne constituent pas un médicament.`,
-      ruo: true,
-    },
-    {
-      id: 'q4',
-      cat: 'stockage',
-      q: 'Comment stocker la poudre lyophilisée ?',
-      a: `Conserver au <strong>sec</strong>, à l'abri de la lumière, idéalement à <strong>≤ −20&nbsp;°C</strong>.
-      Éviter l'humidité&nbsp;: refermer soigneusement et utiliser un dessiccant si possible.`,
-    },
-    {
-      id: 'q5',
-      cat: 'stockage',
-      q: 'Et les solutions reconstituées en laboratoire ?',
-      a: `Préparer dans une solution/tampon stérile compatible avec votre protocole (pH ~5–7),
-      <strong>aliquoter</strong> et limiter les cycles de congélation/décongélation. Stockage conseillé à ≤ −20&nbsp;°C.`,
-    },
-    {
-      id: 'q6',
-      cat: 'stockage',
-      q: 'Dois-je laisser revenir le flacon à température avant ouverture ?',
-      a: `Oui. Laisser revenir à température ambiante avant ouverture pour limiter la <strong>condensation</strong> et l'humidité.`,
-    },
-    {
-      id: 'q7',
-      cat: 'commande',
-      q: 'Puis-je modifier ou annuler ma commande ?',
-      a: `Nous préparons rapidement les commandes. Une fois la préparation lancée, nous ne pouvons
-      pas toujours modifier/annuler. Contactez-nous au plus tôt et nous ferons le maximum.`,
-    },
-    {
-      id: 'q8',
-      cat: 'commande',
-      q: 'Quels moyens de paiement acceptez-vous ?',
-      a: `Cartes bancaires majeures et autres solutions sécurisées selon la région.
-      Les paiements sont traités via des prestataires conformes <strong>PCI-DSS</strong>.`,
-    },
-    {
-      id: 'q9',
-      cat: 'commande',
-      q: 'Proposez-vous des factures avec TVA/TVA intracom ?',
-      a: `Oui. Renseignez votre société et, le cas échéant, votre numéro de TVA intracommunautaire.`,
-    },
-    {
-      id: 'q10',
-      cat: 'shipping',
-      q: "Quel est le délai d'expédition ?",
-      a: `Les commandes validées partent rapidement. Un <strong>numéro de suivi</strong> est envoyé à l'expédition.`,
-    },
-    {
-      id: 'q11',
-      cat: 'shipping',
-      q: 'Le transport nécessite-t-il du froid ?',
-      a: `Les peptides <strong>lyophilisés</strong> sont généralement <strong>stables à température ambiante</strong> pendant le transport.
-      À réception, placer au réfrigérateur (2–8&nbsp;°C) ou au congélateur pour stockage long terme.`,
-    },
-    {
-      id: 'q12',
-      cat: 'shipping',
-      q: 'Conditionnement et discrétion',
-      a: `Emballages <strong>discrets</strong> et protecteurs, flacons scellés et protections antichocs.`,
-    },
-    {
-      id: 'q13',
-      cat: 'shipping',
-      q: "Expédiez-vous à l'international ?",
-      a: `Oui, selon zones desservies. Le client est responsable des éventuelles contraintes et droits
-      locaux. Déclaration comme <i>réactifs de laboratoire – usage recherche</i>.`,
-    },
-    {
-      id: 'q14',
-      cat: 'conformite',
-      q: 'Vos produits sont-ils destinés à un usage humain ?',
-      a: `<strong>Non</strong>. Produits RUO : non destinés à l'usage humain ni vétérinaire. Aucun conseil
-      d'administration ou posologie n'est fourni.`,
-      ruo: true,
-    },
-    {
-      id: 'q15',
-      cat: 'conformite',
-      q: 'Fournissez-vous des recommandations de reconstitution/administration ?',
-      a: `Nous ne donnons <strong>aucune</strong> recommandation d'administration. Pour la reconstitution,
-      référez-vous à vos procédures internes et aux informations du CoA.`,
-      ruo: true,
-    },
-    {
-      id: 'q16',
-      cat: 'conformite',
-      q: 'Traçabilité et contrôles qualité',
-      a: `Traçabilité des lots et contrôles analytiques (HPLC, LC-MS, pureté) fournis sur le CoA.`,
-    },
-    {
-      id: 'q17',
-      cat: 'retour',
-      q: 'Puis-je retourner un article ?',
-      a: `Pour des raisons d'intégrité produit, <strong>aucun retour</strong> n'est accepté pour les flacons
-      ouverts/altérés. Les retours d'articles non ouverts peuvent être envisagés sous conditions (délai, état, autorisation préalable).`,
-    },
-    {
-      id: 'q18',
-      cat: 'retour',
-      q: 'Comment vous contacter ?',
-      a: `Depuis votre espace client (messagerie), par email ou via le formulaire de contact. Nous répondons rapidement aux questions techniques <i>(cadre RUO)</i>.`,
-    },
+  // FAQ items mapping with category and RUO flag
+  const faqConfig: { id: string; cat: CatId; ruo?: boolean }[] = [
+    { id: 'q1', cat: 'qualite' },
+    { id: 'q2', cat: 'qualite' },
+    { id: 'q3', cat: 'qualite', ruo: true },
+    { id: 'q4', cat: 'stockage' },
+    { id: 'q5', cat: 'stockage' },
+    { id: 'q6', cat: 'stockage' },
+    { id: 'q7', cat: 'commande' },
+    { id: 'q8', cat: 'commande' },
+    { id: 'q9', cat: 'commande' },
+    { id: 'q10', cat: 'shipping' },
+    { id: 'q11', cat: 'shipping' },
+    { id: 'q12', cat: 'shipping' },
+    { id: 'q13', cat: 'shipping' },
+    { id: 'q14', cat: 'conformite', ruo: true },
+    { id: 'q15', cat: 'conformite', ruo: true },
+    { id: 'q16', cat: 'conformite' },
+    { id: 'q17', cat: 'retour' },
+    { id: 'q18', cat: 'retour' },
   ]
+
+  const faqs = computed((): FaqItem[] =>
+    faqConfig.map((item) => ({
+      id: item.id,
+      cat: item.cat,
+      q: t(`faq.items.${item.id}.q`),
+      a: t(`faq.items.${item.id}.a`),
+      ruo: item.ruo,
+    })),
+  )
 
   // ============================================
   // STATE
@@ -810,7 +715,7 @@
   // ============================================
   const visibleFaqs = computed(() => {
     const q = search.value.trim().toLowerCase()
-    return faqs.filter((f) => {
+    return faqs.value.filter((f) => {
       const catOk = selectedCategory.value === 'all' || f.cat === selectedCategory.value
       if (!q) return catOk
       const hay = (
@@ -837,7 +742,7 @@
   // METHODS
   // ============================================
   function getCategoryCount(catId: CatId) {
-    return faqs.filter((f) => f.cat === catId).length
+    return faqs.value.filter((f) => f.cat === catId).length
   }
 
   function resetSearch() {
@@ -877,7 +782,7 @@
     const raw = window.location.hash?.slice(1)
     if (!raw) return
     const id = decodeURIComponent(raw)
-    const target = faqs.find((f) => f.id === id)
+    const target = faqs.value.find((f) => f.id === id)
     if (!target) return
 
     selectedCategory.value = target.cat
@@ -900,7 +805,7 @@
     const data = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: faqs.map((f) => ({
+      mainEntity: faqs.value.map((f) => ({
         '@type': 'Question',
         name: f.q,
         acceptedAnswer: {

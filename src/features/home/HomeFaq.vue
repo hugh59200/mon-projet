@@ -4,8 +4,8 @@
     ref="sectionRef"
   >
     <SectionHeader
-      badge="Support"
-      title="Questions fréquentes"
+      :badge="t('home.faq.badge')"
+      :title="t('home.faq.title')"
       light
     />
 
@@ -39,36 +39,36 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import SectionHeader from './shared/SectionHeader.vue'
 
+  const { t } = useI18n()
   const sectionRef = ref<HTMLElement | null>(null)
   const openFaq = ref<number | null>(null)
 
-  const faqItems = [
+  const faqItems = computed(() => [
     {
-      question: 'Vendez-vous aux particuliers ?',
-      answer:
-        'Nos produits sont destinés aux laboratoires, institutions de recherche et professionnels qualifiés.',
+      question: t('home.faq.items.q1.q'),
+      answer: t('home.faq.items.q1.a'),
     },
     {
-      question: 'Les produits sont-ils à usage humain ?',
-      answer:
-        'Non. Tous nos peptides sont vendus exclusivement pour la recherche scientifique in vitro (RUO).',
+      question: t('home.faq.items.q2.q'),
+      answer: t('home.faq.items.q2.a'),
     },
     {
-      question: "Fournissez-vous des certificats d'analyse ?",
-      answer: 'Oui, chaque lot est accompagné de son COA complet (HPLC, MS).',
+      question: t('home.faq.items.q3.q'),
+      answer: t('home.faq.items.q3.a'),
     },
     {
-      question: "D'où expédiez-vous ?",
-      answer: 'Depuis nos entrepôts en Union Européenne (livraison 24-48h).',
+      question: t('home.faq.items.q4.q'),
+      answer: t('home.faq.items.q4.a'),
     },
     {
-      question: 'Quels moyens de paiement acceptez-vous ?',
-      answer: 'Virements bancaires, cartes (Visa, Mastercard) et facturation institutions.',
+      question: t('home.faq.items.q5.q'),
+      answer: t('home.faq.items.q5.a'),
     },
-  ]
+  ])
 
   const toggleFaq = (i: number) => {
     openFaq.value = openFaq.value === i ? null : i

@@ -5,6 +5,267 @@ export default {
   // ============================================
   // COMMON / SHARED
   // ============================================
+  // ============================================
+  // HOME
+  // ============================================
+  home: {
+    hero: {
+      badge: {
+        certified: 'Zertifizierter europäischer Lieferant',
+        researchOnly: 'Nur für Forschungszwecke',
+      },
+      title: {
+        line1: 'Forschungspeptide',
+        accent: 'höchste Reinheit',
+        line2: 'für Labore',
+      },
+      description:
+        'Ausgewählter Katalog zertifizierter Peptide mit ≥99% Reinheit. Analysezertifikate verfügbar. 24h-Versand aus der Europäischen Union.',
+      cta: {
+        explore: 'Katalog entdecken',
+        learnMore: 'Mehr erfahren',
+      },
+      trust: {
+        purity: 'Reinheit ≥99%',
+        coa: 'CoA inklusive',
+        delivery: '24h Lieferung',
+      },
+    },
+    stats: {
+      peptides: {
+        value: '50+',
+        label: 'Verfügbare Peptide',
+      },
+      purity: {
+        value: '99%',
+        label: 'Garantierte Reinheit',
+      },
+      shipping: {
+        value: '24h',
+        label: 'Schneller Versand',
+      },
+      stock: {
+        value: '100%',
+        label: 'Europäisches Lager',
+      },
+    },
+    process: {
+      badge: 'Vereinfachter Prozess',
+      title: 'Wie funktioniert es?',
+      description:
+        'Von der Auswahl bis zur Lieferung vereinfachen wir jeden Schritt, damit Sie sich auf das Wesentliche konzentrieren können: Ihre Forschung.',
+      steps: {
+        step1: {
+          title: 'Auswählen',
+          description: 'Durchsuchen und fügen Sie Produkte zu Ihrer Auswahl hinzu',
+        },
+        step2: {
+          title: 'Analysieren',
+          description: 'Konsultieren Sie unsere CoA und technische Spezifikationen',
+        },
+        step3: {
+          title: 'Empfangen',
+          description: 'Expresslieferung mit vollständiger Dokumentation',
+        },
+      },
+    },
+    quality: {
+      badge: 'Qualitätsverpflichtung',
+      title: {
+        line1: 'Standards',
+        accent: 'pharmazeutisch',
+      },
+      description:
+        'Jedes Peptid in unserem Katalog erfüllt die strengsten Standards in Bezug auf Reinheit und Rückverfolgbarkeit.',
+      coa: {
+        title: 'Analysezertifikat',
+        subtitle: 'Vollständige Dokumentation',
+        hplc: 'HPLC-Chromatogramm',
+        lcms: 'LC-MS Masse',
+        purity: 'Reinheit ≥99%',
+        batch: 'Chargenrückverfolgbarkeit',
+        download: 'CoA herunterladen',
+      },
+      features: {
+        f1: {
+          title: 'Reinheitskontrolle',
+          description: 'Analyse per HPLC und LC-MS für jede Charge',
+        },
+        f2: {
+          title: 'Vollständige Rückverfolgbarkeit',
+          description: 'Verfolgung von der Synthese bis zur Lieferung',
+        },
+        f3: {
+          title: 'Sicherer Versand',
+          description: 'Optimierte Verpackung zur Peptiderhaltung',
+        },
+        f4: {
+          title: 'Technischer Support',
+          description: 'Engagiertes Team für Ihre Fragen',
+        },
+      },
+    },
+    faq: {
+      badge: 'Support',
+      title: 'Häufig gestellte Fragen',
+      items: {
+        q1: {
+          q: 'Sind Ihre Peptide für den menschlichen Gebrauch bestimmt?',
+          a: 'Nein. Unsere Produkte sind ausschließlich für die Laborforschung bestimmt (RUO - Research Use Only). Sie dürfen nicht bei Menschen oder Tieren angewendet werden.',
+        },
+        q2: {
+          q: 'Stellen Sie Analysezertifikate zur Verfügung?',
+          a: 'Ja, ein CoA wird mit jeder Charge geliefert, einschließlich HPLC-Chromatogramm, beobachteter Masse (LC-MS) und Reinheit.',
+        },
+        q3: {
+          q: 'Wie lange dauert der Versand?',
+          a: 'Vor 14 Uhr bestätigte Bestellungen werden am selben Tag versendet. Lieferung in 24-48h in Frankreich, 2-4 Tage in Europa.',
+        },
+        q4: {
+          q: 'Wie sollten Peptide gelagert werden?',
+          a: 'Lyophilisierte Peptide sollten trocken, lichtgeschützt bei -20°C für optimale Haltbarkeit gelagert werden.',
+        },
+        q5: {
+          q: 'Akzeptieren Sie B2B-Bestellungen?',
+          a: 'Ja, wir bedienen Labore, Forschungsinstitute und Pharmaunternehmen. Kontaktieren Sie uns für ein individuelles Angebot.',
+        },
+      },
+    },
+    cta: {
+      title: {
+        line1: 'Bereit, Ihre',
+        accent: 'Forschung zu starten?',
+      },
+      description:
+        'Entdecken Sie unseren kompletten Katalog und bestellen Sie noch heute Ihre ersten Peptide.',
+      buttons: {
+        catalogue: 'Katalog durchsuchen',
+        contact: 'Kontaktieren Sie uns',
+      },
+    },
+    disclaimer: {
+      title: 'Nur für Forschungszwecke (RUO)',
+      text: 'Alle auf dieser Website präsentierten Produkte sind ausschließlich für die Laborforschung bestimmt. Sie sind nicht für diagnostische, therapeutische, präventive oder andere medizinische Verwendung bei Menschen oder Tieren bestimmt.',
+    },
+    banner: {
+      eyebrow: 'Bildungsressourcen',
+      title: {
+        line1: 'Entdecken Sie unsere',
+        accent: 'Forschungs-',
+        line2: 'Bibliothek',
+      },
+      description:
+        'Wissenschaftliche Artikel, Dosierungsanleitungen und praktische Protokolle für Ihre Peptidforschung.',
+      bullets: {
+        b1: 'Peer-reviewed Publikationen',
+        b2: 'Dosierungsanleitungen',
+        b3: 'Laborprotokolle',
+      },
+      cta: 'Alle Ressourcen anzeigen',
+      personas: {
+        rd: { title: 'F&E', subtitle: 'Fortgeschrittene Forschung' },
+        lab: { title: 'Labor', subtitle: 'Experimentelle Protokolle' },
+        phd: { title: 'Forscher', subtitle: 'Akademische Studien' },
+        quality: { title: 'Qualität', subtitle: 'Kontrollen & CoA' },
+      },
+      carousel: {
+        scientific: 'Wissenschaftliche Artikel',
+        protocols: 'Protokolle',
+        guides: 'Anleitungen',
+      },
+    },
+    categories: {
+      weightLoss: {
+        label: 'Gewichtsverlust',
+        eyebrow: 'Gewichtskontrolle',
+        description: 'Peptide, die für ihre Wirkung auf Stoffwechsel und Gewichtsregulation in vitro untersucht werden.',
+        videoLabel: 'Molekulare Visualisierung',
+        stat1Label: 'In klinischer Studie',
+        stat2Label: 'Publikationen',
+      },
+      recovery: {
+        label: 'Erholung',
+        eyebrow: 'Gewebereparatur',
+        description: 'Erkunden Sie Peptide, die mit Geweberegeneration und Heilungsmechanismen verbunden sind.',
+        videoLabel: 'Heilungsvisualisierung',
+        stat1Label: 'Forschungsartikel',
+        stat2Label: 'In-vitro-Studien',
+      },
+      growth: {
+        label: 'Wachstum',
+        eyebrow: 'Entwicklung',
+        description: 'Peptide im Zusammenhang mit Zellwachstum und Gewebeentwicklungsmechanismen.',
+        videoLabel: 'Zelluläre Entwicklung',
+        stat1Label: 'Präklinische Studien',
+        stat2Label: 'Publikationen',
+      },
+      antiAging: {
+        label: 'Anti-Aging',
+        eyebrow: 'Langlebigkeit',
+        description: 'Peptidforschung zu zellulären Alterungsmechanismen und Langlebigkeit.',
+        videoLabel: 'Zelluläre Regeneration',
+        stat1Label: 'Laufende Studien',
+        stat2Label: 'Entdeckungen',
+      },
+      performance: {
+        label: 'Leistung',
+        eyebrow: 'Optimierung',
+        description: 'Peptide, die für ihre Wirkung auf Energiestoffwechsel und körperliche Leistung untersucht werden.',
+        videoLabel: 'Energiestoffwechsel',
+        stat1Label: 'Forschungsprotokolle',
+        stat2Label: 'Analysen',
+      },
+      wellbeing: {
+        label: 'Wohlbefinden',
+        eyebrow: 'Balance',
+        description: 'Erkunden Sie Peptide, die mit Stressregulation und Stimmungsmodulation verbunden sind.',
+        videoLabel: 'Neuronale Balance',
+        stat1Label: 'Neuro-Studien',
+        stat2Label: 'Publikationen',
+      },
+      nootropic: {
+        label: 'Nootropisch',
+        eyebrow: 'Kognition',
+        description: 'Peptide, die für ihre Wirkung auf kognitive Funktionen und Neuroplastizität untersucht werden.',
+        videoLabel: 'Neuronale Verbindungen',
+        stat1Label: 'Kognitive Studien',
+        stat2Label: 'Analysen',
+      },
+      cosmetic: {
+        label: 'Kosmetik',
+        eyebrow: 'Dermatologie',
+        description: 'Peptide, die für ihre Wirkung auf Hautstruktur und zelluläre Regeneration untersucht werden.',
+        videoLabel: 'Hautstruktur',
+        stat1Label: 'Derma-Studien',
+        stat2Label: 'In-vitro-Tests',
+      },
+      health: {
+        label: 'Gesundheit',
+        eyebrow: 'Prävention',
+        description: 'Erkunden Sie Peptide, die mit Schutzmechanismen und Homöostase verbunden sind.',
+        videoLabel: 'Zellschutz',
+        stat1Label: 'Publikationen',
+        stat2Label: 'Präklinische Studien',
+      },
+      hormonal: {
+        label: 'Hormonal',
+        eyebrow: 'Regulation',
+        description: 'Peptide, die für ihre Interaktion mit endokrinen Systemen und Hormonregulation untersucht werden.',
+        videoLabel: 'Hormonsystem',
+        stat1Label: 'Endo-Studien',
+        stat2Label: 'Analysen',
+      },
+      stats: {
+        stat1Value: '150+',
+        stat2Value: '50+',
+      },
+      common: {
+        explore: 'Entdecken',
+        research: 'FORSCHUNG',
+      },
+    },
+  },
+
   common: {
     loading: 'Laden...',
     error: 'Ein Fehler ist aufgetreten',
@@ -440,6 +701,80 @@ export default {
     needHelp: 'Brauchen Sie Hilfe?',
     contactSupport: 'Support kontaktieren',
     responseTime: 'Antwort innerhalb von 24h',
+    items: {
+      q1: {
+        q: 'Stellen Sie ein Analysezertifikat (CoA) zur Verfügung?',
+        a: 'Ja. Jede Charge wird mit einem CoA geliefert, das je nach Fall enthält: <strong>HPLC</strong>-Chromatogramm, beobachtete Masse (<strong>LC-MS</strong>), Reinheit und Chargeninformationen.',
+      },
+      q2: {
+        q: 'Welche Reinheit streben Sie an?',
+        a: 'Je nach Sequenz streben unsere Partner eine hohe Reinheit an (z.B. ≥ 98%, wenn erreichbar). Die Reinheit unterscheidet sich vom <i>Netto-Peptidgehalt</i> (tatsächlicher Peptidanteil im lyophilisierten Pulver).',
+      },
+      q3: {
+        q: 'Sind Ihre Peptide steril?',
+        a: 'Die Fläschchen werden <strong>lyophilisiert</strong> für <strong>Forschungszwecke</strong> geliefert. Sie sind nicht für den menschlichen Gebrauch bestimmt und stellen kein Arzneimittel dar.',
+      },
+      q4: {
+        q: 'Wie sollte ich lyophilisiertes Pulver lagern?',
+        a: '<strong>Trocken</strong> lagern, vor Licht geschützt, idealerweise bei <strong>≤ −20°C</strong>. Feuchtigkeit vermeiden: sorgfältig verschließen und wenn möglich ein Trockenmittel verwenden.',
+      },
+      q5: {
+        q: 'Was ist mit rekonstituierten Lösungen im Labor?',
+        a: 'In einer sterilen Lösung/Puffer vorbereiten, die mit Ihrem Protokoll kompatibel ist (pH ~5–7), <strong>aliquotieren</strong> und Gefrier-/Auftauzyklen begrenzen. Empfohlene Lagerung bei ≤ −20°C.',
+      },
+      q6: {
+        q: 'Sollte ich das Fläschchen vor dem Öffnen auf Raumtemperatur bringen?',
+        a: 'Ja. Lassen Sie das Fläschchen vor dem Öffnen Raumtemperatur erreichen, um <strong>Kondensation</strong> und Feuchtigkeit zu begrenzen.',
+      },
+      q7: {
+        q: 'Kann ich meine Bestellung ändern oder stornieren?',
+        a: 'Wir bearbeiten Bestellungen schnell. Sobald die Vorbereitung begonnen hat, können wir möglicherweise nicht immer ändern/stornieren. Kontaktieren Sie uns so schnell wie möglich und wir werden unser Bestes tun.',
+      },
+      q8: {
+        q: 'Welche Zahlungsmethoden akzeptieren Sie?',
+        a: 'Gängige Kreditkarten und andere sichere Zahlungslösungen je nach Region. Zahlungen werden über <strong>PCI-DSS</strong>-konforme Anbieter abgewickelt.',
+      },
+      q9: {
+        q: 'Bieten Sie Rechnungen mit MwSt./innergemeinschaftlicher MwSt. an?',
+        a: 'Ja. Geben Sie Ihre Firmendaten und gegebenenfalls Ihre innergemeinschaftliche Umsatzsteuer-Identifikationsnummer ein.',
+      },
+      q10: {
+        q: 'Wie lange dauert der Versand?',
+        a: 'Bestätigte Bestellungen werden schnell versendet. Eine <strong>Sendungsverfolgungsnummer</strong> wird bei Versand gesendet.',
+      },
+      q11: {
+        q: 'Benötigt der Versand Kühlung?',
+        a: 'Lyophilisierte Peptide sind während des Transports in der Regel <strong>bei Raumtemperatur stabil</strong>. Nach Erhalt im Kühlschrank (2–8°C) oder Gefrierschrank für Langzeitlagerung aufbewahren.',
+      },
+      q12: {
+        q: 'Verpackung und Diskretion',
+        a: '<strong>Diskrete</strong> und schützende Verpackung, versiegelte Fläschchen und Stoßschutz.',
+      },
+      q13: {
+        q: 'Versenden Sie international?',
+        a: 'Ja, je nach Liefergebieten. Der Kunde ist für eventuelle lokale Beschränkungen und Zölle verantwortlich. Deklariert als <i>Laborreagenzien – Forschungsgebrauch</i>.',
+      },
+      q14: {
+        q: 'Sind Ihre Produkte für den menschlichen Gebrauch bestimmt?',
+        a: '<strong>Nein</strong>. RUO-Produkte: nicht für den menschlichen oder tierärztlichen Gebrauch bestimmt. Es werden keine Verabreichungs- oder Dosierungsempfehlungen gegeben.',
+      },
+      q15: {
+        q: 'Geben Sie Rekonstitutions-/Verabreichungsempfehlungen?',
+        a: 'Wir geben <strong>keine</strong> Verabreichungsempfehlungen. Für die Rekonstitution beziehen Sie sich auf Ihre internen Verfahren und CoA-Informationen.',
+      },
+      q16: {
+        q: 'Rückverfolgbarkeit und Qualitätskontrollen',
+        a: 'Chargenrückverfolgbarkeit und analytische Kontrollen (HPLC, LC-MS, Reinheit) auf dem CoA bereitgestellt.',
+      },
+      q17: {
+        q: 'Kann ich einen Artikel zurückgeben?',
+        a: 'Aus Gründen der Produktintegrität werden <strong>keine Rückgaben</strong> für geöffnete/veränderte Fläschchen akzeptiert. Rückgaben von ungeöffneten Artikeln können unter bestimmten Bedingungen in Betracht gezogen werden (Frist, Zustand, vorherige Genehmigung).',
+      },
+      q18: {
+        q: 'Wie kann ich Sie kontaktieren?',
+        a: 'Über Ihren Kundenbereich (Nachrichten), per E-Mail oder über das Kontaktformular. Wir beantworten technische Fragen schnell <i>(RUO-Rahmen)</i>.',
+      },
+    },
   },
 
   // ============================================

@@ -17,20 +17,19 @@
       <div class="hero-section__content">
         <div class="hero__badge">
           <span class="hero__badge-dot"></span>
-          <span>Fournisseur européen certifié</span>
+          <span>{{ t('home.hero.badge.certified') }}</span>
           <span class="hero__badge-sep">•</span>
-          <span>Usage recherche exclusif</span>
+          <span>{{ t('home.hero.badge.researchOnly') }}</span>
         </div>
 
         <h1 class="hero__title">
-          <span>Peptides de recherche</span>
-          <span class="hero__title-accent">haute pureté</span>
-          <span>pour laboratoires</span>
+          <span>{{ t('home.hero.title.line1') }}</span>
+          <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
+          <span>{{ t('home.hero.title.line2') }}</span>
         </h1>
 
         <p class="hero__desc">
-          Catalogue sélectionné de peptides certifiés ≥99% de pureté. Certificats d'analyse
-          disponibles. Expédition 24h depuis l'Union Européenne.
+          {{ t('home.hero.description') }}
         </p>
 
         <div class="hero__actions">
@@ -39,13 +38,13 @@
             arrow
             @click="$router.push('/catalogue')"
           >
-            Explorer le catalogue
+            {{ t('home.hero.cta.explore') }}
           </BaseButton>
           <BaseButton
             variant="ghost"
             @click="$router.push('/a-propos')"
           >
-            En savoir plus
+            {{ t('home.hero.cta.learnMore') }}
           </BaseButton>
         </div>
 
@@ -61,7 +60,7 @@
                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
               />
             </svg>
-            <span>Pureté ≥99%</span>
+            <span>{{ t('home.hero.trust.purity') }}</span>
           </div>
           <div class="hero__trust-item">
             <svg
@@ -74,7 +73,7 @@
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <span>COA inclus</span>
+            <span>{{ t('home.hero.trust.coa') }}</span>
           </div>
           <div class="hero__trust-item">
             <svg
@@ -85,7 +84,7 @@
             >
               <path d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span>Livraison 24h</span>
+            <span>{{ t('home.hero.trust.delivery') }}</span>
           </div>
         </div>
       </div>
@@ -95,7 +94,10 @@
 
 <script setup lang="ts">
   import peptidesHeroImage from '@/assets/peptides-hero-2.png'
+  import { useI18n } from 'vue-i18n'
   import BaseButton from './shared/BaseButton.vue'
+
+  const { t } = useI18n()
 </script>
 
 <style scoped lang="less">

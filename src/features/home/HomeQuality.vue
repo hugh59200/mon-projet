@@ -11,15 +11,14 @@
 
     <div class="layout-section__inner layout-section__inner--two-cols">
       <div class="quality__content">
-        <span class="quality__badge">Engagement qualité</span>
+        <span class="quality__badge">{{ t('home.quality.badge') }}</span>
         <h2 class="quality__title">
-          Des standards
+          {{ t('home.quality.title.line1') }}
           <br />
-          <span>pharmaceutiques</span>
+          <span>{{ t('home.quality.title.accent') }}</span>
         </h2>
         <p class="quality__desc">
-          Chaque peptide est soumis à un contrôle qualité rigoureux. Analyses HPLC et spectrométrie
-          de masse pour garantir une pureté optimale.
+          {{ t('home.quality.description') }}
         </p>
 
         <div class="quality__features">
@@ -44,28 +43,28 @@
         <div class="coa-card">
           <div class="coa-card__header">
             <span class="coa-card__badge">COA</span>
-            <span class="coa-card__title">Certificat d'analyse</span>
+            <span class="coa-card__title">{{ t('home.quality.coa.title') }}</span>
           </div>
           <div class="coa-card__body">
             <div class="coa-card__row">
-              <span>Référence</span>
+              <span>{{ t('home.quality.coa.hplc') }}</span>
               <span>BPC-157-5mg</span>
             </div>
             <div class="coa-card__row">
-              <span>Lot</span>
+              <span>{{ t('home.quality.coa.batch') }}</span>
               <span>BP2024-0847</span>
             </div>
             <div class="coa-card__row coa-card__row--highlight">
-              <span>Pureté HPLC</span>
+              <span>{{ t('home.quality.coa.purity') }}</span>
               <span>99.4%</span>
             </div>
             <div class="coa-card__row">
-              <span>Masse moléculaire</span>
+              <span>{{ t('home.quality.coa.lcms') }}</span>
               <span>1419.53 Da</span>
             </div>
             <div class="coa-card__row">
-              <span>Apparence</span>
-              <span>Poudre blanche</span>
+              <span>{{ t('home.quality.coa.subtitle') }}</span>
+              <span>✓</span>
             </div>
           </div>
           <div class="coa-card__footer">
@@ -77,7 +76,7 @@
             >
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Vérifié & Authentique</span>
+            <span>{{ t('home.quality.coa.download') }}</span>
           </div>
         </div>
       </div>
@@ -86,8 +85,10 @@
 </template>
 
 <script setup lang="ts">
-  import { h, onMounted, ref } from 'vue'
+  import { computed, h, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const sectionRef = ref<HTMLElement | null>(null)
 
   const icon = (d: string) => () =>
@@ -108,32 +109,32 @@
     'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
   )
 
-  const features = [
+  const features = computed(() => [
     {
-      title: 'Pureté HPLC ≥99%',
-      description: 'Analyse chromatographique haute performance.',
+      title: t('home.quality.features.f1.title'),
+      description: t('home.quality.features.f1.description'),
       variant: 'success',
       icon: CheckIcon,
     },
     {
-      title: 'Spectrométrie de masse',
-      description: "Vérification de la masse moléculaire et de l'identité.",
+      title: t('home.quality.features.f2.title'),
+      description: t('home.quality.features.f2.description'),
       variant: 'primary',
       icon: BeakerIcon,
     },
     {
-      title: 'Stock européen',
-      description: "Expédition depuis l'UE, sans frais de douane.",
+      title: t('home.quality.features.f3.title'),
+      description: t('home.quality.features.f3.description'),
       variant: 'warning',
       icon: GlobeIcon,
     },
     {
-      title: 'Formulation pure',
-      description: 'Sans excipients inutiles ni additifs.',
+      title: t('home.quality.features.f4.title'),
+      description: t('home.quality.features.f4.description'),
       variant: 'info',
       icon: LeafIcon,
     },
-  ]
+  ])
 
   onMounted(() => {
     if ('IntersectionObserver' in window && sectionRef.value) {

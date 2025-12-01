@@ -19,7 +19,7 @@
             color="primary-600"
             class="hero-banner__eyebrow"
           >
-            Ressources pédagogiques
+            {{ t('home.banner.eyebrow') }}
           </BasicText>
 
           <BasicText
@@ -27,7 +27,7 @@
             weight="bold"
             color="neutral-900"
           >
-            Comprendre les peptides avant vos recherches.
+            {{ t('home.banner.title.line1') }} {{ t('home.banner.title.accent') }} {{ t('home.banner.title.line2') }}
           </BasicText>
 
           <BasicText
@@ -35,8 +35,7 @@
             color="neutral-600"
             class="hero-banner__top-sub"
           >
-            Guides, fiches synthétiques et contenus sélectionnés pour mieux appréhender le rôle des
-            peptides dans vos projets de recherche.
+            {{ t('home.banner.description') }}
           </BasicText>
 
           <ul class="hero-banner__bullets">
@@ -47,7 +46,7 @@
                 color="success-600"
               />
               <BasicText color="neutral-700">
-                Vulgarisation claire pour équipes R&D et laboratoires.
+                {{ t('home.banner.bullets.b1') }}
               </BasicText>
             </li>
             <li>
@@ -57,7 +56,7 @@
                 color="primary-600"
               />
               <BasicText color="neutral-700">
-                Ressources externes sélectionnées : articles, vidéos, revues.
+                {{ t('home.banner.bullets.b2') }}
               </BasicText>
             </li>
             <li>
@@ -67,14 +66,14 @@
                 color="warning-600"
               />
               <BasicText color="neutral-700">
-                Rappel constant : recherche exclusivement – aucun usage humain.
+                {{ t('home.banner.bullets.b3') }}
               </BasicText>
             </li>
           </ul>
 
           <div class="hero-banner__cta-row">
             <BasicButton
-              label="Explorer les ressources pédagogiques"
+              :label="t('home.banner.cta')"
               type="primary"
               variant="filled"
               size="medium"
@@ -86,7 +85,7 @@
               color="neutral-500"
               class="hero-banner__disclaimer"
             >
-              Sélection neutre, sans recommandation médicale.
+              {{ t('home.banner.carousel.scientific') }}
             </BasicText>
           </div>
         </div>
@@ -140,14 +139,14 @@
             weight="bold"
             color="neutral-800"
           >
-            Quelques peptides de notre catalogue
+            {{ t('home.banner.carousel.protocols') }}
           </BasicText>
           <BasicText
             fontStyle="italic"
             color="neutral-500"
             size="body-s"
           >
-            Research only – Not for human use
+            {{ t('home.banner.carousel.guides') }}
           </BasicText>
         </div>
 
@@ -192,11 +191,13 @@
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { storeToRefs } from 'pinia'
-  import { onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
 
   gsap.registerPlugin(ScrollTrigger)
 
+  const { t } = useI18n()
   const router = useRouter()
   const productsStore = useProductsStore()
   const { products } = storeToRefs(productsStore)
@@ -221,38 +222,38 @@
     alt: string
   }
 
-  const personas = ref<Persona[]>([
+  const personas = computed<Persona[]>(() => [
     {
       id: 'rd',
       name: 'Dr. L. Moreau',
-      role: 'Chercheuse en peptides – équipe R&D',
-      tag: 'Recherche fondamentale',
+      role: t('home.banner.personas.rd.subtitle'),
+      tag: t('home.banner.personas.rd.title'),
       image: personaRd,
-      alt: 'Chercheuse en laboratoire',
+      alt: t('home.banner.personas.rd.title'),
     },
     {
       id: 'lab',
       name: 'Pr. K. Almeida',
-      role: 'Responsable de laboratoire',
-      tag: 'Laboratoire académique',
+      role: t('home.banner.personas.lab.subtitle'),
+      tag: t('home.banner.personas.lab.title'),
       image: personaLab,
-      alt: 'Responsable de laboratoire',
+      alt: t('home.banner.personas.lab.title'),
     },
     {
       id: 'phd',
       name: 'Noah',
-      role: 'Doctorant en sciences du vivant',
-      tag: 'Projet de thèse',
+      role: t('home.banner.personas.phd.subtitle'),
+      tag: t('home.banner.personas.phd.title'),
       image: personaPhd,
-      alt: 'Jeune doctorant',
+      alt: t('home.banner.personas.phd.title'),
     },
     {
       id: 'quality',
       name: 'Dr. S. Meyer',
-      role: 'Référent qualité & conformité',
-      tag: 'Qualité & conformité',
+      role: t('home.banner.personas.quality.subtitle'),
+      tag: t('home.banner.personas.quality.title'),
       image: personaQuality,
-      alt: 'Scientifiques discutant',
+      alt: t('home.banner.personas.quality.title'),
     },
   ])
 
