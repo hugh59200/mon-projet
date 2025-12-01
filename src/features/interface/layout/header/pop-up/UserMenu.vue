@@ -46,7 +46,7 @@
                 :size="18"
               />
             </span>
-            <span>Mon profil</span>
+            <span>{{ t('nav.profile') }}</span>
           </button>
           <button
             class="user-menu__link"
@@ -58,7 +58,7 @@
                 :size="18"
               />
             </span>
-            <span>Messagerie</span>
+            <span>{{ t('profile.support') }}</span>
             <span
               v-if="totalUnread > 0"
               class="user-menu__link-badge"
@@ -76,7 +76,7 @@
                 :size="18"
               />
             </span>
-            <span>Statistiques</span>
+            <span>{{ t('admin.stats') }}</span>
           </button>
           <button
             v-if="isAdmin"
@@ -89,7 +89,7 @@
                 :size="18"
               />
             </span>
-            <span>Espace Admin</span>
+            <span>{{ t('nav.admin') }}</span>
           </button>
         </nav>
 
@@ -104,7 +104,7 @@
             name="LogOut"
             :size="18"
           />
-          <span>Se déconnecter</span>
+          <span>{{ t('nav.logout') }}</span>
         </button>
       </template>
 
@@ -121,7 +121,7 @@
                 :size="18"
               />
             </span>
-            <span>Suivre ma commande</span>
+            <span>{{ t('tracking.title') }}</span>
           </button>
         </nav>
 
@@ -138,7 +138,7 @@
                 :size="18"
               />
             </span>
-            <span>Connexion</span>
+            <span>{{ t('nav.login') }}</span>
           </button>
           <button
             class="user-menu__link"
@@ -150,7 +150,7 @@
                 :size="18"
               />
             </span>
-            <span>Créer un compte</span>
+            <span>{{ t('nav.register') }}</span>
           </button>
         </nav>
       </template>
@@ -164,9 +164,11 @@
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import UserHeader from './UserHeader.vue'
 
+  const { t } = useI18n()
   const router = useRouter()
   const { user, isAdmin, signOut } = useAuthStore()
   const notifStore = useChatNotifStore()

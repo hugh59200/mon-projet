@@ -545,6 +545,19 @@ export default {
   },
 
   // ============================================
+  // ADMIN
+  // ============================================
+  admin: {
+    stats: 'Statistics',
+    users: 'Users',
+    orders: 'Orders',
+    products: 'Products',
+    news: 'News',
+    categories: 'Categories',
+    messaging: 'Messaging',
+  },
+
+  // ============================================
   // ERRORS & MESSAGES
   // ============================================
   errors: {
@@ -584,5 +597,99 @@ export default {
     de: 'Deutsch',
     es: 'Español',
     it: 'Italiano',
+  },
+
+  // ============================================
+  // ROUTES (Page titles & descriptions)
+  // ============================================
+  routes: {
+    home: {
+      title: 'Home – Fast Peptides',
+      description: 'The European reference for certified research peptides.',
+    },
+    auth: {
+      login: 'Login',
+      register: 'Sign Up',
+      reset: 'Forgot Password',
+      emailSent: 'Email Sent',
+      callback: 'Verifying...',
+    },
+    profile: {
+      title: 'My Profile – Fast Peptides',
+      description: 'Manage your personal information, preferences and account security.',
+    },
+    orders: {
+      title: 'My Orders – Fast Peptides',
+      description: 'View all your previous orders on Fast Peptides.',
+    },
+    orderDetail: {
+      title: 'Order Details – Fast Peptides',
+    },
+    updatePassword: {
+      title: 'New Password – Fast Peptides',
+      description: 'Choose a new password to access your Fast Peptides account.',
+    },
+    updatePasswordSuccess: {
+      title: 'Password Updated – Fast Peptides',
+      description: 'Your password has been successfully changed.',
+    },
+    accessDenied: {
+      title: 'Access Denied – Fast Peptides',
+    },
+    catalogue: {
+      title: 'Catalogue – Fast Peptides',
+      heading: 'Our Catalogue',
+      description: 'Discover our full range of peptides & products available for research.',
+    },
+    product: {
+      title: 'Product – Fast Peptides',
+    },
+    news: {
+      title: 'News – Fast Peptides',
+      heading: 'Stay informed on peptide research',
+      description: 'Discover our latest articles, studies and news about research peptides',
+      badge: 'Blog & News',
+    },
+    newsDetail: {
+      description: 'Discover the details of this news article on Fast Peptides.',
+    },
+    cart: {
+      title: 'My Cart – Fast Peptides',
+      description: 'Review your items, adjust quantities and complete your order.',
+      badge: 'Your Selection',
+    },
+    paymentSuccess: {
+      title: 'Payment Successful 🎉',
+    },
+    paymentCancel: {
+      title: 'Payment Cancelled',
+    },
+    tracking: {
+      title: 'Track My Order – Fast Peptides',
+      heading: 'Track Your Delivery',
+      description: 'Check the progress of your package in real time',
+      badge: 'Order Tracking',
+    },
+    admin: {
+      title: 'Admin Dashboard – Fast Peptides',
+      heading: 'Admin Dashboard',
+      description: 'Manage products, users, orders, statistics and news for the Fast Peptides website.',
+    },
+    faq: {
+      title: 'FAQ – Fast Peptides',
+      description: 'Find quick answers to your questions about our products and services',
+      badge: 'Help Center',
+    },
+    cgu: {
+      title: 'Terms & Conditions – Fast Peptides',
+      heading: 'Terms & Conditions',
+      description: 'View our current terms and conditions of use.',
+    },
+    reconstitution: {
+      title: 'Dosage Calculator & Reconstitution – Fast Peptides',
+      heading: 'Reconstitution Calculator',
+      description: 'Calculate precisely the volume to draw for your research protocols',
+      badge: 'Lab Tool',
+    },
   },
 } as const

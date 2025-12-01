@@ -19,12 +19,17 @@ declare module 'vue-router' {
     requiresCart?: boolean
     requiresAdmin?: boolean
     label?: string
+    labelKey?: string
     icon?: IconNameNext
     order?: number
     title?: string
+    titleKey?: string
     heading?: string
+    headingKey?: string
     description?: string
+    descriptionKey?: string
     badge?: string
+    badgeKey?: string
     headerIcon?: IconNameNext
     getTitle?: (route: RouteLocationNormalizedLoaded) => string
     getDescription?: (route: RouteLocationNormalizedLoaded) => string

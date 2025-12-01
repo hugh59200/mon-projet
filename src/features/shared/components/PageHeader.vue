@@ -40,7 +40,7 @@
         >
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        <span>{{ backLabel }}</span>
+        <span>{{ translatedBackLabel }}</span>
       </button>
 
       <!-- Actions slot (en haut à droite) -->
@@ -112,10 +112,13 @@
     type IconNameNext,
   } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
 
   export type PageHeaderVariant = 'simple' | 'card' | 'premium'
   export type PageHeaderTheme = 'light' | 'dark'
+
+  const { t } = useI18n()
 
   const props = withDefaults(
     defineProps<{
@@ -133,7 +136,6 @@
     {
       variant: 'premium',
       theme: 'dark',
-      backLabel: 'Retour',
     },
   )
 
@@ -144,17 +146,24 @@
   const route = useRoute()
   const router = useRouter()
 
+  const translatedBackLabel = computed(() => props.backLabel || t('common.back'))
+
   const rawTitle = computed(() => {
     if (props.title) return props.title
-    return (
-      (route.meta.heading as string) ||
-      (route.meta.title as string)?.replace(' – Fast Peptides', '') ||
-      ''
-    )
+    // Use headingKey if available, otherwise fallback to heading
+    if (route.meta.headingKey) return t(route.meta.headingKey as string)
+    if (route.meta.heading) return route.meta.heading as string
+    // Use titleKey if available
+    if (route.meta.titleKey) return t(route.meta.titleKey as string).replace(' – Fast Peptides', '')
+    if (route.meta.title) return (route.meta.title as string).replace(' – Fast Peptides', '')
+    return ''
   })
 
   const displayBadge = computed(() => {
-    return props.badge || (route.meta.badge as string) || ''
+    if (props.badge) return props.badge
+    if (route.meta.badgeKey) return t(route.meta.badgeKey as string)
+    if (route.meta.badge) return route.meta.badge as string
+    return ''
   })
 
   const displayIcon = computed<IconNameNext | undefined>(() => {
@@ -163,7 +172,10 @@
   })
 
   const displayDescription = computed(() => {
-    return props.description || (route.meta.description as string) || ''
+    if (props.description) return props.description
+    if (route.meta.descriptionKey) return t(route.meta.descriptionKey as string)
+    if (route.meta.description) return route.meta.description as string
+    return ''
   })
 
   const splitTitle = computed(() => {

@@ -517,14 +517,14 @@
   // ============================================
   // DATA
   // ============================================
-  const categories = [
-    { id: 'qualite', label: 'Produits & Qualité', icon: 'FlaskRound' },
-    { id: 'stockage', label: 'Stockage & Manipulation', icon: 'Boxes' },
-    { id: 'commande', label: 'Commandes & Paiement', icon: 'CreditCard' },
-    { id: 'shipping', label: 'Expédition & Suivi', icon: 'PackageSearch' },
-    { id: 'conformite', label: 'Conformité & Sécurité', icon: 'ShieldCheck' },
-    { id: 'retour', label: 'Retours & Support', icon: 'Undo2' },
-  ] as const
+  const categories = computed((): { id: CatId; label: string; icon: string }[] => [
+    { id: 'qualite', label: t('faq.categories.products'), icon: 'FlaskRound' },
+    { id: 'stockage', label: t('faq.categories.storage'), icon: 'Boxes' },
+    { id: 'commande', label: t('faq.categories.orders'), icon: 'CreditCard' },
+    { id: 'shipping', label: t('faq.categories.shipping'), icon: 'PackageSearch' },
+    { id: 'conformite', label: t('faq.categories.compliance'), icon: 'ShieldCheck' },
+    { id: 'retour', label: t('faq.categories.returns'), icon: 'Undo2' },
+  ])
 
   const faqs: FaqItem[] = [
     {
@@ -825,7 +825,7 @@
   })
 
   const groupedVisible = computed(() => {
-    return categories
+    return categories.value
       .map((c) => ({
         ...c,
         items: visibleFaqs.value.filter((f) => f.cat === c.id),
