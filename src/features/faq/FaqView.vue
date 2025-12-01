@@ -1451,7 +1451,7 @@
       }
 
       &--ruo {
-        border-left: 3px solid #f59e0b;
+        border-left: 3px solid @warning-500;
       }
 
       &--flash {
@@ -1555,14 +1555,14 @@
       padding: 12px 16px;
       background: linear-gradient(
         135deg,
-        rgba(245, 158, 11, 0.1) 0%,
-        rgba(245, 158, 11, 0.05) 100%
+        rgba(var(--warning-500-rgb), 0.1) 0%,
+        rgba(var(--warning-500-rgb), 0.05) 100%
       );
-      border: 1px solid rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(var(--warning-500-rgb), 0.2);
       border-radius: 10px;
 
       svg {
-        color: #f59e0b;
+        color: @warning-500;
         flex-shrink: 0;
       }
 
@@ -1570,7 +1570,7 @@
         font-family: @font-body;
         font-size: 13px;
         font-weight: 500;
-        color: #b45309;
+        color: @warning-700;
       }
     }
 
@@ -1667,7 +1667,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 

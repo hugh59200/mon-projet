@@ -528,18 +528,19 @@
   const showFilters = ref(false)
   const viewMode = ref<'grid' | 'list'>('grid')
 
-  // Category colors
+  // Category colors - mapped to Design System semantic colors
+  // These hex values correspond to the DS color palette for inline style usage
   const categoryColors: Record<string, string> = {
-    Récupération: '#10B981',
-    'Perte de poids': '#F59E0B',
-    Croissance: '#3B82F6',
-    'Anti-âge': '#8B5CF6',
-    Performance: '#EF4444',
-    'Bien-être': '#EC4899',
-    Hormonal: '#6366F1',
-    Nootropique: '#14B8A6',
-    Cosmétique: '#F472B6',
-    Santé: '#22C55E',
+    Récupération: 'var(--success-500)', // success-500
+    'Perte de poids': 'var(--warning-500)', // warning-500
+    Croissance: 'var(--info-500)', // info-500
+    'Anti-âge': 'var(--secondary-500)', // secondary-500 (violet)
+    Performance: 'var(--danger-500)', // danger-500
+    'Bien-être': 'var(--primary-400)', // pink variant
+    Hormonal: 'var(--secondary-600)', // secondary-600 (indigo)
+    Nootropique: 'var(--primary-500)', // primary-500 (teal)
+    Cosmétique: 'var(--primary-300)', // lighter pink/primary
+    Santé: 'var(--success-500)', // success-500
   }
 
   const getCategoryColor = (category: string): string => {

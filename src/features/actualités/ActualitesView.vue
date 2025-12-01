@@ -777,22 +777,22 @@
       padding: 8px 14px;
       background: linear-gradient(
         135deg,
-        rgba(251, 191, 36, 0.15) 0%,
-        rgba(251, 191, 36, 0.08) 100%
+        rgba(var(--warning-400-rgb), 0.15) 0%,
+        rgba(var(--warning-400-rgb), 0.08) 100%
       );
-      border: 1px solid rgba(251, 191, 36, 0.3);
+      border: 1px solid rgba(var(--warning-400-rgb), 0.3);
       border-radius: 50px;
       margin-bottom: 20px;
 
       svg {
-        color: #f59e0b;
+        color: @warning-500;
       }
 
       span {
         font-family: @font-body;
         font-size: 12px;
         font-weight: 600;
-        color: #b45309;
+        color: @warning-700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
@@ -1240,7 +1240,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 

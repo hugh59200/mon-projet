@@ -143,14 +143,18 @@
     pending_orders: 0,
   })
 
+  // Couleurs pour les graphiques (utilise les couleurs du thème)
+  const CHART_COLOR_PRIMARY = '#009688' // primary-500 (teal)
+  const CHART_COLOR_WARNING = '#f59e0b' // warning-500 (orange/amber)
+
   const chartDataRevenue = ref<ChartData>({
     labels: [],
-    datasets: [{ label: 'Revenus (€)', backgroundColor: '#00796b', data: [], borderRadius: 6 }],
+    datasets: [{ label: 'Revenus (€)', backgroundColor: CHART_COLOR_PRIMARY, data: [], borderRadius: 6 }],
   })
 
   const chartDataOrders = ref<ChartData>({
     labels: [],
-    datasets: [{ label: 'Commandes', backgroundColor: '#ffa726', data: [], borderRadius: 6 }],
+    datasets: [{ label: 'Commandes', backgroundColor: CHART_COLOR_WARNING, data: [], borderRadius: 6 }],
   })
 
   const chartOptions = {
@@ -242,7 +246,7 @@
       datasets: [
         {
           label: 'Revenus (€)',
-          backgroundColor: '#00796b',
+          backgroundColor: CHART_COLOR_PRIMARY,
           data: days.map((d) => d.total),
           borderRadius: 6,
         },
@@ -254,7 +258,7 @@
       datasets: [
         {
           label: 'Commandes',
-          backgroundColor: '#ffa726',
+          backgroundColor: CHART_COLOR_WARNING,
           data: days.map((d) => d.count),
           borderRadius: 6,
         },
@@ -334,7 +338,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 12px;
-      background: #f9f9f9;
+      background: @neutral-50;
       border-radius: 12px;
       padding: 10px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -349,16 +353,16 @@
         font-size: 15px;
         cursor: pointer;
         transition: all 0.25s ease;
-        background-color: #e6f3f2;
-        color: #0b5e55;
+        background-color: var(--primary-50);
+        color: var(--primary-800);
 
         &.active {
-          background-color: #00796b;
+          background-color: var(--primary-600);
           color: white;
         }
 
         &:hover {
-          background-color: #009688;
+          background-color: var(--primary-500);
           color: white;
         }
       }
@@ -373,7 +377,7 @@
 
     .dashboard-card {
       background: white;
-      border: 1px solid #e5e7eb;
+      border: 1px solid @neutral-200;
       border-radius: 12px;
       padding: 24px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
@@ -388,24 +392,24 @@
     }
 
     .stat-card {
-      background: #f3f4f6;
+      background: @neutral-100;
       border-radius: 10px;
       padding: 16px 12px;
       text-align: center;
       transition: all 0.2s ease;
 
       &:hover {
-        background: #e5e7eb;
+        background: @neutral-200;
         transform: translateY(-2px);
       }
 
       .label {
-        color: #6b7280;
+        color: @neutral-500;
         font-size: 14px;
       }
 
       .value {
-        color: #111827;
+        color: @neutral-900;
         font-weight: bold;
         font-size: 20px;
         margin-top: 4px;
@@ -420,18 +424,18 @@
       th,
       td {
         padding: 10px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid @neutral-200;
       }
 
       th {
         text-align: left;
-        color: #6b7280;
+        color: @neutral-500;
         font-weight: 500;
         font-size: 14px;
       }
 
       td {
-        color: #111827;
+        color: @neutral-900;
         font-size: 14px;
       }
     }
@@ -450,7 +454,7 @@
     }
 
     .contact-link {
-      color: #00796b;
+      color: var(--primary-600);
       font-weight: 500;
       text-decoration: none;
       &:hover {

@@ -792,10 +792,10 @@
       justify-content: center;
       width: 88px;
       height: 88px;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      background: linear-gradient(135deg, rgba(var(--danger-500-rgb), 0.1) 0%, rgba(var(--danger-500-rgb), 0.05) 100%);
       border-radius: 50%;
       margin-bottom: 24px;
-      color: #ef4444;
+      color: @danger-500;
     }
 
     &__empty-title {
@@ -1189,26 +1189,26 @@
       transition: all 0.25s @ease;
 
       &--twitter {
-        background: #f0f9ff;
-        color: #0ea5e9;
+        background: @info-50;
+        color: @info-500;
 
         &:hover {
-          background: #0ea5e9;
+          background: @info-500;
           color: white;
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+          box-shadow: 0 6px 20px rgba(var(--info-500-rgb), 0.35);
         }
       }
 
       &--linkedin {
-        background: #eff6ff;
-        color: #0077b5;
+        background: @info-50;
+        color: @info-700;
 
         &:hover {
-          background: #0077b5;
+          background: @info-700;
           color: white;
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(0, 119, 181, 0.35);
+          box-shadow: 0 6px 20px rgba(var(--info-700-rgb), 0.35);
         }
       }
 
@@ -1432,7 +1432,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
