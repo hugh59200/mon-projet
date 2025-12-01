@@ -145,9 +145,11 @@ const routes: Array<RouteRecordRaw> = [
       label: 'Actualités',
       icon: 'Newspaper',
       order: 3,
-      heading: 'Nos actualités',
+      heading: 'Restez informé sur la recherche peptidique',
       title: 'Actualités – Fast Peptides',
-      description: 'Derniers articles, recherches & informations importantes',
+      description: 'Découvrez nos derniers articles, études et actualités sur les peptides de recherche',
+      badge: 'Blog & Actualités',
+      headerIcon: 'Newspaper',
     },
   },
   {
@@ -167,6 +169,8 @@ const routes: Array<RouteRecordRaw> = [
       heading: 'Mon panier',
       title: 'Mon panier – Fast Peptides',
       description: 'Vérifiez vos articles, ajustez les quantités et validez votre commande.',
+      badge: 'Votre sélection',
+      headerIcon: 'ShoppingCart',
     },
   },
   {
@@ -193,6 +197,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/tracking/TrackOrderView.vue'),
     meta: {
       title: 'Suivre ma commande – Fast Peptides',
+      heading: 'Suivez votre livraison',
+      description: "Consultez l'état d'avancement de votre colis en temps réel",
+      badge: 'Suivi de commande',
+      headerIcon: 'Package',
       requiresAuth: false,
     },
   },
@@ -273,10 +281,11 @@ const routes: Array<RouteRecordRaw> = [
       label: 'FAQ',
       icon: 'HelpCircle',
       order: 4,
-      heading: 'Foire aux questions',
+      heading: 'Questions Fréquentes',
       title: 'FAQ – Fast Peptides',
-      description:
-        'Produits destinés exclusivement à la recherche (RUO). Non destinés à l’usage humain ou vétérinaire.',
+      description: 'Trouvez rapidement des réponses à vos questions sur nos produits et services',
+      badge: "Centre d'aide",
+      headerIcon: 'HelpCircle',
     },
   },
   {
@@ -294,15 +303,14 @@ const routes: Array<RouteRecordRaw> = [
     name: 'reconstitution',
     component: () => import('@/features/reconstitution/ReconstitutionView.vue'),
     meta: {
-      // Ces 3 lignes servent à la génération du menu
-      label: 'Calculateur', // Nom court pour le menu
-      icon: 'Calculator', // Icône (assure-toi qu'elle existe dans BasicIconNext)
-      order: 3, // Position (après Catalogue)
-
-      // Méta SEO
+      label: 'Calculateur',
+      icon: 'Calculator',
+      order: 3,
       title: 'Calculateur de Dosage & Reconstitution – Fast Peptides',
-      heading: 'Reconstitution & Calculateur',
-      description: 'Outil interactif pour le dosage et protocole de mélange.',
+      heading: 'Calculateur de Reconstitution',
+      description: 'Calculez précisément le volume à prélever pour vos protocoles de recherche',
+      badge: 'Outil de laboratoire',
+      headerIcon: 'FlaskRound',
     },
   },
 ]

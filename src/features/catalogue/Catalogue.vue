@@ -1,48 +1,121 @@
 <template>
   <div class="catalogue-page">
-    <!-- Background décoratif -->
-    <div class="catalogue-page__bg">
-      <div class="catalogue-page__gradient"></div>
-      <div class="catalogue-page__gradient catalogue-page__gradient--2"></div>
-      <div class="catalogue-page__pattern"></div>
-    </div>
-
-    <div class="catalogue-page__container">
-      <!-- Header existant -->
-      <PageHeader>
-        <!-- Quick Category Filters (sous le header) -->
-        <div class="catalogue-quick-nav">
-          <button
-            class="catalogue-chip"
-            :class="{ 'catalogue-chip--active': selectedCategories.length === 0 }"
-            @click="selectedCategories = []"
-          >
-            <span class="catalogue-chip__icon">✨</span>
-            Tous
-            <span class="catalogue-chip__count">{{ products.length }}</span>
-          </button>
-          <button
-            v-for="cat in topCategories"
-            :key="cat.id"
-            class="catalogue-chip"
-            :class="{ 'catalogue-chip--active': selectedCategories.includes(cat.id) }"
-            @click="toggleCategory(cat.id)"
-          >
-            <span
-              class="catalogue-chip__dot"
-              :style="{ background: getCategoryColor(cat.id) }"
-            ></span>
-            {{ cat.label }}
-            <span class="catalogue-chip__count">{{ cat.count }}</span>
-          </button>
-        </div>
-
-        <!-- Mobile Controls -->
-        <div
-          v-if="isMobile"
-          class="catalogue-mobile-bar"
+    <PageHeader>
+      <div class="catalogue-quick-nav">
+        <button
+          class="catalogue-chip"
+          :class="{ 'catalogue-chip--active': selectedCategories.length === 0 }"
+          @click="selectedCategories = []"
         >
-          <div class="catalogue-search catalogue-search--mobile">
+          <span class="catalogue-chip__icon">✨</span>
+          Tous
+          <span class="catalogue-chip__count">{{ products.length }}</span>
+        </button>
+        <button
+          v-for="cat in topCategories"
+          :key="cat.id"
+          class="catalogue-chip"
+          :class="{ 'catalogue-chip--active': selectedCategories.includes(cat.id) }"
+          @click="toggleCategory(cat.id)"
+        >
+          <span
+            class="catalogue-chip__dot"
+            :style="{ background: getCategoryColor(cat.id) }"
+          ></span>
+          {{ cat.label }}
+          <span class="catalogue-chip__count">{{ cat.count }}</span>
+        </button>
+      </div>
+
+      <!-- Mobile Controls -->
+      <div
+        v-if="isMobile"
+        class="catalogue-mobile-bar"
+      >
+        <div class="catalogue-search catalogue-search--mobile">
+          <svg
+            class="catalogue-search__icon"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            v-model="searchTerm"
+            type="text"
+            class="catalogue-search__input"
+            placeholder="Rechercher..."
+          />
+        </div>
+        <button
+          class="catalogue-filter-btn"
+          @click="showFilters = true"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+          </svg>
+          Filtres
+          <span
+            v-if="activeFiltersCount"
+            class="catalogue-filter-btn__badge"
+          >
+            {{ activeFiltersCount }}
+          </span>
+        </button>
+      </div>
+    </PageHeader>
+
+    <PageContent
+      size="xl"
+      class="catalogue-body"
+    >
+      <!-- Sidebar avec FilterPanel existant -->
+      <aside
+        v-if="!isMobile"
+        class="catalogue-sidebar"
+      >
+        <FilterPanel
+          :all-open="allOpen"
+          v-model:filterOpen="filterOpen"
+          v-model:priceRange="priceRange"
+          v-model:selectedCategories="selectedCategories"
+          v-model:inStockOnly="inStockOnly"
+          v-model:selectedTags="selectedTags"
+          :categoryItems="categoryItemsWithCounts"
+          :stockCount="stockCount"
+          :tagItems="tagItemsWithCounts"
+          :tags="allTags"
+          @toggleAll="toggleAll"
+          @resetAll="resetAll"
+          @toggleTag="toggleTag"
+        />
+      </aside>
+
+      <!-- Products Section -->
+      <main class="catalogue-main">
+        <!-- Toolbar -->
+        <div class="catalogue-toolbar">
+          <!-- Search Desktop -->
+          <div
+            v-if="!isMobile"
+            class="catalogue-search"
+          >
             <svg
               class="catalogue-search__icon"
               width="18"
@@ -63,269 +136,12 @@
               v-model="searchTerm"
               type="text"
               class="catalogue-search__input"
-              placeholder="Rechercher..."
+              placeholder="Rechercher un peptide..."
             />
-          </div>
-          <button
-            class="catalogue-filter-btn"
-            @click="showFilters = true"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
-            </svg>
-            Filtres
-            <span
-              v-if="activeFiltersCount"
-              class="catalogue-filter-btn__badge"
-            >
-              {{ activeFiltersCount }}
-            </span>
-          </button>
-        </div>
-      </PageHeader>
-
-      <!-- Main Content -->
-      <div class="catalogue-body">
-        <!-- Sidebar avec FilterPanel existant -->
-        <aside
-          v-if="!isMobile"
-          class="catalogue-sidebar"
-        >
-          <FilterPanel
-            :all-open="allOpen"
-            v-model:filterOpen="filterOpen"
-            v-model:priceRange="priceRange"
-            v-model:selectedCategories="selectedCategories"
-            v-model:inStockOnly="inStockOnly"
-            v-model:selectedTags="selectedTags"
-            :categoryItems="categoryItemsWithCounts"
-            :stockCount="stockCount"
-            :tagItems="tagItemsWithCounts"
-            :tags="allTags"
-            @toggleAll="toggleAll"
-            @resetAll="resetAll"
-            @toggleTag="toggleTag"
-          />
-        </aside>
-
-        <!-- Products Section -->
-        <main class="catalogue-main">
-          <!-- Toolbar -->
-          <div class="catalogue-toolbar">
-            <!-- Search Desktop -->
-            <div
-              v-if="!isMobile"
-              class="catalogue-search"
-            >
-              <svg
-                class="catalogue-search__icon"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="8"
-                />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <input
-                v-model="searchTerm"
-                type="text"
-                class="catalogue-search__input"
-                placeholder="Rechercher un peptide..."
-              />
-              <button
-                v-if="searchTerm"
-                class="catalogue-search__clear"
-                @click="searchTerm = ''"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Results count - bien séparé -->
-            <div class="catalogue-toolbar__results">
-              <span class="catalogue-toolbar__count">{{ finalProducts.length }}</span>
-              <span class="catalogue-toolbar__label">
-                résultat{{ finalProducts.length > 1 ? 's' : '' }}
-              </span>
-            </div>
-
-            <!-- Right side controls -->
-            <div class="catalogue-toolbar__right">
-              <!-- Sort -->
-              <select
-                v-model="sortBy"
-                class="catalogue-toolbar__select"
-              >
-                <option
-                  v-for="item in sortItems"
-                  :value="item"
-                >
-                  {{ item.label }}
-                </option>
-              </select>
-
-              <!-- View Mode Toggle -->
-              <div class="catalogue-toolbar__view">
-                <button
-                  class="catalogue-toolbar__view-btn"
-                  :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }"
-                  @click="viewMode = 'grid'"
-                  title="Vue grille"
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect
-                      x="3"
-                      y="3"
-                      width="7"
-                      height="7"
-                      rx="1"
-                    />
-                    <rect
-                      x="14"
-                      y="3"
-                      width="7"
-                      height="7"
-                      rx="1"
-                    />
-                    <rect
-                      x="3"
-                      y="14"
-                      width="7"
-                      height="7"
-                      rx="1"
-                    />
-                    <rect
-                      x="14"
-                      y="14"
-                      width="7"
-                      height="7"
-                      rx="1"
-                    />
-                  </svg>
-                </button>
-                <button
-                  class="catalogue-toolbar__view-btn"
-                  :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'list' }"
-                  @click="viewMode = 'list'"
-                  title="Vue liste"
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Filters Pills -->
-          <div
-            v-if="hasActiveFilters"
-            class="catalogue-active-filters"
-          >
-            <div class="catalogue-active-filters__list">
-              <span class="catalogue-active-filters__label">Filtres:</span>
-
-              <button
-                v-for="cat in selectedCategories"
-                :key="`cat-${cat}`"
-                class="catalogue-pill"
-                @click="toggleCategory(cat)"
-              >
-                <span
-                  class="catalogue-pill__dot"
-                  :style="{ background: getCategoryColor(cat) }"
-                ></span>
-                {{ cat }}
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-
-              <button
-                v-for="tag in selectedTags"
-                :key="`tag-${tag}`"
-                class="catalogue-pill"
-                @click="toggleTag(tag)"
-              >
-                {{ tag }}
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-
-              <button
-                v-if="inStockOnly"
-                class="catalogue-pill"
-                @click="inStockOnly = false"
-              >
-                En stock uniquement
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
             <button
-              class="catalogue-active-filters__clear"
-              @click="resetAll"
+              v-if="searchTerm"
+              class="catalogue-search__clear"
+              @click="searchTerm = ''"
             >
               <svg
                 width="14"
@@ -335,113 +151,288 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
+                <path d="M18 6L6 18M6 6l12 12" />
               </svg>
-              Tout effacer
             </button>
           </div>
 
-          <!-- Products Grid -->
-          <WrapperLoader
-            :loading="loading"
-            :has-loaded="hasLoaded"
-            :is-empty="hasLoaded && finalProducts.length === 0"
-            message="Chargement des peptides..."
-          >
-            <template #empty>
-              <div class="catalogue-empty">
-                <div class="catalogue-empty__icon">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <circle
-                      cx="11"
-                      cy="11"
-                      r="8"
-                    />
-                    <path d="M21 21l-4.35-4.35" />
-                  </svg>
-                </div>
-                <h3 class="catalogue-empty__title">Aucun peptide trouvé</h3>
-                <p class="catalogue-empty__text">
-                  Essayez de modifier vos filtres ou votre recherche
-                </p>
-                <button
-                  class="catalogue-empty__btn"
-                  @click="resetAll"
+          <!-- Results count - bien séparé -->
+          <div class="catalogue-toolbar__results">
+            <span class="catalogue-toolbar__count">{{ finalProducts.length }}</span>
+            <span class="catalogue-toolbar__label">
+              résultat{{ finalProducts.length > 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <!-- Right side controls -->
+          <div class="catalogue-toolbar__right">
+            <!-- Sort -->
+            <select
+              v-model="sortBy"
+              class="catalogue-toolbar__select"
+            >
+              <option
+                v-for="item in sortItems"
+                :value="item"
+              >
+                {{ item.label }}
+              </option>
+            </select>
+
+            <!-- View Mode Toggle -->
+            <div class="catalogue-toolbar__view">
+              <button
+                class="catalogue-toolbar__view-btn"
+                :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }"
+                @click="viewMode = 'grid'"
+                title="Vue grille"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
                 >
-                  Réinitialiser les filtres
-                </button>
-              </div>
-            </template>
-
-            <div
-              class="catalogue-grid"
-              :class="{ 'catalogue-grid--list': viewMode === 'list' }"
-            >
-              <ProductCart
-                v-for="product in paginatedProducts"
-                :key="product.id"
-                :product="product"
-                @view="viewProduct"
-                @add="addToCart"
-                @buy="handleBuyNow"
-              />
+                  <rect
+                    x="3"
+                    y="3"
+                    width="7"
+                    height="7"
+                    rx="1"
+                  />
+                  <rect
+                    x="14"
+                    y="3"
+                    width="7"
+                    height="7"
+                    rx="1"
+                  />
+                  <rect
+                    x="3"
+                    y="14"
+                    width="7"
+                    height="7"
+                    rx="1"
+                  />
+                  <rect
+                    x="14"
+                    y="14"
+                    width="7"
+                    height="7"
+                    rx="1"
+                  />
+                </svg>
+              </button>
+              <button
+                class="catalogue-toolbar__view-btn"
+                :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'list' }"
+                @click="viewMode = 'list'"
+                title="Vue liste"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                </svg>
+              </button>
             </div>
-          </WrapperLoader>
+          </div>
+        </div>
 
-          <!-- Pagination -->
-          <div
-            v-if="totalPages > 1"
-            class="catalogue-pagination"
-          >
+        <!-- Active Filters Pills -->
+        <div
+          v-if="hasActiveFilters"
+          class="catalogue-active-filters"
+        >
+          <div class="catalogue-active-filters__list">
+            <span class="catalogue-active-filters__label">Filtres:</span>
+
             <button
-              class="catalogue-pagination__btn"
-              :disabled="page === 1"
-              @click="page--"
+              v-for="cat in selectedCategories"
+              :key="`cat-${cat}`"
+              class="catalogue-pill"
+              @click="toggleCategory(cat)"
             >
+              <span
+                class="catalogue-pill__dot"
+                :style="{ background: getCategoryColor(cat) }"
+              ></span>
+              {{ cat }}
               <svg
-                width="18"
-                height="18"
+                width="12"
+                height="12"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="2.5"
               >
-                <path d="M15 18l-6-6 6-6" />
+                <path d="M18 6L6 18M6 6l12 12" />
               </svg>
-              Précédent
             </button>
 
-            <span class="catalogue-pagination__info">Page {{ page }} sur {{ totalPages }}</span>
-
             <button
-              class="catalogue-pagination__btn"
-              :disabled="page === totalPages"
-              @click="page++"
+              v-for="tag in selectedTags"
+              :key="`tag-${tag}`"
+              class="catalogue-pill"
+              @click="toggleTag(tag)"
             >
-              Suivant
+              {{ tag }}
               <svg
-                width="18"
-                height="18"
+                width="12"
+                height="12"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="2.5"
               >
-                <path d="M9 18l6-6-6-6" />
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+
+            <button
+              v-if="inStockOnly"
+              class="catalogue-pill"
+              @click="inStockOnly = false"
+            >
+              En stock uniquement
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
           </div>
-        </main>
-      </div>
-    </div>
+
+          <button
+            class="catalogue-active-filters__clear"
+            @click="resetAll"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            Tout effacer
+          </button>
+        </div>
+
+        <!-- Products Grid -->
+        <WrapperLoader
+          :loading="loading"
+          :has-loaded="hasLoaded"
+          :is-empty="hasLoaded && finalProducts.length === 0"
+          message="Chargement des peptides..."
+        >
+          <template #empty>
+            <div class="catalogue-empty">
+              <div class="catalogue-empty__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                  />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+              </div>
+              <h3 class="catalogue-empty__title">Aucun peptide trouvé</h3>
+              <p class="catalogue-empty__text">
+                Essayez de modifier vos filtres ou votre recherche
+              </p>
+              <button
+                class="catalogue-empty__btn"
+                @click="resetAll"
+              >
+                Réinitialiser les filtres
+              </button>
+            </div>
+          </template>
+
+          <div
+            class="catalogue-grid"
+            :class="{ 'catalogue-grid--list': viewMode === 'list' }"
+          >
+            <ProductCart
+              v-for="product in paginatedProducts"
+              :key="product.id"
+              :product="product"
+              @view="viewProduct"
+              @add="addToCart"
+              @buy="handleBuyNow"
+            />
+          </div>
+        </WrapperLoader>
+
+        <!-- Pagination -->
+        <div
+          v-if="totalPages > 1"
+          class="catalogue-pagination"
+        >
+          <button
+            class="catalogue-pagination__btn"
+            :disabled="page === 1"
+            @click="page--"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            Précédent
+          </button>
+
+          <span class="catalogue-pagination__info">Page {{ page }} sur {{ totalPages }}</span>
+
+          <button
+            class="catalogue-pagination__btn"
+            :disabled="page === totalPages"
+            @click="page++"
+          >
+            Suivant
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      </main>
+    </PageContent>
 
     <!-- Mobile Filter Modal -->
     <ModalComponent
@@ -494,6 +485,7 @@
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { Products } from '@/supabase/types/supabase.types'
@@ -851,7 +843,6 @@
   .catalogue-body {
     display: flex;
     gap: 24px;
-    margin-top: 24px;
   }
 
   // Sidebar

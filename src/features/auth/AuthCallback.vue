@@ -1,70 +1,49 @@
 <template>
-   
   <div class="callback-page">
-       
     <div
       v-if="state === 'loading'"
       class="status-block"
       v-motion-fade
     >
-           
       <BasicLoader
         size="large"
         color="primary"
       />
-           
       <h2 class="status-title">Connexion sécurisée 🔐</h2>
-           
       <p class="status-text">Fast Peptides vérifie vos accès...</p>
-         
     </div>
-
-       
     <div
       v-else-if="state === 'success'"
       class="status-block"
       v-motion-pop
     >
-           
       <BasicIconNext
         name="CheckCircle2"
         :size="64"
         color="success-600"
       />
-           
       <h2 class="status-title text-success">Connexion réussie !</h2>
-           
       <p class="status-text">{{ message }}</p>
-         
     </div>
-
-       
     <div
       v-else
       class="status-block"
       v-motion-fade
     >
-           
       <BasicIconNext
         name="AlertTriangle"
         :size="64"
         color="danger-600"
       />
-           
       <h2 class="status-title text-danger">Lien invalide</h2>
-           
       <p class="status-text error-msg">{{ errorMessage }}</p>
-
-           
       <BasicButton
         label="Retour à la connexion"
         color="primary"
         class="mt-4"
         @click="$router.push('/auth/login')"
       />
-         
     </div>
-     
   </div>
 </template>
 
@@ -76,7 +55,7 @@
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useAuthStore } from './stores/useAuthStore'
-  
+
   const route = useRoute()
   const router = useRouter()
   const auth = useAuthStore()
@@ -91,14 +70,16 @@
     if (code) {
       const { data } = await supabase.auth.getSession()
       if (data.session?.user) return handleSuccess(data.session.user)
-    } // 2️⃣ Cas Email Links (Signup / Reset Password) : token_hash + type
-    // Lit la valeur du jeton à partir de 'token_hash' (nouveau format) ou 'token' (ancien)
+    }
 
+    // 2️⃣ Cas Email Links (Signup / Reset Password) : token_hash + type
+    // Lit la valeur du jeton à partir de 'token_hash' (nouveau format) ou 'token' (ancien)
     const token = (route.query.token_hash as string) || (route.query.token as string)
     const type = route.query.type as any
 
     if (token && type) {
-      console.log(`Tentative de vérification OTP: ${token}, ${type}`) // Utilisation de verifyOtp (méthode Supabase attendue pour la vérification)
+      console.log(`Tentative de vérification OTP: ${token}, ${type}`)
+      // Utilisation de verifyOtp (méthode Supabase attendue pour la vérification)
       const { error } = await supabase.auth.verifyOtp({
         token_hash: token,
         type: type,
@@ -108,13 +89,17 @@
         // Si le jeton est mauvais maintenant, c'est qu'il est expiré.
         fail(type === 'recovery' ? 'Ce lien a expiré.' : 'Lien de validation invalide.')
         return
-      } // Session active après verifyOtp
+      }
+      // Session active après verifyOtp
       const { data } = await supabase.auth.getSession()
       if (data.session?.user) return handleSuccess(data.session.user)
-    } // 3️⃣ Cas Fallback : Déjà connecté ?
-    const { data } = await supabase.auth.getSession()
-    if (data.session?.user) return handleSuccess(data.session.user) // ❌ Échec
+    }
 
+    // 3️⃣ Cas Fallback : Déjà connecté ?
+    const { data } = await supabase.auth.getSession()
+    if (data.session?.user) return handleSuccess(data.session.user)
+
+    // ❌ Échec
     fail('Aucune session trouvée. Veuillez vous reconnecter.')
   })
 
@@ -122,8 +107,9 @@
     auth.user = user
     auth.fetchProfile().then(() => {
       state.value = 'success'
-      message.value = `Bienvenue ${user.email}` // Redirection intelligente
+      message.value = `Bienvenue ${user.email}`
 
+      // Redirection intelligente
       const redirectUrl =
         sessionStorage.getItem('redirectAfterOAuth') || (auth.isAdmin ? '/admin' : '/profil')
       sessionStorage.removeItem('redirectAfterOAuth')

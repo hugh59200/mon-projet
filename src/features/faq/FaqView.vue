@@ -1,69 +1,26 @@
 <template>
   <div class="faq">
-    <!-- Background -->
-    <div class="faq__bg">
-      <div class="faq__bg-gradient"></div>
-      <div class="faq__bg-pattern"></div>
-      <div class="faq__bg-orb faq__bg-orb--1"></div>
-      <div class="faq__bg-orb faq__bg-orb--2"></div>
-    </div>
-
-    <div class="faq__container">
-      <!-- Header -->
-      <header class="faq__header">
-        <div class="faq__header-badge">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-            />
-            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-            <line
-              x1="12"
-              y1="17"
-              x2="12.01"
-              y2="17"
-            />
-          </svg>
-          <span>Centre d'aide</span>
+    <!-- Header via PageHeader -->
+    <PageHeader>
+      <template #stats>
+        <div class="stat">
+          <span class="stat__value">{{ faqs.length }}</span>
+          <span class="stat__label">Questions</span>
         </div>
-
-        <h1 class="faq__title">
-          Questions
-          <span class="faq__title-highlight">Fréquentes</span>
-        </h1>
-
-        <p class="faq__subtitle">
-          Trouvez rapidement des réponses à vos questions sur nos produits et services
-        </p>
-
-        <!-- Quick Stats -->
-        <div class="faq__stats">
-          <div class="faq__stat">
-            <span class="faq__stat-value">{{ faqs.length }}</span>
-            <span class="faq__stat-label">Questions</span>
-          </div>
-          <div class="faq__stat-divider"></div>
-          <div class="faq__stat">
-            <span class="faq__stat-value">{{ categories.length }}</span>
-            <span class="faq__stat-label">Catégories</span>
-          </div>
-          <div class="faq__stat-divider"></div>
-          <div class="faq__stat">
-            <span class="faq__stat-value">24h</span>
-            <span class="faq__stat-label">Support</span>
-          </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat__value">{{ categories.length }}</span>
+          <span class="stat__label">Catégories</span>
         </div>
-      </header>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat__value">24h</span>
+          <span class="stat__label">Support</span>
+        </div>
+      </template>
+    </PageHeader>
 
+    <PageContent size="lg" :no-padding-top="true">
       <!-- Main Layout -->
       <div class="faq__layout">
         <!-- Sidebar -->
@@ -532,10 +489,12 @@
           </div>
         </div>
       </footer>
-    </div>
+    </PageContent>
   </div>
 </template>
 <script setup lang="ts">
+  import PageContent from '@/features/shared/components/PageContent.vue'
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
   // ============================================
@@ -983,176 +942,6 @@
   .faq {
     position: relative;
     min-height: 100vh;
-    padding: 40px 24px 80px;
-
-    // ============================================
-    // BACKGROUND
-    // ============================================
-    &__bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    &__bg-gradient {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        160deg,
-        @neutral-50 0%,
-        white 50%,
-        rgba(var(--primary-500-rgb), 0.03) 100%
-      );
-    }
-
-    &__bg-pattern {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px);
-      background-size: 32px 32px;
-      mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
-    }
-
-    &__bg-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-
-      &--1 {
-        top: 5%;
-        right: 15%;
-        width: 400px;
-        height: 400px;
-        background: rgba(var(--primary-400-rgb), 0.1);
-      }
-
-      &--2 {
-        bottom: 30%;
-        left: 5%;
-        width: 300px;
-        height: 300px;
-        background: rgba(var(--primary-300-rgb), 0.08);
-      }
-    }
-
-    // ============================================
-    // CONTAINER
-    // ============================================
-    &__container {
-      position: relative;
-      z-index: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
-    }
-
-    // ============================================
-    // HEADER
-    // ============================================
-    &__header {
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    &__header-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-500-rgb), 0.1) 0%,
-        rgba(var(--primary-500-rgb), 0.05) 100%
-      );
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
-      border-radius: 50px;
-      margin-bottom: 20px;
-
-      svg {
-        color: var(--primary-600);
-      }
-
-      span {
-        font-family: @font-body;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--primary-700);
-      }
-    }
-
-    &__title {
-      font-family: @font-display;
-      font-size: 48px;
-      font-weight: 700;
-      color: @neutral-900;
-      margin: 0 0 16px;
-      line-height: 1.1;
-    }
-
-    &__title-highlight {
-      background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    &__subtitle {
-      font-family: @font-body;
-      font-size: 18px;
-      color: @neutral-500;
-      margin: 0 0 32px;
-      line-height: 1.6;
-    }
-
-    // ============================================
-    // STATS
-    // ============================================
-    &__stats {
-      display: inline-flex;
-      align-items: center;
-      gap: 24px;
-      padding: 16px 32px;
-      background: white;
-      border-radius: 16px;
-      box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
-    }
-
-    &__stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    &__stat-value {
-      font-family: @font-display;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary-600);
-    }
-
-    &__stat-label {
-      font-family: @font-body;
-      font-size: 12px;
-      font-weight: 500;
-      color: @neutral-500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    &__stat-divider {
-      width: 1px;
-      height: 32px;
-      background: @neutral-200;
-    }
 
     // ============================================
     // LAYOUT
@@ -1965,10 +1754,6 @@
 
     @media (max-width: 768px) {
       padding: 24px 16px 60px;
-
-      &__container {
-        gap: 32px;
-      }
 
       &__title {
         font-size: 36px;

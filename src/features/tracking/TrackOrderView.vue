@@ -1,32 +1,13 @@
 <template>
   <div class="track">
-    <!-- Background Premium -->
-    <div class="track__bg">
-      <div class="track__bg-gradient"></div>
-      <div class="track__bg-pattern"></div>
-      <div class="track__bg-orb track__bg-orb--1"></div>
-      <div class="track__bg-orb track__bg-orb--2"></div>
-      <div class="track__bg-orb track__bg-orb--3"></div>
-    </div>
+    <!-- Header via PageHeader -->
+    <PageHeader
+      variant="premium"
+      theme="dark"
+      :compact="!!order || loading"
+    />
 
-    <div class="track__container">
-      <!-- Header -->
-      <header class="track__header" :class="{ 'track__header--compact': !!order || loading }">
-        <div class="track__header-badge">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 8V21H3V8"/>
-            <path d="M1 3H23V8H1V3Z"/>
-            <path d="M10 12H14"/>
-          </svg>
-          <span>Suivi de commande</span>
-        </div>
-        <h1 class="track__title">
-          Suivez votre <span class="track__title-highlight">livraison</span>
-        </h1>
-        <p v-if="!order && !loading" class="track__subtitle">
-          Consultez l'état d'avancement de votre colis en temps réel
-        </p>
-      </header>
+    <PageContent size="xl" >
 
       <!-- Error Toast -->
       <transition name="slide-down">
@@ -620,12 +601,14 @@
           </aside>
         </div>
       </div>
-    </div>
+    </PageContent>
   </div>
 </template>
 <script setup lang="ts">
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import PageContent from '@/features/shared/components/PageContent.vue'
+import PageHeader from '@/features/shared/components/PageHeader.vue'
 import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/api/supabase/orders'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
@@ -902,162 +885,6 @@ onMounted(async () => {
   position: relative;
   min-height: 100vh;
   padding-bottom: 80px;
-
-  // ===========================
-  // BACKGROUND PREMIUM
-  // ===========================
-  &__bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  &__bg-gradient {
-    position: absolute;
-    inset: 0;
-  }
-
-  &__bg-pattern {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(
-      rgba(var(--primary-500-rgb), 0.04) 1px,
-      transparent 1px
-    );
-    background-size: 32px 32px;
-    mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
-  }
-
-  &__bg-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.6;
-
-    &--1 {
-      top: -5%;
-      right: 15%;
-      width: 500px;
-      height: 500px;
-      background: rgba(var(--primary-400-rgb), 0.12);
-      animation: float-orb 25s ease-in-out infinite;
-    }
-
-    &--2 {
-      bottom: 20%;
-      left: -5%;
-      width: 400px;
-      height: 400px;
-      background: rgba(var(--primary-300-rgb), 0.08);
-      animation: float-orb 30s ease-in-out infinite reverse;
-    }
-
-    &--3 {
-      top: 40%;
-      right: -10%;
-      width: 300px;
-      height: 300px;
-      background: rgba(var(--primary-500-rgb), 0.06);
-      animation: float-orb 20s ease-in-out infinite 5s;
-    }
-  }
-
-  @keyframes float-orb {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -30px) scale(1.05); }
-    66% { transform: translate(-20px, 20px) scale(0.95); }
-  }
-
-  // ===========================
-  // CONTAINER - PLUS LARGE
-  // ===========================
-  &__container {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 48px 32px;
-  }
-
-  // ===========================
-  // HEADER
-  // ===========================
-  &__header {
-    text-align: center;
-    margin-bottom: 48px;
-    transition: all 0.4s @ease;
-
-    &--compact {
-      margin-bottom: 32px;
-
-      .track__header-badge {
-        margin-bottom: 12px;
-      }
-
-      .track__title {
-        font-size: 32px;
-      }
-
-      .track__subtitle {
-        display: none;
-      }
-    }
-  }
-
-  &__header-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--primary-500-rgb), 0.1) 0%,
-      rgba(var(--primary-500-rgb), 0.05) 100%
-    );
-    border: 1px solid rgba(var(--primary-500-rgb), 0.15);
-    border-radius: 50px;
-    margin-bottom: 20px;
-
-    svg {
-      color: var(--primary-600);
-    }
-
-    span {
-      font-family: @font-body;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--primary-700);
-      letter-spacing: 0.02em;
-    }
-  }
-
-  &__title {
-    font-family: @font-display;
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 700;
-    color: @neutral-900;
-    line-height: 1.15;
-    margin: 0 0 16px;
-    transition: font-size 0.4s @ease;
-  }
-
-  &__title-highlight {
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  &__subtitle {
-    font-family: @font-body;
-    font-size: 18px;
-    color: @neutral-500;
-    margin: 0;
-    max-width: 480px;
-    margin: 0 auto;
-  }
 
   // ===========================
   // ERROR TOAST
@@ -2601,10 +2428,6 @@ onMounted(async () => {
   }
 
   @media (max-width: 960px) {
-    &__container {
-      padding: 32px 24px;
-    }
-
     &__search-layout {
       grid-template-columns: 1fr;
       max-width: 560px;
@@ -2627,10 +2450,6 @@ onMounted(async () => {
   }
 
   @media (max-width: 768px) {
-    &__container {
-      padding: 24px 16px;
-    }
-
     &__header {
       margin-bottom: 36px;
     }

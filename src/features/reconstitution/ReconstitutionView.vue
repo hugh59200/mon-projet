@@ -1,42 +1,9 @@
 <template>
   <div class="recon">
-    <!-- Background -->
-    <div class="recon__bg">
-      <div class="recon__bg-gradient"></div>
-      <div class="recon__bg-pattern"></div>
-      <div class="recon__bg-orb recon__bg-orb--1"></div>
-      <div class="recon__bg-orb recon__bg-orb--2"></div>
-    </div>
+    <!-- Header via PageHeader -->
+    <PageHeader />
 
-    <div class="recon__container">
-      <!-- Header -->
-      <header class="recon__header">
-        <div class="recon__header-badge">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-            />
-          </svg>
-          <span>Outil de laboratoire</span>
-        </div>
-
-        <h1 class="recon__title">
-          Calculateur de
-          <span class="recon__title-highlight">Reconstitution</span>
-        </h1>
-
-        <p class="recon__subtitle">
-          Calculez précisément le volume à prélever pour vos protocoles de recherche
-        </p>
-      </header>
-
+    <PageContent size="lg">
       <!-- Calculator Section -->
       <section class="recon__calculator">
         <div class="recon__calc-card">
@@ -489,10 +456,12 @@
           <span>Guide complet</span>
         </div>
       </footer>
-    </div>
+    </PageContent>
   </div>
 </template>
 <script setup lang="ts">
+  import PageContent from '@/features/shared/components/PageContent.vue'
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, h, ref } from 'vue'
 
   // ============================================
@@ -669,131 +638,6 @@
   .recon {
     position: relative;
     min-height: 100vh;
-    padding: 40px 24px 80px;
-
-    // ============================================
-    // BACKGROUND
-    // ============================================
-    &__bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    &__bg-gradient {
-      position: absolute;
-      inset: 0;
-      // background: linear-gradient(
-      //   160deg,
-      //   @neutral-50 0%,
-      //   white 50%,
-      //   rgba(var(--primary-500-rgb), 0.03) 100%
-      // );
-    }
-
-    &__bg-pattern {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px);
-      background-size: 32px 32px;
-      mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
-    }
-
-    &__bg-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-
-      &--1 {
-        top: 10%;
-        right: 10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(var(--primary-400-rgb), 0.12);
-      }
-
-      &--2 {
-        bottom: 20%;
-        left: 5%;
-        width: 300px;
-        height: 300px;
-        background: rgba(var(--primary-300-rgb), 0.08);
-      }
-    }
-
-    // ============================================
-    // CONTAINER
-    // ============================================
-    &__container {
-      position: relative;
-      z-index: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 60px;
-    }
-
-    // ============================================
-    // HEADER
-    // ============================================
-    &__header {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    &__header-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-500-rgb), 0.1) 0%,
-        rgba(var(--primary-500-rgb), 0.05) 100%
-      );
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
-      border-radius: 50px;
-      margin-bottom: 20px;
-
-      svg {
-        color: var(--primary-600);
-      }
-
-      span {
-        font-family: @font-body;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--primary-700);
-      }
-    }
-
-    &__title {
-      font-family: @font-display;
-      font-size: 42px;
-      font-weight: 700;
-      color: @neutral-900;
-      margin: 0 0 16px;
-      line-height: 1.1;
-    }
-
-    &__title-highlight {
-      background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    &__subtitle {
-      font-family: @font-body;
-      font-size: 18px;
-      color: @neutral-500;
-      margin: 0;
-      line-height: 1.6;
-    }
 
     // ============================================
     // CALCULATOR CARD
@@ -1560,10 +1404,6 @@
 
     @media (max-width: 768px) {
       padding: 24px 16px 60px;
-
-      &__container {
-        gap: 40px;
-      }
 
       &__title {
         font-size: 32px;

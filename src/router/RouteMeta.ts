@@ -22,7 +22,10 @@ declare module 'vue-router' {
     icon?: IconNameNext
     order?: number
     title?: string
+    heading?: string
     description?: string
+    badge?: string
+    headerIcon?: IconNameNext
     getTitle?: (route: RouteLocationNormalizedLoaded) => string
     getDescription?: (route: RouteLocationNormalizedLoaded) => string
   }
