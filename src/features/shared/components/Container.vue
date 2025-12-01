@@ -27,9 +27,9 @@
   .container {
     position: relative;
     width: 100%;
-    max-width: 100%; // Empêche le débordement
+    max-width: 100%;
     margin: 0 auto;
-    overflow: hidden; // Évite le scroll horizontal
+    box-sizing: border-box;
 
     // ========================================
     // SIZES (max-width)
@@ -62,27 +62,35 @@
     }
 
     &--padding-sm {
-      padding: 16px 16px 40px;
+      padding: 16px;
 
       @media (max-width: 768px) {
-        padding: 12px 12px 32px;
+        padding: 12px;
       }
     }
 
     &--padding-md {
-      padding: 24px 24px 60px;
+      padding: 24px;
 
       @media (max-width: 768px) {
-        padding: 16px 16px 48px;
+        padding: 16px;
       }
     }
 
     &--padding-lg {
-      padding: 32px 24px 80px;
+      padding: 32px;
 
       @media (max-width: 768px) {
-        padding: 24px 16px 60px;
+        padding: 24px;
       }
+    }
+
+    // ========================================
+    // Empêcher les enfants de déborder
+    // ========================================
+    > * {
+      max-width: 100%;
+      min-width: 0;
     }
   }
 </style>

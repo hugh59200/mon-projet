@@ -31,7 +31,7 @@
               </div>
 
               <p class="payment-overlay__brand-subtitle">
-                Paiement sécurisé et vérifié par Stripe 🔒
+                {{ t('checkout.wrapper.securePayment') }}
               </p>
 
               <div class="payment-overlay__brand-illustration">
@@ -65,6 +65,9 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const visible = ref(true)
 

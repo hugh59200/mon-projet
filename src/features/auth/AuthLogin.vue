@@ -1,14 +1,14 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">Bon retour</h1>
+    <h1 class="auth__title">{{ t('auth.login.welcome') }}</h1>
     <p class="auth__subtitle">
-      Connectez-vous pour accéder à votre espace et poursuivre vos recherches.
+      {{ t('auth.login.subtitle') }}
     </p>
 
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
-        label="Email professionnel"
+        :label="t('auth.login.email')"
         placeholder="nom@entreprise.com"
         inputmode="email"
         iconName="Mail"
@@ -21,7 +21,7 @@
 
       <WrapperInputPassword
         v-model="password"
-        label="Mot de passe"
+        :label="t('auth.login.password')"
         placeholder="••••••••"
         required
         :alertLabel="errors.password"
@@ -37,7 +37,7 @@
       />
 
       <BasicButton
-        label="Se connecter"
+        :label="t('auth.login.submit')"
         variant="filled"
         size="large"
         :disabled="loading || !captchaToken"
@@ -62,7 +62,7 @@
         </transition>
       </div>
 
-      <div class="auth__divider"><span>ou</span></div>
+      <div class="auth__divider"><span>{{ t('common.or') }}</span></div>
 
       <div class="auth__providers">
         <BasicSocialButton
@@ -82,10 +82,10 @@
 
     <div class="auth__links">
       <span>
-        Pas encore de compte ?
-        <RouterLink to="/auth/register">Créer un compte</RouterLink>
+        {{ t('auth.login.noAccount') }}
+        <RouterLink to="/auth/register">{{ t('auth.login.createAccount') }}</RouterLink>
       </span>
-      <RouterLink to="/auth/reset-password">Mot de passe oublié ?</RouterLink>
+      <RouterLink to="/auth/reset-password">{{ t('auth.login.forgotPassword') }}</RouterLink>
     </div>
   </div>
 </template>
@@ -93,10 +93,12 @@
 <script setup lang="ts">
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import BasicSocialButton from './BasicSocialButton.vue'
   import { useForm } from './composables/useForm'
   import { useAuthStore } from './stores/useAuthStore'
 
+  const { t } = useI18n()
   const auth = useAuthStore()
   const { email, password, errors, touched, validate, validateField } = useForm(true, 'weak')
 
@@ -127,7 +129,7 @@
 
     // 2. Sécurité Bot
     if (!captchaToken.value) {
-      error.value = 'Veuillez valider la sécurité.'
+      error.value = t('auth.errors.captchaRequired')
       return
     }
 
@@ -139,7 +141,7 @@
     loading.value = false
 
     if (!success) {
-      error.value = auth.error ?? 'Email ou mot de passe incorrect.'
+      error.value = auth.error ?? t('auth.errors.invalidCredentials')
 
       // ⚠️ IMPORTANT : Si le login échoue, le token est brûlé.
       // Il faut forcer le widget à se recharger pour obtenir un nouveau token.

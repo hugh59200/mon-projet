@@ -1,5 +1,6 @@
 import directives from '@/directives'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import i18n from '@/i18n'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
 import { RegistrationDSComponents } from '@/plugin/registration'
 import { MotionPlugin } from '@vueuse/motion'
@@ -15,6 +16,7 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+app.use(i18n)
 app.use(MotionPlugin)
 app.use(RegistrationDSComponents)
 app.use(deviceBreakpointPlugin)

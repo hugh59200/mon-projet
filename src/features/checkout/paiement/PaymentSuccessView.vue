@@ -31,7 +31,7 @@
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Boutique
+            {{ t('checkout.success.shop') }}
           </button>
 
           <div class="success__status-main">
@@ -85,14 +85,14 @@
             <!-- Title & Subtitle -->
             <div class="success__status-text">
               <h1 class="success__title">
-                {{ isError ? 'Erreur' : 'Paiement confirmé !' }}
+                {{ isError ? t('checkout.success.error') : t('checkout.success.title') }}
               </h1>
               <p
                 v-if="isLoading"
                 class="success__subtitle"
               >
                 <span class="success__loading-dots">
-                  Finalisation
+                  {{ t('checkout.success.finalizing') }}
                   <span>.</span>
                   <span>.</span>
                   <span>.</span>
@@ -102,7 +102,7 @@
                 v-else
                 class="success__subtitle"
               >
-                {{ isError ? 'Vérification nécessaire' : 'Votre commande a bien été enregistrée' }}
+                {{ isError ? t('checkout.success.verificationRequired') : t('checkout.success.orderRegistered') }}
               </p>
             </div>
           </div>
@@ -143,7 +143,7 @@
                 >
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
-                <span>Sécurisé</span>
+                <span>{{ t('checkout.success.secure') }}</span>
               </div>
               <div class="success__trust-item">
                 <svg
@@ -163,7 +163,7 @@
                   />
                   <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
                 </svg>
-                <span>Rapide</span>
+                <span>{{ t('checkout.success.fast') }}</span>
               </div>
             </div>
           </div>
@@ -247,8 +247,8 @@
                   />
                 </svg>
                 <div>
-                  <h3>Créer mon compte</h3>
-                  <p>Suivez vos commandes facilement</p>
+                  <h3>{{ t('checkout.success.createAccount') }}</h3>
+                  <p>{{ t('checkout.success.trackOrders') }}</p>
                 </div>
               </div>
 
@@ -259,7 +259,7 @@
                 <!-- Email (readonly) -->
                 <div class="success__form-row">
                   <div class="success__form-group success__form-group--readonly">
-                    <label class="success__label">Email</label>
+                    <label class="success__label">{{ t('checkout.success.email') }}</label>
                     <div class="success__input-readonly">
                       <span>{{ orderEmail }}</span>
                       <svg
@@ -277,12 +277,12 @@
                   </div>
 
                   <div class="success__form-group">
-                    <label class="success__label">Mot de passe</label>
+                    <label class="success__label">{{ t('checkout.success.password') }}</label>
                     <input
                       v-model="password"
                       type="password"
                       class="success__input"
-                      placeholder="Min. 6 caractères"
+                      :placeholder="t('checkout.success.minChars')"
                       required
                     />
                   </div>
@@ -309,7 +309,7 @@
                       >
                         <polyline points="17 11 19 13 23 9" />
                       </svg>
-                      Activer
+                      {{ t('checkout.success.activate') }}
                     </template>
                   </button>
 
@@ -334,7 +334,7 @@
                         r="3"
                       />
                     </svg>
-                    Suivre
+                    {{ t('checkout.success.track') }}
                   </button>
                 </div>
               </form>
@@ -352,7 +352,7 @@
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Historique
+                  {{ t('checkout.success.history') }}
                 </div>
                 <div class="success__benefit">
                   <svg
@@ -365,7 +365,7 @@
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Suivi temps réel
+                  {{ t('checkout.success.realTimeTracking') }}
                 </div>
                 <div class="success__benefit">
                   <svg
@@ -378,7 +378,7 @@
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Offres exclusives
+                  {{ t('checkout.success.exclusiveOffers') }}
                 </div>
               </div>
             </div>
@@ -403,8 +403,8 @@
                   <path d="M10 12H14" />
                 </svg>
               </div>
-              <h3>Commande enregistrée</h3>
-              <p>Retrouvez-la dans votre espace</p>
+              <h3>{{ t('checkout.success.orderSaved') }}</h3>
+              <p>{{ t('checkout.success.findInSpace') }}</p>
               <button
                 class="success__btn success__btn--primary"
                 @click="$router.push(`/profil/commandes/${currentOrderId}`)"
@@ -424,7 +424,7 @@
                     r="3"
                   />
                 </svg>
-                Voir ma commande
+                {{ t('checkout.success.viewOrder') }}
               </button>
             </div>
 
@@ -434,7 +434,7 @@
               key="error"
               class="success__error"
             >
-              <p>Un problème est survenu. Notre équipe a été notifiée.</p>
+              <p>{{ t('checkout.success.problemOccurred') }}</p>
               <div class="success__error-contact">
                 <svg
                   width="16"
@@ -465,7 +465,10 @@
   import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
+
+  const { t } = useI18n()
 
   const route = useRoute()
   const router = useRouter()
@@ -511,7 +514,7 @@
     } catch (error) {
       console.error('Erreur finalisation:', error)
       isError.value = true
-      toast.show('Problème lors de la confirmation.', 'danger')
+      toast.show(t('checkout.success.confirmationProblem'), 'danger')
     } finally {
       isLoading.value = false
     }
@@ -589,13 +592,13 @@
         email: orderEmail.value,
         password: password.value,
         options: {
-          data: { full_name: 'Nouveau Membre' },
+          data: { full_name: t('checkout.success.newMember') },
           emailRedirectTo: activationRedirectUrl,
         },
       })
 
       if (authError) throw authError
-      if (!authData.user) throw new Error('Erreur lors de la création du compte')
+      if (!authData.user) throw new Error(t('checkout.success.accountCreationError'))
 
       const { error: rpcError } = await supabase.rpc('claim_order_for_user', {
         p_order_id: currentOrderId.value,
@@ -603,14 +606,14 @@
       })
 
       if (rpcError) {
-        throw new Error('Impossible de lier la commande. Veuillez contacter le support.')
+        throw new Error(t('checkout.success.linkOrderError'))
       }
 
-      toast.show('📧 Un email de confirmation vous a été envoyé !', 'success')
+      toast.show(t('checkout.success.confirmationEmailSent'), 'success')
       router.push('/auth/email-sent')
     } catch (err: any) {
       console.error('Erreur conversion:', err)
-      toast.show(err.message || 'Erreur lors de la conversion', 'danger')
+      toast.show(err.message || t('checkout.success.conversionError'), 'danger')
     } finally {
       isConverting.value = false
     }
@@ -619,7 +622,7 @@
   // Guest Tracking Navigation
   function goToGuestTracking() {
     if (!trackingToken.value) {
-      toast.show('Token de suivi introuvable', 'danger')
+      toast.show(t('checkout.success.trackingTokenNotFound'), 'danger')
       return
     }
     router.push(`/suivi-commande?token=${trackingToken.value}`)

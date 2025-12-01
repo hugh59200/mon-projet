@@ -3,14 +3,25 @@ import router from '@/router'
 import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export const useSidebarStore = defineStore('sidebar', () => {
+  const { t } = useI18n()
   const isReduced = ref(false)
   const toggle = () => (isReduced.value = !isReduced.value)
   const auth = useAuthStore()
 
   const allowedSidebarNames = ['home', 'catalogue', 'reconstitution', 'actualites', 'faq']
-  
+
+  // Map route names to i18n keys
+  const labelKeys: Record<string, string> = {
+    home: 'nav.home',
+    catalogue: 'nav.catalogue',
+    reconstitution: 'reconstitution.title',
+    actualites: 'nav.news',
+    faq: 'nav.faq',
+  }
+
   const sidebarItems = computed(() => {
     return router
       .getRoutes()
@@ -22,12 +33,16 @@ export const useSidebarStore = defineStore('sidebar', () => {
         return true
       })
       .sort((a, b) => (a.meta.order || 0) - (b.meta.order || 0))
-      .map((route) => ({
-        name: route.name!,
-        path: route.path,
-        label: route.meta.label as string,
-        icon: route.meta.icon as IconNameNext,
-      }))
+      .map((route) => {
+        const routeName = route.name as string
+        const labelKey = labelKeys[routeName]
+        return {
+          name: route.name!,
+          path: route.path,
+          label: labelKey ? t(labelKey) : (route.meta.label as string),
+          icon: route.meta.icon as IconNameNext,
+        }
+      })
   })
 
   return { isReduced, toggle, sidebarItems }

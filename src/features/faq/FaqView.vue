@@ -5,12 +5,12 @@
       <template #stats>
         <div class="stat">
           <span class="stat__value">{{ faqs.length }}</span>
-          <span class="stat__label">Questions</span>
+          <span class="stat__label">{{ t('faq.title') }}</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <span class="stat__value">{{ categories.length }}</span>
-          <span class="stat__label">Catégories</span>
+          <span class="stat__label">{{ t('faq.categories.all') }}</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
@@ -49,7 +49,7 @@
                 v-model="search"
                 type="text"
                 class="faq__search-input"
-                placeholder="Rechercher une question..."
+                :placeholder="t('faq.searchPlaceholder')"
                 @input="onSearch"
               />
               <button
@@ -83,7 +83,7 @@
 
             <!-- Categories -->
             <div class="faq__categories">
-              <span class="faq__categories-title">Catégories</span>
+              <span class="faq__categories-title">{{ t('faq.categories.all') }}</span>
 
               <button
                 class="faq__category"
@@ -125,7 +125,7 @@
                     />
                   </svg>
                 </div>
-                <span class="faq__category-label">Toutes les catégories</span>
+                <span class="faq__category-label">{{ t('faq.categories.all') }}</span>
                 <span class="faq__category-count">{{ faqs.length }}</span>
               </button>
 
@@ -161,7 +161,7 @@
                 <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
               </svg>
-              Réinitialiser les filtres
+              {{ t('catalogue.filters.resetAll') }}
             </button>
           </div>
 
@@ -179,8 +179,8 @@
                 <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
               </svg>
             </div>
-            <h3 class="faq__help-title">Besoin d'aide ?</h3>
-            <p class="faq__help-text">Notre équipe répond sous 24h</p>
+            <h3 class="faq__help-title">{{ t('faq.needHelp') }}</h3>
+            <p class="faq__help-text">{{ t('faq.responseTime') }}</p>
             <RouterLink
               to="/profil"
               class="faq__help-btn"
@@ -198,7 +198,7 @@
                 />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              Contacter le support
+              {{ t('faq.contactSupport') }}
             </RouterLink>
           </div>
         </aside>
@@ -231,7 +231,7 @@
               <strong>{{ search }}</strong>
               "
             </span>
-            <button @click="search = ''">Effacer</button>
+            <button @click="search = ''">{{ t('faq.reset') }}</button>
           </div>
 
           <!-- Empty State -->
@@ -257,8 +257,8 @@
                 <path d="M8 8l6 6M14 8l-6 6" />
               </svg>
             </div>
-            <h3 class="faq__empty-title">Aucun résultat trouvé</h3>
-            <p class="faq__empty-text">Essayez avec d'autres termes ou parcourez les catégories</p>
+            <h3 class="faq__empty-title">{{ t('faq.noResults') }}</h3>
+            <p class="faq__empty-text">{{ t('faq.noResultsText') }}</p>
             <button
               class="faq__empty-btn"
               @click="resetSearch"
@@ -274,7 +274,7 @@
                 <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
               </svg>
-              Réinitialiser
+              {{ t('faq.reset') }}
             </button>
           </div>
 
@@ -416,8 +416,8 @@
             </svg>
           </div>
           <div class="faq__footer-text">
-            <h3>Vous n'avez pas trouvé votre réponse ?</h3>
-            <p>Notre équipe support est disponible pour répondre à toutes vos questions</p>
+            <h3>{{ t('faq.needHelp') }}</h3>
+            <p>{{ t('faq.responseTime') }}</p>
           </div>
           <RouterLink
             to="/profil"
@@ -436,7 +436,7 @@
               />
               <polyline points="22,6 12,13 2,6" />
             </svg>
-            Contacter le support
+            {{ t('faq.contactSupport') }}
           </RouterLink>
         </div>
 
@@ -458,7 +458,7 @@
               />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <span>Réponse sous 24h</span>
+            <span>{{ t('faq.responseTime') }}</span>
           </div>
           <div class="faq__trust-item">
             <svg
@@ -471,7 +471,7 @@
             >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            <span>Support expert</span>
+            <span>{{ t('product.trustBadges.support') }}</span>
           </div>
           <div class="faq__trust-item">
             <svg
@@ -485,7 +485,7 @@
               <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
-            <span>Satisfaction garantie</span>
+            <span>{{ t('checkout.payment.satisfaction') }}</span>
           </div>
         </div>
       </footer>
@@ -496,6 +496,9 @@
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // ============================================
   // TYPES
@@ -1205,7 +1208,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      width: 100%;
+      width: auto;
       padding: 14px 20px;
       background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
       border-radius: 12px;
@@ -1720,19 +1723,16 @@
 
       &__sidebar {
         position: static;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column; // ← Garder en colonne
         gap: 16px;
       }
 
       &__sidebar-card {
-        flex: 1;
-        min-width: 280px;
+        width: auto;
       }
 
       &__help-card {
-        flex: 1;
-        min-width: 280px;
+        width: auto;
       }
 
       &__footer-content {
@@ -1753,8 +1753,6 @@
     }
 
     @media (max-width: 768px) {
-      padding: 24px 16px 60px;
-
       &__title {
         font-size: 36px;
       }
@@ -1776,11 +1774,6 @@
 
       &__sidebar {
         flex-direction: column;
-      }
-
-      &__sidebar-card,
-      &__help-card {
-        min-width: 100%;
       }
 
       &__categories {
@@ -1865,7 +1858,6 @@
       }
 
       &__footer-btn {
-        width: 100%;
         justify-content: center;
       }
 

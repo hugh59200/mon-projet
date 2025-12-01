@@ -23,7 +23,7 @@
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          <span>Continuer mes achats</span>
+          <span>{{ t('cart.continueShopping') }}</span>
         </button>
 
         <div class="checkout__secure-badge">
@@ -38,7 +38,7 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             <path d="M9 12l2 2 4-4" />
           </svg>
-          <span>Paiement sécurisé</span>
+          <span>{{ t('checkout.payment.securePayment') }}</span>
         </div>
       </header>
 
@@ -65,7 +65,7 @@
             </svg>
             <span v-else>1</span>
           </div>
-          <span class="checkout__step-label">Panier</span>
+          <span class="checkout__step-label">{{ t('checkout.steps.cart') }}</span>
         </div>
         <div
           class="checkout__step-line"
@@ -92,7 +92,7 @@
             </svg>
             <span v-else>2</span>
           </div>
-          <span class="checkout__step-label">Livraison</span>
+          <span class="checkout__step-label">{{ t('checkout.steps.shipping') }}</span>
         </div>
         <div
           class="checkout__step-line"
@@ -103,7 +103,7 @@
           :class="{ 'checkout__step--active': currentStep >= 3 }"
         >
           <div class="checkout__step-number">3</div>
-          <span class="checkout__step-label">Paiement</span>
+          <span class="checkout__step-label">{{ t('checkout.steps.payment') }}</span>
         </div>
       </div>
 
@@ -137,9 +137,9 @@
                 </svg>
               </div>
               <div>
-                <h2 class="checkout__section-title">Votre panier</h2>
+                <h2 class="checkout__section-title">{{ t('cart.title') }}</h2>
                 <p class="checkout__section-subtitle">
-                  {{ cart.items.length }} article{{ cart.items.length > 1 ? 's' : '' }}
+                  {{ cart.items.length }} {{ cart.items.length > 1 ? t('cart.items') : t('cart.item') }}
                 </p>
               </div>
             </div>
@@ -276,13 +276,13 @@
                     <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
                   </svg>
                 </div>
-                <h3>Votre panier est vide</h3>
-                <p>Découvrez notre catalogue de peptides de recherche</p>
+                <h3>{{ t('cart.empty') }}</h3>
+                <p>{{ t('cart.emptyText') }}</p>
                 <button
                   class="checkout__empty-btn"
                   @click="$router.push('/catalogue')"
                 >
-                  Explorer le catalogue
+                  {{ t('catalogue.title') }}
                 </button>
               </div>
             </div>
@@ -320,8 +320,8 @@
                 </svg>
               </div>
               <div>
-                <h2 class="checkout__section-title">Livraison</h2>
-                <p class="checkout__section-subtitle">Où souhaitez-vous être livré ?</p>
+                <h2 class="checkout__section-title">{{ t('checkout.steps.shipping') }}</h2>
+                <p class="checkout__section-subtitle">{{ t('checkout.shipping.whereToDeliver') }}</p>
               </div>
             </div>
 
@@ -354,10 +354,10 @@
                   </svg>
                 </div>
                 <div class="checkout__delivery-content">
-                  <span class="checkout__delivery-title">Point Relais</span>
+                  <span class="checkout__delivery-title">{{ t('checkout.shipping.relay') }}</span>
                   <span class="checkout__delivery-desc">Mondial Relay • 48-72h</span>
                 </div>
-                <div class="checkout__delivery-price checkout__delivery-price--free">Gratuit</div>
+                <div class="checkout__delivery-price checkout__delivery-price--free">{{ t('cart.freeShipping') }}</div>
               </button>
 
               <button
@@ -383,13 +383,13 @@
                   </svg>
                 </div>
                 <div class="checkout__delivery-content">
-                  <span class="checkout__delivery-title">À domicile</span>
+                  <span class="checkout__delivery-title">{{ t('checkout.shipping.home') }}</span>
                   <span class="checkout__delivery-desc">Colissimo • 48-72h</span>
                 </div>
                 <div class="checkout__delivery-price">
                   {{
                     cartSubtotal >= FREE_SHIPPING_THRESHOLD
-                      ? 'Gratuit'
+                      ? t('cart.freeShipping')
                       : formatPrice(FLAT_SHIPPING_RATE)
                   }}
                 </div>
@@ -556,7 +556,7 @@
 
                 <div class="checkout__form-row checkout__form-row--3">
                   <div class="checkout__field">
-                    <label class="checkout__label">Code postal</label>
+                    <label class="checkout__label">{{ t('checkout.shipping.postalCode') }}</label>
                     <input
                       v-model="zip"
                       type="text"
@@ -565,7 +565,7 @@
                     />
                   </div>
                   <div class="checkout__field checkout__field--grow">
-                    <label class="checkout__label">Ville</label>
+                    <label class="checkout__label">{{ t('checkout.shipping.city') }}</label>
                     <input
                       v-model="city"
                       type="text"
@@ -574,7 +574,7 @@
                     />
                   </div>
                   <div class="checkout__field">
-                    <label class="checkout__label">Pays</label>
+                    <label class="checkout__label">{{ t('checkout.shipping.country') }}</label>
                     <select
                       v-model="country"
                       class="checkout__input checkout__select"
@@ -644,8 +644,8 @@
                 </svg>
               </div>
               <div>
-                <h2 class="checkout__section-title">Paiement</h2>
-                <p class="checkout__section-subtitle">Choisissez votre méthode de paiement</p>
+                <h2 class="checkout__section-title">{{ t('checkout.steps.payment') }}</h2>
+                <p class="checkout__section-subtitle">{{ t('checkout.payment.method') }}</p>
               </div>
             </div>
 
@@ -680,7 +680,7 @@
                     </svg>
                   </div>
                   <div class="payment-card__content">
-                    <span class="payment-card__title">Carte bancaire</span>
+                    <span class="payment-card__title">{{ t('checkout.payment.card') }}</span>
                     <span class="payment-card__desc">Visa, Mastercard, Amex</span>
                   </div>
                   <div class="payment-card__cards">
@@ -781,7 +781,7 @@
                   </div>
                   <div class="payment-card__content">
                     <span class="payment-card__title">PayPal</span>
-                    <span class="payment-card__desc">Paiement sécurisé PayPal</span>
+                    <span class="payment-card__desc">{{ t('checkout.payment.paypalSecure') }}</span>
                   </div>
                 </button>
               </div>
@@ -809,8 +809,8 @@
                       />
                       <path d="M12 6v6l4 2" />
                     </svg>
-                    <span>Autres méthodes</span>
-                    <span class="payment-methods__coming-badge">Bientôt</span>
+                    <span>{{ t('checkout.payment.otherMethods') }}</span>
+                    <span class="payment-methods__coming-badge">{{ t('common.comingSoon') }}</span>
                   </div>
                   <svg
                     class="payment-methods__coming-chevron"
@@ -834,18 +834,18 @@
         <!-- Right Column - Order Summary -->
         <aside class="checkout__sidebar">
           <div class="checkout__summary">
-            <h3 class="checkout__summary-title">Récapitulatif</h3>
+            <h3 class="checkout__summary-title">{{ t('checkout.summary.title') }}</h3>
 
             <div class="checkout__summary-rows">
               <div class="checkout__summary-row">
-                <span>Sous-total</span>
+                <span>{{ t('cart.subtotal') }}</span>
                 <span>{{ formatPrice(cartSubtotal) }}</span>
               </div>
 
               <div class="checkout__summary-row">
-                <span>Livraison</span>
+                <span>{{ t('cart.shipping') }}</span>
                 <span :class="{ 'checkout__summary-free': shippingCost === 0 }">
-                  {{ shippingCost === 0 ? 'Offerte' : formatPrice(shippingCost) }}
+                  {{ shippingCost === 0 ? t('cart.freeShipping') : formatPrice(shippingCost) }}
                 </span>
               </div>
 
@@ -898,7 +898,7 @@
               <div class="checkout__summary-divider"></div>
 
               <div class="checkout__summary-row checkout__summary-row--total">
-                <span>Total</span>
+                <span>{{ t('cart.total') }}</span>
                 <span>{{ formatPrice(finalTotal) }}</span>
               </div>
             </div>
@@ -957,7 +957,7 @@
                   />
                   <path d="M7 11V7a5 5 0 0110 0v4" />
                 </svg>
-                <span>Paiement 100% sécurisé</span>
+                <span>{{ t('checkout.payment.securePayment') }}</span>
               </div>
               <div class="checkout__trust-item">
                 <svg
@@ -970,7 +970,7 @@
                 >
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
-                <span>Données protégées SSL</span>
+                <span>{{ t('checkout.payment.sslProtected') }}</span>
               </div>
               <div class="checkout__trust-item">
                 <svg
@@ -984,7 +984,7 @@
                   <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                   <path d="M22 4L12 14.01l-3-3" />
                 </svg>
-                <span>Satisfaction garantie</span>
+                <span>{{ t('checkout.payment.satisfaction') }}</span>
               </div>
             </div>
           </div>
@@ -1002,9 +1002,11 @@
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import RelaySelector from '../livraison/mondial-relay/RelaySelector.vue'
   import type { OrderRelayData, RelayPoint } from '../livraison/mondial-relay/relay'
 
+  const { t } = useI18n()
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()

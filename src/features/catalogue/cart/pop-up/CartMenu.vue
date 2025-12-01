@@ -40,10 +40,10 @@
               :size="36"
             />
           </div>
-          <h4>Votre panier est vide</h4>
-          <p>Découvrez nos peptides d'exception</p>
+          <h4>{{ t('cart.empty') }}</h4>
+          <p>{{ t('cart.emptyText') }}</p>
           <BasicButton
-            label="Explorer le catalogue"
+            :label="t('cart.continueShopping')"
             type="primary"
             size="small"
             block
@@ -54,9 +54,9 @@
         <!-- Filled State -->
         <template v-else>
           <header class="cart__header">
-            <span>Mon Panier</span>
+            <span>{{ t('nav.cart') }}</span>
             <span class="cart__header-count">
-              {{ cart.totalItems }} article{{ cart.totalItems > 1 ? 's' : '' }}
+              {{ cart.totalItems }} {{ cart.totalItems > 1 ? t('cart.items') : t('cart.item') }}
             </span>
           </header>
 
@@ -75,7 +75,7 @@
                 <div class="cart__item-info">
                   <span class="cart__item-name">{{ item.product_name }}</span>
                   <div class="cart__item-meta">
-                    <span class="cart__item-qty">Qté: {{ item.quantity }}</span>
+                    <span class="cart__item-qty">{{ t('cart.quantity') }}: {{ item.quantity }}</span>
                     <div class="cart__item-price">
                       <template v-if="item.is_on_sale">
                         <span class="cart__item-price--old">
@@ -92,7 +92,7 @@
                 <button
                   class="cart__item-remove"
                   @click.stop="cart.removeFromCart(item.product_id!)"
-                  title="Retirer"
+                  :title="t('cart.remove')"
                 >
                   <BasicIconNext
                     name="X"
@@ -105,19 +105,19 @@
 
           <footer class="cart__footer">
             <div class="cart__total">
-              <span>Total estimé</span>
+              <span>{{ t('cart.total') }}</span>
               <strong>{{ formatPrice(cart.totalPrice) }}</strong>
             </div>
             <div class="cart__actions">
               <BasicButton
-                label="Voir le panier"
+                :label="t('cart.title')"
                 type="secondary"
                 variant="outlined"
                 size="small"
                 @click="goToCart"
               />
               <BasicButton
-                label="Commander"
+                :label="t('checkout.placeOrder')"
                 type="primary"
                 size="small"
                 block
@@ -138,7 +138,10 @@
   import { BasicButton } from '@designSystem/components/basic/button'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  const { t } = useI18n()
 
   const router = useRouter()
   const cart = useCartStore()

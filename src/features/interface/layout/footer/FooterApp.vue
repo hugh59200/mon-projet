@@ -13,7 +13,7 @@
             :size="32"
             class="footer__logo"
           />
-          <p class="footer__tagline">Peptides de recherche de haute qualité pour la science.</p>
+          <p class="footer__tagline">{{ t('footer.description') }}</p>
           <!-- Social -->
           <div class="footer__social">
             <a
@@ -104,37 +104,37 @@
         <!-- Navigation -->
         <nav class="footer__nav">
           <div class="footer__nav-col">
-            <h5 class="footer__nav-title">Navigation</h5>
+            <h5 class="footer__nav-title">{{ t('footer.quickLinks') }}</h5>
             <ul class="footer__nav-list">
-              <li><RouterLink to="/">Accueil</RouterLink></li>
-              <li><RouterLink to="/catalogue">Catalogue</RouterLink></li>
-              <li><RouterLink to="/actualites">Actualités</RouterLink></li>
-              <li><RouterLink to="/faq">FAQ</RouterLink></li>
+              <li><RouterLink to="/">{{ t('nav.home') }}</RouterLink></li>
+              <li><RouterLink to="/catalogue">{{ t('nav.catalogue') }}</RouterLink></li>
+              <li><RouterLink to="/actualites">{{ t('nav.news') }}</RouterLink></li>
+              <li><RouterLink to="/faq">{{ t('nav.faq') }}</RouterLink></li>
             </ul>
           </div>
 
           <div class="footer__nav-col">
-            <h5 class="footer__nav-title">Mon compte</h5>
+            <h5 class="footer__nav-title">{{ t('profile.title') }}</h5>
             <ul class="footer__nav-list">
-              <li><RouterLink to="/profil">Profil</RouterLink></li>
-              <li><RouterLink to="/profil/commandes">Mes commandes</RouterLink></li>
-              <li><RouterLink to="/auth/login">Connexion</RouterLink></li>
-              <li><RouterLink to="/auth/register">Inscription</RouterLink></li>
+              <li><RouterLink to="/profil">{{ t('nav.profile') }}</RouterLink></li>
+              <li><RouterLink to="/profil/commandes">{{ t('nav.orders') }}</RouterLink></li>
+              <li><RouterLink to="/auth/login">{{ t('nav.login') }}</RouterLink></li>
+              <li><RouterLink to="/auth/register">{{ t('nav.register') }}</RouterLink></li>
             </ul>
           </div>
 
           <div class="footer__nav-col">
-            <h5 class="footer__nav-title">Informations</h5>
+            <h5 class="footer__nav-title">{{ t('footer.legal') }}</h5>
             <ul class="footer__nav-list">
-              <li><RouterLink to="/checkout">Paiement sécurisé</RouterLink></li>
-              <li><RouterLink to="/track-order">Suivi de commande</RouterLink></li>
-              <li><RouterLink to="/cgu">Conditions générales</RouterLink></li>
-              <li><RouterLink to="/guide-reconstitution">Guide & Calculateur</RouterLink></li>
+              <li><RouterLink to="/checkout">{{ t('product.trustBadges.secure') }}</RouterLink></li>
+              <li><RouterLink to="/track-order">{{ t('tracking.title') }}</RouterLink></li>
+              <li><RouterLink to="/cgu">{{ t('footer.terms') }}</RouterLink></li>
+              <li><RouterLink to="/guide-reconstitution">{{ t('reconstitution.title') }}</RouterLink></li>
             </ul>
           </div>
 
           <div class="footer__nav-col">
-            <h5 class="footer__nav-title">Contact</h5>
+            <h5 class="footer__nav-title">{{ t('footer.contact') }}</h5>
             <ul class="footer__nav-list footer__nav-list--contact">
               <li>
                 <svg
@@ -168,7 +168,7 @@
                   />
                   <path d="M12 6v6l4 2" />
                 </svg>
-                <span>Lun - Ven : 9h - 18h</span>
+                <span>{{ t('footer.hours') }}</span>
               </li>
               <li>
                 <svg
@@ -186,7 +186,7 @@
                     r="3"
                   />
                 </svg>
-                <span>France & Europe</span>
+                <span>{{ t('footer.region') }}</span>
               </li>
             </ul>
           </div>
@@ -209,14 +209,14 @@
               <path d="M22 6l-10 7L2 6" />
             </svg>
             <div>
-              <h4 class="footer__newsletter-title">Newsletter</h4>
-              <p class="footer__newsletter-desc">Nouveautés & offres exclusives</p>
+              <h4 class="footer__newsletter-title">{{ t('footer.newsletter.title') }}</h4>
+              <p class="footer__newsletter-desc">{{ t('footer.newsletter.subtitle') }}</p>
             </div>
           </div>
           <div class="footer__newsletter-form">
             <input
               type="email"
-              placeholder="votre@email.com"
+              :placeholder="t('footer.newsletter.placeholder')"
               class="footer__newsletter-input"
             />
             <button class="footer__newsletter-btn">
@@ -248,22 +248,22 @@
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          <span>Research Use Only</span>
+          <span>{{ t('footer.researchOnly') }}</span>
         </div>
         <div class="footer__disclaimer-items">
           <span>
-            <strong>Recherche uniquement</strong>
-            — Produits destinés à la recherche scientifique
+            <strong>{{ t('footer.disclaimer.research') }}</strong>
+            — {{ t('footer.disclaimer.researchDesc') }}
           </span>
           <span class="footer__disclaimer-sep">•</span>
           <span>
-            <strong>Pas d'usage humain</strong>
-            — Non destiné à un usage thérapeutique
+            <strong>{{ t('footer.disclaimer.noHuman') }}</strong>
+            — {{ t('footer.disclaimer.noHumanDesc') }}
           </span>
           <span class="footer__disclaimer-sep">•</span>
           <span>
-            <strong>Responsabilité</strong>
-            — L'acheteur respecte la législation locale
+            <strong>{{ t('footer.disclaimer.responsibility') }}</strong>
+            — {{ t('footer.disclaimer.responsibilityDesc') }}
           </span>
         </div>
       </div>
@@ -271,7 +271,7 @@
       <!-- Trust bar -->
       <div class="footer__trust">
         <div class="footer__trust-payments">
-          <span class="footer__trust-label">Paiements sécurisés</span>
+          <span class="footer__trust-label">{{ t('footer.securePayments') }}</span>
           <div class="footer__trust-icons">
             <!-- Visa -->
             <svg
@@ -396,7 +396,7 @@
               />
               <path d="M7 11V7a5 5 0 0110 0v4" />
             </svg>
-            <span>SSL Sécurisé</span>
+            <span>{{ t('footer.sslSecure') }}</span>
           </div>
           <div class="footer__trust-badge">
             <svg
@@ -410,7 +410,7 @@
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <path d="M9 12l2 2 4-4" />
             </svg>
-            <span>Qualité certifiée</span>
+            <span>{{ t('product.trustBadges.quality') }}</span>
           </div>
           <div class="footer__trust-badge">
             <svg
@@ -440,18 +440,18 @@
                 r="2.5"
               />
             </svg>
-            <span>Livraison rapide</span>
+            <span>{{ t('product.trustBadges.shipping') }}</span>
           </div>
         </div>
       </div>
 
       <!-- Bottom bar -->
       <div class="footer__bottom">
-        <p class="footer__copyright">© 2025 Fast-Peptides. Tous droits réservés.</p>
+        <p class="footer__copyright">{{ t('footer.copyright', { year: new Date().getFullYear() }) }}</p>
         <div class="footer__legal-links">
-          <RouterLink to="/mentions-legales">Mentions légales</RouterLink>
-          <RouterLink to="/politique-confidentialite">Confidentialité</RouterLink>
-          <RouterLink to="/cookies">Cookies</RouterLink>
+          <RouterLink to="/mentions-legales">{{ t('footer.legalNotice') }}</RouterLink>
+          <RouterLink to="/politique-confidentialite">{{ t('footer.privacy') }}</RouterLink>
+          <RouterLink to="/cookies">{{ t('footer.cookies') }}</RouterLink>
         </div>
         <div class="footer__bottom-right">
           <span class="footer__version">v1.0</span>
@@ -473,7 +473,7 @@
                 d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
               />
             </svg>
-            <span>FR</span>
+            <span>{{ currentLocaleInfo?.code.toUpperCase() }}</span>
           </div>
         </div>
       </div>
@@ -482,7 +482,9 @@
 </template>
 
 <script setup lang="ts">
-  // Pas de logique supplémentaire nécessaire
+  import { useLanguage } from '@/composables/useLanguage'
+
+  const { t, currentLocaleInfo } = useLanguage()
 </script>
 
 <style scoped lang="less">

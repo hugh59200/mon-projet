@@ -9,8 +9,8 @@
         size="large"
         color="primary"
       />
-      <h2 class="status-title">Connexion sécurisée 🔐</h2>
-      <p class="status-text">Fast Peptides vérifie vos accès...</p>
+      <h2 class="status-title">{{ t('auth.callback.loading') }}</h2>
+      <p class="status-text">{{ t('auth.callback.verifying') }}</p>
     </div>
     <div
       v-else-if="state === 'success'"
@@ -22,7 +22,7 @@
         :size="64"
         color="success-600"
       />
-      <h2 class="status-title text-success">Connexion réussie !</h2>
+      <h2 class="status-title text-success">{{ t('auth.callback.success') }}</h2>
       <p class="status-text">{{ message }}</p>
     </div>
     <div
@@ -35,10 +35,10 @@
         :size="64"
         color="danger-600"
       />
-      <h2 class="status-title text-danger">Lien invalide</h2>
+      <h2 class="status-title text-danger">{{ t('auth.callback.invalidLink') }}</h2>
       <p class="status-text error-msg">{{ errorMessage }}</p>
       <BasicButton
-        label="Retour à la connexion"
+        :label="t('auth.reset.backToLogin')"
         color="primary"
         class="mt-4"
         @click="$router.push('/auth/login')"
@@ -53,9 +53,11 @@
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import { onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { useAuthStore } from './stores/useAuthStore'
 
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const auth = useAuthStore()
@@ -87,7 +89,7 @@
       console.log(error)
       if (error) {
         // Si le jeton est mauvais maintenant, c'est qu'il est expiré.
-        fail(type === 'recovery' ? 'Ce lien a expiré.' : 'Lien de validation invalide.')
+        fail(type === 'recovery' ? t('auth.callback.linkExpired') : t('auth.callback.invalidValidation'))
         return
       }
       // Session active après verifyOtp
@@ -100,14 +102,14 @@
     if (data.session?.user) return handleSuccess(data.session.user)
 
     // ❌ Échec
-    fail('Aucune session trouvée. Veuillez vous reconnecter.')
+    fail(t('auth.callback.noSession'))
   })
 
   function handleSuccess(user: any) {
     auth.user = user
     auth.fetchProfile().then(() => {
       state.value = 'success'
-      message.value = `Bienvenue ${user.email}`
+      message.value = `${t('auth.callback.welcome')} ${user.email}`
 
       // Redirection intelligente
       const redirectUrl =

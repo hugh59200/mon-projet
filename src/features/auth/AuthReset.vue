@@ -1,15 +1,14 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">Mot de passe oublié ?</h1>
+    <h1 class="auth__title">{{ t('auth.reset.title') }}</h1>
     <p class="auth__subtitle">
-      Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de
-      passe.
+      {{ t('auth.reset.subtitle') }}
     </p>
 
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
-        label="Email"
+        :label="t('auth.reset.email')"
         placeholder="nom@entreprise.com"
         inputmode="email"
         iconName="Mail"
@@ -27,7 +26,7 @@
       />
 
       <BasicButton
-        label="Envoyer le lien de réinitialisation"
+        :label="t('auth.reset.submit')"
         variant="filled"
         size="large"
         :disabled="loading || !captchaToken"
@@ -70,7 +69,7 @@
           name="ArrowLeft"
           :size="14"
         />
-        Retour à la connexion
+        {{ t('auth.reset.backToLogin') }}
       </RouterLink>
     </div>
   </div>
@@ -81,8 +80,10 @@
   import { supabase } from '@/supabase/supabaseClient'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useForm } from './composables/useForm'
 
+  const { t } = useI18n()
   const { email, errors, touched, validate, validateField } = useForm(true, 'weak')
 
   const loading = ref(false)
@@ -111,7 +112,7 @@
     if (!validate('reset')) return
 
     if (!captchaToken.value) {
-      error.value = 'Veuillez valider la sécurité.'
+      error.value = t('auth.errors.captchaRequired')
       return
     }
 
@@ -126,12 +127,12 @@
     loading.value = false
 
     if (err) {
-      error.value = "Impossible d'envoyer l'e-mail. Veuillez réessayer plus tard."
+      error.value = t('auth.errors.resetFailed')
       // Reset du captcha en cas d'erreur
       captchaToken.value = ''
       turnstileWidget.value?.reset()
     } else {
-      message.value = 'Si un compte existe avec cet e-mail, vous recevrez bientôt un lien.'
+      message.value = t('auth.reset.success')
       email.value = ''
       // Optionnel : on peut reset le captcha ici aussi, mais comme l'utilisateur a réussi, c'est moins grave.
     }

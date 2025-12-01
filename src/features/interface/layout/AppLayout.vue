@@ -105,7 +105,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow-x: hidden;
+    max-width: 100%;
+    overflow-x: clip; /* plus strict que hidden */
     overflow-y: auto;
     background: linear-gradient(180deg, #f8f9fc 0%, #f1f4f9 40%, #e8edf5 100%);
   }

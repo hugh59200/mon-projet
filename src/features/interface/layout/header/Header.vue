@@ -60,6 +60,9 @@
       <!-- RIGHT SECTION           -->
       <!-- ======================== -->
       <div class="navbar__right">
+        <!-- Language Selector -->
+        <LanguageSelector />
+
         <!-- Cart -->
         <CartMenu />
 
@@ -87,7 +90,7 @@
                   r="4"
                 />
               </svg>
-              <span>Invité</span>
+              <span>{{ t('nav.guest') }}</span>
             </div>
 
             <button
@@ -109,14 +112,14 @@
                   r="3"
                 />
               </svg>
-              <span>Suivre</span>
+              <span>{{ t('tracking.title') }}</span>
             </button>
 
             <button
               class="navbar__btn navbar__btn--primary"
               @click="router.push('/auth/login')"
             >
-              Connexion
+              {{ t('nav.login') }}
             </button>
           </div>
         </template>
@@ -147,7 +150,7 @@
                   r="3"
                 />
               </svg>
-              <span>Suivi</span>
+              <span>{{ t('tracking.title') }}</span>
             </button>
 
             <button
@@ -171,13 +174,13 @@
                   y2="12"
                 />
               </svg>
-              <span>Connexion</span>
+              <span>{{ t('nav.login') }}</span>
             </button>
             <button
               class="navbar__btn navbar__btn--outline"
               @click="router.push('/auth/register')"
             >
-              Inscription
+              {{ t('nav.register') }}
             </button>
           </div>
           <UserMenu v-else />
@@ -192,10 +195,13 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onUnmounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+  import LanguageSelector from './LanguageSelector.vue'
   import MainNavLinks from './MainNavLinks.vue'
   import UserMenu from './pop-up/UserMenu.vue'
 
+  const { t } = useI18n()
   const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()

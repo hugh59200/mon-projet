@@ -1,14 +1,14 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">Créer un compte</h1>
+    <h1 class="auth__title">{{ t('auth.register.title') }}</h1>
     <p class="auth__subtitle">
-      Rejoignez Fast Peptides pour accéder à notre catalogue complet et à nos outils.
+      {{ t('auth.register.subtitle') }}
     </p>
 
     <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
-        label="Email professionnel"
+        :label="t('auth.register.email')"
         placeholder="nom@entreprise.com"
         inputmode="email"
         iconName="Mail"
@@ -21,7 +21,7 @@
 
       <WrapperInputPassword
         v-model="password"
-        label="Mot de passe"
+        :label="t('auth.register.password')"
         placeholder="••••••••"
         required
         minStrength="strong"
@@ -39,7 +39,7 @@
       />
 
       <BasicButton
-        label="S'inscrire"
+        :label="t('auth.register.submit')"
         variant="filled"
         size="large"
         :disabled="loading || !captchaToken"
@@ -66,8 +66,8 @@
 
     <div class="auth__links">
       <span>
-        Vous avez déjà un compte ?
-        <RouterLink to="/auth/login">Se connecter</RouterLink>
+        {{ t('auth.register.alreadyAccount') }}
+        <RouterLink to="/auth/login">{{ t('auth.register.login') }}</RouterLink>
       </span>
     </div>
   </div>
@@ -76,10 +76,12 @@
 <script setup lang="ts">
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import { useForm } from './composables/useForm'
   import { useAuthStore } from './stores/useAuthStore'
 
+  const { t } = useI18n()
   const auth = useAuthStore()
   const router = useRouter()
 
@@ -110,7 +112,7 @@
     if (!validate('register')) return
 
     if (!captchaToken.value) {
-      error.value = 'Veuillez valider que vous êtes humain.'
+      error.value = t('auth.errors.captchaRequired')
       return
     }
 
@@ -122,7 +124,7 @@
     loading.value = false
 
     if (!success) {
-      error.value = auth.error ?? "Une erreur est survenue lors de l'inscription."
+      error.value = auth.error ?? t('auth.errors.registrationFailed')
       // Reset du widget en cas d'échec (ex: email déjà pris)
       captchaToken.value = ''
       turnstileWidget.value?.reset()

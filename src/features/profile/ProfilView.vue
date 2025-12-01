@@ -48,7 +48,7 @@
             size="h3"
             weight="bold"
           >
-            {{ editableName || 'Mon profil' }}
+            {{ editableName || t('profile.title') }}
           </BasicText>
           <div class="profil__meta">
             <BasicText
@@ -60,7 +60,7 @@
                 :size="14"
                 class="inline-icon"
               />
-              {{ profile?.email || 'e-mail non renseignée' }}
+              {{ profile?.email || t('profile.emailNotSet') }}
             </BasicText>
 
             <BasicText
@@ -82,22 +82,22 @@
       </div>
       <div class="profil__sections">
         <FilterSection
-          title="Informations personnelles"
+          :title="t('profile.personalInfo')"
           v-model="sections.personal"
           icon="User"
         >
           <div class="profil__form-grid">
             <WrapperInput
               v-model="editableName"
-              label="Nom complet"
-              placeholder="Prénom et Nom"
+              :label="t('profile.fullName')"
+              :placeholder="t('profile.fullNamePlaceholder')"
               input-type="form"
               icon-left="User"
             />
             <WrapperInput
               v-model="phone"
-              label="Téléphone"
-              placeholder="+33 6 ..."
+              :label="t('profile.phone')"
+              :placeholder="t('profile.phonePlaceholder')"
               input-type="form"
               icon-left="Phone"
             />
@@ -110,13 +110,13 @@
             color="neutral-400"
             class="profil__form-subtitle"
           >
-            ADRESSE DE LIVRAISON PAR DÉFAUT
+            {{ t('profile.defaultAddress').toUpperCase() }}
           </BasicText>
 
           <WrapperInput
             v-model="address"
-            label="Adresse (N° et Rue)"
-            placeholder="12 rue du Peptide"
+            :label="t('profile.addressLabel')"
+            :placeholder="t('profile.addressPlaceholder')"
             input-type="form"
             icon-left="MapPin"
             class="mb-4"
@@ -125,13 +125,13 @@
           <div class="profil__form-grid">
             <WrapperInput
               v-model="zip"
-              label="Code postal"
+              :label="t('profile.postalCode')"
               placeholder="75000"
               input-type="form"
             />
             <WrapperInput
               v-model="city"
-              label="Ville"
+              :label="t('profile.city')"
               placeholder="Paris"
               input-type="form"
             />
@@ -139,7 +139,7 @@
 
           <WrapperInput
             v-model="country"
-            label="Pays"
+            :label="t('profile.country')"
             placeholder="France"
             input-type="form"
             icon-left="Globe"
@@ -147,7 +147,7 @@
 
           <div class="profil__actions">
             <BasicButton
-              label="Enregistrer les modifications"
+              :label="t('profile.saveChanges')"
               type="primary"
               variant="filled"
               :disabled="loading || !hasPersonalChanges"
@@ -160,7 +160,7 @@
         </FilterSection>
 
         <FilterSection
-          title="Mes commandes récentes"
+          :title="t('profile.recentOrders')"
           v-model="sections.orders"
           icon="Box"
         >
@@ -176,7 +176,7 @@
                   size="body-l"
                   weight="bold"
                 >
-                  Commande #{{ order.id?.slice(0, 8) }}
+                  {{ t('profile.orderNumber') }}{{ order.id?.slice(0, 8) }}
                 </BasicText>
 
                 <BasicBadge
@@ -191,7 +191,7 @@
                   size="body-m"
                   color="neutral-400"
                 >
-                  Total :
+                  {{ t('profile.orderTotal') }}
                   <strong class="text-primary">{{ order.total_amount }} €</strong>
                 </BasicText>
 
@@ -199,7 +199,7 @@
                   size="body-s"
                   color="neutral-500"
                 >
-                  Passée le {{ formatOrderDate(order.created_at!) }}
+                  {{ t('profile.orderDate') }} {{ formatOrderDate(order.created_at!) }}
                 </BasicText>
               </div>
             </div>
@@ -211,12 +211,12 @@
               align="center"
               class="profil__orders-empty"
             >
-              Vous n’avez pas encore de commande. **Commencez vos achats !**
+              {{ t('profile.noOrders') }} **{{ t('profile.startShopping') }}**
             </BasicText>
           </div>
 
           <BasicButton
-            label="Voir toutes mes commandes"
+            :label="t('profile.viewAllOrders')"
             type="secondary"
             variant="outlined"
             block
@@ -226,7 +226,7 @@
         </FilterSection>
 
         <FilterSection
-          title="Préférences & réglages"
+          :title="t('profile.preferences')"
           v-model="sections.preferences"
           icon="Settings"
         >
@@ -237,7 +237,7 @@
                 weight="semibold"
                 class="profil__pref-card-title"
               >
-                Apparence
+                {{ t('profile.appearance') }}
               </BasicText>
 
               <div class="profil__pref-card-row">
@@ -247,13 +247,13 @@
                     weight="semibold"
                     color="neutral-100"
                   >
-                    Thème de l’interface
+                    {{ t('profile.theme') }}
                   </BasicText>
                   <BasicText
                     size="body-s"
                     color="neutral-400"
                   >
-                    Sélectionnez l’ambiance couleur que vous préférez.
+                    {{ t('profile.themeDesc') }}
                   </BasicText>
                 </div>
 
@@ -267,20 +267,20 @@
                 weight="semibold"
                 class="profil__pref-card-title"
               >
-                Notifications
+                {{ t('profile.notifications') }}
               </BasicText>
 
               <div class="profil__pref-card-list">
                 <BasicCheckbox
                   v-model="newsletter"
-                  label="Recevoir les newsletters et promotions"
+                  :label="t('profile.newsletter')"
                 />
               </div>
             </div>
           </div>
 
           <BasicButton
-            label="Sauvegarder mes préférences"
+            :label="t('profile.savePreferences')"
             type="primary"
             variant="filled"
             block
@@ -292,7 +292,7 @@
         </FilterSection>
 
         <FilterSection
-          title="Sécurité & gestion du compte"
+          :title="t('profile.security')"
           v-model="sections.security"
           icon="Lock"
         >
@@ -300,21 +300,21 @@
             <WrapperInput
               v-model="newPassword"
               type="password"
-              label="Nouveau mot de passe"
+              :label="t('profile.newPassword')"
               input-type="form"
               icon-left="Key"
             />
             <WrapperInput
               v-model="confirmPassword"
               type="password"
-              label="Confirmez le mot de passe"
+              :label="t('profile.confirmNewPassword')"
               input-type="form"
               icon-left="Key"
             />
           </div>
           <div class="profil__actions">
             <BasicButton
-              label="Mettre à jour le mot de passe"
+              :label="t('profile.updatePassword')"
               type="secondary"
               variant="filled"
               :disabled="
@@ -327,7 +327,7 @@
           </div>
           <div class="profil__danger">
             <BasicButton
-              label="Supprimer mon compte"
+              :label="t('profile.deleteAccount')"
               type="danger"
               variant="outlined"
               @click="deleteOwnAccount"
@@ -337,7 +337,7 @@
         </FilterSection>
 
         <FilterSection
-          title="Assistance & support"
+          :title="t('profile.support')"
           v-model="sections.support"
           icon="MessageCircle"
         >
@@ -346,11 +346,10 @@
             color="neutral-400"
             style="margin-bottom: 12px"
           >
-            Vous avez une question sur une commande ou un produit ? Contactez notre support client
-            pour une assistance immédiate.
+            {{ t('profile.supportDesc') }}
           </BasicText>
           <BasicButton
-            label="Ouvrir la messagerie"
+            :label="t('profile.openMessaging')"
             type="secondary"
             variant="outlined"
             @click="openMessaging"
@@ -370,6 +369,7 @@
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch, type Ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import { BasicThemeSelector } from '../../../designSystem/src'
   import { useAuthStore } from '../auth/stores/useAuthStore'
@@ -377,6 +377,7 @@
   import { useProfileSectionsStore } from './useProfileSectionsStore'
 
   // --- Stores et Hooks ---
+  const { t } = useI18n()
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
   const sections = useProfileSectionsStore()

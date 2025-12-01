@@ -8,7 +8,7 @@
           @click="selectedCategories = []"
         >
           <span class="catalogue-chip__icon">✨</span>
-          Tous
+          {{ t('common.all') }}
           <span class="catalogue-chip__count">{{ products.length }}</span>
         </button>
         <button
@@ -53,7 +53,7 @@
             v-model="searchTerm"
             type="text"
             class="catalogue-search__input"
-            placeholder="Rechercher..."
+            :placeholder="t('common.search') + '...'"
           />
         </div>
         <button
@@ -70,7 +70,7 @@
           >
             <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
           </svg>
-          Filtres
+          {{ t('common.filter') }}
           <span
             v-if="activeFiltersCount"
             class="catalogue-filter-btn__badge"
@@ -83,6 +83,7 @@
 
     <PageContent
       size="xl"
+      direction="row"
       class="catalogue-body"
     >
       <FilterPanel
@@ -130,7 +131,7 @@
               v-model="searchTerm"
               type="text"
               class="catalogue-search__input"
-              placeholder="Rechercher un peptide..."
+              :placeholder="t('catalogue.searchPlaceholder')"
             />
             <button
               v-if="searchTerm"
@@ -154,7 +155,7 @@
           <div class="catalogue-toolbar__results">
             <span class="catalogue-toolbar__count">{{ finalProducts.length }}</span>
             <span class="catalogue-toolbar__label">
-              résultat{{ finalProducts.length > 1 ? 's' : '' }}
+              {{ t('catalogue.results.products') }}
             </span>
           </div>
 
@@ -179,7 +180,7 @@
                 class="catalogue-toolbar__view-btn"
                 :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }"
                 @click="viewMode = 'grid'"
-                title="Vue grille"
+                :title="t('catalogue.sort.label')"
               >
                 <svg
                   width="18"
@@ -223,7 +224,7 @@
                 class="catalogue-toolbar__view-btn"
                 :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'list' }"
                 @click="viewMode = 'list'"
-                title="Vue liste"
+                :title="t('catalogue.sort.label')"
               >
                 <svg
                   width="18"
@@ -246,7 +247,7 @@
           class="catalogue-active-filters"
         >
           <div class="catalogue-active-filters__list">
-            <span class="catalogue-active-filters__label">Filtres:</span>
+            <span class="catalogue-active-filters__label">{{ t('catalogue.filters.title') }}:</span>
 
             <button
               v-for="cat in selectedCategories"
@@ -295,7 +296,7 @@
               class="catalogue-pill"
               @click="inStockOnly = false"
             >
-              En stock uniquement
+              {{ t('catalogue.filters.inStock') }}
               <svg
                 width="12"
                 height="12"
@@ -324,7 +325,7 @@
               <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
               <path d="M3 3v5h5" />
             </svg>
-            Tout effacer
+            {{ t('catalogue.filters.resetAll') }}
           </button>
         </div>
 
@@ -333,7 +334,7 @@
           :loading="loading"
           :has-loaded="hasLoaded"
           :is-empty="hasLoaded && finalProducts.length === 0"
-          message="Chargement des peptides..."
+          :message="t('common.loading')"
         >
           <template #empty>
             <div class="catalogue-empty">
@@ -354,15 +355,15 @@
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
               </div>
-              <h3 class="catalogue-empty__title">Aucun peptide trouvé</h3>
+              <h3 class="catalogue-empty__title">{{ t('catalogue.results.noResults') }}</h3>
               <p class="catalogue-empty__text">
-                Essayez de modifier vos filtres ou votre recherche
+                {{ t('catalogue.results.noResultsText') }}
               </p>
               <button
                 class="catalogue-empty__btn"
                 @click="resetAll"
               >
-                Réinitialiser les filtres
+                {{ t('catalogue.filters.resetAll') }}
               </button>
             </div>
           </template>
@@ -402,17 +403,17 @@
             >
               <path d="M15 18l-6-6 6-6" />
             </svg>
-            Précédent
+            {{ t('common.previous') }}
           </button>
 
-          <span class="catalogue-pagination__info">Page {{ page }} sur {{ totalPages }}</span>
+          <span class="catalogue-pagination__info">Page {{ page }} / {{ totalPages }}</span>
 
           <button
             class="catalogue-pagination__btn"
             :disabled="page === totalPages"
             @click="page++"
           >
-            Suivant
+            {{ t('common.next') }}
             <svg
               width="18"
               height="18"
@@ -434,7 +435,7 @@
       v-model="showFilters"
       closable
       size="small"
-      title="Filtres"
+      :title="t('catalogue.filters.title')"
     >
       <template #content>
         <FilterPanel
@@ -456,13 +457,13 @@
       <template #actions>
         <div class="catalogue-modal-actions">
           <BasicButton
-            label="Réinitialiser"
+            :label="t('catalogue.filters.resetAll')"
             type="secondary"
             variant="outlined"
             @click="resetAll"
           />
           <BasicButton
-            :label="`Voir ${finalProducts.length} résultats`"
+            :label="`${t('catalogue.results.showing')} ${finalProducts.length} ${t('catalogue.results.products')}`"
             type="primary"
             @click="showFilters = false"
           />
@@ -487,7 +488,10 @@
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
+
+  const { t } = useI18n()
   import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
 
@@ -667,8 +671,16 @@
 </script>
 
 <style scoped lang="less">
-  @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
-  @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
+  @font-display:
+    'Instrument Sans',
+    'SF Pro Display',
+    -apple-system,
+    sans-serif;
+  @font-body:
+    'Inter',
+    'SF Pro Text',
+    -apple-system,
+    sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   .catalogue {
@@ -805,21 +817,12 @@
     }
 
     // =========================================
-    // BODY LAYOUT
-    // =========================================
-    &-body {
-      display: flex;
-      gap: 24px;
-    }
-
-    // =========================================
     // SIDEBAR
     // =========================================
     &-sidebar {
       width: 280px;
       flex-shrink: 0;
       position: sticky;
-      top: 24px;
       height: fit-content;
       max-height: calc(100vh - 48px);
       overflow-y: auto;

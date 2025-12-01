@@ -16,15 +16,15 @@
       />
     </div>
 
-    <h1 class="payment-cancel__title">Paiement annulé ❌</h1>
+    <h1 class="payment-cancel__title">{{ t('checkout.cancel.title') }}</h1>
     <p class="payment-cancel__subtitle">
-      Le paiement n’a pas pu être finalisé ou a été interrompu.
+      {{ t('checkout.cancel.subtitle') }}
       <br />
-      Vous pouvez réessayer à tout moment.
+      {{ t('checkout.cancel.retryAnytime') }}
     </p>
 
     <BasicButton
-      label="Retourner au panier"
+      :label="t('checkout.cancel.backToCart')"
       variant="filled"
       color="danger"
       size="large"
@@ -38,7 +38,10 @@
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  const { t } = useI18n()
 
   const emit = defineEmits(['finished'])
   const router = useRouter()
