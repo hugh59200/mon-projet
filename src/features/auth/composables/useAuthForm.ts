@@ -67,7 +67,7 @@ export function useAuthForm(options: UseAuthFormOptions) {
       { validator: required('auth.errors.passwordRequired') },
       ...(mode === 'register'
         ? [{ validator: password(requiredStrength as 0 | 1 | 2 | 3 | 4) }]
-        : [{ validator: minLength(1) }]),
+        : [{ validator: minLength(6, 'auth.errors.passwordTooShort') }]),
     ]
 
     const confirmPasswordRules: ValidationRule<string>[] = [
@@ -82,10 +82,13 @@ export function useAuthForm(options: UseAuthFormOptions) {
             initialValue: '',
             rules: emailRules,
             debounce: 400,
+            validateOnChange: true,
+            showErrorsEarly: true,
           },
         },
         liveValidation: true,
         debounceMs: 300,
+        validationMode: 'onChange',
       })
     }
 
@@ -96,15 +99,20 @@ export function useAuthForm(options: UseAuthFormOptions) {
             initialValue: '',
             rules: emailRules,
             debounce: 400,
+            validateOnChange: true,
+            showErrorsEarly: true,
           },
           password: {
             initialValue: '',
             rules: passwordRules,
             debounce: 300,
+            validateOnChange: true,
+            showErrorsEarly: true,
           },
         },
         liveValidation: true,
         debounceMs: 300,
+        validationMode: 'onChange',
       })
     }
 
@@ -115,20 +123,27 @@ export function useAuthForm(options: UseAuthFormOptions) {
           initialValue: '',
           rules: emailRules,
           debounce: 400,
+          validateOnChange: true,
+          showErrorsEarly: true,
         },
         password: {
           initialValue: '',
           rules: passwordRules,
           debounce: 300,
+          validateOnChange: true,
+          showErrorsEarly: true,
         },
         confirmPassword: {
           initialValue: '',
           rules: confirmPasswordRules,
           dependsOn: ['password'],
+          validateOnChange: true,
+          showErrorsEarly: true,
         },
       },
       liveValidation: true,
       debounceMs: 300,
+      validationMode: 'onChange',
     })
   }
 

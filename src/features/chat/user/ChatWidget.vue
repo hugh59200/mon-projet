@@ -63,19 +63,23 @@
           current-role="user"
           :send-message="sendMessage"
           :send-typing="sendTyping"
-          :height="400"
+          :height="chatHeight"
         />
       </div>
     </transition>
   </div>
 </template>
 <script setup lang="ts">
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { IconColor } from '@designSystem/index'
-  import { onMounted, onUnmounted } from 'vue'
+  import { computed, onMounted, onUnmounted } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
   import { useChat } from '../shared/composables/useChat'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
+
+  const { isMobile } = useDeviceBreakpoint()
+  const chatHeight = computed(() => (isMobile.value ? undefined : 400))
 
   const chatNotif = useChatNotifStore()
   const chatStore = useChatWidgetStore()
@@ -247,6 +251,51 @@
       }
       100% {
         transform: scale(1);
+      }
+    }
+
+    /* ------------------------- Mobile responsive ------------------------- */
+    @media (max-width: 480px) {
+      bottom: 16px;
+      right: 16px;
+
+      &__toggle {
+        width: 52px;
+        height: 52px;
+      }
+
+      &__window {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      &__header {
+        padding: 14px 16px;
+        border-radius: 0;
+      }
+
+      &__header-title {
+        font-size: 16px;
+      }
+
+      &__header-status {
+        font-size: 12px;
+      }
+
+      &__header-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      &__header-close {
+        padding: 8px;
       }
     }
   }

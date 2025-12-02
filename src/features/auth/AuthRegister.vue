@@ -38,8 +38,9 @@
           required
           :showStrength="false"
           :alertLabel="fields.password.wrapperProps.value.alertLabel"
+          :alertType="fields.password.wrapperProps.value.alertType"
           :touched="fields.password.touched.value"
-          @input="clear"
+          @input="(e: Event) => { fields.password.onInput(e); clear() }"
           @blur="fields.password.onBlur"
         />
 
@@ -61,8 +62,9 @@
           required
           :showStrength="false"
           :alertLabel="fields.confirmPassword.wrapperProps.value.alertLabel"
+          :alertType="fields.confirmPassword.wrapperProps.value.alertType"
           :touched="fields.confirmPassword.touched.value"
-          @input="clear"
+          @input="(e: Event) => { fields.confirmPassword.onInput(e); clear() }"
           @blur="fields.confirmPassword.onBlur"
         >
           <template #suffix>

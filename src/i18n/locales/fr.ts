@@ -34,6 +34,8 @@ export default {
     showMore: 'Afficher plus',
     showLess: 'Afficher moins',
     comingSoon: 'Bientôt',
+    select: 'Choisir...',
+    general: 'Général',
   },
 
   // ============================================
@@ -379,6 +381,7 @@ export default {
       invalidPassword: 'Mot de passe invalide',
       emailRequired: "L'email est requis",
       passwordRequired: 'Le mot de passe est requis',
+      passwordTooShort: 'Le mot de passe doit contenir au moins 6 caractères',
       passwordMismatch: 'Les mots de passe ne correspondent pas',
       userNotFound: 'Utilisateur non trouvé',
       wrongPassword: 'Mot de passe incorrect',
@@ -404,8 +407,12 @@ export default {
       categories: 'Catégories',
       tags: 'Tags',
       price: 'Prix',
-      inStock: 'En stock uniquement',
+      inStock: 'En stock',
+      inStockOnly: 'En stock uniquement',
       resetAll: 'Réinitialiser',
+      collapseAll: 'Tout réduire',
+      expandAll: 'Tout ouvrir',
+      availability: 'Disponibilité',
     },
     sort: {
       label: 'Trier par',
@@ -473,6 +480,40 @@ export default {
       support: 'Support expert',
       secure: 'Paiement sécurisé',
     },
+    promo: 'PROMO',
+    researchOnly: 'RECHERCHE UNIQUEMENT',
+    clickToZoom: 'Cliquez pour zoomer',
+    certified: 'Certifié',
+    coaIncluded: 'COA inclus',
+    shipping24h: 'Expédition 24h',
+    stock: 'Stock',
+    available: 'disponibles',
+    origin: 'Origine',
+    europeanUnion: 'Union Européenne',
+    priceInfo: 'TTC • Livraison calculée au checkout',
+    lowStockWarning: 'Plus que {count} exemplaires disponibles !',
+    notFound: 'Produit introuvable ou indisponible.',
+    tabs: {
+      specs: 'Fiche technique',
+      protocols: 'Protocoles',
+      shipping: 'Livraison',
+    },
+    guarantees: {
+      purity: 'Pureté garantie ≥99%',
+      purityDesc: "Certificat d'analyse fourni",
+      secureShipping: 'Livraison sécurisée',
+      secureShippingDesc: 'Emballage isotherme inclus',
+      securePayment: 'Paiement sécurisé',
+      securePaymentDesc: 'Stripe & PayPal',
+    },
+    shippingOptions: {
+      standard: 'Livraison Standard',
+      standardTime: '3-5 jours ouvrés • À partir de 9.90€',
+      express: 'Livraison Express',
+      expressTime: '24-48h • À partir de 14.90€',
+      free: 'Livraison Offerte',
+      freeThreshold: "Dès 150€ d'achat",
+    },
   },
 
   // ============================================
@@ -501,6 +542,12 @@ export default {
     apply: 'Appliquer',
     promoApplied: 'Code promo appliqué',
     promoError: 'Code promo invalide',
+    clear: 'Vider le panier',
+    popularProducts: 'Produits populaires',
+    freeShippingUnlocked: 'Livraison offerte !',
+    weAccept: 'Nous acceptons',
+    freeShippingProgress: 'Plus que {amount} pour la livraison offerte',
+    perUnit: '/ unité',
   },
 
   // ============================================
@@ -907,6 +954,61 @@ export default {
     news: 'Actualités',
     categories: 'Catégories',
     messaging: 'Messagerie',
+  },
+
+  // ============================================
+  // VALIDATION
+  // ============================================
+  validation: {
+    required: 'Ce champ est requis',
+    minLength: 'Minimum {n} caractères requis',
+    maxLength: 'Maximum {n} caractères autorisés',
+    email: {
+      invalid: 'Format d\'email invalide',
+      tooLong: 'Email trop long',
+      disposable: 'Les emails jetables ne sont pas autorisés',
+    },
+    password: {
+      enterPassword: 'Entrez un mot de passe',
+      minLength: 'Au moins 8 caractères',
+      lowercase: 'Au moins une minuscule',
+      uppercase: 'Au moins une majuscule',
+      number: 'Au moins un chiffre',
+      special: 'Au moins un caractère spécial',
+      noRepeat: 'Évitez les répétitions',
+      noSequence: 'Évitez les séquences simples',
+      tooCommon: 'Mot de passe trop courant',
+      strong: 'Mot de passe sécurisé',
+      strength: 'Mot de passe trop faible',
+      mismatch: 'Les mots de passe ne correspondent pas',
+    },
+    phone: {
+      invalid: 'Numéro de téléphone invalide',
+      unsupportedCountry: 'Pays non supporté',
+    },
+    postalCode: {
+      invalid: 'Code postal invalide (ex: {value})',
+    },
+    number: {
+      min: 'La valeur doit être au moins {n}',
+      max: 'La valeur doit être au maximum {n}',
+      integer: 'Nombre entier requis',
+    },
+    price: {
+      positive: 'Le prix doit être positif',
+      format: '2 décimales maximum',
+    },
+    name: {
+      invalid: 'Caractères non autorisés',
+      tooShort: 'Nom trop court',
+    },
+    url: {
+      invalid: 'URL invalide',
+    },
+    slug: {
+      invalid: 'Format slug invalide',
+    },
+    error: 'Erreur de validation',
   },
 
   // ============================================

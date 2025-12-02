@@ -25,6 +25,10 @@ export interface UseFormValidationOptions<T extends Record<string, any>> {
       formatter?: (value: string) => string
       debounce?: number
       dependsOn?: (keyof T)[]
+      /** Valider dès la première frappe (sans attendre blur) */
+      validateOnChange?: boolean
+      /** Afficher les erreurs dès la première frappe */
+      showErrorsEarly?: boolean
     }
   }
   /** Validation live activée (défaut: true) */
@@ -33,6 +37,8 @@ export interface UseFormValidationOptions<T extends Record<string, any>> {
   debounceMs?: number
   /** Valider uniquement les champs touchés */
   validateOnlyTouched?: boolean
+  /** Mode de validation: 'onBlur' | 'onChange' | 'aggressive' (défaut: 'onBlur') */
+  validationMode?: 'onBlur' | 'onChange' | 'aggressive'
 }
 
 export interface FieldHelpers<T> {
@@ -67,6 +73,7 @@ export interface FieldHelpers<T> {
     alertLabel: string
     alertType: 'danger' | 'success' | 'warning' | undefined
     isValid: boolean
+    showError: boolean
   }>
 }
 
@@ -111,6 +118,7 @@ export function useFormValidation<T extends Record<string, any>>(
     liveValidation = true,
     debounceMs = 300,
     validateOnlyTouched = false,
+    validationMode = 'onBlur',
   } = options
 
   // Créer les états pour chaque champ
@@ -224,9 +232,18 @@ export function useFormValidation<T extends Record<string, any>>(
       state.value = value
       state.dirty = true
 
-      // Validation live si activée et champ touché
-      if (liveValidation && state.touched) {
+      // Déterminer si on doit valider
+      const shouldValidateOnChange = cfg.validateOnChange ?? (validationMode === 'onChange' || validationMode === 'aggressive')
+      const shouldValidateTouched = liveValidation && state.touched
+
+      // Validation live
+      if (shouldValidateOnChange || shouldValidateTouched) {
         debouncedValidate()
+      }
+
+      // Mode aggressive: marquer comme touché dès la première frappe
+      if (validationMode === 'aggressive' && value.length > 0) {
+        state.touched = true
       }
     }
 
@@ -260,13 +277,17 @@ export function useFormValidation<T extends Record<string, any>>(
 
     // Props pour le wrapper
     const wrapperProps = computed(() => {
-      const showError = state.touched && state.status === 'invalid'
+      // Déterminer si on affiche les erreurs tôt
+      const showErrorsEarly = cfg.showErrorsEarly ?? (validationMode === 'aggressive' || validationMode === 'onChange')
+      const canShowError = showErrorsEarly ? (state.dirty && state.value) : state.touched
+      const showError = canShowError && state.status === 'invalid'
       const showSuccess = state.touched && state.status === 'valid' && state.dirty
 
       return {
         alertLabel: showError ? (state.error ?? '') : '',
         alertType: showError ? 'danger' as const : showSuccess ? 'success' as const : undefined,
         isValid: state.status === 'valid',
+        showError,
       }
     })
 

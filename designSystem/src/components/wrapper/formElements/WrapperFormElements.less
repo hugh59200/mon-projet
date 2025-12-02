@@ -1,3 +1,6 @@
+@import '@designSystem/fondation/colors/colors.less';
+@import '@designSystem/fondation/spacing/spacing.less';
+
 .wrapper {
   position: relative;
   flex: 1;
@@ -19,6 +22,79 @@
     margin-bottom: @spacing-5;
   }
 
+  // ============================================
+  // ALERT STYLES - Premium Design
+  // ============================================
+  &__alert {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    &-message {
+      flex: 1;
+    }
+
+    // Type: Danger
+    &--danger {
+      color: @danger-500;
+
+      .wrapper__alert-icon {
+        color: @danger-500;
+      }
+    }
+
+    // Type: Warning
+    &--warning {
+      color: @warning-600;
+
+      .wrapper__alert-icon {
+        color: @warning-500;
+      }
+    }
+
+    // Type: Success
+    &--success {
+      color: @success-500;
+
+      .wrapper__alert-icon {
+        color: @success-500;
+      }
+    }
+
+    // Type: Info
+    &--info {
+      color: @info-500;
+
+      .wrapper__alert-icon {
+        color: @info-500;
+      }
+    }
+  }
+
+  // Legacy support
   :deep(.alert--label) {
     padding: 0;
   }
@@ -30,5 +106,38 @@
       cursor: pointer;
       text-decoration: underline;
     }
+  }
+}
+
+// ============================================
+// ANIMATIONS - Premium Transitions
+// ============================================
+.field-alert-enter-active {
+  animation: fieldAlertIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.field-alert-leave-active {
+  animation: fieldAlertOut 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fieldAlertIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fieldAlertOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 }

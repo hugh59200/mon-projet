@@ -14,13 +14,13 @@
           @click="$router.push('/catalogue')"
         >
           <BasicIconNext name="ArrowLeft" :size="20" />
-          <span>Retour au catalogue</span>
+          <span>{{ t('common.back') }} {{ t('nav.catalogue').toLowerCase() }}</span>
         </button>
 
         <div class="product-page__breadcrumb">
-          <span @click="$router.push('/')">Accueil</span>
+          <span @click="$router.push('/')">{{ t('nav.home') }}</span>
           <BasicIconNext name="ChevronRight" :size="16" />
-          <span @click="$router.push('/catalogue')">Catalogue</span>
+          <span @click="$router.push('/catalogue')">{{ t('nav.catalogue') }}</span>
           <BasicIconNext name="ChevronRight" :size="16" />
           <span class="active">{{ productName || '...' }}</span>
         </div>
@@ -30,8 +30,8 @@
         :loading="loading"
         :has-loaded="!!product"
         :is-empty="!product && !loading"
-        message="Chargement du produit..."
-        empty-message="Produit introuvable ou indisponible."
+        :message="t('common.loading')"
+        :empty-message="t('product.notFound')"
       >
         <article
           v-if="product"
@@ -48,13 +48,13 @@
                   class="product__badge product__badge--promo"
                 >
                   <BasicIconNext name="Star" :size="14" />
-                  PROMO
+                  {{ t('product.promo') }}
                 </div>
 
                 <!-- Badge RUO -->
                 <div class="product__badge product__badge--ruo">
                   <BasicIconNext name="Lightbulb" :size="12" />
-                  RECHERCHE UNIQUEMENT
+                  {{ t('product.researchOnly') }}
                 </div>
 
                 <!-- Image principale avec zoom -->
@@ -70,7 +70,7 @@
                   />
                   <div class="product__image-hint">
                     <BasicIconNext name="ZoomIn" :size="16" />
-                    Cliquez pour zoomer
+                    {{ t('product.clickToZoom') }}
                   </div>
                 </div>
 
@@ -78,15 +78,15 @@
                 <div class="product__trust-strip">
                   <div class="product__trust-item">
                     <BasicIconNext name="ShieldCheck" :size="18" />
-                    <span>Certifié</span>
+                    <span>{{ t('product.certified') }}</span>
                   </div>
                   <div class="product__trust-item">
                     <BasicIconNext name="FileText" :size="18" />
-                    <span>COA inclus</span>
+                    <span>{{ t('product.coaIncluded') }}</span>
                   </div>
                   <div class="product__trust-item">
                     <BasicIconNext name="Zap" :size="18" />
-                    <span>Expédition 24h</span>
+                    <span>{{ t('product.shipping24h') }}</span>
                   </div>
                 </div>
               </div>
@@ -121,7 +121,7 @@
                     <BasicIconNext name="FlaskConical" :size="20" />
                   </div>
                   <div class="product__spec-content">
-                    <span class="product__spec-label">Pureté</span>
+                    <span class="product__spec-label">{{ t('catalogue.product.purity') }}</span>
                     <span class="product__spec-value product__spec-value--success">
                       {{ product.purity }}%
                     </span>
@@ -133,7 +133,7 @@
                     <BasicIconNext name="Package" :size="20" />
                   </div>
                   <div class="product__spec-content">
-                    <span class="product__spec-label">Stock</span>
+                    <span class="product__spec-label">{{ t('product.stock') }}</span>
                     <span
                       class="product__spec-value"
                       :class="{
@@ -143,7 +143,7 @@
                         'product__spec-value--danger': (product.stock ?? 0) <= 0,
                       }"
                     >
-                      {{ (product.stock ?? 0) > 0 ? `${product.stock} disponibles` : 'Rupture' }}
+                      {{ (product.stock ?? 0) > 0 ? `${product.stock} ${t('product.available')}` : t('catalogue.product.outOfStock') }}
                     </span>
                   </div>
                 </div>
@@ -153,8 +153,8 @@
                     <span class="product__spec-flag">🇪🇺</span>
                   </div>
                   <div class="product__spec-content">
-                    <span class="product__spec-label">Origine</span>
-                    <span class="product__spec-value">Union Européenne</span>
+                    <span class="product__spec-label">{{ t('product.origin') }}</span>
+                    <span class="product__spec-value">{{ t('product.europeanUnion') }}</span>
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@
                       <span>€</span>
                     </div>
                   </template>
-                  <div class="product__price-info">TTC • Livraison calculée au checkout</div>
+                  <div class="product__price-info">{{ t('product.priceInfo') }}</div>
                 </div>
 
                 <!-- Boutons d'action -->
@@ -192,7 +192,7 @@
                   >
                     <BasicIconNext name="ShoppingCart" :size="20" />
                     <span>
-                      {{ (product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock' }}
+                      {{ (product.stock ?? 0) > 0 ? t('catalogue.product.addToCart') : t('catalogue.product.outOfStock') }}
                     </span>
                   </button>
 
@@ -202,7 +202,7 @@
                     @click="buyNow(product!)"
                   >
                     <BasicIconNext name="Zap" :size="20" />
-                    <span>Acheter maintenant</span>
+                    <span>{{ t('product.buyNow') }}</span>
                   </button>
                 </div>
 
@@ -213,9 +213,7 @@
                 >
                   <BasicIconNext name="AlertTriangle" :size="16" />
                   <span>
-                    Plus que
-                    <strong>{{ product.stock }}</strong>
-                    exemplaires disponibles !
+                    {{ t('product.lowStockWarning', { count: product.stock }) }}
                   </span>
                 </div>
               </div>
@@ -227,8 +225,8 @@
                     <BasicIconNext name="ShieldCheck" :size="24" />
                   </div>
                   <div>
-                    <strong>Pureté garantie ≥99%</strong>
-                    <span>Certificat d'analyse fourni</span>
+                    <strong>{{ t('product.guarantees.purity') }}</strong>
+                    <span>{{ t('product.guarantees.purityDesc') }}</span>
                   </div>
                 </div>
                 <div class="product__guarantee">
@@ -236,8 +234,8 @@
                     <BasicIconNext name="Truck" :size="24" />
                   </div>
                   <div>
-                    <strong>Livraison sécurisée</strong>
-                    <span>Emballage isotherme inclus</span>
+                    <strong>{{ t('product.guarantees.secureShipping') }}</strong>
+                    <span>{{ t('product.guarantees.secureShippingDesc') }}</span>
                   </div>
                 </div>
                 <div class="product__guarantee">
@@ -245,8 +243,8 @@
                     <BasicIconNext name="Shield" :size="24" />
                   </div>
                   <div>
-                    <strong>Paiement sécurisé</strong>
-                    <span>Stripe & PayPal</span>
+                    <strong>{{ t('product.guarantees.securePayment') }}</strong>
+                    <span>{{ t('product.guarantees.securePaymentDesc') }}</span>
                   </div>
                 </div>
               </div>
@@ -262,7 +260,7 @@
                 @click="activeTab = 'description'"
               >
                 <BasicIconNext name="FileText" :size="18" />
-                Fiche technique
+                {{ t('product.tabs.specs') }}
               </button>
               <button
                 class="product__tab"
@@ -270,7 +268,7 @@
                 @click="activeTab = 'protocol'"
               >
                 <BasicIconNext name="FlaskConical" :size="18" />
-                Protocoles
+                {{ t('product.tabs.protocols') }}
               </button>
               <button
                 class="product__tab"
@@ -278,7 +276,7 @@
                 @click="activeTab = 'shipping'"
               >
                 <BasicIconNext name="Truck" :size="18" />
-                Livraison
+                {{ t('product.tabs.shipping') }}
               </button>
             </div>
 
@@ -313,22 +311,22 @@
                   <div class="product__shipping-card">
                     <div class="product__shipping-icon">🚚</div>
                     <div>
-                      <h4>Livraison Standard</h4>
-                      <p>3-5 jours ouvrés • À partir de 9.90€</p>
+                      <h4>{{ t('product.shippingOptions.standard') }}</h4>
+                      <p>{{ t('product.shippingOptions.standardTime') }}</p>
                     </div>
                   </div>
                   <div class="product__shipping-card">
                     <div class="product__shipping-icon">⚡</div>
                     <div>
-                      <h4>Livraison Express</h4>
-                      <p>24-48h • À partir de 14.90€</p>
+                      <h4>{{ t('product.shippingOptions.express') }}</h4>
+                      <p>{{ t('product.shippingOptions.expressTime') }}</p>
                     </div>
                   </div>
                   <div class="product__shipping-card">
                     <div class="product__shipping-icon">🎁</div>
                     <div>
-                      <h4>Livraison Offerte</h4>
-                      <p>Dès 150€ d'achat</p>
+                      <h4>{{ t('product.shippingOptions.free') }}</h4>
+                      <p>{{ t('product.shippingOptions.freeThreshold') }}</p>
                     </div>
                   </div>
                 </div>

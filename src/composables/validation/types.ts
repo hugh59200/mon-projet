@@ -36,6 +36,10 @@ export interface FieldConfig<T = string> {
   debounce?: number
   /** Dépendances (autres champs à valider quand celui-ci change) */
   dependsOn?: string[]
+  /** Valider à chaque changement (override du mode global) */
+  validateOnChange?: boolean
+  /** Afficher les erreurs dès la première frappe */
+  showErrorsEarly?: boolean
 }
 
 export interface FormConfig {

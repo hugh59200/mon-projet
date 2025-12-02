@@ -66,8 +66,13 @@
     <ChatInput
       v-model="newMessage"
       :isOnline="isOnline"
+      :showAiButton="showAiButton"
+      :aiLoading="aiLoading"
+      :aiError="aiError"
       @send="sendMessage"
       @typing="sendTyping"
+      @request-ai-suggestion="$emit('request-ai-suggestion')"
+      @clear-ai-error="$emit('clear-ai-error')"
     />
   </div>
 </template>
@@ -91,6 +96,14 @@
     height?: string | number
     maxHeight?: string | number
     minHeight?: string | number
+    showAiButton?: boolean
+    aiLoading?: boolean
+    aiError?: string | null
+  }>()
+
+  defineEmits<{
+    (e: 'request-ai-suggestion'): void
+    (e: 'clear-ai-error'): void
   }>()
 
   const newMessage = defineModel<string>('newMessage', { default: '' })

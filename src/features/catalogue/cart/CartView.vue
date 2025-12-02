@@ -15,13 +15,13 @@
             @click="$router.push('/catalogue')"
           >
             <BasicIconNext name="ArrowLeft" :size="20" />
-            <span>Continuer mes achats</span>
+            <span>{{ t('cart.continueShopping') }}</span>
           </button>
         </div>
 
         <h1 class="cart__title">
           <BasicIconNext name="ShoppingCart" :size="28" />
-          Mon panier
+          {{ t('cart.title') }}
           <span
             v-if="cart.items.length > 0"
             class="cart__title-count"
@@ -37,7 +37,7 @@
             @click="confirmClearCart"
           >
             <BasicIconNext name="Trash2" :size="18" />
-            <span>Vider le panier</span>
+            <span>{{ t('cart.clear') }}</span>
           </button>
         </div>
       </header>
@@ -58,9 +58,9 @@
           </div>
         </div>
 
-        <h2 class="cart__empty-title">Votre panier est vide</h2>
+        <h2 class="cart__empty-title">{{ t('cart.empty') }}</h2>
         <p class="cart__empty-text">
-          Découvrez notre sélection de peptides de recherche haute pureté
+          {{ t('cart.emptyText') }}
         </p>
 
         <button
@@ -68,12 +68,12 @@
           @click="$router.push('/catalogue')"
         >
           <BasicIconNext name="ShoppingBag" :size="20" />
-          Explorer le catalogue
+          {{ t('home.hero.cta.explore') }}
         </button>
 
         <!-- Suggestions -->
         <div class="cart__suggestions">
-          <p class="cart__suggestions-title">Produits populaires</p>
+          <p class="cart__suggestions-title">{{ t('cart.popularProducts') }}</p>
           <div class="cart__suggestions-tags">
             <button @click="$router.push('/catalogue?categories=Anti-âge')">Anti-âge</button>
             <button @click="$router.push('/catalogue?categories=Performance')">Performance</button>
@@ -93,10 +93,10 @@
         <div class="cart__main">
           <!-- Table Header -->
           <div class="cart__table-header">
-            <span class="cart__col cart__col--product">Produit</span>
-            <span class="cart__col cart__col--price">Prix unitaire</span>
-            <span class="cart__col cart__col--quantity">Quantité</span>
-            <span class="cart__col cart__col--total">Total</span>
+            <span class="cart__col cart__col--product">{{ t('cart.item') }}</span>
+            <span class="cart__col cart__col--price">{{ t('cart.price') }}</span>
+            <span class="cart__col cart__col--quantity">{{ t('cart.quantity') }}</span>
+            <span class="cart__col cart__col--total">{{ t('cart.total') }}</span>
             <span class="cart__col cart__col--actions"></span>
           </div>
 
@@ -140,7 +140,7 @@
                   <div class="cart-item__meta">
                     <span class="cart-item__stock cart-item__stock--in">
                       <BasicIconNext name="CheckCircle2" :size="12" />
-                      En stock
+                      {{ t('catalogue.product.inStock') }}
                     </span>
                   </div>
                 </div>
@@ -200,7 +200,7 @@
                 <button
                   class="cart-item__remove"
                   @click="removeItem(item)"
-                  title="Supprimer"
+                  :title="t('common.delete')"
                 >
                   <BasicIconNext name="Trash2" :size="18" />
                 </button>
@@ -238,12 +238,12 @@
           <div class="cart__summary">
             <h3 class="cart__summary-title">
               <BasicIconNext name="ClipboardList" :size="20" />
-              Récapitulatif
+              {{ t('checkout.summary.title') }}
             </h3>
 
             <div class="cart__summary-rows">
               <div class="cart__summary-row">
-                <span>Sous-total ({{ cart.totalItems }} articles)</span>
+                <span>{{ t('cart.subtotal') }} ({{ cart.totalItems }} {{ t('cart.items').toLowerCase() }})</span>
                 <span>{{ formatPrice(cartSubtotal) }}</span>
               </div>
 
@@ -253,15 +253,15 @@
               >
                 <span>
                   <BasicIconNext name="Tag" :size="14" />
-                  Économies
+                  {{ t('cart.discount') }}
                 </span>
                 <span>-{{ formatPrice(totalDiscount) }}</span>
               </div>
 
               <div class="cart__summary-row">
-                <span>Livraison</span>
+                <span>{{ t('cart.shipping') }}</span>
                 <span :class="{ 'cart__summary-free': shippingCost === 0 }">
-                  {{ shippingCost === 0 ? 'Offerte' : formatPrice(shippingCost) }}
+                  {{ shippingCost === 0 ? t('cart.freeShipping') : formatPrice(shippingCost) }}
                 </span>
               </div>
 
@@ -278,9 +278,7 @@
                 </div>
                 <p class="cart__shipping-text">
                   <BasicIconNext name="Truck" :size="14" />
-                  Plus que
-                  <strong>{{ formatPrice(FREE_SHIPPING_THRESHOLD - cartSubtotal) }}</strong>
-                  pour la livraison offerte
+                  {{ t('cart.freeShippingProgress', { amount: formatPrice(FREE_SHIPPING_THRESHOLD - cartSubtotal) }) }}
                 </p>
               </div>
 
@@ -289,13 +287,13 @@
                 class="cart__shipping-success"
               >
                 <BasicIconNext name="CheckCircle2" :size="18" />
-                <span>Livraison offerte !</span>
+                <span>{{ t('cart.freeShippingUnlocked') }}</span>
               </div>
 
               <div class="cart__summary-divider"></div>
 
               <div class="cart__summary-row cart__summary-row--total">
-                <span>Total</span>
+                <span>{{ t('cart.total') }}</span>
                 <span>{{ formatPrice(finalTotal) }}</span>
               </div>
             </div>
@@ -305,28 +303,28 @@
               @click="$router.push('/checkout')"
             >
               <BasicIconNext name="Shield" :size="20" />
-              Procéder au paiement
+              {{ t('cart.checkout') }}
             </button>
 
             <!-- Trust Badges -->
             <div class="cart__trust">
               <div class="cart__trust-item">
                 <BasicIconNext name="Lock" :size="18" />
-                <span>Paiement sécurisé</span>
+                <span>{{ t('product.trustBadges.secure') }}</span>
               </div>
               <div class="cart__trust-item">
                 <BasicIconNext name="Truck" :size="18" />
-                <span>Expédition 24h</span>
+                <span>{{ t('product.trustBadges.shipping') }}</span>
               </div>
               <div class="cart__trust-item">
                 <BasicIconNext name="ShieldCheck" :size="18" />
-                <span>Pureté garantie</span>
+                <span>{{ t('product.trustBadges.quality') }}</span>
               </div>
             </div>
 
             <!-- Payment Methods -->
             <div class="cart__payment-methods">
-              <span>Nous acceptons</span>
+              <span>{{ t('cart.weAccept') }}</span>
               <div class="cart__payment-icons">
                 <div class="cart__payment-icon" title="Visa">
                   <BasicIconNext name="visa" :size="32" />
@@ -352,7 +350,10 @@
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  const { t } = useI18n()
 
   const cart = useCartStore()
   const router = useRouter()
@@ -424,14 +425,14 @@
   function removeItem(item: CartView) {
     if (item.product_id) {
       cart.removeFromCart(item.product_id)
-      toast.show(`${item.product_name} retiré du panier`, 'info')
+      toast.show(`${item.product_name} ${t('cart.remove').toLowerCase()}`, 'info')
     }
   }
 
   function confirmClearCart() {
-    if (confirm('Êtes-vous sûr de vouloir vider votre panier ?')) {
+    if (confirm(t('cart.clear') + ' ?')) {
       cart.clearCart()
-      toast.show('Panier vidé', 'info')
+      toast.show(t('cart.clear'), 'info')
     }
   }
 

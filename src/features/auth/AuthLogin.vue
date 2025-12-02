@@ -38,8 +38,9 @@
           required
           :showStrength="false"
           :alertLabel="fields.password.wrapperProps.value.alertLabel"
+          :alertType="fields.password.wrapperProps.value.alertType"
           :touched="fields.password.touched.value"
-          @input="clear"
+          @input="(e: Event) => { fields.password.onInput(e); clear() }"
           @blur="fields.password.onBlur"
         />
       </div>

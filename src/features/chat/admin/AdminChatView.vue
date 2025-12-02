@@ -2,6 +2,13 @@
   <div class="chat-admin">
     <header class="chat-admin__header">
       <div class="chat-admin__header-info">
+        <BasicButton
+          v-if="isMobile && selectedUserId"
+          variant="ghost"
+          size="small"
+          iconName="ArrowLeft"
+          @click="goBackToList"
+        />
         <BasicIconNext
           name="MessageCircle"
           :size="20"
@@ -24,7 +31,13 @@
         />
       </div>
     </header>
-    <div class="chat-admin__layout">
+    <div
+      class="chat-admin__layout"
+      :class="{
+        'chat-admin__layout--chat-open': isMobile && selectedUserId,
+        'chat-admin__layout--chat-closed': isMobile && !selectedUserId,
+      }"
+    >
       <ChatSidebar
         :conversations="filteredConversations"
         :selected-id="selectedUserId"
@@ -40,7 +53,12 @@
         current-role="admin"
         :send-message="sendMessage"
         :send-typing="sendTyping"
-        :height="600"
+        :height="isMobile ? undefined : 600"
+        :show-ai-button="true"
+        :ai-loading="aiSuggestion.isLoading.value"
+        :ai-error="aiSuggestion.error.value"
+        @request-ai-suggestion="handleAiSuggestion"
+        @clear-ai-error="aiSuggestion.reset"
       />
       <section
         v-else
@@ -62,12 +80,16 @@
 </template>
 
 <script setup lang="ts">
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onMounted, ref, watch } from 'vue'
   import ChatCore from '../shared/components/ChatCore.vue'
+  import { useAiSuggestion } from '../shared/composables/useAiSuggestion'
   import { useChat } from '../shared/composables/useChat'
   import { useChatConversations } from '../shared/composables/useChatConversations'
   import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
   import ChatSidebar from './ChatSidebar.vue'
+
+  const { isMobile } = useDeviceBreakpoint()
 
   const {
     messages,
@@ -79,6 +101,26 @@
     sendMessage,
     sendTyping,
   } = useChat('admin')
+
+  // AI Copilot
+  const aiSuggestion = useAiSuggestion()
+
+  const handleAiSuggestion = async () => {
+    // Récupérer l'email du client depuis la conversation sélectionnée
+    const currentConv = conv.conversations.value.find((c) => c.user_id === selectedUserId.value)
+    const clientEmail = currentConv?.user_email ?? undefined
+
+    const suggestion = await aiSuggestion.generateSuggestion(messages.value, clientEmail)
+
+    if (suggestion) {
+      // Insérer la suggestion dans le champ de saisie (brouillon)
+      newMessage.value = suggestion
+    }
+  }
+
+  const goBackToList = () => {
+    selectedUserId.value = null
+  }
 
   const conv = useChatConversations()
 
@@ -182,6 +224,56 @@
       gap: 12px;
       min-height: 600px;
       text-align: center;
+    }
+
+    /* ------------------------- Mobile responsive ------------------------- */
+    @media (max-width: 768px) {
+      padding: 16px;
+      gap: 12px;
+      min-height: auto;
+      border-radius: 12px;
+
+      &__header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+
+        &-info {
+          justify-content: center;
+        }
+
+        &-actions {
+          justify-content: center;
+        }
+
+        &-search {
+          width: 100%;
+        }
+      }
+
+      &__layout {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+        border-radius: 12px;
+
+        &--chat-open {
+          .chat-sidebar {
+            display: none;
+          }
+        }
+
+        &--chat-closed {
+          .chat-core {
+            display: none;
+          }
+        }
+      }
+
+      &__placeholder {
+        min-height: 300px;
+        padding: 24px;
+      }
     }
   }
 </style>

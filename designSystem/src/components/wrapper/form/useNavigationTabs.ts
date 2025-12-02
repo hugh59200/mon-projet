@@ -1,15 +1,16 @@
 import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
 import type { RouteName } from '@/router/route-name'
 import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
-import type { TabsModel } from '@designSystem/components/basic/tabs/BasicTabs.types'
 import type { TextColor } from '@designSystem/components/basic/text'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 export function useNavigationTabs() {
   const router = useRouter()
   const route = useRoute()
   const adminTabStore = useAdminTabStore()
+  const { t } = useI18n()
 
   // 🔹 Récupère les routes enfants du parent (ex: /admin)
   const tabsRoutes = computed<TabProps[]>(() => {
@@ -18,7 +19,7 @@ export function useNavigationTabs() {
 
     return parent.children.map((child) => ({
       routeName: child.name as RouteName,
-      tabKey: (child.meta?.label as TabsModel) || (child.name as string),
+      tabKey: child.meta?.labelKey ? t(child.meta.labelKey as string) : (child.name as string),
       color: (child.meta?.color as TextColor) ?? 'neutral-300',
       icon: child.meta?.icon as IconNameNext,
     }))

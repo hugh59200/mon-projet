@@ -7,7 +7,7 @@
       <div class="img-container">
         <img
           :src="item.product_image || ''"
-          :alt="item.product_name || 'Produit'"
+          :alt="item.product_name || t('cart.item')"
           loading="lazy"
         />
       </div>
@@ -32,7 +32,7 @@
               size="body-s"
               color="neutral-500"
             >
-              {{ item.product_category || 'Général' }}
+              {{ item.product_category || t('common.general') }}
             </BasicText>
             <span
               v-if="item.product_dosage"
@@ -53,7 +53,7 @@
 
         <button
           class="btn-remove"
-          aria-label="Supprimer"
+          :aria-label="t('common.delete')"
           @click="removeItem"
           :disabled="loading"
         >
@@ -90,7 +90,7 @@
             </BasicText>
           </div>
 
-          <span class="unit-label">/ unité</span>
+          <span class="unit-label">{{ t('cart.perUnit') }}</span>
         </div>
 
         <div class="actions-group">
@@ -135,6 +135,9 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { computed, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   type ExtendedCartView = CartView & {
     product_dosage?: string | null

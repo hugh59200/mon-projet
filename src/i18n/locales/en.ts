@@ -295,6 +295,8 @@ export default {
     showMore: 'Show more',
     showLess: 'Show less',
     comingSoon: 'Coming soon',
+    select: 'Select...',
+    general: 'General',
   },
 
   // ============================================
@@ -372,6 +374,7 @@ export default {
       invalidPassword: 'Invalid password',
       emailRequired: 'Email is required',
       passwordRequired: 'Password is required',
+      passwordTooShort: 'Password must be at least 6 characters',
       passwordMismatch: 'Passwords do not match',
       userNotFound: 'User not found',
       wrongPassword: 'Wrong password',
@@ -397,8 +400,12 @@ export default {
       categories: 'Categories',
       tags: 'Tags',
       price: 'Price',
-      inStock: 'In stock only',
+      inStock: 'In stock',
+      inStockOnly: 'In stock only',
       resetAll: 'Reset all',
+      collapseAll: 'Collapse all',
+      expandAll: 'Expand all',
+      availability: 'Availability',
     },
     sort: {
       label: 'Sort by',
@@ -466,6 +473,40 @@ export default {
       support: 'Expert Support',
       secure: 'Secure Payment',
     },
+    promo: 'SALE',
+    researchOnly: 'RESEARCH ONLY',
+    clickToZoom: 'Click to zoom',
+    certified: 'Certified',
+    coaIncluded: 'CoA included',
+    shipping24h: '24h shipping',
+    stock: 'Stock',
+    available: 'available',
+    origin: 'Origin',
+    europeanUnion: 'European Union',
+    priceInfo: 'Incl. tax • Shipping calculated at checkout',
+    lowStockWarning: 'Only {count} left in stock!',
+    notFound: 'Product not found or unavailable.',
+    tabs: {
+      specs: 'Specifications',
+      protocols: 'Protocols',
+      shipping: 'Shipping',
+    },
+    guarantees: {
+      purity: 'Guaranteed purity ≥99%',
+      purityDesc: 'Certificate of analysis provided',
+      secureShipping: 'Secure shipping',
+      secureShippingDesc: 'Insulated packaging included',
+      securePayment: 'Secure payment',
+      securePaymentDesc: 'Stripe & PayPal',
+    },
+    shippingOptions: {
+      standard: 'Standard Shipping',
+      standardTime: '3-5 business days • From 9.90€',
+      express: 'Express Shipping',
+      expressTime: '24-48h • From 14.90€',
+      free: 'Free Shipping',
+      freeThreshold: 'On orders over 150€',
+    },
   },
 
   // ============================================
@@ -494,6 +535,12 @@ export default {
     apply: 'Apply',
     promoApplied: 'Promo code applied',
     promoError: 'Invalid promo code',
+    clear: 'Clear cart',
+    popularProducts: 'Popular Products',
+    freeShippingUnlocked: 'Free shipping unlocked!',
+    weAccept: 'We accept',
+    freeShippingProgress: 'Only {amount} left to unlock free shipping',
+    perUnit: '/ unit',
   },
 
   // ============================================
@@ -894,6 +941,61 @@ export default {
     news: 'News',
     categories: 'Categories',
     messaging: 'Messaging',
+  },
+
+  // ============================================
+  // VALIDATION
+  // ============================================
+  validation: {
+    required: 'This field is required',
+    minLength: 'Minimum {n} characters required',
+    maxLength: 'Maximum {n} characters allowed',
+    email: {
+      invalid: 'Invalid email format',
+      tooLong: 'Email is too long',
+      disposable: 'Disposable emails are not allowed',
+    },
+    password: {
+      enterPassword: 'Enter a password',
+      minLength: 'At least 8 characters',
+      lowercase: 'At least one lowercase letter',
+      uppercase: 'At least one uppercase letter',
+      number: 'At least one number',
+      special: 'At least one special character',
+      noRepeat: 'Avoid repetitions',
+      noSequence: 'Avoid simple sequences',
+      tooCommon: 'Password is too common',
+      strong: 'Strong password',
+      strength: 'Password is too weak',
+      mismatch: 'Passwords do not match',
+    },
+    phone: {
+      invalid: 'Invalid phone number',
+      unsupportedCountry: 'Unsupported country',
+    },
+    postalCode: {
+      invalid: 'Invalid postal code (e.g., {value})',
+    },
+    number: {
+      min: 'Value must be at least {n}',
+      max: 'Value must be at most {n}',
+      integer: 'Integer required',
+    },
+    price: {
+      positive: 'Price must be positive',
+      format: '2 decimal places maximum',
+    },
+    name: {
+      invalid: 'Invalid characters',
+      tooShort: 'Name is too short',
+    },
+    url: {
+      invalid: 'Invalid URL',
+    },
+    slug: {
+      invalid: 'Invalid slug format',
+    },
+    error: 'Validation error',
   },
 
   // ============================================

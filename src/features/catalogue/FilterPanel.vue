@@ -6,21 +6,21 @@
         weight="bold"
         color="neutral-300"
       >
-        Filtres
+        {{ t('catalogue.filters.title') }}
       </BasicText>
       <div class="catalogue-filters__actions">
         <BasicButton
           type="secondary"
           variant="outlined"
           size="small"
-          :label="allOpen ? 'Tout réduire' : 'Tout ouvrir'"
+          :label="allOpen ? t('catalogue.filters.collapseAll') : t('catalogue.filters.expandAll')"
           @click="emit('toggleAll')"
         />
         <BasicButton
           type="secondary"
           variant="outlined"
           size="small"
-          label="Reset"
+          :label="t('catalogue.filters.resetAll')"
           @click="emit('resetAll')"
         />
       </div>
@@ -28,14 +28,14 @@
 
     <FilterSection
       v-model="filterOpen.price"
-      title="Prix"
+      :title="t('catalogue.filters.price')"
     >
       <BasicRange v-model="priceRange" />
     </FilterSection>
 
     <FilterSection
       v-model="filterOpen.category"
-      title="Catégorie"
+      :title="t('catalogue.filters.categories')"
     >
       <WrapperDropdown
         v-model="selectedCategories"
@@ -44,34 +44,34 @@
         deletable
         mode="multiple"
         size="small"
-        placeholder="Choisir..."
+        :placeholder="t('common.select')"
       />
     </FilterSection>
 
     <FilterSection
       v-model="filterOpen.stock"
-      title="Disponibilité"
+      :title="t('catalogue.filters.availability')"
     >
       <WrapperCheckbox
         v-model="inStockOnly"
-        :label="`En stock (${stockCount})`"
+        :label="`${t('catalogue.filters.inStock')} (${stockCount})`"
       />
     </FilterSection>
 
     <FilterSection
       v-if="tags.length"
       v-model="filterOpen.tags"
-      title="Tags"
+      :title="t('catalogue.filters.tags')"
     >
       <div class="catalogue-filters__tags">
         <BasicBadge
-          v-for="t in displayedTags"
-          :key="t.id"
-          :label="`${t.label} (${t.count})`"
+          v-for="tag in displayedTags"
+          :key="tag.id"
+          :label="`${tag.label} (${tag.count})`"
           size="small"
-          :type="selectedTags.includes(t.id) ? 'success' : 'default'"
+          :type="selectedTags.includes(tag.id) ? 'success' : 'default'"
           deletable
-          @click="emit('toggleTag', t.id)"
+          @click="emit('toggleTag', tag.id)"
           class="filter-tag"
         />
       </div>
@@ -87,7 +87,7 @@
           class="toggle-link"
           @click="showAllTags = !showAllTags"
         >
-          {{ showAllTags ? '- Voir moins' : `+ Voir tout (${tagItems.length})` }}
+          {{ showAllTags ? `- ${t('common.seeLess')}` : `+ ${t('common.viewAll')} (${tagItems.length})` }}
         </BasicText>
       </div>
     </FilterSection>
@@ -97,6 +97,9 @@
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { computed, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // Models
   const filterOpen = defineModel<Record<string, boolean>>('filterOpen', { default: () => ({}) })
