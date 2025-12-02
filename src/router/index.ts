@@ -270,6 +270,14 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/a-propos',
+    name: 'about',
+    component: () => import('@/features/about/AboutView.vue'),
+    meta: {
+      title: 'À propos – Fast Peptides',
+    },
+  },
+  {
     path: '/faq',
     name: 'faq',
     component: () => import('@/features/faq/FaqView.vue'),

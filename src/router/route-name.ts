@@ -7,6 +7,7 @@ export type RouteName =
   'AdminStats' |
   'AdminTopics' |
   'AdminUsers' |
+  'about' |
   'access-denied' |
   'actualite-detail' |
   'actualites' |

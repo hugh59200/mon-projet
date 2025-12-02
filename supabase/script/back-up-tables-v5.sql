@@ -1169,5 +1169,26 @@ FROM auth.users u
 LEFT JOIN public.profiles p ON u.id = p.id;
 
 -- ============================================================
--- FIN DU BACKUP V5.0 — i18n + GUEST + RELAY
+-- BLOC 11 — REALTIME CONFIGURATION
+-- ============================================================
+
+-- Activer Realtime sur la table messages pour le chat en temps reel
+-- Note: La publication supabase_realtime est creee automatiquement par Supabase
+DO $$
+BEGIN
+  -- Verifier si la table messages est deja dans la publication
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+    AND tablename = 'messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+    RAISE NOTICE 'Table messages ajoutee a la publication supabase_realtime';
+  ELSE
+    RAISE NOTICE 'Table messages deja presente dans supabase_realtime';
+  END IF;
+END $$;
+
+-- ============================================================
+-- FIN DU BACKUP V5.0 — i18n + GUEST + RELAY + REALTIME
 -- ============================================================

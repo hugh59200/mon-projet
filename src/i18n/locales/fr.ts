@@ -313,6 +313,7 @@ export default {
     home: 'Accueil',
     catalogue: 'Catalogue',
     news: 'Actualités',
+    about: 'À propos',
     faq: 'FAQ',
     contact: 'Contact',
     cart: 'Panier',
@@ -904,6 +905,94 @@ export default {
     backToNews: 'Retour aux actualités',
     publishedOn: 'Publié le',
     author: 'Par',
+  },
+
+  // ============================================
+  // ABOUT / À PROPOS
+  // ============================================
+  about: {
+    hero: {
+      badge: 'À propos',
+      title: {
+        line1: 'Atlas Lab Solutions',
+        accent: "L'excellence scientifique, la logistique locale.",
+      },
+      subtitle: "Société américaine spécialisée dans la distribution de composés chimiques de haute pureté pour la recherche scientifique, avec une plateforme logistique en France.",
+    },
+    dna: {
+      title: 'Qui sommes-nous ?',
+      description: "Atlas Lab Solutions LLC combine l'expertise américaine en biotechnologie avec la proximité logistique européenne pour offrir le meilleur des deux mondes.",
+      us: {
+        title: 'Expertise Américaine',
+        text: "Basés à Albuquerque (Nouveau-Mexique), au cœur de l'innovation biotechnologique américaine, nous collaborons avec des laboratoires partenaires certifiés.",
+        point1: 'Siège au Nouveau-Mexique, USA',
+        point2: 'Partenariats laboratoires certifiés',
+        point3: 'Pureté garantie ≥99% (HPLC)',
+      },
+      fr: {
+        title: 'Logistique Française',
+        text: 'Pour éviter les frais de douane et les délais à nos clients européens, nous avons mis en place une plateforme logistique en France.',
+        point1: 'Stock physique en France',
+        point2: 'Zéro frais de douane',
+        point3: 'Livraison 24-48h en France',
+      },
+    },
+    advantages: {
+      badge: 'Vos avantages',
+      title: 'Pourquoi commander chez nous ?',
+      items: {
+        noDuty: {
+          title: 'Zéro Douane',
+          text: "Pas de frais de dossier douanier à la réception. Vos commandes partent directement de France.",
+        },
+        fast: {
+          title: 'Livraison 48h',
+          text: "Expédition depuis notre hub français via Mondial Relay ou à domicile.",
+        },
+        tracking: {
+          title: 'Traçabilité Complète',
+          text: "Suivi en temps réel de bout en bout, de notre entrepôt à votre laboratoire.",
+        },
+        quality: {
+          title: 'Qualité Certifiée',
+          text: "Chaque lot testé avec certificat d'analyse (COA) inclus.",
+        },
+      },
+    },
+    quality: {
+      badge: 'Engagement Qualité',
+      title: 'La recherche exige de la précision',
+      description: "Nos peptides sont conservés dans des conditions strictes jusqu'à leur expédition. Chaque lot est testé pour garantir l'absence de contaminants et la stabilité moléculaire.",
+      points: {
+        storage: {
+          title: 'Conservation Optimale',
+          text: "Température contrôlée, à l'abri de la lumière et de l'humidité.",
+        },
+        testing: {
+          title: 'Tests Systématiques',
+          text: 'Analyse HPLC et spectrométrie de masse sur chaque lot.',
+        },
+        packaging: {
+          title: 'Emballage Sécurisé',
+          text: "Conditionnement isotherme pour préserver l'intégrité moléculaire.",
+        },
+      },
+      badge_card: {
+        label: 'Pureté Garantie',
+        sublabel: 'Certifié HPLC',
+      },
+    },
+    disclaimer: {
+      title: 'Usage Strictement Réservé à la Recherche',
+      text: "Nos produits sont des réactifs chimiques destinés exclusivement aux professionnels, chercheurs et laboratoires. Ils ne sont pas destinés à un usage humain ou vétérinaire.",
+    },
+    cta: {
+      title: 'Prêt à démarrer ?',
+      text: "Découvrez notre catalogue complet et bénéficiez d'une livraison rapide depuis la France.",
+      catalogue: 'Explorer le catalogue',
+      contact: 'Nous contacter',
+      signature: "— L'équipe Atlas Lab Solutions",
+    },
   },
 
   // ============================================

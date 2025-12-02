@@ -5,19 +5,29 @@
     role="region"
     aria-label="Zone de conversation"
   >
-    <transition name="fade-scale">
+    <!-- Bannière hors ligne -->
+    <Transition name="banner-slide">
       <div
         v-if="!isOnline"
         class="chat-core__offline-banner"
       >
-        Vous êtes hors ligne — vos messages seront envoyés dès que possible.
+        <div class="chat-core__offline-icon">
+          <BasicIconNext
+            name="WifiOff"
+            :size="14"
+            color="currentColor"
+          />
+        </div>
+        <span>Vous êtes hors ligne — vos messages seront envoyés dès que possible.</span>
       </div>
-    </transition>
+    </Transition>
 
-    <transition
-      name="fade-scale"
+    <!-- Contenu principal -->
+    <Transition
+      name="content-fade"
       mode="out-in"
     >
+      <!-- Loader -->
       <div
         v-if="loading"
         key="loader"
@@ -25,21 +35,45 @@
         role="status"
         aria-live="polite"
       >
-        <BasicLoader />
-        <span>Chargement des messages...</span>
+        <div class="chat-core__loader-animation">
+          <span class="chat-core__loader-dot" />
+          <span class="chat-core__loader-dot" />
+          <span class="chat-core__loader-dot" />
+        </div>
+        <span class="chat-core__loader-text">Chargement des messages...</span>
       </div>
 
+      <!-- Messages -->
       <div
         v-else
+        key="content"
         class="chat-core__content"
       >
+        <!-- Zone des messages -->
         <div
-          ref="msgList"
+          ref="scrollRef"
           class="chat-core__messages"
           aria-live="polite"
-          @scroll="onScroll"
-          @click="hideNewMessagesBtn"
         >
+          <!-- Message vide -->
+          <Transition name="empty-fade">
+            <div
+              v-if="!orderedMessages.length"
+              class="chat-core__empty"
+            >
+              <div class="chat-core__empty-icon">
+                <BasicIconNext
+                  name="MessageCircle"
+                  :size="32"
+                  color="currentColor"
+                />
+              </div>
+              <p class="chat-core__empty-title">Aucun message</p>
+              <p class="chat-core__empty-text">Envoyez un message pour démarrer la conversation</p>
+            </div>
+          </Transition>
+
+          <!-- Liste des messages -->
           <ChatMessage
             v-for="(msg, i) in orderedMessages"
             :key="msg.id || 'msg-' + i"
@@ -49,20 +83,28 @@
           />
         </div>
 
+        <!-- Indicateur de frappe -->
         <ChatTypingIndicator :isTyping="localIsTyping" />
       </div>
-    </transition>
+    </Transition>
 
-    <transition name="slide-fade">
+    <!-- Bouton nouveaux messages -->
+    <Transition name="btn-bounce">
       <button
-        v-if="showNewMessagesBtn"
+        v-if="showNewMessagesIndicator"
         class="chat-core__new-messages-btn"
-        @click="scrollToBottomSmooth"
+        @click="hideNewMessagesIndicator"
       >
-        Nouveaux messages
+        <BasicIconNext
+          name="ChevronDown"
+          :size="14"
+          color="white"
+        />
+        <span>Nouveaux messages</span>
       </button>
-    </transition>
+    </Transition>
 
+    <!-- Input -->
     <ChatInput
       v-model="newMessage"
       :isOnline="isOnline"
@@ -79,8 +121,9 @@
 
 <script setup lang="ts">
   import type { Messages } from '@/supabase/types/supabase.types'
-  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import type { ChatRole } from '../types/chat'
+  import { useScrollMessages } from '../composables/useScrollMessages'
   import ChatInput from './ChatInput.vue'
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
@@ -99,6 +142,8 @@
     showAiButton?: boolean
     aiLoading?: boolean
     aiError?: string | null
+    /** ID de la conversation pour la persistance du scroll */
+    conversationId?: string | null
   }>()
 
   defineEmits<{
@@ -108,6 +153,63 @@
 
   const newMessage = defineModel<string>('newMessage', { default: '' })
 
+  // ─────────────────────────────────────────
+  // Scroll management (composable)
+  // ─────────────────────────────────────────
+  const {
+    scrollRef,
+    showNewMessagesIndicator,
+    initScrollObserver,
+    hideNewMessagesIndicator,
+    cleanup: cleanupScroll,
+    saveScrollPosition,
+    restoreScrollPosition,
+    scrollToEnd,
+  } = useScrollMessages({ threshold: 100 })
+
+  // Référence pour tracker la conversation précédente
+  let previousConversationId: string | null = null
+
+  // Watcher pour sauvegarder/restaurer la position de scroll lors du changement de conversation
+  watch(
+    () => props.conversationId,
+    async (newId, oldId) => {
+      // Sauvegarder la position de l'ancienne conversation
+      if (oldId) {
+        saveScrollPosition(oldId)
+      }
+
+      // Attendre que les nouveaux messages soient rendus
+      if (newId && !props.loading) {
+        // Petite attente pour que le DOM soit mis à jour
+        await new Promise((resolve) => setTimeout(resolve, 50))
+
+        // Essayer de restaurer la position sauvegardée
+        const restored = await restoreScrollPosition(newId)
+
+        // Si pas de position sauvegardée, scroller vers le bas
+        if (!restored) {
+          await scrollToEnd(true)
+        }
+      }
+
+      previousConversationId = newId ?? null
+    },
+  )
+
+  // Sauvegarder aussi quand le loading passe à true (changement de conversation)
+  watch(
+    () => props.loading,
+    (loading) => {
+      if (loading && previousConversationId) {
+        saveScrollPosition(previousConversationId)
+      }
+    },
+  )
+
+  // ─────────────────────────────────────────
+  // Messages ordonnés
+  // ─────────────────────────────────────────
   const orderedMessages = computed(() =>
     [...props.messages].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
@@ -116,41 +218,36 @@
     }),
   )
 
+  // ─────────────────────────────────────────
+  // Typing indicator avec debounce
+  // ─────────────────────────────────────────
   const localIsTyping = ref(false)
   let typingTimeout: ReturnType<typeof setTimeout> | null = null
 
   watch(
     () => props.isTyping,
     (val) => {
-      console.log('[typing] ChatCore props.isTyping =>', val)
       if (val) {
         localIsTyping.value = true
-        clearTimeout(typingTimeout!)
+        if (typingTimeout) clearTimeout(typingTimeout)
       } else {
         typingTimeout = setTimeout(() => {
           localIsTyping.value = false
-          console.log('[typing] ChatCore localIsTyping=false (timeout)')
         }, 600)
       }
     },
     { immediate: true },
   )
 
+  // ─────────────────────────────────────────
+  // Online status
+  // ─────────────────────────────────────────
   const isOnline = ref(true)
   const handleOnlineChange = () => (isOnline.value = navigator.onLine)
 
-  onMounted(() => {
-    isOnline.value = navigator.onLine
-    window.addEventListener('online', handleOnlineChange)
-    window.addEventListener('offline', handleOnlineChange)
-    console.log('[typing] ChatCore mounted; role=', props.currentRole)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('online', handleOnlineChange)
-    window.removeEventListener('offline', handleOnlineChange)
-  })
-
+  // ─────────────────────────────────────────
+  // Computed style
+  // ─────────────────────────────────────────
   const computedStyle = computed(() => {
     const style: Record<string, string> = {
       display: 'flex',
@@ -172,79 +269,29 @@
     return style
   })
 
-  const msgList = ref<HTMLElement | null>(null)
-  const showNewMessagesBtn = ref(false)
-  const isNearBottom = ref(true)
-  let autoHideTimer: ReturnType<typeof setTimeout> | null = null
+  // ─────────────────────────────────────────
+  // Lifecycle
+  // ─────────────────────────────────────────
+  onMounted(() => {
+    isOnline.value = navigator.onLine
+    window.addEventListener('online', handleOnlineChange)
+    window.addEventListener('offline', handleOnlineChange)
 
-  function scrollToBottom(behavior: ScrollBehavior = 'auto') {
-    const el = msgList.value
-    if (!el) return
-    el.scrollTop = el.scrollHeight
-    if (behavior === 'smooth') {
-      el.scrollTo({ top: el.scrollHeight, behavior })
-    }
-    showNewMessagesBtn.value = false
-    isNearBottom.value = true
-    clearTimeout(autoHideTimer!)
-  }
-
-  function scrollToBottomSmooth() {
-    scrollToBottom('smooth')
-  }
-
-  function hideNewMessagesBtn() {
-    if (showNewMessagesBtn.value) {
-      showNewMessagesBtn.value = false
-      clearTimeout(autoHideTimer!)
-    }
-  }
-
-  function onScroll() {
-    const el = msgList.value
-    if (!el) return
-    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 20
-    isNearBottom.value = near
-    if (near) {
-      setTimeout(() => {
-        if (isNearBottom.value) showNewMessagesBtn.value = false
-      }, 300)
-    }
-  }
-
-  function scrollHardToBottom() {
-    const el = msgList.value
-    if (!el) return
-
-    const force = () => {
-      el.scrollTop = el.scrollHeight
-    }
-
-    for (let i = 0; i < 8; i++) {
-      requestAnimationFrame(force)
-      setTimeout(force, i * 30)
-    }
-  }
-
-  onMounted(async () => {
-    await nextTick()
-    scrollHardToBottom()
+    // Initialiser les observers de scroll après le montage
+    // Le ResizeObserver gère automatiquement le scroll sur nouveaux messages
+    initScrollObserver()
   })
-
-  watch(
-    () => props.messages.map((m) => m.id),
-    async () => {
-      await nextTick()
-      scrollHardToBottom()
-    },
-    { immediate: true },
-  )
 
   onUnmounted(() => {
-    clearTimeout(autoHideTimer!)
-    clearTimeout(typingTimeout!)
+    window.removeEventListener('online', handleOnlineChange)
+    window.removeEventListener('offline', handleOnlineChange)
+    if (typingTimeout) clearTimeout(typingTimeout)
+    cleanupScroll()
   })
 
+  // ─────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────
   function isGroupedMessage(index: number) {
     const msg = orderedMessages.value[index]
     const prev = orderedMessages.value[index - 1]
@@ -253,32 +300,90 @@
 </script>
 <style scoped lang="less">
   .chat-core {
-    border-top: 1px solid @neutral-200;
-    background: white;
+    background: linear-gradient(180deg, @neutral-50 0%, white 100%);
     display: flex;
     flex-direction: column;
+    border-radius: 0 0 12px 12px;
 
+    // ─────────────────────────────────────────
+    // Bannière hors ligne
+    // ─────────────────────────────────────────
     &__offline-banner {
-      background: color-mix(in srgb, @danger-600 10%, transparent);
-      color: @danger-700;
-      text-align: center;
-      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, @warning-500 12%, transparent) 0%,
+        color-mix(in srgb, @warning-400 8%, transparent) 100%
+      );
+      color: @warning-800;
+      padding: 10px 16px;
       font-size: 13px;
-      border-bottom: 1px solid color-mix(in srgb, @danger-600 15%, transparent);
+      font-weight: 500;
+      border-bottom: 1px solid color-mix(in srgb, @warning-500 20%, transparent);
     }
 
+    &__offline-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: color-mix(in srgb, @warning-500 20%, transparent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    // ─────────────────────────────────────────
+    // Loader
+    // ─────────────────────────────────────────
     &__loader {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      color: @neutral-600;
-      font-size: 15px;
-      min-height: 600px;
+      gap: 16px;
+      min-height: 400px;
     }
 
+    &__loader-animation {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    &__loader-dot {
+      width: 10px;
+      height: 10px;
+      background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+      border-radius: 50%;
+      animation: loader-bounce 1.4s ease-in-out infinite;
+
+      &:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: 0.16s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0.32s;
+      }
+    }
+
+    &__loader-text {
+      font-size: 14px;
+      color: @neutral-500;
+      font-weight: 500;
+    }
+
+    // ─────────────────────────────────────────
+    // Contenu
+    // ─────────────────────────────────────────
     &__content {
       display: flex;
       flex-direction: column;
@@ -287,54 +392,204 @@
       min-height: 0;
     }
 
+    // ─────────────────────────────────────────
+    // Zone des messages
+    // ─────────────────────────────────────────
     &__messages {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px;
-      background: @neutral-50;
-      scroll-behavior: auto; /* aucun smooth visible */
+      padding: 16px;
+      background: linear-gradient(180deg, @neutral-100 0%, @neutral-50 50%, white 100%);
+      scroll-behavior: auto;
       min-height: 0;
-      gap: 6px;
-      padding-bottom: 20px;
+      gap: 4px;
+      padding-bottom: 24px;
     }
 
     &__messages::-webkit-scrollbar {
       width: 6px;
     }
-    &__messages::-webkit-scrollbar-thumb {
-      background: color-mix(in srgb, @neutral-500 40%, transparent);
-      border-radius: 4px;
-    }
-    &__messages::-webkit-scrollbar-thumb:hover {
-      background: color-mix(in srgb, @neutral-600 60%, transparent);
+
+    &__messages::-webkit-scrollbar-track {
+      background: transparent;
     }
 
+    &__messages::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, @neutral-400 50%, transparent);
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    &__messages::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, @neutral-500 70%, transparent);
+    }
+
+    // ─────────────────────────────────────────
+    // État vide
+    // ─────────────────────────────────────────
+    &__empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    &__empty-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--primary-500) 10%, transparent) 0%,
+        color-mix(in srgb, var(--primary-400) 6%, transparent) 100%
+      );
+      border-radius: 50%;
+      color: var(--primary-400);
+      margin-bottom: 8px;
+    }
+
+    &__empty-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: @neutral-700;
+    }
+
+    &__empty-text {
+      margin: 0;
+      font-size: 13px;
+      color: @neutral-400;
+    }
+
+    // ─────────────────────────────────────────
+    // Bouton nouveaux messages
+    // ─────────────────────────────────────────
     &__new-messages-btn {
       position: absolute;
-      bottom: 70px;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--primary-600);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
       color: white;
       border: none;
-      border-radius: 999px;
-      padding: 6px 12px;
+      border-radius: 20px;
+      padding: 8px 16px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 8px fade(black, 15%);
-      transition: background 0.2s ease;
+      box-shadow:
+        0 4px 12px color-mix(in srgb, var(--primary-600) 35%, transparent),
+        0 2px 4px color-mix(in srgb, @neutral-900 10%, transparent);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10;
+
       &:hover {
-        background: var(--primary-700);
+        transform: translateX(-50%) translateY(-2px);
+        box-shadow:
+          0 6px 16px color-mix(in srgb, var(--primary-600) 45%, transparent),
+          0 4px 8px color-mix(in srgb, @neutral-900 12%, transparent);
+      }
+
+      &:active {
+        transform: translateX(-50%) translateY(0);
       }
     }
 
     @media (max-width: 768px) {
       height: auto;
       min-height: 50vh;
+      border-radius: 0;
     }
+  }
+
+  // ─────────────────────────────────────────
+  // Animations
+  // ─────────────────────────────────────────
+  @keyframes loader-bounce {
+    0%,
+    80%,
+    100% {
+      transform: scale(0.6);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // Transitions
+  // ─────────────────────────────────────────
+  .banner-slide-enter-active {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .banner-slide-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .banner-slide-enter-from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  .banner-slide-leave-to {
+    opacity: 0;
+    transform: translateY(-50%);
+  }
+
+  .content-fade-enter-active,
+  .content-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .content-fade-enter-from,
+  .content-fade-leave-to {
+    opacity: 0;
+  }
+
+  .btn-bounce-enter-active {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .btn-bounce-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .btn-bounce-enter-from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.8);
+  }
+
+  .btn-bounce-leave-to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.9);
+  }
+
+  .empty-fade-enter-active {
+    transition: all 0.4s ease 0.1s;
+  }
+
+  .empty-fade-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .empty-fade-enter-from,
+  .empty-fade-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
   }
 </style>

@@ -306,6 +306,7 @@ export default {
     home: 'Home',
     catalogue: 'Catalogue',
     news: 'News',
+    about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
     cart: 'Cart',
@@ -891,6 +892,94 @@ export default {
     backToNews: 'Back to news',
     publishedOn: 'Published on',
     author: 'By',
+  },
+
+  // ============================================
+  // ABOUT / À PROPOS
+  // ============================================
+  about: {
+    hero: {
+      badge: 'About Us',
+      title: {
+        line1: 'Atlas Lab Solutions',
+        accent: 'Scientific excellence, local logistics.',
+      },
+      subtitle: 'American company specializing in the distribution of high-purity chemical compounds for scientific research, with a logistics platform in France.',
+    },
+    dna: {
+      title: 'Who are we?',
+      description: 'Atlas Lab Solutions LLC combines American biotechnology expertise with European logistics proximity to offer the best of both worlds.',
+      us: {
+        title: 'American Expertise',
+        text: 'Based in Albuquerque (New Mexico), at the heart of American biotechnology innovation, we collaborate with certified partner laboratories.',
+        point1: 'Headquarters in New Mexico, USA',
+        point2: 'Certified laboratory partnerships',
+        point3: 'Guaranteed purity ≥99% (HPLC)',
+      },
+      fr: {
+        title: 'French Logistics',
+        text: 'To avoid customs fees and delays for our European customers, we have set up a logistics platform in France.',
+        point1: 'Physical stock in France',
+        point2: 'Zero customs fees',
+        point3: '24-48h delivery in France',
+      },
+    },
+    advantages: {
+      badge: 'Your Benefits',
+      title: 'Why order from us?',
+      items: {
+        noDuty: {
+          title: 'Zero Customs',
+          text: 'No customs clearance fees upon receipt. Your orders ship directly from France.',
+        },
+        fast: {
+          title: '48h Delivery',
+          text: 'Shipping from our French hub via Mondial Relay or home delivery.',
+        },
+        tracking: {
+          title: 'Full Traceability',
+          text: 'Real-time tracking from end to end, from our warehouse to your laboratory.',
+        },
+        quality: {
+          title: 'Certified Quality',
+          text: 'Each batch tested with Certificate of Analysis (COA) included.',
+        },
+      },
+    },
+    quality: {
+      badge: 'Quality Commitment',
+      title: 'Research demands precision',
+      description: 'Our peptides are stored under strict conditions until shipment. Each batch is tested to ensure the absence of contaminants and molecular stability.',
+      points: {
+        storage: {
+          title: 'Optimal Storage',
+          text: 'Temperature controlled, protected from light and humidity.',
+        },
+        testing: {
+          title: 'Systematic Testing',
+          text: 'HPLC analysis and mass spectrometry on each batch.',
+        },
+        packaging: {
+          title: 'Secure Packaging',
+          text: 'Isothermal packaging to preserve molecular integrity.',
+        },
+      },
+      badge_card: {
+        label: 'Guaranteed Purity',
+        sublabel: 'HPLC Certified',
+      },
+    },
+    disclaimer: {
+      title: 'Strictly Reserved for Research Use',
+      text: 'Our products are chemical reagents intended exclusively for professionals, researchers and laboratories. They are not intended for human or veterinary use.',
+    },
+    cta: {
+      title: 'Ready to get started?',
+      text: 'Discover our full catalog and enjoy fast delivery from France.',
+      catalogue: 'Explore the catalog',
+      contact: 'Contact us',
+      signature: '— The Atlas Lab Solutions Team',
+    },
   },
 
   // ============================================

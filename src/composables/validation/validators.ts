@@ -145,10 +145,13 @@ export const email = (message?: string): ValidatorFn => {
     // Vérifier le domaine (partie après @)
     const [, domain] = trimmed.split('@')
     if (domain) {
-      // Bloquer les domaines jetables courants
-      const disposableDomains = ['tempmail.com', 'throwaway.com', 'mailinator.com', 'guerrillamail.com', 'yopmail.com']
-      if (disposableDomains.some(d => domain.endsWith(d))) {
-        return 'validation.email.disposable'
+      // Bloquer les domaines jetables courants (sauf en développement)
+      const isDev = import.meta.env.DEV
+      if (!isDev) {
+        const disposableDomains = ['tempmail.com', 'throwaway.com', 'mailinator.com', 'guerrillamail.com', 'yopmail.com']
+        if (disposableDomains.some(d => domain.endsWith(d))) {
+          return 'validation.email.disposable'
+        }
       }
     }
 

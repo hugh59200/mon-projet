@@ -5,7 +5,6 @@ import type { ChatRole } from '../types/chat'
 import { useChatConversations } from './useChatConversations'
 import { useChatMessages } from './useChatMessages'
 import { useChatTyping } from './useChatTyping'
-import { useScrollMessages } from './useScrollMessages'
 
 export function useChat(role: ChatRole) {
   const auth = useAuthStore()
@@ -21,13 +20,9 @@ export function useChat(role: ChatRole) {
   const isReady = ref(false)
   const newMessage = ref('')
 
-  const scroll = useScrollMessages(() => {
-    if (typeof window === 'undefined') return null
-    return document.querySelector('.messages-list, .chat-core__messages') as HTMLElement | null
-  })
-
   const conv = role === 'admin' ? useChatConversations() : null
 
+  // Le scroll est maintenant géré par ChatCore.vue via ResizeObserver
   const msgs = useChatMessages({
     role,
     getActiveUser: () => activeUserId.value,
@@ -35,7 +30,6 @@ export function useChat(role: ChatRole) {
     onMarkedRead: async () => {
       if (role === 'admin') await conv?.refreshUnreadCount()
     },
-    scroll,
   })
 
   const typing = useChatTyping({

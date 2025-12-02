@@ -4,70 +4,107 @@
     :class="{
       'chat-message--mine': isMine,
       'chat-message--grouped': isGrouped,
+      'chat-message--with-avatar': !isMine && !isGrouped,
     }"
   >
+    <!-- Avatar (seulement pour les messages reçus, non groupés) -->
     <div
-      class="chat-message__bubble"
-      :class="{ 'chat-message__bubble--read': message.is_read }"
+      v-if="!isMine"
+      class="chat-message__avatar-wrapper"
     >
-      <!-- 💬 Contenu du message -->
-      <BasicText
-        class="chat-message__content"
-        :label="message.content"
-        size="body-m"
-        :color="isMine ? 'white' : 'neutral-700'"
-        :wrap="true"
-      />
-
-      <!-- ⏱️ Métadonnées -->
-      <div class="chat-message__meta">
-        <BasicText
-          class="chat-message__time"
-          :label="formattedTime"
-          size="body-s"
-          :color="isMine ? 'white' : 'neutral-500'"
+      <div
+        v-if="!isGrouped"
+        class="chat-message__avatar"
+      >
+        <BasicIconNext
+          name="Headphones"
+          :size="14"
+          color="white"
         />
-
-        <transition name="fade-scale">
-          <span
-            v-if="isMine"
-            class="chat-message__status"
-          >
-            <BasicIconNext
-              :name="message.is_read ? 'CheckCheck' : 'Check'"
-              :size="14"
-              :color="statusColor"
-              :stroke-width="3"
-            />
-            <!-- ✅ Affiche "Vu à 14:30" si read_at existe -->
-            <BasicText
-              v-if="message.read_at"
-              :label="`Vu à ${new Date(message.read_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`"
-              size="body-s"
-              color="neutral-400"
-            />
-          </span>
-        </transition>
       </div>
+    </div>
+
+    <div class="chat-message__content-wrapper">
+      <!-- Bulle du message -->
+      <div
+        class="chat-message__bubble"
+        :class="{
+          'chat-message__bubble--read': message.is_read && isMine,
+        }"
+      >
+        <p class="chat-message__text">{{ message.content }}</p>
+
+        <!-- Métadonnées -->
+        <div class="chat-message__meta">
+          <span class="chat-message__time">{{ formattedTime }}</span>
+
+          <transition name="status-pop">
+            <span
+              v-if="isMine"
+              class="chat-message__status"
+            >
+              <svg
+                v-if="message.is_read"
+                class="chat-message__check chat-message__check--read"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M2 12l5 5L18 6"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 12l5 5L24 6"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <svg
+                v-else
+                class="chat-message__check"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M5 12l5 5L20 7"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </transition>
+        </div>
+      </div>
+
+      <!-- Indicateur "Vu" avec heure -->
+      <transition name="seen-fade">
+        <span
+          v-if="isMine && message.is_read && message.read_at && !isGrouped"
+          class="chat-message__seen"
+        >
+          Vu {{ formattedReadTime }}
+        </span>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import type { Messages } from '@/supabase/types/supabase.types'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
-  import type { IconColor } from '@designSystem/index'
-  import { computed, watchEffect } from 'vue'
+  import { computed } from 'vue'
 
-  /* ---------------------- Props ---------------------- */
   const props = defineProps<{
     message: Messages
     isMine: boolean
     isGrouped?: boolean
   }>()
 
-  /* ---------------------- Formatage heure ---------------------- */
   const formattedTime = computed(() => {
     const date = props.message.created_at
     if (!date) return ''
@@ -81,19 +118,16 @@
     }
   })
 
-  /* ---------------------- Couleur des coches ---------------------- */
-  const statusColor = computed<IconColor>(() => {
-    if (!props.isMine) return 'neutral-400'
-    return props.message.is_read ? 'secondary-400' : 'neutral-400'
-  })
-
-  /* ---------------------- Réactivité instantanée ---------------------- */
-  // 🔥 Important : Vue ne "voit" pas un simple champ booléen mis à jour par Supabase,
-  // mais comme `message` est un objet réactif (via reactive(msg)), cette watch force le refresh visuel.
-  watchEffect(() => {
-    if (props.message.is_read) {
-      // peut être utilisé pour animations visuelles, logs, etc.
-      // console.log(`✅ Message ${props.message.id} lu`)
+  const formattedReadTime = computed(() => {
+    const date = props.message.read_at
+    if (!date) return ''
+    try {
+      return new Date(date).toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch {
+      return ''
     }
   })
 </script>
@@ -101,97 +135,214 @@
 <style scoped lang="less">
   .chat-message {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    animation: fade-in 0.2s ease;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 2px 0;
+    animation: message-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
     &--mine {
+      flex-direction: row-reverse;
+    }
+
+    &--grouped {
+      padding-top: 1px;
+    }
+
+    // ─────────────────────────────────────────
+    // Avatar
+    // ─────────────────────────────────────────
+    &__avatar-wrapper {
+      width: 28px;
+      flex-shrink: 0;
+    }
+
+    &__avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-600) 30%, transparent);
+    }
+
+    // ─────────────────────────────────────────
+    // Content wrapper
+    // ─────────────────────────────────────────
+    &__content-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+      min-width: 80px;
+    }
+
+    &--mine &__content-wrapper {
       align-items: flex-end;
     }
 
+    // ─────────────────────────────────────────
+    // Bubble
+    // ─────────────────────────────────────────
     &__bubble {
-      max-width: 75%;
+      position: relative;
       padding: 10px 14px;
-      border-radius: 16px;
-      word-break: break-word;
-      transition: all 0.3s ease;
-      background: @neutral-100;
-      color: @neutral-800;
-      box-shadow: 0 1px 2px color-mix(in srgb, @neutral-800 5%, transparent);
+      border-radius: 18px;
+      background: white;
+      box-shadow:
+        0 1px 2px color-mix(in srgb, @neutral-900 6%, transparent),
+        0 2px 8px color-mix(in srgb, @neutral-900 4%, transparent);
+      border: 1px solid color-mix(in srgb, @neutral-200 60%, transparent);
+      transition: all 0.2s ease;
 
       &:hover {
-        background: color-mix(in srgb, @neutral-200 60%, transparent);
+        box-shadow:
+          0 2px 4px color-mix(in srgb, @neutral-900 8%, transparent),
+          0 4px 12px color-mix(in srgb, @neutral-900 6%, transparent);
       }
     }
 
-    &__bubble--read {
-      background: rgba(var(--primary-50-rgb), 0.8);
-      transition: background 0.5s ease;
-    }
-
     &--mine &__bubble {
-      background: var(--primary-600);
-      color: white;
-      border-bottom-right-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+      border: none;
+      border-bottom-right-radius: 6px;
+      box-shadow:
+        0 2px 8px color-mix(in srgb, var(--primary-600) 25%, transparent),
+        0 4px 16px color-mix(in srgb, var(--primary-700) 15%, transparent);
+
+      &:hover {
+        box-shadow:
+          0 4px 12px color-mix(in srgb, var(--primary-600) 35%, transparent),
+          0 6px 20px color-mix(in srgb, var(--primary-700) 20%, transparent);
+        transform: translateY(-1px);
+      }
     }
 
     &--mine &__bubble--read {
-      background: var(--primary-500);
-      box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.3);
-      transition: background 0.4s ease;
+      background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
     }
 
-    &__content {
-      display: block;
+    &:not(&--mine) &__bubble {
+      border-bottom-left-radius: 6px;
+    }
+
+    &--grouped:not(&--mine) &__bubble {
+      border-bottom-left-radius: 18px;
+      border-top-left-radius: 6px;
+    }
+
+    &--grouped&--mine &__bubble {
+      border-bottom-right-radius: 18px;
+      border-top-right-radius: 6px;
+    }
+
+    // ─────────────────────────────────────────
+    // Text
+    // ─────────────────────────────────────────
+    &__text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: @neutral-800;
       white-space: pre-wrap;
       word-break: break-word;
     }
 
+    &--mine &__text {
+      color: white;
+    }
+
+    // ─────────────────────────────────────────
+    // Meta (time + status)
+    // ─────────────────────────────────────────
     &__meta {
       display: flex;
       align-items: center;
       justify-content: flex-end;
       gap: 4px;
       margin-top: 4px;
-      font-size: 12px;
-    }
-
-    &--grouped &__bubble {
-      margin-top: 2px;
-    }
-
-    &__status {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }
 
     &__time {
-      display: inline-flex;
+      font-size: 11px;
+      color: @neutral-400;
+      font-weight: 500;
+    }
+
+    &--mine &__time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    // ─────────────────────────────────────────
+    // Status checks
+    // ─────────────────────────────────────────
+    &__status {
+      display: flex;
       align-items: center;
     }
 
-    .fade-scale-enter-active,
-    .fade-scale-leave-active {
-      transition: all 0.25s ease;
+    &__check {
+      width: 16px;
+      height: 16px;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+
+      &--read {
+        color: #60d394;
+        filter: drop-shadow(0 0 4px rgba(96, 211, 148, 0.5));
+      }
     }
-    .fade-scale-enter-from,
-    .fade-scale-leave-to {
-      opacity: 0;
-      transform: scale(0.7);
+
+    // ─────────────────────────────────────────
+    // Seen indicator
+    // ─────────────────────────────────────────
+    &__seen {
+      font-size: 10px;
+      color: @neutral-400;
+      margin-top: 2px;
+      padding-right: 4px;
     }
   }
 
-  /* 💨 Apparition globale du message */
-  @keyframes fade-in {
-    from {
+  // ─────────────────────────────────────────
+  // Animations
+  // ─────────────────────────────────────────
+  @keyframes message-appear {
+    0% {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translateY(10px) scale(0.95);
     }
-    to {
+    100% {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
+  }
+
+  .status-pop-enter-active {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .status-pop-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .status-pop-enter-from,
+  .status-pop-leave-to {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  .seen-fade-enter-active {
+    transition: all 0.3s ease 0.2s;
+  }
+
+  .seen-fade-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .seen-fade-enter-from,
+  .seen-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 </style>

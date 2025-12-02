@@ -4,7 +4,6 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import { ref } from 'vue'
 import { chatApi } from '@/api/supabase/chat'
 import type { ChatRole } from '../types/chat'
-import type { useScrollMessages } from './useScrollMessages'
 
 const PAGE_SIZE = 30
 
@@ -13,7 +12,6 @@ interface UseChatMessagesOptions {
   getActiveUser: () => string | null
   onUnread?: (userId: string) => void
   onMarkedRead?: () => void | Promise<void>
-  scroll?: ReturnType<typeof useScrollMessages>
 }
 
 // Typage léger pour les payloads realtime
@@ -30,7 +28,6 @@ export function useChatMessages({
   getActiveUser,
   onUnread,
   onMarkedRead,
-  scroll,
 }: UseChatMessagesOptions) {
   const messages = ref<Messages[]>([])
   const isMessagesLoading = ref(false)
@@ -50,11 +47,20 @@ export function useChatMessages({
   const ingest = (m: Messages) => {
     if (!m?.id) return
     const key = keyOf(m.id)
+
+    // Anti-doublon
     if (seenIds.has(key)) {
-      const idx = messages.value.findIndex((x) => x.id === m.id)
+      const idx = messages.value.findIndex((x) => String(x.id) === key)
       if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...m }
       return
     }
+
+    // Double vérification (fallback)
+    if (messages.value.some((x) => String(x.id) === key)) {
+      seenIds.add(key)
+      return
+    }
+
     seenIds.add(key)
     messages.value.push(m)
   }
@@ -97,7 +103,7 @@ export function useChatMessages({
       hasMore.value = list.length === PAGE_SIZE
       oldest.value = list[0]?.created_at ?? null
 
-      await scroll?.scrollToEnd(true)
+      // Le scroll est géré automatiquement par le ResizeObserver dans ChatCore.vue
       markRead()
     } finally {
       if (lastFetchTarget === uid) isMessagesLoading.value = false
@@ -112,7 +118,6 @@ export function useChatMessages({
     if (!uid) return
 
     isMessagesLoading.value = true
-    const prevHeight = scroll?.getScrollEl()?.scrollHeight ?? 0
 
     try {
       const { data, error } = await chatApi.fetchMessagesBefore(uid, oldest.value, PAGE_SIZE)
@@ -144,15 +149,23 @@ export function useChatMessages({
       hasMore.value = batch.length === PAGE_SIZE
     } finally {
       isMessagesLoading.value = false
-      scroll?.keepScrollOnPrepend(prevHeight)
+      // Note: Le maintien de la position de scroll lors du prepend
+      // devrait être géré par le composant parent si nécessaire
     }
   }
 
-  /** Envoi message (role requis) */
+  /** Envoi message (role requis) — le Realtime gère l'affichage */
   const sendMessage = async (text: string) => {
     const uid = getActiveUser()
     if (!uid || !text.trim()) return
-    await chatApi.sendMessage(uid, role, text.trim())
+
+    const { error } = await chatApi.sendMessage(uid, role, text.trim())
+
+    if (error) {
+      console.error('[Chat] Erreur envoi message:', error)
+      throw error
+    }
+    // Le message sera ajouté automatiquement via Realtime (postgres_changes INSERT)
   }
 
   /** Abonnement unread global (admin) — léger */
@@ -193,37 +206,46 @@ export function useChatMessages({
     // pas d'abonnement si pas de cible (ex: admin sans thread sélectionné)
     if (!target) return
 
-    const filter = `user_id=eq.${target}`
+    const channelName = `chat-${role}-${target}-${Date.now()}`
 
-    channel = supabase.channel(`chat-${role}-${target}`, {
+    channel = supabase.channel(channelName, {
       config: { broadcast: { self: false } },
     })
 
     channel.on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages', filter },
-      async (payload) => {
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `user_id=eq.${target}`,
+      },
+      (payload) => {
         const msg = payload.new as RealtimeMessageRow
         if (!msg?.user_id) return
         ingest(msg as unknown as Messages)
-        await scroll?.scrollToEnd(true)
+        // Le scroll est géré automatiquement par le ResizeObserver dans ChatCore.vue
         markRead()
       },
     )
 
     channel.on(
       'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'messages', filter },
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `user_id=eq.${target}`,
+      },
       (payload) => {
         const updated = payload.new as RealtimeMessageRow
-        const idx = messages.value.findIndex((m) => m.id === (updated as any).id)
+        const idx = messages.value.findIndex((m) => String(m.id) === String((updated as any).id))
         if (idx !== -1) messages.value[idx] = { ...messages.value[idx], ...(updated as any) }
       },
     )
 
     channel.subscribe((status) => {
-      if (status === 'CHANNEL_ERROR') console.warn('messages channel error')
-      if (status === 'CLOSED') console.info('messages channel closed')
+      if (status === 'CHANNEL_ERROR') console.warn('[Chat] Realtime channel error')
     })
   }
 

@@ -56,6 +56,7 @@
               <li><RouterLink to="/catalogue">{{ t('nav.catalogue') }}</RouterLink></li>
               <li><RouterLink to="/actualites">{{ t('nav.news') }}</RouterLink></li>
               <li><RouterLink to="/faq">{{ t('nav.faq') }}</RouterLink></li>
+              <li><RouterLink to="/a-propos">{{ t('nav.about') }}</RouterLink></li>
             </ul>
           </div>
 

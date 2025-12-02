@@ -51,7 +51,6 @@ declare module 'vue' {
     CustomToastCompact: typeof import('./../designSystem/src/components/basic/toast/CustomToastCompact.vue')['default']
     DropdownContainer: typeof import('./../designSystem/src/components/wrapper/dropdownContainer/DropdownContainer.vue')['default']
     EmptyTablePlaceholder: typeof import('./../designSystem/src/components/basic/emptyTablePlaceholder/EmptyTablePlaceholder.vue')['default']
-    FieldError: typeof import('./../designSystem/src/components/basic/fieldError/FieldError.vue')['default']
     FloatingDropdownWrapper: typeof import('./../designSystem/src/components/wrapper/pop-up/FloatingDropdownWrapper.vue')['default']
     FormContainer: typeof import('./../designSystem/src/components/wrapper/formContainer/FormContainer.vue')['default']
     InputContainer: typeof import('./../designSystem/src/components/wrapper/inputContainer/InputContainer.vue')['default']
