@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabaseClient'
+import { supabaseSilent } from '@/supabase/supabaseClient'
 import type { Messages } from '@/supabase/types/supabase.types'
 import { ref } from 'vue'
 
@@ -52,7 +52,7 @@ export function useAiSuggestion() {
     try {
       const formattedMessages = formatMessages(messages)
 
-      const { data, error: fnError } = await supabase.functions.invoke<GenerateSuggestionResponse>(
+      const { data, error: fnError } = await supabaseSilent.functions.invoke<GenerateSuggestionResponse>(
         'generate-chat-suggestion',
         {
           body: {

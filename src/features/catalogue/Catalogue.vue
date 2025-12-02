@@ -2,29 +2,26 @@
   <div class="catalogue-page">
     <PageHeader>
       <div class="catalogue-quick-nav">
-        <button
+        <PremiumButton
+          :type="selectedCategories.length === 0 ? 'primary' : 'secondary'"
+          :variant="selectedCategories.length === 0 ? 'solid' : 'ghost'"
+          size="sm"
+          label="✨ Tous"
+          :badge="products.length.toString()"
           class="catalogue-chip"
-          :class="{ 'catalogue-chip--active': selectedCategories.length === 0 }"
           @click="selectedCategories = []"
-        >
-          <span class="catalogue-chip__icon">✨</span>
-          {{ t('common.all') }}
-          <span class="catalogue-chip__count">{{ products.length }}</span>
-        </button>
-        <button
+        />
+        <PremiumButton
           v-for="cat in topCategories"
           :key="cat.id"
+          :type="selectedCategories.includes(cat.id) ? 'primary' : 'secondary'"
+          :variant="selectedCategories.includes(cat.id) ? 'solid' : 'ghost'"
+          size="sm"
+          :label="cat.label"
+          :badge="cat.count.toString()"
           class="catalogue-chip"
-          :class="{ 'catalogue-chip--active': selectedCategories.includes(cat.id) }"
           @click="toggleCategory(cat.id)"
-        >
-          <span
-            class="catalogue-chip__dot"
-            :style="{ background: getCategoryColor(cat.id) }"
-          ></span>
-          {{ cat.label }}
-          <span class="catalogue-chip__count">{{ cat.count }}</span>
-        </button>
+        />
       </div>
 
       <!-- Mobile Controls -->
@@ -99,13 +96,15 @@
               class="catalogue-search__input"
               :placeholder="t('catalogue.searchPlaceholder')"
             />
-            <button
+            <PremiumButton
               v-if="searchTerm"
+              type="secondary"
+              variant="ghost"
+              size="xs"
+              icon-left="X"
               class="catalogue-search__clear"
               @click="searchTerm = ''"
-            >
-              <BasicIconNext name="X" :size="14" />
-            </button>
+            />
           </div>
 
           <!-- Results count - bien séparé -->
@@ -161,38 +160,40 @@
           <div class="catalogue-active-filters__list">
             <span class="catalogue-active-filters__label">{{ t('catalogue.filters.title') }}:</span>
 
-            <button
+            <PremiumButton
               v-for="cat in selectedCategories"
               :key="`cat-${cat}`"
+              type="primary"
+              variant="outline"
+              size="xs"
+              :label="cat"
+              icon-right="X"
               class="catalogue-pill"
               @click="toggleCategory(cat)"
-            >
-              <span
-                class="catalogue-pill__dot"
-                :style="{ background: getCategoryColor(cat) }"
-              ></span>
-              {{ cat }}
-              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
-            </button>
+            />
 
-            <button
+            <PremiumButton
               v-for="tag in selectedTags"
               :key="`tag-${tag}`"
+              type="primary"
+              variant="outline"
+              size="xs"
+              :label="tag"
+              icon-right="X"
               class="catalogue-pill"
               @click="toggleTag(tag)"
-            >
-              {{ tag }}
-              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
-            </button>
+            />
 
-            <button
+            <PremiumButton
               v-if="inStockOnly"
+              type="primary"
+              variant="outline"
+              size="xs"
+              :label="t('catalogue.filters.inStock')"
+              icon-right="X"
               class="catalogue-pill"
               @click="inStockOnly = false"
-            >
-              {{ t('catalogue.filters.inStock') }}
-              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
-            </button>
+            />
           </div>
 
           <PremiumButton
@@ -253,25 +254,29 @@
           v-if="totalPages > 1"
           class="catalogue-pagination"
         >
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="md"
+            :label="t('common.previous')"
+            icon-left="ChevronLeft"
             class="catalogue-pagination__btn"
             :disabled="page === 1"
             @click="page--"
-          >
-            <BasicIconNext name="ChevronLeft" :size="18" />
-            {{ t('common.previous') }}
-          </button>
+          />
 
           <span class="catalogue-pagination__info">Page {{ page }} / {{ totalPages }}</span>
 
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="md"
+            :label="t('common.next')"
+            icon-right="ChevronRight"
             class="catalogue-pagination__btn"
             :disabled="page === totalPages"
             @click="page++"
-          >
-            {{ t('common.next') }}
-            <BasicIconNext name="ChevronRight" :size="18" />
-          </button>
+          />
         </div>
       </main>
     </PageContent>
@@ -321,6 +326,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import ProductCart from '@/features/catalogue/cart/ProductCart.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useFilters } from '@/features/catalogue/composables/useFilters'
@@ -341,6 +347,33 @@
   const { t } = useI18n()
   import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
+
+  // Configuration SEO pour la page catalogue
+  useHead({
+    title: 'Catalogue Peptides - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Parcourez notre catalogue complet de peptides de recherche. Filtrez par catégorie, pureté et disponibilité. Qualité garantie ≥99%, expédition rapide.',
+      },
+      {
+        property: 'og:title',
+        content: 'Catalogue Peptides - Atlas Lab Solutions',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Large sélection de peptides de haute pureté pour vos projets de recherche scientifique.',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: 'https://fast-peptides.com/catalogue',
+      },
+    ],
+  })
 
   const productsStore = useProductsStore()
   const { products, priceRange, hasLoaded, loading } = storeToRefs(productsStore)
@@ -380,25 +413,6 @@
   const viewMode = ref<'grid' | 'list'>(
     (route.query.view as 'grid' | 'list') || 'grid',
   )
-
-  // Category colors - mapped to Design System semantic colors
-  // These hex values correspond to the DS color palette for inline style usage
-  const categoryColors: Record<string, string> = {
-    Récupération: 'var(--success-500)', // success-500
-    'Perte de poids': 'var(--warning-500)', // warning-500
-    Croissance: 'var(--info-500)', // info-500
-    'Anti-âge': 'var(--secondary-500)', // secondary-500 (violet)
-    Performance: 'var(--danger-500)', // danger-500
-    'Bien-être': 'var(--primary-400)', // pink variant
-    Hormonal: 'var(--secondary-600)', // secondary-600 (indigo)
-    Nootropique: 'var(--primary-500)', // primary-500 (teal)
-    Cosmétique: 'var(--primary-300)', // lighter pink/primary
-    Santé: 'var(--success-500)', // success-500
-  }
-
-  const getCategoryColor = (category: string): string => {
-    return categoryColors[category] || 'var(--primary-500)'
-  }
 
   // Extraire le count depuis le label (format: "Category (X)")
   const extractCount = (label: string): number => {

@@ -37,8 +37,8 @@ Deno.serve(
       throw new Error('Order not found')
     }
 
-    // Déterminer la locale (body > order > fallback EN)
-    const locale = getValidLocale(body.locale ?? order.locale)
+    // Déterminer la locale (body > fallback FR par défaut)
+    const locale = getValidLocale(body.locale ?? 'fr')
     const t = translations.confirmation
 
     const orderNumber = order.order_number ?? order_id

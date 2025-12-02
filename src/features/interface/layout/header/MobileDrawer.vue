@@ -38,12 +38,16 @@
 
         <template v-if="auth.user">
           <div class="drawer-links">
-            <button
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="md"
+              width="full"
+              label="Mon profil"
+              icon-left="User"
               class="drawer-link"
               @click="goTo('/profil')"
-            >
-              Mon profil
-            </button>
+            />
           </div>
         </template>
 

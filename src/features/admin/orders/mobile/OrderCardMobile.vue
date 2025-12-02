@@ -150,7 +150,7 @@
     opacity: 0.7;
 
     &:hover {
-      transform: scale(1.15);
+      transform: scale(1.05);
       opacity: 1;
     }
   }

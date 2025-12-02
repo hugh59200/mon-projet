@@ -18,16 +18,14 @@
           />
         </div>
         <span class="chat-input__error-text">{{ aiError }}</span>
-        <button
-          type="button"
+        <PremiumButton
+          type="danger"
+          variant="ghost"
+          size="xs"
+          icon-left="X"
           class="chat-input__error-close"
           @click="clearAiError"
-        >
-          <BasicIconNext
-            name="X"
-            :size="12"
-          />
-        </button>
+        />
       </div>
     </Transition>
 
@@ -50,53 +48,34 @@
 
       <div class="chat-input__actions">
         <!-- Bouton AI Copilot -->
-        <Transition name="btn-pop">
-          <button
-            v-if="showAiButton"
-            type="button"
-            class="chat-input__ai-btn"
-            :class="{
-              'chat-input__ai-btn--loading': aiLoading,
-              'chat-input__ai-btn--pulse': !aiLoading
-            }"
-            :disabled="aiLoading"
-            :title="aiLoading ? 'Génération en cours...' : 'Suggérer une réponse avec l\'IA'"
-            @click="requestAiSuggestion"
-          >
-            <Transition
-              name="icon-swap"
-              mode="out-in"
-            >
-              <BasicIconNext
-                v-if="!aiLoading"
-                key="sparkles"
-                name="Sparkles"
-                :size="16"
-                color="white"
-              />
-              <span
-                v-else
-                key="spinner"
-                class="chat-input__ai-spinner"
-              />
-            </Transition>
-          </button>
-        </Transition>
+        <PremiumButton
+          v-if="showAiButton"
+          type="primary"
+          variant="gradient"
+          size="sm"
+          icon-left="Sparkles"
+          html-type="button"
+          class="chat-input__ai-btn"
+          :loading="aiLoading"
+          :pulse="!aiLoading"
+          :glow="aiLoading"
+          loading-icon="Sparkles"
+          loading-text=""
+          :show-loading-progress="false"
+          :show-loading-dots="false"
+          @click="requestAiSuggestion"
+        />
 
         <!-- Bouton Envoyer -->
-        <button
-          type="submit"
+        <PremiumButton
+          type="primary"
+          variant="solid"
+          size="sm"
+          icon-left="Send"
+          html-type="submit"
           class="chat-input__send-btn"
-          :class="{ 'chat-input__send-btn--active': canSend }"
           :disabled="!canSend"
-          title="Envoyer le message"
-        >
-          <BasicIconNext
-            name="Send"
-            :size="18"
-            color="white"
-          />
-        </button>
+        />
       </div>
     </div>
 
@@ -264,150 +243,12 @@
       z-index: 1;
     }
 
-    // ─────────────────────────────────────────
-    // Bouton AI Copilot Premium
-    // ─────────────────────────────────────────
     &__ai-btn {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #4f46e5 100%);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      overflow: hidden;
-      box-shadow:
-        0 2px 8px color-mix(in srgb, #8b5cf6 35%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-
-      // Shine sweep effect
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          105deg,
-          transparent 20%,
-          rgba(255, 255, 255, 0.25) 45%,
-          rgba(255, 255, 255, 0.25) 55%,
-          transparent 80%
-        );
-        transform: translateX(-150%);
-        transition: transform 0.7s ease;
-      }
-
-      // Subtle inner glow
-      &::after {
-        content: '';
-        position: absolute;
-        inset: 2px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        pointer-events: none;
-      }
-
-      &:hover:not(:disabled) {
-        transform: scale(1.08) translateY(-2px);
-        box-shadow:
-          0 6px 20px color-mix(in srgb, #8b5cf6 50%, transparent),
-          0 12px 40px color-mix(in srgb, #6366f1 30%, transparent),
-          inset 0 1px 0 rgba(255, 255, 255, 0.25);
-
-        &::before {
-          transform: translateX(150%);
-        }
-      }
-
-      &:active:not(:disabled) {
-        transform: scale(0.98);
-      }
-
-      &:disabled {
-        opacity: 0.85;
-        cursor: not-allowed;
-      }
-
-      &--loading {
-        animation: ai-glow-premium 2s ease-in-out infinite;
-      }
-
-      &--pulse:not(:disabled):not(:hover) {
-        animation: subtle-pulse-premium 3s ease-in-out infinite;
-      }
+      flex-shrink: 0;
     }
 
-    &__ai-spinner {
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid rgba(255, 255, 255, 0.25);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    // ─────────────────────────────────────────
-    // Bouton Envoyer Premium
-    // ─────────────────────────────────────────
     &__send-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border: none;
-      border-radius: 14px;
-      background: @neutral-200;
-      cursor: not-allowed;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-
-      &--active {
-        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-        cursor: pointer;
-        box-shadow:
-          0 2px 8px color-mix(in srgb, var(--primary-600) 35%, transparent),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-
-        // Shine effect
-        &::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            105deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.2) 50%,
-            transparent 70%
-          );
-          transform: translateX(-150%);
-          transition: transform 0.5s ease;
-        }
-
-        &:hover {
-          transform: scale(1.08) translateY(-2px);
-          box-shadow:
-            0 6px 20px color-mix(in srgb, var(--primary-600) 45%, transparent),
-            0 12px 40px color-mix(in srgb, var(--primary-700) 25%, transparent),
-            inset 0 1px 0 rgba(255, 255, 255, 0.25);
-
-          &::before {
-            transform: translateX(150%);
-          }
-        }
-
-        &:active {
-          transform: scale(0.98);
-        }
-      }
-
-      &:disabled:not(&--active) {
-        opacity: 0.5;
-      }
+      flex-shrink: 0;
     }
 
     // ─────────────────────────────────────────
@@ -478,7 +319,6 @@
 
       &:hover {
         background: color-mix(in srgb, @danger-500 20%, transparent);
-        transform: scale(1.05);
       }
     }
 
@@ -505,45 +345,6 @@
   }
 
   // ─────────────────────────────────────────
-  // Animations Premium
-  // ─────────────────────────────────────────
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes ai-glow-premium {
-    0%,
-    100% {
-      box-shadow:
-        0 2px 8px color-mix(in srgb, #8b5cf6 40%, transparent),
-        0 4px 16px color-mix(in srgb, #6366f1 25%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-    50% {
-      box-shadow:
-        0 4px 20px color-mix(in srgb, #8b5cf6 60%, transparent),
-        0 8px 32px color-mix(in srgb, #6366f1 40%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-  }
-
-  @keyframes subtle-pulse-premium {
-    0%,
-    100% {
-      box-shadow:
-        0 2px 8px color-mix(in srgb, #8b5cf6 30%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-    50% {
-      box-shadow:
-        0 4px 16px color-mix(in srgb, #8b5cf6 45%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-  }
-
-  // ─────────────────────────────────────────
   // Transitions Premium
   // ─────────────────────────────────────────
   .error-slide-enter-active {
@@ -562,35 +363,6 @@
   .error-slide-leave-to {
     opacity: 0;
     transform: translateY(-6px) scale(0.95);
-  }
-
-  .btn-pop-enter-active {
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .btn-pop-leave-active {
-    transition: all 0.2s ease;
-  }
-
-  .btn-pop-enter-from,
-  .btn-pop-leave-to {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-
-  .icon-swap-enter-active,
-  .icon-swap-leave-active {
-    transition: all 0.25s ease;
-  }
-
-  .icon-swap-enter-from {
-    opacity: 0;
-    transform: scale(0.4) rotate(-120deg);
-  }
-
-  .icon-swap-leave-to {
-    opacity: 0;
-    transform: scale(0.4) rotate(120deg);
   }
 
   .offline-fade-enter-active {

@@ -166,6 +166,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import {
@@ -179,6 +180,17 @@
   import { onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
+
+  // Configuration SEO - noindex pour page transactionnelle
+  useHead({
+    title: 'Paiement réussi - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'robots',
+        content: 'noindex, nofollow',
+      },
+    ],
+  })
 
   const { t } = useI18n()
 
@@ -1021,7 +1033,7 @@
         opacity: 0.4;
       }
       100% {
-        transform: scale(1.4);
+        transform: scale(1.15);
         opacity: 0;
       }
     }
@@ -1032,7 +1044,7 @@
         opacity: 0;
       }
       50% {
-        transform: scale(1.1);
+        transform: scale(1.05);
       }
       100% {
         transform: scale(1);

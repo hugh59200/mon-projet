@@ -5,6 +5,7 @@ import path from 'path'
 import { defineConfig, type BuildEnvironmentOptions } from 'vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import svgLoader from 'vite-svg-loader'
+import sitemap from 'vite-plugin-sitemap'
 import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer.ts'
 import {
   generateGlobalComponents,
@@ -33,7 +34,26 @@ generateRouteNamesUnion(__dirname)
 generateGlobalComponents(__dirname)
 
 export default defineConfig({
-  plugins: [vue(), VueDevTools(), svgLoader()],
+  plugins: [
+    vue(),
+    VueDevTools(),
+    svgLoader(),
+    sitemap({
+      hostname: 'https://fast-peptides.com',
+      dynamicRoutes: [
+        '/',
+        '/catalogue',
+        '/about',
+        '/contact',
+        '/faq',
+        '/actualites',
+        '/reconstitution',
+        '/legal/cgv',
+        '/legal/privacy',
+        '/legal/mentions',
+      ],
+    }),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

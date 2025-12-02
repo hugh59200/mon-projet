@@ -259,30 +259,33 @@
           <!-- ============ SECTION DESCRIPTION ============ -->
           <div class="product__details">
             <div class="product__details-tabs">
-              <button
+              <PremiumButton
+                :type="activeTab === 'description' ? 'primary' : 'secondary'"
+                :variant="activeTab === 'description' ? 'solid' : 'ghost'"
+                size="md"
+                :label="t('product.tabs.specs')"
+                icon-left="FileText"
                 class="product__tab"
-                :class="{ 'product__tab--active': activeTab === 'description' }"
                 @click="activeTab = 'description'"
-              >
-                <BasicIconNext name="FileText" :size="18" />
-                {{ t('product.tabs.specs') }}
-              </button>
-              <button
+              />
+              <PremiumButton
+                :type="activeTab === 'protocol' ? 'primary' : 'secondary'"
+                :variant="activeTab === 'protocol' ? 'solid' : 'ghost'"
+                size="md"
+                :label="t('product.tabs.protocols')"
+                icon-left="FlaskConical"
                 class="product__tab"
-                :class="{ 'product__tab--active': activeTab === 'protocol' }"
                 @click="activeTab = 'protocol'"
-              >
-                <BasicIconNext name="FlaskConical" :size="18" />
-                {{ t('product.tabs.protocols') }}
-              </button>
-              <button
+              />
+              <PremiumButton
+                :type="activeTab === 'shipping' ? 'primary' : 'secondary'"
+                :variant="activeTab === 'shipping' ? 'solid' : 'ghost'"
+                size="md"
+                :label="t('product.tabs.shipping')"
+                icon-left="Truck"
                 class="product__tab"
-                :class="{ 'product__tab--active': activeTab === 'shipping' }"
                 @click="activeTab = 'shipping'"
-              >
-                <BasicIconNext name="Truck" :size="18" />
-                {{ t('product.tabs.shipping') }}
-              </button>
+              />
             </div>
 
             <div class="product__details-content">
@@ -361,11 +364,12 @@
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute, useRouter } from 'vue-router'
   import ProductEssentials from '../shared/components/ProductEssentials.vue'
+  import { useHead } from '@vueuse/head'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -383,6 +387,54 @@
     category: productCategory,
     description: productDescription,
   } = useTranslatedProduct(product)
+
+  // Configuration SEO dynamique pour les produits
+  const pageTitle = computed(() => {
+    if (!product.value) return 'Produit - Atlas Lab Solutions'
+    const name = productName.value || product.value.name || 'Produit'
+    const dosage = product.value.dosage ? ` - ${product.value.dosage}` : ''
+    return `${name}${dosage} | Atlas Lab Solutions`
+  })
+
+  const pageDescription = computed(() => {
+    if (!product.value) return 'Découvrez nos peptides de recherche de haute pureté.'
+    const name = productName.value || product.value.name
+    const purity = product.value.purity || 99
+    const category = productCategory.value || product.value.category || 'Recherche'
+    return `${name} - Peptide de recherche ${category}. Pureté ≥${purity}%. Expédition rapide et certificat d'analyse inclus.`
+  })
+
+  useHead({
+    title: pageTitle,
+    meta: [
+      {
+        name: 'description',
+        content: pageDescription,
+      },
+      {
+        property: 'og:title',
+        content: pageTitle,
+      },
+      {
+        property: 'og:description',
+        content: pageDescription,
+      },
+      {
+        property: 'og:type',
+        content: 'product',
+      },
+      {
+        property: 'og:image',
+        content: computed(() => product.value?.image || 'https://fast-peptides.com/default-product.jpg'),
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: computed(() => `https://fast-peptides.com/catalogue/${route.params.id}`),
+      },
+    ],
+  })
 
   // Couleurs par catégorie
   const categoryColors: Record<string, string> = {
@@ -411,12 +463,8 @@
 
     try {
       const data = await fetchProductById(id)
-
       if (data) {
         product.value = data
-        const productName = data.name || 'Produit Inconnu'
-        const metaTitle = `${productName}${data.dosage ? ' - ' + data.dosage : ''} | Fast Peptides`
-        document.title = metaTitle
       }
     } catch (e) {
       console.error('Erreur loading product:', e)

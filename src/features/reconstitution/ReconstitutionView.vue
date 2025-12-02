@@ -171,27 +171,30 @@
               <div class="recon__presets">
                 <span class="recon__presets-label">Presets rapides :</span>
                 <div class="recon__presets-btns">
-                  <button
+                  <PremiumButton
+                    :type="isPresetActive(5, 2, 250) ? 'primary' : 'secondary'"
+                    :variant="isPresetActive(5, 2, 250) ? 'solid' : 'outline'"
+                    size="sm"
+                    label="5mg / 2ml / 250mcg"
                     class="recon__preset-btn"
                     @click="applyPreset(5, 2, 250)"
-                    :class="{ 'recon__preset-btn--active': isPresetActive(5, 2, 250) }"
-                  >
-                    5mg / 2ml / 250mcg
-                  </button>
-                  <button
+                  />
+                  <PremiumButton
+                    :type="isPresetActive(10, 2, 500) ? 'primary' : 'secondary'"
+                    :variant="isPresetActive(10, 2, 500) ? 'solid' : 'outline'"
+                    size="sm"
+                    label="10mg / 2ml / 500mcg"
                     class="recon__preset-btn"
                     @click="applyPreset(10, 2, 500)"
-                    :class="{ 'recon__preset-btn--active': isPresetActive(10, 2, 500) }"
-                  >
-                    10mg / 2ml / 500mcg
-                  </button>
-                  <button
+                  />
+                  <PremiumButton
+                    :type="isPresetActive(2, 1, 100) ? 'primary' : 'secondary'"
+                    :variant="isPresetActive(2, 1, 100) ? 'solid' : 'outline'"
+                    size="sm"
+                    label="2mg / 1ml / 100mcg"
                     class="recon__preset-btn"
                     @click="applyPreset(2, 1, 100)"
-                    :class="{ 'recon__preset-btn--active': isPresetActive(2, 1, 100) }"
-                  >
-                    2mg / 1ml / 100mcg
-                  </button>
+                  />
                 </div>
               </div>
             </div>
@@ -460,9 +463,36 @@
   </div>
 </template>
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, h, ref } from 'vue'
+
+  // Configuration SEO pour la page Reconstitution
+  useHead({
+    title: 'Guide de Reconstitution des Peptides - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Guide complet et calculateur de reconstitution des peptides lyophilisés. Instructions étape par étape pour préparer vos solutions de recherche en toute sécurité.',
+      },
+      {
+        property: 'og:title',
+        content: 'Guide de Reconstitution des Peptides',
+      },
+      {
+        property: 'og:description',
+        content: 'Calculateur et guide pratique pour reconstituer vos peptides de recherche.',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: 'https://fast-peptides.com/reconstitution',
+      },
+    ],
+  })
 
   // ============================================
   // STATE

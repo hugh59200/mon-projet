@@ -177,7 +177,7 @@
       }
 
       &::-webkit-slider-thumb:hover {
-        transform: scale(1.15);
+        transform: scale(1.05);
         box-shadow: 0 0 6px rgba(var(--primary-600-rgb), 0.5);
       }
 

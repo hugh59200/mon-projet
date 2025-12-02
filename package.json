@@ -17,7 +17,9 @@
   "dependencies": {
     "@supabase/realtime-js": "^2.79.0",
     "@supabase/supabase-js": "^2.79.0",
+    "@unhead/vue": "^2.0.19",
     "@vuepic/vue-datepicker": "^11.0.2",
+    "@vueuse/head": "^2.0.0",
     "@vueuse/motion": "^3.0.3",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
@@ -71,6 +73,7 @@
     "storybook": "^9.0.15",
     "supabase": "^2.54.11",
     "typescript": "^5.9.3",
+    "vite-plugin-sitemap": "^0.8.2",
     "vite-plugin-vue-devtools": "^8.0.0",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.22",

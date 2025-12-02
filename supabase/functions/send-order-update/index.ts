@@ -20,14 +20,14 @@ Deno.serve(
 
     const { data: order } = await supabase
       .from('orders_full_view')
-      .select('shipping_email, order_number, carrier, tracking_number, user_id, tracking_token, locale')
+      .select('shipping_email, order_number, carrier, tracking_number, user_id, tracking_token')
       .eq('order_id', order_id)
       .maybeSingle()
 
     if (!order) throw new Error('Order not found')
 
-    // Déterminer la locale (body > order > fallback EN)
-    const locale = getValidLocale(body.locale ?? order.locale)
+    // Déterminer la locale (body > fallback FR par défaut)
+    const locale = getValidLocale(body.locale ?? 'fr')
     const t = translations.statusUpdate
 
     const isGuest = !order.user_id

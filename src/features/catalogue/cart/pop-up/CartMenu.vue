@@ -89,16 +89,14 @@
                     </div>
                   </div>
                 </div>
-                <button
+                <PremiumButton
+                  type="danger"
+                  variant="ghost"
+                  size="xs"
+                  icon-left="X"
                   class="cart__item-remove"
                   @click.stop="cart.removeFromCart(item.product_id!)"
-                  :title="t('cart.remove')"
-                >
-                  <BasicIconNext
-                    name="X"
-                    :size="14"
-                  />
-                </button>
+                />
               </div>
             </TransitionGroup>
           </div>
@@ -111,7 +109,6 @@
             <div class="cart__actions">
               <PremiumButton
                 type="secondary"
-                variant="outline"
                 size="sm"
                 :label="t('cart.title')"
                 @click="goToCart"
@@ -192,7 +189,7 @@
         }
         .cart__icon {
           color: @neutral-50;
-          transform: scale(1.05);
+          transform: scale(1.02);
         }
       }
     }
@@ -468,7 +465,7 @@
       opacity: 0;
     }
     50% {
-      transform: scale(1.2);
+      transform: scale(1.02);
     }
     100% {
       transform: scale(1);

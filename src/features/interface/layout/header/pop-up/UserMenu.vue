@@ -36,122 +36,103 @@
 
         <!-- Navigation -->
         <nav class="user-menu__nav">
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('nav.profile')"
+            icon-left="UserCog"
             class="user-menu__link"
             @click="goTo('/profil')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="UserCog"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('nav.profile') }}</span>
-          </button>
-          <button
+          />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('profile.support')"
+            icon-left="MessageSquare"
+            :badge="totalUnread > 0 ? totalUnread.toString() : undefined"
             class="user-menu__link"
             @click="goTo('/admin/messagerie')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="MessageSquare"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('profile.support') }}</span>
-            <span
-              v-if="totalUnread > 0"
-              class="user-menu__link-badge"
-            >
-              {{ totalUnread }}
-            </span>
-          </button>
-          <button
+          />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('admin.stats')"
+            icon-left="BarChart3"
             class="user-menu__link"
             @click="goTo('/admin/statistiques')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="BarChart3"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('admin.stats') }}</span>
-          </button>
-          <button
+          />
+          <PremiumButton
             v-if="isAdmin"
+            type="primary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('nav.admin')"
+            icon-left="Settings"
             class="user-menu__link user-menu__link--accent"
             @click="goToAdmin"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="Settings"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('nav.admin') }}</span>
-          </button>
+          />
         </nav>
 
         <div class="user-menu__divider"></div>
 
         <!-- Logout -->
-        <button
+        <PremiumButton
+          type="danger"
+          variant="ghost"
+          size="md"
+          width="full"
+          :label="t('nav.logout')"
+          icon-left="LogOut"
           class="user-menu__logout"
           @click="handleLogout"
-        >
-          <BasicIconNext
-            name="LogOut"
-            :size="18"
-          />
-          <span>{{ t('nav.logout') }}</span>
-        </button>
+        />
       </template>
 
       <!-- Guest -->
       <template v-else>
         <nav class="user-menu__nav">
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('tracking.title')"
+            icon-left="PackageSearch"
             class="user-menu__link"
             @click="goTo('/suivi-commande')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="PackageSearch"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('tracking.title') }}</span>
-          </button>
+          />
         </nav>
 
         <div class="user-menu__divider user-menu__divider--subtle"></div>
 
         <nav class="user-menu__nav">
-          <button
+          <PremiumButton
+            type="primary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('nav.login')"
+            icon-left="LogIn"
             class="user-menu__link user-menu__link--accent"
             @click="goTo('/auth/login')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="LogIn"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('nav.login') }}</span>
-          </button>
-          <button
+          />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('nav.register')"
+            icon-left="UserPlus"
             class="user-menu__link"
             @click="goTo('/auth/register')"
-          >
-            <span class="user-menu__link-icon">
-              <BasicIconNext
-                name="UserPlus"
-                :size="18"
-              />
-            </span>
-            <span>{{ t('nav.register') }}</span>
-          </button>
+          />
         </nav>
       </template>
     </div>
@@ -252,7 +233,7 @@
         background: rgba(var(--secondary-700-rgb), 0.9);
         border-color: rgba(var(--primary-500-rgb), 0.3);
         color: @neutral-50;
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       .user-trigger__glow {
@@ -380,7 +361,7 @@
       transform: scale(0);
     }
     50% {
-      transform: scale(1.2);
+      transform: scale(1.08);
     }
     100% {
       transform: scale(1);

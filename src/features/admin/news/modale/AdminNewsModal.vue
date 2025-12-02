@@ -97,6 +97,88 @@
             </div>
           </div>
         </WrapperFormElements>
+
+        <!-- Section Traductions (i18n) -->
+        <div class="translations-section" v-if="!readonly">
+          <div
+            class="translations-header"
+            @click="showTranslations = !showTranslations"
+          >
+            <BasicText
+              size="h6"
+              weight="bold"
+              color="primary-700"
+            >
+              🌐 Traductions (Multilingue)
+            </BasicText>
+            <BasicText
+              size="body-s"
+              color="neutral-500"
+            >
+              {{ showTranslations ? '▼' : '▶' }} Cliquez pour {{ showTranslations ? 'masquer' : 'afficher' }}
+            </BasicText>
+          </div>
+
+          <div v-if="showTranslations" class="translations-content">
+            <div class="language-group">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="primary-600"
+                class="language-title"
+              >
+                🇫🇷 Français
+              </BasicText>
+              <WrapperInput
+                v-model="titleFr"
+                label="Titre (FR)"
+                placeholder="Ex: Nouvelle découverte sur le BPC-157"
+              />
+              <WrapperInput
+                v-model="excerptFr"
+                label="Résumé (FR)"
+                placeholder="Résumé en français..."
+              />
+              <WrapperFormElements label="Contenu (FR)">
+                <textarea
+                  v-model="contentFr"
+                  rows="4"
+                  class="custom-textarea"
+                  placeholder="Contenu complet en français..."
+                />
+              </WrapperFormElements>
+            </div>
+
+            <div class="language-group">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="primary-600"
+                class="language-title"
+              >
+                🇬🇧 English
+              </BasicText>
+              <WrapperInput
+                v-model="titleEn"
+                label="Title (EN)"
+                placeholder="Ex: New discovery about BPC-157"
+              />
+              <WrapperInput
+                v-model="excerptEn"
+                label="Excerpt (EN)"
+                placeholder="Summary in English..."
+              />
+              <WrapperFormElements label="Content (EN)">
+                <textarea
+                  v-model="contentEn"
+                  rows="4"
+                  class="custom-textarea"
+                  placeholder="Full content in English..."
+                />
+              </WrapperFormElements>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
     <template #actions>
@@ -138,7 +220,19 @@
     published_at: new Date().toISOString(),
     author_id: null,
     topic_id: '',
+    title_i18n: {},
+    excerpt_i18n: {},
+    content_i18n: {},
   })
+
+  // État pour les traductions
+  const showTranslations = ref(false)
+  const titleEn = ref('')
+  const titleFr = ref('')
+  const excerptEn = ref('')
+  const excerptFr = ref('')
+  const contentEn = ref('')
+  const contentFr = ref('')
 
   const isEditMode = computed(() => !!props.newsId)
   const readonly = computed(() => !!props.readonly)
@@ -211,9 +305,24 @@
         topic_id: data.topic_id,
         published_at: data.published_at,
         author_id: data.author_id,
+        title_i18n: data.title_i18n || {},
+        excerpt_i18n: data.excerpt_i18n || {},
+        content_i18n: data.content_i18n || {},
       }
 
       imagePreview.value = data.image || null
+
+      // Extraction des traductions i18n
+      const titleI18n = data.title_i18n as Record<string, string> | null
+      const excerptI18n = data.excerpt_i18n as Record<string, string> | null
+      const contentI18n = data.content_i18n as Record<string, string> | null
+
+      titleFr.value = titleI18n?.fr || ''
+      titleEn.value = titleI18n?.en || ''
+      excerptFr.value = excerptI18n?.fr || ''
+      excerptEn.value = excerptI18n?.en || ''
+      contentFr.value = contentI18n?.fr || ''
+      contentEn.value = contentI18n?.en || ''
     } catch (err) {
       toast.show('Erreur chargement actualité', 'danger')
     }
@@ -237,8 +346,25 @@
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
+      // Construction des objets i18n
+      const titleI18n: Record<string, string> = {}
+      const excerptI18n: Record<string, string> = {}
+      const contentI18n: Record<string, string> = {}
+
+      if (titleFr.value) titleI18n.fr = titleFr.value
+      if (titleEn.value) titleI18n.en = titleEn.value
+      if (excerptFr.value) excerptI18n.fr = excerptFr.value
+      if (excerptEn.value) excerptI18n.en = excerptEn.value
+      if (contentFr.value) contentI18n.fr = contentFr.value
+      if (contentEn.value) contentI18n.en = contentEn.value
+
       const payload = { ...form.value }
       delete (payload as any).topic
+
+      // Ajout des traductions i18n au payload
+      payload.title_i18n = titleI18n
+      payload.excerpt_i18n = excerptI18n
+      payload.content_i18n = contentI18n
 
       if (isEditMode.value && props.newsId) {
         await updateNews(props.newsId, payload)
@@ -275,9 +401,19 @@
         published_at: new Date().toISOString(),
         author_id: null,
         topic_id: '',
+        title_i18n: {},
+        excerpt_i18n: {},
+        content_i18n: {},
       }
       resetImageHandler()
       newTopicLabel.value = ''
+      // Reset i18n fields
+      titleFr.value = ''
+      titleEn.value = ''
+      excerptFr.value = ''
+      excerptEn.value = ''
+      contentFr.value = ''
+      contentEn.value = ''
     }
   })
 </script>
@@ -285,54 +421,259 @@
   .news-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 16px 20px;
-    background: @neutral-50;
-    border-radius: 8px;
+    gap: 28px;
+    padding: 16px;
+    overflow-x: hidden;
   }
 
   .custom-textarea {
-    border: 1px solid @neutral-300;
-    border-radius: 6px;
-    padding: 10px;
+    border: 2px solid @neutral-200;
+    border-radius: 12px;
+    padding: 14px 16px;
     font-size: 14px;
     width: 100%;
     resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    line-height: 1.6;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      border-color: var(--primary-300);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow:
+        0 0 0 4px rgba(var(--primary-500-rgb), 0.1),
+        0 2px 8px rgba(var(--primary-500-rgb), 0.15);
+      background: @white;
+    }
 
     &:read-only {
       background: @neutral-50;
       color: @neutral-600;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: @neutral-400;
     }
   }
 
   .image-preview {
-    margin-top: 8px;
+    margin-top: 16px;
+    padding: 20px;
+    border: 2px dashed var(--primary-200);
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.03) 0%,
+      rgba(var(--primary-300-rgb), 0.05) 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: @white;
-    border: 1px solid @neutral-200;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: radial-gradient(circle at 50% 0%,
+        rgba(var(--primary-500-rgb), 0.05) 0%,
+        transparent 70%);
+      pointer-events: none;
+    }
 
     img {
-      max-width: 280px;
+      max-width: 320px;
+      max-height: 220px;
       width: 100%;
       height: auto;
-      border-radius: 10px;
+      border-radius: 12px;
       object-fit: contain;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
+
+      &:hover {
+        transform: scale(1.02);
+      }
 
       &-actions {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         justify-content: center;
+        z-index: 1;
+        position: relative;
+
+        button {
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
       }
     }
   }
 
   .hidden-input {
     display: none;
+  }
+
+  // Animation d'entrée
+  .news-form > * {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+    &:nth-child(4) { animation-delay: 0.2s; }
+    &:nth-child(5) { animation-delay: 0.25s; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Style premium pour les inputs
+  :deep(.wrapper-input) {
+    .input-wrapper {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Section traductions (i18n)
+  .translations-section {
+    margin-top: 8px;
+    border: 2px dashed var(--primary-200);
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.02) 0%,
+      rgba(var(--secondary-500-rgb), 0.02) 100%);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      border-color: var(--primary-300);
+      box-shadow:
+        0 4px 12px rgba(var(--primary-500-rgb), 0.08),
+        0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .translations-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(135deg,
+        rgba(var(--primary-500-rgb), 0.05) 0%,
+        rgba(var(--primary-300-rgb), 0.03) 100%);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+
+      &:hover {
+        background: linear-gradient(135deg,
+          rgba(var(--primary-500-rgb), 0.08) 0%,
+          rgba(var(--primary-300-rgb), 0.06) 100%);
+      }
+
+      &:active {
+        transform: scale(0.99);
+      }
+    }
+
+    .translations-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 24px;
+      background: @white;
+      animation: slideDown 0.3s ease-out;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px;
+      }
+    }
+
+    .language-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
+      border-radius: 12px;
+      border: 1px solid @neutral-200;
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.03),
+        0 1px 2px rgba(0, 0, 0, 0.04);
+
+      .language-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--primary-100);
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      max-height: 1000px;
+      transform: translateY(0);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .news-form {
+      gap: 20px;
+      padding: 4px;
+    }
+
+    .custom-textarea {
+      min-height: 100px;
+      padding: 12px;
+    }
+
+    .image-preview img {
+      max-width: 240px;
+      max-height: 180px;
+    }
   }
 </style>

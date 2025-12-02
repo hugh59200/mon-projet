@@ -213,11 +213,39 @@
 </template>
 
 <script setup lang="ts">
+import { useHead } from '@vueuse/head'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
 
 const { t } = useI18n()
+
+// Configuration SEO pour la page À propos
+useHead({
+  title: 'À Propos - Atlas Lab Solutions',
+  meta: [
+    {
+      name: 'description',
+      content:
+        'Découvrez Atlas Lab Solutions, votre fournisseur de confiance de peptides de recherche. Excellence américaine et service français pour vos projets scientifiques.',
+    },
+    {
+      property: 'og:title',
+      content: 'À Propos - Atlas Lab Solutions',
+    },
+    {
+      property: 'og:description',
+      content:
+        'Expertise scientifique et service de proximité. Découvrez notre engagement pour la qualité et la recherche.',
+    },
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://fast-peptides.com/about',
+    },
+  ],
+})
 
 type Advantage = {
   icon: IconNameNext

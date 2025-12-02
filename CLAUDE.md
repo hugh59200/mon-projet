@@ -33,12 +33,15 @@ npm run gen:types     # Générer les types TypeScript depuis le schéma Supabas
 
 ```
 src/
-├── api/                        # API centralisées (NOUVEAU)
+├── api/                        # API centralisées
 │   ├── supabase/               # Appels Supabase (products, orders, profiles, etc.)
 │   ├── external/               # API externes (auth, payment, shipping)
 │   └── helpers/                # Utilitaires API (handleError)
 │
-├── types/                      # Types centralisés (NOUVEAU)
+├── config/                     # Configuration centralisée
+│   └── seo.ts                  # Configuration SEO (APP_URL, SITE_NAME, helpers)
+│
+├── types/                      # Types centralisés
 │   ├── utils/                  # Types utilitaires génériques
 │   └── ui/                     # Types UI (dialog, chat)
 │
@@ -88,6 +91,22 @@ import { processPayment } from '@/api/external/payment'
 import type { DeepPartial, DialogResult } from '@/types'
 ```
 
+**Configuration SEO** : Utiliser la configuration centralisée pour les URLs
+```typescript
+import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo'
+
+// Exemple dans useHead
+useHead({
+  meta: [
+    { name: 'author', content: SEO_CONFIG.AUTHOR },
+    { property: 'og:site_name', content: SEO_CONFIG.SITE_NAME },
+  ],
+  link: [
+    { rel: 'canonical', href: getCanonicalUrl('/ma-page') }
+  ]
+})
+```
+
 ## Patterns Clés
 
 **Structure des Features** : Chaque feature peut contenir :
@@ -112,7 +131,8 @@ import type { DeepPartial, DialogResult } from '@/types'
 
 ## Variables d'Environnement
 
-Requises dans `.env` :
+Requises dans `.env` (voir `.env.example` pour la liste complète) :
+- `VITE_APP_URL` - **URL de base de l'application** (ex: `https://fast-peptides.com`) - Utilisée pour le SEO, canonical URLs, Open Graph
 - `VITE_SUPABASE_URL` - URL du projet Supabase
 - `SUPABASE_ANON_KEY` - Clé anonyme Supabase
 - `VITE_GOOGLE_CLIENT_ID` - Client ID Google OAuth

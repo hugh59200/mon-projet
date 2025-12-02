@@ -90,19 +90,26 @@
 
     <!-- Bouton nouveaux messages -->
     <Transition name="btn-bounce">
-      <button
+      <PremiumButton
         v-if="showNewMessagesIndicator"
+        type="primary"
+        variant="solid"
+        size="sm"
+        label="Nouveaux messages"
+        icon-left="ChevronDown"
         class="chat-core__new-messages-btn"
         @click="hideNewMessagesIndicator"
-      >
-        <BasicIconNext
-          name="ChevronDown"
-          :size="14"
-          color="white"
-        />
-        <span>Nouveaux messages</span>
-      </button>
+      />
     </Transition>
+
+    <!-- AI Suggestion Card -->
+    <AiSuggestionCard
+      :show="!!aiSuggestion"
+      :suggestion="aiSuggestion ?? null"
+      @accept="$emit('accept-ai-suggestion')"
+      @edit="$emit('edit-ai-suggestion')"
+      @close="$emit('close-ai-suggestion')"
+    />
 
     <!-- Input -->
     <ChatInput
@@ -128,6 +135,7 @@
   import ChatInput from './ChatInput.vue'
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
+  import AiSuggestionCard from './AiSuggestionCard.vue'
 
   const props = defineProps<{
     messages: Messages[]
@@ -143,6 +151,7 @@
     showAiButton?: boolean
     aiLoading?: boolean
     aiError?: string | null
+    aiSuggestion?: string | null
     /** ID de la conversation pour la persistance du scroll */
     conversationId?: string | null
   }>()
@@ -150,6 +159,9 @@
   defineEmits<{
     (e: 'request-ai-suggestion'): void
     (e: 'clear-ai-error'): void
+    (e: 'accept-ai-suggestion'): void
+    (e: 'edit-ai-suggestion'): void
+    (e: 'close-ai-suggestion'): void
   }>()
 
   const newMessage = defineModel<string>('newMessage', { default: '' })

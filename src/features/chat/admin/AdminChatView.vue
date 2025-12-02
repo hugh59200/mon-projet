@@ -57,9 +57,13 @@
           :show-ai-button="true"
           :ai-loading="aiSuggestion.isLoading.value"
           :ai-error="aiSuggestion.error.value"
+          :ai-suggestion="aiSuggestion.lastSuggestion.value"
           :conversation-id="selectedUserId"
           @request-ai-suggestion="handleAiSuggestion"
           @clear-ai-error="aiSuggestion.reset"
+          @accept-ai-suggestion="acceptAiSuggestion"
+          @edit-ai-suggestion="editAiSuggestion"
+          @close-ai-suggestion="closeAiSuggestion"
         />
         <section
           v-else
@@ -126,12 +130,31 @@
     const currentConv = conv.conversations.value.find((c) => c.user_id === selectedUserId.value)
     const clientEmail = currentConv?.user_email ?? undefined
 
-    const suggestion = await aiSuggestion.generateSuggestion(messages.value, clientEmail)
+    // Générer la suggestion (elle sera affichée automatiquement via aiSuggestion.lastSuggestion)
+    await aiSuggestion.generateSuggestion(messages.value, clientEmail)
+  }
 
-    if (suggestion) {
-      // Insérer la suggestion dans le champ de saisie (brouillon)
-      newMessage.value = suggestion
+  const acceptAiSuggestion = () => {
+    // Copier la suggestion dans le champ de saisie
+    if (aiSuggestion.lastSuggestion.value) {
+      newMessage.value = aiSuggestion.lastSuggestion.value
     }
+    // Fermer la card
+    aiSuggestion.reset()
+  }
+
+  const editAiSuggestion = () => {
+    // Copier la suggestion dans le champ de saisie pour édition
+    if (aiSuggestion.lastSuggestion.value) {
+      newMessage.value = aiSuggestion.lastSuggestion.value
+    }
+    // Fermer la card
+    aiSuggestion.reset()
+  }
+
+  const closeAiSuggestion = () => {
+    // Simplement fermer la card sans copier
+    aiSuggestion.reset()
   }
 
   const goBackToList = () => {

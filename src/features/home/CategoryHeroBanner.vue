@@ -170,12 +170,14 @@
               allow="autoplay; fullscreen"
               allowfullscreen
             ></iframe>
-            <button
+            <PremiumButton
+              type="secondary"
+              variant="solid"
+              size="md"
+              icon-left="X"
               class="video-modal__close"
               @click="closeModal"
-            >
-              ✕
-            </button>
+            />
           </div>
         </div>
       </Transition>
@@ -722,7 +724,7 @@
       background-size: cover;
       background-position: center;
       opacity: 0;
-      transform: scale(1.05);
+      transform: scale(1.02);
       transition:
         opacity 1.2s @ease,
         transform 8s @ease;
@@ -1173,7 +1175,7 @@
           transform: translateX(100%);
         }
         .category-hero__card-play {
-          transform: scale(1.1);
+          transform: scale(1.05);
         }
       }
       &-glow {

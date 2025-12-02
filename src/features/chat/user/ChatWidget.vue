@@ -72,17 +72,14 @@
             </div>
           </div>
 
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="sm"
+            icon-left="Minus"
             class="chat-widget__header-close"
             @click="toggleChat"
-            title="Fermer le chat"
-          >
-            <BasicIconNext
-              name="Minus"
-              :size="18"
-              :color="'white' as IconColor"
-            />
-          </button>
+          />
         </header>
 
         <!-- Zone de chat -->
@@ -171,7 +168,7 @@
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
       &:hover {
-        transform: scale(1.08);
+        transform: translateY(-2px);
         box-shadow:
           0 6px 24px color-mix(in srgb, var(--primary-600) 50%, transparent),
           0 4px 12px color-mix(in srgb, @neutral-900 20%, transparent);
@@ -329,7 +326,6 @@
 
       &:hover {
         background: color-mix(in srgb, white 20%, transparent);
-        transform: scale(1.05);
       }
     }
   }
@@ -343,7 +339,7 @@
       opacity: 0.6;
     }
     100% {
-      transform: scale(1.5);
+      transform: scale(1.2);
       opacity: 0;
     }
   }

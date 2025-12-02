@@ -168,7 +168,7 @@
 
   .modal__actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-around;
     gap: 8px;
   }
 </style>

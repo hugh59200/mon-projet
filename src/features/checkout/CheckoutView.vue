@@ -121,31 +121,36 @@
                         {{ item.product_dosage }}
                       </p>
                     </div>
-                    <button
+                    <PremiumButton
+                      type="danger"
+                      variant="ghost"
+                      size="xs"
+                      icon-left="X"
                       class="checkout-item__remove"
                       @click="cart.removeFromCart(item.product_id!)"
-                      title="Supprimer"
-                    >
-                      <BasicIconNext name="X" :size="18" />
-                    </button>
+                    />
                   </div>
 
                   <div class="checkout-item__bottom">
                     <div class="checkout-item__quantity">
-                      <button
+                      <PremiumButton
+                        type="secondary"
+                        variant="ghost"
+                        size="xs"
+                        icon-left="Minus"
                         class="checkout-item__qty-btn"
-                        @click="updateQuantity(item, -1)"
                         :disabled="(item.quantity ?? 1) <= 1"
-                      >
-                        <BasicIconNext name="Minus" :size="14" />
-                      </button>
+                        @click="updateQuantity(item, -1)"
+                      />
                       <span class="checkout-item__qty-value">{{ item.quantity ?? 1 }}</span>
-                      <button
+                      <PremiumButton
+                        type="secondary"
+                        variant="ghost"
+                        size="xs"
+                        icon-left="Plus"
                         class="checkout-item__qty-btn"
                         @click="updateQuantity(item, 1)"
-                      >
-                        <BasicIconNext name="Plus" :size="14" />
-                      </button>
+                      />
                     </div>
 
                     <div class="checkout-item__price">
@@ -452,7 +457,7 @@
                 </button>
               </div>
 
-              <!-- Section Bientôt disponible (identique à l'original, je le raccourcis ici) -->
+              <!-- Section Bientôt disponible -->
               <div class="payment-methods__coming-soon">
                 <button
                   class="payment-methods__coming-header"

@@ -9,7 +9,10 @@
       v-if="product.is_on_sale"
       class="product-card__promo"
     >
-      <BasicIconNext name="Star" :size="12" />
+      <BasicIconNext
+        name="Star"
+        :size="12"
+      />
       <span>-{{ discountPercent }}%</span>
     </div>
 
@@ -39,21 +42,23 @@
 
       <!-- Quick Actions (on hover) -->
       <div class="product-card__quick-actions">
-        <button
+        <PremiumButton
+          type="secondary"
+          variant="solid"
+          size="sm"
+          icon-left="Eye"
           class="product-card__quick-btn"
-          :title="t('catalogue.product.viewProduct')"
           @click.stop="$emit('view', product.id)"
-        >
-          <BasicIconNext name="Eye" :size="18" />
-        </button>
-        <button
+        />
+        <PremiumButton
           v-if="(product.stock ?? 0) > 0"
+          type="primary"
+          variant="solid"
+          size="sm"
+          icon-left="ShoppingCart"
           class="product-card__quick-btn product-card__quick-btn--primary"
-          :title="t('catalogue.product.addToCart')"
           @click.stop="$emit('add', product)"
-        >
-          <BasicIconNext name="ShoppingCart" :size="18" />
-        </button>
+        />
       </div>
     </div>
 
@@ -74,14 +79,20 @@
       <!-- Specs -->
       <div class="product-card__specs">
         <div class="product-card__spec">
-          <BasicIconNext name="FlaskConical" :size="14" />
+          <BasicIconNext
+            name="FlaskConical"
+            :size="14"
+          />
           <span>{{ product.purity }}%</span>
         </div>
         <div
           v-if="product.dosage"
           class="product-card__spec"
         >
-          <BasicIconNext name="Shield" :size="14" />
+          <BasicIconNext
+            name="Shield"
+            :size="14"
+          />
           <span>{{ product.dosage }}</span>
         </div>
       </div>
@@ -110,7 +121,11 @@
           type="primary"
           variant="solid"
           size="sm"
-          :label="(product.stock ?? 0) > 0 ? t('catalogue.product.add') : t('catalogue.product.outOfStock')"
+          :label="
+            (product.stock ?? 0) > 0
+              ? t('catalogue.product.add')
+              : t('catalogue.product.outOfStock')
+          "
           icon-left="ShoppingCart"
           :disabled="(product.stock ?? 0) <= 0"
           :shine="true"
@@ -120,7 +135,6 @@
         <PremiumButton
           v-if="(product.stock ?? 0) > 0"
           type="secondary"
-          variant="outline"
           size="sm"
           :label="t('catalogue.product.buyNow')"
           icon-left="Zap"
@@ -132,8 +146,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { Products } from '@/supabase/types/supabase.types'
   import { useTranslatedProduct } from '@/composables/useTranslated'
+  import type { Products } from '@/supabase/types/supabase.types'
   import { computed, toRef } from 'vue'
   import { useI18n } from 'vue-i18n'
 
@@ -218,7 +232,7 @@
         0 0 0 1px rgba(var(--primary-500-rgb), 0.1);
 
       .product-card__image-inner img {
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       .product-card__quick-actions {
@@ -325,7 +339,7 @@
       &:hover {
         background: rgba(30, 41, 59, 0.95);
         color: white;
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       &--primary {
@@ -432,6 +446,7 @@
     // ============ ACTIONS ============
     &__actions {
       display: flex;
+      justify-content: space-around;
       gap: 8px;
       margin-top: 4px;
     }

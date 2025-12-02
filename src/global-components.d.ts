@@ -57,6 +57,7 @@ declare module 'vue' {
     NavButton: typeof import('./../designSystem/src/components/basic/button/NavButton.vue')['default']
     PasswordStrengthIndicator: typeof import('./../designSystem/src/components/basic/passwordStrength/PasswordStrengthIndicator.vue')['default']
     PremiumButton: typeof import('./../designSystem/src/components/basic/button/PremiumButton.vue')['default']
+    PremiumThemeSelector: typeof import('./../designSystem/src/components/basic/theme/PremiumThemeSelector.vue')['default']
     SmartModalSkeleton: typeof import('./../designSystem/src/components/basic/skeleton/SmartModalSkeleton.vue')['default']
     ToastContainer: typeof import('./../designSystem/src/components/basic/toast/ToastContainer.vue')['default']
     ValidationIcon: typeof import('./../designSystem/src/components/basic/validationIcon/ValidationIcon.vue')['default']

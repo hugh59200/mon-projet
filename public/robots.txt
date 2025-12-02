@@ -1,0 +1,15 @@
+# Atlas Lab Solutions - Robots.txt
+# https://fast-peptides.com
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /profile
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://fast-peptides.com/sitemap.xml
+
+# Crawl-delay (optionnel, pour éviter la surcharge)
+Crawl-delay: 1

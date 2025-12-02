@@ -277,8 +277,8 @@
       opacity: 0.8;
     }
     50% {
-      transform: scale(1.8);
-      opacity: 0.1;
+      transform: scale(1.15);
+      opacity: 0.2;
     }
     100% {
       transform: scale(1);

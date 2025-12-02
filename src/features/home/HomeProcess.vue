@@ -181,7 +181,7 @@
     }
 
     &__step:hover &__marker {
-      transform: scale(1.1);
+      transform: scale(1.05);
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     }
 

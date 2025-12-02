@@ -56,14 +56,12 @@
               </span>
             </div>
             <div class="info-item">
-              <span class="label">Date</span>
+              <span class="label">Date création</span>
               <span class="value">{{ formatDate(order.created_at!) }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Total</span>
-              <span class="value text-primary-700 font-bold">
-                {{ formatCurrency(order.total_amount ?? 0) }}
-              </span>
+              <span class="label">Dernière MAJ</span>
+              <span class="value">{{ formatDate(order.updated_at!) }}</span>
             </div>
             <div class="info-item col-span-2">
               <span class="label">ID Commande</span>
@@ -71,7 +69,94 @@
                 {{ order.order_number || order.order_id }}
               </span>
             </div>
+            <div class="info-item col-span-2" v-if="order.tracking_token">
+              <span class="label">Token de suivi invité</span>
+              <span class="value font-mono text-xs">
+                {{ order.tracking_token }}
+              </span>
+            </div>
           </div>
+        </div>
+
+        <!-- Détails financiers -->
+        <div class="order-info-card">
+          <BasicText
+            size="h5"
+            weight="bold"
+            class="mb-3"
+          >
+            Détails financiers
+          </BasicText>
+
+          <div class="financial-breakdown">
+            <div class="financial-item">
+              <span class="label">Sous-total</span>
+              <span class="value">{{ formatCurrency(order.subtotal ?? 0) }}</span>
+            </div>
+            <div class="financial-item">
+              <span class="label">Taxes (TVA)</span>
+              <span class="value">{{ formatCurrency(order.tax_amount ?? 0) }}</span>
+            </div>
+            <div class="financial-item">
+              <span class="label">Frais de livraison</span>
+              <span class="value">{{ formatCurrency(order.shipping_cost ?? 0) }}</span>
+            </div>
+            <div class="financial-item" v-if="order.discount_amount && order.discount_amount > 0">
+              <span class="label">Réduction</span>
+              <span class="value text-success-600">-{{ formatCurrency(order.discount_amount) }}</span>
+            </div>
+            <div class="financial-item financial-item--total">
+              <span class="label">Total TTC</span>
+              <span class="value">{{ formatCurrency(order.total_amount ?? 0) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Point Relais Mondial Relay -->
+        <div class="order-info-card" v-if="(order as any).relay_id">
+          <BasicText
+            size="h5"
+            weight="bold"
+            class="mb-2"
+          >
+            📦 Point Relais Mondial Relay
+          </BasicText>
+          <div
+            class="relay-block"
+          >
+            <p class="font-bold">{{ (order as any).relay_name }}</p>
+            <p class="text-xs opacity-70">ID: {{ (order as any).relay_id }}</p>
+            <p>{{ (order as any).relay_address }}</p>
+            <p>{{ (order as any).relay_zipcode }} {{ (order as any).relay_city }}</p>
+            <p>{{ (order as any).relay_country || 'FR' }}</p>
+          </div>
+        </div>
+
+        <!-- Adresse de livraison domicile -->
+        <div class="order-info-card" v-else>
+          <BasicText
+            size="h5"
+            weight="bold"
+            class="mb-2"
+          >
+            🏠 Adresse de livraison (domicile)
+          </BasicText>
+          <div
+            v-if="shippingAddress"
+            class="address-block"
+          >
+            <p class="font-bold">{{ order.shipping_name }}</p>
+            <p>{{ order.shipping_address }}</p>
+            <p>{{ order.shipping_zip }} {{ order.shipping_city }}</p>
+            <p>{{ order.shipping_country }}</p>
+          </div>
+          <BasicText
+            v-else
+            color="neutral-500"
+            size="body-s"
+          >
+            Aucune adresse renseignée
+          </BasicText>
 
           <div class="card-actions">
             <BasicButton
@@ -91,32 +176,6 @@
               @click="copyTrackingLink({ order_id: order.order_id })"
             />
           </div>
-        </div>
-
-        <div class="order-info-card">
-          <BasicText
-            size="h5"
-            weight="bold"
-            class="mb-2"
-          >
-            Adresse de livraison
-          </BasicText>
-          <div
-            v-if="shippingAddress"
-            class="address-block"
-          >
-            <p class="font-bold">{{ order.shipping_name }}</p>
-            <p>{{ order.shipping_address }}</p>
-            <p>{{ order.shipping_zip }} {{ order.shipping_city }}</p>
-            <p>{{ order.shipping_country }}</p>
-          </div>
-          <BasicText
-            v-else
-            color="neutral-500"
-            size="body-s"
-          >
-            Aucune adresse renseignée
-          </BasicText>
         </div>
 
         <div class="order-info-card">
@@ -195,6 +254,21 @@
               <strong>{{ order.carrier }}</strong>
               - {{ order.tracking_number }}
             </BasicText>
+          </div>
+        </div>
+
+        <!-- Notes internes -->
+        <div class="order-info-card border-amber-100 bg-amber-50" v-if="(order as any).internal_notes">
+          <BasicText
+            size="h5"
+            weight="bold"
+            class="mb-2"
+            color="warning-800"
+          >
+            📝 Notes internes
+          </BasicText>
+          <div class="notes-block">
+            {{ (order as any).internal_notes }}
           </div>
         </div>
 
@@ -457,17 +531,48 @@
   .order-detail {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    padding: 16px;
+    overflow-x: hidden;
   }
 
   .order-info-card {
-    background: @white;
-    padding: 20px;
-    border-radius: 12px;
+    position: relative;
+    background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
+    padding: 24px;
+    border-radius: 16px;
     border: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-500), var(--primary-300));
+      border-radius: 16px 16px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary-200);
+
+      &::before {
+        opacity: 1;
+      }
+    }
 
     .card-header {
       display: flex;
@@ -475,11 +580,11 @@
       align-items: center;
       margin-bottom: 16px;
       padding-bottom: 12px;
-      border-bottom: 1px solid @neutral-100;
+      border-bottom: 2px solid @neutral-100;
 
       .header-badges {
         display: flex;
-        gap: 8px; /* Espace entre le badge Invité et le badge Statut */
+        gap: 8px;
         align-items: center;
       }
     }
@@ -488,40 +593,171 @@
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 24px;
+    gap: 16px 24px;
 
     .info-item {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
+      padding: 12px;
+      background: @neutral-50;
+      border-radius: 8px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.03);
+      }
 
       &.col-span-2 {
         grid-column: span 2;
       }
 
       .label {
-        font-size: 12px;
-        color: @neutral-500;
+        font-size: 11px;
+        color: var(--primary-600);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
+        font-weight: 700;
       }
+
       .value {
         font-size: 14px;
         color: @neutral-900;
+        font-weight: 500;
       }
     }
   }
 
   .address-block {
+    padding: 16px;
+    background: @neutral-50;
+    border-radius: 12px;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: @neutral-700;
+    border-left: 3px solid var(--primary-500);
+  }
+
+  .financial-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.02) 0%,
+      rgba(var(--secondary-500-rgb), 0.02) 100%);
+    border-radius: 12px;
+    border: 1px solid @neutral-200;
+
+    .financial-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: @white;
+      border-radius: 8px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.03);
+        transform: translateX(4px);
+      }
+
+      .label {
+        font-size: 13px;
+        color: @neutral-700;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+      }
+
+      .value {
+        font-size: 15px;
+        color: @neutral-900;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &--total {
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+        border: none;
+        padding: 14px 16px;
+        margin-top: 8px;
+        box-shadow:
+          0 4px 12px rgba(var(--primary-500-rgb), 0.25),
+          0 2px 4px rgba(var(--primary-500-rgb), 0.15);
+
+        .label,
+        .value {
+          color: @white;
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+        }
+
+        &:hover {
+          transform: translateX(0) translateY(-2px);
+          box-shadow:
+            0 6px 16px rgba(var(--primary-500-rgb), 0.35),
+            0 3px 6px rgba(var(--primary-500-rgb), 0.2);
+        }
+      }
+    }
+  }
+
+  .relay-block {
+    padding: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.03) 0%,
+      rgba(var(--primary-300-rgb), 0.05) 100%);
+    border-radius: 12px;
+    border: 2px solid var(--primary-200);
+    font-size: 14px;
+    line-height: 1.7;
+    color: @neutral-800;
+    box-shadow:
+      0 2px 8px rgba(var(--primary-500-rgb), 0.1),
+      0 1px 3px rgba(0, 0, 0, 0.05);
+
+    p {
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &.font-bold {
+        color: var(--primary-700);
+        font-size: 15px;
+        margin-bottom: 8px;
+      }
+
+      &.text-xs {
+        font-size: 12px;
+        color: @neutral-600;
+        font-family: 'Courier New', monospace;
+      }
+    }
+  }
+
+  .notes-block {
+    padding: 16px;
+    background: @white;
+    border-radius: 12px;
+    border-left: 4px solid var(--warning-500);
+    font-size: 14px;
+    line-height: 1.7;
+    color: @neutral-800;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow:
+      0 2px 6px rgba(var(--warning-500-rgb), 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   .tracking-form {
     display: grid;
     grid-template-columns: 1fr 1fr auto;
-    gap: 10px;
+    gap: 12px;
 
     @media (max-width: 600px) {
       grid-template-columns: 1fr;
@@ -529,28 +765,35 @@
   }
 
   .products-table {
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
+    border: 2px solid @neutral-200;
+    border-radius: 12px;
     overflow: hidden;
+    background: @white;
 
     .table-header {
       display: grid;
       grid-template-columns: 3fr 1fr 1fr 1fr;
-      background: @neutral-50;
-      padding: 10px 12px;
+      background: linear-gradient(135deg, var(--secondary-900) 0%, var(--secondary-800) 100%);
+      padding: 12px 16px;
       font-size: 12px;
-      font-weight: bold;
-      color: @neutral-600;
-      border-bottom: 1px solid @neutral-200;
+      font-weight: 700;
+      color: @white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .table-row {
       display: grid;
       grid-template-columns: 3fr 1fr 1fr 1fr;
-      padding: 12px;
+      padding: 14px 16px;
       font-size: 14px;
       align-items: center;
       border-bottom: 1px solid @neutral-100;
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.02);
+      }
 
       &:last-child {
         border-bottom: none;
@@ -560,9 +803,77 @@
 
   .card-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid @neutral-100;
+    border-top: 2px solid @neutral-100;
+
+    button {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .order-products {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: 0.2s;
+  }
+
+  // Animation pour les cartes
+  .order-info-card {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+    &:nth-child(4) { animation-delay: 0.2s; }
+    &:nth-child(5) { animation-delay: 0.25s; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .order-detail {
+      gap: 20px;
+      padding: 4px;
+    }
+
+    .order-info-card {
+      padding: 18px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .products-table {
+      .table-header,
+      .table-row {
+        grid-template-columns: 2fr 1fr 1fr;
+        font-size: 12px;
+      }
+
+      .col-price {
+        display: none;
+      }
+    }
   }
 </style>

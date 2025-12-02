@@ -236,44 +236,54 @@
           icon="Settings"
         >
           <div class="profil__preferences">
-            <div class="profil__pref-card">
+            <!-- Appearance Card with Premium Theme Selector -->
+            <div class="profil__pref-card profil__pref-card--premium">
+              <div class="profil__pref-card-header">
+                <BasicIconNext
+                  name="Palette"
+                  :size="20"
+                  class="profil__pref-card-icon"
+                />
+                <BasicText
+                  size="body-m"
+                  weight="bold"
+                  class="profil__pref-card-title"
+                >
+                  {{ t('profile.appearance') }}
+                </BasicText>
+              </div>
+
               <BasicText
-                size="body-m"
-                weight="semibold"
-                class="profil__pref-card-title"
+                size="body-s"
+                color="neutral-400"
+                class="profil__pref-card-subtitle"
               >
-                {{ t('profile.appearance') }}
+                {{ t('profile.themeDesc') }}
               </BasicText>
 
-              <div class="profil__pref-card-row">
-                <div class="profil__pref-card-info">
-                  <BasicText
-                    size="body-m"
-                    weight="semibold"
-                    color="neutral-100"
-                  >
-                    {{ t('profile.theme') }}
-                  </BasicText>
-                  <BasicText
-                    size="body-s"
-                    color="neutral-400"
-                  >
-                    {{ t('profile.themeDesc') }}
-                  </BasicText>
-                </div>
-
-                <BasicThemeSelector v-model="isBrownTheme" />
-              </div>
+              <PremiumThemeSelector
+                v-model="isBrownTheme"
+                label-color="neutral-800"
+                description-color="neutral-600"
+              />
             </div>
 
-            <div class="profil__pref-card">
-              <BasicText
-                size="body-m"
-                weight="semibold"
-                class="profil__pref-card-title"
-              >
-                {{ t('profile.notifications') }}
-              </BasicText>
+            <!-- Notifications Card -->
+            <div class="profil__pref-card profil__pref-card--secondary">
+              <div class="profil__pref-card-header">
+                <BasicIconNext
+                  name="Bell"
+                  :size="20"
+                  class="profil__pref-card-icon"
+                />
+                <BasicText
+                  size="body-m"
+                  weight="bold"
+                  class="profil__pref-card-title"
+                >
+                  {{ t('profile.notifications') }}
+                </BasicText>
+              </div>
 
               <div class="profil__pref-card-list">
                 <BasicCheckbox
@@ -284,15 +294,19 @@
             </div>
           </div>
 
-          <BasicButton
-            :label="t('profile.savePreferences')"
+          <PremiumButton
             type="primary"
-            variant="filled"
-            block
+            variant="solid"
+            size="md"
+            width="full"
+            :label="t('profile.savePreferences')"
+            icon-left="Save"
             :disabled="preferencesLoading || !hasPreferenceChanges"
             :loading="preferencesLoading"
+            loading-text="Enregistrement..."
+            :shine="true"
+            :glow="hasPreferenceChanges && !preferencesLoading"
             @click="savePreferences"
-            icon-left="Download"
           />
         </FilterSection>
 
@@ -376,7 +390,7 @@
   import { computed, onMounted, ref, watch, type Ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
-  import { BasicThemeSelector } from '../../../designSystem/src'
+  import PremiumThemeSelector from '@designSystem/components/basic/theme/PremiumThemeSelector.vue'
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
@@ -624,8 +638,8 @@
     &__form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 20px;
+      margin-bottom: 20px;
 
       &.two-cols {
         grid-template-columns: 1fr 1fr;
@@ -633,23 +647,31 @@
     }
 
     &__form-divider {
-      height: 1px;
-      background: rgba(255, 255, 255, 0.1);
-      margin: 20px 0 12px;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+      );
+      margin: 28px 0 20px;
     }
 
     &__form-subtitle {
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
       font-size: 11px;
-      margin-bottom: 12px;
+      font-weight: 700;
+      margin-bottom: 16px;
       display: block;
+      color: @neutral-400;
     }
 
     &__actions {
-      margin-top: 20px;
-      .BasicButton {
-        max-width: 300px;
+      margin-top: 28px;
+      .BasicButton,
+      .PremiumButton {
+        max-width: 100%;
       }
     }
 
@@ -685,7 +707,8 @@
     🧊 MAIN CONTAINER (glass)
     ----------------------------- */
     &__container {
-      max-width: 950px;
+      width: 1200px;
+      max-width: calc(100% - 40px);
       margin: -100px auto 70px;
       padding: 40px;
 
@@ -734,7 +757,6 @@
       cursor: pointer;
 
       &:hover {
-        transform: scale(1.05);
         box-shadow:
           0 8px 25px fade(@neutral-900, 60%),
           0 0 0 4px var(--primary-400);
@@ -826,29 +848,37 @@
     &__sections {
       display: flex;
       flex-direction: column;
-      gap: 30px;
-      margin-top: 10px;
+      gap: 32px;
+      margin-top: 16px;
 
       :deep(.FilterSection) {
         /* ⬅️ AJOUT :deep() */
-        border: 1px solid fade(@neutral-500, 10%);
-        background: rgba(var(--secondary-900-rgb), 0.5);
-        border-radius: 16px;
-        padding: 20px;
+        border: 1px solid fade(@neutral-500, 12%);
+        background: rgba(var(--secondary-900-rgb), 0.55);
+        border-radius: 20px;
+        padding: 28px 32px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: fade(@neutral-400, 15%);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
       }
 
       :deep(.FilterSection__content) {
         /* ⬅️ AJOUT :deep() */
-        padding-top: 20px;
+        padding-top: 24px;
 
         .BasicInput:not(:last-child) {
-          margin-bottom: 12px;
+          margin-bottom: 16px;
         }
       }
 
       :deep(.FilterSection__head .BasicText) {
         /* ⬅️ AJOUT :deep() */
         color: @neutral-50;
+        font-size: 18px;
+        letter-spacing: -0.3px;
       }
     }
 
@@ -857,18 +887,18 @@
     ----------------------------- */
     &__orders {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
     }
 
     &__order-card,
     &__pref-card {
       background: @neutral-50;
       border: 1px solid @neutral-200;
-      padding: 18px 22px;
-      border-radius: 14px;
-      transition: all 0.25s ease;
+      padding: 22px 26px;
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       .BasicText {
         color: @neutral-900;
@@ -877,28 +907,46 @@
 
     &__order-card {
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-400), var(--primary-600));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
 
       &:hover {
-        transform: translateY(-2px);
         border-color: var(--primary-400);
-        box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.2);
+        box-shadow: 0 12px 32px rgba(var(--primary-500-rgb), 0.2);
+
+        &::before {
+          transform: translateX(0);
+        }
       }
 
       &-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 14px;
 
         .BasicText {
           color: @neutral-900;
+          font-size: 16px;
         }
       }
 
       &-body {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
 
         .BasicText {
           color: @neutral-600;
@@ -912,32 +960,130 @@
 
       .profil__orders-empty {
         display: block;
-        margin-top: 6px;
+        margin-top: 8px;
         text-align: center;
       }
     }
 
     /* -----------------------------
-    PREFERENCES
+    PREFERENCES - PREMIUM EDITION
     ----------------------------- */
     &__preferences {
       display: flex;
       flex-direction: column;
-      gap: 16px; /* Espacement vertical entre les cartes */
-      margin-bottom: 20px;
+      gap: 24px;
+      margin-bottom: 24px;
     }
 
     &__pref-card {
+      position: relative;
       cursor: default;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
+      padding: 28px 32px;
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Default Card Style */
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.92) 100%
+      );
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-400), var(--primary-600));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      &:hover {
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.12),
+          0 2px 8px rgba(0, 0, 0, 0.08);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      /* Premium Variant - pour la carte Apparence */
+      &--premium {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.98) 0%,
+          rgba(250, 250, 255, 0.95) 100%
+        );
+        border: 2px solid rgba(102, 126, 234, 0.15);
+
+        &::before {
+          background: linear-gradient(
+            90deg,
+            #667eea 0%,
+            #764ba2 50%,
+            #f093fb 100%
+          );
+        }
+
+        &:hover {
+          border-color: rgba(102, 126, 234, 0.25);
+          box-shadow:
+            0 20px 60px rgba(102, 126, 234, 0.15),
+            0 2px 10px rgba(102, 126, 234, 0.1);
+        }
+      }
+
+      /* Secondary Variant - pour les autres cartes */
+      &--secondary {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(248, 250, 252, 0.92) 100%
+        );
+      }
+
+      /* Card Header avec Icône */
+      &-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+      }
+
+      &-icon {
+        color: var(--primary-500);
+        padding: 8px;
+        background: rgba(var(--primary-500-rgb), 0.1);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+
+        .profil__pref-card:hover & {
+          background: rgba(var(--primary-500-rgb), 0.15);
+        }
+      }
 
       &-title {
-        color: @neutral-700;
-        border-bottom: 1px solid @neutral-200;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
+        color: @neutral-800;
+        margin: 0;
+        letter-spacing: -0.3px;
+      }
+
+      &-subtitle {
+        margin: -8px 0 8px;
+        line-height: 1.5;
       }
 
       &-row {
@@ -950,7 +1096,7 @@
       &-info {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
 
         .BasicText[color='neutral-100'] {
           color: @neutral-900 !important;
@@ -960,43 +1106,49 @@
       &-list {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 16px;
+        padding: 12px 0;
 
         :deep(.BasicCheckbox) {
-          /* ⬅️ AJOUT :deep() */
-          /* Styles spécifiques aux checkboxes si besoin */
+          padding: 10px 14px;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(var(--primary-500-rgb), 0.05);
+          }
+
           .BasicText {
-            color: @neutral-800; /* Assurer une couleur de texte appropriée dans la carte */
+            color: @neutral-800;
+            font-weight: 500;
           }
         }
       }
 
-      /* STYLE DU SÉLECTEUR DE THÈME */
-      :deep(.BasicThemeSelector) {
-        /* ⬅️ AJOUT :deep() */
-        border: 1px solid @neutral-300;
-        padding: 6px;
-        border-radius: 12px;
-        transition: all 0.3s ease;
+      /* Styles pour le PremiumThemeSelector dans les cartes blanches */
+      :deep(.premium-theme-selector) {
+        .premium-theme-selector__option {
+          background: rgba(0, 0, 0, 0.05);
+          border-color: rgba(0, 0, 0, 0.15);
 
-        &:hover {
-          border-color: @neutral-500;
-        }
-
-        .BasicThemeSelector__option {
-          width: 38px;
-          height: 38px;
-          border-radius: 8px;
-          transition: all 0.3s ease;
+          &:hover:not(.premium-theme-selector__option--active) {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.2);
+          }
 
           &--active {
-            box-shadow: 0 0 0 3px var(--primary-500);
-            transform: scale(1.05);
+            background: rgba(var(--primary-500-rgb), 0.1);
+            border-color: var(--primary-400);
           }
         }
-        .BasicText {
-          font-weight: 500;
-          color: @neutral-700;
+
+        .premium-theme-selector__description {
+          background: rgba(0, 0, 0, 0.03);
+          border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .premium-theme-selector__sparkle {
+          color: var(--primary-500);
         }
       }
     }

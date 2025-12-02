@@ -55,16 +55,14 @@
           >
             <div class="catalogue-dock__header">
               <span class="catalogue-dock__title">Accès rapide</span>
-              <button
+              <PremiumButton
+                type="secondary"
+                variant="ghost"
+                size="sm"
+                icon-left="ChevronLeft"
                 class="catalogue-dock__close"
                 @click="collapse"
-                aria-label="Fermer le panneau"
-              >
-                <BasicIconNext
-                  name="ChevronLeft"
-                  :size="20"
-                />
-              </button>
+              />
             </div>
 
             <ul class="catalogue-dock__categories">
@@ -540,7 +538,7 @@
         background: rgba(255, 255, 255, 0.06);
 
         .catalogue-dock__icon-wrapper {
-          transform: scale(1.1);
+          transform: scale(1.05);
           border-color: @dock-accent;
         }
       }
@@ -716,7 +714,7 @@
         }
 
         .catalogue-dock__item-icon {
-          transform: scale(1.1);
+          transform: scale(1.05);
         }
       }
 
@@ -859,7 +857,7 @@
     }
 
     50% {
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
   }
 

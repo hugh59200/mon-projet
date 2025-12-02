@@ -19,9 +19,14 @@
             <strong>Une erreur est survenue</strong>
             <span>{{ errorMessage }}</span>
           </div>
-          <button class="track__error-close" @click="errorMessage = ''">
-            <BasicIconNext name="X" :size="18" />
-          </button>
+          <PremiumButton
+            type="danger"
+            variant="ghost"
+            size="xs"
+            icon-left="X"
+            class="track__error-close"
+            @click="errorMessage = ''"
+          />
         </div>
       </transition>
 
@@ -508,6 +513,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useHead } from '@vueuse/head'
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import PageContent from '@/features/shared/components/PageContent.vue'
@@ -519,6 +525,27 @@ import { getLabelBadge } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+// Configuration SEO pour le suivi de commande
+useHead({
+  title: 'Suivre ma commande - Atlas Lab Solutions',
+  meta: [
+    {
+      name: 'description',
+      content: 'Suivez votre commande en temps réel. Consultez le statut de livraison et les détails de votre commande de peptides.',
+    },
+    {
+      name: 'robots',
+      content: 'index, follow',
+    },
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://fast-peptides.com/suivi-commande',
+    },
+  ],
+})
 
 // ===========================
 // COMPOSABLES

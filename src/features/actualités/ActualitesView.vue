@@ -26,29 +26,19 @@
               <path d="m2 12 10 5 10-5" />
             </svg>
           </div>
-          <h2 class="actualites__section-title">Explorer par catégorie</h2>
+          <h2 class="actualites__section-title">{{ $t('news.exploreByCategory') }}</h2>
         </div>
 
         <div class="actualites__topics-carousel">
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="sm"
+            icon-left="ChevronLeft"
             class="actualites__topics-nav actualites__topics-nav--prev"
-            @click="scrollTopics('prev')"
             :disabled="!canScrollPrev"
-            aria-label="Catégories précédentes"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          </button>
+            @click="scrollTopics('prev')"
+          />
 
           <div
             class="actualites__topics-track"
@@ -60,7 +50,7 @@
               :to="`/actualites?categorie=${topic.id}`"
               class="actualites__topic-card"
               :class="{ 'actualites__topic-card--active': activeCategory === topic.id }"
-              :aria-label="`Voir les actualités sur : ${topic.label}`"
+              :aria-label="$t('news.seeNewsAbout', { topic: topic.label })"
             >
               <div class="actualites__topic-image">
                 <img
@@ -95,25 +85,15 @@
             </RouterLink>
           </div>
 
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="sm"
+            icon-left="ChevronRight"
             class="actualites__topics-nav actualites__topics-nav--next"
-            @click="scrollTopics('next')"
             :disabled="!canScrollNext"
-            aria-label="Catégories suivantes"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </button>
+            @click="scrollTopics('next')"
+          />
         </div>
       </section>
 
@@ -137,7 +117,7 @@
               points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
             />
           </svg>
-          <span>Article en vedette</span>
+          <span>{{ $t('news.featuredArticle') }}</span>
         </div>
 
         <RouterLink
@@ -155,7 +135,7 @@
           <div class="actualites__featured-content">
             <div class="actualites__featured-meta">
               <span class="actualites__featured-topic">
-                {{ featuredArticle.topic?.label || 'Actualité' }}
+                {{ featuredArticle.topic?.label || $t('news.defaultTopic') }}
               </span>
               <span class="actualites__featured-date">
                 <svg
@@ -207,7 +187,7 @@
             />
 
             <div class="actualites__featured-cta">
-              <span>Lire l'article</span>
+              <span>{{ $t('news.readArticle') }}</span>
               <svg
                 width="18"
                 height="18"
@@ -249,7 +229,7 @@
           </div>
           <div class="actualites__grid-count">
             <span class="actualites__grid-count-number">{{ nonFeaturedArticles.length }}</span>
-            <span class="actualites__grid-count-label">articles</span>
+            <span class="actualites__grid-count-label">{{ $t('news.articles') }}</span>
           </div>
         </div>
 
@@ -279,15 +259,15 @@
               />
             </svg>
           </div>
-          <h3 class="actualites__empty-title">Aucun article trouvé</h3>
+          <h3 class="actualites__empty-title">{{ $t('news.noArticlesFound') }}</h3>
           <p class="actualites__empty-text">
-            Il n'y a pas encore d'articles dans cette catégorie. Revenez bientôt !
+            {{ $t('news.noArticlesText') }}
           </p>
           <PremiumButton
             type="primary"
             variant="solid"
             size="md"
-            label="Voir tous les articles"
+            :label="$t('news.viewAllArticles')"
             icon-left="ArrowLeft"
             @click="$router.push('/actualites')"
           />
@@ -366,7 +346,7 @@
               />
 
               <div class="actualites__article-read">
-                <span>Lire</span>
+                <span>{{ $t('news.readMore') }}</span>
                 <svg
                   width="14"
                   height="14"
@@ -447,6 +427,7 @@
   </div>
 </template>
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { formatDate } from '@/utils/index'
@@ -455,6 +436,36 @@
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useNewsStore } from './store/useNewsStore'
+
+  // Configuration SEO pour la page Actualités
+  useHead({
+    title: 'Actualités & Blog - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Découvrez les dernières actualités sur les peptides de recherche, les avancées scientifiques et les guides pratiques. Blog officiel Atlas Lab Solutions.',
+      },
+      {
+        property: 'og:title',
+        content: 'Actualités & Blog - Atlas Lab Solutions',
+      },
+      {
+        property: 'og:description',
+        content: 'Actualités scientifiques et guides pratiques sur les peptides de recherche.',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: 'https://fast-peptides.com/actualites',
+      },
+    ],
+  })
 
   const route = useRoute()
 
@@ -624,7 +635,7 @@
         background: @neutral-50;
         border-color: var(--primary-300);
         color: var(--primary-600);
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       &:disabled {
@@ -665,7 +676,7 @@
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 
         .actualites__topic-image img {
-          transform: scale(1.08);
+          transform: scale(1.02);
         }
 
         .actualites__topic-arrow {

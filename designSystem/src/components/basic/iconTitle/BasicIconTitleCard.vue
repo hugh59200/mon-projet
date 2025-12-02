@@ -56,7 +56,7 @@
       height: 100%;
       fill: var(--secondary-100);
       transition: fill 0.3s ease;
-      transform: scale(1.4);
+      transform: scale(1.15);
     }
 
     .icon--container {

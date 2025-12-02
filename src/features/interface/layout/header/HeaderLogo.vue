@@ -45,7 +45,7 @@
 
     &:hover {
       .header-logo__icon {
-        transform: scale(1.08) rotate(3deg);
+        transform: scale(1.02) rotate(3deg);
         box-shadow:
           0 0 20px rgba(var(--primary-500-rgb), 0.4),
           0 0 40px rgba(var(--primary-500-rgb), 0.2);

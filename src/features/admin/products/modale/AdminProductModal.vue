@@ -2,8 +2,11 @@
   <ModalComponent
     v-model="visible"
     closable
-    :title="headerTitle"
   >
+    <template #header>
+      {{ headerTitle }}
+    </template>
+
     <template #content>
       <div class="product-form">
         
@@ -141,22 +144,103 @@
           </div>
         </WrapperFormElements>
 
-        <div class="form-actions">
-          <BasicButton
-            label="Annuler"
-            type="secondary"
-            variant="outlined"
-            @click="visible = false"
-          />
-          <BasicButton
-            :label="isEditMode ? 'Enregistrer' : 'Créer le produit'"
-            type="primary"
-            :disabled="loading || uploadLoading"
-            @click="handleSubmit"
-          />
-        </div>
+        <!-- Section Traductions (i18n) -->
+        <div class="translations-section">
+          <div
+            class="translations-header"
+            @click="showTranslations = !showTranslations"
+          >
+            <BasicText
+              size="h6"
+              weight="bold"
+              color="primary-700"
+            >
+              🌐 Traductions (Multilingue)
+            </BasicText>
+            <BasicText
+              size="body-s"
+              color="neutral-500"
+            >
+              {{ showTranslations ? '▼' : '▶' }} Cliquez pour {{ showTranslations ? 'masquer' : 'afficher' }}
+            </BasicText>
+          </div>
 
+          <div v-if="showTranslations" class="translations-content">
+            <div class="language-group">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="primary-600"
+                class="language-title"
+              >
+                🇫🇷 Français
+              </BasicText>
+              <WrapperInput
+                v-model="nameFr"
+                label="Nom (FR)"
+                placeholder="Ex: Peptide BPC-157"
+              />
+              <WrapperInput
+                v-model="categoryFr"
+                label="Catégorie (FR)"
+                placeholder="Ex: Peptides"
+              />
+              <WrapperFormElements label="Description (FR)">
+                <textarea
+                  v-model="descriptionFr"
+                  rows="3"
+                  class="custom-textarea"
+                  placeholder="Description en français..."
+                />
+              </WrapperFormElements>
+            </div>
+
+            <div class="language-group">
+              <BasicText
+                size="body-m"
+                weight="bold"
+                color="primary-600"
+                class="language-title"
+              >
+                🇬🇧 English
+              </BasicText>
+              <WrapperInput
+                v-model="nameEn"
+                label="Name (EN)"
+                placeholder="Ex: BPC-157 Peptide"
+              />
+              <WrapperInput
+                v-model="categoryEn"
+                label="Category (EN)"
+                placeholder="Ex: Peptides"
+              />
+              <WrapperFormElements label="Description (EN)">
+                <textarea
+                  v-model="descriptionEn"
+                  rows="3"
+                  class="custom-textarea"
+                  placeholder="Description in English..."
+                />
+              </WrapperFormElements>
+            </div>
+          </div>
+        </div>
       </div>
+    </template>
+
+    <template #actions>
+      <BasicButton
+        label="Annuler"
+        type="secondary"
+        variant="outlined"
+        @click="visible = false"
+      />
+      <BasicButton
+        :label="isEditMode ? 'Enregistrer' : 'Créer le produit'"
+        type="primary"
+        :disabled="loading || uploadLoading"
+        @click="handleSubmit"
+      />
     </template>
   </ModalComponent>
 </template>
@@ -186,7 +270,7 @@
   const fileInputRef = ref<HTMLInputElement | null>(null)
   const oldImagePath = ref<string | null>(null)
 
-  // ✅ Initialisation complète (avec Dosage)
+  // ✅ Initialisation complète (avec Dosage + i18n)
   const form = ref<TablesInsert<'products'>>({
     name: '',
     dosage: '', // Nouveau champ V2
@@ -198,7 +282,19 @@
     description: '',
     stock: 0,
     image: null,
+    name_i18n: {},
+    description_i18n: {},
+    category_i18n: {},
   })
+
+  // État pour les traductions
+  const showTranslations = ref(false)
+  const nameEn = ref('')
+  const nameFr = ref('')
+  const descriptionEn = ref('')
+  const descriptionFr = ref('')
+  const categoryEn = ref('')
+  const categoryFr = ref('')
 
   const isEditMode = computed(() => !!props.productId)
   const headerTitle = computed(() =>
@@ -240,9 +336,19 @@
         description: '',
         stock: 0,
         image: null,
+        name_i18n: {},
+        description_i18n: {},
+        category_i18n: {},
       }
       imagePreview.value = null
       selectedFile.value = null
+      // Reset i18n fields
+      nameFr.value = ''
+      nameEn.value = ''
+      descriptionFr.value = ''
+      descriptionEn.value = ''
+      categoryFr.value = ''
+      categoryEn.value = ''
       return
     }
 
@@ -260,11 +366,23 @@
 
     form.value = { ...data }
     imagePreview.value = data.image || null
-    
+
     // Extraction du path pour suppression future éventuelle
     if (data.image && data.image.includes('/product-images/')) {
       oldImagePath.value = data.image.split('/product-images/')[1] ?? null
     }
+
+    // Extraction des traductions i18n depuis les JSONB
+    const nameI18n = data.name_i18n as Record<string, string> | null
+    const descI18n = data.description_i18n as Record<string, string> | null
+    const catI18n = data.category_i18n as Record<string, string> | null
+
+    nameFr.value = nameI18n?.fr || ''
+    nameEn.value = nameI18n?.en || ''
+    descriptionFr.value = descI18n?.fr || ''
+    descriptionEn.value = descI18n?.en || ''
+    categoryFr.value = catI18n?.fr || ''
+    categoryEn.value = catI18n?.en || ''
   }
 
   async function removeImage() {
@@ -330,11 +448,28 @@
         if (uploadedUrl) form.value.image = uploadedUrl
       }
 
+      // Construction des objets i18n depuis les champs individuels
+      const nameI18n: Record<string, string> = {}
+      const descriptionI18n: Record<string, string> = {}
+      const categoryI18n: Record<string, string> = {}
+
+      if (nameFr.value) nameI18n.fr = nameFr.value
+      if (nameEn.value) nameI18n.en = nameEn.value
+      if (descriptionFr.value) descriptionI18n.fr = descriptionFr.value
+      if (descriptionEn.value) descriptionI18n.en = descriptionEn.value
+      if (categoryFr.value) categoryI18n.fr = categoryFr.value
+      if (categoryEn.value) categoryI18n.en = categoryEn.value
+
       // Nettoyage logique : Si pas en promo, on vide le prix promo
       const payload = { ...form.value }
       if (!payload.is_on_sale) {
         payload.sale_price = null
       }
+
+      // Ajout des traductions i18n au payload
+      payload.name_i18n = nameI18n
+      payload.description_i18n = descriptionI18n
+      payload.category_i18n = categoryI18n
 
       if (isEditMode.value && props.productId) {
         await updateProduct(props.productId, payload)
@@ -367,32 +502,81 @@
   .product-form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 10px;
+    gap: 28px;
+    padding: 16px;
+    overflow-x: hidden; /* Empêche le scroll horizontal */
   }
 
   .form-section {
-    padding: 20px;
+    position: relative;
+    padding: 24px;
     border: 1px solid @neutral-200;
-    border-radius: 12px;
-    background: @white;
+    border-radius: 16px;
+    background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Effet glassmorphism subtil
+    backdrop-filter: blur(10px);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-500), var(--primary-300));
+      border-radius: 16px 16px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary-200);
+
+      &::before {
+        opacity: 1;
+      }
+    }
   }
 
   .section-title {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--primary-600);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: linear-gradient(180deg, var(--primary-500), var(--primary-300));
+      border-radius: 2px;
+    }
   }
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid @neutral-100;
   }
 
   .form-row {
@@ -415,30 +599,60 @@
   }
 
   .promo-container {
-    position: relative; // Pour l'animation slide-in
+    position: relative;
   }
 
   .helper-text {
-    margin-top: 4px;
+    margin-top: 8px;
     font-size: 0.8rem;
+    color: @neutral-500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &::before {
+      content: 'ℹ';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--primary-100);
+      color: var(--primary-600);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
   }
 
   .custom-textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid @neutral-300;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border: 2px solid @neutral-200;
+    border-radius: 12px;
     font-family: inherit;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
     resize: vertical;
     background: @white;
-    transition: border-color 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 120px;
+
+    &:hover {
+      border-color: var(--primary-300);
+    }
 
     &:focus {
       outline: none;
       border-color: var(--primary-500);
-      box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
+      box-shadow:
+        0 0 0 4px rgba(var(--primary-500-rgb), 0.1),
+        0 2px 8px rgba(var(--primary-500-rgb), 0.15);
+      background: @white;
+    }
+
+    &::placeholder {
+      color: @neutral-400;
     }
   }
 
@@ -451,47 +665,236 @@
   }
 
   .image-preview {
-    margin-top: 12px;
-    padding: 16px;
-    border: 1px dashed @neutral-300;
-    border-radius: 8px;
-    background-color: @neutral-50;
+    margin-top: 16px;
+    padding: 20px;
+    border: 2px dashed var(--primary-200);
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.03) 0%,
+      rgba(var(--primary-300-rgb), 0.05) 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: radial-gradient(circle at 50% 0%,
+        rgba(var(--primary-500-rgb), 0.05) 0%,
+        transparent 70%);
+      pointer-events: none;
+    }
 
     img {
-      max-height: 180px;
+      max-height: 220px;
       max-width: 100%;
       object-fit: contain;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
+
+      &:hover {
+        transform: scale(1.02);
+      }
     }
   }
 
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding-top: 16px;
-    border-top: 1px solid @neutral-100;
-    margin-top: 8px;
-  }
 
-  // Animation simple d'apparition du champ promo
+  // Animation premium d'apparition du champ promo
   .slide-in {
-    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(-10px);
+      transform: translateX(-20px) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: translateX(0);
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  // Animation d'entrée pour les sections
+  .form-section {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+    &:nth-child(4) { animation-delay: 0.2s; }
+    &:nth-child(5) { animation-delay: 0.25s; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Style premium pour les inputs
+  :deep(.wrapper-input) {
+    .input-wrapper {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Section traductions (i18n)
+  .translations-section {
+    margin-top: 8px;
+    border: 2px dashed var(--primary-200);
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.02) 0%,
+      rgba(var(--secondary-500-rgb), 0.02) 100%);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      border-color: var(--primary-300);
+      box-shadow:
+        0 4px 12px rgba(var(--primary-500-rgb), 0.08),
+        0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .translations-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(135deg,
+        rgba(var(--primary-500-rgb), 0.05) 0%,
+        rgba(var(--primary-300-rgb), 0.03) 100%);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+
+      &:hover {
+        background: linear-gradient(135deg,
+          rgba(var(--primary-500-rgb), 0.08) 0%,
+          rgba(var(--primary-300-rgb), 0.06) 100%);
+      }
+
+      &:active {
+        transform: scale(0.99);
+      }
+    }
+
+    .translations-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 24px;
+      background: @white;
+      animation: slideDown 0.3s ease-out;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px;
+      }
+    }
+
+    .language-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
+      border-radius: 12px;
+      border: 1px solid @neutral-200;
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.03),
+        0 1px 2px rgba(0, 0, 0, 0.04);
+
+      .language-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--primary-100);
+        margin-bottom: 4px;
+      }
+
+      .custom-textarea {
+        border: 2px solid @neutral-200;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 14px;
+        width: 100%;
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+        line-height: 1.6;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          border-color: var(--primary-300);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-500);
+          box-shadow:
+            0 0 0 4px rgba(var(--primary-500-rgb), 0.1),
+            0 2px 8px rgba(var(--primary-500-rgb), 0.15);
+          background: @white;
+        }
+
+        &::placeholder {
+          color: @neutral-400;
+        }
+      }
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      max-height: 1000px;
+      transform: translateY(0);
+    }
+  }
+
+  // Responsive amélioré
+  @media (max-width: 768px) {
+    .product-form {
+      gap: 20px;
+      padding: 4px;
+    }
+
+    .form-section {
+      padding: 18px;
+    }
+
+    .image-preview img {
+      max-height: 180px;
     }
   }
 </style>

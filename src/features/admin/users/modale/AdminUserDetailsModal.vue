@@ -249,17 +249,48 @@
   .user-detail {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    padding: 16px;
+    overflow-x: hidden;
   }
 
   .info-card {
-    background: @white;
-    padding: 20px;
-    border-radius: 12px;
+    position: relative;
+    background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
+    padding: 24px;
+    border-radius: 16px;
     border: 1px solid @neutral-200;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-500), var(--primary-300));
+      border-radius: 16px 16px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary-200);
+
+      &::before {
+        opacity: 1;
+      }
+    }
 
     .card-header {
       display: flex;
@@ -267,7 +298,7 @@
       align-items: center;
       margin-bottom: 16px;
       padding-bottom: 12px;
-      border-bottom: 1px solid @neutral-100;
+      border-bottom: 2px solid @neutral-100;
 
       &.border-none {
         border-bottom: none;
@@ -280,32 +311,43 @@
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 24px;
+    gap: 16px 24px;
 
     .info-item {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      padding: 12px;
+      background: @neutral-50;
+      border-radius: 8px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.03);
+      }
 
       .label {
         font-size: 11px;
-        color: @neutral-500;
+        color: var(--primary-600);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
+        letter-spacing: 0.8px;
+        font-weight: 700;
       }
+
       .value {
         font-size: 14px;
         color: @neutral-900;
+        font-weight: 500;
       }
     }
   }
 
   .orders-table-wrapper {
-    border: 1px solid @neutral-200;
-    border-radius: 8px;
+    border: 2px solid @neutral-200;
+    border-radius: 12px;
     overflow: hidden;
-    margin-top: 12px;
+    margin-top: 16px;
+    background: @white;
   }
 
   .orders-table {
@@ -314,30 +356,88 @@
     font-size: 13px;
 
     th {
-      background: @neutral-50;
+      background: linear-gradient(135deg, var(--secondary-900) 0%, var(--secondary-800) 100%);
       text-align: left;
-      padding: 10px 12px;
-      color: @neutral-600;
-      font-weight: 600;
+      padding: 12px 16px;
+      color: @white;
+      font-weight: 700;
       border-bottom: 1px solid @neutral-200;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 12px;
     }
 
     td {
-      padding: 10px 12px;
+      padding: 14px 16px;
       border-bottom: 1px solid @neutral-100;
       color: @neutral-800;
+      transition: background 0.2s;
 
       &:last-child {
         border-bottom: none;
       }
     }
+
+    tr:hover td {
+      background: rgba(var(--primary-500-rgb), 0.02);
+    }
   }
 
   .empty-orders {
-    padding: 16px;
+    padding: 20px;
     text-align: center;
-    background: @neutral-50;
-    border-radius: 8px;
-    border: 1px dashed @neutral-300;
+    background: linear-gradient(135deg,
+      rgba(var(--primary-500-rgb), 0.03) 0%,
+      rgba(var(--primary-300-rgb), 0.05) 100%);
+    border-radius: 12px;
+    border: 2px dashed var(--primary-200);
+    color: @neutral-600;
+    margin-top: 16px;
+  }
+
+  // Animation pour les cartes
+  .info-card {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .user-detail {
+      gap: 20px;
+      padding: 4px;
+    }
+
+    .info-card {
+      padding: 18px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .orders-table {
+      font-size: 11px;
+
+      th,
+      td {
+        padding: 10px 12px;
+      }
+    }
   }
 </style>

@@ -51,14 +51,15 @@
           </div>
         </div>
 
-        <button
+        <PremiumButton
+          type="danger"
+          variant="ghost"
+          size="sm"
+          icon-left="X"
           class="btn-remove"
-          :aria-label="t('common.delete')"
-          @click="removeItem"
           :disabled="loading"
-        >
-          <BasicIconNext name="X" :size="20" />
-        </button>
+          @click="removeItem"
+        />
       </div>
 
       <div class="content-bottom">
@@ -98,21 +99,25 @@
             class="stepper-pill"
             :class="{ 'is-loading': loading }"
           >
-            <button
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="xs"
+              icon-left="Minus"
               class="step-btn"
-              @click="updateQty(-1)"
               :disabled="loading"
-            >
-              −
-            </button>
+              @click="updateQty(-1)"
+            />
             <span class="step-value">{{ item.quantity }}</span>
-            <button
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="xs"
+              icon-left="Plus"
               class="step-btn"
-              @click="updateQty(1)"
               :disabled="loading || (item.product_stock || 0) <= (item.quantity || 0)"
-            >
-              +
-            </button>
+              @click="updateQty(1)"
+            />
           </div>
 
           <div class="total-price">

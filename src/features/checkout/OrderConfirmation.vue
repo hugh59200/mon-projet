@@ -52,27 +52,42 @@
                   <span class="confirmation__detail-label">IBAN</span>
                   <div class="confirmation__detail-value-wrapper">
                     <span class="confirmation__detail-value confirmation__detail-value--mono">{{ bankDetails.iban }}</span>
-                    <button class="confirmation__copy-btn" @click="copyToClipboard(bankDetails.iban)">
-                      <BasicIconNext name="Copy" :size="14" />
-                    </button>
+                    <PremiumButton
+                      type="secondary"
+                      variant="ghost"
+                      size="xs"
+                      icon-left="Copy"
+                      class="confirmation__copy-btn"
+                      @click="copyToClipboard(bankDetails.iban)"
+                    />
                   </div>
                 </div>
                 <div class="confirmation__detail-row">
                   <span class="confirmation__detail-label">BIC / SWIFT</span>
                   <div class="confirmation__detail-value-wrapper">
                     <span class="confirmation__detail-value confirmation__detail-value--mono">{{ bankDetails.bic }}</span>
-                    <button class="confirmation__copy-btn" @click="copyToClipboard(bankDetails.bic)">
-                      <BasicIconNext name="Copy" :size="14" />
-                    </button>
+                    <PremiumButton
+                      type="secondary"
+                      variant="ghost"
+                      size="xs"
+                      icon-left="Copy"
+                      class="confirmation__copy-btn"
+                      @click="copyToClipboard(bankDetails.bic)"
+                    />
                   </div>
                 </div>
                 <div class="confirmation__detail-row confirmation__detail-row--highlight">
                   <span class="confirmation__detail-label">{{ t('checkout.confirmation.reference') }}</span>
                   <div class="confirmation__detail-value-wrapper">
                     <span class="confirmation__detail-value confirmation__detail-value--mono confirmation__detail-value--important">{{ orderId }}</span>
-                    <button class="confirmation__copy-btn" @click="copyToClipboard(orderId)">
-                      <BasicIconNext name="Copy" :size="14" />
-                    </button>
+                    <PremiumButton
+                      type="secondary"
+                      variant="ghost"
+                      size="xs"
+                      icon-left="Copy"
+                      class="confirmation__copy-btn"
+                      @click="copyToClipboard(orderId)"
+                    />
                   </div>
                 </div>
               </div>
@@ -123,9 +138,14 @@
                         <span class="confirmation__detail-value confirmation__detail-value--mono confirmation__detail-value--small">
                           {{ selectedCrypto === 'btc' ? cryptoDetails.btcAddress : cryptoDetails.usdtAddress }}
                         </span>
-                        <button class="confirmation__copy-btn" @click="copyToClipboard(selectedCrypto === 'btc' ? cryptoDetails.btcAddress : cryptoDetails.usdtAddress)">
-                          <BasicIconNext name="Copy" :size="14" />
-                        </button>
+                        <PremiumButton
+                          type="secondary"
+                          variant="ghost"
+                          size="xs"
+                          icon-left="Copy"
+                          class="confirmation__copy-btn"
+                          @click="copyToClipboard(selectedCrypto === 'btc' ? cryptoDetails.btcAddress : cryptoDetails.usdtAddress)"
+                        />
                       </div>
                     </div>
                     <div v-if="selectedCrypto === 'usdt'" class="confirmation__detail-row">
@@ -200,9 +220,14 @@
               <span class="confirmation__order-label">{{ t('checkout.confirmation.orderRef') }}</span>
               <div class="confirmation__order-id-wrapper">
                 <span class="confirmation__order-id">{{ orderId }}</span>
-                <button class="confirmation__copy-btn confirmation__copy-btn--small" @click="copyOrderId">
-                  <BasicIconNext :name="copied ? 'Check' : 'Copy'" :size="14" />
-                </button>
+                <PremiumButton
+                  type="secondary"
+                  variant="ghost"
+                  size="xs"
+                  :icon-left="copied ? 'Check' : 'Copy'"
+                  class="confirmation__copy-btn confirmation__copy-btn--small"
+                  @click="copyOrderId"
+                />
               </div>
             </div>
 
@@ -997,7 +1022,7 @@ onMounted(() => {
     opacity: 0.5;
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.05);
     opacity: 0;
   }
 }

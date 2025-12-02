@@ -117,7 +117,7 @@ function selectLocale(newLocale: SupportedLocale) {
     &:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.12);
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
 
     &:active {

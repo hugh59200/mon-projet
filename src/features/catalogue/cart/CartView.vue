@@ -186,13 +186,15 @@
               <!-- Quantity -->
               <div class="cart-item__quantity">
                 <div class="cart-item__qty-control">
-                  <button
+                  <PremiumButton
+                    type="secondary"
+                    variant="ghost"
+                    size="xs"
+                    icon-left="Minus"
                     class="cart-item__qty-btn"
-                    @click="updateQuantity(item, -1)"
                     :disabled="(item.quantity ?? 1) <= 1"
-                  >
-                    <BasicIconNext name="Minus" :size="16" />
-                  </button>
+                    @click="updateQuantity(item, -1)"
+                  />
                   <input
                     type="number"
                     class="cart-item__qty-input"
@@ -200,12 +202,14 @@
                     min="1"
                     @change="handleQuantityChange(item, $event)"
                   />
-                  <button
+                  <PremiumButton
+                    type="secondary"
+                    variant="ghost"
+                    size="xs"
+                    icon-left="Plus"
                     class="cart-item__qty-btn"
                     @click="updateQuantity(item, 1)"
-                  >
-                    <BasicIconNext name="Plus" :size="16" />
-                  </button>
+                  />
                 </div>
               </div>
 
@@ -218,32 +222,37 @@
 
               <!-- Actions -->
               <div class="cart-item__actions">
-                <button
+                <PremiumButton
+                  type="danger"
+                  variant="ghost"
+                  size="xs"
+                  icon-left="Trash2"
                   class="cart-item__remove"
                   @click="removeItem(item)"
-                  :title="t('common.delete')"
-                >
-                  <BasicIconNext name="Trash2" :size="18" />
-                </button>
+                />
               </div>
 
               <!-- Mobile Layout -->
               <div class="cart-item__mobile-bottom">
                 <div class="cart-item__qty-control cart-item__qty-control--mobile">
-                  <button
+                  <PremiumButton
+                    type="secondary"
+                    variant="ghost"
+                    size="xs"
+                    icon-left="Minus"
                     class="cart-item__qty-btn"
-                    @click="updateQuantity(item, -1)"
                     :disabled="(item.quantity ?? 1) <= 1"
-                  >
-                    <BasicIconNext name="Minus" :size="16" />
-                  </button>
+                    @click="updateQuantity(item, -1)"
+                  />
                   <span class="cart-item__qty-value">{{ item.quantity ?? 1 }}</span>
-                  <button
+                  <PremiumButton
+                    type="secondary"
+                    variant="ghost"
+                    size="xs"
+                    icon-left="Plus"
                     class="cart-item__qty-btn"
                     @click="updateQuantity(item, 1)"
-                  >
-                    <BasicIconNext name="Plus" :size="16" />
-                  </button>
+                  />
                 </div>
 
                 <div class="cart-item__mobile-total">
@@ -370,6 +379,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import type { CartView } from '@/supabase/types/supabase.types'
@@ -377,6 +387,21 @@
   import { computed } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  // Configuration SEO pour le panier (noindex car page privée)
+  useHead({
+    title: 'Mon Panier - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'robots',
+        content: 'noindex, nofollow',
+      },
+      {
+        name: 'description',
+        content: 'Consultez votre panier et finalisez votre commande de peptides de recherche.',
+      },
+    ],
+  })
 
   const { t } = useI18n()
 
@@ -1102,7 +1127,7 @@
       }
 
       &:hover img {
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
     }
 

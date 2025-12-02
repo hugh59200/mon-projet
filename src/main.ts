@@ -5,6 +5,7 @@ import i18n from '@/i18n'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
 import { RegistrationDSComponents } from '@/plugin/registration'
 import { MotionPlugin } from '@vueuse/motion'
+import { createHead } from '@vueuse/head'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
@@ -14,12 +15,14 @@ import router from './router'
 
 const app = createApp(App)
 const pinia = createPinia()
+const head = createHead()
 
 // ⚠️ IMPORTANT : Ajouter le plugin persist AVANT d'utiliser pinia
 pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
 app.use(router)
+app.use(head)
 app.use(i18n)
 app.use(MotionPlugin)
 app.use(RegistrationDSComponents)

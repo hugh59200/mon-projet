@@ -257,7 +257,7 @@
       }
 
       &:hover {
-        transform: translateY(-2px) scale(1.01);
+        transform: translateY(-1px);
         box-shadow:
           0 4px 16px color-mix(in srgb, var(--primary-600) 40%, transparent),
           0 12px 32px color-mix(in srgb, var(--primary-700) 25%, transparent),
@@ -393,19 +393,22 @@
     }
     100% {
       opacity: 0;
-      transform: scale(1.3);
+      transform: scale(1.1);
     }
   }
 
   @keyframes check-pop {
     0% {
       transform: scale(0.5);
+      opacity: 0;
     }
     50% {
-      transform: scale(1.2);
+      transform: scale(1.02);
+      opacity: 1;
     }
     100% {
       transform: scale(1);
+      opacity: 1;
     }
   }
 

@@ -45,17 +45,14 @@
         ref="rightRef"
         class="navbar__right"
       >
-        <button
+        <PremiumButton
+          type="secondary"
+          variant="ghost"
+          size="sm"
+          icon-left="Package"
           class="navbar__icon-btn"
-          :title="t('tracking.title')"
           @click="$router.push('/suivi-commande')"
-        >
-          <BasicIconNext
-            name="Package"
-            :size="18"
-            color="neutral-300"
-          />
-        </button>
+        />
         <LanguageSelector />
         <CartMenu />
         <HeaderActions />
@@ -68,16 +65,12 @@
   import { useNavOverflow } from '@/composables/useNavOverflow'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, onUnmounted, ref, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import HeaderActions from './HeaderActions.vue'
   import HeaderLogo from './HeaderLogo.vue'
   import LanguageSelector from './LanguageSelector.vue'
   import MainNavLinks from './MainNavLinks.vue'
-
-  const { t } = useI18n()
 
   const router = useRouter()
   const { isMobile } = useDeviceBreakpoint()
@@ -214,7 +207,7 @@
       &:hover {
         background: rgba(255, 255, 255, 0.08);
         border-color: rgba(255, 255, 255, 0.12);
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       &:active {

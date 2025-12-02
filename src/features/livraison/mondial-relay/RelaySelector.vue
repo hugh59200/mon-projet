@@ -27,21 +27,23 @@
       </div>
 
       <div class="relay-selector__actions">
-        <button
-          type="button"
-          class="relay-selector__btn relay-selector__btn--outline"
+        <PremiumButton
+          type="secondary"
+          variant="outline"
+          size="sm"
+          label="Modifier"
+          icon-left="Edit"
+          class="relay-selector__btn"
           @click="openModal"
-        >
-          <BasicIconNext name="Edit" :size="16" />
-          Modifier
-        </button>
-        <button
-          type="button"
-          class="relay-selector__btn relay-selector__btn--ghost"
+        />
+        <PremiumButton
+          type="secondary"
+          variant="ghost"
+          size="sm"
+          icon-left="X"
+          class="relay-selector__btn"
           @click="handleReset"
-        >
-          <BasicIconNext name="X" :size="2" />
-        </button>
+        />
       </div>
     </div>
 
@@ -81,13 +83,14 @@
                 <h3 class="relay-modal__title">Choisir un point relais</h3>
                 <p class="relay-modal__subtitle">Retrait gratuit sous 48-72h</p>
               </div>
-              <button
-                type="button"
+              <PremiumButton
+                type="secondary"
+                variant="ghost"
+                size="sm"
+                icon-left="X"
                 class="relay-modal__close"
                 @click="closeModal"
-              >
-                <BasicIconNext name="X" :size="2" />
-              </button>
+              />
             </div>
 
             <!-- Recherche -->
@@ -101,27 +104,26 @@
                   class="relay-modal__search-input"
                   @keyup.enter="handleSearch"
                 />
-                <button
+                <PremiumButton
                   v-if="postcodeInput"
-                  type="button"
+                  type="secondary"
+                  variant="ghost"
+                  size="xs"
+                  icon-left="X"
                   class="relay-modal__search-clear"
                   @click="postcodeInput = ''"
-                >
-                  <BasicIconNext name="X" :size="2" />
-                </button>
+                />
               </div>
-              <button
-                type="button"
-                class="relay-modal__search-btn"
+              <PremiumButton
+                type="primary"
+                variant="solid"
+                size="md"
+                :label="isLoading ? '' : 'Rechercher'"
+                :loading="isLoading"
                 :disabled="postcodeInput.length < 4 || isLoading"
+                class="relay-modal__search-btn"
                 @click="handleSearch"
-              >
-                <span
-                  v-if="isLoading"
-                  class="relay-modal__spinner"
-                ></span>
-                <span v-else>Rechercher</span>
-              </button>
+              />
             </div>
             <!-- Corps -->
             <div class="relay-modal__body">
@@ -203,13 +205,14 @@
                 <BasicIconNext name="MapPin" :size="16" />
                 <span>Livraison offerte en point relais</span>
               </div>
-              <button
-                type="button"
-                class="relay-selector__btn relay-selector__btn--secondary"
+              <PremiumButton
+                type="secondary"
+                variant="outline"
+                size="md"
+                label="Fermer"
+                class="relay-selector__btn"
                 @click="closeModal"
-              >
-                Fermer
-              </button>
+              />
             </div>
           </div>
         </div>

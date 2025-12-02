@@ -16,7 +16,7 @@
           class="article-detail__back"
         >
           <BasicIconNext name="ArrowLeft" :size="18" />
-          <span>Retour aux actualités</span>
+          <span>{{ $t('news.backToNews') }}</span>
         </RouterLink>
       </nav>
 
@@ -28,7 +28,7 @@
         <div class="article-detail__loading-spinner">
           <BasicIconNext name="Loader2" :size="40" />
         </div>
-        <p class="article-detail__loading-text">Chargement de l'article...</p>
+        <p class="article-detail__loading-text">{{ $t('news.loadingArticle') }}</p>
       </div>
 
       <!-- Empty State -->
@@ -39,14 +39,14 @@
         <div class="article-detail__empty-icon">
           <BasicIconNext name="FileWarning" :size="48" />
         </div>
-        <h2 class="article-detail__empty-title">Article non trouvé</h2>
-        <p class="article-detail__empty-text">Cet article n'existe pas ou n'est plus disponible.</p>
+        <h2 class="article-detail__empty-title">{{ $t('news.articleNotFound') }}</h2>
+        <p class="article-detail__empty-text">{{ $t('news.articleNotFoundText') }}</p>
         <RouterLink
           to="/actualites"
           class="article-detail__empty-btn"
         >
           <BasicIconNext name="ArrowLeft" :size="16" />
-          Voir tous les articles
+          {{ $t('news.viewAllArticles') }}
         </RouterLink>
       </div>
 
@@ -67,7 +67,7 @@
             </span>
             <span class="article-detail__date">
               <BasicIconNext name="Calendar" :size="14" />
-              Publié le {{ formatDate(article.published_at) }}
+              {{ $t('news.publishedOn') }} {{ formatDate(article.published_at) }}
             </span>
           </div>
 
@@ -76,7 +76,7 @@
           <!-- Reading time estimate -->
           <div class="article-detail__reading-info">
             <BasicIconNext name="Clock" :size="16" />
-            <span>{{ estimatedReadingTime }} min de lecture</span>
+            <span>{{ estimatedReadingTime }} {{ $t('news.readingTime') }}</span>
           </div>
         </header>
 
@@ -90,13 +90,13 @@
               :src="article.image"
               :zoomSrc="article.image"
               class="article-detail__cover-image"
-              :alt="`Image de couverture : ${article.title}`"
+              :alt="$t('news.coverImageAlt', { title: article.title })"
             />
             <div class="article-detail__cover-overlay"></div>
           </div>
           <p class="article-detail__cover-hint">
             <BasicIconNext name="ZoomIn" :size="14" />
-            Cliquez sur l'image pour zoomer
+            {{ $t('news.clickToZoom') }}
           </p>
         </div>
 
@@ -109,30 +109,32 @@
         <!-- Article Footer -->
         <footer class="article-detail__footer">
           <div class="article-detail__share">
-            <span class="article-detail__share-label">Partager cet article</span>
+            <span class="article-detail__share-label">{{ $t('news.shareArticle') }}</span>
             <div class="article-detail__share-buttons">
-              <button
-                @click="shareArticle('twitter')"
+              <PremiumButton
+                type="secondary"
+                variant="outline"
+                size="sm"
+                icon-left="Twitter"
                 class="article-detail__share-btn article-detail__share-btn--twitter"
-                aria-label="Partager sur Twitter"
-              >
-                <BasicIconNext name="Twitter" :size="18" />
-              </button>
-              <button
-                @click="shareArticle('linkedin')"
+                @click="shareArticle('twitter')"
+              />
+              <PremiumButton
+                type="secondary"
+                variant="outline"
+                size="sm"
+                icon-left="Linkedin"
                 class="article-detail__share-btn article-detail__share-btn--linkedin"
-                aria-label="Partager sur LinkedIn"
-              >
-                <BasicIconNext name="Linkedin" :size="18" />
-              </button>
-              <button
-                @click="shareArticle('copy')"
+                @click="shareArticle('linkedin')"
+              />
+              <PremiumButton
+                type="secondary"
+                variant="outline"
+                size="sm"
+                :icon-left="linkCopied ? 'Check' : 'Copy'"
                 class="article-detail__share-btn article-detail__share-btn--copy"
-                aria-label="Copier le lien"
-              >
-                <BasicIconNext v-if="!linkCopied" name="Copy" :size="18" />
-                <BasicIconNext v-else name="Check" :size="18" />
-              </button>
+                @click="shareArticle('copy')"
+              />
             </div>
           </div>
 
@@ -160,7 +162,7 @@
           <div class="article-detail__section-icon">
             <BasicIconNext name="File" :size="20" />
           </div>
-          <h2 class="article-detail__related-title">Articles similaires</h2>
+          <h2 class="article-detail__related-title">{{ $t('news.similarArticles') }}</h2>
         </div>
 
         <div class="article-detail__related-grid">
@@ -203,15 +205,15 @@
         <div class="article-detail__trust">
           <div class="article-detail__trust-item">
             <BasicIconNext name="ShieldCheck" :size="18" />
-            <span>Sources vérifiées</span>
+            <span>{{ $t('news.verifiedSources') }}</span>
           </div>
           <div class="article-detail__trust-item">
             <BasicIconNext name="BookOpen" :size="18" />
-            <span>Contenu scientifique</span>
+            <span>{{ $t('news.scientificContent') }}</span>
           </div>
           <div class="article-detail__trust-item">
             <BasicIconNext name="Pencil" :size="18" />
-            <span>Rédigé par des experts</span>
+            <span>{{ $t('news.writtenByExperts') }}</span>
           </div>
         </div>
       </footer>
@@ -219,6 +221,7 @@
   </div>
 </template>
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import { fetchNews, fetchNewsBySlug } from '@/api/supabase/news'
   import type { News } from '@/supabase/types/supabase.types'
   import { formatDate } from '@/utils/index'
@@ -233,6 +236,55 @@
   export interface NewsTopic {
     label: string
   }
+
+  // Configuration SEO dynamique pour les articles
+  const pageTitle = computed(() => {
+    if (!article.value) return 'Article - Atlas Lab Solutions'
+    return `${article.value.title} | Blog Atlas Lab`
+  })
+
+  const pageDescription = computed(() => {
+    if (!article.value) return 'Découvrez nos articles sur les peptides de recherche.'
+    // Extraire un extrait du contenu sans HTML
+    const textContent = article.value.content.replace(/<[^>]*>/g, '').substring(0, 155)
+    return textContent + '...'
+  })
+
+  useHead({
+    title: pageTitle,
+    meta: [
+      {
+        name: 'description',
+        content: pageDescription,
+      },
+      {
+        property: 'og:title',
+        content: pageTitle,
+      },
+      {
+        property: 'og:description',
+        content: pageDescription,
+      },
+      {
+        property: 'og:type',
+        content: 'article',
+      },
+      {
+        property: 'og:image',
+        content: computed(() => article.value?.image_url || 'https://fast-peptides.com/default-article.jpg'),
+      },
+      {
+        property: 'article:published_time',
+        content: computed(() => article.value?.created_at || ''),
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: computed(() => `https://fast-peptides.com/actualites/${route.params.slug}`),
+      },
+    ],
+  })
 
   export interface NewsDetail extends News {
     topic: NewsTopic | null
@@ -1091,7 +1143,7 @@
           0 12px 32px rgba(0, 0, 0, 0.12);
 
         .article-detail__related-image img {
-          transform: scale(1.08);
+          transform: scale(1.02);
         }
       }
     }

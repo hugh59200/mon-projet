@@ -38,13 +38,15 @@
                 :placeholder="t('faq.searchPlaceholder')"
                 @input="onSearch"
               />
-              <button
+              <PremiumButton
                 v-if="search"
+                type="secondary"
+                variant="ghost"
+                size="xs"
+                icon-left="X"
                 class="faq__search-clear"
                 @click="search = ''"
-              >
-                <BasicIconNext name="X" :size="16" />
-              </button>
+              />
             </div>
 
             <!-- Categories -->
@@ -270,10 +272,37 @@
   </div>
 </template>
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
+
+  // Configuration SEO pour la page FAQ
+  useHead({
+    title: 'FAQ - Questions Fréquentes | Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Trouvez les réponses à vos questions sur nos peptides de recherche : commande, livraison, pureté, reconstitution. Support disponible 24h/24.',
+      },
+      {
+        property: 'og:title',
+        content: 'FAQ - Questions Fréquentes | Atlas Lab Solutions',
+      },
+      {
+        property: 'og:description',
+        content: 'Toutes les réponses à vos questions sur nos produits et services.',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: 'https://fast-peptides.com/faq',
+      },
+    ],
+  })
 
   const { t } = useI18n()
 

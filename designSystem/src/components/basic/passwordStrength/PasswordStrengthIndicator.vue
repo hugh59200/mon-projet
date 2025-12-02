@@ -274,7 +274,7 @@ watch(strength, (newStrength) => {
       transform 0.3s var(--transition-easing);
 
     &--active {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
   }
 

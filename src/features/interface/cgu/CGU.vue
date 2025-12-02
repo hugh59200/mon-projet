@@ -1,7 +1,7 @@
 <template>
   <div class="cgu-page">
     <PageHeader
-      description="Consultez nos règles d’utilisation et mentions légales en toute transparence."
+      :description="$t('cgu.page.description')"
       show-separator
     />
 
@@ -20,7 +20,7 @@
             color="neutral-900"
             class="mb-4"
           >
-            Sommaire
+            {{ $t('cgu.page.summary') }}
           </BasicText>
           <nav class="cgu-nav">
             <a
@@ -38,7 +38,7 @@
           <div class="cgu-sidebar__divider"></div>
 
           <BasicButton
-            label="Imprimer"
+            :label="$t('cgu.page.print')"
             type="secondary"
             variant="ghost"
             size="small"
@@ -59,12 +59,12 @@
         <div class="cgu-paper">
           <div class="cgu-paper__header">
             <div class="cgu-paper__meta">
-              <div class="cgu-badge">Version 1.0</div>
+              <div class="cgu-badge">{{ $t('cgu.page.version') }}</div>
               <BasicText
                 size="body-s"
                 color="neutral-500"
               >
-                Mis à jour en Janvier 2025
+                {{ $t('cgu.page.updated') }}
               </BasicText>
             </div>
 
@@ -73,7 +73,7 @@
               weight="bold"
               class="cgu-paper__title"
             >
-              Conditions Générales d’Utilisation
+              {{ $t('cgu.page.title') }}
             </BasicText>
 
             <BasicText
@@ -81,8 +81,7 @@
               color="neutral-600"
               class="cgu-paper__intro"
             >
-              Bienvenue sur Fast Peptides. Veuillez lire attentivement ces conditions avant
-              d'utiliser nos services.
+              {{ $t('cgu.page.intro') }}
             </BasicText>
           </div>
 
@@ -126,7 +125,7 @@
               size="body-s"
               color="neutral-400"
             >
-              Document officiel généré par Fast Peptides SA.
+              {{ $t('cgu.page.footer') }}
             </BasicText>
           </div>
         </div>
@@ -136,9 +135,36 @@
 </template>
 
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
+  import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { BasicButton } from '@designSystem/components/basic/button'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
+
+  // Configuration SEO pour les CGU
+  useHead({
+    title: "Conditions Générales d'Utilisation - Atlas Lab Solutions",
+    meta: [
+      {
+        name: 'description',
+        content:
+          "Consultez les conditions générales d'utilisation d'Atlas Lab Solutions. Informations légales sur l'utilisation de notre site et l'achat de peptides de recherche.",
+      },
+      {
+        name: 'robots',
+        content: 'index, follow',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: 'https://fast-peptides.com/cgu',
+      },
+    ],
+  })
+
+  const { t } = useI18n()
 
   function printPage() {
     window.print()
@@ -153,91 +179,91 @@
     }
   }
 
-  const articles = [
+  const articles = computed(() => [
     {
-      shortTitle: 'Préambule',
-      title: 'Article 1 : Préambule et Identité',
+      shortTitle: t('cgu.articles.article1.shortTitle'),
+      title: t('cgu.articles.article1.title'),
       content: [
-        'Les présentes Conditions Générales de Vente (CGV) régissent exclusivement les relations contractuelles entre la société <strong>Atlas Lab Solutions LLC</strong>, immatriculée au Nouveau-Mexique (USA), dont le siège social est situé au 1209 Mountain Road PL NE, Albuquerque, NM 87110 (ci-après le "Vendeur") et toute personne visitant ou effectuant un achat sur le site.',
-        "En validant sa commande, l'Acheteur déclare avoir la capacité juridique de contracter et accepte sans réserve les présentes conditions.",
-        'Ce site est exclusivement destiné aux professionnels, chercheurs, laboratoires et institutions académiques.',
+        t('cgu.articles.article1.paragraph1'),
+        t('cgu.articles.article1.paragraph2'),
+        t('cgu.articles.article1.paragraph3'),
       ],
     },
     {
-      shortTitle: 'Usage Recherche',
-      title: 'Article 2 : Avertissement "Research Use Only" (RUO)',
+      shortTitle: t('cgu.articles.article2.shortTitle'),
+      title: t('cgu.articles.article2.title'),
       content: [
-        '<strong>ATTENTION :</strong> Tous les produits vendus sur ce site sont des composés chimiques destinés <strong>exclusivement à la recherche en laboratoire et aux analyses in vitro</strong>.',
-        'Ils ne sont <strong>PAS</strong> des médicaments, des produits alimentaires, des cosmétiques ou des dispositifs médicaux.',
-        'Ils sont strictement interdits pour toute utilisation humaine (injection, ingestion, application topique) ou vétérinaire.',
-        "L'Acheteur reconnaît être un chercheur qualifié ou un professionnel disposant des compétences et équipements nécessaires pour manipuler ces produits en toute sécurité.",
-        "Le Vendeur se réserve le droit d'annuler toute commande s'il a des raisons de croire que les produits seront utilisés à des fins non conformes (usage personnel, dopage, automédication).",
+        t('cgu.articles.article2.paragraph1'),
+        t('cgu.articles.article2.paragraph2'),
+        t('cgu.articles.article2.paragraph3'),
+        t('cgu.articles.article2.paragraph4'),
+        t('cgu.articles.article2.paragraph5'),
       ],
     },
     {
-      shortTitle: 'Produits',
-      title: 'Article 3 : Caractéristiques des Produits',
+      shortTitle: t('cgu.articles.article3.shortTitle'),
+      title: t('cgu.articles.article3.title'),
       content: [
-        'Les produits sont décrits avec la plus grande exactitude possible (fiche technique, pureté, séquence). Toutefois, les photos ne sont pas contractuelles.',
-        "La pureté indiquée (ex: ≥98%) est certifiée par analyse HPLC. Des certificats d'analyse (COA) sont disponibles pour chaque lot.",
-        'Les peptides sont livrés sous forme lyophilisée (poudre) et doivent être stockés selon les recommandations techniques (congélation) dès réception.',
+        t('cgu.articles.article3.paragraph1'),
+        t('cgu.articles.article3.paragraph2'),
+        t('cgu.articles.article3.paragraph3'),
       ],
     },
     {
-      shortTitle: 'Prix & Paiement',
-      title: 'Article 4 : Prix et Modalités de Paiement',
+      shortTitle: t('cgu.articles.article4.shortTitle'),
+      title: t('cgu.articles.article4.title'),
       content: [
-        "Les prix sont affichés en Euros (€) toutes taxes comprises (TTC) pour l'Union Européenne.",
-        'Le Vendeur se réserve le droit de modifier ses prix à tout moment, mais le produit sera facturé sur la base du tarif en vigueur au moment de la validation de la commande.',
-        'Le paiement est exigible immédiatement à la commande via les moyens proposés (Virement Bancaire, Crypto-monnaies). Aucune expédition ne sera effectuée avant réception complète des fonds.',
+        t('cgu.articles.article4.paragraph1'),
+        t('cgu.articles.article4.paragraph2'),
+        t('cgu.articles.article4.paragraph3'),
       ],
     },
     {
-      shortTitle: 'Livraison',
-      title: 'Article 5 : Livraison et Risques',
+      shortTitle: t('cgu.articles.article5.shortTitle'),
+      title: t('cgu.articles.article5.title'),
       content: [
-        "Les produits sont expédiés depuis notre plateforme logistique partenaire en France vers l'Union Européenne.",
-        'Les délais de livraison (24h-72h) sont donnés à titre indicatif et ne sont pas garantis.',
-        "Le transfert des risques s'opère au moment de la remise des produits au transporteur. Toutefois, en cas de perte confirmée par le transporteur, le Vendeur s'engage à réexpédier la commande à ses frais.",
-        "L'Acheteur est responsable de la vérification de la légalité des produits importés dans son pays de résidence.",
+        t('cgu.articles.article5.paragraph1'),
+        t('cgu.articles.article5.paragraph2'),
+        t('cgu.articles.article5.paragraph3'),
+        t('cgu.articles.article5.paragraph4'),
       ],
     },
     {
-      shortTitle: 'Rétractation',
-      title: 'Article 6 : Absence de Droit de Rétractation',
+      shortTitle: t('cgu.articles.article6.shortTitle'),
+      title: t('cgu.articles.article6.title'),
       content: [
-        'Compte tenu de la nature périssable et sensible des produits chimiques (nécessitant des conditions de stockage spécifiques), et conformément à la législation en vigueur sur la vente à distance de produits susceptibles de se détériorer rapidement :',
-        "<strong>Le droit de rétractation ne s'applique pas.</strong>",
-        "Aucun retour de produit ne sera accepté, sauf en cas d'erreur de préparation avérée de notre part ou de défaut de qualité prouvé par analyse indépendante.",
+        t('cgu.articles.article6.paragraph1'),
+        t('cgu.articles.article6.paragraph2'),
+        t('cgu.articles.article6.paragraph3'),
       ],
     },
     {
-      shortTitle: 'Responsabilité',
-      title: 'Article 7 : Limitation de Responsabilité',
+      shortTitle: t('cgu.articles.article7.shortTitle'),
+      title: t('cgu.articles.article7.title'),
       content: [
-        "Atlas Lab Solutions LLC ne saurait être tenue pour responsable des dommages de toute nature, tant matériels qu'immatériels ou corporels, qui pourraient résulter d'une mauvaise utilisation des produits commercialisés.",
-        'La responsabilité du Vendeur sera, en tout état de cause, limitée au montant de la commande et ne saurait être mise en cause pour de simples erreurs ou omissions qui auraient pu subsister malgré toutes les précautions prises dans la présentation des produits.',
+        t('cgu.articles.article7.paragraph1'),
+        t('cgu.articles.article7.paragraph2'),
       ],
     },
     {
-      shortTitle: 'Données',
-      title: 'Article 8 : Confidentialité des Données',
+      shortTitle: t('cgu.articles.article8.shortTitle'),
+      title: t('cgu.articles.article8.title'),
       content: [
-        'Nous accordons une importance capitale à la confidentialité de vos données. Vos informations personnelles ne sont utilisées que pour le traitement de votre commande.',
-        'Conformément à notre politique de confidentialité ("OpSec"), nous minimisons la conservation des données. Les informations sensibles liées aux commandes sont purgées régulièrement de nos serveurs connectés.',
-        "Aucune donnée n'est revendue à des tiers.",
+        t('cgu.articles.article8.paragraph1'),
+        t('cgu.articles.article8.paragraph2'),
+        t('cgu.articles.article8.paragraph3'),
       ],
     },
     {
-      shortTitle: 'Litiges',
-      title: 'Article 9 : Droit Applicable et Juridiction',
+      shortTitle: t('cgu.articles.article9.shortTitle'),
+      title: t('cgu.articles.article9.title'),
       content: [
-        "Les présentes conditions sont soumises au droit de l'État du Nouveau-Mexique (USA), siège social de l'entreprise.",
-        "Toutefois, pour les consommateurs résidant dans l'Union Européenne, les règles impératives de protection du consommateur de leur pays de résidence peuvent s'appliquer.",
-        'En cas de litige, une solution amiable sera recherchée avant toute action judiciaire.',
+        t('cgu.articles.article9.paragraph1'),
+        t('cgu.articles.article9.paragraph2'),
+        t('cgu.articles.article9.paragraph3'),
       ],
     },
-  ]
+  ])
 </script>
 
 <style scoped lang="less">

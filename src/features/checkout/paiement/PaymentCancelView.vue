@@ -37,9 +37,21 @@
 </template>
 
 <script setup lang="ts">
+  import { useHead } from '@vueuse/head'
   import { onMounted } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  // Configuration SEO - noindex pour page transactionnelle
+  useHead({
+    title: 'Paiement annulé - Atlas Lab Solutions',
+    meta: [
+      {
+        name: 'robots',
+        content: 'noindex, nofollow',
+      },
+    ],
+  })
 
   const { t } = useI18n()
 
@@ -101,7 +113,7 @@
         opacity: 0;
       }
       50% {
-        transform: scale(1.1) rotate(-5deg);
+        transform: scale(1.05) rotate(-5deg);
         opacity: 1;
       }
       100% {
@@ -116,7 +128,7 @@
         transform: scale(1);
       }
       50% {
-        transform: scale(1.08);
+        transform: scale(1.02);
       }
     }
   }

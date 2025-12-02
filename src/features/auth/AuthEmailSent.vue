@@ -71,7 +71,7 @@
       opacity: 0;
     }
     60% {
-      transform: scale(1.12);
+      transform: scale(1.05);
       opacity: 1;
     }
     100% {
@@ -84,7 +84,7 @@
       transform: scale(1);
     }
     95% {
-      transform: scale(1.15);
+      transform: scale(1.05);
     }
     100% {
       transform: scale(1);
