@@ -72,12 +72,14 @@
           </ul>
 
           <div class="hero-banner__cta-row">
-            <BasicButton
-              :label="t('home.banner.cta')"
+            <PremiumButton
               type="primary"
-              variant="filled"
-              size="medium"
+              variant="solid"
+              size="md"
               width="full"
+              :label="t('home.banner.cta')"
+              icon-right="ArrowRight"
+              :shine="true"
               @click="$router.push('/actualites')"
             />
             <BasicText

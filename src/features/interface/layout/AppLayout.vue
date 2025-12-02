@@ -168,13 +168,22 @@
     position: relative;
     z-index: 1;
     min-width: 250px;
-    min-height: 60vh;
+    flex: 1; /* Pousse le footer en bas */
+    display: flex;
+    flex-direction: column;
 
     /* Fond transparent pour laisser voir le gradient de l'app-layout */
     background: transparent;
 
     color: @neutral-900;
     transition: padding 0.3s ease;
+
+    /* Les pages doivent remplir tout l'espace */
+    > * {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   /* Mode Auth plein écran */

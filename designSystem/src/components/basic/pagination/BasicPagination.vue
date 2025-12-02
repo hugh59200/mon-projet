@@ -4,50 +4,53 @@
     :class="`pagination--${props.size ?? 'medium'}`"
     v-if="nbPages > 1"
   >
-    <BasicIcon
-      name="arrow-left"
-      active
-      :class="{ 'arrow--disabled': currentPage === 1, arrow: true }"
+    <button
+      class="pagination__arrow"
+      :class="{ 'pagination__arrow--disabled': currentPage === 1 }"
+      :disabled="currentPage === 1"
       @click="prevPage"
-      color="white"
-    />
-
-    <div
-      v-for="page in pages"
-      :key="page.num"
-      :class="[
-        'pagination__button',
-        {
-          'pagination__button--active': currentPage === page.num,
-          pagination__ellipsis: page.type === 'ellipse',
-        },
-      ]"
-      @click="goToPage(page)"
     >
-      <BasicText :size="page.type === 'ellipse' ? 'body-s' : 'body-m'">
+      <BasicIconNext name="ChevronLeft" :size="16" />
+    </button>
+
+    <div class="pagination__pages">
+      <button
+        v-for="page in pages"
+        :key="page.num"
+        :class="[
+          'pagination__btn',
+          {
+            'pagination__btn--active': currentPage === page.num,
+            'pagination__btn--ellipsis': page.type === 'ellipse',
+          },
+        ]"
+        :disabled="page.type === 'ellipse'"
+        @click="goToPage(page)"
+      >
         {{ page.type === 'ellipse' ? '…' : page.num }}
-      </BasicText>
+      </button>
     </div>
 
-    <BasicIcon
-      name="arrow-right"
-      active
-      :class="{ 'arrow--disabled': currentPage === nbPages, arrow: true }"
+    <button
+      class="pagination__arrow"
+      :class="{ 'pagination__arrow--disabled': currentPage === nbPages }"
+      :disabled="currentPage === nbPages"
       @click="nextPage"
-      color="white"
-    />
+    >
+      <BasicIconNext name="ChevronRight" :size="16" />
+    </button>
 
-    <BasicText
+    <span
       v-if="nbResults && nbResults > 0"
-      class="pagination__span"
-      color="white"
+      class="pagination__results"
     >
       {{ nbResults }} résultat{{ nbResults > 1 ? 's' : '' }}
-    </BasicText>
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
+  import BasicIconNext from '../icon/BasicIconNext.vue'
   import { computed, watch } from 'vue'
 
   interface Page {
@@ -117,75 +120,139 @@
   )
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .pagination {
     display: flex;
     align-items: center;
-    gap: 8px;
-  }
+    gap: 4px;
 
-  .arrow {
-    cursor: pointer;
-    transition: opacity 0.2s;
-    display: flex;
-    align-items: center;
-
-    &--disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+    // ════════════════════════════════════════
+    // Sizes
+    // ════════════════════════════════════════
+    &--small {
+      .pagination__arrow,
+      .pagination__btn {
+        min-width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+      .pagination__results {
+        font-size: 11px;
+      }
     }
 
-    &:hover:not(.arrow--disabled) {
-      opacity: 0.8;
-    }
-  }
-
-  .pagination__button {
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.2s ease;
-
-    /* Design Carré/Rond propre */
-    min-width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-
-    /* Style par défaut (Inactif) */
-    color: @neutral-300;
-    border: 1px solid transparent;
-
-    &--active {
-      /* Style Actif (Primaire) */
-      background: var(--primary-600);
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      border-color: var(--primary-500);
+    &--medium {
+      .pagination__arrow,
+      .pagination__btn {
+        min-width: 34px;
+        height: 34px;
+        font-size: 13px;
+      }
     }
 
-    &.pagination__ellipsis {
-      pointer-events: none;
-      opacity: 0.5;
+    &--large {
+      .pagination__arrow,
+      .pagination__btn {
+        min-width: 40px;
+        height: 40px;
+        font-size: 14px;
+      }
+    }
+
+    // ════════════════════════════════════════
+    // Arrow buttons
+    // ════════════════════════════════════════
+    &__arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: @neutral-200;
+      color: @neutral-700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background: @neutral-300;
+        color: @neutral-900;
+      }
+
+      &--disabled,
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    // ════════════════════════════════════════
+    // Pages container
+    // ════════════════════════════════════════
+    &__pages {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: @neutral-200;
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    // ════════════════════════════════════════
+    // Page buttons
+    // ════════════════════════════════════════
+    &__btn {
+      min-width: 32px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: @neutral-600;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+
+      &:hover:not(:disabled):not(&--active) {
+        background: @neutral-300;
+        color: @neutral-800;
+      }
+
+      &--active {
+        background: var(--primary-500);
+        color: white;
+        box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.3);
+      }
+
+      &--ellipsis {
+        cursor: default;
+        color: @neutral-400;
+        min-width: 24px;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+
+    // ════════════════════════════════════════
+    // Results count
+    // ════════════════════════════════════════
+    &__results {
+      margin-left: 12px;
+      font-size: 12px;
+      font-weight: 500;
       color: @neutral-500;
-    }
+      white-space: nowrap;
 
-    /* Hover sur inactif */
-    &:hover:not(&--active):not(.pagination__ellipsis) {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-  }
-
-  .pagination__span {
-    margin-left: 12px;
-    font-size: 0.9rem;
-    opacity: 0.7;
-
-    @media (max-width: 600px) {
-      display: none;
+      @media (max-width: 600px) {
+        display: none;
+      }
     }
   }
 </style>

@@ -19,6 +19,7 @@ export type RouteName =
   'catalogue' |
   'cgu' |
   'checkout' |
+  'checkout-confirmation' |
   'email-sent' |
   'faq' |
   'home' |

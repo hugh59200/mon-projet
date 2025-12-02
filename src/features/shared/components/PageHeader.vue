@@ -25,14 +25,16 @@
 
     <div class="page-header__container">
       <!-- Back button -->
-      <button
+      <PremiumButton
         v-if="showBack"
+        type="white"
+        variant="ghost"
+        size="sm"
+        :label="translatedBackLabel"
+        icon-left="ArrowLeft"
         class="page-header__back"
         @click="handleBack"
-      >
-        <BasicIconNext name="ArrowLeft" :size="20" />
-        <span>{{ translatedBackLabel }}</span>
-      </button>
+      />
 
       <!-- Actions slot (en haut à droite) -->
       <div

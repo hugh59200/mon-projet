@@ -9,13 +9,15 @@
     <div class="product-page__container">
       <!-- Breadcrumb / Retour -->
       <nav class="product-page__nav">
-        <button
+        <PremiumButton
+          type="secondary"
+          variant="ghost"
+          size="sm"
+          :label="`${t('common.back')} ${t('nav.catalogue').toLowerCase()}`"
+          icon-left="ArrowLeft"
           class="product-page__back"
           @click="$router.push('/catalogue')"
-        >
-          <BasicIconNext name="ArrowLeft" :size="20" />
-          <span>{{ t('common.back') }} {{ t('nav.catalogue').toLowerCase() }}</span>
-        </button>
+        />
 
         <div class="product-page__breadcrumb">
           <span @click="$router.push('/')">{{ t('nav.home') }}</span>
@@ -185,25 +187,28 @@
 
                 <!-- Boutons d'action -->
                 <div class="product__actions">
-                  <button
-                    class="product__btn product__btn--primary"
+                  <PremiumButton
+                    type="primary"
+                    variant="solid"
+                    size="lg"
+                    :label="(product.stock ?? 0) > 0 ? t('catalogue.product.addToCart') : t('catalogue.product.outOfStock')"
+                    icon-left="ShoppingCart"
                     :disabled="(product.stock ?? 0) <= 0"
+                    :shine="true"
+                    :glow="(product.stock ?? 0) > 0"
                     @click="addToCart(product!)"
-                  >
-                    <BasicIconNext name="ShoppingCart" :size="20" />
-                    <span>
-                      {{ (product.stock ?? 0) > 0 ? t('catalogue.product.addToCart') : t('catalogue.product.outOfStock') }}
-                    </span>
-                  </button>
+                  />
 
-                  <button
+                  <PremiumButton
                     v-if="(product.stock ?? 0) > 0"
-                    class="product__btn product__btn--secondary"
+                    type="secondary"
+                    variant="outline"
+                    size="lg"
+                    :label="t('product.buyNow')"
+                    icon-left="Zap"
+                    :shine="true"
                     @click="buyNow(product!)"
-                  >
-                    <BasicIconNext name="Zap" :size="20" />
-                    <span>{{ t('product.buyNow') }}</span>
-                  </button>
+                  />
                 </div>
 
                 <!-- Alerte stock -->

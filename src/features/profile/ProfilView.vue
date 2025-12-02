@@ -146,15 +146,19 @@
           />
 
           <div class="profil__actions">
-            <BasicButton
-              :label="t('profile.saveChanges')"
+            <PremiumButton
               type="primary"
-              variant="filled"
-              :disabled="loading || !hasPersonalChanges"
-              :loading="loading"
-              @click="updateProfileForm"
+              variant="solid"
+              size="md"
+              width="full"
+              :label="t('profile.saveChanges')"
               icon-left="Save"
-              block
+              :disabled="!hasPersonalChanges"
+              :loading="loading"
+              loading-text="Enregistrement..."
+              :shine="true"
+              :glow="hasPersonalChanges && !loading"
+              @click="updateProfileForm"
             />
           </div>
         </FilterSection>
@@ -215,13 +219,14 @@
             </BasicText>
           </div>
 
-          <BasicButton
-            :label="t('profile.viewAllOrders')"
+          <PremiumButton
             type="secondary"
-            variant="outlined"
-            block
+            variant="outline"
+            size="md"
+            width="full"
+            :label="t('profile.viewAllOrders')"
+            icon-right="ArrowRight"
             @click="$router.push('/profil/commandes')"
-            icon-left="ArrowRight"
           />
         </FilterSection>
 

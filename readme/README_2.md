@@ -1,113 +1,105 @@
-# 🧪 Project Atlas - Documentation & Roadmap (Master v3)
+# 🛡️ Project Atlas - Master Documentation & Strategy
 
-**Nom Commercial (Domaine) :** `fast-peptides` (Njalla)
+**Nom Commercial :** `fast-peptides` (Domaine via Njalla)
 **Entité Juridique :** `Atlas Lab Solutions LLC` (New Mexico, USA)
-**Logistique :** France (Stock déporté)
-**Statut :** 🟡 En développement actif (Waiting for EIN)
+**Logistique :** France (Stock déporté / Drop-shipping local)
+**Statut :** 🟡 En cours de finalisation (Attente EIN)
 
 ---
 
-## 🎯 Objectifs du Projet
+## 🚨 MANIFESTE OPSEC (SÉCURITÉ & ANONYMAT)
 
-1.  **Commerce :** Vente de produits de type "Research Chemicals" (Peptides) à une clientèle B2C majoritairement française (90%).
-2.  **Logistique :** Assurer une livraison rapide (48h) sans frais de douane pour le client final (Stock physique en France).
-3.  **Sécurité & Anonymat (OpSec) :**
-    * Protéger l'identité personnelle du dirigeant (Anonymat civil).
-    * Dissocier l'activité commerciale de l'adresse personnelle.
-    * Sécuriser les flux financiers (Crypto & High Risk) pour éviter les blocages (Stripe/PayPal bannis).
+Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'identité du gérant et la pérennité de l'activité "High Risk" (Research Chemicals).
 
----
+### 1. La Barrière Juridique (Le "Coquillage")
+* **Structure :** LLC au **Nouveau-Mexique (USA)**.
+    * *Raison :* Anonymat du registre public (Pas de noms de membres listés).
+* **Adresse Officielle :** Toujours utiliser l'adresse de l'agent (**Northwest Registered Agent**) à Albuquerque.
+* **Règle d'Or :** L'adresse personnelle du gérant en France ne doit **JAMAIS** apparaître sur une facture, un colis, un whois ou le site web.
 
-## 🏗️ Infrastructure Juridique (Mise en place : ✅ FAIT)
+### 2. La Barrière Logistique (Le "Fantôme")
+* **Flux Physique :** Stock en France (pour livrer en 48h sans douane).
+* **Expédition :** Exclusivement via **Mondial Relay / Shop2Shop**.
+    * *Mécanisme :* Le système "Point Relais vers Point Relais" masque l'adresse d'expédition réelle.
+* **Étiquetage :** Expéditeur générique ("Service Logistique" ou "Atlas Lab"). Adresse de retour = Le Point Relais de dépôt.
 
-Nous avons opté pour une structure **Hybride** : *Entité US + Logistique FR*.
+### 3. La Barrière Financière (Le "Firewall")
+* **Banque :** Compte pro Fintech (Wise/Mercury) au nom de la LLC US.
+* **Encaissement :**
+    * **Interdit :** Stripe et PayPal (Bannissement immédiat pour Peptides).
+    * **Stratégie Actuelle :** Paiement **Asynchrone** (Commande validée -> Instructions virement/crypto affichées -> Paiement manuel).
 
-### 1. Structure de l'entreprise
-* **Forme Juridique :** LLC (Limited Liability Company).
-* **État :** New Mexico (USA).
-    * *Pourquoi ?* Confidentialité par défaut (Pas de noms de membres sur le registre public), pas de rapport annuel à déposer.
-* **Nom Enregistré :** `Atlas Lab Solutions LLC`.
-* **Objet Social (Purpose) :** "Online Retail".
-
-### 2. Prestataire & Configuration
-* **Registrar :** Northwest Registered Agent.
-* **Services Achetés :**
-    * Business Formation (LLC).
-    * EIN Service for Non-US Residents (Numéro fiscal fédéral).
-    * BOI Filing (Déclaration anti-blanchiment).
-* **Configuration OpSec (Critique) :**
-    * Adresse Principale & Postale : **1209 Mountain Road PL NE, Albuquerque, NM**. (Adresse du prestataire).
-    * Management : **Member-Managed**.
-    * Registre Public : Membres **NON** listés.
-
-### 3. Statut Administratif Actuel
-* **Paiement :** Effectué le [Date].
-* **Formulaire SS-4 (IRS) :** Signé électroniquement.
-* **En attente :**
-    * 📄 *Articles of Organization* (Délai : 1-3 jours).
-    * 🆔 *EIN Number* (Délai : 3-4 semaines, traitement manuel IRS pour étrangers).
+### 4. La Barrière Numérique (Le "Masque")
+* **Infrastructure :** Cloudflare (Masquage IP serveur) + Njalla (Anonymat Domaine).
+* **Administration :**
+    * 🔴 **VPN OBLIGATOIRE** pour toute connexion aux dashboards (Supabase, Cloudflare, Banque, Email).
+    * L'IP résidentielle ne doit jamais être loguée.
 
 ---
 
-## 📦 Stratégie Logistique & Marketing
+## 🏗️ Architecture Technique (JAMstack)
 
-### Logistique (Physical Layer)
-* **Expédition :** Depuis la France.
-* **Transporteur :** Mondial Relay (et Shop2Shop).
-* **Méthode :** Point Relais vers Point Relais.
-    * *Avantage :* Masquage de l'adresse d'expédition réelle (domicile).
-    * *Étiquette :* Expéditeur = "Service Logistique / Atlas Lab" + Adresse du Point Relais de dépôt.
+### Frontend (Vue 3 + TypeScript)
+* **Framework :** Vue 3 (Composition API).
+* **Build :** Vite.
+* **Hébergement :** Cloudflare Pages.
+* **State Management (Pinia) - Règle de Sécurité :**
+    * *Panier/Préférences :* `localStorage` (Confort).
+    * *Données Sensibles (Nom, Adresse) :* `sessionStorage` (Autodestruction à la fermeture de l'onglet).
 
-### Marketing (Brand Layer)
-* **Positionnement :** "Qualité Scientifique Américaine, Logistique Locale".
-* **Message Client :**
-    > 🇺🇸 Société US (Crédibilité, R&D).
-    > 🇫🇷 Stock en France (Livraison 48h, Pas de douane).
-
----
-
-## 💻 Stack Technique & Dev (Architecture JAMstack)
-
-### 1. Frontend & Application
-* **Framework :** **Vue 3** (Composition API).
-* **Langage :** **TypeScript** (Strict).
-* **Build & Deploy :** Vite + **Cloudflare Pages**.
-* **Domaine :** Géré chez **Njalla** (Anonymat).
-
-### 2. Backend & Data (Supabase)
-* **BaaS :** Supabase (PostgreSQL).
+### Backend (Supabase)
 * **Auth :** Supabase Auth.
-* **Notifications :** API **Resend** (via Edge Functions).
-* **Sécurité Data :** RLS (Row Level Security) strictes.
-* **Backup :** Export SQL quotidien externe (à mettre en place post-MEP).
+* **Database :** PostgreSQL avec RLS (Row Level Security) strictes.
+* **Edge Functions :** Pour les opérations sensibles (Envoi email, appel IA).
+* **Backup :** Export SQL quotidien externe à prévoir (Souveraineté des données).
 
-### 3. Paiements (Payment Gateway)
-* **Priorité 1 (Crypto) :** Intégration Crypto (BTCPay Server ou module API).
-* **Priorité 2 (High Risk) :** Intégration future d'un processeur spécialisé.
-* **Interdit :** Stripe, PayPal standard.
+### Communication (Resend)
+* **Stratégie "Agnostique" :**
+    * Nom d'expéditeur : "FP Store" (Pas de "Peptides").
+    * Contenu : Neutre (Pas de liste de produits, juste un lien vers le compte client).
+    * Logo : Nom de fichier et attribut ALT neutres.
 
-### 4. Conformité Code (Compliance)
-* **Age Gate :** Modal de vérification +18 ans à l'entrée du site.
-* **Disclaimer "Research Only" :** Checkbox obligatoire avant ajout au panier.
+### Intelligence Artificielle (Claude 3 Haiku)
+* **Usage :** "Copilote" pour le support client dans l'Admin.
+* **Sécurité :** L'IA ne parle **jamais** au client en direct. Elle génère des brouillons pour l'admin.
+* **System Prompt :** Interdiction formelle de donner des conseils médicaux/dosages.
 
 ---
 
-## 📝 Roadmap Immédiate & Statut
+## 📦 Parcours Client & Compliance
 
-| Tâche | Priorité | Statut |
+### 1. Le "Bouclier Légal" (Frontend)
+* **Age Gate :** Modale +18 ans à l'entrée (Cookie/LocalStorage).
+* **Disclaimer Checkout :** Checkbox obligatoire avant paiement : *"Je certifie être un chercheur qualifié... Usage laboratoire uniquement..."*.
+* **Geo-blocking :** Formulaire d'adresse restreint (Pas d'Allemagne, Suisse, USA).
+
+### 2. Le Checkout Asynchrone
+1.  **Panier :** Validation classique.
+2.  **Paiement :** Choix "Virement" ou "Crypto".
+3.  **Validation :** Création commande (Statut: `Pending Payment`).
+4.  **Confirmation :** Affichage dynamique des instructions (IBAN ou Wallet Crypto) sur la page de succès + Email de confirmation avec rappel des instructions.
+
+---
+
+## 📝 Roadmap & Statut Actuel
+
+| Brique | Statut | Notes |
 | :--- | :---: | :--- |
-| **Setup Projet Vue 3 + TS** | 🟢 Fait | Déployé sur Cloudflare |
-| **Base de données & Auth** | 🟢 Fait | Supabase Configuré |
-| **Emails Transactionnels** | 🟢 Fait | Resend Connecté |
-| **Intégration Mondial Relay** | 🔥 Haute | 👉 **À faire aujourd'hui** |
-| **Système de Paiement** | 🔥 Haute | 👉 **À faire aujourd'hui** |
-| **Mentions Légales** | 🟡 Moyenne | À intégrer |
-| **Réception Papiers LLC** | 🟡 Moyenne | En attente |
+| **Structure LLC** | 🟡 En cours | Créée, attente EIN (3-4 semaines) |
+| **Site Web (Vue 3)** | 🟢 Fait | Déployé, Design "Labo" OK |
+| **Base de Données** | 🟢 Fait | Supabase Configuré |
+| **Emails (Resend)** | 🟢 Fait | Templates neutres & i18n OK |
+| **Mondial Relay** | 🟢 Fait | Widget intégré |
+| **Paiement Manuel** | 🟢 Fait | Flux asynchrone codé |
+| **IA Support** | 🟢 Fait | Intégration Claude API OK |
+| **Textes Légaux** | 🔴 À FAIRE | CGV/Privacy à rédiger (Spécial Peptides) |
+| **Compte Banque** | 🔴 À FAIRE | Bloqué par l'attente EIN |
 
 ---
 
-## ⚠️ Notes de Sécurité (Rappel OpSec)
+## ⚠️ Rappels Quotidiens pour l'Admin
 
-1.  **VPN OBLIGATOIRE :** Cloudflare masque le site, mais **pas l'admin**. L'accès aux dashboards (Cloudflare, Supabase, Git) doit se faire sous VPN pour éviter de loguer votre IP personnelle.
-2.  **Adresse :** Ne jamais utiliser l'adresse personnelle française sur les factures ou le site web. Toujours utiliser l'adresse NM.
-3.  **Sanitisation :** Pas de clés privées dans le code client Vue.js.
+1.  **Active ton VPN** avant de travailler.
+2.  **Ne donne jamais** de conseils de dosage par chat/email (Réponse type : "Produit pour recherche uniquement").
+3.  **Vérifie les paiements** manuellement (Rapprochement bancaire/crypto) avant d'expédier.
+4.  **Ne livre jamais** en Allemagne ou en Suisse (Risque saisie douane).

@@ -79,14 +79,16 @@
             </div>
 
             <!-- Reset Button -->
-            <button
+            <PremiumButton
               v-if="search || selectedCategory !== 'all'"
-              class="faq__reset"
+              type="secondary"
+              variant="outline"
+              size="sm"
+              :label="t('catalogue.filters.resetAll')"
+              icon-left="RotateCcw"
+              block
               @click="resetSearch"
-            >
-              <BasicIconNext name="RotateCcw" :size="16" />
-              {{ t('catalogue.filters.resetAll') }}
-            </button>
+            />
           </div>
 
           <!-- Help Card -->
@@ -120,7 +122,13 @@
               <strong>{{ search }}</strong>
               "
             </span>
-            <button @click="search = ''">{{ t('faq.reset') }}</button>
+            <PremiumButton
+              type="primary"
+              variant="ghost"
+              size="xs"
+              :label="t('faq.reset')"
+              @click="search = ''"
+            />
           </div>
 
           <!-- Empty State -->
@@ -133,13 +141,14 @@
             </div>
             <h3 class="faq__empty-title">{{ t('faq.noResults') }}</h3>
             <p class="faq__empty-text">{{ t('faq.noResultsText') }}</p>
-            <button
-              class="faq__empty-btn"
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="md"
+              :label="t('faq.reset')"
+              icon-left="RotateCcw"
               @click="resetSearch"
-            >
-              <BasicIconNext name="RotateCcw" :size="16" />
-              {{ t('faq.reset') }}
-            </button>
+            />
           </div>
 
           <!-- FAQ Groups -->

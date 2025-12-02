@@ -177,6 +177,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresCart: true, titleKey: 'checkout.title' },
   },
   {
+    path: '/checkout/confirmation',
+    name: 'checkout-confirmation',
+    component: () => import('@/features/checkout/OrderConfirmation.vue'),
+    meta: { titleKey: 'checkout.confirmation.pageTitle' },
+  },
+  {
     path: '/paiement/success',
     name: 'payment-success',
     component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),

@@ -79,14 +79,19 @@
         @expire="onCaptchaExpire"
       />
 
-      <BasicButton
-        htmlType="submit"
+      <PremiumButton
+        html-type="submit"
+        type="primary"
+        variant="solid"
+        size="lg"
+        width="full"
         :label="t('auth.register.submit')"
-        variant="filled"
-        size="large"
-        :disabled="loading || !captchaToken || !canSubmit"
+        icon-left="UserPlus"
+        :disabled="!captchaToken || !canSubmit"
         :loading="loading"
-        block
+        :loading-text="t('common.loading')"
+        :shine="true"
+        :glow="!!(captchaToken && canSubmit && !loading)"
       />
 
       <!-- Error feedback premium -->

@@ -109,18 +109,20 @@
               <strong>{{ formatPrice(cart.totalPrice) }}</strong>
             </div>
             <div class="cart__actions">
-              <BasicButton
-                :label="t('cart.title')"
+              <PremiumButton
                 type="secondary"
-                variant="outlined"
-                size="small"
+                variant="outline"
+                size="sm"
+                :label="t('cart.title')"
                 @click="goToCart"
               />
-              <BasicButton
-                :label="t('checkout.placeOrder')"
+              <PremiumButton
                 type="primary"
-                size="small"
-                block
+                variant="solid"
+                size="sm"
+                :label="t('checkout.placeOrder')"
+                icon-left="Shield"
+                :shine="true"
                 @click="goToCheckout"
               />
             </div>

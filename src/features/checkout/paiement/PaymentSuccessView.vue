@@ -17,13 +17,15 @@
           :class="{ 'success__status--error': isError }"
         >
           <!-- Back button top right -->
-          <button
+          <PremiumButton
             class="success__back-top"
+            type="white"
+            variant="glass"
+            size="xs"
+            :label="t('checkout.success.shop')"
+            icon-left="ArrowLeft"
             @click="$router.push('/')"
-          >
-            <BasicIconNext name="ArrowLeft" :size="14" />
-            {{ t('checkout.success.shop') }}
-          </button>
+          />
 
           <div class="success__status-main">
             <!-- Icon -->
@@ -532,33 +534,7 @@
       position: absolute;
       top: 16px;
       right: 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      font-family: @font-body;
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.8);
-      cursor: pointer;
-      transition: all 0.2s @ease;
       z-index: 1;
-
-      svg {
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.18);
-        color: white;
-
-        svg {
-          color: white;
-        }
-      }
     }
 
     &__status-main {

@@ -6,7 +6,6 @@
       :show-reset="true"
       @reset="reset"
     >
-      <!-- 🆕 Filtre Guest/User -->
       <template #filters>
         <div class="admin-orders__filters">
           <BasicButton
@@ -32,16 +31,18 @@
           />
         </div>
       </template>
+      <template #pagination>
+        <BasicPagination
+          :current-page="page"
+          :nb-pages="nbPages"
+          :nb-results="displayedTotal"
+          :nb-pages-max="5"
+          :auto-fetch="fetchData"
+          size="small"
+          @change="page = $event"
+        />
+      </template>
     </BasicToolbar>
-
-    <BasicPagination
-      :current-page="page"
-      :nb-pages="nbPages"
-      :nb-results="displayedTotal"
-      :nb-pages-max="5"
-      :auto-fetch="fetchData"
-      @change="page = $event"
-    />
 
     <WrapperLoader
       :loading="loading"
@@ -175,12 +176,12 @@
   import { useOrderActions } from '@/features/order/composables/useOrderActions'
   import type { OrdersOverviewForAdmin } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 
-  // 1. Hook Admin Table
+  // 1. Hook Admin Table avec persistance URL
   const {
     filteredData,
     total,
@@ -193,6 +194,9 @@
     hasLoaded,
     reset,
     fetchData,
+    getInitialValue,
+    route,
+    router,
   } = useAdminTable<'orders_overview_for_admin'>({
     table: 'orders_overview_for_admin',
     orderBy: 'created_at',
@@ -201,6 +205,7 @@
       (o.customer_name?.toLowerCase()?.includes(q) ?? false) ||
       (o.customer_email?.toLowerCase()?.includes(q) ?? false) ||
       (o.order_number?.toLowerCase()?.includes(q) ?? false),
+    persistInUrl: true,
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
@@ -211,8 +216,21 @@
     filteredData,
   )
 
-  // 🆕 Filtre Guest/User
-  const orderFilter = ref<'all' | 'user' | 'guest'>('all')
+  // Filtre Guest/User avec persistance URL
+  type OrderFilterType = 'all' | 'user' | 'guest'
+  const orderFilter = ref<OrderFilterType>(getInitialValue('type', 'all') as OrderFilterType)
+
+  // Synchroniser le filtre avec l'URL
+  watch(orderFilter, (val) => {
+    if (!router || !route) return
+    const query = { ...route.query } as Record<string, string>
+    if (val !== 'all') {
+      query.type = val
+    } else {
+      delete query.type
+    }
+    router.replace({ query })
+  })
 
   // 🆕 Computed: Filtrage par type
   const displayedOrders = computed(() => {
@@ -247,9 +265,10 @@
 
     &__item {
       cursor: pointer;
+      transition: background-color 0.15s ease;
 
       &:hover {
-        background: var(--primary-0);
+        background: var(--admin-bg-card-hover, var(--primary-0));
       }
     }
 
@@ -271,11 +290,12 @@
 
     &__client-name {
       font-weight: 500;
+      color: var(--admin-text-primary, inherit);
     }
 
     &__client-subtext {
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--admin-text-secondary, @neutral-500);
     }
 
     /* 🆕 Badge invité */

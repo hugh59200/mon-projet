@@ -6,13 +6,20 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+interface TabProps {
+  routeName: RouteName
+  tabKey: string
+  color?: TextColor
+  icon?: IconNameNext
+}
+
 export function useNavigationTabs() {
   const router = useRouter()
   const route = useRoute()
   const adminTabStore = useAdminTabStore()
   const { t } = useI18n()
 
-  // 🔹 Récupère les routes enfants du parent (ex: /admin)
+  // Récupère les routes enfants du parent (ex: /admin)
   const tabsRoutes = computed<TabProps[]>(() => {
     const parent = route.matched[0]
     if (!parent?.children) return []
@@ -24,7 +31,8 @@ export function useNavigationTabs() {
       icon: child.meta?.icon as IconNameNext,
     }))
   })
-  // ✅ Liste finale typée : TabProps[]
+
+  // Liste finale typée
   const tabs = computed<TabProps[]>(() =>
     tabsRoutes.value.map((t) => ({
       routeName: t.routeName,
@@ -34,7 +42,7 @@ export function useNavigationTabs() {
     })),
   )
 
-  // 🚀 Navigation + stockage de l’onglet actif
+  // Navigation + stockage de l'onglet actif
   const goToTab = (name: RouteName) => {
     const target = tabsRoutes.value.find((t) => t.routeName === name)
     if (target) {

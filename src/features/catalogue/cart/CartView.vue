@@ -10,13 +10,14 @@
       <!-- Header -->
       <header class="cart__header">
         <div class="cart__header-left">
-          <button
-            class="cart__back"
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="sm"
+            :label="t('cart.continueShopping')"
+            icon-left="ArrowLeft"
             @click="$router.push('/catalogue')"
-          >
-            <BasicIconNext name="ArrowLeft" :size="20" />
-            <span>{{ t('cart.continueShopping') }}</span>
-          </button>
+          />
         </div>
 
         <h1 class="cart__title">
@@ -31,14 +32,16 @@
         </h1>
 
         <div class="cart__header-right">
-          <button
+          <PremiumButton
             v-if="cart.items.length > 0"
+            type="danger"
+            variant="ghost"
+            size="sm"
+            :label="t('cart.clear')"
+            icon-left="Trash2"
             class="cart__clear"
             @click="confirmClearCart"
-          >
-            <BasicIconNext name="Trash2" :size="18" />
-            <span>{{ t('cart.clear') }}</span>
-          </button>
+          />
         </div>
       </header>
 
@@ -63,23 +66,41 @@
           {{ t('cart.emptyText') }}
         </p>
 
-        <button
-          class="cart__empty-btn"
+        <PremiumButton
+          type="primary"
+          variant="solid"
+          size="lg"
+          :label="t('home.hero.cta.explore')"
+          icon-left="ShoppingBag"
+          :shine="true"
           @click="$router.push('/catalogue')"
-        >
-          <BasicIconNext name="ShoppingBag" :size="20" />
-          {{ t('home.hero.cta.explore') }}
-        </button>
+        />
 
         <!-- Suggestions -->
         <div class="cart__suggestions">
           <p class="cart__suggestions-title">{{ t('cart.popularProducts') }}</p>
           <div class="cart__suggestions-tags">
-            <button @click="$router.push('/catalogue?categories=Anti-âge')">Anti-âge</button>
-            <button @click="$router.push('/catalogue?categories=Performance')">Performance</button>
-            <button @click="$router.push('/catalogue?categories=Récupération')">
-              Récupération
-            </button>
+            <PremiumButton
+              type="secondary"
+              variant="outline"
+              size="xs"
+              label="Anti-âge"
+              @click="$router.push('/catalogue?categories=Anti-âge')"
+            />
+            <PremiumButton
+              type="secondary"
+              variant="outline"
+              size="xs"
+              label="Performance"
+              @click="$router.push('/catalogue?categories=Performance')"
+            />
+            <PremiumButton
+              type="secondary"
+              variant="outline"
+              size="xs"
+              label="Récupération"
+              @click="$router.push('/catalogue?categories=Récupération')"
+            />
           </div>
         </div>
       </div>
@@ -298,13 +319,17 @@
               </div>
             </div>
 
-            <button
-              class="cart__checkout-btn"
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="lg"
+              width="full"
+              :label="t('cart.checkout')"
+              icon-left="Shield"
+              :shine="true"
+              :glow="true"
               @click="$router.push('/checkout')"
-            >
-              <BasicIconNext name="Shield" :size="20" />
-              {{ t('cart.checkout') }}
-            </button>
+            />
 
             <!-- Trust Badges -->
             <div class="cart__trust">

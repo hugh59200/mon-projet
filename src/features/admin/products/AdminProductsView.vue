@@ -4,7 +4,6 @@
       v-model:search="search"
       search-placeholder="Rechercher un produit..."
       show-reset
-      show-role
       @reset="reset()"
     >
       <template #actions>
@@ -15,16 +14,18 @@
           @click="isCreateModalVisible = true"
         />
       </template>
+      <template #pagination>
+        <BasicPagination
+          :current-page="page"
+          :nb-pages="nbPages"
+          :nb-results="total"
+          :nb-pages-max="5"
+          :auto-fetch="fetchData"
+          size="small"
+          @change="page = $event"
+        />
+      </template>
     </BasicToolbar>
-
-    <BasicPagination
-      :current-page="page"
-      :nb-pages="nbPages"
-      :nb-results="total"
-      :nb-pages-max="5"
-      :auto-fetch="fetchData"
-      @change="page = $event"
-    />
 
     <WrapperLoader
       :loading="loading"
@@ -213,6 +214,7 @@
       (p.name?.toLowerCase()?.includes(q) ?? false) ||
       (p.category?.toLowerCase()?.includes(q) ?? false) ||
       (p.dosage?.toLowerCase()?.includes(q) ?? false),
+    persistInUrl: true,
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
@@ -251,12 +253,11 @@
     &__item {
       cursor: pointer;
       transition: background 0.15s;
-      // Aération verticale des lignes
       padding-top: 8px;
       padding-bottom: 8px;
 
       &:hover {
-        background: var(--neutral-50);
+        background: var(--admin-bg-card-hover, var(--neutral-50));
       }
     }
 
@@ -267,22 +268,20 @@
     &__info {
       display: flex;
       align-items: center;
-      // Centrage vertical global de la cellule
     }
 
     &__thumb {
-      width: 60px; // Image agrandie
+      width: 60px;
       height: 60px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid @neutral-200;
-      background: @white;
+      border: 1px solid var(--admin-border-subtle, @neutral-200);
+      background: var(--admin-bg-card, @white);
       flex-shrink: 0;
     }
 
-    // Conteneur texte à droite de l'image
     &__details {
-      margin-left: 16px; // Espace horizontal
+      margin-left: 16px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -297,17 +296,17 @@
     &__name {
       font-size: 15px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--admin-text-primary, @neutral-900);
     }
 
     &__dosage {
       font-size: 13px;
       font-weight: 400;
-      color: @neutral-500;
+      color: var(--admin-text-secondary, @neutral-500);
     }
 
     &__badge-promo {
-      margin-top: 8px; // Espace vertical badge
+      margin-top: 8px;
       width: fit-content;
       background-color: @red-600;
       color: @white;
@@ -318,7 +317,6 @@
       border-radius: 4px;
     }
 
-    // Colonne Prix
     &__price-col {
       display: flex;
       flex-direction: column;
@@ -328,7 +326,7 @@
 
       .price-old {
         font-size: 12px;
-        color: @neutral-400;
+        color: var(--admin-text-muted, @neutral-400);
         text-decoration: line-through;
       }
 

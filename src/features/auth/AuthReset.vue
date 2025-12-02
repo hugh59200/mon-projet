@@ -25,14 +25,18 @@
         @expire="onCaptchaExpire"
       />
 
-      <BasicButton
+      <PremiumButton
+        type="primary"
+        variant="solid"
+        size="lg"
+        width="full"
         :label="t('auth.reset.submit')"
-        variant="filled"
-        size="large"
-        :disabled="loading || !captchaToken"
+        icon-left="Mail"
+        :disabled="!captchaToken"
         :loading="loading"
+        :loading-text="t('common.loading')"
+        :shine="true"
         @click="submit"
-        block
       />
 
       <div class="auth__feedback">

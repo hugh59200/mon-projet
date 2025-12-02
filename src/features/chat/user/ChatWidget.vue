@@ -96,6 +96,7 @@
           :send-message="sendMessage"
           :send-typing="sendTyping"
           :height="chatHeight"
+          :conversation-id="userId"
         />
       </div>
     </Transition>

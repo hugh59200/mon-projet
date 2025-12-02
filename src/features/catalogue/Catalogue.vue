@@ -41,19 +41,24 @@
             :placeholder="t('common.search') + '...'"
           />
         </div>
-        <button
+        <PremiumButton
+          type="primary"
+          variant="outline"
+          size="sm"
+          :label="t('common.filter')"
+          icon-left="SlidersHorizontal"
           class="catalogue-filter-btn"
           @click="showFilters = true"
         >
-          <BasicIconNext name="SlidersHorizontal" :size="18" />
-          {{ t('common.filter') }}
-          <span
-            v-if="activeFiltersCount"
-            class="catalogue-filter-btn__badge"
-          >
-            {{ activeFiltersCount }}
-          </span>
-        </button>
+          <template #append>
+            <span
+              v-if="activeFiltersCount"
+              class="catalogue-filter-btn__badge"
+            >
+              {{ activeFiltersCount }}
+            </span>
+          </template>
+        </PremiumButton>
       </div>
     </PageHeader>
 
@@ -128,22 +133,22 @@
 
             <!-- View Mode Toggle -->
             <div class="catalogue-toolbar__view">
-              <button
+              <PremiumButton
+                :type="viewMode === 'grid' ? 'primary' : 'secondary'"
+                :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+                size="sm"
+                icon-left="LayoutGrid"
                 class="catalogue-toolbar__view-btn"
-                :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }"
                 @click="viewMode = 'grid'"
-                :title="t('catalogue.sort.label')"
-              >
-                <BasicIconNext name="LayoutGrid" :size="18" />
-              </button>
-              <button
+              />
+              <PremiumButton
+                :type="viewMode === 'list' ? 'primary' : 'secondary'"
+                :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+                size="sm"
+                icon-left="List"
                 class="catalogue-toolbar__view-btn"
-                :class="{ 'catalogue-toolbar__view-btn--active': viewMode === 'list' }"
                 @click="viewMode = 'list'"
-                :title="t('catalogue.sort.label')"
-              >
-                <BasicIconNext name="List" :size="18" />
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -190,13 +195,15 @@
             </button>
           </div>
 
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="xs"
+            :label="t('catalogue.filters.resetAll')"
+            icon-left="RotateCcw"
             class="catalogue-active-filters__clear"
             @click="resetAll"
-          >
-            <BasicIconNext name="RotateCcw" :size="14" />
-            {{ t('catalogue.filters.resetAll') }}
-          </button>
+          />
         </div>
 
         <!-- Products Grid -->
@@ -215,12 +222,14 @@
               <p class="catalogue-empty__text">
                 {{ t('catalogue.results.noResultsText') }}
               </p>
-              <button
-                class="catalogue-empty__btn"
+              <PremiumButton
+                type="primary"
+                variant="solid"
+                size="md"
+                :label="t('catalogue.filters.resetAll')"
+                icon-left="RotateCcw"
                 @click="resetAll"
-              >
-                {{ t('catalogue.filters.resetAll') }}
-              </button>
+              />
             </div>
           </template>
 
@@ -368,7 +377,9 @@
 
   // UI State
   const showFilters = ref(false)
-  const viewMode = ref<'grid' | 'list'>('grid')
+  const viewMode = ref<'grid' | 'list'>(
+    (route.query.view as 'grid' | 'list') || 'grid',
+  )
 
   // Category colors - mapped to Design System semantic colors
   // These hex values correspond to the DS color palette for inline style usage
@@ -472,6 +483,7 @@
     if (inStockOnly.value) query.stock = 'true'
     if (sortBy.value !== 'default') query.sort = sortBy.value
     if (page.value > 1) query.page = page.value.toString()
+    if (viewMode.value !== 'grid') query.view = viewMode.value
     router.replace({ query })
   }
 
@@ -493,7 +505,7 @@
 
   // ⚠️ PAS de scrollToProductList() ici - c'est ça qui causait le scroll brutal
   watch(
-    [selectedCategories, inStockOnly, selectedTags, priceRange, sortBy, searchTerm, pageSize],
+    [selectedCategories, inStockOnly, selectedTags, priceRange, sortBy, searchTerm, pageSize, viewMode],
     () => {
       page.value = 1
       updateUrl()

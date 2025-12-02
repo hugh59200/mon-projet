@@ -114,9 +114,13 @@
               :placeholder="t('footer.newsletter.placeholder')"
               class="footer__newsletter-input"
             />
-            <button class="footer__newsletter-btn">
-              <BasicIconNext name="ArrowRight" :size="18" />
-            </button>
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              icon-left="ArrowRight"
+              class="footer__newsletter-btn"
+            />
           </div>
         </div>
       </div>
@@ -454,23 +458,7 @@
     }
 
     &__newsletter-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.25s @ease;
       flex-shrink: 0;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.4);
-      }
     }
 
     // ============================================

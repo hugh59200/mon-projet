@@ -73,13 +73,14 @@
         v-if="showSkip"
         class="skip-container"
       >
-        <button
-          class="btn-skip"
+        <PremiumButton
+          type="secondary"
+          variant="ghost"
+          size="sm"
+          label="Continuer sans compte"
+          icon-right="ArrowRight"
           @click="$router.push('/')"
-        >
-          <span>Continuer sans compte</span>
-          <BasicIconNext name="ArrowRight" :size="18" />
-        </button>
+        />
       </div>
 
       <div class="auth-form-wrapper">

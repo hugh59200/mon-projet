@@ -52,7 +52,7 @@
   // ✅ Couleur du texte (normal / sélectionné)
   const computedTextColor = computed<TextColor>(() => {
     if (isSelected.value && props.color) return props.color
-    return 'neutral-400'
+    return 'neutral-600'
   })
 </script>
 
@@ -61,48 +61,65 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px 22px;
+    padding: 10px 20px;
     gap: 8px;
-    border-radius: 10px 10px 0 0;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.25s ease;
-    background: rgba(var(--secondary-900-rgb), 0.75);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: transparent;
     user-select: none;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 13px;
 
-    /* ✅ Hover sur onglet non sélectionné */
-    &:hover {
-      background: rgba(var(--secondary-700-rgb), 0.75);
+    // Effet de hover subtil
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%,
+        color-mix(in srgb, var(--primary-500) 5%, transparent) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 12px;
+    }
 
-      &:not(.tab--selected) {
-        .tab__label {
-          color: @white !important;
-          transition: color 0.25s ease;
-        }
+    &:hover:not(.tab--selected) {
+      background: @neutral-100;
 
-        .tab__icon {
-          color: @white !important;
-          transition: color 0.25s ease;
-        }
+      &::before {
+        opacity: 1;
+      }
+
+      .tab__label {
+        color: @neutral-700 !important;
       }
     }
 
     &--selected {
-      background: rgba(var(--secondary-500-rgb), 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 10px 22px;
-      box-shadow: inset 0 1px 3px rgba(var(--primary-500-rgb), 0.12);
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        background 0.25s ease,
-        color 0.25s ease,
-        opacity 0.18s ease;
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+      box-shadow:
+        0 2px 8px color-mix(in srgb, var(--primary-600) 30%, transparent),
+        0 4px 16px color-mix(in srgb, var(--primary-700) 20%, transparent);
+
+      .tab__label {
+        color: white !important;
+      }
+
+      .tab__icon {
+        color: white !important;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 4px 12px color-mix(in srgb, var(--primary-600) 40%, transparent),
+          0 6px 20px color-mix(in srgb, var(--primary-700) 25%, transparent);
+      }
     }
   }
 </style>

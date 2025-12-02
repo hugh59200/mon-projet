@@ -80,19 +80,23 @@
                   </div>
                 </div>
                 <div class="category-hero__actions">
-                  <button
-                    class="category-hero__btn category-hero__btn--primary"
+                  <PremiumButton
+                    type="primary"
+                    variant="solid"
+                    size="md"
+                    :label="`${t('home.categories.common.explore')} ${slide.label}`"
+                    icon-right="ArrowRight"
+                    :shine="true"
+                    :glow="true"
                     @click="goToCategory(slide)"
-                  >
-                    <span>{{ t('home.categories.common.explore') }} {{ slide.label }}</span>
-                    <BasicIconNext name="ArrowRight" :size="2" />
-                  </button>
-                  <button
-                    class="category-hero__btn category-hero__btn--ghost"
+                  />
+                  <PremiumButton
+                    type="white"
+                    variant="ghost"
+                    size="md"
+                    :label="t('home.cta.buttons.catalogue')"
                     @click="goToCatalogue"
-                  >
-                    {{ t('home.cta.buttons.catalogue') }}
-                  </button>
+                  />
                 </div>
                 <p class="category-hero__disclaimer">
                   ℹ️ {{ t('home.disclaimer.text') }}

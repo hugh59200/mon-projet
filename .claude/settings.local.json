@@ -26,7 +26,8 @@
       "Bash(deno install:*)",
       "Bash(npm run lint)",
       "Bash(npm run lint:*)",
-      "Bash(timeout 15 npm run dev:*)"
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

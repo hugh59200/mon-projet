@@ -30,6 +30,7 @@
   .page-content {
     z-index: 1;
     display: flex;
+    flex: 1; /* Remplit l'espace disponible */
     gap: 32px;
 
     &--column {

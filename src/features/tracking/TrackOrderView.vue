@@ -129,13 +129,19 @@
                 </div>
               </div>
 
-              <button type="submit" class="track__submit" :disabled="loading">
-                <span v-if="loading" class="track__submit-loader"></span>
-                <template v-else>
-                  <BasicIconNext name="Search" :size="20" />
-                  Localiser mon colis
-                </template>
-              </button>
+              <PremiumButton
+                html-type="submit"
+                type="primary"
+                variant="solid"
+                size="lg"
+                width="full"
+                label="Localiser mon colis"
+                icon-left="Search"
+                :loading="loading"
+                loading-text="Recherche..."
+                :shine="true"
+                :glow="!loading"
+              />
             </form>
 
             <div class="track__search-footer">
@@ -191,10 +197,14 @@
       <div v-else-if="order" class="track__results">
         <!-- Navigation -->
         <nav class="track__nav">
-          <button class="track__nav-back" @click="resetSearch">
-            <BasicIconNext name="ArrowLeft" :size="18" />
-            <span>Nouvelle recherche</span>
-          </button>
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="sm"
+            label="Nouvelle recherche"
+            icon-left="ArrowLeft"
+            @click="resetSearch"
+          />
           <div class="track__nav-order">
             <span class="track__nav-label">Commande</span>
             <span class="track__nav-number">{{ order.order_number }}</span>
@@ -434,17 +444,18 @@
                   />
                 </div>
 
-                <button
-                  class="track__register-btn"
-                  :disabled="registerLoading"
+                <PremiumButton
+                  type="success"
+                  variant="solid"
+                  size="md"
+                  width="full"
+                  label="Créer mon compte"
+                  icon-left="UserCheck"
+                  :loading="registerLoading"
+                  loading-text="Création..."
+                  :shine="true"
                   @click="handleQuickRegister"
-                >
-                  <span v-if="registerLoading" class="track__register-loader"></span>
-                  <template v-else>
-                    <BasicIconNext name="UserCheck" :size="18" />
-                    Créer mon compte
-                  </template>
-                </button>
+                />
               </div>
 
               <div class="track__register-benefits">

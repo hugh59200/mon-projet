@@ -31,17 +31,18 @@
           />
         </div>
       </template>
+      <template #pagination>
+        <BasicPagination
+          :current-page="page"
+          :nb-pages="nbPages"
+          :nb-results="displayedTotal"
+          :nb-pages-max="5"
+          :auto-fetch="fetchData"
+          size="small"
+          @change="page = $event"
+        />
+      </template>
     </BasicToolbar>
-
-    <BasicPagination
-      :current-page="page"
-      :nb-pages="nbPages"
-      :nb-results="displayedTotal"
-      :nb-pages-max="5"
-      :auto-fetch="fetchData"
-      @change="page = $event"
-      size="small"
-    />
 
     <WrapperLoader
       :loading="loading"
@@ -158,12 +159,12 @@
   import type { Tables } from '@/supabase/types/supabase'
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import BasicToolbar from '../shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
 
-  // 1. Hook Admin Table
+  // 1. Hook Admin Table avec persistance URL
   const {
     filteredData,
     total,
@@ -176,14 +177,18 @@
     hasLoaded,
     fetchData,
     reset,
+    getInitialValue,
+    route,
+    router,
   } = useAdminTable<'profiles'>({
     table: 'profiles',
     orderBy: 'created_at',
     ascending: false,
-    filters: { role: 'all' }, // Initial request param
+    filters: { role: 'all' },
     searchFn: (u, q) =>
       (u.email?.toLowerCase()?.includes(q) ?? false) ||
       (u.full_name?.toLowerCase()?.includes(q) ?? false),
+    persistInUrl: true,
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()
@@ -194,8 +199,21 @@
     filteredData,
   )
 
-  // 🆕 Filtres Local (User/Admin)
-  const userFilter = ref<'all' | 'user' | 'admin'>('all')
+  // Filtres Local (User/Admin) avec persistance URL
+  type UserFilterType = 'all' | 'user' | 'admin'
+  const userFilter = ref<UserFilterType>(getInitialValue('role', 'all') as UserFilterType)
+
+  // Synchroniser le filtre avec l'URL
+  watch(userFilter, (val) => {
+    if (!router || !route) return
+    const query = { ...route.query } as Record<string, string>
+    if (val !== 'all') {
+      query.role = val
+    } else {
+      delete query.role
+    }
+    router.replace({ query })
+  })
 
   const displayedUsers = computed(() => {
     if (userFilter.value === 'all') return filteredData.value
@@ -229,9 +247,10 @@
 
     &__item {
       cursor: pointer;
+      transition: background-color 0.15s ease;
 
       &:hover {
-        background: var(--primary-0);
+        background: var(--admin-bg-card-hover, var(--primary-0));
       }
     }
 

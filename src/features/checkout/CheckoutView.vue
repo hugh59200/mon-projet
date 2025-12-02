@@ -9,13 +9,15 @@
     <div class="checkout__container">
       <!-- Header -->
       <header class="checkout__header">
-        <button
+        <PremiumButton
+          type="secondary"
+          variant="ghost"
+          size="sm"
+          :label="t('cart.continueShopping')"
+          icon-left="ArrowLeft"
           class="checkout__back"
           @click="$router.push('/catalogue')"
-        >
-          <BasicIconNext name="ArrowLeft" :size="20" />
-          <span>{{ t('cart.continueShopping') }}</span>
-        </button>
+        />
 
         <div class="checkout__secure-badge">
           <BasicIconNext name="ShieldCheck" :size="16" />
@@ -174,12 +176,14 @@
                 </div>
                 <h3>{{ t('cart.empty') }}</h3>
                 <p>{{ t('cart.emptyText') }}</p>
-                <button
-                  class="checkout__empty-btn"
+                <PremiumButton
+                  type="primary"
+                  variant="solid"
+                  size="md"
+                  :label="t('catalogue.title')"
+                  icon-left="ShoppingBag"
                   @click="$router.push('/catalogue')"
-                >
-                  {{ t('catalogue.title') }}
-                </button>
+                />
               </div>
             </div>
           </section>
@@ -268,24 +272,24 @@
                 v-if="auth.user && deliveryMode === 'home'"
                 class="checkout__address-toggle"
               >
-                <button
+                <PremiumButton
+                  :type="useProfileAddress ? 'primary' : 'secondary'"
+                  :variant="useProfileAddress ? 'solid' : 'outline'"
+                  size="md"
+                  label="Mon adresse"
+                  icon-left="User"
                   class="checkout__toggle-btn"
-                  :class="{ 'checkout__toggle-btn--active': useProfileAddress }"
                   @click="useProfileAddress = true"
-                  type="button"
-                >
-                  <BasicIconNext name="User" :size="18" />
-                  Mon adresse
-                </button>
-                <button
+                />
+                <PremiumButton
+                  :type="!useProfileAddress ? 'primary' : 'secondary'"
+                  :variant="!useProfileAddress ? 'solid' : 'outline'"
+                  size="md"
+                  label="Autre adresse"
+                  icon-left="MapPin"
                   class="checkout__toggle-btn"
-                  :class="{ 'checkout__toggle-btn--active': !useProfileAddress }"
                   @click="useProfileAddress = false"
-                  type="button"
-                >
-                  <BasicIconNext name="MapPin" :size="18" />
-                  Autre adresse
-                </button>
+                />
               </div>
 
               <!-- Champs email et nom (toujours visibles) -->
@@ -357,11 +361,13 @@
                       v-model="country"
                       class="checkout__input checkout__select"
                     >
-                      <option value="France">🇫🇷 France</option>
-                      <option value="Belgique">🇧🇪 Belgique</option>
-                      <option value="Suisse">🇨🇭 Suisse</option>
-                      <option value="Luxembourg">🇱🇺 Luxembourg</option>
-                      <option value="Canada">🇨🇦 Canada</option>
+                      <option
+                        v-for="c in ALLOWED_COUNTRIES"
+                        :key="c.code"
+                        :value="c.name"
+                      >
+                        {{ c.flag }} {{ c.name }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -400,45 +406,48 @@
             <div class="checkout__payment-methods">
               <!-- Méthodes disponibles -->
               <div class="payment-methods__available">
-                <!-- Stripe / Carte bancaire -->
+                <!-- Virement Bancaire -->
                 <button
                   class="payment-card"
-                  :class="{ 'payment-card--active': selectedPayment === 'stripe' }"
-                  @click="selectedPayment = 'stripe'"
+                  :class="{ 'payment-card--active': selectedPayment === 'bank_transfer' }"
+                  @click="selectedPayment = 'bank_transfer'"
                   type="button"
                 >
                   <div class="payment-card__radio">
                     <div class="payment-card__radio-inner"></div>
                   </div>
-                  <div class="payment-card__icon payment-card__icon--stripe">
-                    <BasicIconNext name="stripe" :size="40" />
+                  <div class="payment-card__icon payment-card__icon--bank">
+                    <BasicIconNext name="Landmark" :size="24" />
                   </div>
                   <div class="payment-card__content">
-                    <span class="payment-card__title">{{ t('checkout.payment.card') }}</span>
-                    <span class="payment-card__desc">Visa, Mastercard, Amex</span>
+                    <span class="payment-card__title">{{ t('checkout.payment.bankTransfer') }}</span>
+                    <span class="payment-card__desc">{{ t('checkout.payment.bankTransferDesc') }}</span>
                   </div>
-                  <div class="payment-card__cards">
-                    <BasicIconNext name="visa" :size="32" class="payment-card__card-icon" />
-                    <BasicIconNext name="mastercard" :size="32" class="payment-card__card-icon" />
+                  <div class="payment-card__badge-secure">
+                    <BasicIconNext name="ShieldCheck" :size="16" />
                   </div>
                 </button>
 
-                <!-- PayPal -->
+                <!-- Crypto-monnaie -->
                 <button
                   class="payment-card"
-                  :class="{ 'payment-card--active': selectedPayment === 'paypal' }"
-                  @click="selectedPayment = 'paypal'"
+                  :class="{ 'payment-card--active': selectedPayment === 'crypto' }"
+                  @click="selectedPayment = 'crypto'"
                   type="button"
                 >
                   <div class="payment-card__radio">
                     <div class="payment-card__radio-inner"></div>
                   </div>
-                  <div class="payment-card__icon payment-card__icon--paypal">
-                    <BasicIconNext name="paypal" :size="40" />
+                  <div class="payment-card__icon payment-card__icon--crypto">
+                    <BasicIconNext name="Bitcoin" :size="24" />
                   </div>
                   <div class="payment-card__content">
-                    <span class="payment-card__title">PayPal</span>
-                    <span class="payment-card__desc">{{ t('checkout.payment.paypalSecure') }}</span>
+                    <span class="payment-card__title">{{ t('checkout.payment.crypto') }}</span>
+                    <span class="payment-card__desc">{{ t('checkout.payment.cryptoDesc') }}</span>
+                  </div>
+                  <div class="payment-card__crypto-icons">
+                    <span class="payment-card__crypto-badge">BTC</span>
+                    <span class="payment-card__crypto-badge">USDT</span>
                   </div>
                 </button>
               </div>
@@ -526,17 +535,47 @@
               </div>
             </div>
 
-            <button
-              class="checkout__submit"
-              :disabled="!canSubmit"
-              @click="submitOrder"
-            >
-              <BasicIconNext v-if="isSubmitting" name="Loader2" :size="20" class="checkout__submit-spinner" />
-              <template v-else>
-                <BasicIconNext name="Shield" :size="20" />
-                Payer {{ formatPrice(finalTotal) }}
-              </template>
-            </button>
+            <!-- 🛡️ BOUCLIER LÉGAL - Disclaimer obligatoire -->
+            <div class="checkout__disclaimer">
+              <label class="checkout__disclaimer-checkbox">
+                <input
+                  v-model="disclaimerAccepted"
+                  type="checkbox"
+                  class="checkout__disclaimer-input"
+                />
+                <span class="checkout__disclaimer-checkmark">
+                  <BasicIconNext name="Check" :size="12" />
+                </span>
+                <span class="checkout__disclaimer-text">
+                  {{ t('checkout.disclaimer.text') }}
+                </span>
+              </label>
+              <div
+                v-if="!disclaimerAccepted"
+                class="checkout__disclaimer-warning"
+              >
+                <BasicIconNext name="AlertTriangle" :size="14" />
+                <span>{{ t('checkout.disclaimer.required') }}</span>
+              </div>
+            </div>
+
+            <div class="checkout__submit-wrapper">
+              <PremiumButton
+                type="primary"
+                variant="solid"
+                size="lg"
+                width="full"
+                :label="`${t('checkout.placeOrder')} ${formatPrice(finalTotal)}`"
+                icon-left="Lock"
+                :loading="isSubmitting"
+                :loading-text="t('checkout.processing')"
+                loading-icon="Shield"
+                :disabled="!canSubmit"
+                :shine="true"
+                :glow="canSubmit && !isSubmitting"
+                @click="submitOrder"
+              />
+            </div>
 
             <!-- Trust Badges -->
             <div class="checkout__trust">
@@ -563,16 +602,20 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { processPayment, type PaymentProvider } from '@/api/external/payment'
   import { createOrder } from '@/api/supabase/orders'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch, watchEffect } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import { useRouter } from 'vue-router'
   import RelaySelector from '../livraison/mondial-relay/RelaySelector.vue'
   import type { OrderRelayData, RelayPoint } from '../livraison/mondial-relay/relay'
 
+  // Types de paiement manuel (sans Stripe)
+  type ManualPaymentMethod = 'bank_transfer' | 'crypto'
+
   const { t } = useI18n()
+  const router = useRouter()
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
@@ -582,7 +625,19 @@
   const isSubmitting = ref(false)
   const useProfileAddress = ref(true)
   const showComingSoon = ref(false)
-  const selectedPayment = ref<PaymentProvider>('stripe')
+  const selectedPayment = ref<ManualPaymentMethod>('bank_transfer')
+  const disclaimerAccepted = ref(false)
+  const isRestoringFromStorage = ref(false) // Flag pour éviter les effets de bord pendant la restauration
+
+  // 🛡️ BOUCLIER LÉGAL - Liste blanche des pays autorisés
+  const ALLOWED_COUNTRIES = [
+    { code: 'FR', name: 'France', flag: '🇫🇷' },
+    { code: 'BE', name: 'Belgique', flag: '🇧🇪' },
+    { code: 'ES', name: 'Espagne', flag: '🇪🇸' },
+    { code: 'IT', name: 'Italie', flag: '🇮🇹' },
+    { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+    { code: 'NL', name: 'Pays-Bas', flag: '🇳🇱' },
+  ]
 
   // 🆕 State Mondial Relay
   const deliveryMode = ref<'relay' | 'home'>('relay')
@@ -622,6 +677,8 @@
     if (cart.items.length === 0) return false
     if (!email.value || !fullName.value) return false
     if (isSubmitting.value) return false
+    // 🛡️ BOUCLIER LÉGAL - Disclaimer obligatoire
+    if (!disclaimerAccepted.value) return false
 
     if (deliveryMode.value === 'relay') {
       // En mode relay, il faut avoir sélectionné un point
@@ -695,7 +752,19 @@
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        if (!auth.user || !useProfileAddress.value) {
+
+        // Activer le flag pour éviter que les watchers n'écrasent les valeurs
+        isRestoringFromStorage.value = true
+
+        // 1. D'abord restaurer useProfileAddress pour savoir si on doit charger les champs
+        const savedUseProfileAddress = typeof data.useProfileAddress === 'boolean'
+          ? data.useProfileAddress
+          : true
+        useProfileAddress.value = savedUseProfileAddress
+
+        // 2. Restaurer les champs du formulaire
+        // Si pas d'utilisateur connecté OU si l'utilisateur a choisi "Autre adresse"
+        if (!auth.user || !savedUseProfileAddress) {
           email.value = data.email || ''
           fullName.value = data.fullName || ''
           address.value = data.address || ''
@@ -703,11 +772,33 @@
           city.value = data.city || ''
           country.value = data.country || 'France'
         }
-        // Restaurer le mode de livraison
+
+        // 3. Restaurer le mode de livraison
         if (data.deliveryMode) {
           deliveryMode.value = data.deliveryMode
         }
+        // Restaurer la méthode de paiement
+        if (data.selectedPayment) {
+          selectedPayment.value = data.selectedPayment
+        }
+        // Restaurer le disclaimer (ne pas forcer true pour des raisons légales)
+        if (data.disclaimerAccepted === true) {
+          disclaimerAccepted.value = true
+        }
+        // Restaurer le point relais sélectionné
+        if (data.selectedRelay) {
+          selectedRelay.value = data.selectedRelay
+        }
+        if (data.relayOrderData) {
+          relayOrderData.value = data.relayOrderData
+        }
+
+        // Désactiver le flag après restauration (au prochain tick pour laisser les watchers passer)
+        setTimeout(() => {
+          isRestoringFromStorage.value = false
+        }, 0)
       } catch (e) {
+        isRestoringFromStorage.value = false
         /* ignore */
       }
     }
@@ -717,12 +808,18 @@
   })
 
   watchEffect(() => {
+    // Ignorer pendant la restauration depuis sessionStorage
+    if (isRestoringFromStorage.value) return
+
     if (auth.user && useProfileAddress.value) {
       fillFromProfile()
     }
   })
 
   watch(useProfileAddress, (isUsing) => {
+    // Ignorer pendant la restauration depuis sessionStorage
+    if (isRestoringFromStorage.value) return
+
     if (isUsing) {
       fillFromProfile()
       toast.show('Adresse du profil chargée', 'info')
@@ -736,7 +833,7 @@
 
   // Sauvegarder le formulaire (OpSec: sessionStorage)
   watch(
-    [email, fullName, address, zip, city, country, deliveryMode],
+    [email, fullName, address, zip, city, country, deliveryMode, selectedPayment, disclaimerAccepted, useProfileAddress, selectedRelay, relayOrderData],
     () => {
       sessionStorage.setItem(
         'fp-checkout-form',
@@ -748,6 +845,11 @@
           city: city.value,
           country: country.value,
           deliveryMode: deliveryMode.value,
+          selectedPayment: selectedPayment.value,
+          disclaimerAccepted: disclaimerAccepted.value,
+          useProfileAddress: useProfileAddress.value,
+          selectedRelay: selectedRelay.value,
+          relayOrderData: relayOrderData.value,
         }),
       )
     },
@@ -756,11 +858,6 @@
 
   async function submitOrder() {
     if (isSubmitting.value || !canSubmit.value) return
-
-    if (selectedPayment.value !== 'stripe' && selectedPayment.value !== 'paypal') {
-      toast.show('Cette méthode de paiement sera bientôt disponible', 'info')
-      return
-    }
 
     isSubmitting.value = true
 
@@ -775,7 +872,7 @@
           : (item.product_price ?? 0),
       }))
 
-      // 🆕 Préparer les données avec relay si applicable
+      // Préparer les données avec relay si applicable
       const orderPayload: any = {
         userId: auth.user?.id ?? null,
         email: email.value,
@@ -793,7 +890,7 @@
         items: orderItemsPayload,
       }
 
-      // 🆕 Ajouter les données relay si en mode point relais
+      // Ajouter les données relay si en mode point relais
       if (deliveryMode.value === 'relay' && relayOrderData.value) {
         orderPayload.relayId = relayOrderData.value.relay_id
         orderPayload.relayName = relayOrderData.value.relay_name
@@ -805,20 +902,28 @@
 
       const orderResponse = await createOrder(orderPayload)
 
-      // Order tokens peuvent rester en localStorage (non sensibles, utiles pour tracking)
+      // Stocker les infos de commande pour la page de confirmation
       if (orderResponse.tracking_token) {
         localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
       }
       localStorage.setItem('fp-last-order-id', orderResponse.order_id)
-      // Nettoyer les donnees sensibles du formulaire
+      localStorage.setItem('fp-last-payment-method', selectedPayment.value)
+      localStorage.setItem('fp-last-order-total', finalTotal.value.toString())
+
+      // Nettoyer les données sensibles du formulaire
       sessionStorage.removeItem('fp-checkout-form')
 
-      await processPayment(
-        finalTotal.value,
-        selectedPayment.value,
-        email.value,
-        orderResponse.order_id,
-      )
+      // Vider le panier
+      cart.clearCart()
+
+      // Rediriger vers la page de confirmation (paiement manuel)
+      router.push({
+        path: '/checkout/confirmation',
+        query: {
+          orderId: orderResponse.order_id,
+          method: selectedPayment.value,
+        },
+      })
     } catch (err: any) {
       console.error(err)
       toast.show(`Erreur : ${err.message || 'Impossible de créer la commande'}`, 'danger')
@@ -1411,43 +1516,8 @@
       }
     }
 
-    &__submit {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 18px 24px;
+    &__submit-wrapper {
       margin-top: 24px;
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-      border: none;
-      border-radius: 14px;
-      font-family: @font-body;
-      font-size: 16px;
-      font-weight: 600;
-      color: white;
-      cursor: pointer;
-      transition: all 0.25s @ease;
-      box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
-
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(var(--primary-500-rgb), 0.4);
-      }
-
-      &:active:not(:disabled) {
-        transform: translateY(0);
-      }
-
-      &:disabled {
-        background: @neutral-300;
-        box-shadow: none;
-        cursor: not-allowed;
-      }
-
-      &-spinner {
-        animation: spin 1s linear infinite;
-      }
     }
 
     &__trust {
@@ -1857,6 +1927,49 @@
     &__icon--afterpay {
       background: #b2fce4;
       box-shadow: 0 2px 8px rgba(178, 252, 228, 0.3);
+    }
+
+    // Virement bancaire
+    &__icon--bank {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+      color: white;
+    }
+
+    // Crypto-monnaie
+    &__icon--crypto {
+      background: linear-gradient(135deg, #f7931a 0%, #ffb84d 100%);
+      box-shadow: 0 2px 8px rgba(247, 147, 26, 0.3);
+      color: white;
+    }
+
+    // Badge sécurité
+    &__badge-secure {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.1) 0%, rgba(var(--success-500-rgb), 0.05) 100%);
+      border-radius: 10px;
+      color: @success-500;
+    }
+
+    // Badges crypto
+    &__crypto-icons {
+      display: flex;
+      gap: 6px;
+    }
+
+    &__crypto-badge {
+      padding: 4px 10px;
+      background: linear-gradient(135deg, @neutral-100 0%, @neutral-50 100%);
+      border: 1px solid @neutral-200;
+      border-radius: 6px;
+      font-family: @font-body;
+      font-size: 11px;
+      font-weight: 700;
+      color: @neutral-600;
+      letter-spacing: 0.5px;
     }
   }
 
@@ -2492,6 +2605,96 @@
     background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.04) 0%, rgba(var(--success-500-rgb), 0.02) 100%);
     border: 1px dashed rgba(var(--success-500-rgb), 0.3);
     border-radius: 16px;
+  }
+
+  // ============================================
+  // DISCLAIMER LÉGAL (BOUCLIER)
+  // ============================================
+  .checkout__disclaimer {
+    margin: 20px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, @warning-50 0%, rgba(@warning-100, 0.5) 100%);
+    border: 1px solid @warning-200;
+    border-radius: 14px;
+  }
+
+  .checkout__disclaimer-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkout__disclaimer-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .checkout__disclaimer-checkmark {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: @white;
+    border: 2px solid @neutral-300;
+    border-radius: 6px;
+    margin-top: 2px;
+    transition: all 0.2s @ease;
+
+    svg {
+      opacity: 0;
+      transform: scale(0.5);
+      color: @white;
+      transition: all 0.2s @ease;
+    }
+
+    .checkout__disclaimer-input:checked + & {
+      background: @success-500;
+      border-color: @success-500;
+
+      svg {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .checkout__disclaimer-input:focus + & {
+      box-shadow: 0 0 0 3px rgba(var(--success-500-rgb), 0.2);
+    }
+  }
+
+  .checkout__disclaimer-text {
+    font-family: @font-body;
+    font-size: 12px;
+    line-height: 1.6;
+    color: @neutral-700;
+    flex: 1;
+  }
+
+  .checkout__disclaimer-warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(@danger-500, 0.1);
+    border-radius: 8px;
+
+    svg {
+      color: @danger-500;
+      flex-shrink: 0;
+    }
+
+    span {
+      font-family: @font-body;
+      font-size: 12px;
+      font-weight: 500;
+      color: @danger-600;
+    }
   }
 
   // ============================================

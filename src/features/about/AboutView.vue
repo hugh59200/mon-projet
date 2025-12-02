@@ -187,17 +187,22 @@
         <h2 class="about-cta__title">{{ t('about.cta.title') }}</h2>
         <p class="about-cta__text">{{ t('about.cta.text') }}</p>
         <div class="about-cta__buttons">
-          <BasicButton
-            :label="t('about.cta.catalogue')"
+          <PremiumButton
             type="primary"
-            size="large"
+            variant="solid"
+            size="lg"
+            :label="t('about.cta.catalogue')"
+            icon-right="ArrowRight"
+            :shine="true"
+            :glow="true"
             @click="$router.push('/catalogue')"
           />
-          <BasicButton
+          <PremiumButton
+            type="white"
+            variant="outline"
+            size="lg"
             :label="t('about.cta.contact')"
-            type="secondary"
-            variant="outlined"
-            size="large"
+            icon-left="MessageCircle"
             @click="$router.push('/contact')"
           />
         </div>

@@ -189,6 +189,7 @@
     searchFn: (n, q) =>
       (n.title?.toLowerCase()?.includes(q) ?? false) ||
       (n.excerpt?.toLowerCase()?.includes(q) ?? false),
+    persistInUrl: true,
   })
 
   const { isTablet, isDesktop } = useDeviceBreakpoint()

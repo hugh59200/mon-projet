@@ -7,6 +7,7 @@ declare module 'vue' {
     BasicAvatar: (typeof import('@designSystem/components/basic/avatar/BasicAvatar.vue'))['default']
     BasicBadge: (typeof import('@designSystem/components/basic/badge/BasicBadge.vue'))['default']
     BasicButton: (typeof import('@designSystem/components/basic/button/BasicButton.vue'))['default']
+    PremiumButton: (typeof import('@designSystem/components/basic/button/PremiumButton.vue'))['default']
     BasicCard: (typeof import('@designSystem/components/basic/card/BasicCard.vue'))['default']
     BasicCheckbox: (typeof import('@designSystem/components/basic/checkbox/BasicCheckbox.vue'))['default']
     BasicDropdown: (typeof import('@designSystem/components/basic/dropdown/BasicDropdown.vue'))['default']

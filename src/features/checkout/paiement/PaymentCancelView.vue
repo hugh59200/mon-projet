@@ -23,11 +23,13 @@
       {{ t('checkout.cancel.retryAnytime') }}
     </p>
 
-    <BasicButton
+    <PremiumButton
+      type="danger"
+      variant="solid"
+      size="lg"
       :label="t('checkout.cancel.backToCart')"
-      variant="filled"
-      color="danger"
-      size="large"
+      icon-left="ShoppingCart"
+      :shine="true"
       class="payment-cancel__cta"
       @click="$router.push('/panier')"
     />
@@ -35,8 +37,6 @@
 </template>
 
 <script setup lang="ts">
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'

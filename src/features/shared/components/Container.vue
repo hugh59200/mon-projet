@@ -30,6 +30,9 @@
     max-width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
+    flex: 1; /* Remplit l'espace disponible */
+    display: flex;
+    flex-direction: column;
 
     // ========================================
     // SIZES (max-width)

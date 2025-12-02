@@ -106,23 +106,26 @@
 
       <!-- Actions -->
       <div class="product-card__actions">
-        <button
-          class="product-card__btn product-card__btn--primary"
+        <PremiumButton
+          type="primary"
+          variant="solid"
+          size="sm"
+          :label="(product.stock ?? 0) > 0 ? t('catalogue.product.add') : t('catalogue.product.outOfStock')"
+          icon-left="ShoppingCart"
           :disabled="(product.stock ?? 0) <= 0"
+          :shine="true"
           @click.stop="$emit('add', product)"
-        >
-          <BasicIconNext name="ShoppingCart" :size="16" />
-          <span>{{ (product.stock ?? 0) > 0 ? t('catalogue.product.add') : t('catalogue.product.outOfStock') }}</span>
-        </button>
+        />
 
-        <button
+        <PremiumButton
           v-if="(product.stock ?? 0) > 0"
-          class="product-card__btn product-card__btn--secondary"
+          type="secondary"
+          variant="outline"
+          size="sm"
+          :label="t('catalogue.product.buyNow')"
+          icon-left="Zap"
           @click.stop="$emit('buy', product)"
-        >
-          <BasicIconNext name="Zap" :size="16" />
-          <span>{{ t('catalogue.product.buyNow') }}</span>
-        </button>
+        />
       </div>
     </div>
   </article>

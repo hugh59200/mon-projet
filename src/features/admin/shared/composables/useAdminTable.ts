@@ -1,6 +1,7 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Database, Tables } from '@/supabase/types/supabase'
 import { onMounted, ref, watch, type Ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 /** 🕐 Utilitaire de debounce pour les recherches */
 function debounce<T extends (...args: any[]) => void>(fn: T, delay = 400) {
@@ -23,7 +24,8 @@ interface UseAdminTableOptions<T extends TableName, R = Row<T>> {
   filters?: Record<string, any>
   searchFn?: SearchFunction<R>
   limit?: number
-  select?: string // 🆕 permet d’ajouter un SELECT personnalisé
+  select?: string // permet d'ajouter un SELECT personnalisé
+  persistInUrl?: boolean // persister search, page, sort dans l'URL
 }
 
 /** ⚙️ Helper typé : gère les surcharges .from() Tables / Views */
@@ -57,20 +59,71 @@ export function useAdminTable<T extends TableName, R = Row<T>>(
     filters = {},
     searchFn,
     limit = 20,
-    select = '*', // 🆕 valeur par défaut
+    select = '*',
+    persistInUrl = false,
   } = options
+
+  // Router pour la persistance URL
+  const route = persistInUrl ? useRoute() : null
+  const router = persistInUrl ? useRouter() : null
+
+  // Fonction pour lire les valeurs depuis l'URL
+  const getInitialValue = <V>(key: string, defaultValue: V): V => {
+    if (!route) return defaultValue
+    const urlValue = route.query[key]
+    if (urlValue === undefined || urlValue === null) return defaultValue
+    if (typeof defaultValue === 'number') return parseInt(urlValue as string, 10) as V
+    if (typeof defaultValue === 'boolean') return (urlValue === 'true') as V
+    return urlValue as V
+  }
 
   const data = ref([]) as Ref<R[]>
   const filteredData = ref([]) as Ref<R[]>
   const total = ref(0)
   const nbPages = ref(1)
-  const page = ref(1)
-  const search = ref('')
-  const sortKey = ref(orderBy)
-  const sortAsc = ref(ascending)
+  const page = ref(getInitialValue('page', 1))
+  const search = ref(getInitialValue('search', ''))
+  const sortKey = ref(getInitialValue('sort', orderBy))
+  const sortAsc = ref(getInitialValue('asc', ascending))
   const activeFilters = ref(filters)
   const loading = ref(false)
   const hasLoaded = ref(false)
+
+  // Fonction pour mettre à jour l'URL
+  const updateUrl = () => {
+    if (!router || !route) return
+    const query: Record<string, string> = { ...route.query as Record<string, string> }
+
+    // Search
+    if (search.value) {
+      query.search = search.value
+    } else {
+      delete query.search
+    }
+
+    // Page (ne pas mettre page=1)
+    if (page.value > 1) {
+      query.page = String(page.value)
+    } else {
+      delete query.page
+    }
+
+    // Sort (ne pas mettre si c'est la valeur par défaut)
+    if (sortKey.value !== orderBy) {
+      query.sort = sortKey.value
+    } else {
+      delete query.sort
+    }
+
+    // Ascending (ne pas mettre si c'est la valeur par défaut)
+    if (sortAsc.value !== ascending) {
+      query.asc = String(sortAsc.value)
+    } else {
+      delete query.asc
+    }
+
+    router.replace({ query })
+  }
 
   async function fetchData() {
     loading.value = true
@@ -113,8 +166,17 @@ export function useAdminTable<T extends TableName, R = Row<T>>(
   }
 
   const debouncedFetch = debounce(fetchData, 400)
-  watch(search, () => debouncedFetch())
-  watch([sortKey, sortAsc, activeFilters, page], () => fetchData())
+  const debouncedUpdateUrl = debounce(updateUrl, 300)
+
+  watch(search, () => {
+    debouncedFetch()
+    if (persistInUrl) debouncedUpdateUrl()
+  })
+
+  watch([sortKey, sortAsc, activeFilters, page], () => {
+    fetchData()
+    if (persistInUrl) updateUrl()
+  })
 
   function reset() {
     search.value = ''
@@ -141,5 +203,10 @@ export function useAdminTable<T extends TableName, R = Row<T>>(
     hasLoaded,
     fetchData,
     reset,
+    // Helpers URL pour les filtres additionnels
+    updateUrl,
+    getInitialValue,
+    route,
+    router,
   }
 }

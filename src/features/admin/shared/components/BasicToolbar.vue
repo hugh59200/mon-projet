@@ -1,90 +1,90 @@
 <template>
-  <FilterSection
-    v-model="open"
-    title="Filtres"
-    class="toolbar-section"
-  >
-    <div class="basic-toolbar">
+  <div class="admin-toolbar">
+    <div class="admin-toolbar__row">
       <BasicInput
         v-model="search"
         :placeholder="searchPlaceholder"
         icon-name="Search"
         clearable
         size="small"
-        class="toolbar-item"
+        class="admin-toolbar__search"
       />
+      <slot name="filters" />
       <BasicButton
         v-if="showReset"
         label="Réinitialiser"
         variant="outlined"
         size="small"
-        class="toolbar-item"
         @click="emit('reset')"
       />
       <slot name="actions" />
-      <BasicBadge
-        v-if="showRole && role"
-        :type="role === 'admin' ? 'info' : 'default'"
-        class="toolbar-item role-badge"
+      <div
+        v-if="$slots.pagination"
+        class="admin-toolbar__pagination"
       >
-        <BasicIconNext
-          :name="role === 'admin' ? 'ShieldCheck' : 'User'"
-          :size="18"
-          class="role-icon"
-        />
-        <BasicText>{{ roleLabel }}</BasicText>
-      </BasicBadge>
+        <slot name="pagination" />
+      </div>
     </div>
-  </FilterSection>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import FilterSection from '@/features/shared/components/FilterSection.vue'
-
-  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import BasicBadge from '@designSystem/components/basic/badge/BasicBadge.vue'
   import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
-  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
-  import { computed, ref } from 'vue'
 
   defineProps<{
     searchPlaceholder?: string
     showReset?: boolean
-    showRole?: boolean
   }>()
 
   const search = defineModel<string>('search')
   const emit = defineEmits<{ (e: 'reset'): void }>()
-
-  const auth = useAuthStore()
-  const role = computed(() => auth.profile?.role || 'user')
-  const roleLabel = computed(() => (role.value === 'admin' ? 'Administrateur' : 'Utilisateur'))
-
-  const open = ref(false)
 </script>
 
 <style scoped lang="less">
-  .toolbar-section {
-    margin: 16px;
-  }
+  .admin-toolbar {
+    background: @neutral-100;
+    border: 1px solid @neutral-200;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
 
-  .basic-toolbar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    align-items: center;
-
-    .toolbar-item {
-      width: 100%;
+    &__row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    @media (max-width: 700px) {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px 14px;
+    &__search {
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+    }
 
-      .role-badge {
-        justify-self: end;
+    &__pagination {
+      margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+      padding: 10px 12px;
+
+      &__row {
+        gap: 8px;
+      }
+
+      &__search {
+        min-width: 150px;
+        max-width: none;
+        flex: 1 1 100%;
+        order: -1;
+      }
+
+      &__pagination {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+        display: flex;
       }
     }
   }

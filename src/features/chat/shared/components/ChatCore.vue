@@ -121,9 +121,10 @@
 
 <script setup lang="ts">
   import type { Messages } from '@/supabase/types/supabase.types'
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
   import type { ChatRole } from '../types/chat'
   import { useScrollMessages } from '../composables/useScrollMessages'
+  import { useChatScrollStore } from '../stores/useChatScrollStore'
   import ChatInput from './ChatInput.vue'
   import ChatMessage from './ChatMessage.vue'
   import ChatTypingIndicator from './ChatTypingIndicator.vue'
@@ -154,55 +155,88 @@
   const newMessage = defineModel<string>('newMessage', { default: '' })
 
   // ─────────────────────────────────────────
-  // Scroll management (composable)
+  // Scroll management (composable + store)
   // ─────────────────────────────────────────
+  const scrollStore = useChatScrollStore()
   const {
     scrollRef,
     showNewMessagesIndicator,
-    initScrollObserver,
     hideNewMessagesIndicator,
-    cleanup: cleanupScroll,
-    saveScrollPosition,
-    restoreScrollPosition,
     scrollToEnd,
+    scrollToMessage,
+    getFirstVisibleMessageId,
+    checkNearBottom,
   } = useScrollMessages({ threshold: 100 })
 
-  // Référence pour tracker la conversation précédente
-  let previousConversationId: string | null = null
+  // Variable pour tracker la conversation précédente
+  const previousConversationId = ref<string | null>(null)
 
-  // Watcher pour sauvegarder/restaurer la position de scroll lors du changement de conversation
+  // Sauvegarder le scroll avant de changer de conversation
+  const saveCurrentScrollState = () => {
+    const convId = previousConversationId.value
+    if (!convId) return
+
+    const firstVisibleId = getFirstVisibleMessageId()
+    const nearBottom = checkNearBottom()
+
+    console.log('[ChatCore] Saving scroll state for:', convId, { firstVisibleId, nearBottom })
+    scrollStore.saveScrollState(convId, firstVisibleId, nearBottom)
+  }
+
+  // Restaurer le scroll pour la conversation actuelle
+  const restoreScrollState = async () => {
+    const convId = props.conversationId
+    if (!convId) return
+
+    const state = scrollStore.getScrollState(convId)
+    console.log('[ChatCore] Restoring scroll state for:', convId, state)
+
+    if (!state) {
+      // Pas d'état sauvegardé, aller en bas
+      await scrollToEnd(true)
+      return
+    }
+
+    if (state.wasNearBottom) {
+      // L'utilisateur était en bas, y retourner
+      await scrollToEnd(true)
+    } else if (state.firstVisibleMessageId) {
+      // Scroller vers le message sauvegardé
+      await nextTick()
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      const success = scrollToMessage(state.firstVisibleMessageId)
+      console.log('[ChatCore] Scroll to message result:', success)
+    }
+  }
+
+  // Watcher sur conversationId pour sauvegarder/restaurer
   watch(
     () => props.conversationId,
-    async (newId, oldId) => {
-      // Sauvegarder la position de l'ancienne conversation
-      if (oldId) {
-        saveScrollPosition(oldId)
+    async (newConvId, oldConvId) => {
+      console.log('[ChatCore] Conversation changed:', oldConvId, '->', newConvId)
+
+      // Sauvegarder l'état de l'ancienne conversation
+      if (oldConvId) {
+        saveCurrentScrollState()
       }
 
-      // Attendre que les nouveaux messages soient rendus
-      if (newId && !props.loading) {
-        // Petite attente pour que le DOM soit mis à jour
-        await new Promise((resolve) => setTimeout(resolve, 50))
-
-        // Essayer de restaurer la position sauvegardée
-        const restored = await restoreScrollPosition(newId)
-
-        // Si pas de position sauvegardée, scroller vers le bas
-        if (!restored) {
-          await scrollToEnd(true)
-        }
-      }
-
-      previousConversationId = newId ?? null
+      // Mettre à jour la référence
+      previousConversationId.value = newConvId ?? null
     },
   )
 
-  // Sauvegarder aussi quand le loading passe à true (changement de conversation)
+  // Watcher sur loading : restaurer scroll après le chargement
   watch(
     () => props.loading,
-    (loading) => {
-      if (loading && previousConversationId) {
-        saveScrollPosition(previousConversationId)
+    async (isLoading, wasLoading) => {
+      // Quand le loading se termine (passe de true à false)
+      if (wasLoading && !isLoading) {
+        // Attendre que le DOM soit rendu avec les messages
+        await nextTick()
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
+        // Restaurer le scroll
+        await restoreScrollState()
       }
     },
   )
@@ -272,21 +306,30 @@
   // ─────────────────────────────────────────
   // Lifecycle
   // ─────────────────────────────────────────
-  onMounted(() => {
+  onMounted(async () => {
     isOnline.value = navigator.onLine
     window.addEventListener('online', handleOnlineChange)
     window.addEventListener('offline', handleOnlineChange)
 
-    // Initialiser les observers de scroll après le montage
-    // Le ResizeObserver gère automatiquement le scroll sur nouveaux messages
-    initScrollObserver()
+    // Initialiser la conversation actuelle
+    if (props.conversationId) {
+      previousConversationId.value = props.conversationId
+    }
+
+    // Si pas en loading, scroll vers le bas directement
+    if (!props.loading) {
+      await nextTick()
+      await scrollToEnd(true)
+    }
   })
 
   onUnmounted(() => {
     window.removeEventListener('online', handleOnlineChange)
     window.removeEventListener('offline', handleOnlineChange)
     if (typingTimeout) clearTimeout(typingTimeout)
-    cleanupScroll()
+
+    // Sauvegarder le scroll avant de démonter
+    saveCurrentScrollState()
   })
 
   // ─────────────────────────────────────────
@@ -300,10 +343,26 @@
 </script>
 <style scoped lang="less">
   .chat-core {
-    background: linear-gradient(180deg, @neutral-50 0%, white 100%);
+    background: white;
     display: flex;
     flex-direction: column;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
+    position: relative;
+    overflow: hidden;
+
+    // Subtle gradient overlay
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--primary-50) 30%, transparent) 0%,
+        transparent 30%
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
 
     // ─────────────────────────────────────────
     // Bannière hors ligne
@@ -312,32 +371,47 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, @warning-500 12%, transparent) 0%,
-        color-mix(in srgb, @warning-400 8%, transparent) 100%
+        color-mix(in srgb, @warning-500 15%, white) 0%,
+        color-mix(in srgb, @warning-400 10%, white) 100%
       );
       color: @warning-800;
-      padding: 10px 16px;
+      padding: 12px 20px;
       font-size: 13px;
-      font-weight: 500;
-      border-bottom: 1px solid color-mix(in srgb, @warning-500 20%, transparent);
+      font-weight: 600;
+      border-bottom: 1px solid color-mix(in srgb, @warning-400 25%, transparent);
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, @warning-500 0%, @warning-400 100%);
+      }
     }
 
     &__offline-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
-      background: color-mix(in srgb, @warning-500 20%, transparent);
-      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, @warning-500 0%, @warning-400 100%);
+      border-radius: 8px;
       flex-shrink: 0;
+      color: white;
+      box-shadow: 0 2px 8px color-mix(in srgb, @warning-500 30%, transparent);
     }
 
     // ─────────────────────────────────────────
-    // Loader
+    // Loader Premium
     // ─────────────────────────────────────────
     &__loader {
       flex: 1;
@@ -345,22 +419,32 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 24px;
       min-height: 400px;
+      background: linear-gradient(180deg, @neutral-50 0%, white 100%);
+      position: relative;
+      z-index: 1;
     }
 
     &__loader-animation {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      padding: 16px 24px;
+      background: white;
+      border-radius: 16px;
+      box-shadow:
+        0 2px 8px color-mix(in srgb, @neutral-900 6%, transparent),
+        0 8px 24px color-mix(in srgb, @neutral-900 8%, transparent);
     }
 
     &__loader-dot {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
       border-radius: 50%;
       animation: loader-bounce 1.4s ease-in-out infinite;
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-500) 40%, transparent);
 
       &:nth-child(1) {
         animation-delay: 0s;
@@ -378,7 +462,8 @@
     &__loader-text {
       font-size: 14px;
       color: @neutral-500;
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
 
     // ─────────────────────────────────────────
@@ -390,10 +475,11 @@
       flex: 1;
       position: relative;
       min-height: 0;
+      z-index: 1;
     }
 
     // ─────────────────────────────────────────
-    // Zone des messages
+    // Zone des messages Premium
     // ─────────────────────────────────────────
     &__messages {
       flex: 1;
@@ -401,34 +487,63 @@
       flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 16px;
-      background: linear-gradient(180deg, @neutral-100 0%, @neutral-50 50%, white 100%);
-      scroll-behavior: auto;
+      padding: 20px 24px;
+      background:
+        linear-gradient(180deg, @neutral-100 0%, @neutral-50 30%, white 100%);
+      scroll-behavior: smooth;
       min-height: 0;
-      gap: 4px;
-      padding-bottom: 24px;
+      gap: 6px;
+      padding-bottom: 28px;
+      position: relative;
+
+      // Pattern subtil
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 2px 2px,
+          color-mix(in srgb, @neutral-300 8%, transparent) 1px,
+          transparent 0
+        );
+        background-size: 20px 20px;
+        pointer-events: none;
+        opacity: 0.5;
+      }
     }
 
     &__messages::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     &__messages::-webkit-scrollbar-track {
       background: transparent;
+      margin: 8px 0;
     }
 
     &__messages::-webkit-scrollbar-thumb {
-      background: color-mix(in srgb, @neutral-400 50%, transparent);
-      border-radius: 6px;
-      transition: background 0.2s ease;
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, @neutral-400 60%, transparent) 0%,
+        color-mix(in srgb, @neutral-500 60%, transparent) 100%
+      );
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      transition: all 0.2s ease;
     }
 
     &__messages::-webkit-scrollbar-thumb:hover {
-      background: color-mix(in srgb, @neutral-500 70%, transparent);
+      background: linear-gradient(
+        180deg,
+        @neutral-400 0%,
+        @neutral-500 100%
+      );
+      background-clip: padding-box;
     }
 
     // ─────────────────────────────────────────
-    // État vide
+    // État vide Premium
     // ─────────────────────────────────────────
     &__empty {
       flex: 1;
@@ -436,74 +551,116 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 40px 20px;
+      gap: 12px;
+      padding: 48px 24px;
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
 
     &__empty-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 64px;
-      height: 64px;
+      width: 80px;
+      height: 80px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--primary-500) 10%, transparent) 0%,
-        color-mix(in srgb, var(--primary-400) 6%, transparent) 100%
+        color-mix(in srgb, var(--primary-500) 12%, white) 0%,
+        color-mix(in srgb, var(--primary-400) 8%, white) 100%
       );
-      border-radius: 50%;
-      color: var(--primary-400);
+      border-radius: 24px;
+      color: var(--primary-500);
       margin-bottom: 8px;
+      box-shadow:
+        0 4px 16px color-mix(in srgb, var(--primary-500) 15%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      position: relative;
+
+      // Ring effect
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 28px;
+        border: 2px dashed color-mix(in srgb, var(--primary-400) 25%, transparent);
+        animation: rotate-ring 20s linear infinite;
+      }
     }
 
     &__empty-title {
       margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: @neutral-700;
+      font-size: 18px;
+      font-weight: 700;
+      color: @neutral-800;
+      letter-spacing: -0.02em;
     }
 
     &__empty-text {
       margin: 0;
-      font-size: 13px;
-      color: @neutral-400;
+      font-size: 14px;
+      color: @neutral-500;
+      max-width: 260px;
+      line-height: 1.5;
     }
 
     // ─────────────────────────────────────────
-    // Bouton nouveaux messages
+    // Bouton nouveaux messages Premium
     // ─────────────────────────────────────────
     &__new-messages-btn {
       position: absolute;
-      bottom: 80px;
+      bottom: 88px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
       color: white;
       border: none;
-      border-radius: 20px;
-      padding: 8px 16px;
+      border-radius: 24px;
+      padding: 10px 20px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       box-shadow:
-        0 4px 12px color-mix(in srgb, var(--primary-600) 35%, transparent),
-        0 2px 4px color-mix(in srgb, @neutral-900 10%, transparent);
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        0 4px 16px color-mix(in srgb, var(--primary-600) 40%, transparent),
+        0 2px 4px color-mix(in srgb, @neutral-900 15%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 10;
+      letter-spacing: -0.01em;
+      backdrop-filter: blur(8px);
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 24px;
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.15) 50%,
+          transparent 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
 
       &:hover {
-        transform: translateX(-50%) translateY(-2px);
+        transform: translateX(-50%) translateY(-3px);
         box-shadow:
-          0 6px 16px color-mix(in srgb, var(--primary-600) 45%, transparent),
-          0 4px 8px color-mix(in srgb, @neutral-900 12%, transparent);
+          0 8px 24px color-mix(in srgb, var(--primary-600) 50%, transparent),
+          0 4px 8px color-mix(in srgb, @neutral-900 15%, transparent),
+          inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+        &::before {
+          opacity: 1;
+        }
       }
 
       &:active {
-        transform: translateX(-50%) translateY(0);
+        transform: translateX(-50%) translateY(-1px);
       }
     }
 
@@ -511,6 +668,16 @@
       height: auto;
       min-height: 50vh;
       border-radius: 0;
+
+      &__messages {
+        padding: 16px;
+      }
+
+      &__empty-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+      }
     }
   }
 
@@ -522,7 +689,7 @@
     80%,
     100% {
       transform: scale(0.6);
-      opacity: 0.5;
+      opacity: 0.4;
     }
     40% {
       transform: scale(1);
@@ -530,15 +697,24 @@
     }
   }
 
+  @keyframes rotate-ring {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   // ─────────────────────────────────────────
   // Transitions
   // ─────────────────────────────────────────
   .banner-slide-enter-active {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .banner-slide-leave-active {
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
   }
 
   .banner-slide-enter-from {
@@ -553,7 +729,7 @@
 
   .content-fade-enter-active,
   .content-fade-leave-active {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.35s ease;
   }
 
   .content-fade-enter-from,
@@ -562,34 +738,34 @@
   }
 
   .btn-bounce-enter-active {
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .btn-bounce-leave-active {
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
   }
 
   .btn-bounce-enter-from {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px) scale(0.8);
+    transform: translateX(-50%) translateY(24px) scale(0.7);
   }
 
   .btn-bounce-leave-to {
     opacity: 0;
-    transform: translateX(-50%) translateY(10px) scale(0.9);
+    transform: translateX(-50%) translateY(12px) scale(0.85);
   }
 
   .empty-fade-enter-active {
-    transition: all 0.4s ease 0.1s;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
   }
 
   .empty-fade-leave-active {
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
   }
 
   .empty-fade-enter-from,
   .empty-fade-leave-to {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(16px) scale(0.95);
   }
 </style>

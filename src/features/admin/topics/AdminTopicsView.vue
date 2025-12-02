@@ -145,6 +145,7 @@
       orderBy: 'created_at',
       ascending: false,
       searchFn: (t, q) => t.label?.toLowerCase()?.includes(q) ?? false,
+      persistInUrl: true,
     })
 
   const { toggleSort, getSortColor } = useSortableTable<Tables<'news_topics'>>(

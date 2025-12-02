@@ -283,25 +283,14 @@
           <p class="actualites__empty-text">
             Il n'y a pas encore d'articles dans cette catégorie. Revenez bientôt !
           </p>
-          <RouterLink
-            to="/actualites"
-            class="actualites__empty-btn"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m12 19-7-7 7-7" />
-              <path d="M19 12H5" />
-            </svg>
-            Voir tous les articles
-          </RouterLink>
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="md"
+            label="Voir tous les articles"
+            icon-left="ArrowLeft"
+            @click="$router.push('/actualites')"
+          />
         </div>
 
         <!-- Articles Grid -->
