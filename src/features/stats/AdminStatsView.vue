@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+  import { fetchOrdersStats, fetchWeeklyOrdersData, fetchTopClients } from '@/api/supabase/stats'
   import { formatDate } from '@/utils/index'
   import {
     BarElement,
@@ -185,41 +185,12 @@
   ])
 
   async function loadStats() {
-    const { count: totalOrders } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-
-    const { data: revenueData } = await supabase.from('orders').select('total_amount')
-    const totalRevenue = revenueData?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0
-
-    const { count: shipped } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'shipped')
-
-    const { count: pending } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending')
-
-    stats.value = {
-      total_orders: totalOrders || 0,
-      total_revenue: totalRevenue,
-      shipped_orders: shipped || 0,
-      pending_orders: pending || 0,
-    }
+    const result = await fetchOrdersStats()
+    stats.value = result
   }
 
   async function loadWeeklyData() {
-    const since = new Date()
-    since.setDate(since.getDate() - 6)
-
-    const { data, error } = await supabase
-      .from('orders')
-      .select('total_amount, created_at')
-      .gte('created_at', since.toISOString())
-
-    if (error) throw error
+    const data = await fetchWeeklyOrdersData()
 
     const days = Array.from({ length: 7 }).map((_, i) => {
       const d = new Date()
@@ -232,7 +203,7 @@
       }
     })
 
-    data?.forEach((order) => {
+    data.forEach((order) => {
       const dateKey = order.created_at ? new Date(order.created_at).toISOString().split('T')[0] : ''
       const day = days.find((d) => d.key === dateKey)
       if (day) {
@@ -267,21 +238,8 @@
   }
 
   async function loadTopClients() {
-    const { data, error } = await supabase.from('orders').select(`
-    user_id,
-    total_amount,
-    created_at,
-    profiles!inner (
-      full_name,
-      email,
-      avatar_url
-    )
-  `)
-
-    if (error) {
-      console.error('Erreur Supabase :', error)
-      return
-    }
+    const data = await fetchTopClients()
+    if (!data) return
 
     const clients: Record<
       string,

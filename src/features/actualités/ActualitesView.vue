@@ -6,7 +6,7 @@
     <PageContent size="xl">
       <!-- Topics Carousel -->
       <section
-        v-if="topics.length"
+        v-if="topics.length && featuredArticle"
         class="actualites__topics"
       >
         <div class="actualites__topics-header">

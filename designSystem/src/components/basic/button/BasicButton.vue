@@ -1,6 +1,6 @@
 <template>
   <button
-    type="button"
+    :type="htmlType"
     :class="[
       'btn',
       `btn--${type}`,
@@ -41,6 +41,7 @@
 
   withDefaults(defineProps<ButtonProps & { textColor?: TextColor }>(), {
     type: 'primary',
+    htmlType: 'button',
     size: 'medium',
     variant: 'filled',
     width: 'auto',

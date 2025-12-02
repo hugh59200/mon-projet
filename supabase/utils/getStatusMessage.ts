@@ -1,15 +1,24 @@
-export function getStatusMessage(status: string, carrier?: string, tracking_number?: string) {
+import { type Locale, getValidLocale, translations } from './i18n.ts'
+
+export function getStatusMessage(
+  status: string,
+  carrier?: string,
+  tracking_number?: string,
+  locale?: string,
+) {
+  const validLocale: Locale = getValidLocale(locale)
+  const t = translations.status
   const lower = status.toLowerCase()
 
   switch (lower) {
     case 'pending':
-      return 'Elle est en attente de traitement. Nous la préparerons très bientôt. 🕓'
+      return t.pending[validLocale]
 
     case 'confirmed':
-      return 'Elle a bien été confirmée ✅ et sera bientôt préparée.'
+      return t.confirmed[validLocale]
 
     case 'processing':
-      return 'Elle est actuellement en cours de préparation dans nos laboratoires. 🧪'
+      return t.processing[validLocale]
 
     case 'shipped': {
       let trackingInfo = ''
@@ -21,21 +30,21 @@ export function getStatusMessage(status: string, carrier?: string, tracking_numb
 
         trackingInfo = `
           <div style="margin-top:10px;">
-            ${carrier ? `<p><b>Transporteur :</b> ${carrier}</p>` : ''}
-            ${tracking_number ? `<p><b>Numéro / lien de suivi :</b> ${link}</p>` : ''}
+            ${carrier ? `<p><b>${t.carrierLabel[validLocale]} :</b> ${carrier}</p>` : ''}
+            ${tracking_number ? `<p><b>${t.trackingLabel[validLocale]} :</b> ${link}</p>` : ''}
           </div>
         `
       }
-      return `Elle a été expédiée 🚚. Vous la recevrez très prochainement.${trackingInfo}`
+      return `${t.shipped[validLocale]}${trackingInfo}`
     }
 
     case 'completed':
-      return 'Elle a été livrée avec succès 🎉. Merci de votre confiance !'
+      return t.completed[validLocale]
 
     case 'canceled':
-      return "Elle a été annulée ❌. Si vous pensez qu'il s'agit d'une erreur, contactez notre support."
+      return t.canceled[validLocale]
 
     default:
-      return `Son statut a été mis à jour : <b>${status}</b>`
+      return t.defaultUpdate[validLocale](status)
   }
 }

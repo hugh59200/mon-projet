@@ -29,21 +29,7 @@
             <!-- Search -->
             <div class="faq__search">
               <div class="faq__search-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="8"
-                  />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
+                <BasicIconNext name="Search" :size="18" />
               </div>
               <input
                 v-model="search"
@@ -57,27 +43,7 @@
                 class="faq__search-clear"
                 @click="search = ''"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <line
-                    x1="18"
-                    y1="6"
-                    x2="6"
-                    y2="18"
-                  />
-                  <line
-                    x1="6"
-                    y1="6"
-                    x2="18"
-                    y2="18"
-                  />
-                </svg>
+                <BasicIconNext name="X" :size="16" />
               </button>
             </div>
 
@@ -91,39 +57,7 @@
                 @click="selectedCategory = 'all'"
               >
                 <div class="faq__category-icon">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect
-                      x="3"
-                      y="3"
-                      width="7"
-                      height="7"
-                    />
-                    <rect
-                      x="14"
-                      y="3"
-                      width="7"
-                      height="7"
-                    />
-                    <rect
-                      x="14"
-                      y="14"
-                      width="7"
-                      height="7"
-                    />
-                    <rect
-                      x="3"
-                      y="14"
-                      width="7"
-                      height="7"
-                    />
-                  </svg>
+                  <BasicIconNext name="LayoutGrid" :size="18" />
                 </div>
                 <span class="faq__category-label">{{ t('faq.categories.all') }}</span>
                 <span class="faq__category-count">{{ faqs.length }}</span>
@@ -150,17 +84,7 @@
               class="faq__reset"
               @click="resetSearch"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
+              <BasicIconNext name="RotateCcw" :size="16" />
               {{ t('catalogue.filters.resetAll') }}
             </button>
           </div>
@@ -168,16 +92,7 @@
           <!-- Help Card -->
           <div class="faq__help-card">
             <div class="faq__help-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-              </svg>
+              <BasicIconNext name="MessageSquare" :size="24" />
             </div>
             <h3 class="faq__help-title">{{ t('faq.needHelp') }}</h3>
             <p class="faq__help-text">{{ t('faq.responseTime') }}</p>
@@ -185,19 +100,7 @@
               to="/profil"
               class="faq__help-btn"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
+              <BasicIconNext name="Mail" :size="16" />
               {{ t('faq.contactSupport') }}
             </RouterLink>
           </div>
@@ -210,21 +113,7 @@
             v-if="search"
             class="faq__results-info"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="8"
-              />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
+            <BasicIconNext name="Search" :size="18" />
             <span>
               <strong>{{ visibleFaqs.length }}</strong>
               résultat{{ visibleFaqs.length > 1 ? 's' : '' }} pour "
@@ -240,22 +129,7 @@
             class="faq__empty"
           >
             <div class="faq__empty-icon">
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="8"
-                />
-                <path d="M21 21l-4.35-4.35" />
-                <path d="M8 8l6 6M14 8l-6 6" />
-              </svg>
+              <BasicIconNext name="SearchX" :size="48" />
             </div>
             <h3 class="faq__empty-title">{{ t('faq.noResults') }}</h3>
             <p class="faq__empty-text">{{ t('faq.noResultsText') }}</p>
@@ -263,17 +137,7 @@
               class="faq__empty-btn"
               @click="resetSearch"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
+              <BasicIconNext name="RotateCcw" :size="16" />
               {{ t('faq.reset') }}
             </button>
           </div>
@@ -319,48 +183,15 @@
                   >
                     <div class="faq__item-question">
                       <span class="faq__item-indicator">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                          />
-                          <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-                          <line
-                            x1="12"
-                            y1="17"
-                            x2="12.01"
-                            y2="17"
-                          />
-                        </svg>
+                        <BasicIconNext name="HelpCircle" :size="16" />
                       </span>
                       <span class="faq__item-text">{{ item.q }}</span>
                     </div>
                     <span class="faq__item-toggle">
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          d="M12 5v14M5 12h14"
-                          v-if="!groupOpenState[item.id]"
-                        />
-                        <path
-                          d="M5 12h14"
-                          v-else
-                        />
-                      </svg>
+                      <BasicIconNext
+                        :name="groupOpenState[item.id] ? 'Minus' : 'Plus'"
+                        :size="18"
+                      />
                     </span>
                   </button>
 
@@ -379,16 +210,7 @@
                         v-if="item.ruo"
                         class="faq__item-ruo"
                       >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
+                        <BasicIconNext name="Shield" :size="16" />
                         <span>Research Use Only – Usage recherche uniquement</span>
                       </div>
                     </div>
@@ -404,16 +226,7 @@
       <footer class="faq__footer">
         <div class="faq__footer-content">
           <div class="faq__footer-icon">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-            </svg>
+            <BasicIconNext name="MessageSquare" :size="32" />
           </div>
           <div class="faq__footer-text">
             <h3>{{ t('faq.needHelp') }}</h3>
@@ -423,19 +236,7 @@
             to="/profil"
             class="faq__footer-btn"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-              />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
+            <BasicIconNext name="Mail" :size="18" />
             {{ t('faq.contactSupport') }}
           </RouterLink>
         </div>
@@ -443,48 +244,15 @@
         <!-- Trust Items -->
         <div class="faq__trust">
           <div class="faq__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-              />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
+            <BasicIconNext name="Clock" :size="18" />
             <span>{{ t('faq.responseTime') }}</span>
           </div>
           <div class="faq__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
+            <BasicIconNext name="Shield" :size="18" />
             <span>{{ t('product.trustBadges.support') }}</span>
           </div>
           <div class="faq__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
+            <BasicIconNext name="CheckCircle2" :size="18" />
             <span>{{ t('checkout.payment.satisfaction') }}</span>
           </div>
         </div>

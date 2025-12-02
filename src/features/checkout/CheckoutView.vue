@@ -13,31 +13,12 @@
           class="checkout__back"
           @click="$router.push('/catalogue')"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <BasicIconNext name="ArrowLeft" :size="20" />
           <span>{{ t('cart.continueShopping') }}</span>
         </button>
 
         <div class="checkout__secure-badge">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            <path d="M9 12l2 2 4-4" />
-          </svg>
+          <BasicIconNext name="ShieldCheck" :size="16" />
           <span>{{ t('checkout.payment.securePayment') }}</span>
         </div>
       </header>
@@ -52,17 +33,7 @@
           }"
         >
           <div class="checkout__step-number">
-            <svg
-              v-if="currentStep > 1"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
+            <BasicIconNext v-if="currentStep > 1" name="Check" :size="14" :stroke-width="3" />
             <span v-else>1</span>
           </div>
           <span class="checkout__step-label">{{ t('checkout.steps.cart') }}</span>
@@ -79,17 +50,7 @@
           }"
         >
           <div class="checkout__step-number">
-            <svg
-              v-if="currentStep > 2"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
+            <BasicIconNext v-if="currentStep > 2" name="Check" :size="14" :stroke-width="3" />
             <span v-else>2</span>
           </div>
           <span class="checkout__step-label">{{ t('checkout.steps.shipping') }}</span>
@@ -115,26 +76,7 @@
           <section class="checkout__section">
             <div class="checkout__section-header">
               <div class="checkout__section-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle
-                    cx="9"
-                    cy="21"
-                    r="1"
-                  />
-                  <circle
-                    cx="20"
-                    cy="21"
-                    r="1"
-                  />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-                </svg>
+                <BasicIconNext name="ShoppingCart" :size="20" />
               </div>
               <div>
                 <h2 class="checkout__section-title">{{ t('cart.title') }}</h2>
@@ -182,16 +124,7 @@
                       @click="cart.removeFromCart(item.product_id!)"
                       title="Supprimer"
                     >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      </svg>
+                      <BasicIconNext name="X" :size="18" />
                     </button>
                   </div>
 
@@ -202,32 +135,14 @@
                         @click="updateQuantity(item, -1)"
                         :disabled="(item.quantity ?? 1) <= 1"
                       >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path d="M5 12h14" />
-                        </svg>
+                        <BasicIconNext name="Minus" :size="14" />
                       </button>
                       <span class="checkout-item__qty-value">{{ item.quantity ?? 1 }}</span>
                       <button
                         class="checkout-item__qty-btn"
                         @click="updateQuantity(item, 1)"
                       >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path d="M12 5v14M5 12h14" />
-                        </svg>
+                        <BasicIconNext name="Plus" :size="14" />
                       </button>
                     </div>
 
@@ -255,26 +170,7 @@
                 class="checkout__empty"
               >
                 <div class="checkout__empty-icon">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <circle
-                      cx="9"
-                      cy="21"
-                      r="1"
-                    />
-                    <circle
-                      cx="20"
-                      cy="21"
-                      r="1"
-                    />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-                  </svg>
+                  <BasicIconNext name="ShoppingCart" :size="48" />
                 </div>
                 <h3>{{ t('cart.empty') }}</h3>
                 <p>{{ t('cart.emptyText') }}</p>
@@ -291,33 +187,7 @@
           <section class="checkout__section">
             <div class="checkout__section-header">
               <div class="checkout__section-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="1"
-                    y="3"
-                    width="15"
-                    height="13"
-                    rx="2"
-                  />
-                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                  <circle
-                    cx="5.5"
-                    cy="18.5"
-                    r="2.5"
-                  />
-                  <circle
-                    cx="18.5"
-                    cy="18.5"
-                    r="2.5"
-                  />
-                </svg>
+                <BasicIconNext name="Truck" :size="20" />
               </div>
               <div>
                 <h2 class="checkout__section-title">{{ t('checkout.steps.shipping') }}</h2>
@@ -337,21 +207,7 @@
                   <div class="checkout__delivery-radio-inner"></div>
                 </div>
                 <div class="checkout__delivery-icon checkout__delivery-icon--relay">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                    <circle
-                      cx="12"
-                      cy="10"
-                      r="3"
-                    />
-                  </svg>
+                  <BasicIconNext name="MapPin" :size="24" />
                 </div>
                 <div class="checkout__delivery-content">
                   <span class="checkout__delivery-title">{{ t('checkout.shipping.relay') }}</span>
@@ -370,17 +226,7 @@
                   <div class="checkout__delivery-radio-inner"></div>
                 </div>
                 <div class="checkout__delivery-icon checkout__delivery-icon--home">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                    <polyline points="9,22 9,12 15,12 15,22" />
-                  </svg>
+                  <BasicIconNext name="Home" :size="24" />
                 </div>
                 <div class="checkout__delivery-content">
                   <span class="checkout__delivery-title">{{ t('checkout.shipping.home') }}</span>
@@ -428,21 +274,7 @@
                   @click="useProfileAddress = true"
                   type="button"
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                    <circle
-                      cx="12"
-                      cy="7"
-                      r="4"
-                    />
-                  </svg>
+                  <BasicIconNext name="User" :size="18" />
                   Mon adresse
                 </button>
                 <button
@@ -451,21 +283,7 @@
                   @click="useProfileAddress = false"
                   type="button"
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                    <circle
-                      cx="12"
-                      cy="10"
-                      r="3"
-                    />
-                  </svg>
+                  <BasicIconNext name="MapPin" :size="18" />
                   Autre adresse
                 </button>
               </div>
@@ -474,19 +292,7 @@
               <div class="checkout__form-row">
                 <div class="checkout__field">
                   <label class="checkout__label">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                      />
-                      <path d="M22 6l-10 7L2 6" />
-                    </svg>
+                    <BasicIconNext name="Mail" :size="16" />
                     Email
                   </label>
                   <input
@@ -499,21 +305,7 @@
                 </div>
                 <div class="checkout__field">
                   <label class="checkout__label">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                      <circle
-                        cx="12"
-                        cy="7"
-                        r="4"
-                      />
-                    </svg>
+                    <BasicIconNext name="User" :size="16" />
                     Nom complet
                   </label>
                   <input
@@ -529,21 +321,7 @@
               <template v-if="deliveryMode === 'home'">
                 <div class="checkout__field">
                   <label class="checkout__label">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                      <circle
-                        cx="12"
-                        cy="10"
-                        r="3"
-                      />
-                    </svg>
+                    <BasicIconNext name="MapPin" :size="16" />
                     Adresse
                   </label>
                   <input
@@ -595,21 +373,7 @@
                 class="checkout__field"
               >
                 <label class="checkout__label">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <circle
-                      cx="11"
-                      cy="11"
-                      r="8"
-                    />
-                    <path d="M21 21l-4.35-4.35" />
-                  </svg>
+                  <BasicIconNext name="Search" :size="16" />
                   Code postal (pour la recherche)
                 </label>
                 <input
@@ -625,23 +389,7 @@
           <section class="checkout__section">
             <div class="checkout__section-header">
               <div class="checkout__section-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="1"
-                    y="4"
-                    width="22"
-                    height="16"
-                    rx="2"
-                  />
-                  <path d="M1 10h22" />
-                </svg>
+                <BasicIconNext name="CreditCard" :size="20" />
               </div>
               <div>
                 <h2 class="checkout__section-title">{{ t('checkout.steps.payment') }}</h2>
@@ -663,87 +411,15 @@
                     <div class="payment-card__radio-inner"></div>
                   </div>
                   <div class="payment-card__icon payment-card__icon--stripe">
-                    <svg
-                      viewBox="0 0 48 48"
-                      fill="none"
-                    >
-                      <rect
-                        width="48"
-                        height="48"
-                        rx="10"
-                        fill="#635BFF"
-                      />
-                      <path
-                        d="M24.5 18.5C22.5 18.5 21 19.3 21 20.9C21 23 24 23.4 24 24.5C24 24.9 23.6 25.2 22.8 25.2C21.6 25.2 20.5 24.7 20.5 24.7L20 26.7C20 26.7 21.1 27.2 22.9 27.2C25.1 27.2 26.6 26.2 26.6 24.4C26.6 22.2 23.6 21.8 23.6 20.8C23.6 20.4 24 20.1 24.7 20.1C25.7 20.1 26.5 20.4 26.5 20.4L27 18.5C27 18.5 26.1 18.5 24.5 18.5Z"
-                        fill="white"
-                      />
-                    </svg>
+                    <BasicIconNext name="stripe" :size="40" />
                   </div>
                   <div class="payment-card__content">
                     <span class="payment-card__title">{{ t('checkout.payment.card') }}</span>
                     <span class="payment-card__desc">Visa, Mastercard, Amex</span>
                   </div>
                   <div class="payment-card__cards">
-                    <svg
-                      class="payment-card__card-icon"
-                      viewBox="0 0 48 32"
-                      fill="none"
-                    >
-                      <rect
-                        width="48"
-                        height="32"
-                        rx="4"
-                        fill="#1A1F71"
-                      />
-                      <path
-                        d="M19.5 21H17.3L18.7 11H20.9L19.5 21Z"
-                        fill="white"
-                      />
-                      <path
-                        d="M28.5 11.2C28 11 27.3 10.8 26.4 10.8C24.2 10.8 22.6 12 22.6 13.7C22.6 15 23.7 15.7 24.6 16.1C25.5 16.5 25.8 16.8 25.8 17.2C25.8 17.8 25.1 18.1 24.4 18.1C23.4 18.1 22.9 18 22.1 17.6L21.8 17.5L21.5 19.4C22.1 19.7 23.1 19.9 24.2 19.9C26.5 19.9 28.1 18.7 28.1 16.9C28.1 15.9 27.5 15.1 26.2 14.5C25.4 14.1 24.9 13.8 24.9 13.4C24.9 13 25.3 12.6 26.2 12.6C26.9 12.6 27.5 12.7 27.9 12.9L28.1 13L28.5 11.2Z"
-                        fill="white"
-                      />
-                      <path
-                        d="M32.3 11H30.5C30 11 29.5 11.1 29.3 11.7L26 21H28.3L28.8 19.5H31.5L31.8 21H33.9L32.3 11ZM29.4 17.7C29.6 17.1 30.4 14.9 30.4 14.9C30.4 14.9 30.6 14.3 30.7 14L30.9 14.9C30.9 14.9 31.4 17.1 31.5 17.7H29.4Z"
-                        fill="white"
-                      />
-                      <path
-                        d="M16.4 11L14.2 17.8L14 16.7C13.5 15.2 12.1 13.6 10.5 12.8L12.5 21H14.8L18.7 11H16.4Z"
-                        fill="white"
-                      />
-                      <path
-                        d="M12.5 11H9.1L9 11.2C11.7 11.9 13.5 13.6 14 16.7L13.4 11.7C13.3 11.2 12.9 11 12.5 11Z"
-                        fill="#F9A51A"
-                      />
-                    </svg>
-                    <svg
-                      class="payment-card__card-icon"
-                      viewBox="0 0 48 32"
-                      fill="none"
-                    >
-                      <rect
-                        width="48"
-                        height="32"
-                        rx="4"
-                        fill="#000"
-                      />
-                      <circle
-                        cx="18"
-                        cy="16"
-                        r="8"
-                        fill="#EB001B"
-                      />
-                      <circle
-                        cx="30"
-                        cy="16"
-                        r="8"
-                        fill="#F79E1B"
-                      />
-                      <path
-                        d="M24 9.8C25.8 11.2 27 13.5 27 16C27 18.5 25.8 20.8 24 22.2C22.2 20.8 21 18.5 21 16C21 13.5 22.2 11.2 24 9.8Z"
-                        fill="#FF5F00"
-                      />
-                    </svg>
+                    <BasicIconNext name="visa" :size="32" class="payment-card__card-icon" />
+                    <BasicIconNext name="mastercard" :size="32" class="payment-card__card-icon" />
                   </div>
                 </button>
 
@@ -758,26 +434,7 @@
                     <div class="payment-card__radio-inner"></div>
                   </div>
                   <div class="payment-card__icon payment-card__icon--paypal">
-                    <svg
-                      viewBox="0 0 48 48"
-                      fill="none"
-                    >
-                      <rect
-                        width="48"
-                        height="48"
-                        rx="10"
-                        fill="#003087"
-                      />
-                      <path
-                        d="M32.33 18.1C32.31 18.24 32.28 18.39 32.25 18.54C31.27 23.59 27.9 25.33 23.61 25.33H21.42C20.89 25.33 20.45 25.71 20.37 26.23L19.25 33.34L18.93 35.35C18.88 35.69 19.14 36 19.48 36H23.36C23.82 36 24.21 35.67 24.29 35.21L24.32 35.02L25.06 30.38L25.1 30.12C25.17 29.67 25.56 29.33 26.02 29.33H26.61C30.37 29.33 33.31 27.81 34.17 23.39C34.53 21.54 34.34 20 33.39 18.92C33.11 18.59 32.75 18.32 32.33 18.1Z"
-                        fill="white"
-                        fill-opacity="0.6"
-                      />
-                      <path
-                        d="M21.65 18.12C21.69 17.81 21.9 17.56 22.16 17.43C22.29 17.37 22.42 17.33 22.57 17.33H28.41C29.11 17.33 29.75 17.38 30.34 17.48C30.51 17.5 30.68 17.53 30.84 17.57C31 17.6 31.15 17.64 31.3 17.69C31.38 17.71 31.45 17.73 31.52 17.76C31.81 17.85 32.08 17.97 32.33 18.1C32.62 16.23 32.33 14.96 31.32 13.81C30.21 12.54 28.2 12 25.63 12H18.17C17.64 12 17.2 12.38 17.12 12.9L14.01 32.6C13.95 32.99 14.25 33.34 14.64 33.34H19.25L20.4 26L21.65 18.12Z"
-                        fill="white"
-                      />
-                    </svg>
+                    <BasicIconNext name="paypal" :size="40" />
                   </div>
                   <div class="payment-card__content">
                     <span class="payment-card__title">PayPal</span>
@@ -794,36 +451,16 @@
                   type="button"
                 >
                   <div class="payment-methods__coming-left">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                      />
-                      <path d="M12 6v6l4 2" />
-                    </svg>
+                    <BasicIconNext name="Clock" :size="16" />
                     <span>{{ t('checkout.payment.otherMethods') }}</span>
                     <span class="payment-methods__coming-badge">{{ t('common.comingSoon') }}</span>
                   </div>
-                  <svg
+                  <BasicIconNext
+                    name="ChevronDown"
+                    :size="20"
                     class="payment-methods__coming-chevron"
                     :class="{ 'payment-methods__coming-chevron--open': showComingSoon }"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
+                  />
                 </button>
                 <!-- Contenu collapsible identique à l'original -->
               </div>
@@ -854,21 +491,7 @@
                 v-if="deliveryMode === 'relay'"
                 class="checkout__summary-delivery"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                  <circle
-                    cx="12"
-                    cy="10"
-                    r="3"
-                  />
-                </svg>
+                <BasicIconNext name="MapPin" :size="16" />
                 <span v-if="selectedRelay">{{ selectedRelay.name }}</span>
                 <span
                   v-else
@@ -908,31 +531,9 @@
               :disabled="!canSubmit"
               @click="submitOrder"
             >
-              <svg
-                v-if="isSubmitting"
-                class="checkout__submit-spinner"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
-                />
-              </svg>
+              <BasicIconNext v-if="isSubmitting" name="Loader2" :size="20" class="checkout__submit-spinner" />
               <template v-else>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
+                <BasicIconNext name="Shield" :size="20" />
                 Payer {{ formatPrice(finalTotal) }}
               </template>
             </button>
@@ -940,50 +541,15 @@
             <!-- Trust Badges -->
             <div class="checkout__trust">
               <div class="checkout__trust-item">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="3"
-                    y="11"
-                    width="18"
-                    height="11"
-                    rx="2"
-                  />
-                  <path d="M7 11V7a5 5 0 0110 0v4" />
-                </svg>
+                <BasicIconNext name="Lock" :size="20" />
                 <span>{{ t('checkout.payment.securePayment') }}</span>
               </div>
               <div class="checkout__trust-item">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
+                <BasicIconNext name="Shield" :size="20" />
                 <span>{{ t('checkout.payment.sslProtected') }}</span>
               </div>
               <div class="checkout__trust-item">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                  <path d="M22 4L12 14.01l-3-3" />
-                </svg>
+                <BasicIconNext name="CheckCircle2" :size="20" />
                 <span>{{ t('checkout.payment.satisfaction') }}</span>
               </div>
             </div>
@@ -1124,7 +690,8 @@
   }
 
   onMounted(() => {
-    const saved = localStorage.getItem('fp-checkout-form')
+    // OpSec: sessionStorage pour donnees sensibles (efface a la fermeture)
+    const saved = sessionStorage.getItem('fp-checkout-form')
     if (saved) {
       try {
         const data = JSON.parse(saved)
@@ -1167,11 +734,11 @@
     }
   })
 
-  // Sauvegarder le formulaire
+  // Sauvegarder le formulaire (OpSec: sessionStorage)
   watch(
     [email, fullName, address, zip, city, country, deliveryMode],
     () => {
-      localStorage.setItem(
+      sessionStorage.setItem(
         'fp-checkout-form',
         JSON.stringify({
           email: email.value,
@@ -1238,11 +805,13 @@
 
       const orderResponse = await createOrder(orderPayload)
 
+      // Order tokens peuvent rester en localStorage (non sensibles, utiles pour tracking)
       if (orderResponse.tracking_token) {
         localStorage.setItem('fp-last-order-token', orderResponse.tracking_token)
       }
       localStorage.setItem('fp-last-order-id', orderResponse.order_id)
-      localStorage.removeItem('fp-checkout-form')
+      // Nettoyer les donnees sensibles du formulaire
+      sessionStorage.removeItem('fp-checkout-form')
 
       await processPayment(
         finalTotal.value,
@@ -1369,18 +938,18 @@
       padding: 8px 14px;
       background: linear-gradient(
         135deg,
-        rgba(16, 185, 129, 0.1) 0%,
-        rgba(16, 185, 129, 0.05) 100%
+        rgba(var(--success-500-rgb), 0.1) 0%,
+        rgba(var(--success-500-rgb), 0.05) 100%
       );
-      border: 1px solid rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(var(--success-500-rgb), 0.2);
       border-radius: 20px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: #059669;
+      color: @success-600;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
@@ -1416,9 +985,9 @@
         opacity: 1;
 
         .checkout__step-number {
-          background: #10b981;
-          border-color: #10b981;
-          color: white;
+          background: @success-500;
+          border-color: @success-500;
+          color: @white;
         }
       }
     }
@@ -1793,7 +1362,7 @@
     }
 
     &__summary-free {
-      color: #10b981;
+      color: @success-500;
       font-weight: 600;
     }
 
@@ -1899,7 +1468,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
   }
@@ -1942,12 +1511,12 @@
       top: -6px;
       left: -6px;
       padding: 4px 8px;
-      background: #ef4444;
+      background: @danger-500;
       border-radius: 6px;
       font-family: @font-body;
       font-size: 10px;
       font-weight: 700;
-      color: white;
+      color: @white;
     }
 
     &__details {
@@ -1993,8 +1562,8 @@
       transition: all 0.2s @ease;
 
       &:hover {
-        background: #fee2e2;
-        color: #ef4444;
+        background: @danger-50;
+        color: @danger-500;
       }
     }
 
@@ -2069,7 +1638,7 @@
       color: @neutral-900;
 
       &--sale {
-        color: #ef4444;
+        color: @danger-500;
       }
     }
   }
@@ -2865,8 +2434,8 @@
     flex-shrink: 0;
 
     &--relay {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
+      background: linear-gradient(135deg, @success-500 0%, @success-600 100%);
+      color: @white;
     }
 
     &--home {
@@ -2907,10 +2476,10 @@
     &--free {
       background: linear-gradient(
         135deg,
-        rgba(16, 185, 129, 0.1) 0%,
-        rgba(16, 185, 129, 0.05) 100%
+        rgba(var(--success-500-rgb), 0.1) 0%,
+        rgba(var(--success-500-rgb), 0.05) 100%
       );
-      color: #059669;
+      color: @success-600;
     }
   }
 
@@ -2920,8 +2489,8 @@
   .checkout__relay-section {
     margin-bottom: 24px;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(16, 185, 129, 0.02) 100%);
-    border: 1px dashed rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.04) 0%, rgba(var(--success-500-rgb), 0.02) 100%);
+    border: 1px dashed rgba(var(--success-500-rgb), 0.3);
     border-radius: 16px;
   }
 
@@ -2933,11 +2502,11 @@
     align-items: center;
     gap: 8px;
     padding: 12px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+    background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.08) 0%, rgba(var(--success-500-rgb), 0.04) 100%);
     border-radius: 10px;
     font-family: @font-body;
     font-size: 13px;
-    color: #059669;
+    color: @success-600;
 
     svg {
       flex-shrink: 0;

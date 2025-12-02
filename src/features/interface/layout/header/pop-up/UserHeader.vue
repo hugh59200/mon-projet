@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+  import { getProfile, getAvatarPublicUrl } from '@/api/supabase/profiles'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -99,15 +99,10 @@
 
   async function loadProfile() {
     if (!user) return
-    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
+    const data = await getProfile(user.id)
     if (data) {
-      avatarPreview.value = data.avatar_url ? getPublicUrl(data.avatar_url) : null
+      avatarPreview.value = data.avatar_url ? getAvatarPublicUrl(data.avatar_url) : null
     }
-  }
-
-  function getPublicUrl(path: string) {
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-    return data.publicUrl
   }
 
   // 🪪 Initiales fallback

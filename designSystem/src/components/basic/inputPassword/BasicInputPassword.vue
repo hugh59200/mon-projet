@@ -18,6 +18,7 @@
         :readonly
         :disabled
         :maxlength
+        :autocomplete
       />
     </template>
     <template #icon-right>

@@ -1,12 +1,22 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
+import { type Locale, translations } from '../i18n.ts'
 
-export function recoveryTemplate({ url }: { url: string }) {
+export function recoveryTemplate({
+  url,
+  locale = 'en',
+}: {
+  url: string
+  locale?: Locale
+}) {
+  const t = translations.recovery
+
   return baseEmailTemplate({
-    title: 'Réinitialisation du mot de passe 🔐',
+    title: t.title[locale],
     bodyHTML: `
-      <p>Nous avons reçu une demande de réinitialisation.</p>
-      <p>Si ce n’est pas vous, ignorez cet email.</p>`,
-    ctaLabel: 'Réinitialiser mon mot de passe',
+      <p>${t.requestReceived[locale]}</p>
+      <p>${t.ignoreIfNotYou[locale]}</p>`,
+    ctaLabel: t.ctaReset[locale],
     ctaUrl: url,
+    locale,
   })
 }

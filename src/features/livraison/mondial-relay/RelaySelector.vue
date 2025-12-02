@@ -6,14 +6,7 @@
       class="relay-selector__selected"
     >
       <div class="relay-selector__badge">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="3"
-        >
-          <path d="M5 13l4 4L19 7" />
-        </svg>
+        <BasicIconNext name="Check" :size="20" />
       </div>
 
       <div class="relay-selector__info">
@@ -28,19 +21,7 @@
           v-if="selectedPoint.distance"
           class="relay-selector__distance"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-            />
-            <path d="M12 6v6l4 2" />
-          </svg>
+          <BasicIconNext name="Clock" :size="14" />
           {{ (selectedPoint.distance / 1000).toFixed(1) }} km
         </span>
       </div>
@@ -51,15 +32,7 @@
           class="relay-selector__btn relay-selector__btn--outline"
           @click="openModal"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-          </svg>
+          <BasicIconNext name="Edit" :size="16" />
           Modifier
         </button>
         <button
@@ -67,14 +40,7 @@
           class="relay-selector__btn relay-selector__btn--ghost"
           @click="handleReset"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
+          <BasicIconNext name="X" :size="2" />
         </button>
       </div>
     </div>
@@ -88,33 +54,13 @@
       @click="openModal"
     >
       <div class="relay-selector__trigger-icon">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-          <circle
-            cx="12"
-            cy="10"
-            r="3"
-          />
-        </svg>
+        <BasicIconNext name="MapPin" :size="24" />
       </div>
       <div class="relay-selector__trigger-content">
         <span class="relay-selector__trigger-title">{{ buttonLabel }}</span>
         <span class="relay-selector__trigger-subtitle">Gratuit • Retrait en 48-72h</span>
       </div>
-      <svg
-        class="relay-selector__trigger-arrow"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path d="M9 18l6-6-6-6" />
-      </svg>
+      <BasicIconNext name="ChevronRight" :size="2" />
     </button>
 
     <!-- Modal -->
@@ -129,19 +75,7 @@
             <!-- Header compact -->
             <div class="relay-modal__header">
               <div class="relay-modal__header-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle
-                    cx="12"
-                    cy="10"
-                    r="3"
-                  />
-                </svg>
+                <BasicIconNext name="MapPin" :size="24" />
               </div>
               <div class="relay-modal__header-text">
                 <h3 class="relay-modal__title">Choisir un point relais</h3>
@@ -152,34 +86,14 @@
                 class="relay-modal__close"
                 @click="closeModal"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
+                <BasicIconNext name="X" :size="2" />
               </button>
             </div>
 
             <!-- Recherche -->
             <div class="relay-modal__search">
               <div class="relay-modal__search-field">
-                <svg
-                  class="relay-modal__search-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="8"
-                  />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
+                <BasicIconNext name="Search" :size="2" />
                 <input
                   v-model="postcodeInput"
                   type="text"
@@ -193,14 +107,7 @@
                   class="relay-modal__search-clear"
                   @click="postcodeInput = ''"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
+                  <BasicIconNext name="X" :size="2" />
                 </button>
               </div>
               <button
@@ -223,19 +130,7 @@
                 v-if="error"
                 class="relay-modal__error"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                  />
-                  <path d="M12 8v4M12 16h.01" />
-                </svg>
+                <BasicIconNext name="AlertCircle" :size="20" />
                 <span>{{ error }}</span>
               </div>
 
@@ -266,18 +161,7 @@
                     @click="handleSelect(point)"
                   >
                     <div class="relay-point__marker">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle
-                          cx="12"
-                          cy="10"
-                          r="3"
-                          fill="white"
-                        />
-                      </svg>
+                      <BasicIconNext name="MapPin" :size="26" />
                     </div>
                     <div class="relay-point__info">
                       <span class="relay-point__name">{{ point.name }}</span>
@@ -291,15 +175,7 @@
                       >
                         {{ (point.distance / 1000).toFixed(1) }} km
                       </span>
-                      <svg
-                        class="relay-point__chevron"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M9 18l6-6-6-6" />
-                      </svg>
+                      <BasicIconNext name="ChevronRight" :size="2" />
                     </div>
                   </button>
                 </div>
@@ -311,19 +187,7 @@
                 class="relay-modal__empty"
               >
                 <div class="relay-modal__empty-icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle
-                      cx="12"
-                      cy="10"
-                      r="3"
-                    />
-                  </svg>
+                  <BasicIconNext name="MapPin" :size="32" />
                 </div>
                 <h4>Trouvez votre point relais</h4>
                 <p>
@@ -336,21 +200,7 @@
             <!-- Footer -->
             <div class="relay-modal__footer">
               <div class="relay-modal__footer-info">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"
-                  />
-                  <circle
-                    cx="12"
-                    cy="10"
-                    r="3"
-                  />
-                </svg>
+                <BasicIconNext name="MapPin" :size="16" />
                 <span>Livraison offerte en point relais</span>
               </div>
               <button

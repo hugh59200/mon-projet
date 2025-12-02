@@ -127,7 +127,7 @@
   }
 
   .error-text {
-    color: #ef4444;
+    color: @danger-500;
     font-size: 0.8rem;
     margin-top: 0.5rem;
   }

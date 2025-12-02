@@ -21,82 +21,28 @@
               class="footer__social-link"
               aria-label="Twitter"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                />
-              </svg>
+              <BasicIconNext name="twitter" :size="18" />
             </a>
             <a
               href="#"
               class="footer__social-link"
               aria-label="LinkedIn"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-                />
-              </svg>
+              <BasicIconNext name="linkedin" :size="18" />
             </a>
             <a
               href="#"
               class="footer__social-link"
               aria-label="Instagram"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect
-                  x="2"
-                  y="2"
-                  width="20"
-                  height="20"
-                  rx="5"
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="4"
-                />
-                <circle
-                  cx="18"
-                  cy="6"
-                  r="1.5"
-                  fill="currentColor"
-                  stroke="none"
-                />
-              </svg>
+              <BasicIconNext name="instagram" :size="18" />
             </a>
             <a
               href="#"
               class="footer__social-link"
               aria-label="YouTube"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
-                />
-              </svg>
+              <BasicIconNext name="youtube" :size="18" />
             </a>
           </div>
         </div>
@@ -137,55 +83,15 @@
             <h5 class="footer__nav-title">{{ t('footer.contact') }}</h5>
             <ul class="footer__nav-list footer__nav-list--contact">
               <li>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                  />
-                  <path d="M22 6l-10 7L2 6" />
-                </svg>
+                <BasicIconNext name="Mail" :size="14" />
                 <a href="mailto:contact@fast-peptides.com">contact@fast-peptides.com</a>
               </li>
               <li>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                  />
-                  <path d="M12 6v6l4 2" />
-                </svg>
+                <BasicIconNext name="Clock" :size="14" />
                 <span>{{ t('footer.hours') }}</span>
               </li>
               <li>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                  <circle
-                    cx="12"
-                    cy="10"
-                    r="3"
-                  />
-                </svg>
+                <BasicIconNext name="MapPin" :size="14" />
                 <span>{{ t('footer.region') }}</span>
               </li>
             </ul>
@@ -195,19 +101,7 @@
         <!-- Newsletter -->
         <div class="footer__newsletter">
           <div class="footer__newsletter-header">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-              />
-              <path d="M22 6l-10 7L2 6" />
-            </svg>
+            <BasicIconNext name="Mail" :size="20" />
             <div>
               <h4 class="footer__newsletter-title">{{ t('footer.newsletter.title') }}</h4>
               <p class="footer__newsletter-desc">{{ t('footer.newsletter.subtitle') }}</p>
@@ -220,16 +114,7 @@
               class="footer__newsletter-input"
             />
             <button class="footer__newsletter-btn">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+              <BasicIconNext name="ArrowRight" :size="18" />
             </button>
           </div>
         </div>
@@ -238,16 +123,7 @@
       <!-- Disclaimer compact -->
       <div class="footer__disclaimer">
         <div class="footer__disclaimer-badge">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
+          <BasicIconNext name="Shield" :size="16" />
           <span>{{ t('footer.researchOnly') }}</span>
         </div>
         <div class="footer__disclaimer-items">
@@ -273,173 +149,24 @@
         <div class="footer__trust-payments">
           <span class="footer__trust-label">{{ t('footer.securePayments') }}</span>
           <div class="footer__trust-icons">
-            <!-- Visa -->
-            <svg
-              class="footer__payment-icon"
-              viewBox="0 0 48 32"
-              fill="none"
-            >
-              <rect
-                width="48"
-                height="32"
-                rx="4"
-                fill="#1A1F71"
-              />
-              <path
-                d="M19.5 21H17.3L18.7 11H20.9L19.5 21Z"
-                fill="white"
-              />
-              <path
-                d="M28.5 11.2C28 11 27.3 10.8 26.4 10.8C24.2 10.8 22.6 12 22.6 13.7C22.6 15 23.7 15.7 24.6 16.1C25.5 16.5 25.8 16.8 25.8 17.2C25.8 17.8 25.1 18.1 24.4 18.1C23.4 18.1 22.9 18 22.1 17.6L21.8 17.5L21.5 19.4C22.1 19.7 23.1 19.9 24.2 19.9C26.5 19.9 28.1 18.7 28.1 16.9C28.1 15.9 27.5 15.1 26.2 14.5C25.4 14.1 24.9 13.8 24.9 13.4C24.9 13 25.3 12.6 26.2 12.6C26.9 12.6 27.5 12.7 27.9 12.9L28.1 13L28.5 11.2Z"
-                fill="white"
-              />
-              <path
-                d="M32.3 11H30.5C30 11 29.5 11.1 29.3 11.7L26 21H28.3L28.8 19.5H31.5L31.8 21H33.9L32.3 11ZM29.4 17.7C29.6 17.1 30.4 14.9 30.4 14.9L30.7 14L30.9 14.9C30.9 14.9 31.4 17.1 31.5 17.7H29.4Z"
-                fill="white"
-              />
-              <path
-                d="M16.4 11L14.2 17.8L14 16.7C13.5 15.2 12.1 13.6 10.5 12.8L12.5 21H14.8L18.7 11H16.4Z"
-                fill="white"
-              />
-              <path
-                d="M12.5 11H9.1L9 11.2C11.7 11.9 13.5 13.6 14 16.7L13.4 11.7C13.3 11.2 12.9 11 12.5 11Z"
-                fill="#F9A51A"
-              />
-            </svg>
-            <!-- Mastercard -->
-            <svg
-              class="footer__payment-icon"
-              viewBox="0 0 48 32"
-              fill="none"
-            >
-              <rect
-                width="48"
-                height="32"
-                rx="4"
-                fill="#000"
-              />
-              <circle
-                cx="18"
-                cy="16"
-                r="8"
-                fill="#EB001B"
-              />
-              <circle
-                cx="30"
-                cy="16"
-                r="8"
-                fill="#F79E1B"
-              />
-              <path
-                d="M24 9.8C25.8 11.2 27 13.5 27 16C27 18.5 25.8 20.8 24 22.2C22.2 20.8 21 18.5 21 16C21 13.5 22.2 11.2 24 9.8Z"
-                fill="#FF5F00"
-              />
-            </svg>
-            <!-- PayPal -->
-            <svg
-              class="footer__payment-icon"
-              viewBox="0 0 48 32"
-              fill="none"
-            >
-              <rect
-                width="48"
-                height="32"
-                rx="4"
-                fill="#003087"
-              />
-              <path
-                d="M20.5 10H15.5C15.2 10 15 10.2 14.9 10.5L13 21.5C13 21.7 13.1 21.9 13.4 21.9H15.8C16.1 21.9 16.3 21.7 16.4 21.4L16.9 18.5C17 18.2 17.2 18 17.5 18H18.8C21.3 18 22.8 16.7 23.2 14.3C23.4 13.2 23.2 12.4 22.7 11.8C22.1 11.1 21 10 20.5 10Z"
-                fill="white"
-              />
-              <path
-                d="M30.5 10H25.5C25.2 10 25 10.2 24.9 10.5L23 21.5C23 21.7 23.1 21.9 23.4 21.9H26C26.2 21.9 26.4 21.8 26.4 21.5L26.9 18.5C27 18.2 27.2 18 27.5 18H28.8C31.3 18 32.8 16.7 33.2 14.3C33.4 13.2 33.2 12.4 32.7 11.8C32.1 11.1 31 10 30.5 10Z"
-                fill="white"
-                fill-opacity="0.7"
-              />
-            </svg>
-            <!-- Stripe -->
-            <svg
-              class="footer__payment-icon"
-              viewBox="0 0 48 32"
-              fill="none"
-            >
-              <rect
-                width="48"
-                height="32"
-                rx="4"
-                fill="#635BFF"
-              />
-              <path
-                d="M22.5 13C20.5 13 19 13.8 19 15.4C19 17.5 22 17.9 22 19C22 19.4 21.6 19.7 20.8 19.7C19.6 19.7 18.5 19.2 18.5 19.2L18 21.2C18 21.2 19.1 21.7 20.9 21.7C23.1 21.7 24.6 20.7 24.6 18.9C24.6 16.7 21.6 16.3 21.6 15.3C21.6 14.9 22 14.6 22.7 14.6C23.7 14.6 24.5 14.9 24.5 14.9L25 13C25 13 24.1 13 22.5 13Z"
-                fill="white"
-              />
-            </svg>
+            <BasicIconNext name="visa" :size="32" class="footer__payment-icon" />
+            <BasicIconNext name="mastercard" :size="32" class="footer__payment-icon" />
+            <BasicIconNext name="paypal" :size="32" class="footer__payment-icon" />
+            <BasicIconNext name="stripe" :size="32" class="footer__payment-icon" />
           </div>
         </div>
 
         <div class="footer__trust-badges">
           <div class="footer__trust-badge">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <rect
-                x="3"
-                y="11"
-                width="18"
-                height="11"
-                rx="2"
-              />
-              <path d="M7 11V7a5 5 0 0110 0v4" />
-            </svg>
+            <BasicIconNext name="Lock" :size="16" />
             <span>{{ t('footer.sslSecure') }}</span>
           </div>
           <div class="footer__trust-badge">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path d="M9 12l2 2 4-4" />
-            </svg>
+            <BasicIconNext name="ShieldCheck" :size="16" />
             <span>{{ t('product.trustBadges.quality') }}</span>
           </div>
           <div class="footer__trust-badge">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <rect
-                x="1"
-                y="3"
-                width="15"
-                height="13"
-                rx="2"
-              />
-              <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6" />
-              <circle
-                cx="5.5"
-                cy="18.5"
-                r="2.5"
-              />
-              <circle
-                cx="18.5"
-                cy="18.5"
-                r="2.5"
-              />
-            </svg>
+            <BasicIconNext name="Truck" :size="16" />
             <span>{{ t('product.trustBadges.shipping') }}</span>
           </div>
         </div>
@@ -456,23 +183,7 @@
         <div class="footer__bottom-right">
           <span class="footer__version">v1.0</span>
           <div class="footer__locale">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-              />
-              <path
-                d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
-              />
-            </svg>
+            <BasicIconNext name="Globe" :size="14" />
             <span>{{ currentLocaleInfo?.code.toUpperCase() }}</span>
           </div>
         </div>

@@ -105,9 +105,9 @@
     sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
-  @light-text-primary: #1a202c;
-  @light-text-secondary: #4a5568;
-  @light-bg-card: #ffffff;
+  @light-text-primary: @neutral-950;
+  @light-text-secondary: @neutral-600;
+  @light-bg-card: @white;
 
   .process {
     padding: 80px 40px;

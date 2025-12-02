@@ -22,6 +22,6 @@ export type InputProps = {
   iconColor?: IconColor
   pointer?: boolean
   validationState?: ValidationState
-  autocomplete?: 'off' | 'on'
+  autocomplete?: 'off' | 'on' | 'email' | 'username' | 'current-password' | 'new-password' | 'name' | 'given-name' | 'family-name' | 'tel' | 'street-address' | 'postal-code' | 'country' | 'cc-number' | 'cc-exp' | 'cc-csc' | (string & {})
   inputType?: 'form' | 'table'
 }

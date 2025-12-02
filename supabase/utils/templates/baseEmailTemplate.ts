@@ -1,23 +1,33 @@
 // supabase/functions/utils/templates/baseEmailTemplate.ts
 
+import { type Locale, translations } from '../i18n.ts'
+import { APP_BASE_URL } from '../clients.ts'
+
 export function baseEmailTemplate({
   title,
   bodyHTML,
   ctaLabel,
   ctaUrl,
+  locale = 'en',
 }: {
   title: string
   bodyHTML: string
   ctaLabel?: string
   ctaUrl?: string
+  locale?: Locale
 }) {
   const primary = '#00796B'
   const accent = '#00BFA5'
-  const accentYellow = '#facc15' // Couleur accent jaune
+  const accentYellow = '#facc15'
 
-  // URL de ton logo hébergé
+  // URL du logo hébergé
   const logoUrl =
     'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-icon/fast-peptides-logo.png'
+
+  // Traductions du footer
+  const t = translations.base
+  const needHelp = t.needHelp[locale]
+  const teamSignature = t.teamSignature[locale]
 
   const ctaBlock =
     ctaLabel && ctaUrl
@@ -44,9 +54,11 @@ export function baseEmailTemplate({
     `
       : ''
 
+  const langAttr = locale === 'fr' ? 'fr' : 'en'
+
   return `
 <!DOCTYPE html>
-<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="${langAttr}" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -54,12 +66,12 @@ export function baseEmailTemplate({
   <title>${title}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f7fa;font-family:'Segoe UI', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  
+
   <center style="width:100%;background-color:#f4f7fa;padding:40px 0;">
     <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-      
+
       <div style="background-color:${primary};padding:40px 20px;text-align:center;">
-        
+
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">
             <tr>
                 <td style="padding-right: 12px; vertical-align: middle;">
@@ -79,14 +91,14 @@ export function baseEmailTemplate({
 
       <div style="padding:40px 32px;color:#334155;line-height:1.6;font-size:16px;">
         ${bodyHTML}
-        
+
         ${ctaBlock}
 
         <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e2e8f0;text-align:center;font-size:14px;color:#64748b;">
-          <p style="margin:0 0 8px;">Besoin d'aide ? Contactez notre support.</p>
+          <p style="margin:0 0 8px;">${needHelp}</p>
           <p style="margin:0;">
-            L'équipe Atlas Lab (FP)<br/>
-            <a href="https://fast-peptides.com" style="color:${accent};text-decoration:none;">fp-store.com</a>
+            ${teamSignature}<br/>
+            <a href="${APP_BASE_URL}" style="color:${accent};text-decoration:none;">fp-store.com</a>
           </p>
         </div>
       </div>

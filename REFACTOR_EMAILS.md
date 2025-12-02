@@ -1,5 +1,8 @@
 # Mission : Refactoring des emails transactionnels (Resend)
 
+export CLAUDE_CODE_GIT_BASH_PATH='C:\Users\hugo.bogrand-ext\AppData\Local\Programs\Git\bin\bash.exe'
+npx claude
+
 ## Contexte
 
 Je vends des peptides de recherche sur mon e-commerce Fast Peptides (Vue.js + Supabase). J'utilise **Resend** pour les emails transactionnels.

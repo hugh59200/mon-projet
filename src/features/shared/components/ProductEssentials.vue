@@ -11,54 +11,7 @@
     <div class="essentials__grid">
       <div class="info-card">
         <div class="info-card__icon">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
-            <line
-              x1="8"
-              y1="16"
-              x2="8.01"
-              y2="16"
-            ></line>
-            <line
-              x1="8"
-              y1="20"
-              x2="8.01"
-              y2="20"
-            ></line>
-            <line
-              x1="12"
-              y1="18"
-              x2="12.01"
-              y2="18"
-            ></line>
-            <line
-              x1="12"
-              y1="22"
-              x2="12.01"
-              y2="22"
-            ></line>
-            <line
-              x1="16"
-              y1="16"
-              x2="16.01"
-              y2="16"
-            ></line>
-            <line
-              x1="16"
-              y1="20"
-              x2="16.01"
-              y2="20"
-            ></line>
-          </svg>
+          <BasicIconNext name="Snowflake" :size="24" />
         </div>
         <div class="info-card__content">
           <BasicText
@@ -84,18 +37,7 @@
 
       <div class="info-card">
         <div class="info-card__icon">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-          </svg>
+          <BasicIconNext name="Droplet" :size="24" />
         </div>
         <div class="info-card__content">
           <BasicText
@@ -120,21 +62,7 @@
 
       <div class="info-card">
         <div class="info-card__icon">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M10 2v7.31"></path>
-            <path d="M14 2v7.31"></path>
-            <path d="M8.5 2h7"></path>
-            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
-          </svg>
+          <BasicIconNext name="FlaskRound" :size="24" />
         </div>
         <div class="info-card__content">
           <BasicText

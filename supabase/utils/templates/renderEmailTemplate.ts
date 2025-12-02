@@ -1,5 +1,7 @@
-// supabase/functions/utils/templates/renderEmailTemplate.ts (Modifié)
+// supabase/functions/utils/templates/renderEmailTemplate.ts
 
+import { APP_BASE_URL } from '../clients.ts'
+import { type Locale, getValidLocale, translations } from '../i18n.ts'
 import { accountDeletedTemplate } from './accountDeletedTemplate.ts'
 import { emailChangeTemplate } from './emailChangeTemplate.ts'
 import { genericTemplate } from './genericTemplate.ts'
@@ -8,67 +10,108 @@ import { recoveryTemplate } from './recoveryTemplate.ts'
 import { shippingTemplate } from './shippingTemplate.ts'
 import { signupConfirmationTemplate } from './signupConfirmationTemplate.ts'
 
-export function renderEmailTemplate(type: string, data: any) {
+// Type générique pour les données d'email
+// deno-lint-ignore no-explicit-any
+type EmailData = Record<string, any>
+
+export function renderEmailTemplate(type: string, data: EmailData): string {
+  // Validation de la locale avec fallback EN
+  const locale: Locale = getValidLocale(data.locale)
+
   switch (type) {
     case 'confirmation': {
-      // Attend les données V2 : subtotal, shipping_cost, etc.
-      return orderConfirmationTemplate(data)
+      return orderConfirmationTemplate({
+        order_number: data.order_number,
+        full_name: data.full_name,
+        item_count: data.item_count,
+        subtotal: data.subtotal,
+        shipping_cost: data.shipping_cost,
+        total_amount: data.total_amount,
+        created_at: data.created_at,
+        shipping_address: data.shipping_address,
+        relay_name: data.relay_name,
+        ctaLabel: data.ctaLabel,
+        ctaUrl: data.ctaUrl,
+        locale,
+      })
     }
 
     case 'shipping': {
-      return shippingTemplate(data)
+      return shippingTemplate({
+        order_number: data.order_number,
+        full_name: data.full_name,
+        item_count: data.item_count,
+        carrier: data.carrier,
+        tracking_number: data.tracking_number,
+        tracking_url: data.tracking_url,
+        ctaUrl: data.ctaUrl,
+        locale,
+      })
     }
 
     case 'payment': {
+      const t = translations.payment
       return genericTemplate({
-        title: 'Paiement reçu 💳',
-        message: `
-          Nous confirmons la réception de votre paiement de <strong>${(Number(data.amount) || 0).toFixed(2)} €</strong>.<br/>
-          Votre commande est maintenant validée et partira en préparation.
-        `,
-        ctaLabel: 'Voir ma commande',
-        // Utilise l'URL par défaut pour un membre (puisque le paiement est souvent le point de départ)
-        ctaUrl: `https://fast-peptides.com/profil/commandes/${data.order_id}`,
+        title: t.title[locale],
+        message: t.received[locale]((Number(data.amount) || 0).toFixed(2)),
+        ctaLabel: t.ctaViewOrder[locale],
+        ctaUrl: `${APP_BASE_URL}/profil/commandes/${data.order_id}`,
+        locale,
       })
     }
 
     case 'status_update': {
+      const t = translations.statusUpdate
       const displayId = data.order_number ?? String(data.order_id).slice(0, 8)
-      // 🆕 Récupère ctaUrl depuis les données passées par l'Edge Function
-      const ctaUrl = data.ctaUrl ?? `https://fast-peptides.com/profil/commandes/${data.order_id}`
+      const ctaUrl = data.ctaUrl ?? `${APP_BASE_URL}/profil/commandes/${data.order_id}`
 
       return genericTemplate({
-        title: `Mise à jour commande ${displayId}`,
+        title: t.title[locale](displayId),
         message: `
-          Le statut de votre commande a évolué.<br/><br/>
+          ${t.statusChanged[locale]}<br/><br/>
           ${data.message ?? ''}
         `,
-        ctaLabel: 'Voir les détails',
-        // 🆕 Utilise l'URL dynamique
+        ctaLabel: t.ctaViewDetails[locale],
         ctaUrl: ctaUrl,
+        locale,
       })
     }
 
     case 'signup': {
-      return signupConfirmationTemplate(data)
+      return signupConfirmationTemplate({
+        full_name: data.full_name,
+        url: data.url ?? data.confirmation_url,
+        locale,
+      })
     }
 
     case 'recovery': {
-      return recoveryTemplate(data)
+      return recoveryTemplate({
+        url: data.url ?? data.confirmation_url,
+        locale,
+      })
     }
 
     case 'email_change': {
-      return emailChangeTemplate(data)
+      return emailChangeTemplate({
+        url: data.url ?? data.confirmation_url,
+        locale,
+      })
     }
 
     case 'account_deleted': {
-      return accountDeletedTemplate(data)
+      return accountDeletedTemplate({
+        email: data.email,
+        locale,
+      })
     }
 
     default: {
+      const t = translations.base
       return genericTemplate({
-        title: 'Notification FP Store',
-        message: 'Vous avez reçu une nouvelle notification.',
+        title: t.defaultNotificationTitle[locale],
+        message: t.defaultNotificationMessage[locale],
+        locale,
       })
     }
   }

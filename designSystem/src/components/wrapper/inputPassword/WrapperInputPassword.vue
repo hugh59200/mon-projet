@@ -19,6 +19,7 @@
       :autoValidate
       :touched
       :deletable
+      :autocomplete
       @strength-change="onStrengthChange"
     />
   </WrapperFormElements>

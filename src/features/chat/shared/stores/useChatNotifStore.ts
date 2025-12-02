@@ -35,7 +35,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
   /** Récupération initiale */
   const fetchUnreadByUser = async () => {
     if (isAdmin.value) {
-      const { data } = await supabase.from('messages_unread_view').select('*')
+      const { data } = await chatApi.fetchUnreadMessagesView()
       unreadByUser.value = Object.fromEntries(
         (data ?? []).map((row) => [row.user_id, Number(row.count)]),
       )
@@ -45,12 +45,7 @@ export const useChatNotifStore = defineStore('chatNotif', () => {
     const uid = auth.user?.id
     if (!uid) return
 
-    const { count } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', uid)
-      .eq('sender_role', 'admin')
-      .eq('is_read', false)
+    const { count } = await chatApi.fetchUserUnreadCount(uid)
 
     unreadByUser.value = { [uid]: count ?? 0 }
   }

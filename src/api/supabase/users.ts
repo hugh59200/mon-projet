@@ -1,6 +1,11 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
-import type { Role } from '@/supabase/types/supabase.types'
-import { handleMutation } from '../helpers/handleError'
+import type { Profiles, Role } from '@/supabase/types/supabase.types'
+import { handleApi, handleMutation } from '../helpers/handleError'
+
+export async function fetchAllProfiles(): Promise<Profiles[]> {
+  const res = await supabase.from('profiles').select('*')
+  return handleApi(res)
+}
 
 export async function fetchUsersWithCount(search = '', limit = 20, offset = 0) {
   let query = supabase

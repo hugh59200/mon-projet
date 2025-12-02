@@ -21,16 +21,7 @@
             class="success__back-top"
             @click="$router.push('/')"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
+            <BasicIconNext name="ArrowLeft" :size="14" />
             {{ t('checkout.success.shop') }}
           </button>
 
@@ -43,42 +34,8 @@
                 class="success__icon"
                 :class="{ 'success__icon--error': isError }"
               >
-                <svg
-                  v-if="!isError"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <svg
-                  v-else
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-                  />
-                  <line
-                    x1="12"
-                    y1="9"
-                    x2="12"
-                    y2="13"
-                  />
-                  <line
-                    x1="12"
-                    y1="17"
-                    x2="12.01"
-                    y2="17"
-                  />
-                </svg>
+                <BasicIconNext v-if="!isError" name="Check" :size="28" :stroke-width="2.5" />
+                <BasicIconNext v-else name="AlertTriangle" :size="28" />
               </div>
             </div>
 
@@ -116,53 +73,16 @@
               v-if="orderEmail"
               class="success__email"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
+              <BasicIconNext name="Mail" :size="14" />
               <span>{{ orderEmail }}</span>
             </div>
             <div class="success__trust">
               <div class="success__trust-item">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
+                <BasicIconNext name="Shield" :size="12" />
                 <span>{{ t('checkout.success.secure') }}</span>
               </div>
               <div class="success__trust-item">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="1"
-                    y="3"
-                    width="15"
-                    height="13"
-                    rx="2"
-                  />
-                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                </svg>
+                <BasicIconNext name="Truck" :size="12" />
                 <span>{{ t('checkout.success.fast') }}</span>
               </div>
             </div>
@@ -219,213 +139,9 @@
               class="success__conversion"
             >
               <div class="success__conversion-header">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                  <circle
-                    cx="8.5"
-                    cy="7"
-                    r="4"
-                  />
-                  <line
-                    x1="20"
-                    y1="8"
-                    x2="20"
-                    y2="14"
-                  />
-                  <line
-                    x1="23"
-                    y1="11"
-                    x2="17"
-                    y2="11"
-                  />
-                </svg>
-                <div>
-                  <h3>{{ t('checkout.success.createAccount') }}</h3>
-                  <p>{{ t('checkout.success.trackOrders') }}</p>
-                </div>
-              </div>
-
-              <form
-                class="success__form"
-                @submit.prevent="handleGuestConversion"
-              >
-                <!-- Email (readonly) -->
-                <div class="success__form-row">
-                  <div class="success__form-group success__form-group--readonly">
-                    <label class="success__label">{{ t('checkout.success.email') }}</label>
-                    <div class="success__input-readonly">
-                      <span>{{ orderEmail }}</span>
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div class="success__form-group">
-                    <label class="success__label">{{ t('checkout.success.password') }}</label>
-                    <input
-                      v-model="password"
-                      type="password"
-                      class="success__input"
-                      :placeholder="t('checkout.success.minChars')"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div class="success__form-actions">
-                  <button
-                    type="submit"
-                    class="success__btn success__btn--primary"
-                    :disabled="password.length < 6 || isConverting"
-                  >
-                    <span
-                      v-if="isConverting"
-                      class="success__btn-loader"
-                    ></span>
-                    <template v-else>
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <polyline points="17 11 19 13 23 9" />
-                      </svg>
-                      {{ t('checkout.success.activate') }}
-                    </template>
-                  </button>
-
-                  <button
-                    v-if="trackingToken"
-                    type="button"
-                    class="success__btn success__btn--outline"
-                    @click="goToGuestTracking"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                      <circle
-                        cx="12"
-                        cy="10"
-                        r="3"
-                      />
-                    </svg>
-                    {{ t('checkout.success.track') }}
-                  </button>
-                </div>
-              </form>
-
-              <!-- Benefits inline -->
-              <div class="success__benefits">
-                <div class="success__benefit">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {{ t('checkout.success.history') }}
-                </div>
-                <div class="success__benefit">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {{ t('checkout.success.realTimeTracking') }}
-                </div>
-                <div class="success__benefit">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {{ t('checkout.success.exclusiveOffers') }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Logged in User -->
-            <div
-              v-else-if="auth.user && !isError"
-              key="logged"
-              class="success__logged"
-            >
-              <div class="success__logged-icon">
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 8V21H3V8" />
-                  <path d="M1 3H23V8H1V3Z" />
-                  <path d="M10 12H14" />
-                </svg>
-              </div>
-              <h3>{{ t('checkout.success.orderSaved') }}</h3>
-              <p>{{ t('checkout.success.findInSpace') }}</p>
-              <button
-                class="success__btn success__btn--primary"
-                @click="$router.push(`/profil/commandes/${currentOrderId}`)"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="3"
-                  />
-                </svg>
+                <BasicIconNext name="Eye" :size="20" />
                 {{ t('checkout.success.viewOrder') }}
-              </button>
+              </div>
             </div>
 
             <!-- Error State -->
@@ -436,19 +152,7 @@
             >
               <p>{{ t('checkout.success.problemOccurred') }}</p>
               <div class="success__error-contact">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                  />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
+                <BasicIconNext name="Mail" :size="16" />
                 <span>support@fastpeptides.com</span>
               </div>
             </div>
@@ -462,16 +166,21 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+  import {
+    getOrderSummaryPublic,
+    fetchOrderByStripeSession,
+    fetchLastUserOrder,
+    invokeOrderConfirmation,
+    invokeCapturePayPal,
+  } from '@/api/supabase/orders'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
 
   const { t } = useI18n()
 
   const route = useRoute()
-  const router = useRouter()
   const cart = useCartStore()
   const auth = useAuthStore()
   const toast = useToastStore()
@@ -491,8 +200,6 @@
   const orderEmail = ref<string>('')
   const orderNumber = ref<string>('')
   const trackingToken = ref<string>('')
-  const password = ref('')
-  const isConverting = ref(false)
 
   // Lifecycle
   onMounted(async () => {
@@ -522,9 +229,7 @@
 
   // API Functions
   async function fetchOrderDetails(id: string) {
-    const { data } = await supabase.rpc('get_order_summary_public', {
-      p_order_id: id,
-    })
+    const data = await getOrderSummaryPublic(id)
 
     if (data) {
       const orderData = data as unknown as OrderSummary
@@ -536,96 +241,36 @@
   }
 
   async function handlePayPalCapture(orderId: string) {
-    const { error } = await supabase.functions.invoke('capture-paypal-order', {
-      body: { orderId },
-    })
+    const { error } = await invokeCapturePayPal(orderId)
     if (error) throw error
     await fetchOrderDetails(orderId)
   }
 
   async function handleStripeSuccess() {
     if (currentOrderId.value) {
-      await supabase.functions.invoke('order-confirmation', {
-        body: { order_id: currentOrderId.value },
-      })
+      await invokeOrderConfirmation(currentOrderId.value)
     }
   }
 
   async function fetchOrderByStripe(sessionId: string) {
-    const { data } = await supabase.rpc('get_order_by_stripe_session', {
-      p_session_id: sessionId,
-    })
+    const data = await fetchOrderByStripeSession(sessionId)
 
-    if (data && typeof data === 'object' && 'id' in data) {
-      currentOrderId.value = (data as { id: string }).id
-      orderEmail.value = (data as { email?: string }).email || ''
-      orderNumber.value = (data as { order_number?: string }).order_number || ''
-      trackingToken.value = (data as { tracking_token?: string }).tracking_token || ''
+    if (data) {
+      currentOrderId.value = data.id
+      orderEmail.value = data.email || ''
+      orderNumber.value = data.order_number || ''
+      trackingToken.value = data.tracking_token || ''
     }
   }
 
   async function fetchLastOrder() {
-    const { data } = await supabase
-      .from('orders')
-      .select('id, email, order_number, tracking_token')
-      .eq('user_id', auth.user!.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
+    const data = await fetchLastUserOrder(auth.user!.id)
     if (data) {
       currentOrderId.value = data.id
       orderEmail.value = data.email
       orderNumber.value = data.order_number || ''
       trackingToken.value = data.tracking_token || ''
     }
-  }
-
-  // Guest Conversion
-  async function handleGuestConversion() {
-    if (!orderEmail.value || !password.value || !currentOrderId.value) return
-    isConverting.value = true
-
-    const activationRedirectUrl = `${window.location.origin}/auth/callback`
-
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: orderEmail.value,
-        password: password.value,
-        options: {
-          data: { full_name: t('checkout.success.newMember') },
-          emailRedirectTo: activationRedirectUrl,
-        },
-      })
-
-      if (authError) throw authError
-      if (!authData.user) throw new Error(t('checkout.success.accountCreationError'))
-
-      const { error: rpcError } = await supabase.rpc('claim_order_for_user', {
-        p_order_id: currentOrderId.value,
-        p_user_id: authData.user.id,
-      })
-
-      if (rpcError) {
-        throw new Error(t('checkout.success.linkOrderError'))
-      }
-
-      toast.show(t('checkout.success.confirmationEmailSent'), 'success')
-      router.push('/auth/email-sent')
-    } catch (err: any) {
-      console.error('Erreur conversion:', err)
-      toast.show(err.message || t('checkout.success.conversionError'), 'danger')
-    } finally {
-      isConverting.value = false
-    }
-  }
-
-  // Guest Tracking Navigation
-  function goToGuestTracking() {
-    if (!trackingToken.value) {
-      toast.show(t('checkout.success.trackingTokenNotFound'), 'danger')
-      return
-    }
-    router.push(`/suivi-commande?token=${trackingToken.value}`)
   }
 </script>
 
@@ -879,7 +524,7 @@
       }
 
       &--error {
-        background: linear-gradient(160deg, #7f1d1d 0%, #991b1b 100%);
+        background: linear-gradient(160deg, @danger-900 0%, @danger-800 100%);
       }
     }
 
@@ -950,19 +595,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(16, 185, 129, 0.2);
+      background: rgba(var(--success-500-rgb), 0.2);
       border-radius: 50%;
-      color: #34d399;
+      color: @success-400;
       box-shadow:
-        0 0 0 4px rgba(16, 185, 129, 0.1),
+        0 0 0 4px rgba(var(--success-500-rgb), 0.1),
         0 6px 20px rgba(0, 0, 0, 0.2);
       animation: icon-pop 0.5s @ease;
 
       &--error {
-        background: rgba(239, 68, 68, 0.2);
-        color: #f87171;
+        background: rgba(var(--danger-500-rgb), 0.2);
+        color: @danger-400;
         box-shadow:
-          0 0 0 4px rgba(239, 68, 68, 0.1),
+          0 0 0 4px rgba(var(--danger-500-rgb), 0.1),
           0 6px 20px rgba(0, 0, 0, 0.2);
       }
     }
@@ -1046,7 +691,7 @@
       color: rgba(255, 255, 255, 0.6);
 
       svg {
-        color: #34d399;
+        color: @success-400;
         flex-shrink: 0;
       }
     }
@@ -1180,7 +825,7 @@
       }
 
       svg {
-        color: #10b981;
+        color: @success-500;
         flex-shrink: 0;
       }
     }
@@ -1232,7 +877,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
@@ -1291,7 +936,7 @@
       p {
         font-family: @font-body;
         font-size: 14px;
-        color: #991b1b;
+        color: @danger-800;
         margin: 0 0 16px;
         line-height: 1.5;
       }
@@ -1302,15 +947,15 @@
       align-items: center;
       gap: 8px;
       padding: 10px 14px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
+      background: @danger-50;
+      border: 1px solid @danger-200;
       border-radius: 8px;
       font-family: @font-body;
       font-size: 13px;
-      color: #dc2626;
+      color: @danger-600;
 
       svg {
-        color: #ef4444;
+        color: @danger-500;
       }
     }
 

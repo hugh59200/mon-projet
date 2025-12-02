@@ -292,7 +292,7 @@
   }
 
   .custom-textarea {
-    border: 1px solid #ccc;
+    border: 1px solid @neutral-300;
     border-radius: 6px;
     padding: 10px;
     font-size: 14px;
@@ -300,8 +300,8 @@
     resize: vertical;
 
     &:read-only {
-      background: #f8f8f8;
-      color: #666;
+      background: @neutral-50;
+      color: @neutral-600;
     }
   }
 
@@ -313,8 +313,8 @@
     gap: 10px;
     padding: 10px;
     border-radius: 8px;
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
+    background-color: @white;
+    border: 1px solid @neutral-200;
 
     img {
       max-width: 280px;

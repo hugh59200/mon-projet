@@ -3,9 +3,11 @@ import type { IconNameNext } from '../icon/BasicIconNext.vue'
 export type ButtonType = 'primary' | 'reverse' | 'secondary' | 'danger'
 export type ButtonSize = 'large' | 'medium' | 'small'
 export type ButtonVariant = 'filled' | 'outlined' | 'ghost'
+export type ButtonHtmlType = 'button' | 'submit' | 'reset'
 
 export type ButtonProps = {
   type?: ButtonType
+  htmlType?: ButtonHtmlType
   size?: ButtonSize
   variant?: ButtonVariant
   label?: string

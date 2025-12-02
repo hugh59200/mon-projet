@@ -67,7 +67,6 @@ const { locale, currentLocaleInfo, availableLocales, changeLocale } = useLanguag
 const flagIcons: Record<SupportedLocale, CustomIconName> = {
   fr: 'flagFR',
   en: 'flagEN',
-  de: 'flagDE',
 }
 
 const isOpen = ref(false)

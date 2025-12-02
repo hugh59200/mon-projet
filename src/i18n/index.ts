@@ -1,14 +1,12 @@
 import { createI18n } from 'vue-i18n'
 import fr from './locales/fr'
 import en from './locales/en'
-import de from './locales/de'
 
-export type SupportedLocale = 'fr' | 'en' | 'de'
+export type SupportedLocale = 'fr' | 'en'
 
 export const SUPPORTED_LOCALES: { code: SupportedLocale; name: string; flag: string }[] = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
 ]
 
 export const DEFAULT_LOCALE: SupportedLocale = 'fr'
@@ -37,7 +35,6 @@ const i18n = createI18n({
   messages: {
     fr,
     en,
-    de,
   },
 })
 

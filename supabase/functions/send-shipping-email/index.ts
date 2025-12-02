@@ -2,11 +2,13 @@
 
 import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
+import { getValidLocale, translations } from '../../utils/i18n.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
 interface ShippingBody {
   order_id: string
+  locale?: string
 }
 
 Deno.serve(
@@ -21,6 +23,10 @@ Deno.serve(
       .maybeSingle()
 
     if (!order) throw new Error('Order not found')
+
+    // Déterminer la locale (body > order > fallback EN)
+    const locale = getValidLocale(body.locale ?? order.locale)
+    const t = translations.shipping
 
     const orderNumber = order.order_number ?? order_id
     const isGuest = !order.user_id
@@ -52,16 +58,20 @@ Deno.serve(
       tracking_number: order.tracking_number,
       tracking_url,
       ctaUrl,
+      locale,
     })
+
+    // Sujet traduit
+    const emailSubject = t.subject[locale](orderNumber)
 
     await sendEmail({
       to: order.shipping_email,
-      subject: `Votre commande #${orderNumber} est en route`,
+      subject: emailSubject,
       html,
       type: 'shipping',
       order_id,
     })
 
-    return { success: true }
+    return { success: true, locale }
   }),
 )

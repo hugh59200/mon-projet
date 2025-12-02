@@ -411,10 +411,13 @@ export default {
     },
     product: {
       addToCart: 'Add to cart',
+      add: 'Add',
+      buyNow: 'Buy now',
       outOfStock: 'Out of stock',
       inStock: 'In stock',
       lowStock: 'Low stock',
       viewDetails: 'View details',
+      viewProduct: 'View product',
       quantity: 'Quantity',
       purity: 'Purity',
       format: 'Format',
@@ -445,6 +448,7 @@ export default {
   // ============================================
   product: {
     description: 'Description',
+    noDescription: 'No detailed description available.',
     specifications: 'Specifications',
     storage: 'Storage',
     research: 'Research Applications',
@@ -929,7 +933,6 @@ export default {
     current: 'English',
     fr: 'Français',
     en: 'English',
-    de: 'Deutsch',
     es: 'Español',
     it: 'Italiano',
   },

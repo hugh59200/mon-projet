@@ -29,8 +29,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fff;
-      border: 1px solid #e6e6e6;
+      background: @white;
+      border: 1px solid @neutral-200;
       transition:
         transform 0.15s ease,
         box-shadow 0.2s ease;
@@ -45,7 +45,7 @@
   /* ✅ GitHub : fond noir + logo blanc */
   .provider-github {
     &:deep(.icon-container) {
-      background: #302f2f;
+      background: @neutral-900;
       border: none;
 
       svg {
@@ -57,16 +57,16 @@
   /* ✅ Facebook : fond blanc, icône couleur, pas de fond flashy */
   .provider-facebook {
     &:deep(.icon-container) {
-      background: #fff;
-      border: 1px solid #c8caff;
+      background: @white;
+      border: 1px solid @info-200;
     }
   }
 
   /* ✅ Google idem : fond blanc propre */
   .provider-google {
     &:deep(.icon-container) {
-      background: #fff;
-      border: 1px solid #e6e6e6;
+      background: @white;
+      border: 1px solid @neutral-200;
     }
   }
 </style>

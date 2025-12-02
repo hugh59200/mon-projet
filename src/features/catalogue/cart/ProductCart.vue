@@ -9,16 +9,7 @@
       v-if="product.is_on_sale"
       class="product-card__promo"
     >
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path
-          d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-        />
-      </svg>
+      <BasicIconNext name="Star" :size="12" />
       <span>-{{ discountPercent }}%</span>
     </div>
 
@@ -27,13 +18,13 @@
       v-if="(product.stock ?? 0) <= 0"
       class="product-card__stock-badge product-card__stock-badge--out"
     >
-      Rupture
+      {{ t('catalogue.product.outOfStock') }}
     </div>
     <div
       v-else-if="(product.stock ?? 0) < 5"
       class="product-card__stock-badge product-card__stock-badge--low"
     >
-      Stock limité
+      {{ t('catalogue.product.lowStock') }}
     </div>
 
     <!-- Image -->
@@ -41,7 +32,7 @@
       <div class="product-card__image-inner">
         <img
           :src="product.image || defaultImage"
-          :alt="product.name"
+          :alt="productName"
           loading="lazy"
         />
       </div>
@@ -50,51 +41,18 @@
       <div class="product-card__quick-actions">
         <button
           class="product-card__quick-btn"
-          title="Voir le produit"
+          :title="t('catalogue.product.viewProduct')"
           @click.stop="$emit('view', product.id)"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle
-              cx="12"
-              cy="12"
-              r="3"
-            />
-          </svg>
+          <BasicIconNext name="Eye" :size="18" />
         </button>
         <button
           v-if="(product.stock ?? 0) > 0"
           class="product-card__quick-btn product-card__quick-btn--primary"
-          title="Ajouter au panier"
+          :title="t('catalogue.product.addToCart')"
           @click.stop="$emit('add', product)"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="9"
-              cy="21"
-              r="1"
-            />
-            <circle
-              cx="20"
-              cy="21"
-              r="1"
-            />
-            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-          </svg>
+          <BasicIconNext name="ShoppingCart" :size="18" />
         </button>
       </div>
     </div>
@@ -107,43 +65,23 @@
           class="product-card__category-dot"
           :style="{ background: categoryColor }"
         ></span>
-        <span>{{ product.category }}</span>
+        <span>{{ productCategory }}</span>
       </div>
 
       <!-- Name -->
-      <h3 class="product-card__name">{{ product.name }}</h3>
+      <h3 class="product-card__name">{{ productName }}</h3>
 
       <!-- Specs -->
       <div class="product-card__specs">
         <div class="product-card__spec">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-            />
-          </svg>
+          <BasicIconNext name="FlaskConical" :size="14" />
           <span>{{ product.purity }}%</span>
         </div>
         <div
           v-if="product.dosage"
           class="product-card__spec"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
+          <BasicIconNext name="Shield" :size="14" />
           <span>{{ product.dosage }}</span>
         </div>
       </div>
@@ -173,27 +111,8 @@
           :disabled="(product.stock ?? 0) <= 0"
           @click.stop="$emit('add', product)"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="9"
-              cy="21"
-              r="1"
-            />
-            <circle
-              cx="20"
-              cy="21"
-              r="1"
-            />
-            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-          </svg>
-          <span>{{ (product.stock ?? 0) > 0 ? 'Ajouter' : 'Rupture' }}</span>
+          <BasicIconNext name="ShoppingCart" :size="16" />
+          <span>{{ (product.stock ?? 0) > 0 ? t('catalogue.product.add') : t('catalogue.product.outOfStock') }}</span>
         </button>
 
         <button
@@ -201,17 +120,8 @@
           class="product-card__btn product-card__btn--secondary"
           @click.stop="$emit('buy', product)"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          <span>Acheter</span>
+          <BasicIconNext name="Zap" :size="16" />
+          <span>{{ t('catalogue.product.buyNow') }}</span>
         </button>
       </div>
     </div>
@@ -220,12 +130,21 @@
 
 <script setup lang="ts">
   import type { Products } from '@/supabase/types/supabase.types'
-  import { computed } from 'vue'
+  import { useTranslatedProduct } from '@/composables/useTranslated'
+  import { computed, toRef } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const props = defineProps<{
     product: Products
     viewMode?: 'grid' | 'list'
   }>()
+
+  // Traductions automatiques du produit
+  const { name: productName, category: productCategory } = useTranslatedProduct(
+    toRef(props, 'product'),
+  )
 
   defineEmits(['view', 'add', 'buy'])
 
@@ -315,13 +234,13 @@
       align-items: center;
       gap: 4px;
       padding: 6px 10px;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
       border-radius: 8px;
       font-family: @font-body;
       font-size: 11px;
       font-weight: 700;
-      color: white;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      color: @white;
+      box-shadow: 0 4px 12px rgba(var(--danger-500-rgb), 0.4);
     }
 
     &__stock-badge {
@@ -338,15 +257,15 @@
       letter-spacing: 0.5px;
 
       &--out {
-        background: rgba(239, 68, 68, 0.15);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        background: rgba(var(--danger-500-rgb), 0.15);
+        color: @danger-500;
+        border: 1px solid rgba(var(--danger-500-rgb), 0.3);
       }
 
       &--low {
-        background: rgba(245, 158, 11, 0.15);
-        color: #f59e0b;
-        border: 1px solid rgba(245, 158, 11, 0.3);
+        background: rgba(var(--warning-500-rgb), 0.15);
+        color: @warning-500;
+        border: 1px solid rgba(var(--warning-500-rgb), 0.3);
       }
     }
 
@@ -503,7 +422,7 @@
       color: @neutral-100;
 
       &--sale {
-        color: #ef4444;
+        color: @danger-500;
       }
     }
 

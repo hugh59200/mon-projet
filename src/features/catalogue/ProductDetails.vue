@@ -13,43 +13,16 @@
           class="product-page__back"
           @click="$router.push('/catalogue')"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <BasicIconNext name="ArrowLeft" :size="20" />
           <span>Retour au catalogue</span>
         </button>
 
         <div class="product-page__breadcrumb">
           <span @click="$router.push('/')">Accueil</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
+          <BasicIconNext name="ChevronRight" :size="16" />
           <span @click="$router.push('/catalogue')">Catalogue</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-          <span class="active">{{ product?.name || '...' }}</span>
+          <BasicIconNext name="ChevronRight" :size="16" />
+          <span class="active">{{ productName || '...' }}</span>
         </div>
       </nav>
 
@@ -74,33 +47,13 @@
                   v-if="product.is_on_sale"
                   class="product__badge product__badge--promo"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                    />
-                  </svg>
+                  <BasicIconNext name="Star" :size="14" />
                   PROMO
                 </div>
 
                 <!-- Badge RUO -->
                 <div class="product__badge product__badge--ruo">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
+                  <BasicIconNext name="Lightbulb" :size="12" />
                   RECHERCHE UNIQUEMENT
                 </div>
 
@@ -110,27 +63,13 @@
                     v-if="product.image"
                     :src="product.image"
                     :zoomSrc="product.image"
-                    :alt="`Peptide ${product.name}`"
+                    :alt="`Peptide ${productName}`"
                     class="product__image"
                     moveType="drag"
                     zoomType="click"
                   />
                   <div class="product__image-hint">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle
-                        cx="11"
-                        cy="11"
-                        r="8"
-                      />
-                      <path d="M21 21l-4.35-4.35M11 8v6M8 11h6" />
-                    </svg>
+                    <BasicIconNext name="ZoomIn" :size="16" />
                     Cliquez pour zoomer
                   </div>
                 </div>
@@ -138,46 +77,15 @@
                 <!-- Indicateurs de confiance -->
                 <div class="product__trust-strip">
                   <div class="product__trust-item">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                      />
-                    </svg>
+                    <BasicIconNext name="ShieldCheck" :size="18" />
                     <span>Certifié</span>
                   </div>
                   <div class="product__trust-item">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+                    <BasicIconNext name="FileText" :size="18" />
                     <span>COA inclus</span>
                   </div>
                   <div class="product__trust-item">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <BasicIconNext name="Zap" :size="18" />
                     <span>Expédition 24h</span>
                   </div>
                 </div>
@@ -193,10 +101,10 @@
                     class="product__category-dot"
                     :style="{ background: getCategoryColor(product.category) }"
                   ></span>
-                  {{ product.category }}
+                  {{ productCategory }}
                 </div>
 
-                <h1 class="product__title">{{ product.name }}</h1>
+                <h1 class="product__title">{{ productName }}</h1>
 
                 <p
                   v-if="product.dosage"
@@ -210,18 +118,7 @@
               <div class="product__specs">
                 <div class="product__spec">
                   <div class="product__spec-icon product__spec-icon--purity">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                      />
-                    </svg>
+                    <BasicIconNext name="FlaskConical" :size="20" />
                   </div>
                   <div class="product__spec-content">
                     <span class="product__spec-label">Pureté</span>
@@ -233,16 +130,7 @@
 
                 <div class="product__spec">
                   <div class="product__spec-icon product__spec-icon--stock">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
+                    <BasicIconNext name="Package" :size="20" />
                   </div>
                   <div class="product__spec-content">
                     <span class="product__spec-label">Stock</span>
@@ -302,26 +190,7 @@
                     :disabled="(product.stock ?? 0) <= 0"
                     @click="addToCart(product!)"
                   >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle
-                        cx="9"
-                        cy="21"
-                        r="1"
-                      />
-                      <circle
-                        cx="20"
-                        cy="21"
-                        r="1"
-                      />
-                      <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-                    </svg>
+                    <BasicIconNext name="ShoppingCart" :size="20" />
                     <span>
                       {{ (product.stock ?? 0) > 0 ? 'Ajouter au panier' : 'Rupture de stock' }}
                     </span>
@@ -332,16 +201,7 @@
                     class="product__btn product__btn--secondary"
                     @click="buyNow(product!)"
                   >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <BasicIconNext name="Zap" :size="20" />
                     <span>Acheter maintenant</span>
                   </button>
                 </div>
@@ -351,18 +211,7 @@
                   v-if="(product.stock ?? 0) > 0 && (product.stock ?? 0) < 10"
                   class="product__stock-alert"
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
+                  <BasicIconNext name="AlertTriangle" :size="16" />
                   <span>
                     Plus que
                     <strong>{{ product.stock }}</strong>
@@ -375,18 +224,7 @@
               <div class="product__guarantees">
                 <div class="product__guarantee">
                   <div class="product__guarantee-icon">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    >
-                      <path
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                      />
-                    </svg>
+                    <BasicIconNext name="ShieldCheck" :size="24" />
                   </div>
                   <div>
                     <strong>Pureté garantie ≥99%</strong>
@@ -395,23 +233,7 @@
                 </div>
                 <div class="product__guarantee">
                   <div class="product__guarantee-icon">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    >
-                      <rect
-                        x="1"
-                        y="3"
-                        width="15"
-                        height="13"
-                        rx="2"
-                      />
-                      <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                    </svg>
+                    <BasicIconNext name="Truck" :size="24" />
                   </div>
                   <div>
                     <strong>Livraison sécurisée</strong>
@@ -420,16 +242,7 @@
                 </div>
                 <div class="product__guarantee">
                   <div class="product__guarantee-icon">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    >
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
+                    <BasicIconNext name="Shield" :size="24" />
                   </div>
                   <div>
                     <strong>Paiement sécurisé</strong>
@@ -448,17 +261,7 @@
                 :class="{ 'product__tab--active': activeTab === 'description' }"
                 @click="activeTab = 'description'"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-                </svg>
+                <BasicIconNext name="FileText" :size="18" />
                 Fiche technique
               </button>
               <button
@@ -466,18 +269,7 @@
                 :class="{ 'product__tab--active': activeTab === 'protocol' }"
                 @click="activeTab = 'protocol'"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                  />
-                </svg>
+                <BasicIconNext name="FlaskConical" :size="18" />
                 Protocoles
               </button>
               <button
@@ -485,23 +277,7 @@
                 :class="{ 'product__tab--active': activeTab === 'shipping' }"
                 @click="activeTab = 'shipping'"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="1"
-                    y="3"
-                    width="15"
-                    height="13"
-                    rx="2"
-                  />
-                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                </svg>
+                <BasicIconNext name="Truck" :size="18" />
                 Livraison
               </button>
             </div>
@@ -515,7 +291,7 @@
                 <div
                   class="product__description prose"
                   v-html="
-                    sanitizeHTML(product.description || 'Aucune description détaillée disponible.')
+                    sanitizeHTML(productDescription || t('product.noDescription'))
                   "
                 ></div>
               </div>
@@ -562,21 +338,7 @@
 
           <!-- Disclaimer -->
           <div class="product__disclaimer">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-              />
-              <path d="M12 16v-4M12 8h.01" />
-            </svg>
+            <BasicIconNext name="Info" :size="20" />
             <p>
               <strong>Usage Recherche Uniquement (RUO)</strong>
               — Ce produit est strictement destiné à la recherche en laboratoire. Non destiné à la
@@ -591,15 +353,18 @@
 
 <script setup lang="ts">
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+  import { useTranslatedProduct } from '@/composables/useTranslated'
+  import { fetchProductById } from '@/api/supabase/products'
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute, useRouter } from 'vue-router'
   import ProductEssentials from '../shared/components/ProductEssentials.vue'
 
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const cart = useCartStore()
@@ -608,6 +373,13 @@
   const product = ref<Products | null>(null)
   const loading = ref(true)
   const activeTab = ref<'description' | 'protocol' | 'shipping'>('description')
+
+  // Traductions automatiques du produit
+  const {
+    name: productName,
+    category: productCategory,
+    description: productDescription,
+  } = useTranslatedProduct(product)
 
   // Couleurs par catégorie
   const categoryColors: Record<string, string> = {
@@ -635,9 +407,9 @@
     loading.value = true
 
     try {
-      const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
+      const data = await fetchProductById(id)
 
-      if (!error && data) {
+      if (data) {
         product.value = data
         const productName = data.name || 'Produit Inconnu'
         const metaTitle = `${productName}${data.dosage ? ' - ' + data.dosage : ''} | Fast Peptides`
@@ -844,9 +616,9 @@
       &--promo {
         top: 16px;
         left: 16px;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
+        color: @white;
+        box-shadow: 0 4px 12px rgba(var(--danger-500-rgb), 0.3);
       }
 
       &--ruo {
@@ -995,13 +767,13 @@
       flex-shrink: 0;
 
       &--purity {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
+        background: rgba(var(--success-500-rgb), 0.1);
+        color: @success-500;
       }
 
       &--stock {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
+        background: rgba(var(--info-500-rgb), 0.1);
+        color: @info-500;
       }
 
       &--origin {
@@ -1032,13 +804,13 @@
       color: @neutral-800;
 
       &--success {
-        color: #10b981;
+        color: @success-500;
       }
       &--warning {
-        color: #f59e0b;
+        color: @warning-500;
       }
       &--danger {
-        color: #ef4444;
+        color: @danger-500;
       }
     }
 
@@ -1071,8 +843,8 @@
 
     &__discount-badge {
       padding: 4px 8px;
-      background: #fee2e2;
-      color: #dc2626;
+      background: @danger-50;
+      color: @danger-600;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
@@ -1092,7 +864,7 @@
       }
 
       &--sale {
-        color: #dc2626;
+        color: @danger-600;
       }
     }
 
@@ -1161,15 +933,15 @@
       align-items: center;
       gap: 10px;
       padding: 12px 16px;
-      background: #fef3c7;
-      border: 1px solid #fcd34d;
+      background: @warning-100;
+      border: 1px solid @warning-300;
       border-radius: 10px;
       font-family: @font-body;
       font-size: 13px;
-      color: #92400e;
+      color: @warning-800;
 
       svg {
-        color: #f59e0b;
+        color: @warning-500;
         flex-shrink: 0;
       }
 
@@ -1385,12 +1157,12 @@
       align-items: flex-start;
       gap: 14px;
       padding: 20px 24px;
-      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-      border: 1px solid #fecaca;
+      background: linear-gradient(135deg, @danger-50 0%, @danger-100 100%);
+      border: 1px solid @danger-200;
       border-radius: 16px;
 
       svg {
-        color: #dc2626;
+        color: @danger-600;
         flex-shrink: 0;
         margin-top: 2px;
       }
@@ -1399,7 +1171,7 @@
         font-family: @font-body;
         font-size: 14px;
         line-height: 1.6;
-        color: #991b1b;
+        color: @danger-800;
         margin: 0;
 
         strong {

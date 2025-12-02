@@ -25,19 +25,11 @@
             @click="toggleExpanded"
           >
             <span class="catalogue-dock__icon-wrapper">
-              <svg
+              <BasicIconNext
+                name="Package"
+                :size="20"
                 class="catalogue-dock__icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path
-                  d="M20 7L12 3L4 7M20 7L12 11M20 7V17L12 21M12 11L4 7M12 11V21M4 7V17L12 21"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              />
             </span>
             <span class="catalogue-dock__label">Catalogue</span>
           </button>
@@ -68,18 +60,10 @@
                 @click="collapse"
                 aria-label="Fermer le panneau"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M15 19l-7-7 7-7"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+                <BasicIconNext
+                  name="ChevronLeft"
+                  :size="20"
+                />
               </button>
             </div>
 
@@ -118,41 +102,10 @@
                 class="catalogue-dock__action catalogue-dock__action--primary"
                 @click="handleNavigation"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <rect
-                    x="3"
-                    y="3"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="14"
-                    y="3"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="3"
-                    y="14"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="14"
-                    y="14"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                </svg>
+                <BasicIconNext
+                  name="LayoutGrid"
+                  :size="18"
+                />
                 <span>Tout le catalogue</span>
               </RouterLink>
 
@@ -161,21 +114,10 @@
                 class="catalogue-dock__action"
                 @click="handleNavigation"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                  <line
-                    x1="3"
-                    y1="6"
-                    x2="21"
-                    y2="6"
-                  />
-                  <path d="M16 10a4 4 0 01-8 0" />
-                </svg>
+                <BasicIconNext
+                  name="ShoppingBag"
+                  :size="18"
+                />
                 <span>Mon panier</span>
                 <span
                   v-if="cartItemCount > 0"
@@ -190,38 +132,10 @@
                 class="catalogue-dock__action"
                 @click="handleNavigation"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <rect
-                    x="4"
-                    y="2"
-                    width="16"
-                    height="20"
-                    rx="2"
-                  />
-                  <line
-                    x1="8"
-                    y1="6"
-                    x2="16"
-                    y2="6"
-                  />
-                  <line
-                    x1="8"
-                    y1="10"
-                    x2="16"
-                    y2="10"
-                  />
-                  <line
-                    x1="8"
-                    y1="14"
-                    x2="12"
-                    y2="14"
-                  />
-                </svg>
+                <BasicIconNext
+                  name="FileText"
+                  :size="18"
+                />
                 <span>Calculateur</span>
               </RouterLink>
             </div>
@@ -250,6 +164,7 @@
     autoCollapseDelay?: number
     allowedRoutes?: string[] // Routes où le dock PEUT s'afficher
     headerSelector?: string // Sélecteur CSS du header à observer
+    footerSelector?: string // Sélecteur CSS du footer à observer
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -257,6 +172,7 @@
     // 🆕 Liste blanche : le dock n'apparaît QUE sur ces routes
     allowedRoutes: () => ['/', '/actualites', '/faq', '/cgu', '/guide-reconstitution'],
     headerSelector: '.navbar',
+    footerSelector: '.footer',
   })
 
   // ═══════════════════════════════════════════════════════════════
@@ -281,7 +197,9 @@
 
   // 🆕 IntersectionObserver state
   const isHeaderVisible = ref(true)
+  const isFooterVisible = ref(false)
   const headerObserver = ref<IntersectionObserver | null>(null)
+  const footerObserver = ref<IntersectionObserver | null>(null)
 
   // ═══════════════════════════════════════════════════════════════
   // COMPUTED
@@ -308,6 +226,9 @@
 
     // 🆕 Ne pas afficher si le header est visible
     if (isHeaderVisible.value) return false
+
+    // 🆕 Ne pas afficher si le footer est visible
+    if (isFooterVisible.value) return false
 
     return true
   })
@@ -361,11 +282,6 @@
     }
   }
 
-  function expand() {
-    isExpanded.value = true
-    cancelCollapseTimer()
-  }
-
   function collapse() {
     isExpanded.value = false
     cancelCollapseTimer()
@@ -373,12 +289,18 @@
 
   function handleMouseEnter() {
     isHovering.value = true
-    expand()
+    // 🆕 Ne plus expand au hover, seulement annuler le timer de collapse
+    if (isExpanded.value) {
+      cancelCollapseTimer()
+    }
   }
 
   function handleMouseLeave() {
     isHovering.value = false
-    startCollapseTimer()
+    // 🆕 Démarrer le timer de collapse seulement si expanded
+    if (isExpanded.value) {
+      startCollapseTimer()
+    }
   }
 
   function startCollapseTimer() {
@@ -435,6 +357,39 @@
     }
   }
 
+  // 🆕 Setup IntersectionObserver pour le footer
+  function setupFooterObserver() {
+    const footer = document.querySelector(props.footerSelector)
+
+    if (!footer) {
+      console.warn(`[CatalogueDock] Footer element "${props.footerSelector}" not found`)
+      isFooterVisible.value = false
+      return
+    }
+
+    footerObserver.value = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Le footer est considéré "visible" si au moins un pixel est dans le viewport
+          isFooterVisible.value = entry.isIntersecting
+        })
+      },
+      {
+        rootMargin: '0px 0px 0px 0px',
+        threshold: 0, // Dès qu'un pixel est visible
+      },
+    )
+
+    footerObserver.value.observe(footer)
+  }
+
+  function cleanupFooterObserver() {
+    if (footerObserver.value) {
+      footerObserver.value.disconnect()
+      footerObserver.value = null
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // LIFECYCLE
   // ═══════════════════════════════════════════════════════════════
@@ -445,13 +400,17 @@
       productsStore.load()
     }
 
-    // 🆕 Setup l'observer après un petit délai (laisser le DOM se stabiliser)
-    setTimeout(setupHeaderObserver, 100)
+    // 🆕 Setup les observers après un petit délai (laisser le DOM se stabiliser)
+    setTimeout(() => {
+      setupHeaderObserver()
+      setupFooterObserver()
+    }, 100)
   })
 
   onUnmounted(() => {
     cancelCollapseTimer()
     cleanupHeaderObserver()
+    cleanupFooterObserver()
   })
 
   // Reset on route change
@@ -459,9 +418,13 @@
     () => route.path,
     () => {
       collapse()
-      // Re-setup l'observer en cas de changement de layout
+      // Re-setup les observers en cas de changement de layout
       cleanupHeaderObserver()
-      setTimeout(setupHeaderObserver, 100)
+      cleanupFooterObserver()
+      setTimeout(() => {
+        setupHeaderObserver()
+        setupFooterObserver()
+      }, 100)
     },
   )
 </script>
@@ -473,16 +436,16 @@
 
   @dock-bg: rgba(30, 41, 59, 0.97);
   @dock-border: rgba(255, 255, 255, 0.08);
-  @dock-accent: #a67c5b;
-  @dock-accent-light: #c9a68a;
-  @dock-text: #f1f5f9;
-  @dock-text-muted: #94a3b8;
+  @dock-accent: var(--primary-700);
+  @dock-accent-light: var(--primary-500);
+  @dock-text: @neutral-100;
+  @dock-text-muted: @neutral-500;
   @dock-collapsed-width: 52px;
   @dock-expanded-width: 260px;
   @dock-transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   // ═══════════════════════════════════════════════════════════════
-  // DOCK CONTAINER
+  // DOCK CONTAINER (BEM imbriqué)
   // ═══════════════════════════════════════════════════════════════
 
   .catalogue-dock {
@@ -494,26 +457,22 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
-
     background: @dock-bg;
     backdrop-filter: blur(20px) saturate(1.2);
     -webkit-backdrop-filter: blur(20px) saturate(1.2);
-
     border-radius: 0 16px 16px 0;
     border: 1px solid @dock-border;
     border-left: none;
-
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.3),
       0 2px 8px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
     transition:
       width @dock-transition,
       box-shadow @dock-transition;
-
     overflow: hidden;
 
+    // Modificateurs
     &--collapsed {
       width: @dock-collapsed-width;
     }
@@ -525,215 +484,383 @@
         0 4px 16px rgba(0, 0, 0, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
-  }
 
-  // ═══════════════════════════════════════════════════════════════
-  // TRIGGER
-  // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
+    // TRIGGER
+    // ═══════════════════════════════════════════════════════════════
 
-  .catalogue-dock__trigger {
-    position: relative;
-    width: @dock-collapsed-width;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px 0;
-    gap: 8px;
+    &__trigger {
+      position: relative;
+      width: @dock-collapsed-width;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      gap: 10px;
 
-    &::after {
-      content: '';
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 1px;
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          @dock-border 20%,
+          @dock-accent 50%,
+          @dock-border 80%,
+          transparent 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+
+        .catalogue-dock--expanded & {
+          opacity: 1;
+        }
+      }
+    }
+
+    &__toggle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 8px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: @dock-text;
+      transition: all 0.25s ease;
+      border-radius: 8px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+
+        .catalogue-dock__icon-wrapper {
+          transform: scale(1.1);
+          border-color: @dock-accent;
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid @dock-accent;
+        outline-offset: 2px;
+      }
+    }
+
+    &__icon-wrapper {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid @dock-border;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      transition: all 0.3s ease;
+    }
+
+    &__icon {
+      width: 18px;
+      height: 18px;
+      color: @dock-accent;
+    }
+
+    &__label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: @dock-text-muted;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+
+    &__cart-badge {
       position: absolute;
-      right: 0;
-      top: 20%;
-      height: 60%;
-      width: 1px;
-      background: linear-gradient(
-        180deg,
-        transparent 0%,
-        @dock-border 20%,
-        @dock-accent 50%,
-        @dock-border 80%,
-        transparent 100%
-      );
+      top: 8px;
+      right: 6px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background: @dock-accent;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(@dock-accent, 0.4);
+      animation: badge-pulse 2s ease-in-out infinite;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL
+    // ═══════════════════════════════════════════════════════════════
+
+    &__panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 16px 16px 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid @dock-border;
+    }
+
+    &__title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: @dock-accent-light;
+    }
+
+    &__close {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: @dock-text-muted;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: @dock-text;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CATEGORIES
+    // ═══════════════════════════════════════════════════════════════
+
+    &__categories {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 280px;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+      }
+    }
+
+    &__item {
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transform: translateX(-10px);
+      animation: item-appear 0.3s ease forwards;
+      animation-delay: var(--item-delay, 0s);
+    }
 
-      .catalogue-dock--expanded & {
-        opacity: 1;
+    &__link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: @dock-text;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%) scaleY(0);
+        width: 3px;
+        height: 60%;
+        background: var(--category-color, @dock-accent);
+        border-radius: 0 2px 2px 0;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+
+        &::before {
+          transform: translateY(-50%) scaleY(1);
+        }
+
+        .catalogue-dock__item-icon {
+          transform: scale(1.1);
+        }
+      }
+
+      &.router-link-active {
+        background: rgba(255, 255, 255, 0.08);
+
+        &::before {
+          transform: translateY(-50%) scaleY(1);
+        }
       }
     }
-  }
 
-  .catalogue-dock__toggle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: @dock-text;
-    transition: all 0.25s ease;
-    border-radius: 8px;
+    &__item-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      transition: all 0.25s ease;
+      flex-shrink: 0;
+    }
 
-    &:hover {
+    &__item-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--category-color, @dock-accent);
+    }
+
+    &__item-label {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__item-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: @dock-text-muted;
       background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
 
-      .catalogue-dock__icon-wrapper {
-        transform: scale(1.1);
-        border-color: @dock-accent;
+    // ═══════════════════════════════════════════════════════════════
+    // DIVIDER & ACTIONS
+    // ═══════════════════════════════════════════════════════════════
+
+    &__divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, @dock-border 50%, transparent 100%);
+      margin: 16px 0;
+    }
+
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__action {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: @dock-text-muted;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: @dock-text;
+      }
+
+      &--primary {
+        background: rgba(@dock-accent, 0.12);
+        color: @dock-accent-light;
+        border: 1px solid rgba(@dock-accent, 0.2);
+
+        &:hover {
+          background: rgba(@dock-accent, 0.2);
+          border-color: rgba(@dock-accent, 0.35);
+        }
       }
     }
 
-    &:focus-visible {
-      outline: 2px solid @dock-accent;
-      outline-offset: 2px;
+    &__action-badge {
+      margin-left: auto;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: @dock-accent;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // GRADIENT DECO
+    // ═══════════════════════════════════════════════════════════════
+
+    &__gradient-deco {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(180deg, transparent 0%, rgba(@dock-accent, 0.05) 100%);
+      pointer-events: none;
+      border-radius: 0 0 16px 0;
     }
   }
 
-  .catalogue-dock__icon-wrapper {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid @dock-border;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    transition: all 0.3s ease;
-  }
-
-  .catalogue-dock__icon {
-    width: 18px;
-    height: 18px;
-    color: @dock-accent;
-  }
-
-  .catalogue-dock__label {
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: @dock-text-muted;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-  }
-
-  .catalogue-dock__cart-badge {
-    position: absolute;
-    top: 8px;
-    right: 6px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    background: @dock-accent;
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(@dock-accent, 0.4);
-    animation: badge-pulse 2s ease-in-out infinite;
-  }
+  // ═══════════════════════════════════════════════════════════════
+  // KEYFRAMES
+  // ═══════════════════════════════════════════════════════════════
 
   @keyframes badge-pulse {
     0%,
     100% {
       transform: scale(1);
     }
+
     50% {
       transform: scale(1.05);
     }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // PANEL
-  // ═══════════════════════════════════════════════════════════════
-
-  .catalogue-dock__panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px 16px 16px 8px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .catalogue-dock__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid @dock-border;
-  }
-
-  .catalogue-dock__title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: @dock-accent-light;
-  }
-
-  .catalogue-dock__close {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: @dock-text-muted;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-
-    svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: @dock-text;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // CATEGORIES
-  // ═══════════════════════════════════════════════════════════════
-
-  .catalogue-dock__categories {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 280px;
-    overflow-y: auto;
-
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-    }
-  }
-
-  .catalogue-dock__item {
-    opacity: 0;
-    transform: translateX(-10px);
-    animation: item-appear 0.3s ease forwards;
-    animation-delay: var(--item-delay, 0s);
   }
 
   @keyframes item-appear {
@@ -743,171 +870,8 @@
     }
   }
 
-  .catalogue-dock__link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: @dock-text;
-    transition: all 0.2s ease;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%) scaleY(0);
-      width: 3px;
-      height: 60%;
-      background: var(--category-color, @dock-accent);
-      border-radius: 0 2px 2px 0;
-      transition: transform 0.2s ease;
-    }
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.06);
-
-      &::before {
-        transform: translateY(-50%) scaleY(1);
-      }
-
-      .catalogue-dock__item-icon {
-        transform: scale(1.1);
-      }
-    }
-
-    &.router-link-active {
-      background: rgba(255, 255, 255, 0.08);
-
-      &::before {
-        transform: translateY(-50%) scaleY(1);
-      }
-    }
-  }
-
-  .catalogue-dock__item-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.04);
-    transition: all 0.25s ease;
-    flex-shrink: 0;
-  }
-
-  .catalogue-dock__item-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--category-color, @dock-accent);
-  }
-
-  .catalogue-dock__item-label {
-    flex: 1;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .catalogue-dock__item-count {
-    font-size: 11px;
-    font-weight: 600;
-    color: @dock-text-muted;
-    background: rgba(255, 255, 255, 0.06);
-    padding: 2px 8px;
-    border-radius: 10px;
-  }
-
   // ═══════════════════════════════════════════════════════════════
-  // DIVIDER & ACTIONS
-  // ═══════════════════════════════════════════════════════════════
-
-  .catalogue-dock__divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, @dock-border 50%, transparent 100%);
-    margin: 16px 0;
-  }
-
-  .catalogue-dock__actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .catalogue-dock__action {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: @dock-text-muted;
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-
-    svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: @dock-text;
-    }
-
-    &--primary {
-      background: rgba(@dock-accent, 0.12);
-      color: @dock-accent-light;
-      border: 1px solid rgba(@dock-accent, 0.2);
-
-      &:hover {
-        background: rgba(@dock-accent, 0.2);
-        border-color: rgba(@dock-accent, 0.35);
-      }
-    }
-  }
-
-  .catalogue-dock__action-badge {
-    margin-left: auto;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    background: @dock-accent;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // GRADIENT DECO
-  // ═══════════════════════════════════════════════════════════════
-
-  .catalogue-dock__gradient-deco {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: linear-gradient(180deg, transparent 0%, rgba(@dock-accent, 0.05) 100%);
-    pointer-events: none;
-    border-radius: 0 0 16px 0;
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // TRANSITIONS
+  // TRANSITIONS (Vue)
   // ═══════════════════════════════════════════════════════════════
 
   .dock-slide-enter-active,

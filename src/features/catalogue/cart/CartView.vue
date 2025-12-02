@@ -14,41 +14,13 @@
             class="cart__back"
             @click="$router.push('/catalogue')"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
+            <BasicIconNext name="ArrowLeft" :size="20" />
             <span>Continuer mes achats</span>
           </button>
         </div>
 
         <h1 class="cart__title">
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="9"
-              cy="21"
-              r="1"
-            />
-            <circle
-              cx="20"
-              cy="21"
-              r="1"
-            />
-            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-          </svg>
+          <BasicIconNext name="ShoppingCart" :size="28" />
           Mon panier
           <span
             v-if="cart.items.length > 0"
@@ -64,18 +36,7 @@
             class="cart__clear"
             @click="confirmClearCart"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
-              />
-            </svg>
+            <BasicIconNext name="Trash2" :size="18" />
             <span>Vider le panier</span>
           </button>
         </div>
@@ -88,26 +49,7 @@
       >
         <div class="cart__empty-visual">
           <div class="cart__empty-icon">
-            <svg
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <circle
-                cx="9"
-                cy="21"
-                r="1"
-              />
-              <circle
-                cx="20"
-                cy="21"
-                r="1"
-              />
-              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-            </svg>
+            <BasicIconNext name="ShoppingCart" :size="64" />
           </div>
           <div class="cart__empty-circles">
             <span></span>
@@ -125,16 +67,7 @@
           class="cart__empty-btn"
           @click="$router.push('/catalogue')"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
-          </svg>
+          <BasicIconNext name="ShoppingBag" :size="20" />
           Explorer le catalogue
         </button>
 
@@ -206,17 +139,7 @@
                   </p>
                   <div class="cart-item__meta">
                     <span class="cart-item__stock cart-item__stock--in">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                        <path d="M22 4L12 14.01l-3-3" />
-                      </svg>
+                      <BasicIconNext name="CheckCircle2" :size="12" />
                       En stock
                     </span>
                   </div>
@@ -247,16 +170,7 @@
                     @click="updateQuantity(item, -1)"
                     :disabled="(item.quantity ?? 1) <= 1"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M5 12h14" />
-                    </svg>
+                    <BasicIconNext name="Minus" :size="16" />
                   </button>
                   <input
                     type="number"
@@ -269,16 +183,7 @@
                     class="cart-item__qty-btn"
                     @click="updateQuantity(item, 1)"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
+                    <BasicIconNext name="Plus" :size="16" />
                   </button>
                 </div>
               </div>
@@ -297,18 +202,7 @@
                   @click="removeItem(item)"
                   title="Supprimer"
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"
-                    />
-                  </svg>
+                  <BasicIconNext name="Trash2" :size="18" />
                 </button>
               </div>
 
@@ -320,32 +214,14 @@
                     @click="updateQuantity(item, -1)"
                     :disabled="(item.quantity ?? 1) <= 1"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M5 12h14" />
-                    </svg>
+                    <BasicIconNext name="Minus" :size="16" />
                   </button>
                   <span class="cart-item__qty-value">{{ item.quantity ?? 1 }}</span>
                   <button
                     class="cart-item__qty-btn"
                     @click="updateQuantity(item, 1)"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
+                    <BasicIconNext name="Plus" :size="16" />
                   </button>
                 </div>
 
@@ -361,18 +237,7 @@
         <aside class="cart__sidebar">
           <div class="cart__summary">
             <h3 class="cart__summary-title">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
+              <BasicIconNext name="ClipboardList" :size="20" />
               Récapitulatif
             </h3>
 
@@ -387,24 +252,7 @@
                 class="cart__summary-row cart__summary-row--discount"
               >
                 <span>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
-                    />
-                    <line
-                      x1="7"
-                      y1="7"
-                      x2="7.01"
-                      y2="7"
-                    />
-                  </svg>
+                  <BasicIconNext name="Tag" :size="14" />
                   Économies
                 </span>
                 <span>-{{ formatPrice(totalDiscount) }}</span>
@@ -429,33 +277,7 @@
                   ></div>
                 </div>
                 <p class="cart__shipping-text">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect
-                      x="1"
-                      y="3"
-                      width="15"
-                      height="13"
-                      rx="2"
-                    />
-                    <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                    <circle
-                      cx="5.5"
-                      cy="18.5"
-                      r="2.5"
-                    />
-                    <circle
-                      cx="18.5"
-                      cy="18.5"
-                      r="2.5"
-                    />
-                  </svg>
+                  <BasicIconNext name="Truck" :size="14" />
                   Plus que
                   <strong>{{ formatPrice(FREE_SHIPPING_THRESHOLD - cartSubtotal) }}</strong>
                   pour la livraison offerte
@@ -466,17 +288,7 @@
                 v-else
                 class="cart__shipping-success"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                  <path d="M22 4L12 14.01l-3-3" />
-                </svg>
+                <BasicIconNext name="CheckCircle2" :size="18" />
                 <span>Livraison offerte !</span>
               </div>
 
@@ -492,84 +304,22 @@
               class="cart__checkout-btn"
               @click="$router.push('/checkout')"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
+              <BasicIconNext name="Shield" :size="20" />
               Procéder au paiement
             </button>
 
             <!-- Trust Badges -->
             <div class="cart__trust">
               <div class="cart__trust-item">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="3"
-                    y="11"
-                    width="18"
-                    height="11"
-                    rx="2"
-                  />
-                  <path d="M7 11V7a5 5 0 0110 0v4" />
-                </svg>
+                <BasicIconNext name="Lock" :size="18" />
                 <span>Paiement sécurisé</span>
               </div>
               <div class="cart__trust-item">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="1"
-                    y="3"
-                    width="15"
-                    height="13"
-                    rx="2"
-                  />
-                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" />
-                  <circle
-                    cx="5.5"
-                    cy="18.5"
-                    r="2.5"
-                  />
-                  <circle
-                    cx="18.5"
-                    cy="18.5"
-                    r="2.5"
-                  />
-                </svg>
+                <BasicIconNext name="Truck" :size="18" />
                 <span>Expédition 24h</span>
               </div>
               <div class="cart__trust-item">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
+                <BasicIconNext name="ShieldCheck" :size="18" />
                 <span>Pureté garantie</span>
               </div>
             </div>
@@ -578,86 +328,14 @@
             <div class="cart__payment-methods">
               <span>Nous acceptons</span>
               <div class="cart__payment-icons">
-                <div
-                  class="cart__payment-icon"
-                  title="Visa"
-                >
-                  <svg
-                    viewBox="0 0 48 48"
-                    fill="none"
-                  >
-                    <rect
-                      width="48"
-                      height="48"
-                      rx="6"
-                      fill="#1A1F71"
-                    />
-                    <path
-                      d="M19.5 30H16.5L18.5 18H21.5L19.5 30Z"
-                      fill="white"
-                    />
-                    <path
-                      d="M30 18L27.5 26L27 24L26 19C26 19 25.8 18 24.5 18H20L20 18.2C20 18.2 21.5 18.5 23.2 19.5L26 30H29L33 18H30Z"
-                      fill="white"
-                    />
-                  </svg>
+                <div class="cart__payment-icon" title="Visa">
+                  <BasicIconNext name="visa" :size="32" />
                 </div>
-                <div
-                  class="cart__payment-icon"
-                  title="Mastercard"
-                >
-                  <svg
-                    viewBox="0 0 48 48"
-                    fill="none"
-                  >
-                    <rect
-                      width="48"
-                      height="48"
-                      rx="6"
-                      fill="#F5F5F5"
-                    />
-                    <circle
-                      cx="19"
-                      cy="24"
-                      r="10"
-                      fill="#EB001B"
-                    />
-                    <circle
-                      cx="29"
-                      cy="24"
-                      r="10"
-                      fill="#F79E1B"
-                    />
-                    <path
-                      d="M24 17C26 19 27 21 27 24C27 27 26 29 24 31C22 29 21 27 21 24C21 21 22 19 24 17Z"
-                      fill="#FF5F00"
-                    />
-                  </svg>
+                <div class="cart__payment-icon" title="Mastercard">
+                  <BasicIconNext name="mastercard" :size="32" />
                 </div>
-                <div
-                  class="cart__payment-icon"
-                  title="PayPal"
-                >
-                  <svg
-                    viewBox="0 0 48 48"
-                    fill="none"
-                  >
-                    <rect
-                      width="48"
-                      height="48"
-                      rx="6"
-                      fill="#003087"
-                    />
-                    <path
-                      d="M32.33 18.1C31.27 23.59 27.9 25.33 23.61 25.33H21.42L19.25 33.34L18.93 35.35C18.88 35.69 19.14 36 19.48 36H23.36L24.32 35.02L25.1 30.12C25.17 29.67 25.56 29.33 26.02 29.33H26.61C30.37 29.33 33.31 27.81 34.17 23.39C34.53 21.54 34.34 20 33.39 18.92C33.11 18.59 32.75 18.32 32.33 18.1Z"
-                      fill="white"
-                      fill-opacity="0.6"
-                    />
-                    <path
-                      d="M21.65 18.12L20.4 26L19.25 33.34H14.64L17.12 12.9C17.2 12.38 17.64 12 18.17 12H25.63C28.2 12 30.21 12.54 31.32 13.81C32.33 14.96 32.62 16.23 32.33 18.1C32.08 17.97 31.81 17.85 31.52 17.76L31.3 17.69C31.15 17.64 31 17.6 30.84 17.57C30.68 17.53 30.51 17.5 30.34 17.48C29.75 17.38 29.11 17.33 28.41 17.33H22.57C22.42 17.33 22.29 17.37 22.16 17.43C21.89 17.56 21.69 17.81 21.65 18.12Z"
-                      fill="white"
-                    />
-                  </svg>
+                <div class="cart__payment-icon" title="PayPal">
+                  <BasicIconNext name="paypal" :size="32" />
                 </div>
               </div>
             </div>
@@ -921,9 +599,9 @@
       transition: all 0.2s @ease;
 
       &:hover {
-        background: #fee2e2;
-        border-color: #fecaca;
-        color: #ef4444;
+        background: @danger-50;
+        border-color: @danger-200;
+        color: @danger-500;
       }
     }
 
@@ -1173,7 +851,7 @@
       color: @neutral-600;
 
       &--discount {
-        color: #10b981;
+        color: @success-500;
 
         span:first-child {
           display: flex;
@@ -1196,7 +874,7 @@
     }
 
     &__summary-free {
-      color: #10b981;
+      color: @success-500;
       font-weight: 600;
     }
 
@@ -1260,17 +938,17 @@
       padding: 12px;
       background: linear-gradient(
         135deg,
-        rgba(16, 185, 129, 0.1) 0%,
-        rgba(16, 185, 129, 0.05) 100%
+        rgba(var(--success-500-rgb), 0.1) 0%,
+        rgba(var(--success-500-rgb), 0.05) 100%
       );
       border-radius: 10px;
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: #059669;
+      color: @success-600;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
@@ -1317,7 +995,7 @@
       color: @neutral-500;
 
       svg {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
@@ -1407,12 +1085,12 @@
       top: -6px;
       left: -6px;
       padding: 4px 8px;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
       border-radius: 6px;
       font-family: @font-body;
       font-size: 10px;
       font-weight: 700;
-      color: white;
+      color: @white;
     }
 
     &__info {
@@ -1457,7 +1135,7 @@
       font-size: 12px;
 
       &--in {
-        color: #10b981;
+        color: @success-500;
       }
     }
 
@@ -1482,7 +1160,7 @@
       color: @neutral-900;
 
       &--sale {
-        color: #ef4444;
+        color: @danger-500;
       }
     }
 
@@ -1587,8 +1265,8 @@
       transition: all 0.2s @ease;
 
       &:hover {
-        background: #fee2e2;
-        color: #ef4444;
+        background: @danger-50;
+        color: @danger-500;
       }
     }
 

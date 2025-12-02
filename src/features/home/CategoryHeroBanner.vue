@@ -85,14 +85,7 @@
                     @click="goToCategory(slide)"
                   >
                     <span>{{ t('home.categories.common.explore') }} {{ slide.label }}</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                    <BasicIconNext name="ArrowRight" :size="2" />
                   </button>
                   <button
                     class="category-hero__btn category-hero__btn--ghost"
@@ -126,92 +119,12 @@
                     <span class="category-hero__card-badge">▶ {{ t('home.banner.carousel.guides') }}</span>
                     <h3>{{ slide.videoLabel }}</h3>
                     <span class="category-hero__card-play">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                      <BasicIconNext name="Play" :size="24" />
                     </span>
                   </div>
                 </div>
                 <div class="category-hero__molecule">
-                  <svg
-                    viewBox="0 0 100 100"
-                    fill="none"
-                  >
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="6"
-                      fill="currentColor"
-                      opacity="0.5"
-                    />
-                    <circle
-                      cx="25"
-                      cy="25"
-                      r="4"
-                      fill="currentColor"
-                      opacity="0.3"
-                    />
-                    <circle
-                      cx="75"
-                      cy="25"
-                      r="4"
-                      fill="currentColor"
-                      opacity="0.3"
-                    />
-                    <circle
-                      cx="25"
-                      cy="75"
-                      r="4"
-                      fill="currentColor"
-                      opacity="0.3"
-                    />
-                    <circle
-                      cx="75"
-                      cy="75"
-                      r="4"
-                      fill="currentColor"
-                      opacity="0.3"
-                    />
-                    <line
-                      x1="50"
-                      y1="50"
-                      x2="25"
-                      y2="25"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      opacity="0.2"
-                    />
-                    <line
-                      x1="50"
-                      y1="50"
-                      x2="75"
-                      y2="25"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      opacity="0.2"
-                    />
-                    <line
-                      x1="50"
-                      y1="50"
-                      x2="25"
-                      y2="75"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      opacity="0.2"
-                    />
-                    <line
-                      x1="50"
-                      y1="50"
-                      x2="75"
-                      y2="75"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      opacity="0.2"
-                    />
-                  </svg>
+                  <BasicIconNext name="molecule" />
                 </div>
               </div>
             </div>
@@ -995,8 +908,8 @@
         --nav-color-rgb: 20, 184, 166;
       }
       &--orange {
-        --nav-color: #f97316;
-        --nav-color-rgb: 249, 115, 22;
+        --nav-color: @warning-500;
+        --nav-color-rgb: var(--warning-500-rgb);
       }
       &--indigo {
         --nav-color: #6366f1;
@@ -1089,8 +1002,8 @@
       --slide-color-rgb: 20, 184, 166;
     }
     &__slide--orange {
-      --slide-color: #f97316;
-      --slide-color-rgb: 249, 115, 22;
+      --slide-color: @warning-500;
+      --slide-color-rgb: var(--warning-500-rgb);
     }
     &__slide--indigo {
       --slide-color: #6366f1;
@@ -1421,7 +1334,7 @@
         --prog-color: #14b8a6;
       }
       &--orange {
-        --prog-color: #f97316;
+        --prog-color: @warning-500;
       }
       &--indigo {
         --prog-color: #6366f1;

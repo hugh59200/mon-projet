@@ -20,6 +20,7 @@
       :maxlength
       :readonly
       :disabled
+      :autocomplete
     />
   </InputContainer>
 </template>

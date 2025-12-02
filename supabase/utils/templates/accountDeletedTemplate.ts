@@ -1,17 +1,26 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
+import { type Locale, translations } from '../i18n.ts'
+import { APP_BASE_URL } from '../clients.ts'
 
-export function accountDeletedTemplate({ email }: { email: string }) {
+export function accountDeletedTemplate({
+  email,
+  locale = 'en',
+}: {
+  email: string
+  locale?: Locale
+}) {
+  const t = translations.accountDeleted
+
   return baseEmailTemplate({
-    title: 'Votre compte a été supprimé ✅',
+    title: t.title[locale],
     bodyHTML: `
-      <p>Bonjour,</p>
-      <p>Nous confirmons que votre compte associé à l’adresse 
-        <strong>${email}</strong> a bien été supprimé de notre plateforme.</p>
+      <p>${t.greeting[locale]}</p>
+      <p>${t.confirmation[locale](email)}</p>
 
-      <p>Si cette action n’a pas été effectuée par vous,
-         merci de contacter notre support dans les plus brefs délais.</p>
+      <p>${t.notYouWarning[locale]}</p>
     `,
-    ctaLabel: 'Contacter le support',
-    ctaUrl: 'https://fast-peptides.com/contact',
+    ctaLabel: t.ctaContactSupport[locale],
+    ctaUrl: `${APP_BASE_URL}/contact`,
+    locale,
   })
 }

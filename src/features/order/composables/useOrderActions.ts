@@ -4,11 +4,13 @@ import {
   deleteOrderById,
   updateOrderStatusInDB,
   getDeliveryAddress,
+  getOrderSummaryPublic,
+  fetchOrderFullViewById,
+  invokeSendOrderUpdate,
 } from '@/api/supabase/orders'
 import type { OrderStatus } from '@/utils'
 import { sanitizeHTML } from '@/utils/sanitize'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 
 // Type minimaliste qui accepte Vue ou Table
 type MinimalOrder = {
@@ -80,9 +82,7 @@ export function useOrderActions(fetchData?: () => void) {
 
       // 2. EDGE FUNCTION : Envoie l'email au client avec lien de tracking
       try {
-        await supabase.functions.invoke('send-order-update', {
-          body: { order_id: id, status },
-        })
+        await invokeSendOrderUpdate(id, status)
         console.log('Email de mise à jour envoyé')
       } catch (emailErr) {
         console.warn('Erreur envoi email (non bloquant):', emailErr)
@@ -99,11 +99,9 @@ export function useOrderActions(fetchData?: () => void) {
   // Récupérer le lien de tracking
   async function getOrderTrackingLink(orderId: string): Promise<string | null> {
     try {
-      const { data, error } = await supabase.rpc('get_order_summary_public', {
-        p_order_id: orderId,
-      })
+      const data = await getOrderSummaryPublic(orderId)
 
-      if (error || !data) return null
+      if (!data) return null
 
       const order = data as any
       const isGuest = !order.user_id
@@ -147,13 +145,9 @@ export function useOrderActions(fetchData?: () => void) {
     if (!id) return
 
     try {
-      const { data, error } = await supabase
-        .from('orders_full_view')
-        .select('*')
-        .eq('order_id', id)
-        .single()
+      const data = await fetchOrderFullViewById(id)
 
-      if (error || !data) {
+      if (!data) {
         toast.show('Impossible de charger les détails', 'danger')
         return
       }

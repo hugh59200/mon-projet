@@ -273,3 +273,63 @@ export async function fetchOrderByStripeSession(sessionId: string): Promise<{
 
   return data as any
 }
+
+// ============================================================
+// ORDER SUMMARY (Public)
+// ============================================================
+
+export async function getOrderSummaryPublic(orderId: string) {
+  const { data, error } = await supabase.rpc('get_order_summary_public', {
+    p_order_id: orderId,
+  })
+  if (error) throw error
+  return data
+}
+
+// ============================================================
+// EDGE FUNCTIONS
+// ============================================================
+
+export async function invokeOrderConfirmation(orderId: string) {
+  return await supabase.functions.invoke('order-confirmation', {
+    body: { order_id: orderId },
+  })
+}
+
+export async function invokeCapturePayPal(orderId: string) {
+  return await supabase.functions.invoke('capture-paypal-order', {
+    body: { orderId },
+  })
+}
+
+export async function invokeSendOrderUpdate(orderId: string, status: string) {
+  return await supabase.functions.invoke('send-order-update', {
+    body: { order_id: orderId, status },
+  })
+}
+
+// ============================================================
+// ORDERS FULL VIEW
+// ============================================================
+
+export async function fetchOrderFullViewById(orderId: string) {
+  const { data, error } = await supabase
+    .from('orders_full_view')
+    .select('*')
+    .eq('order_id', orderId)
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function fetchLastUserOrder(userId: string) {
+  const { data } = await supabase
+    .from('orders')
+    .select('id, email, order_number, tracking_token')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return data
+}

@@ -5,15 +5,7 @@
     @click="$emit('click')"
   >
     <span v-if="$slots.default"><slot /></span>
-    <svg
-      v-if="arrow"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-    >
-      <path d="M5 12h14M12 5l7 7-7 7" />
-    </svg>
+    <BasicIconNext name="ArrowRight" :size="2" />
   </button>
 </template>
 

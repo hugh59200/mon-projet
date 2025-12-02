@@ -1,14 +1,16 @@
-// supabase/functions/send-order-update.ts (Modifié)
+// supabase/functions/send-order-update/index.ts
 
-import { supabase } from '../../utils/clients.ts'
+import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
 import { getStatusMessage } from '../../utils/getStatusMessage.ts'
+import { getValidLocale, translations } from '../../utils/i18n.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
 
 interface OrderUpdateBody {
   order_id: string
   status: string
+  locale?: string
 }
 
 Deno.serve(
@@ -16,40 +18,46 @@ Deno.serve(
     const { order_id, status } = body
     if (!order_id || !status) throw new Error('Missing order_id or status')
 
-    // ✅ SELECT V2 : On ajoute user_id et tracking_token
     const { data: order } = await supabase
       .from('orders_full_view')
-      .select('shipping_email, order_number, carrier, tracking_number, user_id, tracking_token') // 🆕 Ajout de user_id et tracking_token
+      .select('shipping_email, order_number, carrier, tracking_number, user_id, tracking_token, locale')
       .eq('order_id', order_id)
       .maybeSingle()
 
     if (!order) throw new Error('Order not found')
 
-    const isGuest = !order.user_id // Détermine si c'est un invité
+    // Déterminer la locale (body > order > fallback EN)
+    const locale = getValidLocale(body.locale ?? order.locale)
+    const t = translations.statusUpdate
+
+    const isGuest = !order.user_id
     const displayId = order.order_number ?? order_id
 
-    // Génère le message texte personnalisé selon le statut
-    const message = getStatusMessage(status, order.carrier, order.tracking_number)
+    // Génère le message texte personnalisé selon le statut (avec locale)
+    const message = getStatusMessage(status, order.carrier, order.tracking_number, locale)
 
-    // 🆕 Calcul du lien de suivi dynamique (guest ou membre)
+    // Calcul du lien de suivi dynamique (guest ou membre)
     let ctaUrl: string
     if (isGuest && order.tracking_token) {
-      ctaUrl = `https://fast-peptides.com/suivi-commande?token=${order.tracking_token}`
+      ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
     } else {
-      ctaUrl = `https://fast-peptides.com/profil/commandes/${order_id}`
+      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
     }
 
     const html = renderEmailTemplate('status_update', {
       order_id,
       order_number: displayId,
       message,
-      // 🆕 Passage du lien calculé au template
       ctaUrl,
+      locale,
     })
+
+    // Sujet traduit
+    const emailSubject = t.subject[locale](displayId)
 
     await sendEmail({
       to: order.shipping_email,
-      subject: `Mise à jour – Commande ${displayId}`,
+      subject: emailSubject,
       html,
       type: 'status_update',
       order_id,
@@ -58,7 +66,8 @@ Deno.serve(
     return {
       email_sent: order.shipping_email,
       new_status: status,
-      is_guest: isGuest, // Information supplémentaire pour le log
+      is_guest: isGuest,
+      locale,
     }
   }),
 )

@@ -140,22 +140,22 @@
   .status-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: @neutral-900;
     margin: 0;
   }
   .status-text {
-    color: #64748b;
+    color: @neutral-500;
     font-size: 1rem;
   }
   .error-msg {
-    color: #ef4444;
+    color: @danger-500;
     max-width: 300px;
   }
   .text-success {
-    color: #059669;
+    color: @success-600;
   }
   .text-danger {
-    color: #dc2626;
+    color: @danger-600;
   }
   .mt-4 {
     margin-top: 24px;

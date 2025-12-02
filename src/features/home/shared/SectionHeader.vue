@@ -40,8 +40,8 @@
     -apple-system,
     sans-serif;
 
-  @light-text-primary: #1a202c;
-  @light-text-secondary: #4a5568;
+  @light-text-primary: @neutral-950;
+  @light-text-secondary: @neutral-600;
 
   .section-header {
     text-align: center;

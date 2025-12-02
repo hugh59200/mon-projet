@@ -93,3 +93,8 @@ export async function updateUiPreferences(userId: string, prefs: string) {
 
   if (error) throw new Error(error.message)
 }
+
+export function getAvatarPublicUrl(path: string): string {
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+  return data.publicUrl
+}

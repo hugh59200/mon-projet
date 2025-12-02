@@ -79,4 +79,17 @@ export const chatApi = {
 
     return { data, error }
   },
+
+  async fetchUnreadMessagesView() {
+    return await supabase.from('messages_unread_view').select('*')
+  },
+
+  async fetchUserUnreadCount(userId: string) {
+    return await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('sender_role', 'admin')
+      .eq('is_read', false)
+  },
 }

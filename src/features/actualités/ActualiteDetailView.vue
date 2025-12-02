@@ -15,19 +15,7 @@
           to="/actualites"
           class="article-detail__back"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m12 19-7-7 7-7" />
-            <path d="M19 12H5" />
-          </svg>
+          <BasicIconNext name="ArrowLeft" :size="18" />
           <span>Retour aux actualités</span>
         </RouterLink>
       </nav>
@@ -38,18 +26,7 @@
         class="article-detail__loading"
       >
         <div class="article-detail__loading-spinner">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-          </svg>
+          <BasicIconNext name="Loader2" :size="40" />
         </div>
         <p class="article-detail__loading-text">Chargement de l'article...</p>
       </div>
@@ -60,20 +37,7 @@
         class="article-detail__empty"
       >
         <div class="article-detail__empty-icon">
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <path d="M12 9v4" />
-            <path d="M12 17h.01" />
-          </svg>
+          <BasicIconNext name="FileWarning" :size="48" />
         </div>
         <h2 class="article-detail__empty-title">Article non trouvé</h2>
         <p class="article-detail__empty-text">Cet article n'existe pas ou n'est plus disponible.</p>
@@ -81,19 +45,7 @@
           to="/actualites"
           class="article-detail__empty-btn"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m12 19-7-7 7-7" />
-            <path d="M19 12H5" />
-          </svg>
+          <BasicIconNext name="ArrowLeft" :size="16" />
           Voir tous les articles
         </RouterLink>
       </div>
@@ -110,60 +62,11 @@
               v-if="article.topic"
               class="article-detail__topic"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5Z" />
-                <path d="m2 17 10 5 10-5" />
-                <path d="m2 12 10 5 10-5" />
-              </svg>
+              <BasicIconNext name="Layers" :size="14" />
               {{ article.topic.label }}
             </span>
             <span class="article-detail__date">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect
-                  width="18"
-                  height="18"
-                  x="3"
-                  y="4"
-                  rx="2"
-                  ry="2"
-                />
-                <line
-                  x1="16"
-                  x2="16"
-                  y1="2"
-                  y2="6"
-                />
-                <line
-                  x1="8"
-                  x2="8"
-                  y1="2"
-                  y2="6"
-                />
-                <line
-                  x1="3"
-                  x2="21"
-                  y1="10"
-                  y2="10"
-                />
-              </svg>
+              <BasicIconNext name="Calendar" :size="14" />
               Publié le {{ formatDate(article.published_at) }}
             </span>
           </div>
@@ -172,23 +75,7 @@
 
           <!-- Reading time estimate -->
           <div class="article-detail__reading-info">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-              />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
+            <BasicIconNext name="Clock" :size="16" />
             <span>{{ estimatedReadingTime }} min de lecture</span>
           </div>
         </header>
@@ -208,25 +95,7 @@
             <div class="article-detail__cover-overlay"></div>
           </div>
           <p class="article-detail__cover-hint">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="8"
-              />
-              <path d="m21 21-4.3-4.3" />
-              <path d="M11 8v6" />
-              <path d="M8 11h6" />
-            </svg>
+            <BasicIconNext name="ZoomIn" :size="14" />
             Cliquez sur l'image pour zoomer
           </p>
         </div>
@@ -247,72 +116,22 @@
                 class="article-detail__share-btn article-detail__share-btn--twitter"
                 aria-label="Partager sur Twitter"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                  />
-                </svg>
+                <BasicIconNext name="Twitter" :size="18" />
               </button>
               <button
                 @click="shareArticle('linkedin')"
                 class="article-detail__share-btn article-detail__share-btn--linkedin"
                 aria-label="Partager sur LinkedIn"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-                  />
-                </svg>
+                <BasicIconNext name="Linkedin" :size="18" />
               </button>
               <button
                 @click="shareArticle('copy')"
                 class="article-detail__share-btn article-detail__share-btn--copy"
                 aria-label="Copier le lien"
               >
-                <svg
-                  v-if="!linkCopied"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect
-                    width="14"
-                    height="14"
-                    x="8"
-                    y="8"
-                    rx="2"
-                    ry="2"
-                  />
-                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                </svg>
-                <svg
-                  v-else
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <BasicIconNext v-if="!linkCopied" name="Copy" :size="18" />
+                <BasicIconNext v-else name="Check" :size="18" />
               </button>
             </div>
           </div>
@@ -325,18 +144,7 @@
               :to="`/actualites?categorie=${article.topic_id}`"
               class="article-detail__tag"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5Z" />
-              </svg>
+              <BasicIconNext name="Layers" :size="14" />
               {{ article.topic.label }}
             </RouterLink>
           </div>
@@ -350,19 +158,7 @@
       >
         <div class="article-detail__related-header">
           <div class="article-detail__section-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
-              <path d="M15 3v4a2 2 0 0 0 2 2h4" />
-            </svg>
+            <BasicIconNext name="File" :size="20" />
           </div>
           <h2 class="article-detail__related-title">Articles similaires</h2>
         </div>
@@ -406,50 +202,15 @@
       >
         <div class="article-detail__trust">
           <div class="article-detail__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
+            <BasicIconNext name="ShieldCheck" :size="18" />
             <span>Sources vérifiées</span>
           </div>
           <div class="article-detail__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
+            <BasicIconNext name="BookOpen" :size="18" />
             <span>Contenu scientifique</span>
           </div>
           <div class="article-detail__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-            </svg>
+            <BasicIconNext name="Pencil" :size="18" />
             <span>Rédigé par des experts</span>
           </div>
         </div>

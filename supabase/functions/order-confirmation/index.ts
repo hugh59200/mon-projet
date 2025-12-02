@@ -2,6 +2,7 @@
 
 import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
+import { getValidLocale, translations } from '../../utils/i18n.ts'
 import { logEmail } from '../../utils/logEmail.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
@@ -9,6 +10,7 @@ import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.t
 interface OrderConfirmationBody {
   order_id?: string
   orderId?: string
+  locale?: string
 }
 
 Deno.serve(
@@ -35,6 +37,10 @@ Deno.serve(
       throw new Error('Order not found')
     }
 
+    // Déterminer la locale (body > order > fallback EN)
+    const locale = getValidLocale(body.locale ?? order.locale)
+    const t = translations.confirmation
+
     const orderNumber = order.order_number ?? order_id
     const isGuest = !order.user_id
 
@@ -56,11 +62,11 @@ Deno.serve(
         console.log(`Token trouvé: ${order.tracking_token.substring(0, 8)}...`)
         ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
       }
-      ctaLabel = 'Suivre ma commande'
+      ctaLabel = t.ctaTrackOrder[locale]
     } else {
       // MEMBRE : Lien vers le profil privé
       ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
-      ctaLabel = 'Voir ma commande'
+      ctaLabel = t.ctaViewOrder[locale]
       console.log(`Email pour membre: ${order.user_id}`)
     }
 
@@ -99,10 +105,13 @@ Deno.serve(
       // Liens intelligents
       ctaLabel,
       ctaUrl,
+
+      // Locale pour i18n
+      locale,
     })
 
-    // 6. Envoi de l'email
-    const emailSubject = `Confirmation de commande #${orderNumber}`
+    // 6. Envoi de l'email avec sujet traduit
+    const emailSubject = t.subject[locale](orderNumber)
     const emailResult = await sendEmail({
       to: order.shipping_email,
       subject: emailSubject,
@@ -146,6 +155,7 @@ Deno.serve(
       tracking_link: ctaUrl,
       order_number: orderNumber,
       has_tracking_token: !!order.tracking_token,
+      locale,
     }
   }),
 )

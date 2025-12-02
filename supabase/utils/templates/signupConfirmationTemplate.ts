@@ -1,19 +1,25 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
+import { type Locale, translations } from '../i18n.ts'
 
 export function signupConfirmationTemplate({
   full_name,
   url,
+  locale = 'en',
 }: {
   full_name?: string
   url: string
+  locale?: Locale
 }) {
+  const t = translations.signup
+
   return baseEmailTemplate({
-    title: 'Bienvenue chez FP Store',
+    title: t.title[locale],
     bodyHTML: `
-      <p>Bonjour ${full_name || ''},</p>
-      <p>Merci de votre inscription !</p>
-      <p>Cliquez ci-dessous pour activer votre compte :</p>`,
-    ctaLabel: 'Activer mon compte',
+      <p>${t.greeting[locale](full_name || '')}</p>
+      <p>${t.thanks[locale]}</p>
+      <p>${t.activatePrompt[locale]}</p>`,
+    ctaLabel: t.ctaActivate[locale],
     ctaUrl: url,
+    locale,
   })
 }

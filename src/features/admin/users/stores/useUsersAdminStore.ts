@@ -1,5 +1,5 @@
 import { useUserActions } from '../composables/useUserActions'
-import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+import { fetchAllProfiles } from '@/api/supabase/users'
 import type { Profiles } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -10,8 +10,7 @@ export const useUsersAdminStore = defineStore('users-admin', () => {
 
   async function loadUsers() {
     loading.value = true
-    const { data } = await supabase.from('profiles').select('*')
-    users.value = data ?? []
+    users.value = await fetchAllProfiles()
     loading.value = false
   }
 

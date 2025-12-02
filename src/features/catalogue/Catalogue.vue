@@ -33,22 +33,7 @@
         class="catalogue-mobile-bar"
       >
         <div class="catalogue-search catalogue-search--mobile">
-          <svg
-            class="catalogue-search__icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle
-              cx="11"
-              cy="11"
-              r="8"
-            />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
+          <BasicIconNext name="Search" :size="18" />
           <input
             v-model="searchTerm"
             type="text"
@@ -60,16 +45,7 @@
           class="catalogue-filter-btn"
           @click="showFilters = true"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
-          </svg>
+          <BasicIconNext name="SlidersHorizontal" :size="18" />
           {{ t('common.filter') }}
           <span
             v-if="activeFiltersCount"
@@ -111,22 +87,7 @@
             v-if="!isMobile"
             class="catalogue-search"
           >
-            <svg
-              class="catalogue-search__icon"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="8"
-              />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
+            <BasicIconNext name="Search" :size="18" />
             <input
               v-model="searchTerm"
               type="text"
@@ -138,16 +99,7 @@
               class="catalogue-search__clear"
               @click="searchTerm = ''"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <BasicIconNext name="X" :size="14" />
             </button>
           </div>
 
@@ -182,43 +134,7 @@
                 @click="viewMode = 'grid'"
                 :title="t('catalogue.sort.label')"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect
-                    x="3"
-                    y="3"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="14"
-                    y="3"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="3"
-                    y="14"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                  <rect
-                    x="14"
-                    y="14"
-                    width="7"
-                    height="7"
-                    rx="1"
-                  />
-                </svg>
+                <BasicIconNext name="LayoutGrid" :size="18" />
               </button>
               <button
                 class="catalogue-toolbar__view-btn"
@@ -226,16 +142,7 @@
                 @click="viewMode = 'list'"
                 :title="t('catalogue.sort.label')"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                </svg>
+                <BasicIconNext name="List" :size="18" />
               </button>
             </div>
           </div>
@@ -260,16 +167,7 @@
                 :style="{ background: getCategoryColor(cat) }"
               ></span>
               {{ cat }}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
             </button>
 
             <button
@@ -279,16 +177,7 @@
               @click="toggleTag(tag)"
             >
               {{ tag }}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
             </button>
 
             <button
@@ -297,16 +186,7 @@
               @click="inStockOnly = false"
             >
               {{ t('catalogue.filters.inStock') }}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <BasicIconNext name="X" :size="12" :stroke-width="2.5" />
             </button>
           </div>
 
@@ -314,17 +194,7 @@
             class="catalogue-active-filters__clear"
             @click="resetAll"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
-              <path d="M3 3v5h5" />
-            </svg>
+            <BasicIconNext name="RotateCcw" :size="14" />
             {{ t('catalogue.filters.resetAll') }}
           </button>
         </div>
@@ -339,21 +209,7 @@
           <template #empty>
             <div class="catalogue-empty">
               <div class="catalogue-empty__icon">
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="8"
-                  />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
+                <BasicIconNext name="Search" :size="48" />
               </div>
               <h3 class="catalogue-empty__title">{{ t('catalogue.results.noResults') }}</h3>
               <p class="catalogue-empty__text">
@@ -393,16 +249,7 @@
             :disabled="page === 1"
             @click="page--"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
+            <BasicIconNext name="ChevronLeft" :size="18" />
             {{ t('common.previous') }}
           </button>
 
@@ -414,16 +261,7 @@
             @click="page++"
           >
             {{ t('common.next') }}
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
+            <BasicIconNext name="ChevronRight" :size="18" />
           </button>
         </div>
       </main>

@@ -24,17 +24,7 @@
         </div>
         
         <div class="cta__visual">
-          <svg viewBox="0 0 120 120" fill="none" class="cta__molecule">
-            <circle cx="60" cy="60" r="8" class="cta__molecule-center" />
-            <circle cx="30" cy="40" r="5" class="cta__molecule-dot cta__molecule-dot--1" />
-            <circle cx="90" cy="40" r="5" class="cta__molecule-dot cta__molecule-dot--2" />
-            <circle cx="30" cy="80" r="5" class="cta__molecule-dot cta__molecule-dot--3" />
-            <circle cx="90" cy="80" r="5" class="cta__molecule-dot cta__molecule-dot--4" />
-            <line x1="60" y1="60" x2="30" y2="40" class="cta__molecule-line" />
-            <line x1="60" y1="60" x2="90" y2="40" class="cta__molecule-line" />
-            <line x1="60" y1="60" x2="30" y2="80" class="cta__molecule-line" />
-            <line x1="60" y1="60" x2="90" y2="80" class="cta__molecule-line" />
-          </svg>
+          <BasicIconNext name="moleculeCta" class="cta__molecule" />
         </div>
       </div>
     </div>
@@ -185,14 +175,12 @@ onMounted(() => {
     height: 180px;
     animation: rotateSlow 20s linear infinite;
 
-    &-center { fill: rgba(255, 255, 255, 0.9); }
-    &-line { stroke: rgba(255, 255, 255, 0.3); stroke-width: 1.5; }
-    &-dot {
-      &--1 { fill: rgba(@success-500, 0.8); }
-      &--2 { fill: rgba(var(--primary-400-rgb), 0.8); }
-      &--3 { fill: rgba(@warning-500, 0.8); }
-      &--4 { fill: rgba(@info-500, 0.8); }
-    }
+    :deep(.molecule-cta__center) { fill: rgba(255, 255, 255, 0.9); }
+    :deep(.molecule-cta__line) { stroke: rgba(255, 255, 255, 0.3); stroke-width: 1.5; }
+    :deep(.molecule-cta__dot--1) { fill: rgba(@success-500, 0.8); }
+    :deep(.molecule-cta__dot--2) { fill: rgba(var(--primary-400-rgb), 0.8); }
+    :deep(.molecule-cta__dot--3) { fill: rgba(@warning-500, 0.8); }
+    :deep(.molecule-cta__dot--4) { fill: rgba(@info-500, 0.8); }
   }
 
   @keyframes rotateSlow {

@@ -13,20 +13,14 @@
       <transition name="slide-down">
         <div v-if="errorMessage" class="track__error">
           <div class="track__error-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
+            <BasicIconNext name="AlertCircle" :size="20" />
           </div>
           <div class="track__error-content">
             <strong>Une erreur est survenue</strong>
             <span>{{ errorMessage }}</span>
           </div>
           <button class="track__error-close" @click="errorMessage = ''">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
+            <BasicIconNext name="X" :size="18" />
           </button>
         </div>
       </transition>
@@ -90,10 +84,7 @@
           <div class="track__search-card">
             <div class="track__search-header">
               <div class="track__search-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="M21 21l-4.35-4.35"/>
-                </svg>
+                <BasicIconNext name="Search" :size="28" />
               </div>
               <div>
                 <h2 class="track__search-title">Localiser ma commande</h2>
@@ -105,9 +96,7 @@
               <div class="track__form-row">
                 <div class="track__form-group">
                   <label class="track__label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
-                    </svg>
+                    <BasicIconNext name="Type" :size="16" />
                     Numéro de commande
                   </label>
                   <div class="track__input-wrapper" :class="{ 'track__input-wrapper--error': !!errorMessage }">
@@ -124,10 +113,7 @@
 
                 <div class="track__form-group">
                   <label class="track__label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                      <polyline points="22,6 12,13 2,6"/>
-                    </svg>
+                    <BasicIconNext name="Mail" :size="16" />
                     Adresse email
                   </label>
                   <div class="track__input-wrapper" :class="{ 'track__input-wrapper--error': !!errorMessage }">
@@ -146,10 +132,7 @@
               <button type="submit" class="track__submit" :disabled="loading">
                 <span v-if="loading" class="track__submit-loader"></span>
                 <template v-else>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35"/>
-                  </svg>
+                  <BasicIconNext name="Search" :size="20" />
                   Localiser mon colis
                 </template>
               </button>
@@ -157,9 +140,7 @@
 
             <div class="track__search-footer">
               <div class="track__search-secure">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
+                <BasicIconNext name="Shield" :size="16" />
                 <span>Connexion sécurisée SSL</span>
               </div>
             </div>
@@ -168,21 +149,14 @@
           <!-- Help Sidebar -->
           <aside class="track__help">
             <h3 class="track__help-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
+              <BasicIconNext name="HelpCircle" :size="18" />
               Besoin d'aide ?
             </h3>
             
             <div class="track__help-items">
               <div class="track__help-item">
                 <div class="track__help-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
-                  </svg>
+                  <BasicIconNext name="Mail" :size="20" />
                 </div>
                 <div class="track__help-content">
                   <strong>Email de confirmation</strong>
@@ -192,9 +166,7 @@
 
               <div class="track__help-item">
                 <div class="track__help-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                  </svg>
+                  <BasicIconNext name="MessageSquare" :size="20" />
                 </div>
                 <div class="track__help-content">
                   <strong>Contacter le support</strong>
@@ -204,12 +176,7 @@
 
               <div class="track__help-item">
                 <div class="track__help-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
+                  <BasicIconNext name="Calendar" :size="20" />
                 </div>
                 <div class="track__help-content">
                   <strong>Délais de livraison</strong>
@@ -225,9 +192,7 @@
         <!-- Navigation -->
         <nav class="track__nav">
           <button class="track__nav-back" @click="resetSearch">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
+            <BasicIconNext name="ArrowLeft" :size="18" />
             <span>Nouvelle recherche</span>
           </button>
           <div class="track__nav-order">
@@ -251,12 +216,7 @@
                   <p class="track__status-message">{{ getStatusMessage(order.status ?? '') }}</p>
                 </div>
                 <div class="track__status-date" v-if="order.created_at">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
+                  <BasicIconNext name="Calendar" :size="16" />
                   <span>Commandé le {{ formatDate(order.created_at) }}</span>
                 </div>
               </div>
@@ -281,9 +241,7 @@
                     }"
                   >
                     <div class="track__timeline-icon">
-                      <svg v-if="isStepActive(step.statuses)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
+                      <BasicIconNext v-if="isStepActive(step.statuses)" name="Check" :size="16" :stroke-width="3" />
                       <component v-else :is="getStepIcon(step.key)" />
                     </div>
                     <div class="track__timeline-content">
@@ -306,10 +264,7 @@
               <div class="track__detail-card">
                 <div class="track__detail-header">
                   <div class="track__detail-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                      <circle cx="12" cy="10" r="3"/>
-                    </svg>
+                    <BasicIconNext name="MapPin" :size="22" />
                   </div>
                   <span class="track__detail-title">Adresse de livraison</span>
                 </div>
@@ -326,12 +281,7 @@
               <div class="track__detail-card" :class="{ 'track__detail-card--highlight': order.tracking_number }">
                 <div class="track__detail-header">
                   <div class="track__detail-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="1" y="3" width="15" height="13" rx="2"/>
-                      <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/>
-                      <circle cx="5.5" cy="18.5" r="2.5"/>
-                      <circle cx="18.5" cy="18.5" r="2.5"/>
-                    </svg>
+                    <BasicIconNext name="Truck" :size="22" />
                   </div>
                   <span class="track__detail-title">Transporteur</span>
                 </div>
@@ -342,21 +292,13 @@
                     <button class="track__tracking-btn" @click="copyTracking">
                       <span class="track__tracking-number">{{ order.tracking_number }}</span>
                       <div class="track__tracking-copy">
-                        <svg v-if="!copied" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="9" y="9" width="13" height="13" rx="2"/>
-                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                        </svg>
-                        <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
+                        <BasicIconNext v-if="!copied" name="Copy" :size="16" />
+                        <BasicIconNext v-else name="Check" :size="16" />
                       </div>
                     </button>
                   </div>
                   <p v-else class="track__detail-pending">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12 6 12 12 16 14"/>
-                    </svg>
+                    <BasicIconNext name="Clock" :size="14" />
                     Numéro de suivi disponible après expédition
                   </p>
                 </div>
@@ -366,20 +308,14 @@
               <div class="track__detail-card">
                 <div class="track__detail-header">
                   <div class="track__detail-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                      <line x1="1" y1="10" x2="23" y2="10"/>
-                    </svg>
+                    <BasicIconNext name="CreditCard" :size="22" />
                   </div>
                   <span class="track__detail-title">Paiement</span>
                 </div>
                 <div class="track__detail-body">
                   <strong class="track__detail-name">Carte bancaire</strong>
                   <p class="track__detail-status track__detail-status--success">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-                      <polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>
+                    <BasicIconNext name="CheckCircle2" :size="14" />
                     Paiement confirmé
                   </p>
                 </div>
@@ -389,10 +325,7 @@
               <div class="track__detail-card">
                 <div class="track__detail-header">
                   <div class="track__detail-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                      <polyline points="22,6 12,13 2,6"/>
-                    </svg>
+                    <BasicIconNext name="Mail" :size="22" />
                   </div>
                   <span class="track__detail-title">Contact</span>
                 </div>
@@ -412,9 +345,7 @@
             <div class="track__summary">
               <div class="track__summary-header">
                 <h3 class="track__summary-title">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
-                  </svg>
+                  <BasicIconNext name="ShoppingBag" :size="20" />
                   Récapitulatif
                 </h3>
                 <span class="track__summary-count">
@@ -459,10 +390,7 @@
                 </div>
                 <div v-if="order.discount_amount" class="track__totals-row track__totals-row--discount">
                   <span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-                      <line x1="7" y1="7" x2="7.01" y2="7"/>
-                    </svg>
+                    <BasicIconNext name="Tag" :size="14" />
                     Réduction
                   </span>
                   <span>-{{ formatPrice(order.discount_amount) }}</span>
@@ -481,12 +409,7 @@
             >
               <div class="track__register-header">
                 <div class="track__register-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="8.5" cy="7" r="4"/>
-                    <line x1="20" y1="8" x2="20" y2="14"/>
-                    <line x1="23" y1="11" x2="17" y2="11"/>
-                  </svg>
+                  <BasicIconNext name="UserPlus" :size="24" />
                 </div>
                 <div>
                   <strong>Créer mon compte</strong>
@@ -496,22 +419,13 @@
 
               <div class="track__register-form">
                 <div class="track__register-email">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
-                  </svg>
+                  <BasicIconNext name="Mail" :size="16" />
                   <span>{{ order.shipping_email }}</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="track__register-verified">
-                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
+                  <BasicIconNext name="CheckCircle2" :size="16" class="track__register-verified" />
                 </div>
 
                 <div class="track__register-input-wrapper">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2"/>
-                    <path d="M7 11V7a5 5 0 0110 0v4"/>
-                  </svg>
+                  <BasicIconNext name="Lock" :size="18" />
                   <input
                     v-model="newPassword"
                     type="password"
@@ -527,11 +441,7 @@
                 >
                   <span v-if="registerLoading" class="track__register-loader"></span>
                   <template v-else>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                      <circle cx="8.5" cy="7" r="4"/>
-                      <polyline points="17 11 19 13 23 9"/>
-                    </svg>
+                    <BasicIconNext name="UserCheck" :size="18" />
                     Créer mon compte
                   </template>
                 </button>
@@ -539,21 +449,15 @@
 
               <div class="track__register-benefits">
                 <div class="track__register-benefit">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
+                  <BasicIconNext name="Check" :size="14" />
                   <span>Historique des commandes</span>
                 </div>
                 <div class="track__register-benefit">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
+                  <BasicIconNext name="Check" :size="14" />
                   <span>Suivi simplifié</span>
                 </div>
                 <div class="track__register-benefit">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
+                  <BasicIconNext name="Check" :size="14" />
                   <span>Offres exclusives</span>
                 </div>
               </div>
@@ -562,10 +466,7 @@
             <!-- Success Message -->
             <div v-else-if="registerSuccess" class="track__success">
               <div class="track__success-icon">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
+                <BasicIconNext name="CheckCircle2" :size="36" />
               </div>
               <strong class="track__success-title">Compte créé avec succès !</strong>
               <p class="track__success-text">
@@ -577,24 +478,15 @@
             <!-- Trust Badges -->
             <div class="track__trust">
               <div class="track__trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
+                <BasicIconNext name="Shield" :size="18" />
                 <span>Données sécurisées</span>
               </div>
               <div class="track__trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                </svg>
+                <BasicIconNext name="MessageSquare" :size="18" />
                 <span>Support réactif</span>
               </div>
               <div class="track__trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="1" y="3" width="15" height="13" rx="2"/>
-                  <path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/>
-                  <circle cx="5.5" cy="18.5" r="2.5"/>
-                  <circle cx="18.5" cy="18.5" r="2.5"/>
-                </svg>
+                <BasicIconNext name="Truck" :size="18" />
                 <span>Livraison suivie</span>
               </div>
             </div>

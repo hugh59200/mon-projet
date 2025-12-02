@@ -67,7 +67,7 @@
   })
 
   supabase.auth.onAuthStateChange((_event, session) => {
-    if (!session) cart.items = []
+    if (!session) cart.clearCart()
   })
 
   const lastScroll = ref(0)

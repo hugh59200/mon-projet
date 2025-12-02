@@ -20,14 +20,7 @@
         <div class="faq__question">
           <span>{{ item.question }}</span>
           <div class="faq__toggle">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
+            <BasicIconNext name="Plus" :size="2" />
           </div>
         </div>
         <div class="faq__answer">
@@ -102,9 +95,9 @@
     sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
-  @light-text-primary: #1a202c;
-  @light-text-secondary: #4a5568;
-  @light-bg-card: #ffffff;
+  @light-text-primary: @neutral-950;
+  @light-text-secondary: @neutral-600;
+  @light-bg-card: @white;
   @light-border: rgba(0, 0, 0, 0.08);
 
   .faq {

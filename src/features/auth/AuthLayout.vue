@@ -78,19 +78,7 @@
           @click="$router.push('/')"
         >
           <span>Continuer sans compte</span>
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
+          <BasicIconNext name="ArrowRight" :size="18" />
         </button>
       </div>
 
@@ -246,7 +234,7 @@
     margin-bottom: 16px;
     color: white;
     .text-gradient {
-      background: linear-gradient(135deg, #fff 0%, var(--primary-400) 100%);
+      background: linear-gradient(135deg, @white 0%, var(--primary-400) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -365,9 +353,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
-    border: 1px solid #cbd5e1;
-    color: #334155;
+    background: @white;
+    border: 1px solid @neutral-300;
+    color: @neutral-700;
     font-weight: 700;
     font-size: 0.9rem;
     padding: 10px 20px;
@@ -379,7 +367,7 @@
     &:hover {
       border-color: var(--primary-500);
       color: var(--primary-600);
-      background: #fff;
+      background: @white;
       box-shadow: 0 6px 12px -2px rgba(var(--primary-500-rgb), 0.15);
       transform: translateY(-2px);
     }

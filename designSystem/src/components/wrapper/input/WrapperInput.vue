@@ -21,6 +21,7 @@
       :input-type
       :alertLabel
       :alertType
+      :autocomplete
     />
   </WrapperFormElements>
 </template>
