@@ -8,7 +8,6 @@ declare module 'vue' {
     BasicAvatar: typeof import('./../designSystem/src/components/basic/avatar/BasicAvatar.vue')['default']
     BasicBadge: typeof import('./../designSystem/src/components/basic/badge/BasicBadge.vue')['default']
     BasicBreadcrumbs: typeof import('./../designSystem/src/components/basic/breadcrumbs/BasicBreadcrumbs.vue')['default']
-    BasicButton: typeof import('./../designSystem/src/components/basic/button/BasicButton.vue')['default']
     BasicCard: typeof import('./../designSystem/src/components/basic/card/BasicCard.vue')['default']
     BasicCarousel: typeof import('./../designSystem/src/components/basic/carousel/BasicCarousel.vue')['default']
     BasicCell: typeof import('./../designSystem/src/components/basic/cell/BasicCell.vue')['default']

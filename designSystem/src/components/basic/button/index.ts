@@ -1,5 +1,2 @@
-export { default as BasicButton } from './BasicButton.vue'
-export { default as NavButton } from './NavButton.vue'
 export { default as PremiumButton } from './PremiumButton.vue'
-export * from './BasicButton.types'
 export * from './PremiumButton.types'

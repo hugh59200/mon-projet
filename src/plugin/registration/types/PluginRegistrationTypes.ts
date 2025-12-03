@@ -9,11 +9,9 @@ declare global {
   type AutocompleteProps = import('@designSystem/components').AutocompleteProps
   type AvatarProps = import('@designSystem/components').AvatarProps
   type BadgeProps = import('@designSystem/components').BadgeProps
-  type ButtonProps = import('@designSystem/components').ButtonProps
-  type CardProps = import('@designSystem/components').CardProps
+  type PremiumButtonProps = import('@designSystem/components').PremiumButtonProps
   type CheckboxProps = import('@designSystem/components').CheckboxProps
   type DropdownProps = import('@designSystem/components').DropdownProps
-  type DropdownButtonProps = import('@designSystem/components').DropdownButtonProps
   type DropdownItemProps = import('@designSystem/components').DropdownItemProps
   type HintProps = import('@designSystem/components').HintProps
   type InputProps = import('@designSystem/components').InputProps
@@ -23,10 +21,7 @@ declare global {
   type InputNumberProps = import('@designSystem/components').InputNumberProps
   type InputTelephoneProps = import('@designSystem/components').InputTelephoneProps
   type LinkProps = import('@designSystem/components').StandaloneLinkProps
-  type PopupProps = import('@designSystem/components').PopupProps
-  type SubtitleProps = import('@designSystem/components').SubtitleProps
   type TabProps = import('@designSystem/components').TabProps
-  type TagProps = import('@designSystem/components').TagProps
   type TextProps = import('@designSystem/components').HeadingProps
   type ToggleSwitchProps = import('@designSystem/components').ToggleSwitchProps
   type TooltipProps = import('@designSystem/components').TooltipProps

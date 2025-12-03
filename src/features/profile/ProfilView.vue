@@ -669,7 +669,6 @@
 
     &__actions {
       margin-top: 28px;
-      .BasicButton,
       .PremiumButton {
         max-width: 100%;
       }
@@ -680,7 +679,7 @@
       border-top: 1px dashed @neutral-800;
       padding-top: 20px;
 
-      .BasicButton {
+      .PremiumButton {
         max-width: 250px;
       }
     }
