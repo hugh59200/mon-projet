@@ -288,6 +288,116 @@ export const translations = {
     },
   },
 
+  // ========== PENDING PAYMENT ==========
+  pendingPayment: {
+    title: {
+      fr: 'Commande en attente de paiement',
+      en: 'Order awaiting payment',
+    },
+    subject: {
+      fr: (orderNumber: string) => `Commande #${orderNumber} – En attente de paiement`,
+      en: (orderNumber: string) => `Order #${orderNumber} – Awaiting payment`,
+    },
+    greeting: {
+      fr: (name: string) => `Merci <strong>${name || 'cher client'}</strong>.`,
+      en: (name: string) => `Thank you <strong>${name || 'dear customer'}</strong>.`,
+    },
+    orderRegistered: {
+      fr: (orderNumber: string) =>
+        `Votre commande <strong>#${orderNumber}</strong> est bien enregistrée et les produits sont réservés pour <strong>24 heures</strong>.`,
+      en: (orderNumber: string) =>
+        `Your order <strong>#${orderNumber}</strong> has been registered and the products are reserved for <strong>24 hours</strong>.`,
+    },
+    paymentInstructions: {
+      fr: 'Instructions de paiement',
+      en: 'Payment instructions',
+    },
+    bankTransferTitle: {
+      fr: 'Virement bancaire',
+      en: 'Bank transfer',
+    },
+    cryptoTitle: {
+      fr: 'Paiement en cryptomonnaie',
+      en: 'Cryptocurrency payment',
+    },
+    beneficiary: {
+      fr: 'Bénéficiaire',
+      en: 'Beneficiary',
+    },
+    iban: {
+      fr: 'IBAN',
+      en: 'IBAN',
+    },
+    bic: {
+      fr: 'BIC / SWIFT',
+      en: 'BIC / SWIFT',
+    },
+    reference: {
+      fr: 'Référence (obligatoire)',
+      en: 'Reference (required)',
+    },
+    referenceWarning: {
+      fr: 'Indiquez impérativement cette référence dans le libellé de votre virement pour permettre le traitement rapide de votre commande.',
+      en: 'Please include this reference in your transfer description to ensure quick processing of your order.',
+    },
+    btcAddress: {
+      fr: 'Adresse BTC',
+      en: 'BTC Address',
+    },
+    usdtAddress: {
+      fr: 'Adresse USDT (TRC-20)',
+      en: 'USDT Address (TRC-20)',
+    },
+    cryptoWarning: {
+      fr: 'Envoyez le montant exact indiqué ci-dessous. Toute différence pourrait retarder le traitement de votre commande.',
+      en: 'Send the exact amount indicated below. Any discrepancy may delay the processing of your order.',
+    },
+    amountToPay: {
+      fr: 'Montant à régler',
+      en: 'Amount to pay',
+    },
+    orderSummary: {
+      fr: 'Récapitulatif de votre commande',
+      en: 'Order summary',
+    },
+    product: {
+      fr: 'Produit',
+      en: 'Product',
+    },
+    quantity: {
+      fr: 'Qté',
+      en: 'Qty',
+    },
+    price: {
+      fr: 'Prix',
+      en: 'Price',
+    },
+    subtotal: {
+      fr: 'Sous-total',
+      en: 'Subtotal',
+    },
+    shipping: {
+      fr: 'Livraison',
+      en: 'Shipping',
+    },
+    free: {
+      fr: 'Offerte',
+      en: 'Free',
+    },
+    total: {
+      fr: 'Total',
+      en: 'Total',
+    },
+    expirationNotice: {
+      fr: 'Passé ce délai de 24h sans paiement, la réservation sera automatiquement annulée.',
+      en: 'After 24 hours without payment, the reservation will be automatically cancelled.',
+    },
+    ctaViewOrder: {
+      fr: 'Voir ma commande',
+      en: 'View my order',
+    },
+  },
+
   // ========== STATUS MESSAGES ==========
   status: {
     pending: {

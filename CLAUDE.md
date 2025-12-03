@@ -25,7 +25,6 @@ npm run gen:types     # Générer les types TypeScript depuis le schéma Supabas
 - **État** : Pinia avec plugin de persistance
 - **Styles** : Préprocesseur LESS avec tokens du design system
 - **Backend** : Supabase (PostgreSQL, Auth, Edge Functions)
-- **Paiements** : Stripe
 - **Emails** : API Resend
 - **Livraison** : Intégration Mondial Relay
 
@@ -35,7 +34,7 @@ npm run gen:types     # Générer les types TypeScript depuis le schéma Supabas
 src/
 ├── api/                        # API centralisées
 │   ├── supabase/               # Appels Supabase (products, orders, profiles, etc.)
-│   ├── external/               # API externes (auth, payment, shipping)
+│   ├── external/               # API externes (auth, shipping)
 │   └── helpers/                # Utilitaires API (handleError)
 │
 ├── config/                     # Configuration centralisée
@@ -48,7 +47,7 @@ src/
 ├── features/                   # Modules par fonctionnalité (domain-driven)
 │   ├── auth/                   # Authentification (email/password, OAuth, magic links)
 │   ├── catalogue/              # Catalogue produits avec filtres et panier
-│   ├── checkout/               # Tunnel de paiement (Stripe)
+│   ├── checkout/               # Tunnel de commande
 │   ├── order/                  # Gestion et historique des commandes
 │   ├── profile/                # Profil utilisateur et paramètres
 │   ├── admin/                  # Dashboard admin (products, orders, users, stats)
@@ -69,8 +68,6 @@ designSystem/src/
 └── fondation/                  # Tokens de design (couleurs, typographie, espacements, icônes)
 
 supabase/functions/             # Edge Functions basées sur Deno
-├── create-stripe-session/
-├── stripe-webhook/
 ├── order-confirmation/
 ├── send-shipping-email/
 └── search-relay-points/
@@ -83,7 +80,6 @@ supabase/functions/             # Edge Functions basées sur Deno
 import { fetchProducts, createOrder } from '@/api'
 // ou plus spécifique
 import { fetchProducts } from '@/api/supabase/products'
-import { processPayment } from '@/api/external/payment'
 ```
 
 **Types** : Utiliser les imports depuis `@/types`
@@ -137,7 +133,6 @@ Requises dans `.env` (voir `.env.example` pour la liste complète) :
 - `SUPABASE_ANON_KEY` - Clé anonyme Supabase
 - `VITE_GOOGLE_CLIENT_ID` - Client ID Google OAuth
 - `RESEND_API_KEY` - Service email (Edge Functions)
-- `STRIPE_WEBHOOK_SECRET` - Webhook Stripe (Edge Functions)
 
 ## Design System Tokens
 

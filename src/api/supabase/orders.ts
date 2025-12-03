@@ -250,31 +250,6 @@ export async function updateOrderStatusInDB(orderId: string, status: OrderStatus
 }
 
 // ============================================================
-// STRIPE SESSION LOOKUP
-// ============================================================
-
-export async function fetchOrderByStripeSession(sessionId: string): Promise<{
-  id: string
-  email: string
-  order_number: string
-  tracking_token: string
-  status: string
-  total_amount: number
-  is_guest_order: boolean
-} | null> {
-  const { data, error } = await supabase.rpc('get_order_by_stripe_session', {
-    p_session_id: sessionId,
-  })
-
-  if (error) {
-    console.error('Erreur fetchOrderByStripeSession:', error)
-    return null
-  }
-
-  return data as any
-}
-
-// ============================================================
 // ORDER SUMMARY (Public)
 // ============================================================
 
@@ -293,12 +268,6 @@ export async function getOrderSummaryPublic(orderId: string) {
 export async function invokeOrderConfirmation(orderId: string) {
   return await supabase.functions.invoke('order-confirmation', {
     body: { order_id: orderId },
-  })
-}
-
-export async function invokeCapturePayPal(orderId: string) {
-  return await supabase.functions.invoke('capture-paypal-order', {
-    body: { orderId },
   })
 }
 

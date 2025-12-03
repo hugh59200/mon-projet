@@ -1,6 +1,7 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V5.0 — i18n + GUEST CHECKOUT + RELAY
+-- SUPABASE CLEAN BACKUP V5.1 — i18n + GUEST + RELAY + PAYMENT VALIDATION
 -- ============================================================
+-- V5.1 : Ajout payment_method dans orders_overview_for_admin (validation paiement manuel)
 -- V5.0 : Support multilingue (colonnes JSONB i18n)
 -- V4.0 : Integration Mondial Relay
 -- V3.1 : Guest checkout secured avec tracking token
@@ -1051,7 +1052,7 @@ LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
 ALTER VIEW public.orders_full_view SET (security_invoker = true);
 GRANT SELECT ON public.orders_full_view TO authenticated;
 
--- 3. Admin Overview
+-- 3. Admin Overview (V5.1: ajout payment_method pour validation paiement manuel)
 CREATE OR REPLACE VIEW public.orders_overview_for_admin AS
 SELECT
   o.id AS order_id,
@@ -1062,6 +1063,7 @@ SELECT
   o.email AS customer_email,
   o.status,
   o.total_amount,
+  o.payment_method,  -- V5.1: Pour identifier Virement/Crypto et valider manuellement
   o.created_at,
   o.shipped_at,
   -- Info relay pour l'admin
@@ -1190,5 +1192,5 @@ BEGIN
 END $$;
 
 -- ============================================================
--- FIN DU BACKUP V5.0 — i18n + GUEST + RELAY + REALTIME
+-- FIN DU BACKUP V5.1 — i18n + GUEST + RELAY + PAYMENT VALIDATION
 -- ============================================================

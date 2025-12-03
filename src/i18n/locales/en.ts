@@ -608,7 +608,6 @@ export default {
       billingAddress: 'Billing Address',
       sameAsShipping: 'Same as shipping',
       securePayment: 'Encrypted transaction',
-      paypalSecure: 'PayPal',
       otherMethods: 'Crypto / Wire',
       sslProtected: '256-bit SSL Protection',
       satisfaction: 'Compliance guarantee',

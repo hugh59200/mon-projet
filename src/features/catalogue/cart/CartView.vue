@@ -367,7 +367,6 @@
                   <BasicIconNext name="mastercard" :size="32" />
                 </div>
                 <div class="cart__payment-icon" title="PayPal">
-                  <BasicIconNext name="paypal" :size="32" />
                 </div>
               </div>
             </div>

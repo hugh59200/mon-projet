@@ -183,18 +183,6 @@ const routes: Array<RouteRecordRaw> = [
     meta: { titleKey: 'checkout.confirmation.pageTitle' },
   },
   {
-    path: '/paiement/success',
-    name: 'payment-success',
-    component: () => import('@/features/checkout/paiement/PaymentSuccessView.vue'),
-    meta: { titleKey: 'routes.paymentSuccess.title', requiresAuth: false },
-  },
-  {
-    path: '/paiement/cancel',
-    name: 'payment-cancel',
-    component: () => import('@/features/checkout/paiement/PaymentCancelView.vue'),
-    meta: { titleKey: 'routes.paymentCancel.title' },
-  },
-  {
     path: '/suivi-commande',
     name: 'track-order',
     component: () => import('@/features/tracking/TrackOrderView.vue'),

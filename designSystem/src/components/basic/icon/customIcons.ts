@@ -5,11 +5,9 @@ import EmailIcon from '@/assets/icons/EmailIcon.vue'
 import FastPeptidesLogo from '@/assets/icons/FastPeptidesLogo.vue'
 import FlagFR from '@/assets/icons/FlagFR.vue'
 import FlagEN from '@/assets/icons/FlagEN.vue'
-import StripeIcon from '@/assets/icons/StripeIcon.vue'
 import PaymentVisa from '@/assets/icons/PaymentVisa.vue'
 import PaymentMastercard from '@/assets/icons/PaymentMastercard.vue'
 import PaymentAmex from '@/assets/icons/PaymentAmex.vue'
-import PaypalIcon from '@/assets/icons/PaypalIcon.vue'
 import TwitterIcon from '@/assets/icons/TwitterIcon.vue'
 import LinkedinIcon from '@/assets/icons/LinkedinIcon.vue'
 import InstagramIcon from '@/assets/icons/InstagramIcon.vue'
@@ -25,11 +23,9 @@ export const customIcons = {
   fastPeptides: FastPeptidesLogo,
   flagFR: FlagFR,
   flagEN: FlagEN,
-  stripe: StripeIcon,
   visa: PaymentVisa,
   mastercard: PaymentMastercard,
   amex: PaymentAmex,
-  paypal: PaypalIcon,
   twitter: TwitterIcon,
   linkedin: LinkedinIcon,
   instagram: InstagramIcon,

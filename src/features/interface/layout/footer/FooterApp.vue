@@ -156,8 +156,6 @@
           <div class="footer__trust-icons">
             <BasicIconNext name="visa" :size="32" class="footer__payment-icon" />
             <BasicIconNext name="mastercard" :size="32" class="footer__payment-icon" />
-            <BasicIconNext name="paypal" :size="32" class="footer__payment-icon" />
-            <BasicIconNext name="stripe" :size="32" class="footer__payment-icon" />
           </div>
         </div>
 

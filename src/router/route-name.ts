@@ -25,8 +25,6 @@ export type RouteName =
   'home' |
   'order-detail' |
   'orders' |
-  'payment-cancel' |
-  'payment-success' |
   'product-detail' |
   'profil' |
   'reconstitution' |

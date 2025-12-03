@@ -57,8 +57,8 @@
     }
 
     &__search {
-      flex: 1;
-      min-width: 200px;
+      flex: 0 1 280px;
+      min-width: 180px;
       max-width: 320px;
     }
 
@@ -66,6 +66,26 @@
       margin-left: auto;
     }
 
+    // Tablette
+    @media (max-width: 1024px) {
+      padding: 10px 14px;
+
+      &__row {
+        gap: 10px;
+      }
+
+      &__search {
+        flex: 0 1 220px;
+        min-width: 160px;
+      }
+
+      &__pagination {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+    }
+
+    // Mobile
     @media (max-width: 768px) {
       padding: 10px 12px;
 
@@ -74,7 +94,7 @@
       }
 
       &__search {
-        min-width: 150px;
+        min-width: 100%;
         max-width: none;
         flex: 1 1 100%;
         order: -1;
@@ -85,6 +105,7 @@
         width: 100%;
         justify-content: center;
         display: flex;
+        order: 20;
       }
     }
   }

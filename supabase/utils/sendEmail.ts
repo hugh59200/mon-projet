@@ -1,19 +1,14 @@
 // supabase/utils/sendEmail.ts
 
-import { EMAIL_PROVIDER, sendWithProvider } from './emailProvider.ts'
+import { sendWithProvider } from './emailProvider.ts'
 import { logEmail } from './logEmail.ts'
 
-const MAILGUN_DOMAIN = Deno.env.get('MAILGUN_DOMAIN') ?? ''
 const RESEND_DOMAIN = Deno.env.get('RESEND_DOMAIN') ?? ''
 
 // Contrôle dynamique du From
 function buildFrom() {
-  if (EMAIL_PROVIDER === 'resend') {
-    // Resend impose d'utiliser le domaine vérifié
+  if (RESEND_DOMAIN) {
     return `FP Store <contact@${RESEND_DOMAIN}>`
-  }
-  if (EMAIL_PROVIDER === 'mailgun') {
-    return `FP Store <postmaster@${MAILGUN_DOMAIN}>`
   }
   // Fallback générique pour dev
   return 'FP Store <noreply@fast-peptides.com>'
@@ -34,7 +29,7 @@ export async function sendEmail({
 }) {
   const FROM = buildFrom()
 
-  console.log(`📧 Envoi email [${type}] via ${EMAIL_PROVIDER} à ${to}`)
+  console.log(`📧 Envoi email [${type}] via Resend à ${to}`)
 
   try {
     const providerResponse = await sendWithProvider({

@@ -616,7 +616,7 @@
   import RelaySelector from '../livraison/mondial-relay/RelaySelector.vue'
   import type { OrderRelayData, RelayPoint } from '../livraison/mondial-relay/relay'
 
-  // Types de paiement manuel (sans Stripe)
+  // Types de paiement manuel
   type ManualPaymentMethod = 'bank_transfer' | 'crypto'
 
   const { t } = useI18n()
@@ -2089,12 +2089,12 @@
         height: 100%;
       }
 
-      &--stripe {
+      &--bank_transfer {
         background: #635bff;
         box-shadow: 0 2px 8px rgba(99, 91, 255, 0.3);
       }
 
-      &--paypal {
+      &--crypto {
         background: #003087;
         box-shadow: 0 2px 8px rgba(0, 48, 135, 0.3);
       }
@@ -2140,7 +2140,6 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    &__paypal-logo {
       flex-shrink: 0;
 
       svg {
@@ -2304,7 +2303,6 @@
         border-top: 1px solid @neutral-100;
       }
 
-      &__paypal-logo,
       &__apple-badge {
         margin-left: auto;
       }

@@ -44,7 +44,7 @@ export function createHandler<T = unknown>(handler: HandlerFn<T>) {
 }
 
 /**
- * Webhook handler (Stripe / PayPal / Coinbase)
+ * Webhook handler
  * Returns rawBody for signature verification
  */
 export function createWebhookHandler(
@@ -62,7 +62,7 @@ export function createWebhookHandler(
     }
 
     try {
-      // RAW body obligatoire pour Stripe
+      // RAW body obligatoire pour signature
       const buf = await req.arrayBuffer()
       const rawBody = new TextDecoder().decode(buf)
 

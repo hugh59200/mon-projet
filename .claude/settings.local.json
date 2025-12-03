@@ -30,7 +30,10 @@
       "Bash(ls:*)",
       "Bash(npx vite build)",
       "Bash(npm run dev)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(rm:*)",
+      "Bash(echo:*)",
+      "Bash(deno cache:*)"
     ],
     "deny": [],
     "ask": []

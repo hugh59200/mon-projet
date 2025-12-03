@@ -198,37 +198,46 @@ export type Database = {
         Row: {
           author_id: string | null
           content: string | null
+          content_i18n: Json | null
           created_at: string | null
           excerpt: string | null
+          excerpt_i18n: Json | null
           id: string
           image: string | null
           published_at: string | null
           slug: string
           title: string
+          title_i18n: Json | null
           topic_id: string | null
         }
         Insert: {
           author_id?: string | null
           content?: string | null
+          content_i18n?: Json | null
           created_at?: string | null
           excerpt?: string | null
+          excerpt_i18n?: Json | null
           id?: string
           image?: string | null
           published_at?: string | null
           slug: string
           title: string
+          title_i18n?: Json | null
           topic_id?: string | null
         }
         Update: {
           author_id?: string | null
           content?: string | null
+          content_i18n?: Json | null
           created_at?: string | null
           excerpt?: string | null
+          excerpt_i18n?: Json | null
           id?: string
           image?: string | null
           published_at?: string | null
           slug?: string
           title?: string
+          title_i18n?: Json | null
           topic_id?: string | null
         }
         Relationships: [
@@ -259,25 +268,31 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          description_i18n: Json | null
           id: string
           image: string | null
           label: string
+          label_i18n: Json | null
           slug: string
         }
         Insert: {
           created_at?: string | null
           description?: string | null
+          description_i18n?: Json | null
           id?: string
           image?: string | null
           label: string
+          label_i18n?: Json | null
           slug: string
         }
         Update: {
           created_at?: string | null
           description?: string | null
+          description_i18n?: Json | null
           id?: string
           image?: string | null
           label?: string
+          label_i18n?: Json | null
           slug?: string
         }
         Relationships: []
@@ -527,13 +542,16 @@ export type Database = {
       products: {
         Row: {
           category: string
+          category_i18n: Json | null
           created_at: string | null
           description: string | null
+          description_i18n: Json | null
           dosage: string | null
           id: string
           image: string | null
           is_on_sale: boolean | null
           name: string
+          name_i18n: Json | null
           price: number
           purity: number | null
           sale_price: number | null
@@ -542,13 +560,16 @@ export type Database = {
         }
         Insert: {
           category: string
+          category_i18n?: Json | null
           created_at?: string | null
           description?: string | null
+          description_i18n?: Json | null
           dosage?: string | null
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
           name: string
+          name_i18n?: Json | null
           price: number
           purity?: number | null
           sale_price?: number | null
@@ -557,13 +578,16 @@ export type Database = {
         }
         Update: {
           category?: string
+          category_i18n?: Json | null
           created_at?: string | null
           description?: string | null
+          description_i18n?: Json | null
           dosage?: string | null
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
           name?: string
+          name_i18n?: Json | null
           price?: number
           purity?: number | null
           sale_price?: number | null
@@ -905,6 +929,7 @@ export type Database = {
           is_relay_delivery: boolean | null
           order_id: string | null
           order_number: string | null
+          payment_method: string | null
           relay_id: string | null
           relay_name: string | null
           shipped_at: string | null
@@ -932,7 +957,9 @@ export type Database = {
       user_cart_view: {
         Row: {
           cart_item_id: string | null
+          category_i18n: Json | null
           is_on_sale: boolean | null
+          name_i18n: Json | null
           product_category: string | null
           product_dosage: string | null
           product_id: string | null

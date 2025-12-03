@@ -189,29 +189,32 @@
 
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Méthode</span>
+              <span class="label">Methode</span>
               <span class="value capitalize">{{ order.payment_method || '—' }}</span>
             </div>
-            <div
-              class="info-item"
-              v-if="order.stripe_session_id"
-            >
-              <span class="label">Session Stripe</span>
-              <BasicLink
-                :href="stripeLink!"
-                target="_blank"
-                class="text-xs"
-              >
-                {{ order.stripe_session_id.slice(0, 12) }}...
-              </BasicLink>
+          </div>
+
+          <!-- Validation paiement manuel (Virement/Crypto) -->
+          <div
+            v-if="order.status === 'pending'"
+            class="payment-validation"
+          >
+            <div class="payment-validation__header">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" class="payment-validation__icon">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z" />
+              </svg>
+              <span>En attente de validation</span>
             </div>
-            <div
-              class="info-item"
-              v-if="order.paypal_order_id"
-            >
-              <span class="label">ID PayPal</span>
-              <span class="value text-xs">{{ order.paypal_order_id }}</span>
-            </div>
+            <p class="payment-validation__text">
+              Avez-vous recu le paiement de <strong>{{ formatCurrency(order.total_amount ?? 0) }}</strong> via <strong>{{ order.payment_method }}</strong> ?
+            </p>
+            <BasicButton
+              label="Valider le paiement"
+              type="primary"
+              size="small"
+              :loading="isValidatingPayment"
+              @click="handleValidatePayment"
+            />
           </div>
         </div>
 
@@ -360,6 +363,7 @@
   // État local typé
   const order = ref<OrdersFullView | null>(null)
   const isLoading = ref(true)
+  const isValidatingPayment = ref(false)
 
   // Champs formulaire local
   const carrier = ref('')
@@ -402,12 +406,6 @@
     return (rawOrder.detailed_items as OrderItemDetailed[]) || []
   })
 
-  const stripeLink = computed(() =>
-    order.value?.stripe_session_id
-      ? `https://dashboard.stripe.com/payments/${order.value.stripe_session_id}`
-      : null,
-  )
-
   const shippingAddress = computed(() => {
     if (!order.value) return null
     const parts = [
@@ -446,7 +444,7 @@
     // 1. Mise à jour DB (RPC) + Log historique
     await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
 
-    // 2. ✅ ENVOI EMAIL (Appel explicite à l'Edge Function)
+    // 2. ENVOI EMAIL (Appel explicite à l'Edge Function)
     try {
       await supabase.functions.invoke('send-order-update', {
         body: {
@@ -454,15 +452,30 @@
           status: selectedStatus.value,
         },
       })
-      // Note: Le toast de succès est déjà affiché par changeOrderStatus
     } catch (e) {
       console.error('Erreur envoi email:', e)
-      toast.show("Statut mis à jour, mais échec de l'envoi d'email", 'warning')
+      toast.show("Statut mis a jour, mais echec de l'envoi d'email", 'warning')
     }
 
-    // 3. Rafraîchissement UI
+    // 3. Rafraichissement UI
     await loadOrder()
-    // await loadEmails() // Si tu as cette fonction pour lister les mails envoyés
+  }
+
+  // Validation paiement manuel (Virement/Crypto)
+  const handleValidatePayment = async () => {
+    if (!order.value) return
+
+    isValidatingPayment.value = true
+    try {
+      await changeOrderStatus({ order_id: order.value.order_id }, 'processing')
+      toast.show('Paiement valide - Commande en preparation', 'success')
+      await loadOrder()
+    } catch (err: any) {
+      console.error(err)
+      toast.show(`Erreur validation : ${err.message}`, 'danger')
+    } finally {
+      isValidatingPayment.value = false
+    }
   }
 
   // Dans src/features/admin/orders/modale/AdminOrderDetailsModal.vue
@@ -626,6 +639,47 @@
         font-weight: 500;
       }
     }
+  }
+
+  .payment-validation {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--warning-50) 0%, var(--warning-100) 100%);
+    border: 2px solid var(--warning-300);
+    border-radius: 12px;
+    text-align: center;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--warning-800);
+    }
+
+    &__icon {
+      color: var(--warning-600);
+      animation: pulse-icon 2s infinite;
+    }
+
+    &__text {
+      font-size: 14px;
+      color: var(--warning-900);
+      margin-bottom: 16px;
+      line-height: 1.5;
+
+      strong {
+        color: var(--warning-800);
+      }
+    }
+  }
+
+  @keyframes pulse-icon {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   .address-block {

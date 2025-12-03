@@ -70,10 +70,9 @@ Je vends des peptides de recherche sur mon e-commerce Fast Peptides (Vue.js + Su
 Lister toutes les Edge Functions Supabase qui envoient des emails. Chercher dans :
 - `supabase/functions/`
 - Tout fichier qui importe ou utilise Resend
-- Les webhooks Stripe
+- 
 
 Fichiers probables :
-- `stripe-webhook/index.ts` (webhook Stripe → email confirmation après paiement)
 - `send-order-email/index.ts` (email de confirmation)
 - `send-shipping-email/index.ts` (email d'expédition avec tracking)
 - Autres...
