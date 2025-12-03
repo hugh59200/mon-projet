@@ -22,6 +22,9 @@ describe('Catalogue - Navigation et Filtres', () => {
   })
 
   it('Recherche un produit par nom', () => {
+    // Intercepter la requête de recherche
+    cy.intercept('GET', '**/rest/v1/products*').as('searchProducts')
+
     // Récupérer le nombre initial de produits
     cy.get('.catalogue-toolbar__count')
       .invoke('text')
@@ -29,8 +32,8 @@ describe('Catalogue - Navigation et Filtres', () => {
         // Taper dans la recherche
         cy.get('.catalogue-search__input').type('BPC')
 
-        // Attendre que les résultats se mettent à jour
-        cy.wait(500)
+        // Attendre la réponse du serveur
+        cy.wait('@searchProducts')
 
         // Vérifier que les produits filtrés contiennent le terme recherché
         cy.get('[class*="product-card"]').should('have.length.greaterThan', 0)
@@ -53,13 +56,13 @@ describe('Catalogue - Navigation et Filtres', () => {
 
   it('Filtre par catégorie via les chips rapides', () => {
     // Cliquer sur une catégorie dans la nav rapide
-    cy.get('.catalogue-quick-nav .catalogue-chip').not(':contains("Tous")').first().click()
+    cy.get('.catalogue-quick-nav .catalogue-chip').not(':contains("Tous"), :contains("All")').first().click()
 
     // Vérifier que les filtres actifs s'affichent
     cy.get('.catalogue-active-filters').should('be.visible')
 
-    // Cliquer sur "Tous" pour réinitialiser
-    cy.get('.catalogue-quick-nav').contains('Tous').click()
+    // Cliquer sur "Tous/All" pour réinitialiser
+    cy.get('.catalogue-quick-nav').contains(/tous|all/i).click()
 
     // Les filtres actifs doivent disparaître
     cy.get('.catalogue-active-filters').should('not.exist')
@@ -94,11 +97,14 @@ describe('Catalogue - Navigation et Filtres', () => {
   })
 
   it('Trie les produits par prix', () => {
+    // Intercepter la requête de tri
+    cy.intercept('GET', '**/rest/v1/products*').as('sortProducts')
+
     // Sélectionner le tri par prix croissant
     cy.get('.catalogue-toolbar__select').select(1)
 
-    // Attendre la mise à jour
-    cy.wait(300)
+    // Attendre la réponse du serveur
+    cy.wait('@sortProducts')
 
     // Vérifier que l'URL contient le paramètre de tri
     cy.url().should('include', 'sort=')
@@ -107,7 +113,7 @@ describe('Catalogue - Navigation et Filtres', () => {
   it('Réinitialise tous les filtres', () => {
     // Appliquer quelques filtres
     cy.get('.catalogue-search__input').type('test')
-    cy.get('.catalogue-quick-nav .catalogue-chip').not(':contains("Tous")').first().click()
+    cy.get('.catalogue-quick-nav .catalogue-chip').not(':contains("Tous"), :contains("All")').first().click()
 
     // Vérifier que des filtres sont actifs
     cy.get('.catalogue-active-filters').should('be.visible')
@@ -129,11 +135,14 @@ describe('Catalogue - Navigation et Filtres', () => {
   })
 
   it('Affiche un état vide pour une recherche sans résultat', () => {
+    // Intercepter la requête de recherche
+    cy.intercept('GET', '**/rest/v1/products*').as('searchProducts')
+
     // Rechercher quelque chose qui n'existe pas
     cy.get('.catalogue-search__input').type('xyznonexistent123456')
 
-    // Attendre la mise à jour
-    cy.wait(500)
+    // Attendre la réponse du serveur
+    cy.wait('@searchProducts')
 
     // Vérifier l'état vide
     cy.get('.catalogue-empty').should('be.visible')

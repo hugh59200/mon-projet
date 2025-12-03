@@ -27,8 +27,10 @@ describe('FAQ', () => {
           .first()
           .click()
 
-        // Attendre l'animation
-        cy.wait(300)
+        // Vérifier que le contenu est visible après ouverture
+        cy.get('[class*="accordion"], [class*="faq-item"], details')
+          .first()
+          .should('be.visible')
       }
     })
   })
@@ -132,7 +134,7 @@ describe('Page d\'accueil', () => {
   })
 
   it('Contient un CTA vers le catalogue', () => {
-    cy.get('a[href*="/catalogue"], button').contains(/catalogue|produits|découvrir|explorer/i)
+    cy.get('a[href*="/catalogue"], button').contains(/catalogue|produits|products|découvrir|discover|explorer|explore|shop/i)
   })
 
   it('Le header est visible', () => {

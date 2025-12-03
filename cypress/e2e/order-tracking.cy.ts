@@ -27,7 +27,7 @@ describe('Suivi de commande - Formulaire de recherche', () => {
 
   it('Affiche la section d\'aide', () => {
     cy.get('.track__help').should('be.visible')
-    cy.get('.track__help-title').should('contain.text', 'aide')
+    cy.get('.track__help-title').should('be.visible')
     cy.get('.track__help-item').should('have.length.at.least', 1)
   })
 
@@ -52,6 +52,9 @@ describe('Suivi de commande - Formulaire de recherche', () => {
   })
 
   it('Affiche une erreur pour une commande inexistante', () => {
+    // Intercepter la requête de recherche de commande
+    cy.intercept('GET', '**/rest/v1/orders*').as('searchOrder')
+
     // Remplir avec des données fictives
     cy.get('.track__input[placeholder*="FP-"]').should('be.visible').click().type('FP-0000-000000')
     cy.get('.track__input[type="email"]').should('be.visible').click().type('nonexistent@test.com')
@@ -59,8 +62,8 @@ describe('Suivi de commande - Formulaire de recherche', () => {
     // Soumettre
     cy.get('.track__form button[type="submit"]').click()
 
-    // Attendre le chargement
-    cy.wait(2000)
+    // Attendre la réponse du serveur
+    cy.wait('@searchOrder')
 
     // Une erreur devrait s'afficher
     cy.get('.track__error, .track__input-wrapper--error').should('exist')

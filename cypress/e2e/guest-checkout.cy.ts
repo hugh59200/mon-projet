@@ -134,4 +134,20 @@ describe('Guest Checkout - Golden Path', () => {
     // Le bouton DOIT être désactivé
     cy.get('.checkout__submit-wrapper button').should('be.disabled')
   })
+
+  it('Vérifie que le virement bancaire est désactivé (Phase 1)', () => {
+    cy.visit('/checkout')
+
+    // Ouvre l'accordéon "Autres méthodes" si présent
+    cy.get('body').then(($body) => {
+      if ($body.find('.payment-methods__coming-header').length) {
+        cy.get('.payment-methods__coming-header').click()
+      }
+    })
+
+    // Vérifie que le virement bancaire est désactivé
+    cy.get('.payment-card--bank').should('exist')
+    cy.get('.payment-card--bank').should('have.class', 'payment-card--disabled')
+    cy.get('.payment-card--bank').should('have.attr', 'aria-disabled', 'true')
+  })
 })

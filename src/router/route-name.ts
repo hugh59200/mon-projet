@@ -20,11 +20,14 @@ export type RouteName =
   'cgu' |
   'checkout' |
   'checkout-confirmation' |
+  'cookies' |
   'email-sent' |
   'faq' |
   'home' |
+  'mentions-legales' |
   'order-detail' |
   'orders' |
+  'politique-confidentialite' |
   'product-detail' |
   'profil' |
   'reconstitution' |

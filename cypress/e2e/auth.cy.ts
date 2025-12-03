@@ -49,17 +49,12 @@ describe('Auth - Page de connexion', () => {
   })
 
   it('Valide le format email', () => {
-    const emailInput = cy.get('input[autocomplete="email"]')
-
     // Entrer un email invalide
-    emailInput.type('invalid-email')
-    emailInput.blur()
+    cy.get('input[autocomplete="email"]').type('invalid-email')
+    cy.get('input[autocomplete="email"]').blur()
 
-    // Attendre la validation
-    cy.wait(300)
-
-    // Une alerte de validation devrait être visible
-    cy.get('.auth__field').first().should('contain.text', '')
+    // Vérifier que le champ est invalide (validation HTML5)
+    cy.get('input[autocomplete="email"]:invalid').should('exist')
   })
 })
 
@@ -93,8 +88,8 @@ describe('Auth - Page d\'inscription', () => {
     // Blur pour déclencher la validation
     cy.get('input[type="password"]').last().blur()
 
-    // Une erreur de correspondance devrait apparaître
-    cy.wait(300)
+    // Le bouton devrait rester désactivé car les mots de passe ne correspondent pas
+    cy.get('.auth__form button[type="submit"]').should('be.disabled')
   })
 
   it('Le bouton est désactivé sans captcha', () => {
@@ -127,7 +122,9 @@ describe('Auth - Récupération de mot de passe', () => {
   it('Valide le format email', () => {
     cy.get('input[autocomplete="email"]').type('invalid')
     cy.get('input[autocomplete="email"]').blur()
-    cy.wait(300)
+
+    // Vérifier que le champ est invalide (validation HTML5)
+    cy.get('input[autocomplete="email"]:invalid').should('exist')
   })
 
   it('Retourne à la page de connexion', () => {
