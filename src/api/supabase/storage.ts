@@ -95,3 +95,91 @@ export async function deleteTopicImage(imageUrl: string): Promise<boolean> {
     return false
   }
 }
+
+// ============================================================
+// PRODUCT IMAGES
+// ============================================================
+
+export interface UploadProductImageOptions {
+  productName: string
+  dosage?: string
+  file: File
+}
+
+export async function uploadProductImage(options: UploadProductImageOptions): Promise<string> {
+  const { productName, dosage, file } = options
+
+  const slug = slugify(productName)
+  const dosageSlug = dosage ? slugify(dosage) : 'u'
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${slug}-${dosageSlug}-${Date.now()}.${fileExt}`
+  const fullPath = `products/${fileName}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('product-images')
+    .upload(fullPath, file, {
+      cacheControl: '3600',
+      upsert: true
+    })
+
+  if (uploadError) throw new Error(`Erreur upload image produit : ${uploadError.message}`)
+
+  const { data } = supabase.storage.from('product-images').getPublicUrl(fullPath)
+  return data.publicUrl
+}
+
+export async function deleteProductImage(imageUrl: string): Promise<boolean> {
+  try {
+    const path = imageUrl.split('/product-images/')[1]
+    if (!path) return false
+
+    const { error } = await supabase.storage.from('product-images').remove([path])
+    if (error) throw new Error(error.message)
+
+    return true
+  } catch (err: any) {
+    console.warn("Erreur lors de la suppression de l'image produit :", err)
+    return false
+  }
+}
+
+// ============================================================
+// AVATAR IMAGES
+// ============================================================
+
+/**
+ * Récupère l'URL publique d'un avatar
+ */
+export function getAvatarPublicUrl(avatarPath: string): string {
+  const { data } = supabase.storage.from('avatars').getPublicUrl(avatarPath)
+  return data.publicUrl
+}
+
+export async function uploadAvatar(userId: string, file: File): Promise<string> {
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${userId}-${Date.now()}.${fileExt}`
+  const filePath = `avatars/${fileName}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    })
+
+  if (uploadError) throw new Error(`Erreur upload avatar : ${uploadError.message}`)
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
+  return data.publicUrl
+}
+
+export async function deleteAvatar(avatarPath: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.storage.from('avatars').remove([avatarPath])
+    if (error) throw new Error(error.message)
+    return true
+  } catch (err: any) {
+    console.warn("Erreur lors de la suppression de l'avatar :", err)
+    return false
+  }
+}

@@ -576,11 +576,11 @@
     }
 
     &:hover {
-      transform: translateY(-2px);
       box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.08),
-        0 2px 6px rgba(0, 0, 0, 0.08);
-      border-color: var(--primary-200);
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+      border-color: var(--primary-300);
+      background: @white;
 
       &::before {
         opacity: 1;
@@ -743,7 +743,9 @@
       z-index: 1;
 
       &:hover {
-        transform: scale(1.02);
+        box-shadow:
+          0 12px 32px rgba(0, 0, 0, 0.15),
+          0 4px 8px rgba(0, 0, 0, 0.1);
       }
     }
   }
@@ -793,7 +795,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
-        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       }
     }
   }

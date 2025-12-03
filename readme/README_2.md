@@ -3,7 +3,7 @@
 **Nom Commercial :** `fast-peptides` (Domaine via Njalla)
 **Entité Juridique :** `Atlas Lab Solutions LLC` (New Mexico, USA)
 **Logistique :** France (Stock déporté / Drop-shipping local)
-**Statut :** 🟡 En cours de finalisation (Site Prêt / Phase 1 Paiement active / Attente EIN)
+**Statut :** 🟢 **PRÊT POUR LANCEMENT** (Phase 1 : Crypto Only)
 
 ---
 
@@ -30,7 +30,7 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 - **Banque :** Compte pro Fintech (Wise/Mercury) au nom de la LLC US (en attente EIN).
 - **Encaissement :**
   - **Interdit :** Stripe et PayPal (Bannissement immédiat pour Peptides).
-  - **Stratégie Actuelle :** Paiement **Asynchrone** (Commande validée -> Instructions virement/crypto affichées -> Paiement manuel).
+  - **Stratégie Actuelle :** Paiement **Crypto** (Wallet Non-Custodial). Virement bancaire désactivé temporairement.
 
 ### 4. La Barrière Numérique (Le "Masque")
 
@@ -64,7 +64,7 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 - **Stratégie "Agnostique" :**
   - Nom d'expéditeur : "FP Store" (Pas de "Peptides").
   - Contenu : Neutre (Pas de liste de produits, juste un lien vers le compte client).
-  - Logo : Nom de fichier et attribut ALT neutres.
+  - Footer : Nettoyé (Pas de réseaux sociaux).
 
 ---
 
@@ -72,14 +72,14 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 
 Nous adoptons une approche évolutive pour contourner les délais administratifs (IRS) et sécuriser le lancement.
 
-### PHASE 1 : Le Lancement Asynchrone (ACTUEL)
+### PHASE 1 : Le Lancement Crypto (ACTUEL)
 
-- **Objectif :** Time-to-market immédiat & Création d'historique de vente.
+- **Objectif :** Premières ventes immédiates & Sécurité maximale.
 - **Mécanisme :**
-  1.  **Checkout :** Validation du panier sans paiement immédiat.
-  2.  **Confirmation :** Affichage des instructions (IBAN LLC ou Wallet Crypto USDT/BTC).
-  3.  **Validation :** Admin vérifie la réception des fonds et passe la commande en `Processing`.
-- **Avantage :** Incensurable, aucun risque de gel des fonds par Stripe/PayPal.
+  1.  **Checkout :** Paiement Crypto uniquement (Virement affiché "Bientôt").
+  2.  **Confirmation :** Affichage adresses Wallet (BTC / USDT-TRC20).
+  3.  **Validation :** Admin vérifie la réception sur Exodus et valide la commande.
+- **Avantage :** Incensurable, aucun risque de gel des fonds.
 
 ### PHASE 2 : L'Upgrade "High-Risk" (FUTUR - Post EIN)
 
@@ -96,13 +96,14 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 - **Age Gate :** Modale +18 ans à l'entrée (Cookie/LocalStorage).
 - **Disclaimer Checkout :** Checkbox obligatoire avant paiement : _"Je certifie être un chercheur qualifié... Usage laboratoire uniquement..."_.
 - **Geo-blocking :** Formulaire d'adresse restreint (Pas d'Allemagne, Suisse, USA).
+- **SEO/GEO :** Données structurées Schema.org "Research Chemical" injectées pour les IA.
 
-### 2. Le Checkout Asynchrone (Implémenté)
+### 2. Le Checkout Asynchrone
 
 1.  **Panier :** Validation classique.
-2.  **Choix Paiement :** "Virement Bancaire" ou "Crypto-monnaie" (Stripe/PayPal désactivés).
-3.  **Validation :** Création commande en base (Statut: `Pending Payment`).
-4.  **Succès :** Page de confirmation avec instructions de paiement détaillées (IBAN / Adresse Wallet + QR Code).
+2.  **Paiement :** Crypto par défaut.
+3.  **Validation :** Création commande (Statut: `Pending Payment`).
+4.  **Succès :** Page de confirmation avec instructions Wallet + Email "En attente".
 
 ---
 
@@ -110,18 +111,19 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 
 _Mise à jour : 03/12/2025_
 
-| Brique               |   Statut   | Notes                                                             |
-| :------------------- | :--------: | :---------------------------------------------------------------- |
-| **Structure LLC**    |  🟢 Fait   | Créée (30/11), OA signé (03/12) & Archivé.                        |
-| **Site Web (Vue 3)** |  🟢 Fait   | Déployé, Design "Labo" OK.                                        |
-| **Base de Données**  |  🟢 Fait   | Supabase Configuré.                                               |
-| **Textes Légaux**    |  🟢 Fait   | CGV/Privacy intégrées (Spécial NM Law + RUO).                     |
-| **Emails (Resend)**  |  🟢 Fait   | Templates neutres & i18n OK.                                      |
-| **Mondial Relay**    |  🟢 Fait   | Widget intégré (Checkout).                                        |
-| **Paiement Manuel**  |  🟢 Fait   | Flux Checkout -> Page Confirmation instructions OK.               |
-| **IA Support**       |  🟢 Fait   | Intégration Claude API OK.                                        |
-| **Config Crypto**    | 🟡 À FAIRE | Créer Wallet (Exodus/Ledger) et mettre les adresses dans le code. |
-| **Compte Banque**    | 🔴 Bloqué  | Attente EIN (Délai IRS important).                                |
+| Brique               |  Statut   | Notes                                                |
+| :------------------- | :-------: | :--------------------------------------------------- |
+| **Structure LLC**    |  🟢 Fait  | Créée (30/11), OA signé (03/12) & Archivé.           |
+| **Site Web (Vue 3)** |  🟢 Fait  | Déployé, Design "Labo" OK, Footer Clean.             |
+| **Base de Données**  |  🟢 Fait  | Supabase Configuré.                                  |
+| **Textes Légaux**    |  🟢 Fait  | CGV/Privacy intégrées (Spécial NM Law + RUO).        |
+| **Emails (Resend)**  |  🟢 Fait  | Templates transactionnels (Pending/Paid) OK.         |
+| **Mondial Relay**    |  🟢 Fait  | Widget intégré (Checkout).                           |
+| **Paiement Manuel**  |  🟢 Fait  | Flux Checkout -> Page Confirmation instructions OK.  |
+| **Config Crypto**    |  🟢 Fait  | Wallet Exodus configuré, Adresses réelles injectées. |
+| **Qualité (QA)**     |  🟢 Fait  | Tests E2E Cypress (Guest Checkout + Links) validés.  |
+| **SEO / GEO**        |  🟢 Fait  | Schema.org JSON-LD (CAS Number, Purity) intégré.     |
+| **Compte Banque**    | 🔴 Bloqué | Attente EIN (Délai IRS important).                   |
 
 ---
 
@@ -129,6 +131,6 @@ _Mise à jour : 03/12/2025_
 
 1.  **Active ton VPN** avant de travailler.
 2.  **Ne donne jamais** de conseils de dosage par chat/email (Réponse type : "Produit pour recherche uniquement").
-3.  **Vérifie les paiements** manuellement (Rapprochement bancaire/crypto) avant d'expédier une commande.
+3.  **Vérifie les paiements** sur l'app Exodus avant d'expédier une commande (compare les 4 derniers caractères de l'adresse).
 4.  **Ne livre jamais** en Allemagne ou en Suisse (Risque saisie douane).
-5.  **Archivage :** Conserve l'Operating Agreement signé dans le volume chiffré **uniquement**.
+5.  **Archivage :** Conserve l'Operating Agreement signé et ta Phrase de Récupération Exodus (Seed) **hors ligne** ou dans un volume chiffré.

@@ -113,6 +113,13 @@ Cypress.Commands.add('addProductToCart', () => {
   cy.get('.compact-toast, .toast').should('be.visible')
 })
 
+// Commande pour naviguer vers le panier via l'UI (évite les problèmes d'hydratation Pinia)
+Cypress.Commands.add('goToCartViaUI', () => {
+  cy.get('.cart__trigger').click()
+  cy.get('.cart__actions').find('button').first().click()
+  cy.url().should('include', '/panier')
+})
+
 // Commande pour ouvrir le chat widget
 Cypress.Commands.add('openChatWidget', () => {
   cy.get('.chat-widget__toggle').click()
@@ -161,6 +168,7 @@ declare global {
       loginAsAdmin(): Chainable<void>
       loginAsUser(): Chainable<void>
       logout(): Chainable<void>
+      goToCartViaUI(): Chainable<void>
     }
   }
 }

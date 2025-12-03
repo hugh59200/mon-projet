@@ -373,7 +373,9 @@
       z-index: 1;
 
       &:hover {
-        transform: scale(1.02);
+        box-shadow:
+          0 12px 32px rgba(0, 0, 0, 0.15),
+          0 4px 8px rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -388,11 +390,11 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:hover {
-          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         &:active {
-          transform: translateY(0);
+          opacity: 0.9;
         }
       }
     }
@@ -424,7 +426,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
-        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       }
     }
   }

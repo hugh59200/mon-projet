@@ -40,26 +40,6 @@
         />
       </div>
 
-      <!-- Quick Actions (on hover) -->
-      <div class="product-card__quick-actions">
-        <PremiumButton
-          type="secondary"
-          variant="solid"
-          size="sm"
-          icon-left="Eye"
-          class="product-card__quick-btn"
-          @click.stop="$emit('view', product.id)"
-        />
-        <PremiumButton
-          v-if="(product.stock ?? 0) > 0"
-          type="primary"
-          variant="solid"
-          size="sm"
-          icon-left="ShoppingCart"
-          class="product-card__quick-btn product-card__quick-btn--primary"
-          @click.stop="$emit('add', product)"
-        />
-      </div>
     </div>
 
     <!-- Content -->
@@ -225,20 +205,11 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
     &:hover {
-      border-color: rgba(var(--primary-500-rgb), 0.3);
-      transform: translateY(-4px);
+      border-color: rgba(var(--primary-500-rgb), 0.4);
       box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(var(--primary-500-rgb), 0.1);
-
-      .product-card__image-inner img {
-        transform: scale(1.02);
-      }
-
-      .product-card__quick-actions {
-        opacity: 1;
-        transform: translateY(0);
-      }
+        0 8px 24px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(var(--primary-500-rgb), 0.15);
+      background: rgba(var(--secondary-900-rgb), 1);
     }
 
     // ============ BADGES ============
@@ -308,48 +279,6 @@
         max-height: 85%;
         object-fit: contain;
         transition: transform 0.4s @ease;
-      }
-    }
-
-    &__quick-actions {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      display: flex;
-      gap: 8px;
-      opacity: 0;
-      transition: all 0.3s @ease;
-    }
-
-    &__quick-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: rgba(30, 41, 59, 0.9);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: @neutral-300;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        background: rgba(30, 41, 59, 0.95);
-        color: white;
-        transform: scale(1.02);
-      }
-
-      &--primary {
-        background: var(--primary-500);
-        border-color: var(--primary-500);
-        color: white;
-
-        &:hover {
-          background: var(--primary-600);
-        }
       }
     }
 
@@ -473,7 +402,7 @@
 
         &:hover:not(:disabled) {
           box-shadow: 0 6px 16px rgba(var(--primary-500-rgb), 0.35);
-          transform: translateY(-1px);
+          background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
         }
 
         &:disabled {
@@ -527,10 +456,6 @@
       .product-card__actions {
         flex-direction: row;
         max-width: 300px;
-      }
-
-      .product-card__quick-actions {
-        display: none;
       }
     }
 

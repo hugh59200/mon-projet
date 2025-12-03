@@ -741,7 +741,7 @@
       &:hover {
         background: var(--success-500);
         color: @white;
-        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(var(--success-500-rgb), 0.3);
       }
     }
 

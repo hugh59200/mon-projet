@@ -635,7 +635,7 @@
         background: @neutral-50;
         border-color: var(--primary-300);
         color: var(--primary-600);
-        transform: scale(1.02);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
       }
 
       &:disabled {
@@ -672,15 +672,11 @@
       transition: all 0.3s @ease;
 
       &:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-
-        .actualites__topic-image img {
-          transform: scale(1.02);
-        }
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        outline: 2px solid var(--primary-400);
+        outline-offset: -2px;
 
         .actualites__topic-arrow {
-          transform: translateX(4px);
           opacity: 1;
         }
       }

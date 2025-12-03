@@ -1051,7 +1051,7 @@
         box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.3);
 
         &:hover {
-          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(var(--primary-500-rgb), 0.4);
         }
       }
     }

@@ -78,10 +78,11 @@
       transform 0.2s ease;
 
     &:hover {
-      background: @neutral-200;
+      background: @neutral-100;
+      border-color: var(--primary-300);
     }
     &:active {
-      transform: scale(0.98);
+      background: @neutral-200;
     }
   }
 
@@ -124,13 +125,10 @@
 
   .action-icon {
     opacity: 0.8;
-    transition:
-      transform 0.2s ease,
-      opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 
     &:hover {
       opacity: 1;
-      transform: scale(1.05);
     }
   }
 </style>

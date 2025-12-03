@@ -50,8 +50,8 @@ describe('Auth - Page de connexion', () => {
 
   it('Valide le format email', () => {
     // Entrer un email invalide
-    cy.get('.auth__form input[type="email"], .auth__form input[inputmode="email"]').first().type('invalid-email')
-    cy.get('.auth__form input[type="email"], .auth__form input[inputmode="email"]').first().blur()
+    cy.get('input[autocomplete="email"]').type('invalid-email')
+    cy.get('input[autocomplete="email"]').blur()
 
     // Vérifier que la validation s'effectue (via le composant)
     cy.get('.auth__form').should('exist')
@@ -117,12 +117,12 @@ describe('Auth - Récupération de mot de passe', () => {
     cy.get('.auth__title').should('be.visible')
     cy.get('.auth__form').should('be.visible')
     // L'input email est dans un WrapperInput
-    cy.get('.auth__form input[inputmode="email"], .auth__form input[type="email"]').should('exist')
+    cy.get('input[autocomplete="email"]').should('exist')
   })
 
   it('Valide le format email', () => {
-    cy.get('.auth__form input[inputmode="email"], .auth__form input[type="email"]').first().type('invalid')
-    cy.get('.auth__form input[inputmode="email"], .auth__form input[type="email"]').first().blur()
+    cy.get('input[autocomplete="email"]').type('invalid')
+    cy.get('input[autocomplete="email"]').blur()
 
     // Vérifier que le formulaire existe (la validation custom gère les erreurs)
     cy.get('.auth__form').should('exist')

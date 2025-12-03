@@ -49,8 +49,9 @@
     gap: 10px;
 
     &.hoverable:hover {
-      box-shadow: 0 2px 6px color-mix(in srgb, @neutral-900 10%, transparent);
-      transform: translateY(-1px);
+      box-shadow: 0 2px 8px color-mix(in srgb, @neutral-900 12%, transparent);
+      border-color: var(--primary-300);
+      background: @white;
     }
 
     &__header {

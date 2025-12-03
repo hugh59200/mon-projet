@@ -78,12 +78,12 @@
 
     &:hover {
       background: @neutral-50;
-      transform: translateY(-2px);
+      border-color: var(--primary-300);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     &:active {
-      transform: scale(0.98);
+      background: @neutral-100;
     }
   }
 
@@ -118,13 +118,10 @@
   }
 
   .action-icon {
-    transition:
-      transform 0.2s ease,
-      opacity 0.2s ease;
+    transition: opacity 0.2s ease;
     opacity: 0.7;
 
     &:hover {
-      transform: scale(1.05);
       opacity: 1;
     }
   }
