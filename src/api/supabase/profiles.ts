@@ -1,6 +1,6 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Orders, Profiles } from '@/supabase/types/supabase.types'
-import { handleApi, handleApiMaybe, handleMutation } from '../helpers/handleError'
+import { handleApi, handleApiMaybe, handleMutation } from '@/api/helpers/handleError'
 
 export async function getProfile(id: string): Promise<Profiles | null> {
   const res = await supabase.from('profiles').select('*').eq('id', id).maybeSingle()

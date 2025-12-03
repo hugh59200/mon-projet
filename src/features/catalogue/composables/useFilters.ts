@@ -1,5 +1,7 @@
 import type { Products } from '@/supabase/types/supabase.types'
+import { getTranslated } from '@/composables/useTranslated'
 import { computed, ref, type Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 type Range = {
   min: number
@@ -13,6 +15,8 @@ type Range = {
  * Gère les filtres dynamiques du catalogue (prix, stock, tags, catégories)
  */
 export function useFilters(products: Ref<Products[]>, priceRange: Ref<Range>) {
+  const { locale } = useI18n()
+
   // 🧭 États des filtres
   const selectedCategories = ref<string[]>([])
   const inStockOnly = ref(false)
@@ -51,10 +55,18 @@ export function useFilters(products: Ref<Products[]>, priceRange: Ref<Range>) {
   )
 
   const categoryItemsWithCounts = computed(() =>
-    categories.value.map((cat) => ({
-      id: cat,
-      label: `${cat} (${priceFiltered.value.filter((p) => p.category === cat).length})`,
-    })),
+    categories.value.map((cat) => {
+      // Trouver un produit avec cette catégorie pour obtenir la traduction
+      const productWithCat = products.value.find((p) => p.category === cat)
+      const translatedCat = productWithCat
+        ? getTranslated(productWithCat.category_i18n, cat, locale.value)
+        : cat
+      const count = priceFiltered.value.filter((p) => p.category === cat).length
+      return {
+        id: cat, // Garder l'id en français pour le filtrage
+        label: `${translatedCat} (${count})`,
+      }
+    }),
   )
 
   // 📊 Stock

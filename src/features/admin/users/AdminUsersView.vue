@@ -160,7 +160,7 @@
   import type { Role } from '@/supabase/types/supabase.types'
   import { formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import { computed, ref, watch } from 'vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import UserCardMobile from './mobile/UserCardMobile.vue'
   import AdminUserDetailsModal from './modale/AdminUserDetailsModal.vue'
 

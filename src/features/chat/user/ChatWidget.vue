@@ -103,9 +103,9 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { IconColor } from '@designSystem/index'
   import { computed, onMounted, onUnmounted } from 'vue'
-  import ChatCore from '../shared/components/ChatCore.vue'
-  import { useChat } from '../shared/composables/useChat'
-  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+  import ChatCore from '@/features/chat/shared/components/ChatCore.vue'
+  import { useChat } from '@/features/chat/shared/composables/useChat'
+  import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
 
   const { isMobile } = useDeviceBreakpoint()

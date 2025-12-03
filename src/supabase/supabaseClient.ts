@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { useSablierStore } from '../features/interface/sablier/useSablierStore.ts'
-import type { Database } from './types/supabase.ts'
+import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
+import type { Database } from '@/supabase/types/supabase'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY

@@ -1,6 +1,6 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Profiles, Role } from '@/supabase/types/supabase.types'
-import { handleApi, handleMutation } from '../helpers/handleError'
+import { handleApi, handleMutation } from '@/api/helpers/handleError'
 
 export async function fetchAllProfiles(): Promise<Profiles[]> {
   const res = await supabase.from('profiles').select('*')

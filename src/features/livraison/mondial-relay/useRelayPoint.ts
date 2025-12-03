@@ -1,6 +1,6 @@
 // composables/useRelayPoint.ts
 import { computed, ref } from 'vue'
-import { supabase } from '../../../supabase/supabaseClient'
+import { supabase } from '@/supabase/supabaseClient'
 import type { OrderRelayData, RelayPoint } from './relay'
 
 // Points relais mock pour le développement

@@ -518,8 +518,7 @@ import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import PageContent from '@/features/shared/components/PageContent.vue'
 import PageHeader from '@/features/shared/components/PageHeader.vue'
-import { trackGuestOrderByEmail, trackGuestOrderByToken } from '@/api/supabase/orders'
-import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
+import { signUpWithMetadata, trackGuestOrderByEmail, trackGuestOrderByToken } from '@/api'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
 import { getLabelBadge } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -740,16 +739,12 @@ async function handleQuickRegister() {
   if (!order.value?.shipping_email) return
 
   registerLoading.value = true
-  
+
   try {
-    const { error } = await supabase.auth.signUp({
+    const { error } = await signUpWithMetadata({
       email: order.value.shipping_email,
       password: newPassword.value,
-      options: {
-        data: {
-          full_name: order.value.shipping_name || '',
-        },
-      },
+      fullName: order.value.shipping_name || '',
     })
 
     if (error) throw error

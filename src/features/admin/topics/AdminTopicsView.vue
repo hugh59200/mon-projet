@@ -130,7 +130,7 @@
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import TopicCardMobile from './mobile/TopicCardMobile.vue'
   import AdminTopicModal from './modale/AdminTopicModal.vue'
 

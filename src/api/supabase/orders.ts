@@ -3,7 +3,7 @@ import type { OrderStatus } from '@/utils'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Json } from '@/supabase/types/supabase'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
-import { handleApi, handleMutation } from '../helpers/handleError'
+import { handleApi, handleMutation } from '@/api/helpers/handleError'
 
 // ============================================================
 // TYPES

@@ -255,9 +255,9 @@
 </template>
 
 <script setup lang="ts">
+  import { fetchProductById, uploadProductImage } from '@/api'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useProductActions } from '../composables/useProductActions'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -376,13 +376,9 @@
       return
     }
 
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', props.productId)
-      .single()
+    const data = await fetchProductById(props.productId)
 
-    if (error) {
+    if (!data) {
       toast.show('Erreur chargement produit', 'danger')
       visible.value = false
       return
@@ -433,32 +429,15 @@
 
   async function uploadImage(): Promise<string | null> {
     if (!selectedFile.value || !form.value.name) return null
-    
+
     uploadLoading.value = true
     try {
-      // Création d'un nom de fichier unique : slug-dosage-timestamp.ext
-      const slug = form.value.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
-      const dosageSlug = form.value.dosage?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'u'
-      const fileExt = selectedFile.value.name.split('.').pop()
-      const fileName = `${slug}-${dosageSlug}-${Date.now()}.${fileExt}`
-      
-      const folderPath = `products`
-      const fullPath = `${folderPath}/${fileName}`
-
-      // Upload Supabase
-      const { error } = await supabase.storage
-        .from('product-images')
-        .upload(fullPath, selectedFile.value, { 
-          cacheControl: '3600', 
-          upsert: true 
-        })
-
-      if (error) throw error
-
-      // Récupération URL publique
-      const { data } = supabase.storage.from('product-images').getPublicUrl(fullPath)
-      return data.publicUrl
-
+      const publicUrl = await uploadProductImage({
+        productName: form.value.name,
+        dosage: form.value.dosage || undefined,
+        file: selectedFile.value,
+      })
+      return publicUrl
     } catch (err: any) {
       toast.show(`Erreur upload : ${err.message}`, 'danger')
       return null

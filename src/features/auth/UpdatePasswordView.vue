@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/supabase/supabaseClient'
+  import { updatePassword as updateUserPassword } from '@/api'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -117,7 +117,7 @@
 
     loading.value = true
 
-    const { error: err } = await supabase.auth.updateUser({ password: password.value })
+    const { error: err } = await updateUserPassword(password.value)
 
     loading.value = false
 

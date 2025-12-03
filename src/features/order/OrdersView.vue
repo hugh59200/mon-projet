@@ -363,7 +363,7 @@
   import { getLabelBadge, getTypeBadge } from '@/utils/mappingBadge'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { onMounted, ref, type Ref } from 'vue'
-  import PageHeader from '../shared/components/PageHeader.vue'
+  import PageHeader from '@/features/shared/components/PageHeader.vue'
 
   const orders = ref<OrdersFullView[]>([])
   const openSections = ref({}) as Ref<

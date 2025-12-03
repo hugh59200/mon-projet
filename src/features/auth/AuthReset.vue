@@ -82,8 +82,8 @@
 </template>
 
 <script setup lang="ts">
+  import { resetPasswordForEmail } from '@/api'
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
-  import { supabase } from '@/supabase/supabaseClient'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -125,9 +125,10 @@
     loading.value = true
     clear()
 
-    const { error: err } = await supabase.auth.resetPasswordForEmail(email.value, {
+    const { error: err } = await resetPasswordForEmail({
+      email: email.value,
       redirectTo: `${window.location.origin}/auth/update-password`,
-      captchaToken: captchaToken.value, // ✅ Ajout crucial
+      captchaToken: captchaToken.value,
     })
 
     loading.value = false

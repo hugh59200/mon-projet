@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-  import { supabase } from '@/supabase/supabaseClient'
+  import { getSession, verifyOtp } from '@/api'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import { onMounted, ref } from 'vue'
@@ -69,8 +69,8 @@
     // 1️⃣ Cas OAuth (Google, etc.) : code dans l'URL
     const code = route.query.code as string | undefined
     if (code) {
-      const { data } = await supabase.auth.getSession()
-      if (data.session?.user) return handleSuccess(data.session.user)
+      const { user } = await getSession()
+      if (user) return handleSuccess(user)
     }
 
     // 2️⃣ Cas Email Links (Signup / Reset Password) : token_hash + type
@@ -81,8 +81,8 @@
     if (token && type) {
       console.log(`Tentative de vérification OTP: ${token}, ${type}`)
       // Utilisation de verifyOtp (méthode Supabase attendue pour la vérification)
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: token,
+      const { error } = await verifyOtp({
+        tokenHash: token,
         type: type,
       })
       console.log(error)
@@ -92,13 +92,13 @@
         return
       }
       // Session active après verifyOtp
-      const { data } = await supabase.auth.getSession()
-      if (data.session?.user) return handleSuccess(data.session.user)
+      const { user } = await getSession()
+      if (user) return handleSuccess(user)
     }
 
     // 3️⃣ Cas Fallback : Déjà connecté ?
-    const { data } = await supabase.auth.getSession()
-    if (data.session?.user) return handleSuccess(data.session.user)
+    const { user } = await getSession()
+    if (user) return handleSuccess(user)
 
     // ❌ Échec
     fail(t('auth.callback.noSession'))

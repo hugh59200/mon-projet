@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+  import { onAuthStateChange } from '@/api'
   import AppRegisterGlobals from '@/AppRegisterGlobals.vue'
   import { vFeedbackAnimate } from '@/directives/vFeedbackAnimate'
   import { vFocusable } from '@/directives/vFocus'
@@ -46,7 +47,6 @@
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
   import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
   import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
@@ -66,7 +66,7 @@
     return route.path.startsWith('/auth') || route.path.startsWith('/paiement')
   })
 
-  supabase.auth.onAuthStateChange((_event, session) => {
+  onAuthStateChange((_event, session) => {
     if (!session) cart.clearCart()
   })
 

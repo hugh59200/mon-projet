@@ -374,7 +374,7 @@
   import { useI18n } from 'vue-i18n'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute, useRouter } from 'vue-router'
-  import ProductEssentials from '../shared/components/ProductEssentials.vue'
+  import ProductEssentials from '@/features/shared/components/ProductEssentials.vue'
   import ProductSchema from './components/ProductSchema.vue'
   import { useHead } from '@vueuse/head'
   import { getCanonicalUrl } from '@/config/seo'

@@ -277,7 +277,7 @@
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, ref, watch, h, type FunctionalComponent } from 'vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import OrderCardMobile from './mobile/OrderCardMobile.vue'
   import AdminOrderDetailsModal from './modale/AdminOrderDetailsModal.vue'
 

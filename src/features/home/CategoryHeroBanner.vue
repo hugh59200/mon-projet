@@ -364,7 +364,7 @@
     {
       id: 'weight-loss',
       label: t('home.categories.weightLoss.label'),
-      category: t('home.categories.weightLoss.label'),
+      category: 'Perte de poids', // Clé française pour le filtrage
       eyebrow: t('home.categories.weightLoss.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.weightLoss.label'),
@@ -384,7 +384,7 @@
     {
       id: 'recovery',
       label: t('home.categories.recovery.label'),
-      category: t('home.categories.recovery.label'),
+      category: 'Récupération', // Clé française pour le filtrage
       eyebrow: t('home.categories.recovery.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.recovery.label'),
@@ -404,7 +404,7 @@
     {
       id: 'growth',
       label: t('home.categories.growth.label'),
-      category: t('home.categories.growth.label'),
+      category: 'Croissance', // Clé française pour le filtrage
       eyebrow: t('home.categories.growth.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.growth.label'),
@@ -424,7 +424,7 @@
     {
       id: 'anti-aging',
       label: t('home.categories.antiAging.label'),
-      category: t('home.categories.antiAging.label'),
+      category: 'Anti-âge', // Clé française pour le filtrage
       eyebrow: t('home.categories.antiAging.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.antiAging.label'),
@@ -444,7 +444,7 @@
     {
       id: 'performance',
       label: t('home.categories.performance.label'),
-      category: t('home.categories.performance.label'),
+      category: 'Performance', // Clé française pour le filtrage
       eyebrow: t('home.categories.performance.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.performance.label'),
@@ -464,7 +464,7 @@
     {
       id: 'wellbeing',
       label: t('home.categories.wellbeing.label'),
-      category: t('home.categories.wellbeing.label'),
+      category: 'Bien-être', // Clé française pour le filtrage
       eyebrow: t('home.categories.wellbeing.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.wellbeing.label'),
@@ -484,7 +484,7 @@
     {
       id: 'nootropic',
       label: t('home.categories.nootropic.label'),
-      category: t('home.categories.nootropic.label'),
+      category: 'Nootropique', // Clé française pour le filtrage
       eyebrow: t('home.categories.nootropic.eyebrow'),
       titleMain: t('home.categories.common.research'),
       titleAccent: t('home.categories.nootropic.label'),

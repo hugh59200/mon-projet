@@ -5,7 +5,7 @@ import type { AuthChangeEvent, Session, User, AuthOtpResponse } from '@supabase/
 // TYPES
 // ============================================================
 
-export interface SignUpOptions {
+export interface SignUpWithMetadataOptions {
   email: string
   password: string
   fullName?: string
@@ -48,13 +48,14 @@ export function onAuthStateChange(
 }
 
 // ============================================================
-// SIGN UP / SIGN IN
+// SIGN UP WITH METADATA (pour TrackOrderView)
 // ============================================================
 
 /**
- * Inscription d'un nouvel utilisateur
+ * Inscription avec métadonnées utilisateur (fullName, etc.)
+ * Différent de signUp dans external/auth.ts qui ne prend pas de metadata
  */
-export async function signUp(options: SignUpOptions): Promise<{ user: User | null; error: Error | null }> {
+export async function signUpWithMetadata(options: SignUpWithMetadataOptions): Promise<{ user: User | null; error: Error | null }> {
   const { data, error } = await supabase.auth.signUp({
     email: options.email,
     password: options.password,
@@ -72,43 +73,12 @@ export async function signUp(options: SignUpOptions): Promise<{ user: User | nul
   }
 }
 
-/**
- * Connexion avec email/password
- */
-export async function signInWithPassword(
-  email: string,
-  password: string,
-): Promise<{ user: User | null; error: Error | null }> {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  return {
-    user: data.user,
-    error: error ? new Error(error.message) : null,
-  }
-}
-
-/**
- * Connexion OAuth (Google, etc.)
- */
-export async function signInWithOAuth(
-  provider: 'google' | 'github' | 'facebook',
-  redirectTo?: string,
-) {
-  return supabase.auth.signInWithOAuth({
-    provider,
-    options: { redirectTo },
-  })
-}
-
 // ============================================================
 // PASSWORD RESET & UPDATE
 // ============================================================
 
 /**
- * Envoie un email de réinitialisation de mot de passe
+ * Envoie un email de réinitialisation de mot de passe avec captcha
  */
 export async function resetPasswordForEmail(
   options: ResetPasswordOptions,
@@ -151,20 +121,6 @@ export async function verifyOtp(
 
   return {
     user: data.user ?? null,
-    error: error ? new Error(error.message) : null,
-  }
-}
-
-// ============================================================
-// SIGN OUT
-// ============================================================
-
-/**
- * Déconnexion
- */
-export async function signOut(): Promise<{ error: Error | null }> {
-  const { error } = await supabase.auth.signOut()
-  return {
     error: error ? new Error(error.message) : null,
   }
 }

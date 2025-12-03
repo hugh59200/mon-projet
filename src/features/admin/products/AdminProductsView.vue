@@ -190,7 +190,7 @@
   import { ref } from 'vue'
 
   import type { BadgeType } from '@designSystem/components/basic/badge/BasicBadge.types'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import ProductCardMobile from './mobile/ProductCardMobile.vue'
   import AdminProductModal from './modale/AdminProductModal.vue'
 

@@ -159,7 +159,7 @@
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperLoader from '@designSystem/components/wrapper/loader/WrapperLoader.vue'
   import { computed, onMounted, ref } from 'vue'
-  import BasicToolbar from '../shared/components/BasicToolbar.vue'
+  import BasicToolbar from '@/features/admin/shared/components/BasicToolbar.vue'
   import NewsCardMobile from './mobile/NewsCardMobile.vue'
   import AdminNewsModal from './modale/AdminNewsModal.vue'
 

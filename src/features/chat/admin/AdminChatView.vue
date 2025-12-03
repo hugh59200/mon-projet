@@ -100,11 +100,11 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import ChatCore from '../shared/components/ChatCore.vue'
-  import { useAiSuggestion } from '../shared/composables/useAiSuggestion'
-  import { useChat } from '../shared/composables/useChat'
-  import { useChatConversations } from '../shared/composables/useChatConversations'
-  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+  import ChatCore from '@/features/chat/shared/components/ChatCore.vue'
+  import { useAiSuggestion } from '@/features/chat/shared/composables/useAiSuggestion'
+  import { useChat } from '@/features/chat/shared/composables/useChat'
+  import { useChatConversations } from '@/features/chat/shared/composables/useChatConversations'
+  import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import ChatSidebar from './ChatSidebar.vue'
 
   const route = useRoute()

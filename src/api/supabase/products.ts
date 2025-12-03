@@ -1,6 +1,6 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Products, ProductsInsert, ProductsUpdate } from '@/supabase/types/supabase.types'
-import { handleApi, handleApiMaybe, handleMutation } from '../helpers/handleError'
+import { handleApi, handleApiMaybe, handleMutation } from '@/api/helpers/handleError'
 
 export async function fetchProducts() {
   const res = await supabase.from('products').select('*').order('created_at', { ascending: false })

@@ -1,7 +1,7 @@
 import { useProfilePreferencesActions } from './composables/useProfilePreferencesActions'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useAuthStore } from '../auth/stores/useAuthStore'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 
 export const useProfileSectionsStore = defineStore(
   'profileSections',

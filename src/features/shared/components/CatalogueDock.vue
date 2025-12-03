@@ -68,12 +68,12 @@
             <ul class="catalogue-dock__categories">
               <li
                 v-for="(category, index) in categories"
-                :key="category.name"
+                :key="category.key"
                 class="catalogue-dock__item"
                 :style="{ '--item-delay': `${index * 0.05}s` }"
               >
                 <RouterLink
-                  :to="`/catalogue?categories=${encodeURIComponent(category.name)}`"
+                  :to="`/catalogue?categories=${encodeURIComponent(category.key)}`"
                   class="catalogue-dock__link"
                   :style="{ '--category-color': category.color }"
                   @click="handleNavigation"
@@ -150,9 +150,11 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useProductsStore } from '@/features/catalogue/composables/useProducts'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { getTranslated } from '@/composables/useTranslated'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useI18n } from 'vue-i18n'
 
   // ═══════════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -181,6 +183,7 @@
   const cartStore = useCartStore()
   const productsStore = useProductsStore()
   const { isMobile } = useDeviceBreakpoint()
+  const { locale } = useI18n()
 
   const { products } = storeToRefs(productsStore)
 
@@ -233,7 +236,7 @@
 
   // Catégories dynamiques basées sur les produits
   const categories = computed(() => {
-    const categoryMap = new Map<string, { count: number }>()
+    const categoryMap = new Map<string, { count: number; i18n: unknown }>()
 
     products.value.forEach((product) => {
       if (product.category) {
@@ -241,12 +244,12 @@
         if (existing) {
           existing.count++
         } else {
-          categoryMap.set(product.category, { count: 1 })
+          categoryMap.set(product.category, { count: 1, i18n: product.category_i18n })
         }
       }
     })
 
-    // Mapping des couleurs par catégorie
+    // Mapping des couleurs par catégorie (clés en français)
     const colorMap: Record<string, string> = {
       Récupération: '#10B981',
       'Perte de poids': '#F59E0B',
@@ -261,9 +264,10 @@
     }
 
     return Array.from(categoryMap.entries())
-      .map(([name, data]) => ({
-        name,
-        color: colorMap[name] || '#a67c5b',
+      .map(([categoryKey, data]) => ({
+        name: getTranslated(data.i18n, categoryKey, locale.value), // Nom traduit pour l'affichage
+        key: categoryKey, // Clé originale (français) pour le filtrage
+        color: colorMap[categoryKey] || '#a67c5b',
         count: data.count,
       }))
       .sort((a, b) => b.count - a.count)

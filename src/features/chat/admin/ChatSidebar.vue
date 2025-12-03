@@ -66,11 +66,11 @@
 </template>
 
 <script setup lang="ts">
+  import { getAvatarPublicUrl, getProfile } from '@/api'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-  import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
   import type { ConversationOverview } from '@/supabase/types/supabase.types'
   import { computed, onMounted, ref } from 'vue'
-  import { useChatNotifStore } from '../shared/stores/useChatNotifStore'
+  import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import ConversationItem from './ConversationItem.vue'
 
   const props = defineProps<{
@@ -105,15 +105,10 @@
 
   onMounted(async () => {
     if (!auth.user?.id) return
-    const { data } = await supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('id', auth.user.id)
-      .maybeSingle()
+    const profile = await getProfile(auth.user.id)
 
-    if (data?.avatar_url) {
-      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(data.avatar_url)
-      avatarUrl.value = pub.publicUrl
+    if (profile?.avatar_url) {
+      avatarUrl.value = getAvatarPublicUrl(profile.avatar_url)
     }
   })
 </script>
