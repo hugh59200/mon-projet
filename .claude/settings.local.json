@@ -34,7 +34,9 @@
       "Bash(rm:*)",
       "Bash(echo:*)",
       "Bash(deno cache:*)",
-      "Bash(xargs dirname:*)"
+      "Bash(xargs dirname:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

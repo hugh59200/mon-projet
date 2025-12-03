@@ -1134,7 +1134,7 @@ export default {
     newsletter: {
       title: 'Scientific watch',
       subtitle: 'Receive updates',
-      placeholder: 'email@lab.com',
+      placeholder: "email{'@'}lab.com",
       subscribe: "OK",
       success: 'Subscribed!',
     },

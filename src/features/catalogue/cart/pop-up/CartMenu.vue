@@ -64,6 +64,7 @@
             <TransitionGroup name="item">
               <div
                 v-for="item in cart.items"
+                :key="item.cart_item_id ?? item.product_id ?? `item-${item.product_name}`"
                 class="cart__item"
               >
                 <div class="cart__item-image">

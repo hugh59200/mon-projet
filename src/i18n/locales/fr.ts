@@ -1470,6 +1470,11 @@ export default {
       description: 'Outil de laboratoire.',
       badge: 'Utilitaire',
     },
+    legal: {
+      mentions: 'Mentions Légales',
+      privacy: 'Confidentialité',
+      cookies: 'Cookies',
+    },
   },
 
   // ============================================
@@ -1551,6 +1556,188 @@ export default {
         paragraph1: "Les présentes conditions sont soumises au droit de l'État du Nouveau-Mexique (USA), siège social de l'entreprise.",
         paragraph2: "Toutefois, pour les consommateurs résidant dans l'Union Européenne, les règles impératives de protection du consommateur de leur pays de résidence peuvent s'appliquer.",
         paragraph3: 'En cas de litige, une solution amiable sera recherchée avant toute action judiciaire.',
+      },
+    },
+  },
+
+  // ============================================
+  // LEGAL PAGES
+  // ============================================
+  legal: {
+    lastUpdated: 'Dernière mise à jour',
+
+    // Mentions Légales
+    mentions: {
+      title: 'Mentions Légales',
+      editor: {
+        title: 'Éditeur du site',
+        address: 'Adresse disponible sur demande',
+      },
+      director: {
+        title: 'Directeur de la publication',
+        text: 'Le directeur de la publication est le représentant légal de la société Atlas Lab Solutions.',
+      },
+      hosting: {
+        title: 'Hébergement',
+      },
+      ip: {
+        title: 'Propriété intellectuelle',
+        text: "L'ensemble du contenu de ce site (textes, images, logos, icônes, sons, logiciels, etc.) est la propriété exclusive d'Atlas Lab Solutions ou de ses partenaires. Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie de ce site est strictement interdite sans autorisation préalable écrite.",
+      },
+      liability: {
+        title: 'Limitation de responsabilité',
+        text: "Atlas Lab Solutions s'efforce de fournir des informations exactes et à jour. Toutefois, nous ne pouvons garantir l'exactitude, la complétude ou l'actualité des informations diffusées sur ce site.",
+        research: "Tous les produits vendus sur ce site sont destinés exclusivement à la recherche scientifique (Research Use Only - RUO). Ils ne sont pas destinés à un usage humain, vétérinaire, alimentaire ou cosmétique.",
+      },
+      links: {
+        title: 'Liens hypertextes',
+        text: "Ce site peut contenir des liens vers d'autres sites. Atlas Lab Solutions n'assume aucune responsabilité quant au contenu de ces sites tiers.",
+      },
+      law: {
+        title: 'Droit applicable',
+        text: 'Les présentes mentions légales sont soumises au droit français. En cas de litige, et après échec de toute tentative de recherche d\'une solution amiable, les tribunaux français seront seuls compétents.',
+      },
+    },
+
+    // Politique de Confidentialité
+    privacy: {
+      title: 'Politique de Confidentialité',
+      intro: {
+        title: 'Introduction',
+        text: "Atlas Lab Solutions s'engage à protéger la vie privée de ses utilisateurs. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD).",
+      },
+      controller: {
+        title: 'Responsable du traitement',
+      },
+      data: {
+        title: 'Données collectées',
+        intro: 'Nous collectons les données suivantes :',
+        identity: 'Données d\'identité :',
+        identityDesc: 'nom, prénom, adresse email',
+        contact: 'Données de contact :',
+        contactDesc: 'adresse postale, numéro de téléphone',
+        transaction: 'Données de transaction :',
+        transactionDesc: 'historique des commandes, détails de paiement (via prestataire sécurisé)',
+        technical: 'Données techniques :',
+        technicalDesc: 'adresse IP, type de navigateur, pages visitées',
+      },
+      purpose: {
+        title: 'Finalités du traitement',
+        orders: 'Gestion des commandes',
+        ordersDesc: 'Traitement et livraison de vos commandes, facturation et service après-vente.',
+        communication: 'Communication',
+        communicationDesc: 'Envoi de confirmations, notifications de livraison et réponses à vos demandes.',
+        analytics: 'Analyse',
+        analyticsDesc: "Amélioration de nos services et de l'expérience utilisateur sur notre site.",
+        security: 'Sécurité',
+        securityDesc: 'Protection contre la fraude et maintien de la sécurité de nos systèmes.',
+      },
+      basis: {
+        title: 'Base légale du traitement',
+        text: 'Le traitement de vos données repose sur les bases légales suivantes :',
+        contract: "Exécution du contrat : pour la gestion de vos commandes",
+        legal: "Obligation légale : pour la conservation des factures",
+        consent: "Consentement : pour l'envoi de communications marketing",
+        interest: "Intérêt légitime : pour l'amélioration de nos services",
+      },
+      retention: {
+        title: 'Durée de conservation',
+        dataType: 'Type de données',
+        duration: 'Durée de conservation',
+        account: 'Données de compte',
+        accountDuration: "3 ans après la dernière activité",
+        orders: 'Données de commande',
+        ordersDuration: '10 ans (obligation légale)',
+        logs: 'Logs de connexion',
+        logsDuration: '1 an',
+        cookies: 'Cookies',
+        cookiesDuration: '13 mois maximum',
+      },
+      rights: {
+        title: 'Vos droits',
+        intro: 'Conformément au RGPD, vous disposez des droits suivants :',
+        access: "Droit d'accès",
+        accessDesc: 'Obtenir une copie de vos données personnelles.',
+        rectification: 'Droit de rectification',
+        rectificationDesc: 'Corriger des données inexactes ou incomplètes.',
+        erasure: "Droit à l'effacement",
+        erasureDesc: 'Demander la suppression de vos données.',
+        portability: 'Droit à la portabilité',
+        portabilityDesc: 'Recevoir vos données dans un format structuré.',
+        opposition: "Droit d'opposition",
+        oppositionDesc: 'Vous opposer au traitement de vos données.',
+        contact: 'Pour exercer ces droits, contactez notre DPO :',
+      },
+      security: {
+        title: 'Sécurité des données',
+        text: 'Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données :',
+        ssl: 'Chiffrement SSL/TLS pour toutes les transmissions',
+        encryption: 'Chiffrement des données sensibles au repos',
+        access: "Accès restreint aux données personnelles",
+        audit: 'Audits de sécurité réguliers',
+      },
+      transfer: {
+        title: 'Transferts internationaux',
+        text: "Certaines de nos données peuvent être traitées par des prestataires situés en dehors de l'UE. Dans ce cas, nous nous assurons que des garanties appropriées sont en place (clauses contractuelles types, certification Privacy Shield, etc.).",
+      },
+      cnil: {
+        title: 'Réclamation auprès de la CNIL',
+        text: 'Si vous estimez que le traitement de vos données constitue une violation de vos droits, vous pouvez introduire une réclamation auprès de la CNIL :',
+      },
+    },
+
+    // Politique Cookies
+    cookies: {
+      title: 'Politique des Cookies',
+      what: {
+        title: "Qu'est-ce qu'un cookie ?",
+        text: "Un cookie est un petit fichier texte déposé sur votre terminal (ordinateur, tablette, smartphone) lors de la visite d'un site web. Il permet de stocker des informations relatives à votre navigation.",
+      },
+      types: {
+        title: 'Types de cookies utilisés',
+        essential: {
+          title: 'Cookies essentiels',
+          text: "Ces cookies sont indispensables au fonctionnement du site et ne peuvent pas être désactivés. Ils permettent d'utiliser les fonctionnalités principales comme la navigation et l'accès aux zones sécurisées.",
+          auth: 'Authentification et session utilisateur',
+          age: "Vérification de l'âge (18+)",
+          cart: 'Conservation du panier',
+        },
+        functional: {
+          title: 'Cookies fonctionnels',
+          text: 'Ces cookies permettent de mémoriser vos préférences et de personnaliser votre expérience.',
+          locale: 'Préférence de langue',
+          theme: "Thème d'affichage",
+        },
+        analytics: {
+          title: 'Cookies analytiques',
+          text: "Ces cookies nous aident à comprendre comment les visiteurs utilisent notre site afin d'améliorer son fonctionnement.",
+          ga: 'Identifiant Google Analytics',
+          gid: 'Distinction des utilisateurs',
+        },
+      },
+      required: 'Obligatoire',
+      optional: 'Optionnel',
+      table: {
+        name: 'Nom',
+        purpose: 'Finalité',
+        duration: 'Durée',
+      },
+      days: 'jours',
+      year: 'an',
+      years: 'ans',
+      hours: 'heures',
+      session: 'Session',
+      manage: {
+        title: 'Gestion des cookies',
+        text: 'Vous pouvez à tout moment modifier vos préférences en matière de cookies via les paramètres de votre navigateur :',
+      },
+      consent: {
+        title: 'Consentement',
+        text: "En continuant à naviguer sur ce site, vous acceptez l'utilisation des cookies essentiels. Pour les cookies analytiques, nous vous demandons votre consentement explicite lors de votre première visite.",
+      },
+      contact: {
+        title: 'Contact',
+        text: 'Pour toute question concernant notre politique de cookies, contactez-nous :',
       },
     },
   },

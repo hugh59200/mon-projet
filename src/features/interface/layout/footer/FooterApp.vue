@@ -43,7 +43,7 @@
             <h5 class="footer__nav-title">{{ t('footer.legal') }}</h5>
             <ul class="footer__nav-list">
               <li><RouterLink to="/checkout">{{ t('product.trustBadges.secure') }}</RouterLink></li>
-              <li><RouterLink to="/track-order">{{ t('tracking.title') }}</RouterLink></li>
+              <li><RouterLink to="/suivi-commande">{{ t('tracking.title') }}</RouterLink></li>
               <li><RouterLink to="/cgu">{{ t('footer.terms') }}</RouterLink></li>
               <li><RouterLink to="/guide-reconstitution">{{ t('reconstitution.title') }}</RouterLink></li>
             </ul>

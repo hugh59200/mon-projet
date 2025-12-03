@@ -311,6 +311,31 @@ const routes: Array<RouteRecordRaw> = [
       headerIcon: 'FlaskRound',
     },
   },
+  // Pages légales
+  {
+    path: '/mentions-legales',
+    name: 'mentions-legales',
+    component: () => import('@/features/legal/MentionsLegalesView.vue'),
+    meta: {
+      titleKey: 'routes.legal.mentions',
+    },
+  },
+  {
+    path: '/politique-confidentialite',
+    name: 'politique-confidentialite',
+    component: () => import('@/features/legal/PolitiqueConfidentialiteView.vue'),
+    meta: {
+      titleKey: 'routes.legal.privacy',
+    },
+  },
+  {
+    path: '/cookies',
+    name: 'cookies',
+    component: () => import('@/features/legal/CookiesView.vue'),
+    meta: {
+      titleKey: 'routes.legal.cookies',
+    },
+  },
 ]
 
 routes.push({

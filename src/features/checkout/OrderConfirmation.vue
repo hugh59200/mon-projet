@@ -338,10 +338,10 @@ const bankDetails = {
   bic: 'BNPAFRPP',
 }
 
-// Adresses crypto (placeholder)
+// Adresses crypto depuis les variables d'environnement
 const cryptoDetails = {
-  btcAddress: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-  usdtAddress: 'TN3W4H6rK2ce4vX9YnFQHwKENnHjoxb3m9',
+  btcAddress: import.meta.env.VITE_CRYPTO_BTC_ADDRESS || '',
+  usdtAddress: import.meta.env.VITE_CRYPTO_USDT_ADDRESS || '',
 }
 
 function formatPrice(value: number) {
