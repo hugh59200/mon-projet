@@ -79,10 +79,10 @@
         class="actions"
         @click.stop
       >
-        <BasicButton
+        <PremiumButton
           type="danger"
           variant="ghost"
-          size="small"
+          size="sm"
           icon-left="Trash2"
           @click="handleDelete(product)"
         />

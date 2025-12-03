@@ -80,18 +80,18 @@
               class="image-actions"
               v-if="!readonly"
             >
-              <BasicButton
-                label="Supprimer l’image"
+              <PremiumButton
+                label="Supprimer l'image"
                 type="secondary"
-                variant="outlined"
-                size="small"
+                variant="outline"
+                size="sm"
                 @click="handleRemoveImage"
               />
-              <BasicButton
-                label="Changer d’image"
+              <PremiumButton
+                label="Changer d'image"
                 type="primary"
                 variant="ghost"
-                size="small"
+                size="sm"
                 @click="openFilePicker"
               />
             </div>
@@ -105,7 +105,7 @@
             @click="showTranslations = !showTranslations"
           >
             <BasicText
-              size="h6"
+              size="body-l"
               weight="bold"
               color="primary-700"
             >
@@ -182,11 +182,11 @@
       </div>
     </template>
     <template #actions>
-      <BasicButton
+      <PremiumButton
         v-if="!readonly"
-        :label="isEditMode ? 'Mettre à jour' : 'Publier l’actualité'"
+        :label="isEditMode ? 'Mettre à jour' : 'Publier l\'actualité'"
         type="primary"
-        :disabled="loading"
+        :loading="loading"
         @click="handleSubmit"
       />
     </template>
@@ -196,11 +196,24 @@
 <script setup lang="ts">
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { createNews, createTopic, fetchNewsById, fetchTopics, updateNews } from '@/api/supabase'
-  import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import type { InputModel } from '@designSystem/index'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useNewsImageHandler } from '../composables/useNewsImageHandler'
+
+  interface NewsForm {
+    title: string
+    slug: string
+    excerpt: string | null
+    content: string | null
+    image: string | null
+    published_at: string | null
+    author_id: string | null
+    topic_id: string | null
+    title_i18n: Record<string, string>
+    excerpt_i18n: Record<string, string>
+    content_i18n: Record<string, string>
+  }
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ newsId?: string | null; readonly?: boolean }>()
@@ -211,7 +224,7 @@
   const topicsOptions = ref<{ id: string; label: string }[]>([])
   const newTopicLabel = ref('')
 
-  const form = ref<TablesInsert<'news'>>({
+  const form = ref<NewsForm>({
     title: '',
     slug: '',
     excerpt: '',
@@ -305,9 +318,9 @@
         topic_id: data.topic_id,
         published_at: data.published_at,
         author_id: data.author_id,
-        title_i18n: data.title_i18n || {},
-        excerpt_i18n: data.excerpt_i18n || {},
-        content_i18n: data.content_i18n || {},
+        title_i18n: (data.title_i18n as Record<string, string>) || {},
+        excerpt_i18n: (data.excerpt_i18n as Record<string, string>) || {},
+        content_i18n: (data.content_i18n as Record<string, string>) || {},
       }
 
       imagePreview.value = data.image || null

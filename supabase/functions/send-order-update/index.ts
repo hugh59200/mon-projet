@@ -20,7 +20,9 @@ Deno.serve(
 
     const { data: order } = await supabase
       .from('orders_full_view')
-      .select('shipping_email, order_number, carrier, tracking_number, user_id, tracking_token')
+      .select(
+        'shipping_email, order_number, carrier, tracking_number, user_id, tracking_token, total_amount, payment_method, shipping_full_name',
+      )
       .eq('order_id', order_id)
       .maybeSingle()
 
@@ -28,13 +30,9 @@ Deno.serve(
 
     // Déterminer la locale (body > fallback FR par défaut)
     const locale = getValidLocale(body.locale ?? 'fr')
-    const t = translations.statusUpdate
 
     const isGuest = !order.user_id
     const displayId = order.order_number ?? order_id
-
-    // Génère le message texte personnalisé selon le statut (avec locale)
-    const message = getStatusMessage(status, order.carrier, order.tracking_number, locale)
 
     // Calcul du lien de suivi dynamique (guest ou membre)
     let ctaUrl: string
@@ -44,22 +42,44 @@ Deno.serve(
       ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
     }
 
-    const html = renderEmailTemplate('status_update', {
-      order_id,
-      order_number: displayId,
-      message,
-      ctaUrl,
-      locale,
-    })
+    let html: string
+    let emailSubject: string
 
-    // Sujet traduit
-    const emailSubject = t.subject[locale](displayId)
+    // Cas spécial : statut "processing" = paiement validé (email premium vert)
+    if (status.toLowerCase() === 'processing') {
+      const t = translations.paymentValidated
+
+      html = renderEmailTemplate('payment_validated', {
+        order_number: displayId,
+        full_name: order.shipping_full_name,
+        total_amount: order.total_amount,
+        payment_method: order.payment_method,
+        ctaUrl,
+        locale,
+      })
+
+      emailSubject = t.subject[locale](displayId)
+    } else {
+      // Comportement standard pour tous les autres statuts
+      const t = translations.statusUpdate
+      const message = getStatusMessage(status, order.carrier, order.tracking_number, locale)
+
+      html = renderEmailTemplate('status_update', {
+        order_id,
+        order_number: displayId,
+        message,
+        ctaUrl,
+        locale,
+      })
+
+      emailSubject = t.subject[locale](displayId)
+    }
 
     await sendEmail({
       to: order.shipping_email,
       subject: emailSubject,
       html,
-      type: 'status_update',
+      type: status.toLowerCase() === 'processing' ? 'payment_validated' : 'status_update',
       order_id,
     })
 

@@ -607,7 +607,7 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import { createOrder } from '@/api/supabase/orders'
+  import { createOrder, invokeOrderConfirmation } from '@/api/supabase/orders'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch, watchEffect } from 'vue'
@@ -906,6 +906,11 @@
       }
 
       const orderResponse = await createOrder(orderPayload)
+
+      // Envoyer l'email de confirmation de commande (non bloquant)
+      invokeOrderConfirmation(orderResponse.order_id).catch((err) => {
+        console.warn('Erreur envoi email confirmation (non bloquant):', err)
+      })
 
       // Stocker les infos de commande pour la page de confirmation
       if (orderResponse.tracking_token) {
@@ -2164,7 +2169,6 @@
         letter-spacing: 0.5px;
       }
     }
-  }
 
   // ============================================
   // ANIMATIONS

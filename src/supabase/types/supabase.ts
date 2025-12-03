@@ -1,10 +1,6 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+// Type Json simplifié pour éviter les erreurs "Type instantiation is excessively deep"
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Json = any
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -377,9 +373,7 @@ export type Database = {
           internal_notes: string | null
           is_guest_order: boolean | null
           order_number: string | null
-          payment_intent_id: string | null
           payment_method: string | null
-          paypal_order_id: string | null
           relay_address: string | null
           relay_city: string | null
           relay_country: string | null
@@ -389,7 +383,6 @@ export type Database = {
           shipped_at: string | null
           shipping_cost: number | null
           status: Database["public"]["Enums"]["order_status"]
-          stripe_session_id: string | null
           subtotal: number | null
           tax_amount: number | null
           total_amount: number
@@ -412,9 +405,7 @@ export type Database = {
           internal_notes?: string | null
           is_guest_order?: boolean | null
           order_number?: string | null
-          payment_intent_id?: string | null
           payment_method?: string | null
-          paypal_order_id?: string | null
           relay_address?: string | null
           relay_city?: string | null
           relay_country?: string | null
@@ -424,7 +415,6 @@ export type Database = {
           shipped_at?: string | null
           shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
-          stripe_session_id?: string | null
           subtotal?: number | null
           tax_amount?: number | null
           total_amount: number
@@ -447,9 +437,7 @@ export type Database = {
           internal_notes?: string | null
           is_guest_order?: boolean | null
           order_number?: string | null
-          payment_intent_id?: string | null
           payment_method?: string | null
-          paypal_order_id?: string | null
           relay_address?: string | null
           relay_city?: string | null
           relay_country?: string | null
@@ -459,7 +447,6 @@ export type Database = {
           shipped_at?: string | null
           shipping_cost?: number | null
           status?: Database["public"]["Enums"]["order_status"]
-          stripe_session_id?: string | null
           subtotal?: number | null
           tax_amount?: number | null
           total_amount?: number
@@ -873,9 +860,7 @@ export type Database = {
           is_relay_delivery: boolean | null
           order_id: string | null
           order_number: string | null
-          payment_intent_id: string | null
           payment_method: string | null
-          paypal_order_id: string | null
           profile_info: Json | null
           relay_address: string | null
           relay_city: string | null
@@ -892,7 +877,6 @@ export type Database = {
           shipping_name: string | null
           shipping_zip: string | null
           status: Database["public"]["Enums"]["order_status"] | null
-          stripe_session_id: string | null
           subtotal: number | null
           tax_amount: number | null
           total_amount: number | null

@@ -32,11 +32,11 @@
           d’accueil.
         </BasicText>
 
-        <BasicButton
-          label="Retour à l’accueil"
+        <PremiumButton
+          label="Retour à l'accueil"
           type="primary"
-          variant="filled"
-          size="medium"
+          variant="solid"
+          size="md"
           width="full"
           @click="goHome"
         />

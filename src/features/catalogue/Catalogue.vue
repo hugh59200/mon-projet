@@ -308,13 +308,13 @@
       </template>
       <template #actions>
         <div class="catalogue-modal-actions">
-          <BasicButton
+          <PremiumButton
             :label="t('catalogue.filters.resetAll')"
             type="secondary"
-            variant="outlined"
+            variant="outline"
             @click="resetAll"
           />
-          <BasicButton
+          <PremiumButton
             :label="`${t('catalogue.results.showing')} ${finalProducts.length} ${t('catalogue.results.products')}`"
             type="primary"
             @click="showFilters = false"
@@ -337,7 +337,6 @@
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { Products } from '@/supabase/types/supabase.types'
-  import { BasicButton } from '@designSystem/components/basic/button'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref, watch } from 'vue'

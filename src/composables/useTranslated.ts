@@ -1,6 +1,7 @@
 import { useI18n } from 'vue-i18n'
 import { computed, type MaybeRef, toValue } from 'vue'
 import type { Products, News, NewsTopics } from '@/supabase/types/supabase.types'
+import type { Json } from '@/supabase/types/supabase'
 
 // ==========================================
 // 🌍 Types pour les champs i18n JSONB
@@ -8,22 +9,16 @@ import type { Products, News, NewsTopics } from '@/supabase/types/supabase.types
 
 type I18nField = Record<string, string> | null
 
-interface ProductWithI18n extends Products {
-  name_i18n?: I18nField
-  description_i18n?: I18nField
-  category_i18n?: I18nField
+// Helper pour convertir Json en I18nField
+function jsonToI18nField(json: Json | null | undefined): I18nField {
+  if (!json || typeof json !== 'object' || Array.isArray(json)) return null
+  return json as Record<string, string>
 }
 
-interface NewsWithI18n extends News {
-  title_i18n?: I18nField
-  excerpt_i18n?: I18nField
-  content_i18n?: I18nField
-}
-
-interface NewsTopicWithI18n extends NewsTopics {
-  label_i18n?: I18nField
-  description_i18n?: I18nField
-}
+// On utilise directement Products/News/NewsTopics car ils ont déjà les champs i18n
+type ProductWithI18n = Products
+type NewsWithI18n = News
+type NewsTopicWithI18n = NewsTopics
 
 // ==========================================
 // 🔧 Helper générique
@@ -36,7 +31,7 @@ interface NewsTopicWithI18n extends NewsTopics {
  * @param locale - La locale actuelle
  */
 function getTranslatedValue(
-  i18nField: I18nField | undefined,
+  i18nField: Json | I18nField | undefined,
   fallback: string | null,
   locale: string,
 ): string {
@@ -45,9 +40,12 @@ function getTranslatedValue(
     return fallback ?? ''
   }
 
+  // Convertir en I18nField si nécessaire
+  const field = jsonToI18nField(i18nField as Json | null | undefined)
+
   // Sinon, chercher dans le JSONB
-  if (i18nField && typeof i18nField === 'object' && locale in i18nField) {
-    return i18nField[locale] ?? fallback ?? ''
+  if (field && typeof field === 'object' && locale in field) {
+    return field[locale] ?? fallback ?? ''
   }
 
   // Fallback sur la valeur FR

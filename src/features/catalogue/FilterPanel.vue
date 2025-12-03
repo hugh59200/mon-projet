@@ -9,17 +9,17 @@
         {{ t('catalogue.filters.title') }}
       </BasicText>
       <div class="catalogue-filters__actions">
-        <BasicButton
+        <PremiumButton
           type="secondary"
-          variant="outlined"
-          size="small"
+          variant="outline"
+          size="sm"
           :label="allOpen ? t('catalogue.filters.collapseAll') : t('catalogue.filters.expandAll')"
           @click="emit('toggleAll')"
         />
-        <BasicButton
+        <PremiumButton
           type="secondary"
-          variant="outlined"
-          size="small"
+          variant="outline"
+          size="sm"
           :label="t('catalogue.filters.resetAll')"
           @click="emit('resetAll')"
         />

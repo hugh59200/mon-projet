@@ -7,10 +7,10 @@
       @reset="reset"
     >
       <template #actions>
-        <BasicButton
+        <PremiumButton
           label="+ Nouveau topic"
           type="primary"
-          size="small"
+          size="sm"
           @click="openTopicModal(null)"
         />
       </template>
@@ -125,7 +125,6 @@
   import { sanitizeHTML } from '@/utils/sanitize'
   import { ref, watch } from 'vue'
 
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicCell from '@designSystem/components/basic/cell/BasicCell.vue'
   import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'

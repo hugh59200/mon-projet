@@ -8,11 +8,11 @@
       @reset="reset"
     >
       <template #actions>
-        <BasicButton
+        <PremiumButton
           v-if="!readonly"
           label="+ Ajouter une actualité"
           type="primary"
-          size="small"
+          size="sm"
           @click="isCreateModalVisible = true"
         />
       </template>
@@ -152,7 +152,6 @@
   import type { Tables } from '@/supabase/types/supabase'
   import type { News } from '@/supabase/types/supabase.types'
   import { formatDate, sanitizeHTML } from '@/utils'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicCell from '@designSystem/components/basic/cell/BasicCell.vue'
   import BasicCellActionIcon from '@designSystem/components/basic/cell/BasicCellActionIcon.vue'
   import BasicPagination from '@designSystem/components/basic/pagination/BasicPagination.vue'

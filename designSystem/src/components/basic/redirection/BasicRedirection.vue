@@ -12,10 +12,10 @@
           label="Revenir au tableau"
           position="top"
         >
-          <BasicButton
+          <PremiumButton
             class="basic-redirection__btn"
-            v-bind="props"
-            icon-name="ArrowUp"
+            :variant="props.variant === 'outlined' ? 'outline' : props.variant === 'filled' ? 'solid' : props.variant"
+            icon-left="ArrowUp"
             @click="onClick"
           />
         </BasicTooltip>

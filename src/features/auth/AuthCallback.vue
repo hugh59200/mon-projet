@@ -37,9 +37,9 @@
       />
       <h2 class="status-title text-danger">{{ t('auth.callback.invalidLink') }}</h2>
       <p class="status-text error-msg">{{ errorMessage }}</p>
-      <BasicButton
+      <PremiumButton
         :label="t('auth.reset.backToLogin')"
-        color="primary"
+        type="primary"
         class="mt-4"
         @click="$router.push('/auth/login')"
       />
@@ -49,7 +49,6 @@
 
 <script setup lang="ts">
   import { supabase } from '@/supabase/supabaseClient'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import { onMounted, ref } from 'vue'

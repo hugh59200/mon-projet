@@ -46,18 +46,18 @@
               alt="Aperçu du topic"
             />
             <div class="image-actions">
-              <BasicButton
+              <PremiumButton
                 v-if="form.image"
-                label="Supprimer l’image"
+                label="Supprimer l'image"
                 type="secondary"
-                size="small"
-                variant="outlined"
+                size="sm"
+                variant="outline"
                 @click="handleRemoveImage"
               />
-              <BasicButton
-                label="Changer d’image"
+              <PremiumButton
+                label="Changer d'image"
                 type="primary"
-                size="small"
+                size="sm"
                 variant="ghost"
                 @click="openFilePicker"
               />
@@ -72,7 +72,7 @@
             @click="showTranslations = !showTranslations"
           >
             <BasicText
-              size="h6"
+              size="body-l"
               weight="bold"
               color="primary-700"
             >
@@ -142,10 +142,10 @@
     <!-- 🧭 Actions -->
     <template #actions>
       <div class="justify-content-space-evenly flex">
-        <BasicButton
+        <PremiumButton
           label="Enregistrer"
           type="primary"
-          :disabled="loading"
+          :loading="loading"
           @click="handleSubmit"
         />
       </div>
@@ -157,8 +157,6 @@
   import { useTopicImageHandler } from '@/features/admin/topics/composables/useTopicImageHandler'
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { createTopic, fetchTopicById, updateTopic } from '@/api/supabase/topics'
-  import type { NewsTopics } from '@/supabase/types/supabase.types'
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import WrapperFormElements from '@designSystem/components/wrapper/formElements/WrapperFormElements.vue'
@@ -169,10 +167,17 @@
   const props = defineProps<{ topicId?: string | null }>()
   const emit = defineEmits<{ (e: 'saved'): void }>()
 
+  interface TopicForm {
+    label: string
+    image: string | null
+    label_i18n: Record<string, string>
+    description_i18n: Record<string, string>
+  }
+
   const toast = useToastStore()
   const loading = ref(false)
 
-  const form = ref<Pick<NewsTopics, 'label' | 'image' | 'label_i18n' | 'description_i18n'>>({
+  const form = ref<TopicForm>({
     label: '',
     image: null,
     label_i18n: {},
@@ -296,14 +301,14 @@
     if (props.topicId) {
       const data = await fetchTopicById(props.topicId)
       if (data) {
+        // Extraction des traductions i18n
+        const labelI18n = (data.label_i18n as Record<string, string>) || {}
+        const descI18n = (data.description_i18n as Record<string, string>) || {}
+
         form.value.label = data.label
         form.value.image = data.image
-        form.value.label_i18n = data.label_i18n || {}
-        form.value.description_i18n = data.description_i18n || {}
-
-        // Extraction des traductions i18n
-        const labelI18n = data.label_i18n as Record<string, string> | null
-        const descI18n = data.description_i18n as Record<string, string> | null
+        form.value.label_i18n = labelI18n
+        form.value.description_i18n = descI18n
 
         labelFr.value = labelI18n?.fr || ''
         labelEn.value = labelI18n?.en || ''

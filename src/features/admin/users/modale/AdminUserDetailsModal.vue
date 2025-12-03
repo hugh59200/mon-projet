@@ -10,7 +10,7 @@
         size="h4"
         weight="bold"
       >
-        Détails utilisateur
+        {{ t('admin.userDetails.title') }}
       </BasicText>
     </template>
 
@@ -25,7 +25,7 @@
               size="h5"
               weight="bold"
             >
-              Informations générales
+              {{ t('admin.userDetails.generalInfo') }}
             </BasicText>
             <BasicBadge
               :label="getLabelBadge(user.role as Role)"
@@ -35,25 +35,25 @@
 
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Nom complet</span>
+              <span class="label">{{ t('admin.userDetails.fullName') }}</span>
               <span class="value">{{ user.full_name || '—' }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Email</span>
+              <span class="label">{{ t('admin.userDetails.email') }}</span>
               <span class="value">{{ user.email }}</span>
             </div>
             <div class="info-item">
-              <span class="label">ID Utilisateur</span>
+              <span class="label">{{ t('admin.userDetails.userId') }}</span>
               <span class="value font-mono text-xs">{{ user.id }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Date création</span>
+              <span class="label">{{ t('admin.userDetails.createdAt') }}</span>
               <span class="value">{{ formatDate(user.created_at) }}</span>
             </div>
             <div class="info-item">
-              <span class="label">CGU Acceptées</span>
+              <span class="label">{{ t('admin.userDetails.cguAccepted') }}</span>
               <span class="value">
-                {{ user.cgu_accepted ? '✅ Oui' : '❌ Non' }}
+                {{ user.cgu_accepted ? `✅ ${t('common.yes')}` : `❌ ${t('common.no')}` }}
               </span>
             </div>
           </div>
@@ -66,7 +66,7 @@
             class="mb-3"
             color="primary-800"
           >
-            Gestion du rôle
+            {{ t('admin.userDetails.roleManagement') }}
           </BasicText>
           <div class="flex-gap-5 align-items-center flex">
             <BasicDropdown
@@ -74,11 +74,13 @@
               :items="ROLES_OPTIONS"
               size="small"
               class="w-40"
+              :disabled="isUpdatingRole"
             />
-            <BasicButton
-              label="Modifier le rôle"
+            <PremiumButton
+              :label="t('admin.userDetails.changeRole')"
               type="primary"
-              size="small"
+              size="sm"
+              :loading="isUpdatingRole"
               @click="handleRoleChange"
             />
           </div>
@@ -90,7 +92,7 @@
               size="h5"
               weight="bold"
             >
-              Historique Commandes ({{ orders.length }})
+              {{ t('admin.userDetails.orderHistory') }} ({{ orders.length }})
             </BasicText>
           </div>
 
@@ -101,10 +103,10 @@
             <table class="orders-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Référence</th>
-                  <th>Total</th>
-                  <th>Statut</th>
+                  <th>{{ t('orders.date') }}</th>
+                  <th>{{ t('orders.orderNumber') }}</th>
+                  <th>{{ t('orders.total') }}</th>
+                  <th>{{ t('orders.status') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,7 +140,7 @@
               color="neutral-500"
               size="body-s"
             >
-              Aucune commande passée.
+              {{ t('admin.userDetails.noOrders') }}
             </BasicText>
           </div>
         </div>
@@ -150,21 +152,22 @@
             class="mb-2"
             color="danger-700"
           >
-            Zone de danger
+            {{ t('admin.common.dangerZone') }}
           </BasicText>
           <BasicText
             size="body-s"
             class="mb-4"
             color="neutral-600"
           >
-            Cette action est irréversible. Toutes les données seront supprimées.
+            {{ t('admin.common.deleteWarning') }}
           </BasicText>
-          <BasicButton
-            label="Supprimer l'utilisateur"
+          <PremiumButton
+            :label="t('admin.userDetails.deleteUser')"
             type="danger"
-            variant="outlined"
-            size="small"
-            icon-name="Trash2"
+            variant="outline"
+            size="sm"
+            icon-left="Trash2"
+            :loading="isDeleting"
             @click="handleDelete"
           />
         </div>
@@ -181,6 +184,9 @@
   import type { Orders, Profiles, Role } from '@/supabase/types/supabase.types'
   import { formatCurrency, formatDate, getLabelBadge, getTypeBadge } from '@/utils/index'
   import { onMounted, ref, watch } from 'vue'
+  import { useLanguage } from '@/composables/useLanguage'
+
+  const { t } = useLanguage()
 
   const visible = defineModel<boolean>()
   const props = defineProps<{ userId: string }>()
@@ -191,6 +197,8 @@
   const user = ref<Profiles | null>(null)
   const orders = ref<Orders[]>([])
   const isLoading = ref(true)
+  const isUpdatingRole = ref(false)
+  const isDeleting = ref(false)
   const selectedRole = ref<Role>('user')
 
   // ✅ Correction 1 : On mappe vers 'id' pour satisfaire le type DropdownItem
@@ -225,20 +233,28 @@
 
   const handleRoleChange = async () => {
     if (!user.value) return
-    // ✅ Correction 2 : 'as any' pour éviter l'erreur "excessively deep type instantiation"
-    // Cela arrive car le type Profiles est très complexe (champs JSON, nullables)
-    await changeUserRole(user.value as any, selectedRole.value)
 
-    await loadData() // Reload local
-    emit('refresh') // Refresh parent table
+    isUpdatingRole.value = true
+    try {
+      await changeUserRole(user.value as any, selectedRole.value)
+      await loadData()
+      emit('refresh')
+    } finally {
+      isUpdatingRole.value = false
+    }
   }
 
   const handleDelete = async () => {
     if (!user.value) return
-    // ✅ Correction 2 bis : même chose ici par sécurité pour deleteUser
-    await deleteUser(user.value as any)
-    visible.value = false // Close modal on delete
-    emit('refresh')
+
+    isDeleting.value = true
+    try {
+      await deleteUser(user.value as any)
+      visible.value = false
+      emit('refresh')
+    } finally {
+      isDeleting.value = false
+    }
   }
 
   onMounted(loadData)

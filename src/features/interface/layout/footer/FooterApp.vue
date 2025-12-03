@@ -14,37 +14,6 @@
             class="footer__logo"
           />
           <p class="footer__tagline">{{ t('footer.description') }}</p>
-          <!-- Social -->
-          <div class="footer__social">
-            <a
-              href="#"
-              class="footer__social-link"
-              aria-label="Twitter"
-            >
-              <BasicIconNext name="twitter" :size="18" />
-            </a>
-            <a
-              href="#"
-              class="footer__social-link"
-              aria-label="LinkedIn"
-            >
-              <BasicIconNext name="linkedin" :size="18" />
-            </a>
-            <a
-              href="#"
-              class="footer__social-link"
-              aria-label="Instagram"
-            >
-              <BasicIconNext name="instagram" :size="18" />
-            </a>
-            <a
-              href="#"
-              class="footer__social-link"
-              aria-label="YouTube"
-            >
-              <BasicIconNext name="youtube" :size="18" />
-            </a>
-          </div>
         </div>
 
         <!-- Navigation -->
@@ -288,32 +257,6 @@
       color: rgba(255, 255, 255, 0.45);
       line-height: 1.5;
       margin: 0;
-    }
-
-    &__social {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    &__social-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      color: rgba(255, 255, 255, 0.5);
-      transition: all 0.25s @ease;
-
-      &:hover {
-        background: var(--primary-500);
-        border-color: var(--primary-500);
-        color: white;
-        transform: translateY(-2px);
-      }
     }
 
     // ============================================
@@ -654,15 +597,14 @@
       }
 
       &__brand {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
       }
 
       &__tagline {
-        display: none;
+        display: block;
+        max-width: 280px;
       }
 
       &__nav {

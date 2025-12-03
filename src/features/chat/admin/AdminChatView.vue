@@ -7,11 +7,11 @@
     >
       <template #filters>
         <div class="chat-admin__filters">
-          <BasicButton
+          <PremiumButton
             v-if="isMobile && selectedUserId"
             variant="ghost"
-            size="small"
-            iconName="ArrowLeft"
+            size="sm"
+            icon-left="ArrowLeft"
             label="Retour"
             @click="goBackToList"
           />

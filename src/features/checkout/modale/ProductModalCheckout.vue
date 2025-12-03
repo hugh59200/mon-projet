@@ -85,10 +85,10 @@
       <!-- ✅ FOOTER -->
       <template #footer>
         <div class="product-modal__footer">
-          <BasicButton
+          <PremiumButton
             label="Fermer"
-            variant="outlined"
-            size="medium"
+            variant="outline"
+            size="md"
             type="secondary"
             @click="visible = false"
           />

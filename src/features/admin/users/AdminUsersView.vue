@@ -8,24 +8,24 @@
     >
       <template #filters>
         <div class="admin-users__filters">
-          <BasicButton
+          <PremiumButton
             :label="`Tous (${total})`"
             :type="userFilter === 'all' ? 'primary' : 'secondary'"
-            size="small"
+            size="sm"
             variant="ghost"
             @click="userFilter = 'all'"
           />
-          <BasicButton
+          <PremiumButton
             :label="`Clients (${userCount})`"
             :type="userFilter === 'user' ? 'primary' : 'secondary'"
-            size="small"
+            size="sm"
             variant="ghost"
             @click="userFilter = 'user'"
           />
-          <BasicButton
+          <PremiumButton
             :label="`Admins (${adminCount})`"
             :type="userFilter === 'admin' ? 'primary' : 'secondary'"
-            size="small"
+            size="sm"
             variant="ghost"
             @click="userFilter = 'admin'"
           />

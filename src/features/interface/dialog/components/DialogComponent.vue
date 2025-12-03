@@ -42,11 +42,11 @@
       </section>
     </template>
     <template #actions>
-      <BasicButton
+      <PremiumButton
         v-for="action in actions"
         :key="action"
         type="secondary"
-        size="large"
+        size="lg"
         :label="wording.actions[action]"
         :variant="variantType(action)"
         @click="store.triggerUserAction(action)"
@@ -81,10 +81,10 @@
       case 'Ok':
       case 'Yes':
       case 'Retry':
-        return 'outlined'
+        return 'outline'
       case 'Cancel':
       case 'No':
-        return 'filled'
+        return 'solid'
     }
   }
 

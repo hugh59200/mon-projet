@@ -7,10 +7,10 @@
       @reset="reset()"
     >
       <template #actions>
-        <BasicButton
+        <PremiumButton
           label="+ Ajouter un produit"
           type="primary"
-          size="small"
+          size="sm"
           @click="isCreateModalVisible = true"
         />
       </template>

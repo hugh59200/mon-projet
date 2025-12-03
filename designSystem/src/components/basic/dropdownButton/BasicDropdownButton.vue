@@ -1,12 +1,12 @@
 <template>
   <div :class="['dropdown__button', `dropdown__button--${size}`, { 'dropdown__button--disabled': disabled }]">
-    <BasicButton
+    <PremiumButton
       :label
       :active
       :type
-      icon-name="ArrowDown"
+      icon-right="ArrowDown"
       :disabled
-      :size
+      :size="size === 'large' ? 'lg' : size === 'medium' ? 'md' : 'sm'"
       @click="toggleDropdownButton"
       :class="['dropdown__button__content', { 'dropdown__button--open': isOpen }]"
     />

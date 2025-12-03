@@ -37,11 +37,11 @@
 
           <div class="cgu-sidebar__divider"></div>
 
-          <BasicButton
+          <PremiumButton
             :label="$t('cgu.page.print')"
             type="secondary"
             variant="ghost"
-            size="small"
+            size="sm"
             icon-left="Printer"
             width="full"
             @click="printPage"
@@ -139,7 +139,6 @@
   import { computed } from 'vue'
   import { useI18n } from 'vue-i18n'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
-  import { BasicButton } from '@designSystem/components/basic/button'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
 
   // Configuration SEO pour les CGU

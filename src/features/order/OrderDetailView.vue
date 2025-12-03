@@ -1,10 +1,10 @@
 <template>
   <div class="order-detail">
-    <BasicButton
+    <PremiumButton
       label="← Retour à mes commandes"
       type="secondary"
       variant="ghost"
-      size="small"
+      size="sm"
       class="order-detail__back"
       @click="$router.push('/profil/commandes')"
     />
@@ -105,20 +105,20 @@
         </div>
 
         <div class="order-detail__tracking-actions">
-          <BasicButton
+          <PremiumButton
             v-if="order.tracking_number"
             label="Suivre le colis"
             type="primary"
-            variant="filled"
-            size="small"
+            variant="solid"
+            size="sm"
             icon-left="Truck"
             @click="trackPackage(order.tracking_number)"
           />
-          <BasicButton
+          <PremiumButton
             label="Contacter le support"
             type="secondary"
-            variant="outlined"
-            size="small"
+            variant="outline"
+            size="sm"
             icon-left="MessageSquare"
             @click="contactSupport"
           />
@@ -294,11 +294,11 @@
       >
         Cette commande est introuvable ou n’existe plus.
       </BasicText>
-      <BasicButton
+      <PremiumButton
         label="Retour à mes commandes"
         type="primary"
-        variant="filled"
-        size="small"
+        variant="solid"
+        size="sm"
         @click="$router.push('/profil/commandes')"
       />
     </div>

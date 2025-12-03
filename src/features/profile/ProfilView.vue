@@ -332,10 +332,10 @@
             />
           </div>
           <div class="profil__actions">
-            <BasicButton
+            <PremiumButton
               :label="t('profile.updatePassword')"
               type="secondary"
-              variant="filled"
+              variant="solid"
               :disabled="
                 passwordLoading || newPassword !== confirmPassword || newPassword.length < 6
               "
@@ -345,10 +345,10 @@
             />
           </div>
           <div class="profil__danger">
-            <BasicButton
+            <PremiumButton
               :label="t('profile.deleteAccount')"
               type="danger"
-              variant="outlined"
+              variant="outline"
               @click="deleteOwnAccount"
               icon-left="Trash"
             />
@@ -367,10 +367,10 @@
           >
             {{ t('profile.supportDesc') }}
           </BasicText>
-          <BasicButton
+          <PremiumButton
             :label="t('profile.openMessaging')"
             type="secondary"
-            variant="outlined"
+            variant="outline"
             @click="openMessaging"
             icon-left="Mail"
           />

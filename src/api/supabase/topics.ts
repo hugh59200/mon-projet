@@ -44,12 +44,22 @@ export async function createTopic(
   return data
 }
 
-export async function updateTopic(id: string, payload: { label?: string; image?: string | null }) {
+export async function updateTopic(
+  id: string,
+  payload: {
+    label?: string
+    image?: string | null
+    label_i18n?: Record<string, string>
+    description_i18n?: Record<string, string>
+  },
+) {
   const { data, error } = await supabase
     .from('news_topics')
     .update({
       label: payload.label,
       image: payload.image ?? null,
+      label_i18n: payload.label_i18n,
+      description_i18n: payload.description_i18n,
     })
     .eq('id', id)
     .select()

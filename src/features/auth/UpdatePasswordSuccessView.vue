@@ -25,11 +25,11 @@
           votre compte.
         </BasicText>
 
-        <BasicButton
+        <PremiumButton
           label="Se connecter"
           type="primary"
-          variant="filled"
-          size="medium"
+          variant="solid"
+          size="md"
           width="full"
           @click="router.push('/auth/login')"
         />

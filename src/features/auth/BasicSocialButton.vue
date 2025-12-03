@@ -1,6 +1,6 @@
 <template>
-  <BasicButton
-    :icon-name="provider"
+  <PremiumButton
+    :icon-left="provider"
     variant="ghost"
     class="provider-social"
     :class="`provider-${provider}`"

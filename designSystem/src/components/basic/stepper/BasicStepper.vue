@@ -1,22 +1,21 @@
 <template>
   <div class="stepper">
-    <BasicButton
+    <PremiumButton
       :disabled="!canMovePrevious"
       label="Précédent"
       type="secondary"
       variant="ghost"
-      size="small"
-      iconName="ArrowLeft"
+      size="sm"
+      icon-left="ArrowLeft"
       @click="$emit('movePrevious')"
     />
-    <BasicButton
+    <PremiumButton
       :disabled="!canMoveNext"
       label="Suivant"
       type="secondary"
       variant="ghost"
-      size="small"
-      iconRight
-      iconName="ArrowRight"
+      size="sm"
+      icon-right="ArrowRight"
       @click="$emit('moveNext')"
     />
   </div>

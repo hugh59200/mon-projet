@@ -360,17 +360,17 @@ export const translations = {
       fr: 'Récapitulatif de votre commande',
       en: 'Order summary',
     },
-    product: {
-      fr: 'Produit',
-      en: 'Product',
-    },
     quantity: {
-      fr: 'Qté',
-      en: 'Qty',
+      fr: 'Quantité',
+      en: 'Quantity',
     },
-    price: {
-      fr: 'Prix',
-      en: 'Price',
+    itemSingular: {
+      fr: 'article',
+      en: 'item',
+    },
+    itemPlural: {
+      fr: 'articles',
+      en: 'items',
     },
     subtotal: {
       fr: 'Sous-total',
@@ -395,6 +395,82 @@ export const translations = {
     ctaViewOrder: {
       fr: 'Voir ma commande',
       en: 'View my order',
+    },
+  },
+
+  // ========== PAYMENT VALIDATED (processing status) ==========
+  paymentValidated: {
+    title: {
+      fr: 'Paiement validé avec succès',
+      en: 'Payment successfully validated',
+    },
+    subject: {
+      fr: (orderNumber: string) => `Paiement Reçu - Commande #${orderNumber} en préparation ✅`,
+      en: (orderNumber: string) => `Payment Received - Order #${orderNumber} in preparation ✅`,
+    },
+    greeting: {
+      fr: (name: string) => `Bonjour <strong>${name}</strong>,`,
+      en: (name: string) => `Hello <strong>${name}</strong>,`,
+    },
+    greetingDefault: {
+      fr: 'Bonjour,',
+      en: 'Hello,',
+    },
+    confirmationTitle: {
+      fr: 'Paiement confirmé',
+      en: 'Payment confirmed',
+    },
+    confirmationMessage: {
+      fr: 'Nous vous confirmons la bonne réception de votre règlement. Votre commande est officiellement validée et part en préparation logistique immédiate.',
+      en: 'We confirm the receipt of your payment. Your order is officially validated and is now being prepared for immediate shipment.',
+    },
+    orderDetails: {
+      fr: 'Détails de la commande',
+      en: 'Order details',
+    },
+    orderNumber: {
+      fr: 'Numéro de commande',
+      en: 'Order number',
+    },
+    paymentMethod: {
+      fr: 'Mode de paiement',
+      en: 'Payment method',
+    },
+    paymentMethodLabel: {
+      fr: (method: string) => {
+        if (method === 'bank_transfer') return 'Virement bancaire'
+        if (method === 'crypto') return 'Cryptomonnaie'
+        return method
+      },
+      en: (method: string) => {
+        if (method === 'bank_transfer') return 'Bank transfer'
+        if (method === 'crypto') return 'Cryptocurrency'
+        return method
+      },
+    },
+    amountReceived: {
+      fr: 'Montant reçu',
+      en: 'Amount received',
+    },
+    nextStepsTitle: {
+      fr: 'Prochaines étapes',
+      en: 'Next steps',
+    },
+    step1: {
+      fr: 'Votre commande est maintenant en préparation',
+      en: 'Your order is now being prepared',
+    },
+    step2: {
+      fr: 'Vous recevrez un email avec le numéro de suivi dès expédition',
+      en: 'You will receive an email with tracking number once shipped',
+    },
+    step3: {
+      fr: 'Livraison estimée sous 2-5 jours ouvrés',
+      en: 'Estimated delivery within 2-5 business days',
+    },
+    ctaLabel: {
+      fr: 'Suivre ma commande',
+      en: 'Track my order',
     },
   },
 

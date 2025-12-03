@@ -16,12 +16,12 @@
         </BasicText>
       </div>
 
-      <BasicButton
-        size="small"
+      <PremiumButton
+        size="sm"
         variant="ghost"
         class="fg-action"
         :label="toggleLabel"
-        :icon-name="toggleIcon"
+        :icon-left="toggleIcon"
         @click="toggleAll"
       />
     </header>

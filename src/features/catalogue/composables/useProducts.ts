@@ -1,12 +1,13 @@
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { Products } from '@/supabase/types/supabase.types'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 export const useProductsStore = defineStore(
   'products',
   () => {
-    const products = ref<Products[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products: Ref<Products[]> = ref([] as any)
     const hasLoaded = ref(false)
     const loading = ref(false)
 

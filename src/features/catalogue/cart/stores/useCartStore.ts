@@ -4,11 +4,33 @@
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
-import type { CartItems, CartView, Products } from '@/supabase/types/supabase.types'
+import type { CartItems, Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyJson = any
+
+// Type simplifié pour éviter les erreurs "Type instantiation is excessively deep"
+export interface SimpleCartItem {
+  cart_item_id: string | null
+  category_i18n: AnyJson
+  is_on_sale: boolean | null
+  name_i18n: AnyJson
+  product_category: string | null
+  product_dosage: string | null
+  product_id: string | null
+  product_image: string | null
+  product_name: string | null
+  product_price: number | null
+  product_purity: number | null
+  product_sale_price: number | null
+  product_stock: number | null
+  quantity: number | null
+  updated_at: string | null
+  user_id: string | null
+}
 
 export const useCartStore = defineStore(
   'cart',
@@ -19,10 +41,10 @@ export const useCartStore = defineStore(
     // 💾 État
     // ============================================================
     // dbCart : Items depuis la DB (utilisateur connecté)
-    const dbCart = ref<CartView[]>([])
+    const dbCart = ref<SimpleCartItem[]>([])
 
     // guestCart : Items persistés dans localStorage (invité)
-    const guestCart = ref<CartView[]>([])
+    const guestCart = ref<SimpleCartItem[]>([])
 
     const isSyncing = ref(false)
     let channel: RealtimeChannel | null = null
@@ -30,8 +52,9 @@ export const useCartStore = defineStore(
     // ============================================================
     // 🎯 items = computed qui choisit la bonne source
     // ============================================================
-    const items = computed(() => {
-      return auth.user?.id ? dbCart.value : guestCart.value
+    const items = computed((): SimpleCartItem[] => {
+      const userId = auth.user?.id
+      return userId ? dbCart.value : guestCart.value
     })
 
     // ============================================================
@@ -64,10 +87,11 @@ export const useCartStore = defineStore(
 
         if (error) throw error
 
-        dbCart.value = (data ?? []).map((i) => ({
-          ...i,
-          product_image: safeImage(i.product_image),
-        }))
+        // Cast explicite pour éviter l'erreur "Type instantiation is excessively deep"
+        dbCart.value = ((data ?? []) as unknown as SimpleCartItem[]).map((i) => {
+          i.product_image = safeImage(i.product_image)
+          return i
+        })
       } catch (e) {
         console.warn('Erreur panier DB:', e)
       } finally {
@@ -116,7 +140,9 @@ export const useCartStore = defineStore(
             product_stock: product.stock,
             product_purity: product.purity,
             quantity: 1,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            name_i18n: product.name_i18n,
+            category_i18n: product.category_i18n,
           })
         }
         // Pas besoin de synchro, items est un computed de guestCart
@@ -250,9 +276,9 @@ export const useCartStore = defineStore(
     // ============================================================
     // 🧮 Computed
     // ============================================================
-    const totalItems = computed(() => items.value.reduce((sum, i) => sum + Number(i.quantity ?? 0), 0))
+    const totalItems = computed((): number => items.value.reduce((sum, i) => sum + Number(i.quantity ?? 0), 0))
     
-    const totalPrice = computed(() =>
+    const totalPrice = computed((): number =>
       items.value.reduce((sum, item) => {
         const qty = Number(item.quantity ?? 0)
         const unitPrice = item.is_on_sale

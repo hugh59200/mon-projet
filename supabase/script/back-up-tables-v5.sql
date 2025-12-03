@@ -1,6 +1,7 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V5.1 — i18n + GUEST + RELAY + PAYMENT VALIDATION
+-- SUPABASE CLEAN BACKUP V5.2 — i18n + GUEST + RELAY + MANUAL PAYMENT
 -- ============================================================
+-- V5.2 : Suppression Stripe/PayPal - Paiements manuels uniquement (Virement/Crypto)
 -- V5.1 : Ajout payment_method dans orders_overview_for_admin (validation paiement manuel)
 -- V5.0 : Support multilingue (colonnes JSONB i18n)
 -- V4.0 : Integration Mondial Relay
@@ -62,7 +63,6 @@ DROP FUNCTION IF EXISTS
   public.get_order_summary_public,
   public.get_guest_order_by_token,
   public.claim_guest_orders,
-  public.get_order_by_stripe_session,
   public.update_order_relay,
   public.remove_order_relay
 CASCADE;
@@ -188,11 +188,8 @@ CREATE TABLE public.orders (
   city text,
   country text,
 
-  -- Paiement
+  -- Paiement (Virement bancaire / Crypto)
   payment_method text,
-  payment_intent_id text,
-  stripe_session_id text,
-  paypal_order_id text,
 
   -- Montants
   subtotal numeric(10,2) DEFAULT 0 CHECK (subtotal >= 0),
@@ -747,35 +744,6 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.get_order_summary_public TO anon, authenticated;
 
--- Get order by Stripe session
-CREATE OR REPLACE FUNCTION public.get_order_by_stripe_session(p_session_id text)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_result jsonb;
-BEGIN
-  SELECT jsonb_build_object(
-    'id', id,
-    'email', email,
-    'order_number', order_number,
-    'tracking_token', tracking_token,
-    'status', status,
-    'total_amount', total_amount,
-    'is_guest_order', is_guest_order
-  )
-  INTO v_result
-  FROM public.orders
-  WHERE stripe_session_id = p_session_id
-  LIMIT 1;
-
-  RETURN v_result;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.get_order_by_stripe_session TO anon, authenticated;
-
 -- ============================================================
 -- BLOC 8 — RELAY FUNCTIONS
 -- ============================================================
@@ -983,9 +951,6 @@ CREATE OR REPLACE VIEW public.orders_full_view AS
 SELECT
   o.id AS order_id,
   o.user_id,
-  o.stripe_session_id,
-  o.payment_intent_id,
-  o.paypal_order_id,
   o.order_number,
   o.tracking_token,
   o.is_guest_order,
@@ -1192,5 +1157,5 @@ BEGIN
 END $$;
 
 -- ============================================================
--- FIN DU BACKUP V5.1 — i18n + GUEST + RELAY + PAYMENT VALIDATION
+-- FIN DU BACKUP V5.2 — i18n + GUEST + RELAY + MANUAL PAYMENT
 -- ============================================================

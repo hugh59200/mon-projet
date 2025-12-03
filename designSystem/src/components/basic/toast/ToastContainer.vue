@@ -29,7 +29,7 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    z-index: 2500;
+    z-index: @z-toast;
     pointer-events: none;
   }
   .toast-container > * {

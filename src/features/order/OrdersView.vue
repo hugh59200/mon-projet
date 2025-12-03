@@ -19,11 +19,11 @@
         Vous n’avez encore passé aucune commande.
       </BasicText>
 
-      <BasicButton
+      <PremiumButton
         label="Découvrir le catalogue"
         type="primary"
-        variant="filled"
-        size="medium"
+        variant="solid"
+        size="md"
         @click="$router.push('/catalogue')"
       />
     </div>
@@ -39,10 +39,10 @@
           enter: { opacity: 1, y: 0, transition: { delay: 0.1, type: 'spring', stiffness: 120 } },
         }"
       >
-        <BasicButton
+        <PremiumButton
           type="secondary"
-          variant="outlined"
-          size="small"
+          variant="outline"
+          size="sm"
           :label="allOpen ? 'Tout réduire' : 'Tout ouvrir'"
           @click="toggleAllSections"
         />
@@ -331,20 +331,20 @@
         </FilterSection>
 
         <div class="user-orders__card-actions">
-          <BasicButton
+          <PremiumButton
             label="Voir les détails"
             type="secondary"
-            variant="outlined"
-            size="small"
+            variant="outline"
+            size="sm"
             @click="$router.push(`/profil/commandes/${order.order_id ?? ''}`)"
           />
 
-          <BasicButton
+          <PremiumButton
             v-if="order.tracking_number"
             label="Suivre le colis"
             type="primary"
-            variant="filled"
-            size="small"
+            variant="solid"
+            size="sm"
             @click="trackPackage(order.tracking_number)"
           />
         </div>

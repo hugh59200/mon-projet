@@ -10,7 +10,7 @@
         size="h4"
         weight="bold"
       >
-        Détails de la commande
+        {{ t('admin.orderDetails.title') }}
       </BasicText>
     </template>
     <template #content>
@@ -42,11 +42,11 @@
 
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Client</span>
+              <span class="label">{{ t('admin.orderDetails.customer') }}</span>
               <span class="value">{{ profileInfo.full_name }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Email</span>
+              <span class="label">{{ t('admin.userDetails.email') }}</span>
               <span class="value">
                 {{
                   order.is_guest_order
@@ -56,21 +56,21 @@
               </span>
             </div>
             <div class="info-item">
-              <span class="label">Date création</span>
+              <span class="label">{{ t('admin.orderDetails.createdAt') }}</span>
               <span class="value">{{ formatDate(order.created_at!) }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Dernière MAJ</span>
+              <span class="label">{{ t('admin.orderDetails.updatedAt') }}</span>
               <span class="value">{{ formatDate(order.updated_at!) }}</span>
             </div>
             <div class="info-item col-span-2">
-              <span class="label">ID Commande</span>
+              <span class="label">{{ t('orders.orderNumber') }}</span>
               <span class="value font-mono text-xs">
                 {{ order.order_number || order.order_id }}
               </span>
             </div>
             <div class="info-item col-span-2" v-if="order.tracking_token">
-              <span class="label">Token de suivi invité</span>
+              <span class="label">{{ t('admin.orderDetails.guestToken') }}</span>
               <span class="value font-mono text-xs">
                 {{ order.tracking_token }}
               </span>
@@ -85,28 +85,28 @@
             weight="bold"
             class="mb-3"
           >
-            Détails financiers
+            {{ t('admin.orderDetails.financialDetails') }}
           </BasicText>
 
           <div class="financial-breakdown">
             <div class="financial-item">
-              <span class="label">Sous-total</span>
+              <span class="label">{{ t('admin.orderDetails.subtotal') }}</span>
               <span class="value">{{ formatCurrency(order.subtotal ?? 0) }}</span>
             </div>
             <div class="financial-item">
-              <span class="label">Taxes (TVA)</span>
+              <span class="label">{{ t('admin.orderDetails.taxes') }}</span>
               <span class="value">{{ formatCurrency(order.tax_amount ?? 0) }}</span>
             </div>
             <div class="financial-item">
-              <span class="label">Frais de livraison</span>
+              <span class="label">{{ t('admin.orderDetails.shippingFees') }}</span>
               <span class="value">{{ formatCurrency(order.shipping_cost ?? 0) }}</span>
             </div>
             <div class="financial-item" v-if="order.discount_amount && order.discount_amount > 0">
-              <span class="label">Réduction</span>
+              <span class="label">{{ t('admin.orderDetails.discount') }}</span>
               <span class="value text-success-600">-{{ formatCurrency(order.discount_amount) }}</span>
             </div>
             <div class="financial-item financial-item--total">
-              <span class="label">Total TTC</span>
+              <span class="label">{{ t('admin.orderDetails.totalTTC') }}</span>
               <span class="value">{{ formatCurrency(order.total_amount ?? 0) }}</span>
             </div>
           </div>
@@ -159,20 +159,21 @@
           </BasicText>
 
           <div class="card-actions">
-            <BasicButton
+            <PremiumButton
               label="Télécharger facture"
-              size="small"
+              size="sm"
               type="secondary"
-              variant="outlined"
-              icon-name="Download"
+              variant="outline"
+              icon-left="Download"
+              :loading="isDownloadingInvoice"
               @click="downloadInvoice"
             />
-            <BasicButton
+            <PremiumButton
               label="Copier lien de suivi"
-              size="small"
+              size="sm"
               type="secondary"
-              variant="outlined"
-              icon-name="Link"
+              variant="outline"
+              icon-left="Link"
               @click="copyTrackingLink({ order_id: order.order_id })"
             />
           </div>
@@ -208,10 +209,10 @@
             <p class="payment-validation__text">
               Avez-vous recu le paiement de <strong>{{ formatCurrency(order.total_amount ?? 0) }}</strong> via <strong>{{ order.payment_method }}</strong> ?
             </p>
-            <BasicButton
+            <PremiumButton
               label="Valider le paiement"
-              type="primary"
-              size="small"
+              type="success"
+              size="sm"
               :loading="isValidatingPayment"
               @click="handleValidatePayment"
             />
@@ -231,16 +232,19 @@
               v-model="carrier"
               placeholder="Transporteur (ex: Colissimo)"
               size="small"
+              :disabled="isSavingTracking"
             />
             <BasicInput
               v-model="trackingNumber"
               placeholder="N° de suivi"
               size="small"
+              :disabled="isSavingTracking"
             />
-            <BasicButton
+            <PremiumButton
               label="Enregistrer"
-              size="small"
+              size="sm"
               type="primary"
+              :loading="isSavingTracking"
               @click="handleAddTracking"
             />
           </div>
@@ -289,11 +293,13 @@
               v-model="selectedStatus"
               :items="STATUSES"
               size="small"
+              :disabled="isUpdatingStatus"
             />
-            <BasicButton
+            <PremiumButton
               label="Mettre à jour"
               type="primary"
-              size="small"
+              size="sm"
+              :loading="isUpdatingStatus"
               @click="handleUpdateStatus"
             />
           </div>
@@ -353,7 +359,9 @@
   } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useLanguage } from '@/composables/useLanguage'
 
+  const { t } = useLanguage()
   const visible = defineModel<boolean>()
   const props = defineProps<{ orderId: string }>()
   const toast = useToastStore()
@@ -364,6 +372,9 @@
   const order = ref<OrdersFullView | null>(null)
   const isLoading = ref(true)
   const isValidatingPayment = ref(false)
+  const isUpdatingStatus = ref(false)
+  const isSavingTracking = ref(false)
+  const isDownloadingInvoice = ref(false)
 
   // Champs formulaire local
   const carrier = ref('')
@@ -441,24 +452,29 @@
   const handleUpdateStatus = async () => {
     if (!order.value) return
 
-    // 1. Mise à jour DB (RPC) + Log historique
-    await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
-
-    // 2. ENVOI EMAIL (Appel explicite à l'Edge Function)
+    isUpdatingStatus.value = true
     try {
-      await supabase.functions.invoke('send-order-update', {
-        body: {
-          order_id: order.value.order_id,
-          status: selectedStatus.value,
-        },
-      })
-    } catch (e) {
-      console.error('Erreur envoi email:', e)
-      toast.show("Statut mis a jour, mais echec de l'envoi d'email", 'warning')
-    }
+      // 1. Mise à jour DB (RPC) + Log historique
+      await changeOrderStatus({ order_id: order.value.order_id }, selectedStatus.value)
 
-    // 3. Rafraichissement UI
-    await loadOrder()
+      // 2. ENVOI EMAIL (Appel explicite à l'Edge Function)
+      try {
+        await supabase.functions.invoke('send-order-update', {
+          body: {
+            order_id: order.value.order_id,
+            status: selectedStatus.value,
+          },
+        })
+      } catch (e) {
+        console.error('Erreur envoi email:', e)
+        toast.show("Statut mis a jour, mais echec de l'envoi d'email", 'warning')
+      }
+
+      // 3. Rafraichissement UI
+      await loadOrder()
+    } finally {
+      isUpdatingStatus.value = false
+    }
   }
 
   // Validation paiement manuel (Virement/Crypto)
@@ -467,8 +483,23 @@
 
     isValidatingPayment.value = true
     try {
+      // 1. Mise à jour du statut en DB
       await changeOrderStatus({ order_id: order.value.order_id }, 'processing')
-      toast.show('Paiement valide - Commande en preparation', 'success')
+
+      // 2. Envoi de l'email de confirmation de paiement
+      try {
+        await supabase.functions.invoke('send-order-update', {
+          body: {
+            order_id: order.value.order_id,
+            status: 'processing',
+          },
+        })
+        toast.show('Paiement validé - Email envoyé au client', 'success')
+      } catch (e) {
+        console.error('Erreur envoi email:', e)
+        toast.show('Paiement validé, mais échec envoi email', 'warning')
+      }
+
       await loadOrder()
     } catch (err: any) {
       console.error(err)
@@ -486,51 +517,60 @@
 
     if (!order.value) return
 
-    // 1. Update DB
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        carrier: carrier.value,
-        tracking_number: trackingNumber.value,
-        shipped_at: new Date().toISOString(),
-        status: 'shipped', // On force le statut shipped
-      })
-      .eq('id', order.value.order_id!) // Utilise l'ID technique
-
-    if (error) {
-      toast.show('Erreur suivi ❌', 'danger')
-    } else {
-      // 2. ✅ ENVOI EMAIL EXPÉDITION (Nouveau)
-      try {
-        // On utilise l'Edge Function dédiée (ou send-order-update si tu préfères)
-        await supabase.functions.invoke('send-shipping-email', {
-          body: { order_id: order.value.order_id },
+    isSavingTracking.value = true
+    try {
+      // 1. Update DB
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          carrier: carrier.value,
+          tracking_number: trackingNumber.value,
+          shipped_at: new Date().toISOString(),
+          status: 'shipped', // On force le statut shipped
         })
-        toast.show('Suivi ajouté et email envoyé ✅', 'success')
-      } catch (e) {
-        console.error('Erreur email tracking:', e)
-        toast.show('Suivi enregistré, échec envoi email', 'warning')
-      }
+        .eq('id', order.value.order_id!) // Utilise l'ID technique
 
-      await loadOrder()
+      if (error) {
+        toast.show('Erreur suivi', 'danger')
+      } else {
+        // 2. ENVOI EMAIL EXPÉDITION
+        try {
+          await supabase.functions.invoke('send-shipping-email', {
+            body: { order_id: order.value.order_id },
+          })
+          toast.show('Suivi ajouté et email envoyé', 'success')
+        } catch (e) {
+          console.error('Erreur email tracking:', e)
+          toast.show('Suivi enregistré, échec envoi email', 'warning')
+        }
+
+        await loadOrder()
+      }
+    } finally {
+      isSavingTracking.value = false
     }
   }
 
   const downloadInvoice = async () => {
     if (!order.value) return
 
-    const { data, error } = await supabase.functions.invoke('order-invoice', {
-      body: { order_id: order.value.order_id },
-    })
+    isDownloadingInvoice.value = true
+    try {
+      const { data, error } = await supabase.functions.invoke('order-invoice', {
+        body: { order_id: order.value.order_id },
+      })
 
-    if (error || !data?.pdf_base64) return toast.show('Erreur facture ❌', 'danger')
+      if (error || !data?.pdf_base64) return toast.show('Erreur facture', 'danger')
 
-    const link = document.createElement('a')
-    link.href = `data:application/pdf;base64,${data.pdf_base64}`
-    link.download = `facture_${order.value.order_number || 'commande'}.pdf`
-    link.click()
+      const link = document.createElement('a')
+      link.href = `data:application/pdf;base64,${data.pdf_base64}`
+      link.download = `facture_${order.value.order_number || 'commande'}.pdf`
+      link.click()
 
-    toast.show('Facture téléchargée ✅', 'success')
+      toast.show('Facture téléchargée', 'success')
+    } finally {
+      isDownloadingInvoice.value = false
+    }
   }
 
   // --- WATCHERS ---

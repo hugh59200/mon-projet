@@ -96,7 +96,7 @@
     descriptionColor?: TextColor
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  const { labelColor, descriptionColor } = withDefaults(defineProps<Props>(), {
     labelColor: 'neutral-100',
     descriptionColor: 'neutral-400',
   })

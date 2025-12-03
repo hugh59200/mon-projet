@@ -6,7 +6,6 @@ import { type Locale, translations } from '../i18n.ts'
 export type PaymentMethod = 'bank_transfer' | 'crypto'
 
 export interface OrderItem {
-  name: string
   quantity: number
   unit_price: number
 }
@@ -53,18 +52,8 @@ export function pendingPaymentTemplate({
   // Gestion affichage livraison
   const shippingLabel = !shipping_cost || shipping_cost === 0 ? t.free[locale] : `${shipping_cost.toFixed(2)} €`
 
-  // Génération de la liste des articles
-  const itemsHTML = items
-    .map(
-      (item) => `
-      <tr>
-        <td style="padding:12px 8px;border-bottom:1px solid #e2e8f0;color:#334155;">${item.name}</td>
-        <td style="padding:12px 8px;border-bottom:1px solid #e2e8f0;text-align:center;color:#64748b;">${item.quantity}</td>
-        <td style="padding:12px 8px;border-bottom:1px solid #e2e8f0;text-align:right;color:#1e293b;">${item.unit_price.toFixed(2)} €</td>
-      </tr>
-    `
-    )
-    .join('')
+  // Calcul du nombre total d'articles (sans afficher les noms - OpSec)
+  const totalItemCount = items.reduce((acc, item) => acc + item.quantity, 0)
 
   // Bloc instructions de paiement - Virement bancaire
   const bankTransferBlock =
@@ -153,26 +142,24 @@ export function pendingPaymentTemplate({
     ${bankTransferBlock}
     ${cryptoBlock}
 
-    <!-- Récapitulatif de la commande -->
+    <!-- Récapitulatif de la commande (OpSec: pas de noms de produits) -->
     <h2 style="margin:32px 0 16px;font-size:18px;color:#1e293b;font-weight:600;border-bottom:2px solid ${primary};padding-bottom:8px;">
       ${t.orderSummary[locale]}
     </h2>
 
     <div style="margin:24px 0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-      <table style="width:100%;font-size:14px;border-collapse:collapse;">
-        <thead>
-          <tr style="background:#f8fafc;">
-            <th style="padding:12px 8px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">${t.product[locale]}</th>
-            <th style="padding:12px 8px;text-align:center;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">${t.quantity[locale]}</th>
-            <th style="padding:12px 8px;text-align:right;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">${t.price[locale]}</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHTML}
-        </tbody>
-      </table>
+      <!-- Nombre d'articles -->
+      <div style="padding:20px;text-align:center;background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:14px;color:#166534;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">
+          ${t.quantity[locale]}
+        </p>
+        <p style="margin:8px 0 0;font-size:32px;font-weight:700;color:#14532d;">
+          ${totalItemCount} ${totalItemCount > 1 ? t.itemPlural[locale] : t.itemSingular[locale]}
+        </p>
+      </div>
 
-      <div style="padding:16px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+      <!-- Totaux -->
+      <div style="padding:16px;background:#f8fafc;">
         <table style="width:100%;font-size:14px;">
           <tr>
             <td style="padding:4px 0;color:#64748b;">${t.subtotal[locale]}</td>

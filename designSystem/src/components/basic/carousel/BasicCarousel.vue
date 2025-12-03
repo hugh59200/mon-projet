@@ -1,11 +1,11 @@
 <template>
   <div class="basic-carousel">
-    <BasicButton
+    <PremiumButton
       v-if="showArrows"
       type="secondary"
-      variant="filled"
-      size="small"
-      iconName="ArrowLeft"
+      variant="solid"
+      size="sm"
+      icon-left="ArrowLeft"
       :disabled="scrollPosition <= 1"
       class="nav-btn prev"
       @click="scrollLeft"
@@ -43,12 +43,12 @@
       </div>
     </div>
 
-    <BasicButton
+    <PremiumButton
       v-if="showArrows"
       type="secondary"
-      variant="filled"
-      size="small"
-      iconName="ArrowRight"
+      variant="solid"
+      size="sm"
+      icon-left="ArrowRight"
       :disabled="scrollMaxReached"
       class="nav-btn next"
       @click="scrollRight"
@@ -58,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import { computed, nextTick, onMounted, ref } from 'vue'
 
   interface Props {

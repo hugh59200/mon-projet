@@ -53,18 +53,18 @@
 
         <template v-else>
           <div class="drawer-auth">
-            <BasicButton
+            <PremiumButton
               label="Connexion"
               type="primary"
-              full
-              size="small"
+              width="full"
+              size="sm"
               @click="goTo('/auth/login')"
             />
-            <BasicButton
+            <PremiumButton
               label="Inscription"
-              type="reverse"
-              full
-              size="small"
+              type="white"
+              width="full"
+              size="sm"
               @click="goTo('/auth/register')"
             />
           </div>

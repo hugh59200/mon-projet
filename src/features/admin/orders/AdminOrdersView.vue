@@ -246,13 +246,14 @@
             </div>
 
             <div class="validation-modal__actions">
-              <BasicButton
+              <PremiumButton
                 label="Annuler"
                 type="secondary"
-                variant="outlined"
+                variant="outline"
+                :disabled="isValidating"
                 @click="closeValidationModal"
               />
-              <BasicButton
+              <PremiumButton
                 label="Confirmer le paiement"
                 type="primary"
                 :loading="isValidating"

@@ -1,11 +1,12 @@
 // supabase/functions/order-confirmation/index.ts
+// Email "Commande en attente de paiement" (Paiement Asynchrone)
 
 import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
 import { createHandler } from '../../utils/createHandler.ts'
 import { getValidLocale, translations } from '../../utils/i18n.ts'
-import { logEmail } from '../../utils/logEmail.ts'
 import { sendEmail } from '../../utils/sendEmail.ts'
 import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
+import type { BankTransferDetails, CryptoDetails, PaymentMethod } from '../../utils/templates/pendingPaymentTemplate.ts'
 
 interface OrderConfirmationBody {
   order_id?: string
@@ -13,14 +14,33 @@ interface OrderConfirmationBody {
   locale?: string
 }
 
+// ============================================================
+// CONFIGURATION PAIEMENT (Phase 1 - Hardcodé)
+// ============================================================
+
+const BANK_DETAILS: BankTransferDetails = {
+  beneficiary: 'Atlas Lab Solutions LLC',
+  iban: 'FR76 XXXX XXXX XXXX XXXX XXXX XXX', // TODO: Remplacer par le vrai IBAN
+  bic: 'XXXXXXXX', // TODO: Remplacer par le vrai BIC
+}
+
+const CRYPTO_DETAILS: CryptoDetails = {
+  btc_address: 'bc1qXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', // TODO: Remplacer par la vraie adresse
+  usdt_address: 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', // TODO: Remplacer par la vraie adresse TRC-20
+}
+
+// ============================================================
+// HANDLER PRINCIPAL
+// ============================================================
+
 Deno.serve(
   createHandler<OrderConfirmationBody>(async (_req, body) => {
     const order_id = body.order_id ?? body.orderId
     if (!order_id) throw new Error('Missing order_id')
 
-    console.log(`Recherche commande: ${order_id}`)
+    console.log(`📧 Traitement commande en attente: ${order_id}`)
 
-    // 1. Récupération via le client ADMIN (Service Role Key)
+    // 1. Récupération de la commande via le client ADMIN
     const { data: order, error } = await supabase
       .from('orders_full_view')
       .select('*')
@@ -37,121 +57,83 @@ Deno.serve(
       throw new Error('Order not found')
     }
 
-    // Déterminer la locale (body > fallback FR par défaut)
+    // 2. Déterminer la locale
     const locale = getValidLocale(body.locale ?? 'fr')
-    const t = translations.confirmation
+    const t = translations.pendingPayment
 
     const orderNumber = order.order_number ?? order_id
     const isGuest = !order.user_id
 
-    // Validation email
+    // 3. Validation email
     if (!order.shipping_email || !order.shipping_email.includes('@')) {
       throw new Error(`Email invalide: ${order.shipping_email}`)
     }
 
-    // 2. Construction du lien intelligent selon le type d'utilisateur
-    let ctaUrl: string
-    let ctaLabel: string
+    // 4. Déterminer la méthode de paiement
+    const rawPaymentMethod = (order.payment_method || 'bank_transfer').toLowerCase()
+    let paymentMethod: PaymentMethod = 'bank_transfer'
 
-    if (isGuest) {
-      // INVITÉ : Lien de tracking public avec TOKEN sécurisé
-      if (!order.tracking_token) {
-        console.warn(`Token manquant pour ${order_id}, fallback email+ref`)
-        ctaUrl = `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
-      } else {
-        console.log(`Token trouvé: ${order.tracking_token.substring(0, 8)}...`)
-        ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
-      }
-      ctaLabel = t.ctaTrackOrder[locale]
-    } else {
-      // MEMBRE : Lien vers le profil privé
-      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
-      ctaLabel = t.ctaViewOrder[locale]
-      console.log(`Email pour membre: ${order.user_id}`)
+    if (rawPaymentMethod.includes('crypto') || rawPaymentMethod.includes('btc') || rawPaymentMethod.includes('usdt')) {
+      paymentMethod = 'crypto'
     }
 
-    // 3. Calcul du nombre d'articles (sans les noms de produits)
+    console.log(`Méthode de paiement détectée: ${paymentMethod}`)
+
+    // 5. Construire la liste des articles (OpSec: pas de noms de produits)
     const detailedItems = order.detailed_items ?? []
-    const itemCount = detailedItems.reduce((acc: number, item: any) => acc + Number(item.quantity ?? 1), 0)
+    const items = detailedItems.map((item: { quantity?: number; product_price?: number }) => ({
+      quantity: Number(item.quantity ?? 1),
+      unit_price: Number(item.product_price ?? 0),
+    }))
 
-    // 4. Construction de l'adresse de livraison
-    const shippingAddress = [
-      order.shipping_address,
-      order.shipping_zip,
-      order.shipping_city,
-      order.shipping_country,
-    ]
-      .filter(Boolean)
-      .join(', ')
+    // 6. Construire le lien de suivi
+    let ctaUrl: string
 
-    // 5. Préparation des données pour le template (SANS les noms de produits)
-    const html = renderEmailTemplate('confirmation', {
+    if (isGuest) {
+      if (order.tracking_token) {
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
+      } else {
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
+      }
+    } else {
+      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
+    }
+
+    // 7. Générer le HTML avec le template pending_payment
+    const html = renderEmailTemplate('pending_payment', {
       order_number: orderNumber,
-      created_at: order.created_at,
       full_name: order.shipping_name,
-
-      // Données financières
+      payment_method: paymentMethod,
+      items,
+      subtotal: order.subtotal ?? order.total_amount,
+      shipping_cost: order.shipping_cost ?? 0,
       total_amount: order.total_amount,
-      subtotal: order.subtotal,
-      shipping_cost: order.shipping_cost,
-
-      // Nombre d'articles (pas les noms !)
-      item_count: itemCount,
-
-      // Livraison
-      shipping_address: shippingAddress,
-      relay_name: order.relay_name,
-
-      // Liens intelligents
-      ctaLabel,
+      bank_details: paymentMethod === 'bank_transfer' ? BANK_DETAILS : undefined,
+      crypto_details: paymentMethod === 'crypto' ? CRYPTO_DETAILS : undefined,
       ctaUrl,
-
-      // Locale pour i18n
       locale,
     })
 
-    // 6. Envoi de l'email avec sujet traduit
+    // 8. Envoyer l'email avec le nouveau sujet
     const emailSubject = t.subject[locale](orderNumber)
+
+    console.log(`📤 Envoi email à ${order.shipping_email}`)
+
     const emailResult = await sendEmail({
       to: order.shipping_email,
       subject: emailSubject,
       html,
-      type: 'confirmation',
+      type: 'pending_payment',
       order_id,
     })
 
-    // 7. Log dans emails_sent via logEmail
-    if (emailResult.success) {
-      await logEmail({
-        order_id,
-        to_email: order.shipping_email,
-        subject: emailSubject,
-        body_html: html,
-        type: 'confirmation',
-        provider_response: emailResult.data || null,
-        status: 'sent',
-      })
-      console.log('Email enregistré dans emails_sent')
-    } else {
-      // Log même en cas d'échec pour debugging
-      await logEmail({
-        order_id,
-        to_email: order.shipping_email,
-        subject: emailSubject,
-        body_html: html,
-        type: 'confirmation',
-        provider_response: emailResult.error || null,
-        status: 'error',
-      })
-      console.error('Échec envoi email')
-    }
-
-    console.log(`Email envoyé à ${order.shipping_email}`)
+    console.log(`✅ Email envoyé: ${order.shipping_email}`)
 
     return {
       success: true,
       email_sent_to: order.shipping_email,
       mode: isGuest ? 'guest' : 'authenticated',
+      payment_method: paymentMethod,
       tracking_link: ctaUrl,
       order_number: orderNumber,
       has_tracking_token: !!order.tracking_token,

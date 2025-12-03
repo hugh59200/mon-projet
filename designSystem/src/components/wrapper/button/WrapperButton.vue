@@ -6,14 +6,13 @@
     :alertLabel
     :alertType
   >
-    <BasicButton
+    <PremiumButton
       :active
       :type
       :label="buttonLabel"
-      :icon-right
-      :icon-name
+      :icon-right="iconName"
       :disabled
-      :size
+      :size="size === 'large' ? 'lg' : size === 'medium' ? 'md' : 'sm'"
       :width
     />
   </WrapperFormElements>

@@ -45,12 +45,12 @@
           @input="clearMessages"
         />
 
-        <BasicButton
+        <PremiumButton
           label="Mettre à jour le mot de passe"
           type="primary"
-          variant="filled"
+          variant="solid"
           width="full"
-          size="medium"
+          size="md"
           :disabled="loading"
           :loading="loading"
           @click="updatePassword"

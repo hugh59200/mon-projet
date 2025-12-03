@@ -42,11 +42,11 @@
           </div>
           <h4>{{ t('cart.empty') }}</h4>
           <p>{{ t('cart.emptyText') }}</p>
-          <BasicButton
+          <PremiumButton
             :label="t('cart.continueShopping')"
             type="primary"
-            size="small"
-            block
+            size="sm"
+            width="full"
             @click="goToProducts"
           />
         </div>
@@ -134,7 +134,6 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
-  import { BasicButton } from '@designSystem/components/basic/button'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'

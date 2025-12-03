@@ -10,11 +10,11 @@
         class="admin-toolbar__search"
       />
       <slot name="filters" />
-      <BasicButton
+      <PremiumButton
         v-if="showReset"
         label="Réinitialiser"
-        variant="outlined"
-        size="small"
+        variant="outline"
+        size="sm"
         @click="emit('reset')"
       />
       <slot name="actions" />
@@ -29,7 +29,6 @@
 </template>
 
 <script setup lang="ts">
-  import BasicButton from '@designSystem/components/basic/button/BasicButton.vue'
   import BasicInput from '@designSystem/components/basic/input/BasicInput.vue'
 
   defineProps<{

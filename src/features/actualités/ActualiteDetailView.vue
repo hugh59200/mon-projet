@@ -246,7 +246,7 @@
   const pageDescription = computed(() => {
     if (!article.value) return 'Découvrez nos articles sur les peptides de recherche.'
     // Extraire un extrait du contenu sans HTML
-    const textContent = article.value.content.replace(/<[^>]*>/g, '').substring(0, 155)
+    const textContent = (article.value.content ?? '').replace(/<[^>]*>/g, '').substring(0, 155)
     return textContent + '...'
   })
 
@@ -271,7 +271,7 @@
       },
       {
         property: 'og:image',
-        content: computed(() => article.value?.image_url || 'https://fast-peptides.com/default-article.jpg'),
+        content: computed(() => article.value?.image || 'https://fast-peptides.com/default-article.jpg'),
       },
       {
         property: 'article:published_time',

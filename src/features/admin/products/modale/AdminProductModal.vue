@@ -134,11 +134,11 @@
           
           <div v-if="imagePreview" class="image-preview">
             <img :src="imagePreview" alt="Aperçu produit" />
-            <BasicButton
+            <PremiumButton
               label="Supprimer l'image"
               type="danger"
               variant="ghost"
-              size="small"
+              size="sm"
               @click="removeImage"
             />
           </div>
@@ -151,7 +151,7 @@
             @click="showTranslations = !showTranslations"
           >
             <BasicText
-              size="h6"
+              size="body-l"
               weight="bold"
               color="primary-700"
             >
@@ -229,16 +229,17 @@
     </template>
 
     <template #actions>
-      <BasicButton
+      <PremiumButton
         label="Annuler"
         type="secondary"
-        variant="outlined"
+        variant="outline"
+        :disabled="loading || uploadLoading"
         @click="visible = false"
       />
-      <BasicButton
+      <PremiumButton
         :label="isEditMode ? 'Enregistrer' : 'Créer le produit'"
         type="primary"
-        :disabled="loading || uploadLoading"
+        :loading="loading || uploadLoading"
         @click="handleSubmit"
       />
     </template>
@@ -249,9 +250,24 @@
   import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
   import { useProductActions } from '../composables/useProductActions'
   import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
-  import type { TablesInsert } from '@/supabase/types/supabase'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, onMounted, ref, watch } from 'vue'
+
+  interface ProductForm {
+    name: string
+    dosage: string | null
+    category: string
+    price: number
+    sale_price: number | null
+    is_on_sale: boolean | null
+    purity: number | null
+    description: string | null
+    stock: number
+    image: string | null
+    name_i18n: Record<string, string>
+    description_i18n: Record<string, string>
+    category_i18n: Record<string, string>
+  }
 
   const visible = defineModel<boolean>()
 
@@ -271,7 +287,7 @@
   const oldImagePath = ref<string | null>(null)
 
   // ✅ Initialisation complète (avec Dosage + i18n)
-  const form = ref<TablesInsert<'products'>>({
+  const form = ref<ProductForm>({
     name: '',
     dosage: '', // Nouveau champ V2
     category: '',
@@ -364,18 +380,32 @@
       return
     }
 
-    form.value = { ...data }
+    // Extraction des traductions i18n depuis les JSONB
+    const nameI18n = (data.name_i18n as Record<string, string>) || {}
+    const descI18n = (data.description_i18n as Record<string, string>) || {}
+    const catI18n = (data.category_i18n as Record<string, string>) || {}
+
+    form.value = {
+      name: data.name,
+      dosage: data.dosage,
+      category: data.category,
+      price: data.price,
+      sale_price: data.sale_price,
+      is_on_sale: data.is_on_sale,
+      purity: data.purity,
+      description: data.description,
+      stock: data.stock,
+      image: data.image,
+      name_i18n: nameI18n,
+      description_i18n: descI18n,
+      category_i18n: catI18n,
+    }
     imagePreview.value = data.image || null
 
     // Extraction du path pour suppression future éventuelle
     if (data.image && data.image.includes('/product-images/')) {
       oldImagePath.value = data.image.split('/product-images/')[1] ?? null
     }
-
-    // Extraction des traductions i18n depuis les JSONB
-    const nameI18n = data.name_i18n as Record<string, string> | null
-    const descI18n = data.description_i18n as Record<string, string> | null
-    const catI18n = data.category_i18n as Record<string, string> | null
 
     nameFr.value = nameI18n?.fr || ''
     nameEn.value = nameI18n?.en || ''
