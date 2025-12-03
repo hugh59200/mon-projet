@@ -27,3 +27,5 @@ dist-ssr
 # Cypress
 cypress/videos/
 cypress/screenshots/
+cypress/fixtures/admin.json
+cypress/fixtures/user.json

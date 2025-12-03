@@ -35,6 +35,12 @@
         :message="t('common.loading')"
         :empty-message="t('product.notFound')"
       >
+        <!-- Schema JSON-LD pour SEO/GEO -->
+        <ProductSchema
+          v-if="schemaProps"
+          v-bind="schemaProps"
+        />
+
         <article
           v-if="product"
           class="product"
@@ -369,7 +375,9 @@
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute, useRouter } from 'vue-router'
   import ProductEssentials from '../shared/components/ProductEssentials.vue'
+  import ProductSchema from './components/ProductSchema.vue'
   import { useHead } from '@vueuse/head'
+  import { getCanonicalUrl } from '@/config/seo'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -387,6 +395,31 @@
     category: productCategory,
     description: productDescription,
   } = useTranslatedProduct(product)
+
+  // ============================================
+  // DONNÉES POUR LE SCHEMA JSON-LD (GEO/SEO)
+  // ============================================
+  const schemaProps = computed(() => {
+    if (!product.value) return null
+
+    const p = product.value
+    const effectivePrice = p.is_on_sale && p.sale_price ? p.sale_price : p.price
+
+    return {
+      name: productName.value || p.name,
+      description: productDescription.value || p.description || '',
+      price: effectivePrice,
+      currency: 'EUR',
+      sku: p.id,
+      image: p.image || '',
+      inStock: (p.stock ?? 0) > 0,
+      purity: p.purity ? `≥${p.purity}%` : undefined,
+      productUrl: getCanonicalUrl(`/catalogue/${p.id}`),
+      category: productCategory.value || p.category,
+      casNumber: p.cas_number ?? undefined,
+      sequence: p.sequence ?? undefined,
+    }
+  })
 
   // Configuration SEO dynamique pour les produits
   const pageTitle = computed(() => {

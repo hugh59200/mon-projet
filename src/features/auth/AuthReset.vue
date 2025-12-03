@@ -46,6 +46,7 @@
         >
           <BasicText
             v-if="error"
+            key="error"
             size="body-s"
             color="danger-500"
             class="auth__error"
@@ -53,7 +54,8 @@
             {{ error }}
           </BasicText>
           <BasicText
-            v-if="message"
+            v-else-if="message"
+            key="message"
             size="body-s"
             color="success-600"
             class="auth__message"

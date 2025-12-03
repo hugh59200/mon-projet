@@ -36,7 +36,9 @@
       "Bash(deno cache:*)",
       "Bash(xargs dirname:*)",
       "Bash(npx playwright install:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npx cypress:*)",
+      "Bash(dir \"C:\\Users\\hugo.bogrand-ext\\sources\\Projet\\mon-projet\\supabase\"\")"
     ],
     "deny": [],
     "ask": []

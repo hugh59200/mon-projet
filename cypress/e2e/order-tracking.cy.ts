@@ -52,9 +52,6 @@ describe('Suivi de commande - Formulaire de recherche', () => {
   })
 
   it('Affiche une erreur pour une commande inexistante', () => {
-    // Intercepter la requête de recherche de commande
-    cy.intercept('GET', '**/rest/v1/orders*').as('searchOrder')
-
     // Remplir avec des données fictives
     cy.get('.track__input[placeholder*="FP-"]').should('be.visible').click().type('FP-0000-000000')
     cy.get('.track__input[type="email"]').should('be.visible').click().type('nonexistent@test.com')
@@ -62,11 +59,8 @@ describe('Suivi de commande - Formulaire de recherche', () => {
     // Soumettre
     cy.get('.track__form button[type="submit"]').click()
 
-    // Attendre la réponse du serveur
-    cy.wait('@searchOrder')
-
-    // Une erreur devrait s'afficher
-    cy.get('.track__error, .track__input-wrapper--error').should('exist')
+    // Une erreur devrait s'afficher (attendre un peu pour la réponse)
+    cy.get('.track__error, .track__input-wrapper--error, .track__not-found', { timeout: 10000 }).should('exist')
   })
 
   it('Affiche l\'indicateur de sécurité SSL', () => {

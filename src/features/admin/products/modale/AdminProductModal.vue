@@ -68,6 +68,10 @@
               label="Prix standard (€)"
               placeholder="0.00"
               input-type="form"
+              inputmode="decimal"
+              type="number"
+              min="0"
+              step="0.01"
               class="flex-grow-1"
             />
 
@@ -79,6 +83,10 @@
                 label="Prix Promo (€)"
                 placeholder="0.00"
                 input-type="form"
+                inputmode="decimal"
+                type="number"
+                min="0"
+                step="0.01"
                 class="slide-in"
               />
             </div>

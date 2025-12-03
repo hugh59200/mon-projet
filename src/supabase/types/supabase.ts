@@ -528,6 +528,7 @@ export type Database = {
       }
       products: {
         Row: {
+          cas_number: string | null
           category: string
           category_i18n: Json | null
           created_at: string | null
@@ -542,10 +543,12 @@ export type Database = {
           price: number
           purity: number | null
           sale_price: number | null
+          sequence: string | null
           stock: number
           tags: string[] | null
         }
         Insert: {
+          cas_number?: string | null
           category: string
           category_i18n?: Json | null
           created_at?: string | null
@@ -560,10 +563,12 @@ export type Database = {
           price: number
           purity?: number | null
           sale_price?: number | null
+          sequence?: string | null
           stock?: number
           tags?: string[] | null
         }
         Update: {
+          cas_number?: string | null
           category?: string
           category_i18n?: Json | null
           created_at?: string | null
@@ -578,6 +583,7 @@ export type Database = {
           price?: number
           purity?: number | null
           sale_price?: number | null
+          sequence?: string | null
           stock?: number
           tags?: string[] | null
         }

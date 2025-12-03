@@ -113,14 +113,14 @@ describe('Actualités', () => {
   })
 
   it('Permet de cliquer sur un article pour voir le détail', () => {
-    cy.get(
-      '[class*="article"], [class*="news"], [class*="actualite"], [class*="card"], article',
-    )
+    // Cliquer sur un article (featured ou dans la grille)
+    // Les article-cards ont des liens vers /actualites/{slug}
+    cy.get('.actualites__featured-card, .actualites__article-card')
       .first()
       .click()
 
-    // Devrait naviguer vers une page de détail
-    cy.url().should('match', /\/actualites\/[a-z0-9-]+/)
+    // Devrait naviguer vers une page de détail (slug peut contenir majuscules)
+    cy.url().should('match', /\/actualites\/[a-zA-Z0-9-]+/)
   })
 })
 

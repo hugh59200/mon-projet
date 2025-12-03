@@ -302,63 +302,109 @@
                 <div class="checkout__field">
                   <label class="checkout__label">
                     <BasicIconNext name="Mail" :size="16" />
-                    Email
+                    Email *
                   </label>
                   <input
                     v-model="email"
                     type="email"
                     class="checkout__input"
+                    :class="{ 'checkout__input--error': touched.email && errors.email }"
                     placeholder="votre@email.com"
                     :readonly="!!auth.user"
+                    @blur="onFieldBlur('email')"
                   />
+                  <span v-if="touched.email && errors.email" class="checkout__error">
+                    {{ errors.email }}
+                  </span>
                 </div>
                 <div class="checkout__field">
                   <label class="checkout__label">
                     <BasicIconNext name="User" :size="16" />
-                    Nom complet
+                    Nom complet *
                   </label>
                   <input
                     v-model="fullName"
                     type="text"
                     class="checkout__input"
+                    :class="{ 'checkout__input--error': touched.fullName && errors.fullName }"
                     placeholder="Prénom Nom"
+                    minlength="3"
+                    @input="onFullNameInput"
+                    @blur="onFieldBlur('fullName')"
                   />
+                  <span v-if="touched.fullName && errors.fullName" class="checkout__error">
+                    {{ errors.fullName }}
+                  </span>
                 </div>
               </div>
 
               <!-- Champs adresse (masqués si mode relay) -->
               <template v-if="deliveryMode === 'home'">
-                <div class="checkout__field">
+                <!-- Autocomplétion pour la France -->
+                <div v-if="country === 'France'" class="checkout__field">
+                  <AddressAutocomplete
+                    v-model="address"
+                    label="Adresse *"
+                    placeholder="Commencez à taper votre adresse..."
+                    :required="true"
+                    :alert-label="touched.address && errors.address ? errors.address : undefined"
+                    :alert-type="touched.address && errors.address ? 'danger' : undefined"
+                    @fill="onAddressFill"
+                    @blur="onFieldBlur('address')"
+                  />
+                </div>
+                <!-- Champ classique pour les autres pays -->
+                <div v-else class="checkout__field">
                   <label class="checkout__label">
                     <BasicIconNext name="MapPin" :size="16" />
-                    Adresse
+                    Adresse *
                   </label>
                   <input
                     v-model="address"
                     type="text"
                     class="checkout__input"
+                    :class="{ 'checkout__input--error': touched.address && errors.address }"
                     placeholder="Numéro et nom de rue"
+                    minlength="5"
+                    @blur="onFieldBlur('address')"
                   />
+                  <span v-if="touched.address && errors.address" class="checkout__error">
+                    {{ errors.address }}
+                  </span>
                 </div>
 
                 <div class="checkout__form-row checkout__form-row--3">
                   <div class="checkout__field">
-                    <label class="checkout__label">{{ t('checkout.shipping.postalCode') }}</label>
+                    <label class="checkout__label">{{ t('checkout.shipping.postalCode') }} *</label>
                     <input
-                      v-model="zip"
+                      :value="zip"
                       type="text"
+                      inputmode="numeric"
                       class="checkout__input"
+                      :class="{ 'checkout__input--error': touched.zip && errors.zip }"
                       placeholder="75001"
+                      maxlength="10"
+                      @input="onZipInput"
+                      @blur="onFieldBlur('zip')"
                     />
+                    <span v-if="touched.zip && errors.zip" class="checkout__error">
+                      {{ errors.zip }}
+                    </span>
                   </div>
                   <div class="checkout__field checkout__field--grow">
-                    <label class="checkout__label">{{ t('checkout.shipping.city') }}</label>
+                    <label class="checkout__label">{{ t('checkout.shipping.city') }} *</label>
                     <input
                       v-model="city"
                       type="text"
                       class="checkout__input"
+                      :class="{ 'checkout__input--error': touched.city && errors.city }"
                       placeholder="Paris"
+                      minlength="2"
+                      @blur="onFieldBlur('city')"
                     />
+                    <span v-if="touched.city && errors.city" class="checkout__error">
+                      {{ errors.city }}
+                    </span>
                   </div>
                   <div class="checkout__field">
                     <label class="checkout__label">{{ t('checkout.shipping.country') }}</label>
@@ -603,11 +649,15 @@
   import { createOrder, invokeOrderConfirmation } from '@/api/supabase/orders'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+  import { computed, onMounted, ref, watch, watchEffect, reactive } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import RelaySelector from '../livraison/mondial-relay/RelaySelector.vue'
   import type { OrderRelayData, RelayPoint } from '../livraison/mondial-relay/relay'
+  import AddressAutocomplete from '@/features/shared/components/AddressAutocomplete.vue'
+  import { formatPostalCode } from '@/composables/validation/formatters'
+  import { COUNTRY_CONFIGS } from '@/composables/validation/validators'
+  import type { SupportedCountry } from '@/composables/validation/types'
 
   // Types de paiement manuel
   type ManualPaymentMethod = 'bank_transfer' | 'crypto'
@@ -653,9 +703,163 @@
   const city = ref('')
   const country = ref('France')
 
+  // États d'erreur pour chaque champ
+  const errors = reactive({
+    email: '',
+    fullName: '',
+    address: '',
+    zip: '',
+    city: '',
+  })
+
+  // Champs touchés (pour afficher les erreurs seulement après interaction)
+  const touched = reactive({
+    email: false,
+    fullName: false,
+    address: false,
+    zip: false,
+    city: false,
+  })
+
+  // Regex pour validation email
+  const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+
+  // Mapper pays -> code ISO pour validation
+  const COUNTRY_CODE_MAP: Record<string, SupportedCountry> = {
+    'France': 'FR',
+    'Belgique': 'BE',
+    'Espagne': 'ES',
+    'Italie': 'IT',
+    'Luxembourg': 'LU',
+    'Pays-Bas': 'NL',
+  }
+
   // Constants
   const FREE_SHIPPING_THRESHOLD = 100
   const FLAT_SHIPPING_RATE = 9.9
+
+  // Fonctions de validation
+  function validateEmail(value: string): string {
+    if (!value.trim()) return 'Email requis'
+    if (!EMAIL_REGEX.test(value.trim())) return 'Email invalide'
+    return ''
+  }
+
+  function validateFullName(value: string): string {
+    if (!value.trim()) return 'Nom requis'
+    if (value.trim().length < 3) return 'Minimum 3 caractères'
+    if (!/^[\p{L}\s'-]+$/u.test(value.trim())) return 'Caractères invalides'
+    return ''
+  }
+
+  function validateAddress(value: string): string {
+    if (!value.trim()) return 'Adresse requise'
+    if (value.trim().length < 5) return 'Adresse trop courte'
+    return ''
+  }
+
+  function validateZip(value: string, countryName: string): string {
+    if (!value.trim()) return 'Code postal requis'
+    const countryCode = COUNTRY_CODE_MAP[countryName] || 'FR'
+    const config = COUNTRY_CONFIGS[countryCode]
+    if (config && !config.postalCodeRegex.test(value.trim())) {
+      return `Format: ${config.postalCodeExample}`
+    }
+    return ''
+  }
+
+  function validateCity(value: string): string {
+    if (!value.trim()) return 'Ville requise'
+    if (value.trim().length < 2) return 'Ville trop courte'
+    return ''
+  }
+
+  // Handler pour le champ code postal (filtre les lettres)
+  function onZipInput(event: Event) {
+    const input = event.target as HTMLInputElement
+    const countryCode = COUNTRY_CODE_MAP[country.value] || 'FR'
+    // Formater selon le pays
+    input.value = formatPostalCode(input.value, countryCode)
+    zip.value = input.value
+    // Valider si touché
+    if (touched.zip) {
+      errors.zip = validateZip(zip.value, country.value)
+    }
+  }
+
+  /**
+   * Auto-remplissage depuis l'autocomplétion d'adresse
+   */
+  function onAddressFill(data: { address: string; city: string; postcode: string }) {
+    // Remplir les champs automatiquement
+    address.value = data.address
+    city.value = data.city
+    zip.value = data.postcode
+
+    // Marquer comme touchés et valider
+    touched.address = true
+    touched.city = true
+    touched.zip = true
+
+    errors.address = validateAddress(data.address)
+    errors.city = validateCity(data.city)
+    errors.zip = validateZip(data.postcode, country.value)
+  }
+
+  // Handler pour le champ nom (capitalise)
+  function onFullNameInput(event: Event) {
+    const input = event.target as HTMLInputElement
+    fullName.value = input.value
+    if (touched.fullName) {
+      errors.fullName = validateFullName(fullName.value)
+    }
+  }
+
+  // Handler blur pour marquer comme touché et valider
+  function onFieldBlur(field: keyof typeof touched) {
+    touched[field] = true
+    switch (field) {
+      case 'email':
+        errors.email = validateEmail(email.value)
+        break
+      case 'fullName':
+        errors.fullName = validateFullName(fullName.value)
+        break
+      case 'address':
+        errors.address = validateAddress(address.value)
+        break
+      case 'zip':
+        errors.zip = validateZip(zip.value, country.value)
+        break
+      case 'city':
+        errors.city = validateCity(city.value)
+        break
+    }
+  }
+
+  // Valider tout le formulaire
+  function validateForm(): boolean {
+    errors.email = validateEmail(email.value)
+    errors.fullName = validateFullName(fullName.value)
+
+    if (deliveryMode.value === 'home') {
+      errors.address = validateAddress(address.value)
+      errors.zip = validateZip(zip.value, country.value)
+      errors.city = validateCity(city.value)
+    } else {
+      errors.address = ''
+      errors.zip = ''
+      errors.city = ''
+    }
+
+    // Marquer tous comme touchés
+    Object.keys(touched).forEach(key => {
+      touched[key as keyof typeof touched] = true
+    })
+
+    return !errors.email && !errors.fullName &&
+      (deliveryMode.value === 'relay' || (!errors.address && !errors.zip && !errors.city))
+  }
 
   // Computed
   const cartSubtotal = computed(() => cart.totalPrice)
@@ -673,17 +877,25 @@
   // 🆕 Validation du formulaire
   const canSubmit = computed(() => {
     if (cart.items.length === 0) return false
-    if (!email.value || !fullName.value) return false
     if (isSubmitting.value) return false
     // 🛡️ BOUCLIER LÉGAL - Disclaimer obligatoire
     if (!disclaimerAccepted.value) return false
+
+    // Validation des champs obligatoires
+    if (!email.value.trim() || !fullName.value.trim()) return false
+    if (validateEmail(email.value)) return false
+    if (validateFullName(fullName.value)) return false
 
     if (deliveryMode.value === 'relay') {
       // En mode relay, il faut avoir sélectionné un point
       return selectedRelay.value !== null
     } else {
-      // En mode domicile, il faut l'adresse complète
-      return !!(address.value && zip.value && city.value)
+      // En mode domicile, il faut l'adresse complète et valide
+      if (!address.value.trim() || !zip.value.trim() || !city.value.trim()) return false
+      if (validateAddress(address.value)) return false
+      if (validateZip(zip.value, country.value)) return false
+      if (validateCity(city.value)) return false
+      return true
     }
   })
 
@@ -856,6 +1068,12 @@
 
   async function submitOrder() {
     if (isSubmitting.value || !canSubmit.value) return
+
+    // Valider le formulaire avant soumission
+    if (!validateForm()) {
+      toast.show('Veuillez corriger les erreurs du formulaire', 'warning')
+      return
+    }
 
     isSubmitting.value = true
 
@@ -1394,6 +1612,39 @@
         background: @neutral-100;
         color: @neutral-600;
         cursor: not-allowed;
+      }
+
+      &--error {
+        border-color: @danger-500;
+        background: rgba(@danger-500, 0.02);
+
+        &:focus {
+          border-color: @danger-500;
+          box-shadow: 0 0 0 3px rgba(@danger-500, 0.1);
+        }
+      }
+    }
+
+    &__error {
+      display: block;
+      margin-top: 6px;
+      font-family: @font-body;
+      font-size: 12px;
+      font-weight: 500;
+      color: @danger-500;
+      animation: shake 0.3s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-4px);
+      }
+      75% {
+        transform: translateX(4px);
       }
     }
 

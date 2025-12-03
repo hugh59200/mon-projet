@@ -6,9 +6,9 @@
 
 describe('Panier - Gestion des articles', () => {
   beforeEach(() => {
-    // Vider le panier avant chaque test
+    // Vider le panier avant chaque test (clé correcte du store Pinia)
     cy.window().then((win) => {
-      win.localStorage.removeItem('cart')
+      win.localStorage.removeItem('fp-cart-storage')
     })
   })
 
@@ -26,15 +26,19 @@ describe('Panier - Gestion des articles', () => {
   it('Ajoute un produit au panier depuis le catalogue', () => {
     cy.visit('/catalogue')
 
-    // Cliquer sur "Ajouter au panier" d'un produit
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    // Aller sur la page produit
+    cy.get('[class*="product-card"]').first().click()
+    cy.url().should('match', /\/catalogue\/[a-z0-9-]+/)
+
+    // Cliquer sur "Ajouter au panier" depuis la page produit
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
 
-    // Un toast de confirmation devrait apparaître
-    cy.get('[class*="toast"], [class*="snackbar"]').should('be.visible')
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     // Aller sur le panier
     cy.visit('/panier')
@@ -44,13 +48,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Augmente la quantité d\'un produit', () => {
-    // Ajouter un produit d'abord
+    // Ajouter un produit d'abord via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     // Aller sur le panier
     cy.visit('/panier')
@@ -82,13 +90,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Diminue la quantité d\'un produit', () => {
-    // Ajouter un produit d'abord
+    // Ajouter un produit d'abord via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -124,12 +136,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Le bouton - est désactivé quand quantité = 1', () => {
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -142,13 +159,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Supprime un produit du panier', () => {
-    // Ajouter un produit
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -163,23 +184,31 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Vide tout le panier', () => {
-    // Ajouter plusieurs produits
+    // Ajouter plusieurs produits via les pages produit
     cy.visit('/catalogue')
 
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    // Premier produit
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
 
-    // Attendre le toast de confirmation
-    cy.get('[class*="toast"], [class*="snackbar"]').should('be.visible')
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
-    cy.get('[class*="product-card"]')
-      .eq(1)
-      .find('button')
+    // Retour au catalogue pour le deuxième produit
+    cy.visit('/catalogue')
+    cy.get('[class*="product-card"]').eq(1).click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -197,12 +226,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Affiche la progression vers livraison gratuite', () => {
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -211,12 +245,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Navigue vers checkout depuis le panier', () => {
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -238,13 +277,17 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Le panier persiste après rechargement de page', () => {
-    // Ajouter un produit
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     // Recharger la page
     cy.reload()
@@ -257,20 +300,24 @@ describe('Panier - Gestion des articles', () => {
 
 describe('Panier - Calculs', () => {
   beforeEach(() => {
+    // Vider le panier avant chaque test (clé correcte du store Pinia)
     cy.window().then((win) => {
-      win.localStorage.removeItem('cart')
+      win.localStorage.removeItem('fp-cart-storage')
     })
   })
 
   it('Calcule correctement le sous-total', () => {
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-
-    // Ajouter un produit
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 
@@ -279,12 +326,17 @@ describe('Panier - Calculs', () => {
   })
 
   it('Affiche les frais de livraison ou gratuit', () => {
+    // Ajouter un produit via la page produit
     cy.visit('/catalogue')
-    cy.get('[class*="product-card"]')
-      .first()
-      .find('button')
+    cy.get('[class*="product-card"]').first().click()
+    cy.get('.product__actions button, [class*="product-actions"] button')
       .contains(/panier|cart|ajouter/i)
       .click()
+
+    // Attendre que le toast confirme l'ajout et que pinia-persist sauvegarde
+    cy.get('.compact-toast, .toast').should('be.visible')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000)
 
     cy.visit('/panier')
 

@@ -113,7 +113,18 @@
             {{ t('profile.defaultAddress').toUpperCase() }}
           </BasicText>
 
+          <!-- Autocomplétion pour la France -->
+          <AddressAutocomplete
+            v-if="country === 'France' || country === ''"
+            v-model="address"
+            :label="t('profile.addressLabel')"
+            :placeholder="t('profile.addressPlaceholder')"
+            class="mb-4"
+            @fill="onAddressFill"
+          />
+          <!-- Champ classique pour les autres pays -->
           <WrapperInput
+            v-else
             v-model="address"
             :label="t('profile.addressLabel')"
             :placeholder="t('profile.addressPlaceholder')"
@@ -128,12 +139,17 @@
               :label="t('profile.postalCode')"
               placeholder="75000"
               input-type="form"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              :maxlength="5"
+              @input="onZipInput"
             />
             <WrapperInput
               v-model="city"
               :label="t('profile.city')"
               placeholder="Paris"
               input-type="form"
+              minlength="2"
             />
           </div>
 
@@ -322,6 +338,9 @@
               :label="t('profile.newPassword')"
               input-type="form"
               icon-left="Key"
+              minlength="8"
+              :alert-label="newPassword && passwordStrength.score < 2 ? 'Mot de passe trop faible' : ''"
+              :alert-type="newPassword && passwordStrength.score < 2 ? 'warning' : undefined"
             />
             <WrapperInput
               v-model="confirmPassword"
@@ -329,16 +348,34 @@
               :label="t('profile.confirmNewPassword')"
               input-type="form"
               icon-left="Key"
+              minlength="8"
+              :alert-label="confirmPassword && !passwordsMatch ? 'Les mots de passe ne correspondent pas' : ''"
+              :alert-type="confirmPassword && !passwordsMatch ? 'danger' : undefined"
             />
           </div>
+
+          <!-- Indicateur de force du mot de passe -->
+          <div v-if="newPassword" class="profil__password-strength">
+            <div class="profil__password-strength-bar">
+              <div
+                class="profil__password-strength-fill"
+                :style="{
+                  width: `${(passwordStrength.score / 4) * 100}%`,
+                  backgroundColor: passwordStrength.color
+                }"
+              />
+            </div>
+            <span class="profil__password-strength-label" :style="{ color: passwordStrength.color }">
+              {{ t(`validation.password.${passwordStrength.label}`) }}
+            </span>
+          </div>
+
           <div class="profil__actions">
             <PremiumButton
               :label="t('profile.updatePassword')"
               type="secondary"
               variant="solid"
-              :disabled="
-                passwordLoading || newPassword !== confirmPassword || newPassword.length < 6
-              "
+              :disabled="passwordLoading || !canUpdatePassword"
               :loading="passwordLoading"
               @click="updatePasswordAction"
               icon-left="RefreshCw"
@@ -394,6 +431,9 @@
   import { useAuthStore } from '../auth/stores/useAuthStore'
   import { useChatWidgetStore } from '../chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
+  import { formatPostalCode } from '@/composables/validation/formatters'
+  import { calculatePasswordStrength } from '@/composables/validation'
+  import AddressAutocomplete from '@/features/shared/components/AddressAutocomplete.vue'
 
   // --- Stores et Hooks ---
   const { t } = useI18n()
@@ -441,6 +481,16 @@
   const newPassword = ref('')
   const confirmPassword = ref('')
   const passwordLoading = ref(false)
+  const passwordStrength = computed(() => calculatePasswordStrength(newPassword.value))
+  const passwordsMatch = computed(() => newPassword.value === confirmPassword.value)
+  const canUpdatePassword = computed(() => {
+    return (
+      newPassword.value.length > 0 &&
+      confirmPassword.value.length > 0 &&
+      passwordsMatch.value &&
+      passwordStrength.value.score >= 2
+    )
+  })
 
   // --- Computed pour l'UX des boutons ---
 
@@ -492,6 +542,27 @@
   function goToOrder(id?: string) {
     if (!id) return
     router.push(`/profil/commandes/${id}`)
+  }
+
+  // Handler pour filtrer le code postal (chiffres uniquement)
+  function onZipInput(event: Event) {
+    const input = event.target as HTMLInputElement
+    // Formater le code postal (France par défaut = 5 chiffres)
+    input.value = formatPostalCode(input.value, 'FR')
+    zip.value = input.value
+  }
+
+  /**
+   * Auto-remplissage depuis l'autocomplétion d'adresse
+   */
+  function onAddressFill(data: { address: string; city: string; postcode: string }) {
+    address.value = data.address
+    city.value = data.city
+    zip.value = data.postcode
+    // Mettre France par défaut si vide (API Adresse = France uniquement)
+    if (!country.value) {
+      country.value = 'France'
+    }
   }
 
   // --- Actions Profil ---
@@ -577,12 +648,12 @@
   }
 
   async function updatePasswordAction() {
-    if (newPassword.value !== confirmPassword.value) {
-      toast.show('Les mots de passe ne correspondent pas.', 'danger')
-      return
-    }
-    if (newPassword.value.length < 6) {
-      toast.show('Le mot de passe doit contenir au moins 6 caractères.', 'danger')
+    if (!canUpdatePassword.value) {
+      if (!passwordsMatch.value) {
+        toast.show('Les mots de passe ne correspondent pas.', 'danger')
+      } else if (passwordStrength.value.score < 2) {
+        toast.show('Le mot de passe est trop faible.', 'warning')
+      }
       return
     }
 
@@ -591,7 +662,7 @@
     const success = await updatePassword(newPassword.value)
 
     if (success) {
-      toast.show('Mot de passe mis à jour! ✅', 'success')
+      toast.show('Mot de passe mis à jour !', 'success')
       newPassword.value = ''
       confirmPassword.value = ''
     }
@@ -671,6 +742,35 @@
       margin-top: 28px;
       .PremiumButton {
         max-width: 100%;
+      }
+    }
+
+    &__password-strength {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 8px;
+
+      &-bar {
+        flex: 1;
+        height: 6px;
+        background: @neutral-700;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      &-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+      }
+
+      &-label {
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: right;
       }
     }
 

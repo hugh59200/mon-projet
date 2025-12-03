@@ -59,7 +59,7 @@ describe('Liens du Footer', () => {
   beforeEach(() => {
     cy.visit('/')
     // Scroll vers le footer
-    cy.get('footer, [class*="footer"]').scrollIntoView()
+    cy.get('footer, [class*="footer"]').first().scrollIntoView()
   })
 
   it('Tous les liens internes du footer sont cliquables', () => {
