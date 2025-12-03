@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import router from '@/router'
-import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
+import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

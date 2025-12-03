@@ -91,15 +91,10 @@
     description: string
   }
 
-  interface Props {
+  const { labelColor = 'neutral-100', descriptionColor = 'neutral-400' } = defineProps<{
     labelColor?: TextColor
     descriptionColor?: TextColor
-  }
-
-  const { labelColor, descriptionColor } = withDefaults(defineProps<Props>(), {
-    labelColor: 'neutral-100',
-    descriptionColor: 'neutral-400',
-  })
+  }>()
 
   const modelValue = defineModel<boolean>({ required: true })
 

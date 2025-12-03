@@ -6,8 +6,6 @@
  */
 declare global {
   type AlertInputProps = import('@designSystem/components').AlertInputProps
-  type AutocompleteProps = import('@designSystem/components').AutocompleteProps
-  type AvatarProps = import('@designSystem/components').AvatarProps
   type BadgeProps = import('@designSystem/components').BadgeProps
   type PremiumButtonProps = import('@designSystem/components').PremiumButtonProps
   type CheckboxProps = import('@designSystem/components').CheckboxProps
@@ -15,15 +13,10 @@ declare global {
   type DropdownItemProps = import('@designSystem/components').DropdownItemProps
   type HintProps = import('@designSystem/components').HintProps
   type InputProps = import('@designSystem/components').InputProps
-  type InputDateProps = import('@designSystem/components').InputDateProps
-  type InputDureeProps = import('@designSystem/components').InputDureeProps
   type InputLabelProps = import('@designSystem/components').InputLabelProps
   type InputNumberProps = import('@designSystem/components').InputNumberProps
-  type InputTelephoneProps = import('@designSystem/components').InputTelephoneProps
-  type LinkProps = import('@designSystem/components').StandaloneLinkProps
   type TabProps = import('@designSystem/components').TabProps
   type TextProps = import('@designSystem/components').HeadingProps
-  type ToggleSwitchProps = import('@designSystem/components').ToggleSwitchProps
   type TooltipProps = import('@designSystem/components').TooltipProps
 }
 

@@ -1,5 +1,5 @@
 import type { RouteName } from '@/router/route-name'
-import type { IconNameNext } from '../icon/BasicIconNext.vue'
+import type { IconNameNext } from '../icon/BasicIconNext.types'
 import type { TabsModel } from '../tabs/BasicTabs.types'
 import type { TextColor } from '../text'
 

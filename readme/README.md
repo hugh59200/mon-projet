@@ -2,7 +2,7 @@
 
 ## 🎯 Objectif
 
-Créer une application front-end moderne construite avec **Vue 3**, **TypeScript**, et **Vite**, intégrant un **design system**, une **documentation Storybook**, et un **backend Supabase** pour la gestion des données.
+Créer une application front-end moderne construite avec **Vue 3**, **TypeScript**, et **Vite**, intégrant un **design system** et un **backend Supabase** pour la gestion des données.
 
 ---
 
@@ -10,9 +10,8 @@ Créer une application front-end moderne construite avec **Vue 3**, **TypeScript
 
 - Interface réactive et modulaire via Vue 3 + Composition API
 - Composants UI centralisés dans un **design system** réutilisable
-- Documentation et test visuel des composants avec **Storybook**
 - Authentification, base de données et stockage gérés via **Supabase**
-- Scripts d’automatisation dans le dossier `script/`
+- Scripts d'automatisation dans le dossier `script/`
 - Intégration continue simplifiée avec Vite
 
 ---
@@ -23,10 +22,9 @@ Créer une application front-end moderne construite avec **Vue 3**, **TypeScript
 .mon-projet/
 │
 ├── designSystem/      # Composants UI partagés
-├── src/               # Logique principale de l’application
+├── src/               # Logique principale de l'application
 ├── supabase/          # Configuration et migrations Supabase
 ├── supabase-cli/      # Outils de ligne de commande Supabase
-├── .storybook/        # Storybook pour visualiser les composants
 ├── vite/              # Configuration du bundler
 └── public/            # Fichiers statiques
 ```
@@ -57,9 +55,8 @@ Créer une application front-end moderne construite avec **Vue 3**, **TypeScript
 
 | Dossier        | Rôle                                     | Interaction                                     |
 | -------------- | ---------------------------------------- | ----------------------------------------------- |
-| `designSystem` | Bibliothèque de composants réutilisables | Alimente l’UI principale                        |
+| `designSystem` | Bibliothèque de composants réutilisables | Alimente l'UI principale                        |
 | `supabase`     | Backend et données                       | Fournit/authentifie les données côté front      |
-| `.storybook`   | Documentation visuelle                   | Met en scène les composants du design system    |
 | `src`          | Application Vue principale               | Consomme les composants et les données Supabase |
 
 ---
@@ -72,16 +69,13 @@ npm install
 
 # Lancer le serveur de développement
 npm run dev
-
-# Ouvrir Storybook
-npm run storybook
 ```
 
 ---
 
 ## 📘 À venir
 
-- Gestion d’état avec Pinia
+- Gestion d'état avec Pinia
 - Tests unitaires avec Vitest
 - Déploiement automatisé (Netlify / Vercel)
 - Documentation technique approfondie

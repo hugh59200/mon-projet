@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node node_modules/vite/bin/vite.js",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.vue src",
@@ -50,11 +50,6 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^9.0.0-alpha.12",
-    "@storybook/addon-interactions": "^9.0.0-alpha.10",
-    "@storybook/addon-links": "^9.0.15",
-    "@storybook/vue3": "^9.0.15",
-    "@storybook/vue3-vite": "^9.0.15",
     "@types/jquery": "^3.5.33",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-basic-ssl": "^2.0.0",
@@ -70,7 +65,6 @@
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.0",
-    "storybook": "^9.0.15",
     "supabase": "^2.54.11",
     "typescript": "^5.9.3",
     "vite-plugin-sitemap": "^0.8.2",

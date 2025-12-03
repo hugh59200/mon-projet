@@ -1,4 +1,4 @@
-import type { IconNameNext } from '../icon/BasicIconNext.vue'
+import type { IconNameNext } from '../icon/BasicIconNext.types'
 
 // Types de base hérités
 export type PremiumButtonType = 'primary' | 'secondary' | 'danger' | 'success' | 'white'
@@ -44,7 +44,6 @@ export type PremiumButtonProps = {
   showLoadingDots?: boolean
 }
 
-// Arrays pour Storybook
 export const premiumButtonTypes: PremiumButtonType[] = ['primary', 'secondary', 'danger', 'success', 'white']
 export const premiumButtonSizes: PremiumButtonSize[] = ['xl', 'lg', 'md', 'sm', 'xs']
 export const premiumButtonVariants: PremiumButtonVariant[] = ['solid', 'outline', 'ghost', 'glass', 'gradient']

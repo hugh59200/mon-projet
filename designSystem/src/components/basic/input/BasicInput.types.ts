@@ -1,5 +1,5 @@
 import type { IconColor } from '../icon'
-import type { IconNameNext } from '../icon/BasicIconNext.vue'
+import type { IconNameNext } from '../icon/BasicIconNext.types'
 
 export type InputSize = 'small' | 'medium' | 'large'
 export type ValidationState = 'success' | 'error'

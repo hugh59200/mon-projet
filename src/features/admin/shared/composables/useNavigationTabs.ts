@@ -1,6 +1,6 @@
 import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
 import type { RouteName } from '@/router/route-name'
-import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
+import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.types'
 import type { TextColor } from '@designSystem/components/basic/text'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

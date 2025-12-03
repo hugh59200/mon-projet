@@ -1,11 +1,6 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:@storybook/addon-essentials@^9.0.0-alpha.12": "9.0.0-alpha.12_storybook@9.1.16__prettier@3.6.2__esbuild@0.25.12__@types+node@24.10.0__less@4.4.2_prettier@3.6.2_@types+node@24.10.0_less@4.4.2",
-    "npm:@storybook/addon-interactions@^9.0.0-alpha.10": "9.0.0-alpha.10_storybook@9.1.16__prettier@3.6.2__esbuild@0.25.12__@types+node@24.10.0__less@4.4.2_prettier@3.6.2_@types+node@24.10.0_less@4.4.2",
-    "npm:@storybook/addon-links@^9.0.15": "9.1.16_storybook@9.1.16__prettier@3.6.2__esbuild@0.25.12__@types+node@24.10.0__less@4.4.2_prettier@3.6.2_@types+node@24.10.0_less@4.4.2",
-    "npm:@storybook/vue3-vite@^9.0.15": "9.1.16_storybook@9.1.16__prettier@3.6.2__esbuild@0.25.12__@types+node@24.10.0__less@4.4.2_vite@7.2.1__@types+node@24.10.0__less@4.4.2__picomatch@4.0.3_vue@3.5.23__typescript@5.9.3_prettier@3.6.2_@types+node@24.10.0_less@4.4.2_typescript@5.9.3",
-    "npm:@storybook/vue3@^9.0.15": "9.1.16_storybook@9.1.16__prettier@3.6.2__esbuild@0.25.12__@types+node@24.10.0__less@4.4.2_vue@3.5.23__typescript@5.9.3_prettier@3.6.2_typescript@5.9.3_@types+node@24.10.0_less@4.4.2",
     "npm:@supabase/realtime-js@^2.79.0": "2.80.0",
     "npm:@supabase/supabase-js@^2.79.0": "2.80.0",
     "npm:@types/jquery@^3.5.33": "3.5.33",
@@ -45,7 +40,6 @@
     "npm:prettier@^3.6.2": "3.6.2",
     "npm:recharts@^3.3.0": "3.3.0_react@19.2.0_react-dom@19.2.0__react@19.2.0_react-is@17.0.2_react-redux@9.2.0__react@19.2.0",
     "npm:resend@^6.4.2": "6.5.2",
-    "npm:storybook@^9.0.15": "9.1.16_prettier@3.6.2_esbuild@0.25.12_@types+node@24.10.0_less@4.4.2",
     "npm:supabase@^2.54.11": "2.54.11",
     "npm:typescript@^5.9.3": "5.9.3",
     "npm:vite-plugin-sitemap@~0.8.2": "0.8.2",
@@ -5518,11 +5512,6 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@storybook/addon-essentials@^9.0.0-alpha.12",
-        "npm:@storybook/addon-interactions@^9.0.0-alpha.10",
-        "npm:@storybook/addon-links@^9.0.15",
-        "npm:@storybook/vue3-vite@^9.0.15",
-        "npm:@storybook/vue3@^9.0.15",
         "npm:@supabase/realtime-js@^2.79.0",
         "npm:@supabase/supabase-js@^2.79.0",
         "npm:@types/jquery@^3.5.33",
@@ -5562,7 +5551,6 @@
         "npm:prettier@^3.6.2",
         "npm:recharts@^3.3.0",
         "npm:resend@^6.4.2",
-        "npm:storybook@^9.0.15",
         "npm:supabase@^2.54.11",
         "npm:typescript@^5.9.3",
         "npm:vite-plugin-sitemap@~0.8.2",
