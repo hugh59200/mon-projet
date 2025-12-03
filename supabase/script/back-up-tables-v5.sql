@@ -256,7 +256,7 @@ CREATE TABLE public.emails_sent (
   to_email text NOT NULL,
   subject text NOT NULL,
   body_html text NOT NULL,
-  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom')) NOT NULL DEFAULT 'custom',
+  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom','pending_payment','payment_validated')) NOT NULL DEFAULT 'custom',
   status text CHECK (status IN ('sent','error')) DEFAULT 'sent',
   provider_response jsonb,
   sent_at timestamptz DEFAULT now()
@@ -1014,8 +1014,8 @@ FROM public.orders o
 LEFT JOIN public.profiles p ON p.id = o.user_id
 LEFT JOIN public.orders_detailed_view odv ON odv.order_id = o.id;
 
-ALTER VIEW public.orders_full_view SET (security_invoker = true);
-GRANT SELECT ON public.orders_full_view TO authenticated;
+-- Note: security_invoker désactivé pour permettre aux Edge Functions (service_role) d'accéder aux commandes guest
+GRANT SELECT ON public.orders_full_view TO authenticated, service_role;
 
 -- 3. Admin Overview (V5.1: ajout payment_method pour validation paiement manuel)
 CREATE OR REPLACE VIEW public.orders_overview_for_admin AS

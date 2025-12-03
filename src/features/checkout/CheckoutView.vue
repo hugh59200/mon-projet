@@ -411,28 +411,6 @@
             <div class="checkout__payment-methods">
               <!-- Méthodes disponibles -->
               <div class="payment-methods__available">
-                <!-- Virement Bancaire -->
-                <button
-                  class="payment-card"
-                  :class="{ 'payment-card--active': selectedPayment === 'bank_transfer' }"
-                  @click="selectedPayment = 'bank_transfer'"
-                  type="button"
-                >
-                  <div class="payment-card__radio">
-                    <div class="payment-card__radio-inner"></div>
-                  </div>
-                  <div class="payment-card__icon payment-card__icon--bank">
-                    <BasicIconNext name="Landmark" :size="24" />
-                  </div>
-                  <div class="payment-card__content">
-                    <span class="payment-card__title">{{ t('checkout.payment.bankTransfer') }}</span>
-                    <span class="payment-card__desc">{{ t('checkout.payment.bankTransferDesc') }}</span>
-                  </div>
-                  <div class="payment-card__badge-secure">
-                    <BasicIconNext name="ShieldCheck" :size="16" />
-                  </div>
-                </button>
-
                 <!-- Crypto-monnaie -->
                 <button
                   class="payment-card"
@@ -476,7 +454,22 @@
                     :class="{ 'payment-methods__coming-chevron--open': showComingSoon }"
                   />
                 </button>
-                <!-- Contenu collapsible identique à l'original -->
+
+                <!-- Contenu collapsible - Virement bancaire -->
+                <div v-if="showComingSoon" class="payment-methods__coming-content">
+                  <div class="payment-card payment-card--disabled">
+                    <div class="payment-card__icon payment-card__icon--bank">
+                      <BasicIconNext name="Landmark" :size="24" />
+                    </div>
+                    <div class="payment-card__content">
+                      <span class="payment-card__title">{{ t('checkout.payment.bankTransfer') }}</span>
+                      <span class="payment-card__desc">{{ t('checkout.payment.bankTransferDesc') }}</span>
+                    </div>
+                    <div class="payment-card__badge-coming">
+                      {{ t('common.comingSoon') }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -630,7 +623,7 @@
   const isSubmitting = ref(false)
   const useProfileAddress = ref(true)
   const showComingSoon = ref(false)
-  const selectedPayment = ref<ManualPaymentMethod>('bank_transfer')
+  const selectedPayment = ref<ManualPaymentMethod>('crypto')
   const disclaimerAccepted = ref(false)
   const isRestoringFromStorage = ref(false) // Flag pour éviter les effets de bord pendant la restauration
 
@@ -1842,6 +1835,19 @@
     .payment-card__desc {
       font-size: 12px;
       color: @neutral-400;
+    }
+
+    .payment-card__badge-coming {
+      margin-left: auto;
+      padding: 4px 10px;
+      background: @neutral-100;
+      border-radius: 6px;
+      font-family: @font-body;
+      font-size: 11px;
+      font-weight: 600;
+      color: @neutral-500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   }
 

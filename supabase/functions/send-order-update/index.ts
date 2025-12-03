@@ -21,7 +21,7 @@ Deno.serve(
     const { data: order } = await supabase
       .from('orders_full_view')
       .select(
-        'shipping_email, order_number, carrier, tracking_number, user_id, tracking_token, total_amount, payment_method, shipping_full_name',
+        'shipping_email, order_number, carrier, tracking_number, user_id, tracking_token, total_amount, payment_method, shipping_name',
       )
       .eq('order_id', order_id)
       .maybeSingle()
@@ -51,7 +51,7 @@ Deno.serve(
 
       html = renderEmailTemplate('payment_validated', {
         order_number: displayId,
-        full_name: order.shipping_full_name,
+        full_name: order.shipping_name,
         total_amount: order.total_amount,
         payment_method: order.payment_method,
         ctaUrl,

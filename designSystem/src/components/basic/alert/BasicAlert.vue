@@ -38,10 +38,10 @@
   import {
     type AlertInputProps,
     type AlertType,
-    type IconName,
     type AlertSize,
     type TextSize,
   } from '@designSystem/components'
+  import type { IconName } from '@designSystem/fondation/icons/iconsList'
 
   withDefaults(defineProps<AlertInputProps>(), {
     hasBg: true,

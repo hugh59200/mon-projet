@@ -33,7 +33,8 @@
       "Bash(xargs sed:*)",
       "Bash(rm:*)",
       "Bash(echo:*)",
-      "Bash(deno cache:*)"
+      "Bash(deno cache:*)",
+      "Bash(xargs dirname:*)"
     ],
     "deny": [],
     "ask": []

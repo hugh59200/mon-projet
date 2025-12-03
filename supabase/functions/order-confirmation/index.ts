@@ -15,18 +15,18 @@ interface OrderConfirmationBody {
 }
 
 // ============================================================
-// CONFIGURATION PAIEMENT (Phase 1 - Hardcodé)
+// CONFIGURATION PAIEMENT (depuis variables d'environnement)
 // ============================================================
 
 const BANK_DETAILS: BankTransferDetails = {
-  beneficiary: 'Atlas Lab Solutions LLC',
-  iban: 'FR76 XXXX XXXX XXXX XXXX XXXX XXX', // TODO: Remplacer par le vrai IBAN
-  bic: 'XXXXXXXX', // TODO: Remplacer par le vrai BIC
+  beneficiary: Deno.env.get('BANK_BENEFICIARY') || 'Atlas Lab Solutions LLC',
+  iban: Deno.env.get('BANK_IBAN') || '',
+  bic: Deno.env.get('BANK_BIC') || '',
 }
 
 const CRYPTO_DETAILS: CryptoDetails = {
-  btc_address: 'bc1qXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', // TODO: Remplacer par la vraie adresse
-  usdt_address: 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', // TODO: Remplacer par la vraie adresse TRC-20
+  btc_address: Deno.env.get('CRYPTO_BTC_ADDRESS') || '',
+  usdt_address: Deno.env.get('CRYPTO_USDT_ADDRESS') || '',
 }
 
 // ============================================================

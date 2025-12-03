@@ -1134,7 +1134,7 @@ export default {
     newsletter: {
       title: 'Veille scientifique',
       subtitle: 'Recevoir les mises à jour',
-      placeholder: 'email@labo.com',
+      placeholder: "email{'@'}labo.com",
       subscribe: "OK",
       success: 'Inscrit !',
     },

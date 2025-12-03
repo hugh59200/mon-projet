@@ -59,15 +59,7 @@
 
 <script setup lang="ts">
   import { useDialog } from '@/features/interface/dialog'
-  import type {
-    AlertInputProps,
-    IconColor,
-    InputDateModel,
-    InputDureeModel,
-    InputNumberModel,
-    InputProps,
-    InputTelephoneModel,
-  } from '@designSystem/components'
+  import type { AlertInputProps, IconColor, InputProps } from '@designSystem/components'
   import BasicAlert from '@designSystem/components/basic/alert/BasicAlert.vue'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { computed } from 'vue'
@@ -90,8 +82,8 @@
   })
 
   /* --- v-model --- */
-  type InputModel = InputDateModel | InputDureeModel | InputTelephoneModel | InputNumberModel
-  const modelValue = defineModel<InputModel>()
+  type InputContainerModel = string | number | null | undefined
+  const modelValue = defineModel<InputContainerModel>()
 
   /* --- Détection de slot droit --- */
   const showRightIcons = computed(() => !!(props.iconState === 'iconRight' && props.iconName))
