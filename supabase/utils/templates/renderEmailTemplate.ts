@@ -17,6 +17,7 @@ import { recoveryTemplate } from './recoveryTemplate.ts'
 import { shippingTemplate } from './shippingTemplate.ts'
 import { signupConfirmationTemplate } from './signupConfirmationTemplate.ts'
 import { paymentValidatedTemplate } from './paymentValidatedTemplate.ts'
+import { statusUpdateTemplate } from './statusUpdateTemplate.ts'
 
 // Type générique pour les données d'email
 // deno-lint-ignore no-explicit-any
@@ -89,13 +90,16 @@ export function renderEmailTemplate(type: string, data: EmailData): string {
       const displayId = data.order_number ?? String(data.order_id).slice(0, 8)
       const ctaUrl = data.ctaUrl ?? `${APP_BASE_URL}/profil/commandes/${data.order_id}`
 
-      return genericTemplate({
-        title: t.title[locale](displayId),
-        message: `
-          ${t.statusChanged[locale]}<br/><br/>
-          ${data.message ?? ''}
-        `,
-        ctaLabel: t.ctaViewDetails[locale],
+      // Récupérer le label du statut traduit
+      const status = (data.status || 'pending').toLowerCase()
+      const statusLabels = t.statusLabels as Record<string, { fr: string; en: string }>
+      const statusLabel = statusLabels[status]?.[locale] || status
+
+      return statusUpdateTemplate({
+        order_number: displayId,
+        status: status,
+        statusLabel: statusLabel,
+        message: data.message ?? '',
         ctaUrl: ctaUrl,
         locale,
       })

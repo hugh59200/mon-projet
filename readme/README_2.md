@@ -3,7 +3,7 @@
 **Nom Commercial :** `fast-peptides` (Domaine via Njalla)
 **Entité Juridique :** `Atlas Lab Solutions LLC` (New Mexico, USA)
 **Logistique :** France (Stock déporté / Drop-shipping local)
-**Statut :** 🟢 **PRÊT POUR LANCEMENT** (Phase 1 : Crypto Only)
+**Statut :** 🟡 **PRÉ-LANCEMENT** (Finalisation Email Pro & DNS)
 
 ---
 
@@ -59,12 +59,15 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 - **Edge Functions :** Pour les opérations sensibles (Envoi email, appel IA).
 - **Backup :** Export SQL quotidien externe à prévoir (Souveraineté des données).
 
-### Communication (Resend)
+### Communication (Resend + Proton)
 
 - **Stratégie "Agnostique" :**
   - Nom d'expéditeur : "FP Store" (Pas de "Peptides").
   - Contenu : Neutre (Pas de liste de produits, juste un lien vers le compte client).
   - Footer : Nettoyé (Pas de réseaux sociaux).
+- **Infrastructure Email (En cours) :**
+  - Utilisation de **Proton Mail / Njalla Email** pour l'adresse admin (`admin@fast-peptides.com`).
+  - **Raison :** Éviter les logs et la surveillance systématique de Microsoft (Outlook) et Google (Gmail) sur les activités "High Risk".
 
 ---
 
@@ -111,19 +114,19 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 
 _Mise à jour : 03/12/2025_
 
-| Brique               |  Statut   | Notes                                                |
-| :------------------- | :-------: | :--------------------------------------------------- |
-| **Structure LLC**    |  🟢 Fait  | Créée (30/11), OA signé (03/12) & Archivé.           |
-| **Site Web (Vue 3)** |  🟢 Fait  | Déployé, Design "Labo" OK, Footer Clean.             |
-| **Base de Données**  |  🟢 Fait  | Supabase Configuré.                                  |
-| **Textes Légaux**    |  🟢 Fait  | CGV/Privacy intégrées (Spécial NM Law + RUO).        |
-| **Emails (Resend)**  |  🟢 Fait  | Templates transactionnels (Pending/Paid) OK.         |
-| **Mondial Relay**    |  🟢 Fait  | Widget intégré (Checkout).                           |
-| **Paiement Manuel**  |  🟢 Fait  | Flux Checkout -> Page Confirmation instructions OK.  |
-| **Config Crypto**    |  🟢 Fait  | Wallet Exodus configuré, Adresses réelles injectées. |
-| **Qualité (QA)**     |  🟢 Fait  | Tests E2E Cypress (Guest Checkout + Links) validés.  |
-| **SEO / GEO**        |  🟢 Fait  | Schema.org JSON-LD (CAS Number, Purity) intégré.     |
-| **Compte Banque**    | 🔴 Bloqué | Attente EIN (Délai IRS important).                   |
+| Brique                |   Statut    | Notes                                                          |
+| :-------------------- | :---------: | :------------------------------------------------------------- |
+| **Structure LLC**     |   🟢 Fait   | Créée (30/11), OA signé (03/12) & Archivé.                     |
+| **Site Web (Vue 3)**  |   🟢 Fait   | Déployé, Design "Labo" OK, Footer Clean.                       |
+| **Base de Données**   |   🟢 Fait   | Supabase Configuré.                                            |
+| **Textes Légaux**     |   🟢 Fait   | CGV/Privacy intégrées (Spécial NM Law + RUO).                  |
+| **Mondial Relay**     |   🟢 Fait   | Widget intégré (Checkout).                                     |
+| **Paiement Manuel**   |   🟢 Fait   | Flux Checkout -> Page Confirmation instructions OK.            |
+| **Config Crypto**     |   🟢 Fait   | Wallet Exodus configuré, Adresses réelles injectées.           |
+| **Qualité (QA)**      |   🟢 Fait   | Tests E2E Cypress (Guest Checkout + Links) validés.            |
+| **SEO / GEO**         |   🟢 Fait   | Schema.org JSON-LD (CAS Number, Purity) intégré.               |
+| **Email Pro (OpSec)** | 🟡 En cours | Création Proton/Njalla pour éviter logs GAFAM & Config Resend. |
+| **Compte Banque**     |  🔴 Bloqué  | Attente EIN (Délai IRS important).                             |
 
 ---
 

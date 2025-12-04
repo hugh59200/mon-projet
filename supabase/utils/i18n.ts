@@ -155,20 +155,48 @@ export const translations = {
   // ========== STATUS UPDATE ==========
   statusUpdate: {
     title: {
-      fr: (orderNumber: string) => `Mise à jour commande ${orderNumber}`,
-      en: (orderNumber: string) => `Order update ${orderNumber}`,
+      fr: (orderNumber: string) => `Mise à jour – Commande #${orderNumber}`,
+      en: (orderNumber: string) => `Update – Order #${orderNumber}`,
     },
     subject: {
-      fr: (orderNumber: string) => `Mise à jour – Commande ${orderNumber}`,
-      en: (orderNumber: string) => `Update – Order ${orderNumber}`,
+      fr: (orderNumber: string) => `Mise à jour – Commande #${orderNumber}`,
+      en: (orderNumber: string) => `Update – Order #${orderNumber}`,
     },
     statusChanged: {
       fr: 'Le statut de votre commande a évolué.',
       en: 'Your order status has changed.',
     },
     ctaViewDetails: {
-      fr: 'Voir les détails',
-      en: 'View details',
+      fr: 'Suivre ma commande',
+      en: 'Track my order',
+    },
+    orderInfo: {
+      fr: 'Informations de commande',
+      en: 'Order information',
+    },
+    orderNumber: {
+      fr: 'N° de commande',
+      en: 'Order number',
+    },
+    currentStatus: {
+      fr: 'Statut actuel',
+      en: 'Current status',
+    },
+    trackingNote: {
+      fr: 'Vous pouvez suivre l\'évolution de votre commande à tout moment depuis votre espace client.',
+      en: 'You can track your order status at any time from your account.',
+    },
+    // Labels de statut pour les badges
+    statusLabels: {
+      pending: { fr: 'En attente', en: 'Pending' },
+      confirmed: { fr: 'Confirmée', en: 'Confirmed' },
+      paid: { fr: 'Payée', en: 'Paid' },
+      processing: { fr: 'En préparation', en: 'Processing' },
+      shipped: { fr: 'Expédiée', en: 'Shipped' },
+      completed: { fr: 'Livrée', en: 'Delivered' },
+      canceled: { fr: 'Annulée', en: 'Canceled' },
+      refunded: { fr: 'Remboursée', en: 'Refunded' },
+      failed: { fr: 'Erreur', en: 'Failed' },
     },
   },
 
@@ -477,52 +505,52 @@ export const translations = {
   // ========== STATUS MESSAGES ==========
   status: {
     pending: {
-      fr: 'Elle est en attente de traitement. Nous la préparerons très bientôt. 🕓',
-      en: 'It is awaiting processing. We will prepare it very soon. 🕓',
+      fr: 'Votre commande est en attente de traitement. Notre équipe la prendra en charge dans les plus brefs délais.',
+      en: 'Your order is awaiting processing. Our team will handle it as soon as possible.',
     },
     confirmed: {
-      fr: 'Elle a bien été confirmée ✅ et sera bientôt préparée.',
-      en: 'It has been confirmed ✅ and will be prepared soon.',
+      fr: 'Votre commande a été confirmée avec succès. Elle sera préparée sous 24 à 48 heures.',
+      en: 'Your order has been successfully confirmed. It will be prepared within 24 to 48 hours.',
     },
     paid: {
-      fr: 'Le paiement a été reçu 💳. Votre commande va être préparée.',
-      en: 'Payment has been received 💳. Your order will be prepared.',
+      fr: 'Nous avons bien reçu votre paiement. Votre commande entre maintenant en phase de préparation.',
+      en: 'We have received your payment. Your order is now entering the preparation phase.',
     },
     processing: {
-      fr: 'Elle est actuellement en cours de préparation. 🧪',
-      en: 'It is currently being prepared. 🧪',
+      fr: 'Votre commande est actuellement en cours de préparation par notre équipe.',
+      en: 'Your order is currently being prepared by our team.',
     },
     shipped: {
-      fr: 'Elle a été expédiée 🚚. Vous la recevrez très prochainement.',
-      en: 'It has been shipped 🚚. You will receive it very soon.',
+      fr: 'Votre commande a été expédiée. Vous la recevrez sous 2 à 5 jours ouvrés selon votre localisation.',
+      en: 'Your order has been shipped. You will receive it within 2 to 5 business days depending on your location.',
     },
     completed: {
-      fr: 'Elle a été livrée avec succès 🎉. Merci de votre confiance !',
-      en: 'It has been successfully delivered 🎉. Thank you for your trust!',
+      fr: 'Votre commande a été livrée avec succès. Merci pour votre confiance !',
+      en: 'Your order has been successfully delivered. Thank you for your trust!',
     },
     canceled: {
-      fr: "Elle a été annulée ❌. Si vous pensez qu'il s'agit d'une erreur, contactez notre support.",
-      en: 'It has been canceled ❌. If you believe this is an error, please contact our support.',
+      fr: "Votre commande a été annulée. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre service client.",
+      en: 'Your order has been canceled. If you believe this is an error, please contact our customer service.',
     },
     refunded: {
-      fr: 'Votre commande a été remboursée 💰. Le montant sera crédité sous 5-10 jours ouvrés.',
-      en: 'Your order has been refunded 💰. The amount will be credited within 5-10 business days.',
+      fr: 'Votre commande a été remboursée. Le montant sera crédité sur votre compte sous 5 à 10 jours ouvrés.',
+      en: 'Your order has been refunded. The amount will be credited to your account within 5 to 10 business days.',
     },
     failed: {
-      fr: "Une erreur s'est produite avec votre commande ⚠️. Veuillez contacter notre support.",
-      en: 'An error occurred with your order ⚠️. Please contact our support.',
+      fr: "Un problème est survenu avec votre commande. Veuillez contacter notre service client pour plus d'informations.",
+      en: 'An issue occurred with your order. Please contact our customer service for more information.',
     },
     defaultUpdate: {
-      fr: (status: string) => `Son statut a été mis à jour : <b>${status}</b>`,
-      en: (status: string) => `Its status has been updated to: <b>${status}</b>`,
+      fr: (status: string) => `Le statut de votre commande a été mis à jour : <b>${status}</b>`,
+      en: (status: string) => `Your order status has been updated to: <b>${status}</b>`,
     },
     carrierLabel: {
       fr: 'Transporteur',
       en: 'Carrier',
     },
     trackingLabel: {
-      fr: 'Numéro / lien de suivi',
-      en: 'Tracking number / link',
+      fr: 'Numéro de suivi',
+      en: 'Tracking number',
     },
   },
 } as const

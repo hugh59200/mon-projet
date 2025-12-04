@@ -67,6 +67,7 @@ Deno.serve(
       html = renderEmailTemplate('status_update', {
         order_id,
         order_number: displayId,
+        status: status.toLowerCase(), // Pour le template premium avec icônes
         message,
         ctaUrl,
         locale,
