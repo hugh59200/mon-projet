@@ -13,7 +13,12 @@ describe('Panier - Gestion des articles', () => {
   })
 
   it('Affiche le panier vide avec message', () => {
+    // Visiter d'abord, puis nettoyer le localStorage et recharger
     cy.visit('/panier')
+    cy.window().then((win) => {
+      win.localStorage.removeItem('fp-cart-storage')
+    })
+    cy.reload()
 
     // Vérifier l'état vide
     cy.get('.cart__empty').should('be.visible')

@@ -16,12 +16,6 @@
         </transition>
       </RouterView>
 
-      <transition
-        name="fade"
-        appear
-      >
-        <SablierComponent v-if="sablier.estSablierVisible" />
-      </transition>
     </main>
 
     <footer
@@ -45,8 +39,6 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
-  import SablierComponent from '@/features/interface/sablier/SablierComponent.vue'
-  import { useSablierStore } from '@/features/interface/sablier/useSablierStore'
   import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
@@ -59,7 +51,6 @@
   })
 
   const route = useRoute()
-  const sablier = useSablierStore()
   const cart = useCartStore()
 
   const isAuthPage = computed(() => {

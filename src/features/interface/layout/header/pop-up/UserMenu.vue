@@ -267,6 +267,7 @@
     &__link {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 12px;
       width: 100%;
       padding: 10px 12px;
@@ -279,6 +280,10 @@
       cursor: pointer;
       transition: all 0.2s @ease;
       text-align: left;
+
+      :deep(.pbtn__content) {
+        justify-content: flex-start;
+      }
 
       &:hover {
         background: rgba(var(--neutral-100-rgb), 0.04);
@@ -329,6 +334,7 @@
     &__logout {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 12px;
       width: 100%;
       padding: 10px 12px;
@@ -340,6 +346,10 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s @ease;
+
+      :deep(.pbtn__content) {
+        justify-content: flex-start;
+      }
 
       &:hover {
         background: rgba(@danger-500, 0.1);

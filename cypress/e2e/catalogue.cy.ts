@@ -127,11 +127,17 @@ describe('Catalogue - Navigation et Filtres', () => {
   })
 
   it('Navigue vers un produit au clic', () => {
-    // Cliquer sur le premier produit
-    cy.get('[class*="product-card"]').first().click()
+    // S'assurer de partir d'une page fraîche avec tous les produits
+    cy.visit('/catalogue')
+
+    // Attendre que les produits soient chargés
+    cy.get('[class*="product-card"]', { timeout: 15000 }).should('have.length.greaterThan', 0)
+
+    // Cliquer sur l'image du premier produit
+    cy.get('[class*="product-card"]').first().find('.product-card__image').click()
 
     // Vérifier la redirection vers la page produit
-    cy.url().should('match', /\/catalogue\/[a-z0-9-]+/)
+    cy.url().should('match', /\/catalogue\/[a-z0-9-]+/, { timeout: 15000 })
   })
 
   it('Affiche un état vide pour une recherche sans résultat', () => {

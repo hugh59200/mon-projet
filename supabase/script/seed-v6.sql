@@ -47,15 +47,93 @@ COMMENT ON COLUMN public.products.cas_number IS 'Numéro CAS (Chemical Abstracts
 COMMENT ON COLUMN public.products.sequence IS 'Séquence d''acides aminés du peptide';
 
 -- ============================
+-- 👤 SEED — AUTH USERS
+-- ============================
+-- Création de l'utilisateur admin avec mot de passe: 162497
+
+-- Utiliser un UUID fixe pour pouvoir référencer l'utilisateur
+DO $$
+DECLARE
+  v_user_id uuid := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+BEGIN
+  -- Supprimer les identities et l'utilisateur existants
+  DELETE FROM auth.identities WHERE auth.identities.user_id IN (SELECT id FROM auth.users WHERE email = 'h.bogrand@gmail.com');
+  DELETE FROM auth.users WHERE email = 'h.bogrand@gmail.com';
+
+  -- Créer l'utilisateur avec le mot de passe
+  INSERT INTO auth.users (
+    id,
+    instance_id,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    updated_at,
+    role,
+    aud,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    confirmation_token,
+    recovery_token,
+    email_change_token_new,
+    email_change
+  )
+  VALUES (
+    v_user_id,
+    '00000000-0000-0000-0000-000000000000',
+    'h.bogrand@gmail.com',
+    crypt('162497', gen_salt('bf')),
+    now(),
+    now(),
+    now(),
+    'authenticated',
+    'authenticated',
+    '{"provider": "email", "providers": ["email"]}',
+    '{}',
+    '',
+    '',
+    '',
+    ''
+  );
+
+  -- Créer l'identity pour l'authentification email
+  INSERT INTO auth.identities (
+    id,
+    user_id,
+    provider_id,
+    provider,
+    identity_data,
+    last_sign_in_at,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    v_user_id,
+    v_user_id,
+    'h.bogrand@gmail.com',
+    'email',
+    jsonb_build_object(
+      'sub', v_user_id::text,
+      'email', 'h.bogrand@gmail.com',
+      'email_verified', true,
+      'provider', 'email'
+    ),
+    now(),
+    now(),
+    now()
+  );
+END $$;
+
+-- ============================
 -- 👤 SEED — PROFILES
 -- ============================
 INSERT INTO public.profiles (id, email, full_name, role)
 VALUES
-((SELECT id FROM auth.users WHERE email = 'lucas.martin@example.com'), 'lucas.martin@example.com', 'Lucas Martin', 'user'),
-((SELECT id FROM auth.users WHERE email = 'maxime.riviere@example.com'), 'maxime.riviere@example.com', 'Maxime Rivière', 'user'),
-((SELECT id FROM auth.users WHERE email = 'h.bogrand@gmail.com'), 'h.bogrand@gmail.com', 'Hugo Bogrand', 'admin'),
-((SELECT id FROM auth.users WHERE email = 'emma.dupont@example.com'), 'emma.dupont@example.com', 'Emma Dupont', 'user')
-ON CONFLICT (id) DO NOTHING;
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'h.bogrand@gmail.com', 'Hugo Bogrand', 'admin')
+ON CONFLICT (id) DO UPDATE SET
+  email = EXCLUDED.email,
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role;
 
 -- ============================
 -- 📦 SEED — PRODUCTS AVEC I18N + SEO

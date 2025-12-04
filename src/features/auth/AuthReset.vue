@@ -11,6 +11,7 @@
         :label="t('auth.reset.email')"
         placeholder="nom@entreprise.com"
         inputmode="email"
+        autocomplete="email"
         iconName="Mail"
         required
         :alertLabel="touched.email ? errors.email : ''"

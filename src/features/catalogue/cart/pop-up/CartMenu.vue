@@ -321,6 +321,7 @@
       border-radius: 12px;
       transition: background 0.2s;
       position: relative;
+      width: 100%;
 
       &:hover {
         background: rgba(var(--neutral-100-rgb), 0.03);

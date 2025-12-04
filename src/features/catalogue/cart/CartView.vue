@@ -40,6 +40,8 @@
             :label="t('cart.clear')"
             icon-left="Trash2"
             class="cart__clear"
+            :loading="isClearing"
+            :disabled="isClearing"
             @click="confirmClearCart"
           />
         </div>
@@ -192,7 +194,8 @@
                     size="xs"
                     icon-left="Minus"
                     class="cart-item__qty-btn"
-                    :disabled="(item.quantity ?? 1) <= 1"
+                    :disabled="(item.quantity ?? 1) <= 1 || isItemUpdating(item.product_id)"
+                    :loading="isItemUpdating(item.product_id)"
                     @click="updateQuantity(item, -1)"
                   />
                   <input
@@ -200,6 +203,7 @@
                     class="cart-item__qty-input"
                     :value="item.quantity ?? 1"
                     min="1"
+                    :disabled="isItemUpdating(item.product_id)"
                     @change="handleQuantityChange(item, $event)"
                   />
                   <PremiumButton
@@ -208,6 +212,8 @@
                     size="xs"
                     icon-left="Plus"
                     class="cart-item__qty-btn"
+                    :disabled="isItemUpdating(item.product_id)"
+                    :loading="isItemUpdating(item.product_id)"
                     @click="updateQuantity(item, 1)"
                   />
                 </div>
@@ -228,6 +234,8 @@
                   size="xs"
                   icon-left="Trash2"
                   class="cart-item__remove"
+                  :loading="isItemUpdating(item.product_id)"
+                  :disabled="isItemUpdating(item.product_id)"
                   @click="removeItem(item)"
                 />
               </div>
@@ -241,7 +249,8 @@
                     size="xs"
                     icon-left="Minus"
                     class="cart-item__qty-btn"
-                    :disabled="(item.quantity ?? 1) <= 1"
+                    :disabled="(item.quantity ?? 1) <= 1 || isItemUpdating(item.product_id)"
+                    :loading="isItemUpdating(item.product_id)"
                     @click="updateQuantity(item, -1)"
                   />
                   <span class="cart-item__qty-value">{{ item.quantity ?? 1 }}</span>
@@ -251,6 +260,8 @@
                     size="xs"
                     icon-left="Plus"
                     class="cart-item__qty-btn"
+                    :disabled="isItemUpdating(item.product_id)"
+                    :loading="isItemUpdating(item.product_id)"
                     @click="updateQuantity(item, 1)"
                   />
                 </div>
@@ -383,7 +394,7 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
 
@@ -407,6 +418,10 @@
   const cart = useCartStore()
   const router = useRouter()
   const toast = useToastStore()
+
+  // Loading states
+  const updatingItems = ref<Set<string>>(new Set())
+  const isClearing = ref(false)
 
   // Constants
   const FREE_SHIPPING_THRESHOLD = 100
@@ -454,35 +469,59 @@
     return 0
   }
 
-  function updateQuantity(item: CartView, delta: number) {
+  async function updateQuantity(item: CartView, delta: number) {
     const newQty = (item.quantity ?? 1) + delta
     if (newQty >= 1 && item.product_id) {
-      cart.updateQuantity(item.product_id, newQty)
+      updatingItems.value.add(item.product_id)
+      try {
+        await cart.updateQuantity(item.product_id, newQty)
+      } finally {
+        updatingItems.value.delete(item.product_id)
+      }
     }
   }
 
-  function handleQuantityChange(item: CartView, event: Event) {
+  async function handleQuantityChange(item: CartView, event: Event) {
     const input = event.target as HTMLInputElement
     const newQty = parseInt(input.value)
     if (newQty >= 1 && item.product_id) {
-      cart.updateQuantity(item.product_id, newQty)
+      updatingItems.value.add(item.product_id)
+      try {
+        await cart.updateQuantity(item.product_id, newQty)
+      } finally {
+        updatingItems.value.delete(item.product_id)
+      }
     } else {
       input.value = String(item.quantity ?? 1)
     }
   }
 
-  function removeItem(item: CartView) {
+  async function removeItem(item: CartView) {
     if (item.product_id) {
-      cart.removeFromCart(item.product_id)
-      toast.show(`${item.product_name} ${t('cart.remove').toLowerCase()}`, 'info')
+      updatingItems.value.add(item.product_id)
+      try {
+        await cart.removeFromCart(item.product_id)
+        toast.show(`${item.product_name} ${t('cart.remove').toLowerCase()}`, 'info')
+      } finally {
+        updatingItems.value.delete(item.product_id)
+      }
     }
   }
 
-  function confirmClearCart() {
+  async function confirmClearCart() {
     if (confirm(t('cart.clear') + ' ?')) {
-      cart.clearCart()
-      toast.show(t('cart.clear'), 'info')
+      isClearing.value = true
+      try {
+        await cart.clearCart()
+        toast.show(t('cart.clear'), 'info')
+      } finally {
+        isClearing.value = false
+      }
     }
+  }
+
+  function isItemUpdating(productId: string | null) {
+    return productId ? updatingItems.value.has(productId) : false
   }
 
   function viewProduct(id: string) {

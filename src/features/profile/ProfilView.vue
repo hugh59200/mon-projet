@@ -13,7 +13,7 @@
       v-motion-slide-visible-once-bottom
     >
       <div class="profil__header">
-        <div class="profil__avatar">
+        <div class="profil__avatar" :class="{ 'profil__avatar--uploading': isUploadingAvatar }">
           <img
             v-if="avatarPreview"
             :src="avatarPreview"
@@ -34,10 +34,13 @@
             type="file"
             accept="image/*"
             class="profil__avatar-input"
+            :disabled="isUploadingAvatar"
             @change="handleAvatarSelect"
           />
           <div class="profil__avatar-overlay">
+            <BasicLoader v-if="isUploadingAvatar" size="small" />
             <BasicIconNext
+              v-else
               name="Camera"
               :size="20"
             />
@@ -476,6 +479,9 @@
   const newsletter = ref(false)
   const preferencesLoading = ref(false)
 
+  // Avatar upload
+  const isUploadingAvatar = ref(false)
+
   // Sécurité
   const loading = ref(false)
   const newPassword = ref('')
@@ -610,11 +616,16 @@
     const file = target.files?.[0]
     if (!file || !auth.user) return
 
-    const publicUrl = await changeAvatar(auth.user.id, file)
+    isUploadingAvatar.value = true
+    try {
+      const publicUrl = await changeAvatar(auth.user.id, file)
 
-    if (publicUrl) {
-      avatarPreview.value = publicUrl
-      toast.show('Avatar mis à jour 🎨', 'success')
+      if (publicUrl) {
+        avatarPreview.value = publicUrl
+        toast.show('Avatar mis à jour', 'success')
+      }
+    } finally {
+      isUploadingAvatar.value = false
     }
   }
 
@@ -873,8 +884,17 @@
         transition: opacity 0.3s ease;
         z-index: 10;
 
-        .profil__avatar:hover & {
+        .profil__avatar:hover &,
+        .profil__avatar--uploading & {
           opacity: 1;
+        }
+      }
+
+      &--uploading {
+        pointer-events: none;
+
+        .profil__avatar-input {
+          cursor: wait;
         }
       }
 

@@ -4,6 +4,13 @@
     <PageHeader />
 
     <PageContent size="xl">
+      <!-- Loading State -->
+      <div v-if="isLoading" class="actualites__loading">
+        <BasicLoader size="medium" />
+        <p class="actualites__loading-text">Chargement des articles...</p>
+      </div>
+
+      <template v-else>
       <!-- Topics Carousel -->
       <section
         v-if="topics.length && featuredArticle"
@@ -423,6 +430,7 @@
           </div>
         </div>
       </footer>
+      </template>
     </PageContent>
   </div>
 </template>
@@ -568,6 +576,25 @@
     position: relative;
     min-height: 100vh;
     padding-bottom: 80px;
+
+    // ===========================
+    // LOADING STATE
+    // ===========================
+    &__loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px;
+      gap: 20px;
+    }
+
+    &__loading-text {
+      font-family: @font-body;
+      font-size: 15px;
+      color: @neutral-500;
+      margin: 0;
+    }
 
     // ===========================
     // SECTION HEADERS
