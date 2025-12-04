@@ -81,90 +81,62 @@
             <div class="recon__inputs">
               <!-- Peptide Amount -->
               <div class="recon__input-group">
-                <label class="recon__label">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                    />
-                  </svg>
-                  Quantité de Peptide (Vial)
-                </label>
-                <div class="recon__input-wrapper">
-                  <input
-                    type="number"
-                    v-model="vialMg"
-                    min="1"
-                    step="1"
-                    class="recon__input"
-                  />
-                  <span class="recon__input-unit">mg</span>
-                </div>
-                <span class="recon__input-hint">Ex: 2mg, 5mg, 10mg...</span>
+                <WrapperFormElements
+                  label="Quantité de Peptide (Vial)"
+                  hint="Ex: 2mg, 5mg, 10mg..."
+                >
+                  <div class="recon__input-with-unit">
+                    <InputContainer size="medium" icon-name="FlaskConical" icon-state="iconLeft">
+                      <input
+                        type="number"
+                        v-model.number="vialMg"
+                        min="1"
+                        step="1"
+                      />
+                    </InputContainer>
+                    <span class="recon__input-unit">mg</span>
+                  </div>
+                </WrapperFormElements>
               </div>
 
               <!-- Water Amount -->
               <div class="recon__input-group">
-                <label class="recon__label">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
-                  </svg>
-                  Eau Bactériostatique Ajoutée
-                </label>
-                <div class="recon__input-wrapper">
-                  <input
-                    type="number"
-                    v-model="waterMl"
-                    min="0.5"
-                    step="0.1"
-                    class="recon__input"
-                  />
-                  <span class="recon__input-unit">ml</span>
-                </div>
-                <span class="recon__input-hint">Généralement 1ml ou 2ml</span>
+                <WrapperFormElements
+                  label="Eau Bactériostatique Ajoutée"
+                  hint="Généralement 1ml ou 2ml"
+                >
+                  <div class="recon__input-with-unit">
+                    <InputContainer size="medium" icon-name="Droplets" icon-state="iconLeft">
+                      <input
+                        type="number"
+                        v-model.number="waterMl"
+                        min="0.5"
+                        step="0.1"
+                      />
+                    </InputContainer>
+                    <span class="recon__input-unit">ml</span>
+                  </div>
+                </WrapperFormElements>
               </div>
 
               <!-- Desired Dose -->
               <div class="recon__input-group">
-                <label class="recon__label">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"
-                    />
-                  </svg>
-                  Dose de Recherche Désirée
-                </label>
-                <div class="recon__input-wrapper">
-                  <input
-                    type="number"
-                    v-model="doseMcg"
-                    min="10"
-                    step="10"
-                    class="recon__input"
-                  />
-                  <span class="recon__input-unit">mcg</span>
-                </div>
-                <span class="recon__input-hint">Ex: 100mcg, 250mcg...</span>
+                <WrapperFormElements
+                  label="Dose de Recherche Désirée"
+                  hint="Ex: 100mcg, 250mcg..."
+                >
+                  <div class="recon__input-with-unit">
+                    <InputContainer size="medium" icon-name="Heart" icon-state="iconLeft">
+                      <input
+                        type="number"
+                        v-model.number="doseMcg"
+                        min="10"
+                        step="10"
+                      />
+                    </InputContainer>
+                    <span class="recon__input-unit">mcg</span>
+                  </div>
+                </WrapperFormElements>
               </div>
 
               <!-- Quick Presets -->
@@ -815,22 +787,25 @@
       }
     }
 
+    &__input-with-unit {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+
+      > :first-child {
+        flex: 1;
+      }
+    }
+
     &__input-unit {
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
       color: @neutral-400;
-      margin-left: 12px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: @neutral-100;
       border-radius: 8px;
-    }
-
-    &__input-hint {
-      font-family: @font-body;
-      font-size: 12px;
-      color: @neutral-400;
-      padding-left: 4px;
+      margin-bottom: 22px; // Aligner avec l'input (au-dessus du hint)
     }
 
     // ============================================

@@ -95,25 +95,17 @@
 
             <!-- Recherche -->
             <div class="relay-modal__search">
-              <div class="relay-modal__search-field">
-                <BasicIconNext name="Search" :size="2" />
-                <input
-                  v-model="postcodeInput"
-                  type="text"
-                  placeholder="Entrez votre code postal..."
-                  class="relay-modal__search-input"
-                  @keyup.enter="handleSearch"
-                />
-                <PremiumButton
-                  v-if="postcodeInput"
-                  type="secondary"
-                  variant="ghost"
-                  size="xs"
-                  icon-left="X"
-                  class="relay-modal__search-clear"
-                  @click="postcodeInput = ''"
-                />
-              </div>
+              <BasicInput
+                v-model="postcodeInput"
+                placeholder="Entrez votre code postal..."
+                icon-name="Search"
+                icon-state="iconLeft"
+                deletable
+                size="medium"
+                autocomplete="postal-code"
+                class="relay-modal__search-field"
+                @keyup.enter="handleSearch"
+              />
               <PremiumButton
                 type="primary"
                 variant="solid"

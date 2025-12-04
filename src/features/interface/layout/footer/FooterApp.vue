@@ -78,9 +78,12 @@
             </div>
           </div>
           <div class="footer__newsletter-form">
-            <input
-              type="email"
+            <BasicInput
               :placeholder="t('footer.newsletter.placeholder')"
+              icon-name="Mail"
+              icon-state="iconLeft"
+              autocomplete="email"
+              size="medium"
               class="footer__newsletter-input"
             />
             <PremiumButton

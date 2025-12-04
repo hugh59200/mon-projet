@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
   import { getSession, verifyOtp } from '@/api'
+  import { getPostLoginRedirect } from '@/router'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import BasicLoader from '@designSystem/components/basic/loader/BasicLoader.vue'
   import { onMounted, ref } from 'vue'
@@ -110,9 +111,10 @@
       state.value = 'success'
       message.value = `${t('auth.callback.welcome')} ${user.email}`
 
-      // Redirection intelligente
-      const redirectUrl =
-        sessionStorage.getItem('redirectAfterOAuth') || (auth.isAdmin ? '/admin' : '/profil')
+      // Redirection intelligente basée sur le rôle
+      const storedRedirect = sessionStorage.getItem('redirectAfterOAuth')
+      const userRole = auth.profile?.role || 'user'
+      const redirectUrl = getPostLoginRedirect(userRole, storedRedirect || null)
       sessionStorage.removeItem('redirectAfterOAuth')
 
       setTimeout(() => router.replace(redirectUrl), 1500)

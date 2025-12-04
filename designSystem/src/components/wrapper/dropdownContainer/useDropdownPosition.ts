@@ -16,14 +16,10 @@ export function useDropdownPosition(
     const direction = dropdownDirection.value
     const offsetDown = -4
     const offsetUp = 14
-    const shiftLeftUp = 2
 
     const menuHeight = menuRef.value?.offsetHeight || 0
 
-    const leftPosition =
-      direction === 'up'
-        ? `${rect.left + window.scrollX - shiftLeftUp}px`
-        : `${rect.left + window.scrollX}px`
+    const leftPosition = `${rect.left + window.scrollX}px`
 
     menuPositionStyle.value = {
       position: 'absolute',

@@ -29,15 +29,15 @@
         v-if="isMobile"
         class="catalogue-mobile-bar"
       >
-        <div class="catalogue-search catalogue-search--mobile">
-          <BasicIconNext name="Search" :size="18" />
-          <input
-            v-model="searchTerm"
-            type="text"
-            class="catalogue-search__input"
-            :placeholder="t('common.search') + '...'"
-          />
-        </div>
+        <BasicInput
+          v-model="searchTerm"
+          :placeholder="t('common.search') + '...'"
+          icon-name="Search"
+          icon-state="iconLeft"
+          deletable
+          size="medium"
+          class="catalogue-search catalogue-search--mobile"
+        />
         <PremiumButton
           type="primary"
           variant="outline"
@@ -85,27 +85,16 @@
         <!-- Toolbar -->
         <div class="catalogue-toolbar">
           <!-- Search Desktop -->
-          <div
+          <BasicInput
             v-if="!isMobile"
+            v-model="searchTerm"
+            :placeholder="t('catalogue.searchPlaceholder')"
+            icon-name="Search"
+            icon-state="iconLeft"
+            deletable
+            size="small"
             class="catalogue-search"
-          >
-            <BasicIconNext name="Search" :size="18" />
-            <input
-              v-model="searchTerm"
-              type="text"
-              class="catalogue-search__input"
-              :placeholder="t('catalogue.searchPlaceholder')"
-            />
-            <PremiumButton
-              v-if="searchTerm"
-              type="secondary"
-              variant="ghost"
-              size="xs"
-              icon-left="X"
-              class="catalogue-search__clear"
-              @click="searchTerm = ''"
-            />
-          </div>
+          />
 
           <!-- Results count - bien séparé -->
           <div class="catalogue-toolbar__results">
@@ -118,17 +107,14 @@
           <!-- Right side controls -->
           <div class="catalogue-toolbar__right">
             <!-- Sort -->
-            <select
+            <WrapperDropdown
               v-model="sortBy"
-              class="catalogue-toolbar__select"
-            >
-              <option
-                v-for="item in sortItems"
-                :value="item"
-              >
-                {{ item.label }}
-              </option>
-            </select>
+              :items="sortItems"
+              placeholder="Trier par"
+              size="small"
+              force-value
+              class="catalogue-toolbar__dropdown"
+            />
 
             <!-- View Mode Toggle -->
             <div class="catalogue-toolbar__view">
@@ -242,6 +228,7 @@
               v-for="product in paginatedProducts"
               :key="product.id"
               :product="product"
+              :view-mode="viewMode"
               @view="viewProduct"
               @add="addToCart"
               @buy="handleBuyNow"
@@ -752,28 +739,41 @@
         margin-left: auto;
       }
 
-      &__select {
-        padding: 10px 36px 10px 14px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        font-family: @font-body;
-        font-size: 13px;
-        color: @neutral-200;
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
+      &__dropdown {
+        min-width: 160px;
 
-        &:focus {
-          outline: none;
-          border-color: var(--primary-500);
+        // Style "secondary outline" pour le dark mode
+        :deep(.dropdown) {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 10px;
+
+          &:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.03);
+          }
+
+          input {
+            background: transparent;
+            color: @neutral-200;
+            font-family: @font-body;
+            font-size: 13px;
+
+            &::placeholder {
+              color: @neutral-500;
+            }
+          }
+
+          svg {
+            background: transparent;
+            fill: @neutral-400;
+          }
         }
 
-        option {
-          background: var(--secondary-900);
-          color: @neutral-200;
+        :deep(.dropdown__menu) {
+          background: rgba(var(--secondary-900-rgb), 0.95);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
       }
 
@@ -830,66 +830,50 @@
     // SEARCH
     // =========================================
     &-search {
-      position: relative;
       flex: 1;
-      display: flex;
-      max-width: 320px;
-      min-width: 180px;
+      max-width: 280px;
+      min-width: 160px;
 
       &--mobile {
         flex: 1;
         max-width: none;
       }
 
-      &__icon {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: @neutral-500;
-        pointer-events: none;
-      }
-
-      &__input {
-        width: 100%;
-        padding: 10px 14px 10px 42px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        font-family: @font-body;
-        font-size: 14px;
-        color: @neutral-100;
-        outline: none;
-
-        &::placeholder {
-          color: @neutral-600;
-        }
-
-        &:focus {
-          border-color: var(--primary-500);
-          box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
-        }
-      }
-
-      &__clear {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 22px;
-        height: 22px;
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        border-radius: 6px;
-        color: @neutral-400;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      // Style "secondary ghost" pour BasicInput
+      :deep(.input-container) {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        height: 36px;
+        padding: 0 10px;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.15);
-          color: @neutral-100;
+          border-color: rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.02);
+        }
+
+        &:focus-within {
+          border-color: rgba(255, 255, 255, 0.25);
+          background: rgba(255, 255, 255, 0.03);
+          box-shadow: none;
+        }
+
+        input {
+          background: transparent;
+          color: @neutral-200;
+          font-family: @font-body;
+          font-size: 13px;
+          padding: 0 4px;
+
+          &::placeholder {
+            color: @neutral-500;
+          }
+        }
+
+        svg {
+          background: transparent;
+          color: @neutral-400;
+          transform: scale(0.85);
         }
       }
 

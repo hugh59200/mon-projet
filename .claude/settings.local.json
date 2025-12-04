@@ -5,7 +5,9 @@
       "Bash(tree:*)",
       "Bash(node scripts/upload-images.js:*)",
       "Bash(npx cypress run:*)",
-      "Bash(node scripts/upload-images.cjs:*)"
+      "Bash(node scripts/upload-images.cjs:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

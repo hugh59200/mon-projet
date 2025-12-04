@@ -300,41 +300,34 @@
               <!-- Champs email et nom (toujours visibles) -->
               <div class="checkout__form-row">
                 <div class="checkout__field">
-                  <label class="checkout__label">
-                    <BasicIconNext name="Mail" :size="16" />
-                    Email *
-                  </label>
-                  <input
+                  <WrapperInput
                     v-model="email"
-                    type="email"
-                    class="checkout__input"
-                    :class="{ 'checkout__input--error': touched.email && errors.email }"
+                    label="Email"
+                    required
                     placeholder="votre@email.com"
+                    icon-name="Mail"
+                    icon-state="iconLeft"
+                    autocomplete="email"
                     :readonly="!!auth.user"
+                    :alert-label="touched.email && errors.email ? errors.email : undefined"
+                    :alert-type="touched.email && errors.email ? 'danger' : undefined"
                     @blur="onFieldBlur('email')"
                   />
-                  <span v-if="touched.email && errors.email" class="checkout__error">
-                    {{ errors.email }}
-                  </span>
                 </div>
                 <div class="checkout__field">
-                  <label class="checkout__label">
-                    <BasicIconNext name="User" :size="16" />
-                    Nom complet *
-                  </label>
-                  <input
+                  <WrapperInput
                     v-model="fullName"
-                    type="text"
-                    class="checkout__input"
-                    :class="{ 'checkout__input--error': touched.fullName && errors.fullName }"
+                    label="Nom complet"
+                    required
                     placeholder="Prénom Nom"
-                    minlength="3"
+                    icon-name="User"
+                    icon-state="iconLeft"
+                    autocomplete="name"
+                    :alert-label="touched.fullName && errors.fullName ? errors.fullName : undefined"
+                    :alert-type="touched.fullName && errors.fullName ? 'danger' : undefined"
                     @input="onFullNameInput"
                     @blur="onFieldBlur('fullName')"
                   />
-                  <span v-if="touched.fullName && errors.fullName" class="checkout__error">
-                    {{ errors.fullName }}
-                  </span>
                 </div>
               </div>
 
@@ -355,71 +348,56 @@
                 </div>
                 <!-- Champ classique pour les autres pays -->
                 <div v-else class="checkout__field">
-                  <label class="checkout__label">
-                    <BasicIconNext name="MapPin" :size="16" />
-                    Adresse *
-                  </label>
-                  <input
+                  <WrapperInput
                     v-model="address"
-                    type="text"
-                    class="checkout__input"
-                    :class="{ 'checkout__input--error': touched.address && errors.address }"
+                    label="Adresse"
+                    required
                     placeholder="Numéro et nom de rue"
-                    minlength="5"
+                    icon-name="MapPin"
+                    icon-state="iconLeft"
+                    autocomplete="street-address"
+                    :alert-label="touched.address && errors.address ? errors.address : undefined"
+                    :alert-type="touched.address && errors.address ? 'danger' : undefined"
                     @blur="onFieldBlur('address')"
                   />
-                  <span v-if="touched.address && errors.address" class="checkout__error">
-                    {{ errors.address }}
-                  </span>
                 </div>
 
                 <div class="checkout__form-row checkout__form-row--3">
                   <div class="checkout__field">
-                    <label class="checkout__label">{{ t('checkout.shipping.postalCode') }} *</label>
-                    <input
-                      :value="zip"
-                      type="text"
-                      inputmode="numeric"
-                      class="checkout__input"
-                      :class="{ 'checkout__input--error': touched.zip && errors.zip }"
+                    <WrapperInput
+                      :model-value="zip"
+                      :label="t('checkout.shipping.postalCode')"
+                      required
                       placeholder="75001"
-                      maxlength="10"
-                      @input="onZipInput"
+                      :maxlength="10"
+                      autocomplete="postal-code"
+                      :alert-label="touched.zip && errors.zip ? errors.zip : undefined"
+                      :alert-type="touched.zip && errors.zip ? 'danger' : undefined"
+                      @update:model-value="onZipInput"
                       @blur="onFieldBlur('zip')"
                     />
-                    <span v-if="touched.zip && errors.zip" class="checkout__error">
-                      {{ errors.zip }}
-                    </span>
                   </div>
                   <div class="checkout__field checkout__field--grow">
-                    <label class="checkout__label">{{ t('checkout.shipping.city') }} *</label>
-                    <input
+                    <WrapperInput
                       v-model="city"
-                      type="text"
-                      class="checkout__input"
-                      :class="{ 'checkout__input--error': touched.city && errors.city }"
+                      :label="t('checkout.shipping.city')"
+                      required
                       placeholder="Paris"
-                      minlength="2"
+                      autocomplete="address-level2"
+                      :alert-label="touched.city && errors.city ? errors.city : undefined"
+                      :alert-type="touched.city && errors.city ? 'danger' : undefined"
                       @blur="onFieldBlur('city')"
                     />
-                    <span v-if="touched.city && errors.city" class="checkout__error">
-                      {{ errors.city }}
-                    </span>
                   </div>
                   <div class="checkout__field">
-                    <label class="checkout__label">{{ t('checkout.shipping.country') }}</label>
-                    <select
+                    <WrapperDropdown
                       v-model="country"
-                      class="checkout__input checkout__select"
-                    >
-                      <option
-                        v-for="c in ALLOWED_COUNTRIES"
-                        :key="c.code"
-                        :value="c.name"
-                      >
-                        {{ c.flag }} {{ c.name }}
-                      </option>
-                    </select>
+                      :items="countryItems"
+                      :label="t('checkout.shipping.country')"
+                      placeholder="Sélectionner un pays"
+                      size="medium"
+                      force-value
+                    />
                   </div>
                 </div>
               </template>
@@ -429,15 +407,13 @@
                 v-if="deliveryMode === 'relay' && !selectedRelay"
                 class="checkout__field"
               >
-                <label class="checkout__label">
-                  <BasicIconNext name="Search" :size="16" />
-                  Code postal (pour la recherche)
-                </label>
-                <input
+                <WrapperInput
                   v-model="zip"
-                  type="text"
-                  class="checkout__input"
+                  label="Code postal (pour la recherche)"
                   placeholder="Entrez votre code postal pour trouver les points relais"
+                  icon-name="Search"
+                  icon-state="iconLeft"
+                  autocomplete="postal-code"
                 />
               </div>
             </div>
@@ -687,6 +663,12 @@
     { code: 'NL', name: 'Pays-Bas', flag: '🇳🇱' },
   ]
 
+  // Items formatés pour le dropdown
+  const countryItems = ALLOWED_COUNTRIES.map((c) => ({
+    id: c.name,
+    label: `${c.flag} ${c.name}`,
+  }))
+
   // 🆕 State Mondial Relay
   const deliveryMode = ref<'relay' | 'home'>('relay')
   const selectedRelay = ref<RelayPoint | null>(null)
@@ -775,12 +757,10 @@
   }
 
   // Handler pour le champ code postal (filtre les lettres)
-  function onZipInput(event: Event) {
-    const input = event.target as HTMLInputElement
+  function onZipInput(value: string | null | undefined) {
     const countryCode = COUNTRY_CODE_MAP[country.value] || 'FR'
     // Formater selon le pays
-    input.value = formatPostalCode(input.value, countryCode)
-    zip.value = input.value
+    zip.value = formatPostalCode(value || '', countryCode)
     // Valider si touché
     if (touched.zip) {
       errors.zip = validateZip(zip.value, country.value)

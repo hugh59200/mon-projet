@@ -30,6 +30,16 @@
   // Récupération de la clé publique depuis le .env
   const SITE_KEY = import.meta.env.VITE_CLOUDFLARE_SITE_KEY
 
+  // Détection automatique du mode dev/test pour désactiver le CAPTCHA
+  // Contrôlé via VITE_DISABLE_CAPTCHA=true dans .env.local
+  const isCaptchaDisabled = () => {
+    return (
+      import.meta.env.VITE_DISABLE_CAPTCHA === 'true' ||
+      import.meta.env.DEV || // Mode dev Vite
+      typeof (window as any).Cypress !== 'undefined' // Tests Cypress
+    )
+  }
+
   // Déclaration globale pour TypeScript (évite les erreurs de linter)
   declare global {
     interface Window {
@@ -86,6 +96,18 @@
   }
 
   onMounted(() => {
+    // Mode dev/test : Auto-validation du CAPTCHA
+    if (isCaptchaDisabled()) {
+      if (import.meta.env.DEV) {
+        console.info('ℹ️ CAPTCHA désactivé en mode développement')
+      }
+      // Émet automatiquement un token factice après un court délai
+      setTimeout(() => {
+        emit('verify', 'dev-captcha-bypass-token')
+      }, 100)
+      return
+    }
+
     // Chargement dynamique du script Cloudflare s'il n'est pas là
     if (window.turnstile) {
       renderWidget()

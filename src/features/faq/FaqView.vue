@@ -27,27 +27,16 @@
         <aside class="faq__sidebar">
           <div class="faq__sidebar-card">
             <!-- Search -->
-            <div class="faq__search">
-              <div class="faq__search-icon">
-                <BasicIconNext name="Search" :size="18" />
-              </div>
-              <input
-                v-model="search"
-                type="text"
-                class="faq__search-input"
-                :placeholder="t('faq.searchPlaceholder')"
-                @input="onSearch"
-              />
-              <PremiumButton
-                v-if="search"
-                type="secondary"
-                variant="ghost"
-                size="xs"
-                icon-left="X"
-                class="faq__search-clear"
-                @click="search = ''"
-              />
-            </div>
+            <BasicInput
+              v-model="search"
+              :placeholder="t('faq.searchPlaceholder')"
+              icon-name="Search"
+              icon-state="iconLeft"
+              deletable
+              size="medium"
+              class="faq__search"
+              @input="onSearch"
+            />
 
             <!-- Categories -->
             <div class="faq__categories">

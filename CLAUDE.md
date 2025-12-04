@@ -127,12 +127,19 @@ useHead({
 
 ## Variables d'Environnement
 
-Requises dans `.env` (voir `.env.example` pour la liste complète) :
+Requises dans `.env` :
 - `VITE_APP_URL` - **URL de base de l'application** (ex: `https://fast-peptides.com`) - Utilisée pour le SEO, canonical URLs, Open Graph
 - `VITE_SUPABASE_URL` - URL du projet Supabase
 - `SUPABASE_ANON_KEY` - Clé anonyme Supabase
 - `VITE_GOOGLE_CLIENT_ID` - Client ID Google OAuth
 - `RESEND_API_KEY` - Service email (Edge Functions)
+- `VITE_CLOUDFLARE_SITE_KEY` - Clé publique Cloudflare Turnstile (CAPTCHA)
+
+**Variables de développement** (`.env.local`) :
+- `VITE_DISABLE_CAPTCHA=true` - Désactive le CAPTCHA Turnstile (auto-désactivé en mode dev)
+- `VITE_DISABLE_MFA=true` - Désactive le MFA admin (auto-désactivé en mode dev)
+
+> **Note** : En mode `npm run dev`, le CAPTCHA et le MFA sont automatiquement désactivés. Pour forcer leur activation en dev, utilisez `VITE_DISABLE_CAPTCHA=false` et `VITE_DISABLE_MFA=false`.
 
 ## Design System Tokens
 

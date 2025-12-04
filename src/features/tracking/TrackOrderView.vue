@@ -100,37 +100,30 @@
             <form @submit.prevent="handleSearch" class="track__form">
               <div class="track__form-row">
                 <div class="track__form-group">
-                  <label class="track__label">
-                    <BasicIconNext name="Type" :size="16" />
-                    Numéro de commande
-                  </label>
-                  <div class="track__input-wrapper" :class="{ 'track__input-wrapper--error': !!errorMessage }">
-                    <input
-                      v-model="form.orderNumber"
-                      type="text"
-                      class="track__input"
-                      placeholder="Ex: FP-2025-000123"
-                      required
-                      @input="errorMessage = ''"
-                    />
-                  </div>
+                  <WrapperInput
+                    v-model="form.orderNumber"
+                    label="Numéro de commande"
+                    placeholder="Ex: FP-2025-000123"
+                    icon-name="Type"
+                    icon-state="iconLeft"
+                    :alert-label="errorMessage || undefined"
+                    :alert-type="errorMessage ? 'danger' : undefined"
+                    @input="errorMessage = ''"
+                  />
                 </div>
 
                 <div class="track__form-group">
-                  <label class="track__label">
-                    <BasicIconNext name="Mail" :size="16" />
-                    Adresse email
-                  </label>
-                  <div class="track__input-wrapper" :class="{ 'track__input-wrapper--error': !!errorMessage }">
-                    <input
-                      v-model="form.email"
-                      type="email"
-                      class="track__input"
-                      placeholder="exemple@email.com"
-                      required
-                      @input="errorMessage = ''"
-                    />
-                  </div>
+                  <WrapperInput
+                    v-model="form.email"
+                    label="Adresse email"
+                    placeholder="exemple@email.com"
+                    icon-name="Mail"
+                    icon-state="iconLeft"
+                    autocomplete="email"
+                    :alert-label="errorMessage || undefined"
+                    :alert-type="errorMessage ? 'danger' : undefined"
+                    @input="errorMessage = ''"
+                  />
                 </div>
               </div>
 
@@ -439,15 +432,14 @@
                   <BasicIconNext name="CheckCircle2" :size="16" class="track__register-verified" />
                 </div>
 
-                <div class="track__register-input-wrapper">
-                  <BasicIconNext name="Lock" :size="18" />
-                  <input
-                    v-model="newPassword"
-                    type="password"
-                    class="track__register-input"
-                    placeholder="Choisissez un mot de passe (min. 6 car.)"
-                  />
-                </div>
+                <WrapperInputPassword
+                  v-model="newPassword"
+                  label="Mot de passe"
+                  placeholder="Choisissez un mot de passe (min. 6 car.)"
+                  autocomplete="new-password"
+                  :show-strength="true"
+                  min-strength="medium"
+                />
 
                 <PremiumButton
                   type="success"

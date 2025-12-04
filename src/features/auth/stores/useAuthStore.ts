@@ -1,4 +1,4 @@
-import router from '@/router'
+import router, { getPostLoginRedirect } from '@/router'
 import { supabase } from '@/supabase/supabaseClient'
 import type { Profiles, Role } from '@/supabase/types/supabase.types'
 import type { User } from '@supabase/supabase-js'
@@ -80,9 +80,16 @@ export const useAuthStore = defineStore('auth', () => {
       await fetchProfile()
       startAutoRefresh()
 
-      const redirect = router.currentRoute.value.query.redirect as string | undefined
-      sessionStorage.setItem('redirectAfterOAuth', redirect || '')
-      router.push(redirect || '/')
+      // Récupérer la redirection demandée et le rôle pour déterminer la destination
+      const requestedRedirect = router.currentRoute.value.query.redirect as string | undefined
+      const userRole = profile.value?.role || 'user'
+
+      // Stocker pour OAuth callback si nécessaire
+      sessionStorage.setItem('redirectAfterOAuth', requestedRedirect || '')
+
+      // Redirection intelligente basée sur le rôle
+      const destination = getPostLoginRedirect(userRole, requestedRedirect)
+      router.push(destination)
     }
 
     return true

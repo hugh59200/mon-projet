@@ -58,6 +58,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/features/auth/AuthCallback.vue'),
         meta: { titleKey: 'routes.auth.callback' },
       },
+      {
+        path: 'mfa-setup',
+        name: 'mfa-setup',
+        component: () => import('@/features/auth/AdminMfaSetup.vue'),
+        meta: { titleKey: 'Configuration MFA', requiresAuth: true },
+      },
+      {
+        path: 'mfa-challenge',
+        name: 'mfa-challenge',
+        component: () => import('@/features/auth/AdminMfaChallenge.vue'),
+        meta: { titleKey: 'Vérification MFA', requiresAuth: true },
+      },
     ],
   },
   {
@@ -352,4 +364,31 @@ const router = createRouter({
 })
 
 registerBaseGuard(router)
+
+/**
+ * Utilitaire pour déterminer la route de redirection après login
+ * @param role - Le rôle de l'utilisateur ('admin' | 'user')
+ * @param requestedRedirect - La route demandée initialement (optionnel)
+ * @returns La route de destination
+ */
+export function getPostLoginRedirect(role: string, requestedRedirect?: string | null): string {
+  // Si admin -> toujours vers /admin (sauf si redirect spécifique vers une route admin)
+  if (role === 'admin') {
+    // Si une redirection vers une route admin était demandée, on la respecte
+    if (requestedRedirect?.startsWith('/admin')) {
+      return requestedRedirect
+    }
+    // Sinon, direction /admin par défaut
+    return '/admin'
+  }
+
+  // Si utilisateur standard avec une redirection demandée (non-admin)
+  if (requestedRedirect && !requestedRedirect.startsWith('/admin')) {
+    return requestedRedirect
+  }
+
+  // Par défaut pour un utilisateur standard -> /profil
+  return '/profil'
+}
+
 export default router

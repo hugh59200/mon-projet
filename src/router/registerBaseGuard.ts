@@ -8,8 +8,9 @@ export function registerBaseGuard(router: Router) {
     const auth = useAuthStore()
     const cart = useCartStore()
 
-    // ✅ 1. Toujours laisser passer la callback d'auth (sinon boucle infinie)
-    if (to.path === '/auth/callback') return true
+    // ✅ 1. Toujours laisser passer les routes MFA et callback (sinon boucle infinie)
+    const mfaRoutes = ['/auth/callback', '/auth/mfa-challenge', '/auth/mfa-setup']
+    if (mfaRoutes.includes(to.path)) return true
 
     // ✅ 2. Initialiser session si nécessaire
     if (!auth.user) {
@@ -54,19 +55,49 @@ export function registerBaseGuard(router: Router) {
       return { path: '/auth/login', query: { redirect: to.fullPath } }
     }
 
-    // ✅ 6. Admin
+    // ✅ 6. Admin - Vérification du rôle
     if (to.meta.requiresAdmin && auth.profile?.role !== 'admin') {
       return '/access-denied'
     }
 
-    // ✅ 7. Panier obligatoire
+    // ✅ 7. Admin - Vérification MFA (AAL2) pour les admins
+    // Bypass MFA en mode dev si VITE_DISABLE_MFA=true
+    const isMfaDisabled =
+      import.meta.env.VITE_DISABLE_MFA === 'true' ||
+      (import.meta.env.DEV && import.meta.env.VITE_DISABLE_MFA !== 'false')
+
+    if (to.meta.requiresAdmin && auth.profile?.role === 'admin' && !isMfaDisabled) {
+      const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+
+      if (aalError) {
+        console.warn('Erreur vérification AAL:', aalError)
+        return '/auth/login'
+      }
+
+      // Si l'admin a configuré le MFA mais n'est pas au niveau AAL2
+      if (aalData.nextLevel === 'aal2' && aalData.currentLevel !== 'aal2') {
+        return { path: '/auth/mfa-challenge', query: { redirect: to.fullPath } }
+      }
+
+      // Si l'admin n'a pas encore configuré le MFA (pas de facteur TOTP)
+      const { data: factorsData } = await supabase.auth.mfa.listFactors()
+      const hasVerifiedTotp = factorsData?.totp?.some((f) => f.status === 'verified')
+
+      if (!hasVerifiedTotp) {
+        return '/auth/mfa-setup'
+      }
+    }
+
+    // ✅ 8. Panier obligatoire
     if (to.meta.requiresCart && cart.items.length === 0) {
       return '/panier'
     }
 
-    // ✅ 8. Si connecté → empêche retour sur /auth/login ou /auth/register
-    if (auth.isAuthenticated && to.path.startsWith('/auth/') && to.path !== '/auth/callback') {
-      return '/profil'
+    // ✅ 9. Si connecté → empêche retour sur /auth/login ou /auth/register
+    // Redirige vers /admin si admin, sinon /profil
+    const authRoutesBlocked = ['/auth/login', '/auth/register', '/auth/reset-password']
+    if (auth.isAuthenticated && authRoutesBlocked.includes(to.path)) {
+      return auth.profile?.role === 'admin' ? '/admin' : '/profil'
     }
 
     return true

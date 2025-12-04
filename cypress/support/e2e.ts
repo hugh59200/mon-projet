@@ -234,6 +234,57 @@ Cypress.Commands.add('shouldOr', { prevSubject: true }, (subject, assertion1, as
   }
 })
 
+// Commande pour se connecter en tant qu'admin via l'UI (bypass CAPTCHA)
+// Cette méthode intercepte Turnstile pour auto-valider le CAPTCHA
+Cypress.Commands.add('loginAsAdminViaUI', () => {
+  cy.fixture('admin').then((admin) => {
+    // Intercepter le script Turnstile pour le bloquer
+    cy.intercept('GET', '**/challenges.cloudflare.com/**', {
+      statusCode: 200,
+      body: '// Turnstile blocked for testing',
+    }).as('turnstileScript')
+
+    // Injecter le mock AVANT que la page ne charge
+    cy.visit('/auth/login', {
+      onBeforeLoad(win) {
+        // Créer un mock de turnstile qui appelle automatiquement le callback
+        ;(win as any).turnstile = {
+          render: (
+            element: HTMLElement,
+            options: { callback: (token: string) => void; sitekey: string },
+          ) => {
+            // Appeler le callback avec un faux token après un court délai
+            setTimeout(() => {
+              if (options.callback) {
+                options.callback('test-turnstile-token-cypress')
+              }
+            }, 100)
+            return 'mock-widget-id'
+          },
+          remove: () => {},
+          reset: () => {},
+        }
+      },
+    })
+
+    // Attendre que la page soit chargée
+    cy.get('.auth__form', { timeout: 10000 }).should('be.visible')
+
+    // Remplir le formulaire
+    cy.get('input[autocomplete="email"]').clear().type(admin.email)
+    cy.get('input[type="password"]').clear().type(admin.password)
+
+    // Attendre que le bouton soit activé (après validation CAPTCHA mock)
+    cy.get('.auth__form button[type="submit"]', { timeout: 10000 }).should('not.be.disabled')
+
+    // Soumettre le formulaire
+    cy.get('.auth__form button[type="submit"]').click()
+
+    // Attendre la redirection vers l'admin ou la page d'accueil
+    cy.url({ timeout: 15000 }).should('not.include', '/auth/login')
+  })
+})
+
 // Déclaration TypeScript
 declare global {
   namespace Cypress {
@@ -246,6 +297,7 @@ declare global {
       selectRelayPoint(postcode: string): Chainable<void>
       shouldOr(assertion1: string, assertion2: string): Chainable<void>
       loginAsAdmin(): Chainable<void>
+      loginAsAdminViaUI(): Chainable<void>
       loginAsUser(): Chainable<void>
       logout(): Chainable<void>
       goToCartViaUI(): Chainable<void>

@@ -40,21 +40,16 @@ describe('Guest Checkout - Golden Path', () => {
     cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
 
     // ÉTAPE 6 : Remplir le formulaire
-    cy.get('.checkout__form input[type="email"], .checkout__field input[type="email"]')
-      .first()
-      .clear()
-      .type(GUEST.email)
+    cy.get('input[type="email"]').first().clear().type(GUEST.email)
 
-    cy.get('.checkout__form input[type="text"]').first().clear().type(GUEST.fullName)
+    cy.get('input[type="text"]').first().clear().type(GUEST.fullName)
 
-    cy.get('.checkout__field input[placeholder*="rue"], .checkout__field input[placeholder*="Numéro"]')
-      .first()
-      .clear()
-      .type(GUEST.address)
+    // Adresse - champ autocomplete ou champ manuel
+    cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().clear().type(GUEST.address)
 
-    cy.get('.checkout__field input[placeholder*="75001"]').first().clear().type(GUEST.zip)
-
-    cy.get('.checkout__field input[placeholder*="Paris"]').first().clear().type(GUEST.city)
+    // Code postal et ville (placeholders exacts: "75001" et "Paris")
+    cy.get('input[placeholder="75001"]').first().clear().type(GUEST.zip)
+    cy.get('input[placeholder="Paris"]').first().clear().type(GUEST.city)
 
     // ÉTAPE 7 : Vérifier paiement Crypto
     cy.get('.payment-card__crypto-badge').contains('BTC').should('be.visible')
@@ -102,7 +97,7 @@ describe('Guest Checkout - Golden Path', () => {
     cy.contains('TRC-20').should('be.visible')
 
     // ÉTAPE 13 : Vérifier le récapitulatif
-    cy.get('.confirmation__order-id, [class*="order-ref"]').scrollIntoView().should('be.visible')
+    cy.get('.confirmation__order-id, [class*="order-ref"]').first().scrollIntoView().should('be.visible')
   })
 
   it('Age Gate bloque sans consentement', () => {
@@ -122,15 +117,11 @@ describe('Guest Checkout - Golden Path', () => {
 
     // Remplir le formulaire mais NE PAS cocher le disclaimer
     cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
-    cy.get('.checkout__form input[type="email"], .checkout__field input[type="email"]')
-      .first()
-      .type('test@test.com')
-    cy.get('.checkout__form input[type="text"]').first().type('Test User')
-    cy.get('.checkout__field input[placeholder*="rue"], .checkout__field input[placeholder*="Numéro"]')
-      .first()
-      .type('1 Test St')
-    cy.get('.checkout__field input[placeholder*="75001"]').first().type('75001')
-    cy.get('.checkout__field input[placeholder*="Paris"]').first().type('Paris')
+    cy.get('input[type="email"]').first().type('test@test.com')
+    cy.get('input[type="text"]').first().type('Test User')
+    cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().type('1 Test St')
+    cy.get('input[placeholder="75001"]').first().type('75001')
+    cy.get('input[placeholder="Paris"]').first().type('Paris')
 
     // Le bouton DOIT être désactivé
     cy.get('.checkout__submit-wrapper button').should('be.disabled')

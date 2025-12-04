@@ -25,6 +25,8 @@ export type RouteName =
   'faq' |
   'home' |
   'mentions-legales' |
+  'mfa-challenge' |
+  'mfa-setup' |
   'order-detail' |
   'orders' |
   'politique-confidentialite' |

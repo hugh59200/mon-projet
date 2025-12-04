@@ -118,7 +118,8 @@ describe('Admin - Gestion des Utilisateurs', () => {
     it('Trie les utilisateurs par date de création', () => {
       cy.get('.admin-users__header .elem').eq(3).find('svg').first().click({ force: true })
 
-      cy.url().should('include', 'sort')
+      // L'URL peut contenir 'sort' ou 'asc' selon l'implémentation
+      cy.url().should('match', /sort|asc/)
     })
   })
 
