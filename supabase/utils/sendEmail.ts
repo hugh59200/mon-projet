@@ -3,16 +3,8 @@
 import { sendWithProvider } from './emailProvider.ts'
 import { logEmail } from './logEmail.ts'
 
-const RESEND_DOMAIN = Deno.env.get('RESEND_DOMAIN') ?? ''
-
-// Contrôle dynamique du From
-function buildFrom() {
-  if (RESEND_DOMAIN) {
-    return `FP Store <contact@${RESEND_DOMAIN}>`
-  }
-  // Fallback générique pour dev
-  return 'FP Store <noreply@fast-peptides.com>'
-}
+// Email expéditeur de production
+const FROM_EMAIL = 'FP Store <contact@fast-peptides.com>'
 
 export async function sendEmail({
   to,
@@ -27,7 +19,7 @@ export async function sendEmail({
   type?: string
   order_id?: string
 }) {
-  const FROM = buildFrom()
+  const FROM = FROM_EMAIL
 
   console.log(`📧 Envoi email [${type}] via Resend à ${to}`)
 

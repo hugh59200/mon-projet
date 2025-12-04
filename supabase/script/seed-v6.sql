@@ -56,9 +56,9 @@ DO $$
 DECLARE
   v_user_id uuid := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 BEGIN
-  -- Supprimer les identities et l'utilisateur existants
-  DELETE FROM auth.identities WHERE auth.identities.user_id IN (SELECT id FROM auth.users WHERE email = 'h.bogrand@gmail.com');
-  DELETE FROM auth.users WHERE email = 'h.bogrand@gmail.com';
+  -- Supprimer les identities et l'utilisateur existants (par UUID pour éviter les conflits)
+  DELETE FROM auth.identities WHERE user_id = v_user_id;
+  DELETE FROM auth.users WHERE id = v_user_id;
 
   -- Créer l'utilisateur avec le mot de passe
   INSERT INTO auth.users (
@@ -81,7 +81,7 @@ BEGIN
   VALUES (
     v_user_id,
     '00000000-0000-0000-0000-000000000000',
-    'h.bogrand@gmail.com',
+    'contact@fast-peptides.com',
     crypt('162497', gen_salt('bf')),
     now(),
     now(),
@@ -110,11 +110,11 @@ BEGIN
   VALUES (
     v_user_id,
     v_user_id,
-    'h.bogrand@gmail.com',
+    'contact@fast-peptides.com',
     'email',
     jsonb_build_object(
       'sub', v_user_id::text,
-      'email', 'h.bogrand@gmail.com',
+      'email', 'contact@fast-peptides.com',
       'email_verified', true,
       'provider', 'email'
     ),
@@ -127,13 +127,16 @@ END $$;
 -- ============================
 -- 👤 SEED — PROFILES
 -- ============================
-INSERT INTO public.profiles (id, email, full_name, role)
+INSERT INTO public.profiles (id, email, full_name, role, address, zip, city)
 VALUES
-('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'h.bogrand@gmail.com', 'Hugo Bogrand', 'admin')
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'contact@fast-peptides.com', 'Hugo Bogrand', 'admin', '11 rue du Général Leclerc', '59126', 'Linselles')
 ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   full_name = EXCLUDED.full_name,
-  role = EXCLUDED.role;
+  role = EXCLUDED.role,
+  address = EXCLUDED.address,
+  zip = EXCLUDED.zip,
+  city = EXCLUDED.city;
 
 -- ============================
 -- 📦 SEED — PRODUCTS AVEC I18N + SEO

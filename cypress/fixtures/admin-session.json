@@ -8,7 +8,7 @@
     "id": "admin-test-uuid-0001",
     "aud": "authenticated",
     "role": "authenticated",
-    "email": "h.bogrand@gmail.com",
+    "email": "contact@fast-peptides.com",
     "email_confirmed_at": "2024-01-01T00:00:00.000Z",
     "phone": "",
     "confirmed_at": "2024-01-01T00:00:00.000Z",
