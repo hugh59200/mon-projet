@@ -28,10 +28,14 @@ const config = {
         entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
-
     // ✅ cible moderne (Cloudflare Pages supporte ESNext)
     target: 'esnext',
-  },
+  } as BuildEnvironmentOptions,
+}
+
+generateIconsList(__dirname)
+generateRouteNamesUnion(__dirname)
+generateGlobalComponents(__dirname)
 
 export default defineConfig({
   plugins: [
