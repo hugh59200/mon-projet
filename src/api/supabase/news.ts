@@ -69,11 +69,7 @@ export async function deleteNews(id: string): Promise<boolean> {
   if (article?.image) {
     const path = article.image.split('/news-images/')[1]
     if (path) {
-      try {
-        await supabase.storage.from('news-images').remove([path])
-      } catch (err) {
-        console.warn("Erreur lors de la suppression de l'image :", err)
-      }
+      await supabase.storage.from('news-images').remove([path]).catch(() => {})
     }
   }
 

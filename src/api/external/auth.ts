@@ -22,10 +22,7 @@ function mapAuthError(error: { code?: string; message?: string }): string {
 
 async function emailExists(email: string): Promise<boolean> {
   const { data, error } = await supabase.rpc('user_exists_by_email', { p_email: email })
-  if (error) {
-    console.warn('Failed emailExists RPC:', error.message)
-    return false
-  }
+  if (error) return false
   return Boolean(data)
 }
 

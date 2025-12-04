@@ -61,16 +61,12 @@ export async function deleteAccountApi() {
 }
 
 export async function claimGuestOrders(email: string, userId: string) {
-  const { data, error } = await supabase.rpc('claim_guest_orders', {
+  const { error } = await supabase.rpc('claim_guest_orders', {
     p_email: email,
     p_user_id: userId,
   })
 
-  if (error) {
-    console.error('Erreur lors de la récupération des commandes:', error)
-  } else {
-    console.log('Récupération commandes:', data)
-  }
+  if (error) throw new Error(error.message)
 }
 
 // UI Preferences

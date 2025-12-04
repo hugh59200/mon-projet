@@ -3,7 +3,7 @@
 **Nom Commercial :** `fast-peptides` (Domaine via Njalla)
 **Entité Juridique :** `Atlas Lab Solutions LLC` (New Mexico, USA)
 **Logistique :** France (Stock déporté / Drop-shipping local)
-**Statut :** 🟡 **PRÉ-LANCEMENT** (Finalisation Email Pro & DNS)
+**Statut :** 🟡 **PRÉ-LANCEMENT** (Technique 100% OK / Attente EIN)
 
 ---
 
@@ -36,8 +36,8 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 
 - **Infrastructure :** Cloudflare (Masquage IP serveur) + Njalla (Anonymat Domaine).
 - **Administration :**
-  - 🔴 **VPN OBLIGATOIRE** pour toute connexion aux dashboards (Supabase, Cloudflare, Banque, Email).
-  - L'IP résidentielle ne doit jamais être loguée.
+  - 🔴 **VPN OBLIGATOIRE (Mullvad)** pour toute connexion aux dashboards (Supabase, Cloudflare, Banque, Email).
+  - **Cloisonnement :** L'email Admin (Proton) ne doit jamais interagir avec l'email Perso (Gmail). Pas de transfert automatique.
 
 ---
 
@@ -56,18 +56,19 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
 
 - **Auth :** Supabase Auth.
 - **Database :** PostgreSQL avec RLS (Row Level Security) strictes.
-- **Edge Functions :** Pour les opérations sensibles (Envoi email, appel IA).
-- **Backup :** Export SQL quotidien externe à prévoir (Souveraineté des données).
+- **Edge Functions :** `send-order-confirmation` (Envoi email transactionnel sécurisé via Resend).
+- **Secrets :** Clés API (Resend, etc.) stockées exclusivement dans Supabase Vault, jamais dans le code client.
 
-### Communication (Resend + Proton)
+### Communication (Architecture Hybride)
 
-- **Stratégie "Agnostique" :**
-  - Nom d'expéditeur : "FP Store" (Pas de "Peptides").
-  - Contenu : Neutre (Pas de liste de produits, juste un lien vers le compte client).
-  - Footer : Nettoyé (Pas de réseaux sociaux).
-- **Infrastructure Email (En cours) :**
-  - Utilisation de **Proton Mail / Njalla Email** pour l'adresse admin (`admin@fast-peptides.com`).
-  - **Raison :** Éviter les logs et la surveillance systématique de Microsoft (Outlook) et Google (Gmail) sur les activités "High Risk".
+- **Canal Transactionnel (Site) :**
+  - **Service :** Resend API.
+  - **Usage :** Confirmations de commande automatiques.
+  - **Sécurité :** DKIM/SPF validés sur Cloudflare.
+- **Canal Administratif (Humain) :**
+  - **Service :** Proton Mail (Suisse).
+  - **Adresse :** `contact@fast-peptides.com` (Identité "Atlas Lab").
+  - **Sécurité :** Cryptage de bout en bout, cloisonné du personnel.
 
 ---
 
@@ -105,35 +106,33 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 
 1.  **Panier :** Validation classique.
 2.  **Paiement :** Crypto par défaut.
-3.  **Validation :** Création commande (Statut: `Pending Payment`).
-4.  **Succès :** Page de confirmation avec instructions Wallet + Email "En attente".
+3.  **Validation :** Appel Edge Function -> Email confirmation.
+4.  **Succès :** Page de confirmation avec instructions Wallet.
 
 ---
 
 ## 📝 Roadmap & Statut Actuel
 
-_Mise à jour : 03/12/2025_
+_Mise à jour : 04/12/2025_
 
-| Brique                |   Statut    | Notes                                                          |
-| :-------------------- | :---------: | :------------------------------------------------------------- |
-| **Structure LLC**     |   🟢 Fait   | Créée (30/11), OA signé (03/12) & Archivé.                     |
-| **Site Web (Vue 3)**  |   🟢 Fait   | Déployé, Design "Labo" OK, Footer Clean.                       |
-| **Base de Données**   |   🟢 Fait   | Supabase Configuré.                                            |
-| **Textes Légaux**     |   🟢 Fait   | CGV/Privacy intégrées (Spécial NM Law + RUO).                  |
-| **Mondial Relay**     |   🟢 Fait   | Widget intégré (Checkout).                                     |
-| **Paiement Manuel**   |   🟢 Fait   | Flux Checkout -> Page Confirmation instructions OK.            |
-| **Config Crypto**     |   🟢 Fait   | Wallet Exodus configuré, Adresses réelles injectées.           |
-| **Qualité (QA)**      |   🟢 Fait   | Tests E2E Cypress (Guest Checkout + Links) validés.            |
-| **SEO / GEO**         |   🟢 Fait   | Schema.org JSON-LD (CAS Number, Purity) intégré.               |
-| **Email Pro (OpSec)** | 🟡 En cours | Création Proton/Njalla pour éviter logs GAFAM & Config Resend. |
-| **Compte Banque**     |  🔴 Bloqué  | Attente EIN (Délai IRS important).                             |
+| Brique                |  Statut   | Notes                                                      |
+| :-------------------- | :-------: | :--------------------------------------------------------- |
+| **Structure LLC**     |  🟢 Fait  | Créée, OA signé & Archivé.                                 |
+| **Site Web (Vue 3)**  |  🟢 Fait  | Déployé, Design "Labo" OK, Footer Clean.                   |
+| **Base de Données**   |  🟢 Fait  | Supabase Configuré.                                        |
+| **Textes Légaux**     |  🟢 Fait  | CGV/Privacy intégrées (Spécial NM Law + RUO).              |
+| **Logistique**        |  🟢 Fait  | Widget Mondial Relay intégré.                              |
+| **Paiement Crypto**   |  🟢 Fait  | Wallet Exodus configuré, Adresses injectées.               |
+| **Qualité (QA)**      |  🟢 Fait  | Tests E2E Cypress validés.                                 |
+| **Email Pro (OpSec)** |  🟢 Fait  | Proton (Admin) + Resend (Auto) + DNS Cloudflare Sécurisés. |
+| **Compte Banque**     | 🔴 Bloqué | Attente EIN (Délai IRS important).                         |
 
 ---
 
 ## ⚠️ Rappels Quotidiens pour l'Admin
 
-1.  **Active ton VPN** avant de travailler.
-2.  **Ne donne jamais** de conseils de dosage par chat/email (Réponse type : "Produit pour recherche uniquement").
-3.  **Vérifie les paiements** sur l'app Exodus avant d'expédier une commande (compare les 4 derniers caractères de l'adresse).
+1.  **Active ton VPN (Mullvad)** avant de travailler.
+2.  **Ne donne jamais** de conseils de dosage (Réponse type : "Produit pour recherche uniquement").
+3.  **Vérifie l'expéditeur** avant de répondre : Toujours utiliser `contact@fast-peptides.com`, jamais l'adresse technique/perso.
 4.  **Ne livre jamais** en Allemagne ou en Suisse (Risque saisie douane).
-5.  **Archivage :** Conserve l'Operating Agreement signé et ta Phrase de Récupération Exodus (Seed) **hors ligne** ou dans un volume chiffré.
+5.  **Hygiène Numérique :** Ne jamais transférer les emails Proton vers Gmail.

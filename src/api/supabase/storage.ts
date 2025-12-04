@@ -29,18 +29,11 @@ export async function uploadNewsImage(title: string, file: File): Promise<string
 }
 
 export async function deleteNewsImage(imageUrl: string): Promise<boolean> {
-  try {
-    const path = imageUrl.split('/news-images/')[1]
-    if (!path) return false
+  const path = imageUrl.split('/news-images/')[1]
+  if (!path) return false
 
-    const { error } = await supabase.storage.from('news-images').remove([path])
-    if (error) throw new Error(`Erreur suppression image : ${error.message}`)
-
-    return true
-  } catch (err: any) {
-    console.warn("Erreur lors de la suppression de l'image news :", err)
-    return false
-  }
+  const { error } = await supabase.storage.from('news-images').remove([path])
+  return !error
 }
 
 // ============================================================
@@ -76,24 +69,16 @@ export async function uploadTopicImage(
 
     return `${data.publicUrl}?v=${timestamp}`
   } catch (err: any) {
-    console.error('Erreur uploadTopicImage :', err.message)
     throw new Error(`Erreur upload image topic : ${err.message}`)
   }
 }
 
 export async function deleteTopicImage(imageUrl: string): Promise<boolean> {
-  try {
-    const path = imageUrl.split('/topic-images/')[1]
-    if (!path) return false
+  const path = imageUrl.split('/topic-images/')[1]
+  if (!path) return false
 
-    const { error } = await supabase.storage.from('topic-images').remove([path])
-    if (error) throw new Error(error.message)
-
-    return true
-  } catch (err: any) {
-    console.warn("Erreur lors de la suppression de l'image topic :", err)
-    return false
-  }
+  const { error } = await supabase.storage.from('topic-images').remove([path])
+  return !error
 }
 
 // ============================================================
@@ -129,17 +114,10 @@ export async function uploadProductImage(options: UploadProductImageOptions): Pr
 }
 
 export async function deleteProductImage(imageUrl: string): Promise<boolean> {
-  try {
-    const path = imageUrl.split('/product-images/')[1]
-    if (!path) return false
+  const path = imageUrl.split('/product-images/')[1]
+  if (!path) return false
 
-    const { error } = await supabase.storage.from('product-images').remove([path])
-    if (error) throw new Error(error.message)
-
-    return true
-  } catch (err: any) {
-    console.warn("Erreur lors de la suppression de l'image produit :", err)
-    return false
-  }
+  const { error } = await supabase.storage.from('product-images').remove([path])
+  return !error
 }
 

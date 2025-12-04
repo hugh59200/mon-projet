@@ -14,10 +14,12 @@ import {
 } from './vite/generator.ts'
 
 const outDir = 'dist' // Output directory for the build
+const isProd = process.env.NODE_ENV === 'production'
+
 const config = {
   APP: {
     outDir,
-    sourcemap: true,
+    sourcemap: !isProd, // Désactivé en production
     rollupOptions: {
       output: {
         manualChunks: manualChunksOptimizer,
@@ -36,7 +38,7 @@ generateGlobalComponents(__dirname)
 export default defineConfig({
   plugins: [
     vue(),
-    VueDevTools(),
+    !isProd && VueDevTools(), // Désactivé en production
     svgLoader(),
     sitemap({
       hostname: 'https://fast-peptides.com',
