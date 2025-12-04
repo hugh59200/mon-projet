@@ -51,6 +51,17 @@
             variant="ghost"
             size="md"
             width="full"
+            :label="t('nav.favorites')"
+            icon-left="Heart"
+            :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
+            class="user-menu__link"
+            @click="goTo('/favoris')"
+          />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
             :label="t('profile.support')"
             icon-left="MessageSquare"
             :badge="totalUnread > 0 ? totalUnread.toString() : undefined"
@@ -108,6 +119,17 @@
             class="user-menu__link"
             @click="goTo('/suivi-commande')"
           />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="md"
+            width="full"
+            :label="t('nav.favorites')"
+            icon-left="Heart"
+            :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
+            class="user-menu__link"
+            @click="goTo('/favoris')"
+          />
         </nav>
 
         <div class="user-menu__divider user-menu__divider--subtle"></div>
@@ -142,6 +164,7 @@
 <script setup lang="ts">
   import { useAdminTabStore } from '@/features/admin/stores/useAdminTabStore'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+  import { useWishlistStore } from '@/features/catalogue/stores/useWishlistStore'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, ref } from 'vue'
@@ -154,11 +177,13 @@
   const { user, isAdmin, signOut } = useAuthStore()
   const notifStore = useChatNotifStore()
   const adminTabStore = useAdminTabStore()
+  const wishlistStore = useWishlistStore()
   const isOpen = ref(false)
 
   const totalUnread = computed(() =>
     Object.values(notifStore.unreadByUser || {}).reduce((a, b) => a + (b || 0), 0),
   )
+  const wishlistCount = computed(() => wishlistStore.count)
 
   const goTo = (path: string) => {
     isOpen.value = false

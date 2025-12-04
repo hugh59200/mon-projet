@@ -148,6 +148,17 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/favoris',
+    name: 'favorites',
+    component: () => import('@/features/catalogue/FavoritesView.vue'),
+    meta: {
+      titleKey: 'routes.favorites.title',
+      headingKey: 'routes.favorites.heading',
+      descriptionKey: 'routes.favorites.description',
+      headerIcon: 'Heart',
+    },
+  },
+  {
     path: '/actualites',
     name: 'actualites',
     component: () => import('@/features/actualités/ActualitesView.vue'),

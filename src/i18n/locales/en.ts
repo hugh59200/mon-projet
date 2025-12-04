@@ -319,6 +319,7 @@ export default {
     faq: 'FAQ',
     contact: 'Contact',
     cart: 'Cart',
+    favorites: 'Favorites',
     profile: 'Profile',
     orders: 'My Orders',
     settings: 'Settings',
@@ -1418,10 +1419,15 @@ export default {
     catalogue: {
       title: 'Research Catalogue',
       heading: 'Catalogue',
-      description: "List of available reagents.",
+      description: 'High-purity research peptides, delivered in 24-48h.',
     },
     product: {
       title: 'Product Sheet',
+    },
+    favorites: {
+      title: 'My Favorites',
+      heading: 'My Favorites',
+      description: 'Find your saved favorite products.',
     },
     news: {
       title: 'Resources',
@@ -1552,6 +1558,23 @@ export default {
         paragraph2: 'However, for consumers residing in the European Union, mandatory consumer protection rules of their country of residence may apply.',
         paragraph3: 'In case of dispute, an amicable solution will be sought before any legal action.',
       },
+    },
+  },
+
+  // ============================================
+  // WISHLIST / FAVORITES
+  // ============================================
+  wishlist: {
+    title: 'My Favorites',
+    count: '{count} product(s)',
+    added: 'Added to favorites',
+    removed: 'Removed from favorites',
+    cleared: 'Favorites cleared',
+    clearAll: 'Clear all favorites',
+    empty: {
+      title: 'No favorites yet',
+      description: "You haven't added any products to your favorites yet.",
+      cta: 'Browse catalogue',
     },
   },
 } as const

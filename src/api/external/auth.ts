@@ -71,12 +71,16 @@ export async function signUp(
   email: string,
   password: string,
   captchaToken?: string,
+  locale: string = 'fr',
 ): Promise<AuthResult> {
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       captchaToken,
+      data: {
+        locale, // Stocké dans user_metadata pour les emails
+      },
     },
   })
 

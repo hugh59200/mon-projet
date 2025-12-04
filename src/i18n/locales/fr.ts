@@ -319,6 +319,7 @@ export default {
     faq: 'FAQ',
     contact: 'Contact',
     cart: 'Panier',
+    favorites: 'Favoris',
     profile: 'Profil',
     orders: 'Mes commandes',
     settings: 'Paramètres',
@@ -1418,10 +1419,15 @@ export default {
     catalogue: {
       title: 'Catalogue Recherche',
       heading: 'Catalogue',
-      description: "Liste des réactifs disponibles.",
+      description: 'Peptides de recherche haute pureté, livrés en 24-48h.',
     },
     product: {
       title: 'Fiche Produit',
+    },
+    favorites: {
+      title: 'Mes Favoris',
+      heading: 'Mes Favoris',
+      description: 'Retrouvez vos produits favoris sauvegardés.',
     },
     news: {
       title: 'Ressources',
@@ -1739,6 +1745,23 @@ export default {
         title: 'Contact',
         text: 'Pour toute question concernant notre politique de cookies, contactez-nous :',
       },
+    },
+  },
+
+  // ============================================
+  // WISHLIST / FAVORIS
+  // ============================================
+  wishlist: {
+    title: 'Mes Favoris',
+    count: '{count} produit(s)',
+    added: 'Ajouté aux favoris',
+    removed: 'Retiré des favoris',
+    cleared: 'Favoris vidés',
+    clearAll: 'Vider les favoris',
+    empty: {
+      title: 'Aucun favori',
+      description: "Vous n'avez pas encore ajouté de produits à vos favoris.",
+      cta: 'Découvrir le catalogue',
     },
   },
 } as const

@@ -40,6 +40,11 @@
         />
       </div>
 
+      <!-- Wishlist Button -->
+      <WishlistButton
+        :product-id="product.id"
+        class="product-card__wishlist"
+      />
     </div>
 
     <!-- Content -->
@@ -63,7 +68,7 @@
             name="FlaskConical"
             :size="14"
           />
-          <span>{{ product.purity }}%</span>
+          <span>≥99%</span>
         </div>
         <div
           v-if="product.dosage"
@@ -130,6 +135,7 @@
   import type { Products } from '@/supabase/types/supabase.types'
   import { computed, toRef } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import WishlistButton from '../components/WishlistButton.vue'
 
   const { t } = useI18n()
 
@@ -280,6 +286,28 @@
         object-fit: contain;
         transition: transform 0.4s @ease;
       }
+    }
+
+    &__wishlist {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      z-index: 10;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.2s @ease;
+    }
+
+    &:hover &__wishlist,
+    &__wishlist:focus-within {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    // Toujours visible si actif (favori sélectionné)
+    &__wishlist:has(.wishlist-button--active) {
+      opacity: 1;
+      transform: scale(1);
     }
 
     // ============ CONTENT ============

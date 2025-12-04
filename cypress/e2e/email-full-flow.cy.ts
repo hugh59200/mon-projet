@@ -90,11 +90,12 @@ describe('Email Full Flow - Vraies commandes', () => {
         cy.get('.checkout-item').should('exist')
         cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
 
-        cy.get('input[type="email"]').first().clear().type(GUEST.email)
-        cy.get('input[type="text"]').first().clear().type(GUEST.fullName)
-        cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().clear().type(GUEST.address)
-        cy.get('input[placeholder="75001"]').first().clear().type(GUEST.zip)
-        cy.get('input[placeholder="Paris"]').first().clear().type(GUEST.city)
+        // Sélecteurs autocomplete pour WrapperInput
+        cy.get('input[autocomplete="email"]').first().clear().type(GUEST.email)
+        cy.get('input[autocomplete="name"]').first().clear().type(GUEST.fullName)
+        cy.get('input[placeholder*="adresse"], input[autocomplete="street-address"]').first().clear().type(GUEST.address)
+        cy.get('input[autocomplete="postal-code"]').first().clear().type(GUEST.zip)
+        cy.get('input[autocomplete="address-level2"]').first().clear().type(GUEST.city)
 
         cy.get('.payment-card__crypto-badge').contains('BTC').should('be.visible')
 

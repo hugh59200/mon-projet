@@ -2,13 +2,14 @@
   <div
     :class="[
       'input-container',
-      `input-container--${inputType}`,
-      `input-container--${size}`,
+      `input-container--${props.inputType}`,
+      `input-container--${props.size}`,
+      props.variant !== 'default' ? `input-container--${props.variant}` : '',
       {
-        'input-container--disabled': disabled,
-        'input-container--readonly': readonly,
-        'input-container--success': validationState === 'success',
-        'input-container--error': validationState === 'error',
+        'input-container--disabled': props.disabled,
+        'input-container--readonly': props.readonly,
+        'input-container--success': props.validationState === 'success',
+        'input-container--error': props.validationState === 'error',
       },
     ]"
   >
@@ -67,6 +68,7 @@
   /* --- Props --- */
   const props = withDefaults(defineProps<InputProps & AlertInputProps>(), {
     size: 'medium',
+    variant: 'default',
     iconName: undefined,
     iconState: 'iconRight',
     deletable: false,

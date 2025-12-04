@@ -95,12 +95,12 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
-  async function signUp(email: string, password: string, captchaToken?: string): Promise<boolean> {
+  async function signUp(email: string, password: string, captchaToken?: string, locale: string = 'fr'): Promise<boolean> {
     loading.value = true
     error.value = null
 
-    // Appel au SERVICE
-    const result = await serviceSignUp(email, password, captchaToken)
+    // Appel au SERVICE avec la locale
+    const result = await serviceSignUp(email, password, captchaToken, locale)
 
     loading.value = false
 

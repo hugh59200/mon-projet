@@ -131,7 +131,7 @@
                   <div class="product__spec-content">
                     <span class="product__spec-label">{{ t('catalogue.product.purity') }}</span>
                     <span class="product__spec-value product__spec-value--success">
-                      {{ product.purity }}%
+                      ≥99%
                     </span>
                   </div>
                 </div>
@@ -214,6 +214,12 @@
                     icon-left="Zap"
                     :shine="true"
                     @click="buyNow(product!)"
+                  />
+
+                  <WishlistButton
+                    :product-id="product.id"
+                    :size="24"
+                    class="product__wishlist-btn"
                   />
                 </div>
 
@@ -376,6 +382,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import ProductEssentials from '@/features/shared/components/ProductEssentials.vue'
   import ProductSchema from './components/ProductSchema.vue'
+  import WishlistButton from './components/WishlistButton.vue'
   import { useHead } from '@vueuse/head'
   import { getCanonicalUrl } from '@/config/seo'
 
@@ -413,7 +420,7 @@
       sku: p.id,
       image: p.image || '',
       inStock: (p.stock ?? 0) > 0,
-      purity: p.purity ? `≥${p.purity}%` : undefined,
+      purity: '≥99%',
       productUrl: getCanonicalUrl(`/catalogue/${p.id}`),
       category: productCategory.value || p.category,
       casNumber: p.cas_number ?? undefined,
@@ -432,9 +439,8 @@
   const pageDescription = computed(() => {
     if (!product.value) return 'Découvrez nos peptides de recherche de haute pureté.'
     const name = productName.value || product.value.name
-    const purity = product.value.purity || 99
     const category = productCategory.value || product.value.category || 'Recherche'
-    return `${name} - Peptide de recherche ${category}. Pureté ≥${purity}%. Expédition rapide et certificat d'analyse inclus.`
+    return `${name} - Peptide de recherche ${category}. Pureté ≥99%. Expédition rapide et certificat d'analyse inclus.`
   })
 
   useHead({
@@ -961,6 +967,13 @@
     &__actions {
       display: flex;
       gap: 12px;
+      align-items: center;
+    }
+
+    &__wishlist-btn {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
     }
 
     &__btn {

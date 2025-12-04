@@ -2,6 +2,7 @@
   <InputContainer
     v-model="modelValue"
     :size
+    :variant
     :validation-state
     :icon-state
     :icon-name
@@ -30,6 +31,7 @@
 
   withDefaults(defineProps<InputProps & AlertInputProps>(), {
     size: 'medium',
+    variant: 'default',
     readonly: false,
     disabled: false,
     hasBg: false,

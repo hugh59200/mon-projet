@@ -23,6 +23,7 @@ export type RouteName =
   'cookies' |
   'email-sent' |
   'faq' |
+  'favorites' |
   'home' |
   'mentions-legales' |
   'mfa-challenge' |

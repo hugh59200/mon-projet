@@ -67,11 +67,8 @@
           :type="getProductStockType(product.stock)"
           size="small"
         />
-        <span
-          v-if="product.purity"
-          class="purity-text"
-        >
-          Pureté: {{ product.purity }}%
+        <span class="purity-text">
+          Pureté: ≥99%
         </span>
       </div>
 

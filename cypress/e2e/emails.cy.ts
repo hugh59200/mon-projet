@@ -55,17 +55,12 @@ describe('Emails - Flux Checkout Guest (Crypto)', () => {
       // ÉTAPE 4 : Sélectionner livraison domicile
       cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
 
-      // ÉTAPE 5 : Remplir le formulaire (nouveaux sélecteurs basés sur le formulaire actuel)
-      cy.get('input[type="email"]').first().clear().type(GUEST.email)
-
-      cy.get('input[type="text"]').first().clear().type(GUEST.fullName)
-
-      // Adresse - champ autocomplete ou champ manuel
-      cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().clear().type(GUEST.address)
-
-      // Code postal et ville (placeholders exacts: "75001" et "Paris")
-      cy.get('input[placeholder="75001"]').first().clear().type(GUEST.zip)
-      cy.get('input[placeholder="Paris"]').first().clear().type(GUEST.city)
+      // ÉTAPE 5 : Remplir le formulaire (sélecteurs autocomplete pour WrapperInput)
+      cy.get('input[autocomplete="email"]').first().clear().type(GUEST.email)
+      cy.get('input[autocomplete="name"]').first().clear().type(GUEST.fullName)
+      cy.get('input[placeholder*="adresse"], input[autocomplete="street-address"]').first().clear().type(GUEST.address)
+      cy.get('input[autocomplete="postal-code"]').first().clear().type(GUEST.zip)
+      cy.get('input[autocomplete="address-level2"]').first().clear().type(GUEST.city)
 
       // ÉTAPE 6 : Cocher le disclaimer
       cy.get('.checkout__disclaimer-input').check({ force: true })

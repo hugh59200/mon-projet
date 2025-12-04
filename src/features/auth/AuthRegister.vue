@@ -125,7 +125,7 @@
   import { useAuthForm } from './composables/useAuthForm'
   import { useAuthStore } from './stores/useAuthStore'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const auth = useAuthStore()
   const router = useRouter()
 
@@ -175,11 +175,12 @@
 
     loading.value = true
 
-    // 3. Appel au store
+    // 3. Appel au store avec la locale courante
     const success = await auth.signUp(
       fields.email.value.value,
       fields.password.value.value,
-      captchaToken.value
+      captchaToken.value,
+      locale.value
     )
 
     loading.value = false

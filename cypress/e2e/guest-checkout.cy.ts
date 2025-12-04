@@ -39,17 +39,12 @@ describe('Guest Checkout - Golden Path', () => {
     // ÉTAPE 5 : Sélectionner livraison domicile
     cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
 
-    // ÉTAPE 6 : Remplir le formulaire
-    cy.get('input[type="email"]').first().clear().type(GUEST.email)
-
-    cy.get('input[type="text"]').first().clear().type(GUEST.fullName)
-
-    // Adresse - champ autocomplete ou champ manuel
-    cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().clear().type(GUEST.address)
-
-    // Code postal et ville (placeholders exacts: "75001" et "Paris")
-    cy.get('input[placeholder="75001"]').first().clear().type(GUEST.zip)
-    cy.get('input[placeholder="Paris"]').first().clear().type(GUEST.city)
+    // ÉTAPE 6 : Remplir le formulaire (sélecteurs autocomplete pour WrapperInput)
+    cy.get('input[autocomplete="email"]').first().clear().type(GUEST.email)
+    cy.get('input[autocomplete="name"]').first().clear().type(GUEST.fullName)
+    cy.get('input[placeholder*="adresse"], input[autocomplete="street-address"]').first().clear().type(GUEST.address)
+    cy.get('input[autocomplete="postal-code"]').first().clear().type(GUEST.zip)
+    cy.get('input[autocomplete="address-level2"]').first().clear().type(GUEST.city)
 
     // ÉTAPE 7 : Vérifier paiement Crypto
     cy.get('.payment-card__crypto-badge').contains('BTC').should('be.visible')
@@ -117,11 +112,11 @@ describe('Guest Checkout - Golden Path', () => {
 
     // Remplir le formulaire mais NE PAS cocher le disclaimer
     cy.get('.checkout__delivery-option').contains(/colissimo|home|domicile/i).click()
-    cy.get('input[type="email"]').first().type('test@test.com')
-    cy.get('input[type="text"]').first().type('Test User')
-    cy.get('input[placeholder*="adresse"], input[placeholder*="rue"]').first().type('1 Test St')
-    cy.get('input[placeholder="75001"]').first().type('75001')
-    cy.get('input[placeholder="Paris"]').first().type('Paris')
+    cy.get('input[autocomplete="email"]').first().type('test@test.com')
+    cy.get('input[autocomplete="name"]').first().type('Test User')
+    cy.get('input[placeholder*="adresse"], input[autocomplete="street-address"]').first().type('1 Test St')
+    cy.get('input[autocomplete="postal-code"]').first().type('75001')
+    cy.get('input[autocomplete="address-level2"]').first().type('Paris')
 
     // Le bouton DOIT être désactivé
     cy.get('.checkout__submit-wrapper button').should('be.disabled')

@@ -47,8 +47,7 @@
 
             <div class="product-modal__badges">
               <BasicBadge
-                v-if="product?.purity"
-                :label="`Pureté ${product.purity}%`"
+                label="Pureté ≥99%"
                 type="info"
                 size="small"
               />

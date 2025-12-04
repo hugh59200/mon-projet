@@ -32,10 +32,14 @@ export function useFilters(products: Ref<Products[]>, priceRange: Ref<Range>) {
   )
 
   // 🏷️ Tags
+  const EXCLUDED_TAGS = ['Quantité', 'Quantity', 'Pureté', 'Purity']
+
   const allTags = computed<string[]>(() => {
     const set = new Set<string>()
     for (const p of products.value) (p.tags || []).forEach((t) => set.add(t))
-    return Array.from(set).sort((a, b) => a.localeCompare(b))
+    return Array.from(set)
+      .filter((t) => !EXCLUDED_TAGS.includes(t))
+      .sort((a, b) => a.localeCompare(b))
   })
 
   const tagItemsWithCounts = computed(() =>

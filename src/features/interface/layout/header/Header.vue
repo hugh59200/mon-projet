@@ -54,6 +54,7 @@
           @click="$router.push('/suivi-commande')"
         />
         <LanguageSelector />
+        <WishlistIcon />
         <CartMenu />
         <HeaderActions />
       </div>
@@ -64,6 +65,7 @@
 <script setup lang="ts">
   import { useNavOverflow } from '@/composables/useNavOverflow'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
+  import WishlistIcon from '@/features/catalogue/components/WishlistIcon.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'

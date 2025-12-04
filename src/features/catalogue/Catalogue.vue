@@ -1,29 +1,6 @@
 <template>
   <div class="catalogue-page">
     <PageHeader>
-      <div class="catalogue-quick-nav">
-        <PremiumButton
-          :type="selectedCategories.length === 0 ? 'primary' : 'secondary'"
-          :variant="selectedCategories.length === 0 ? 'solid' : 'ghost'"
-          size="sm"
-          label="✨ Tous"
-          :badge="products.length.toString()"
-          class="catalogue-chip"
-          @click="selectedCategories = []"
-        />
-        <PremiumButton
-          v-for="cat in topCategories"
-          :key="cat.id"
-          :type="selectedCategories.includes(cat.id) ? 'primary' : 'secondary'"
-          :variant="selectedCategories.includes(cat.id) ? 'solid' : 'ghost'"
-          size="sm"
-          :label="cat.label"
-          :badge="cat.count.toString()"
-          class="catalogue-chip"
-          @click="toggleCategory(cat.id)"
-        />
-      </div>
-
       <!-- Mobile Controls -->
       <div
         v-if="isMobile"
@@ -93,6 +70,7 @@
             icon-state="iconLeft"
             deletable
             size="small"
+            variant="ghost"
             class="catalogue-search"
           />
 
@@ -119,19 +97,19 @@
             <!-- View Mode Toggle -->
             <div class="catalogue-toolbar__view">
               <PremiumButton
-                :type="viewMode === 'grid' ? 'primary' : 'secondary'"
-                :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+                type="secondary"
+                :variant="viewMode === 'grid' ? 'outline' : 'ghost'"
                 size="sm"
                 icon-left="LayoutGrid"
-                class="catalogue-toolbar__view-btn"
+                :class="['catalogue-toolbar__view-btn', { 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }]"
                 @click="viewMode = 'grid'"
               />
               <PremiumButton
-                :type="viewMode === 'list' ? 'primary' : 'secondary'"
-                :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+                type="secondary"
+                :variant="viewMode === 'list' ? 'outline' : 'ghost'"
                 size="sm"
                 icon-left="List"
-                class="catalogue-toolbar__view-btn"
+                :class="['catalogue-toolbar__view-btn', { 'catalogue-toolbar__view-btn--active': viewMode === 'list' }]"
                 @click="viewMode = 'list'"
               />
             </div>
@@ -400,29 +378,6 @@
     (route.query.view as 'grid' | 'list') || 'grid',
   )
 
-  // Extraire le count depuis le label (format: "Category (X)")
-  const extractCount = (label: string): number => {
-    const match = label.match(/\((\d+)\)$/)
-    return match ? parseInt(match[1]!, 10) : 0
-  }
-
-  // Extraire le nom de catégorie sans le count
-  const extractCategoryName = (label: string): string => {
-    return label.replace(/\s*\(\d+\)$/, '')
-  }
-
-  // Top categories for quick nav (avec count extrait du label)
-  const topCategories = computed(() => {
-    return categoryItemsWithCounts.value
-      .map((cat) => ({
-        id: cat.id,
-        label: extractCategoryName(cat.label),
-        count: extractCount(cat.label),
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 6)
-  })
-
   // Active filters
   const hasActiveFilters = computed(() => {
     return selectedCategories.value.length > 0 || selectedTags.value.length > 0 || inStockOnly.value
@@ -543,88 +498,6 @@
     }
 
     // =========================================
-    // QUICK NAV
-    // =========================================
-    &-quick-nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-
-      @media (max-width: 1100px) {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        padding-bottom: 8px;
-
-        &::-webkit-scrollbar {
-          display: none;
-        }
-      }
-    }
-
-    // =========================================
-    // CHIP
-    // =========================================
-    &-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      font-family: @font-body;
-      font-size: 13px;
-      font-weight: 500;
-      color: @neutral-400;
-      cursor: pointer;
-      transition: all 0.2s @ease;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.12);
-        color: @neutral-200;
-      }
-
-      &--active {
-        background: rgba(var(--primary-500-rgb), 0.12);
-        border-color: rgba(var(--primary-500-rgb), 0.3);
-        color: var(--primary-300);
-
-        .catalogue-chip__count {
-          background: rgba(var(--primary-500-rgb), 0.2);
-          color: var(--primary-400);
-        }
-      }
-
-      &__icon {
-        font-size: 14px;
-      }
-
-      &__dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-
-      &__count {
-        padding: 2px 6px;
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 600;
-        color: @neutral-500;
-      }
-
-      @media (max-width: 1100px) {
-        flex-shrink: 0;
-      }
-    }
-
-    // =========================================
     // MOBILE BAR
     // =========================================
     &-mobile-bar {
@@ -740,7 +613,7 @@
       }
 
       &__dropdown {
-        min-width: 160px;
+        min-width: 130px;
 
         // Style "secondary outline" pour le dark mode
         :deep(.dropdown) {
@@ -780,31 +653,14 @@
       &__view {
         display: flex;
         gap: 4px;
-        padding: 4px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 10px;
 
-        &-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          background: transparent;
-          border: none;
-          border-radius: 8px;
-          color: @neutral-500;
-          cursor: pointer;
-          transition: all 0.2s;
+        &-btn--active {
+          :deep(.premium-button) {
+            background: transparent;
 
-          &:hover {
-            color: @neutral-300;
-            background: rgba(255, 255, 255, 0.05);
-          }
-
-          &--active {
-            background: rgba(var(--primary-500-rgb), 0.15);
-            color: var(--primary-400);
+            &:hover {
+              background: transparent;
+            }
           }
         }
       }
@@ -831,50 +687,13 @@
     // =========================================
     &-search {
       flex: 1;
+      min-width: 140px;
       max-width: 280px;
-      min-width: 160px;
 
       &--mobile {
         flex: 1;
         max-width: none;
-      }
-
-      // Style "secondary ghost" pour BasicInput
-      :deep(.input-container) {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 8px;
-        height: 36px;
-        padding: 0 10px;
-
-        &:hover {
-          border-color: rgba(255, 255, 255, 0.2);
-          background: rgba(255, 255, 255, 0.02);
-        }
-
-        &:focus-within {
-          border-color: rgba(255, 255, 255, 0.25);
-          background: rgba(255, 255, 255, 0.03);
-          box-shadow: none;
-        }
-
-        input {
-          background: transparent;
-          color: @neutral-200;
-          font-family: @font-body;
-          font-size: 13px;
-          padding: 0 4px;
-
-          &::placeholder {
-            color: @neutral-500;
-          }
-        }
-
-        svg {
-          background: transparent;
-          color: @neutral-400;
-          transform: scale(0.85);
-        }
+        min-width: 0;
       }
 
       @media (max-width: 900px) {

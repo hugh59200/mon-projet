@@ -46,14 +46,6 @@ export const useProductsStore = defineStore(
                 ? parseFloat(r.sale_price)
                 : r.sale_price,
 
-          // ✅ Gestion de la pureté
-          purity:
-            r.purity == null
-              ? null
-              : typeof r.purity === 'string'
-                ? parseFloat(r.purity)
-                : r.purity,
-
           tags: Array.isArray(r.tags) ? r.tags : [],
         }))
 

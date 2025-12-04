@@ -256,7 +256,7 @@ CREATE TABLE public.emails_sent (
   to_email text NOT NULL,
   subject text NOT NULL,
   body_html text NOT NULL,
-  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom','pending_payment','payment_validated')) NOT NULL DEFAULT 'custom',
+  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom','pending_payment','payment_validated','auth_signup','auth_recovery','auth_email_change')) NOT NULL DEFAULT 'custom',
   status text CHECK (status IN ('sent','error')) DEFAULT 'sent',
   provider_response jsonb,
   sent_at timestamptz DEFAULT now()

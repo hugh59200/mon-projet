@@ -516,11 +516,11 @@ export const translations = {
 } as const
 
 /**
- * Retourne la locale validée (fallback 'en' si non supportée)
+ * Retourne la locale validée (fallback 'fr' par défaut)
  */
 export function getValidLocale(locale?: string): Locale {
-  if (locale === 'fr') return 'fr'
-  return 'en' // Fallback EN
+  if (locale === 'en') return 'en'
+  return 'fr' // Fallback FR (site principalement français)
 }
 
 /**

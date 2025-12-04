@@ -43,15 +43,40 @@
               variant="ghost"
               size="md"
               width="full"
-              label="Mon profil"
+              :label="t('nav.profile')"
               icon-left="User"
               class="drawer-link"
               @click="goTo('/profil')"
+            />
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="md"
+              width="full"
+              :label="t('nav.favorites')"
+              icon-left="Heart"
+              :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
+              class="drawer-link"
+              @click="goTo('/favoris')"
             />
           </div>
         </template>
 
         <template v-else>
+          <div class="drawer-links">
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="md"
+              width="full"
+              :label="t('nav.favorites')"
+              icon-left="Heart"
+              :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
+              class="drawer-link"
+              @click="goTo('/favoris')"
+            />
+          </div>
+          <div class="drawer-divider"></div>
           <div class="drawer-auth">
             <PremiumButton
               label="Connexion"
@@ -78,6 +103,9 @@
   import { vClickOutside } from '@/directives/vClickOutside'
   import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+  import { useWishlistStore } from '@/features/catalogue/stores/useWishlistStore'
+  import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import MainNavLinks from './MainNavLinks.vue'
 
@@ -88,9 +116,13 @@
     },
   })
 
+  const { t } = useI18n()
   const modelValue = defineModel<boolean>({ required: true })
   const auth = useAuthStore()
+  const wishlistStore = useWishlistStore()
   const router = useRouter()
+
+  const wishlistCount = computed(() => wishlistStore.count)
 
   function closeDrawer() {
     modelValue.value = false
