@@ -17,7 +17,10 @@
         :name="iconName"
         :class="['icon', `icon--${size}`]"
       />
-      <BasicText class="dropdown-item__label">
+      <BasicText
+        class="dropdown-item__label"
+        color="neutral-800"
+      >
         {{ label }}
       </BasicText>
     </slot>
@@ -26,6 +29,14 @@
 
 <script setup lang="ts">
   import { type DropdownItemProps } from '@designSystem/components'
+  import { inject } from 'vue'
+
+  const closeDropdown = inject<(force?: boolean) => void>('closeDropdown', () => {})
+
+  const handleClick = () => {
+    emit('select', props.label)
+    closeDropdown()
+  }
 
   const props = withDefaults(defineProps<DropdownItemProps>(), {
     iconName: undefined,
@@ -35,10 +46,6 @@
   })
 
   const emit = defineEmits(['select'])
-
-  const handleClick = () => {
-    emit('select', props.label)
-  }
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {

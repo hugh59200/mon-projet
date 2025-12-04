@@ -1,22 +1,28 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*",
-  "designSystem/**/*",
-  "src/plugin/registration/types/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/*",
+    "designSystem/**/*",
+    "src/plugin/registration/types/*.ts"
+  ],
+  "exclude": ["node_modules", "supabase"],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "types": ["vite/client"],
-  
+    "types": ["vite/client", "pinia-plugin-persistedstate"],
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-        "paths": {
+    "paths": {
       "@/*": ["./src/*"],
       "@designSystem/*": ["./designSystem/src/*"],
       "@designSystem/components": ["./designSystem/src/components/index.ts"]
-    },
-    
-  },
+    }
+  }
 }

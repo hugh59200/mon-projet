@@ -4,6 +4,7 @@
   align-items: center;
   border-radius: @border-radius-l;
   border: 1px solid;
+  cursor: default;
 
   &--medium {
     height: 30px;
@@ -22,11 +23,11 @@
   }
 
   &--default {
-    background-color: @secondary-0;
-    color: @secondary-600;
-    border-color: @secondary-600;
+    background-color: var(--secondary-0);
+    color: var(--secondary-600);
+    border-color: var(--secondary-600);
     svg {
-      fill: @secondary-0;
+      fill: var(--secondary-0);
     }
   }
 
@@ -81,5 +82,9 @@
     justify-content: center;
     width: 24px;
     height: 24px;
+  }
+
+  .badge__label {
+    color: inherit !important;
   }
 }

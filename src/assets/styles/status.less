@@ -1,0 +1,62 @@
+/* src/assets/styles/status.less */
+
+.status-badge {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  display: inline-block;
+  text-transform: capitalize;
+  transition: all 0.25s ease;
+}
+
+/* 🌞 Mode clair */
+.status--pending {
+  color: #b7791f;
+  background-color: #fef3c7;
+}
+
+.status--confirmed {
+  color: #2563eb;
+  background-color: #dbeafe;
+}
+
+.status--shipped {
+  color: #0891b2;
+  background-color: #cffafe;
+}
+
+.status--completed {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.status--canceled {
+  color: #6b7280;
+  background-color: #f3f4f6;
+  text-decoration: line-through;
+}
+
+/* 🌚 Mode sombre */
+@media (prefers-color-scheme: dark) {
+  .status--pending {
+    color: #fcd34d;
+    background-color: #78350f;
+  }
+  .status--confirmed {
+    color: #93c5fd;
+    background-color: #1e3a8a;
+  }
+  .status--shipped {
+    color: #5eead4;
+    background-color: #134e4a;
+  }
+  .status--completed {
+    color: #86efac;
+    background-color: #14532d;
+  }
+  .status--canceled {
+    color: #9ca3af;
+    background-color: #1f2937;
+  }
+}

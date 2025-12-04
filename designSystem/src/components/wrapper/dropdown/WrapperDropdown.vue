@@ -6,7 +6,6 @@
     :alertLabel
     :alertType
     :help
-    :wrapLabel
   >
     <BasicDropdown
       v-model="modelValue"
@@ -17,19 +16,30 @@
       :readonly
       :deletable
       :force-value
-      :key-id
-      :key-label
-      :key-icon-name
+      :key-id="'id' as keyof DropdownItem"
+      :key-label="'label' as keyof DropdownItem"
+      :key-icon-name="'iconName' as keyof DropdownItem"
+      :mode
     />
   </WrapperFormElements>
 </template>
 
-<script setup lang="ts" generic="TDropdownItem = DropdownItem, TDropdownKey extends DropdownId = DropdownId">
-  import type { WrapperDropdownProps, DropdownId, DropdownItem } from '@designSystem/components'
+<script
+  setup
+  lang="ts"
+  generic="
+    TDropdownItem extends DropdownItem = DropdownItem,
+    TDropdownKey extends DropdownId = DropdownId
+  "
+>
+  import type { DropdownId, DropdownItem, WrapperDropdownProps } from '@designSystem/components'
 
   withDefaults(defineProps<WrapperDropdownProps<TDropdownItem>>(), {
     deletable: true,
+    mode: 'single',
   })
 
-  const modelValue = defineModel<TDropdownKey>()
+  type ModelType = TDropdownKey | TDropdownKey[]
+
+  const modelValue = defineModel<ModelType>()
 </script>

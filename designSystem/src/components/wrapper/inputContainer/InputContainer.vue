@@ -2,21 +2,28 @@
   <div
     :class="[
       'input-container',
-      `input-container--${inputType}`,
-      `input-container--${size}`,
+      `input-container--${props.inputType}`,
+      `input-container--${props.size}`,
+      props.variant !== 'default' ? `input-container--${props.variant}` : '',
       {
-        'input-container--disabled': disabled,
-        'input-container--readonly': readonly,
-        'input-container--success': validationState === 'success',
-        'input-container--error': validationState === 'error',
+        'input-container--disabled': props.disabled,
+        'input-container--readonly': props.readonly,
+        'input-container--success': props.validationState === 'success',
+        'input-container--error': props.validationState === 'error',
       },
     ]"
   >
-    <BasicIcon
+    <BasicIconNext
       v-if="iconState === 'iconLeft' && iconName && inputType === 'form'"
       :name="iconName"
+      :color="iconColor"
+      :pointer="pointer"
+      :size="16"
+      class="input-container__icon-left"
     />
-    <slot></slot>
+    <div class="input-container__field">
+      <slot></slot>
+    </div>
     <BasicAlert
       v-if="inputType === 'table' && alertLabel"
       :class="[`input-container--${inputType}--alert`]"
@@ -28,32 +35,40 @@
       :has-label="false"
       :hasBg="false"
     />
-    <BasicIcon
+    <BasicIconNext
       v-if="deletable && !readonly && !disabled && modelValue"
-      name="close"
+      name="X"
+      :color="'danger-600' as IconColor"
+      pointer
+      :size="16"
       @click="modelValue = null"
+      class="input-container__icon-delete"
     />
-    <BasicIcon
-      v-if="inputType === 'form' && iconState === 'iconRight' && iconName"
+    <div v-if="$slots['icon-right'] || showRightIcons">
+      <slot name="icon-right"></slot>
+    </div>
+    <BasicIconNext
+      v-if="!$slots['icon-right'] && inputType === 'form' && iconState === 'iconRight' && iconName"
       :name="iconName"
-      :class="[`input-container--${inputType}--alert`]"
+      :color="iconColor"
+      :pointer="pointer"
+      :size="16"
+      class="input-container__icon-fallback"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-  import type {
-    AlertInputProps,
-    InputDateModel,
-    InputDureeModel,
-    InputNumberModel,
-    InputProps,
-    InputTelephoneModel,
-  } from '@designSystem/components'
   import { useDialog } from '@/features/interface/dialog'
+  import type { AlertInputProps, IconColor, InputProps } from '@designSystem/components'
+  import BasicAlert from '@designSystem/components/basic/alert/BasicAlert.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+  import { computed } from 'vue'
 
-  withDefaults(defineProps<InputProps & AlertInputProps>(), {
+  /* --- Props --- */
+  const props = withDefaults(defineProps<InputProps & AlertInputProps>(), {
     size: 'medium',
+    variant: 'default',
     iconName: undefined,
     iconState: 'iconRight',
     deletable: false,
@@ -64,12 +79,18 @@
     wrap: false,
     hasLabel: true,
     alertMaxlength: undefined,
+    iconColor: 'neutral-600',
+    pointer: false,
   })
 
-  type InputModel = InputDateModel | InputDureeModel | InputTelephoneModel | InputNumberModel | InputDateModel
+  /* --- v-model --- */
+  type InputContainerModel = string | number | null | undefined
+  const modelValue = defineModel<InputContainerModel>()
 
-  const modelValue = defineModel<InputModel>()
+  /* --- Détection de slot droit --- */
+  const showRightIcons = computed(() => !!(props.iconState === 'iconRight' && props.iconName))
 
+  /* --- Alerte --- */
   const showAlert = (message: string) => {
     const dialog = useDialog()
     dialog.showDialog({

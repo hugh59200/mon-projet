@@ -14,6 +14,7 @@ export type DropdownItem<T = DropdownId> = {
 
 export type DropdownProps<T = DropdownItem<DropdownId>> = {
   items?: T[]
+  mode?: 'single' | 'multiple'
   placeholder?: string
   selectedLabel?: string
   searchable?: boolean

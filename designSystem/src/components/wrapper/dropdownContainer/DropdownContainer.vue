@@ -48,32 +48,36 @@
       pointer
     />
 
-    <div
-      v-if="isOpen && !disabled"
-      class="dropdown__menu"
-      ref="menuRef"
-      role="listbox"
-    >
-      <ClickOutside @close="closeFromOutside">
-        <slot name="dropdown-items" />
-      </ClickOutside>
-    </div>
+    <!-- 🚀 Menu avec v-motion -->
+    <Teleport to="#overlay-root">
+      <div
+        v-if="isOpen && !disabled"
+        v-motion="motion"
+        class="dropdown__menu"
+        ref="menuRef"
+        :style="menuPositionStyle"
+        role="listbox"
+      >
+        <ClickOutside @close="closeFromOutside">
+          <slot name="dropdown-items" />
+        </ClickOutside>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts" generic="TDropdownItem = DropdownItem">
-  import { ref, computed } from 'vue'
-  import { useAutoId, type DropdownItem, type DropdownProps } from '@designSystem/components'
   import { useDialog } from '@/features/interface/dialog'
-  import { useDropdownMenuHandler } from './useDropdownMenuHandler'
+  import { useAutoId, type DropdownItem, type DropdownProps } from '@designSystem/components'
+  import { computed, provide, ref, watch } from 'vue'
   import type { DropdownContainerEvent } from './DropdownContainer.types'
+  import { useDropdownMenuHandler } from './useDropdownMenuHandler'
+  import { useDropdownPosition } from './useDropdownPosition'
 
   const id = useAutoId('input-dropdown')
   const dropdownRef = ref<HTMLElement | null>(null)
   const menuRef = ref<HTMLElement | null>(null)
-
   const emit = defineEmits<DropdownContainerEvent>()
-
   const isFocused = ref(false)
 
   const props = withDefaults(defineProps<DropdownProps<TDropdownItem>>(), {
@@ -82,23 +86,61 @@
     readonly: false,
     dropdownType: 'form',
     selectedLabel: '',
+    mode: 'single',
   })
 
-  const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } = useDropdownMenuHandler(
-    props.items,
-    props.keyId,
-    props.keyLabel,
-    props.keyIconName,
+  const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } =
+    useDropdownMenuHandler(props.items, props.keyId, props.keyLabel, props.keyIconName, dropdownRef)
+
+  const { menuPositionStyle, updatePosition } = useDropdownPosition(
     dropdownRef,
+    menuRef,
+    dropdownDirection,
   )
 
-  const dynamicPlaceholder = computed(() =>
-    !computedItems.value.length
-      ? 'Aucun élément disponible'
-      : props.readonly
-        ? 'Sélection impossible (Lecture seule)'
-        : props.placeholder,
-  )
+  const motion = computed(() => {
+    const dir = dropdownDirection.value
+    return {
+      initial: {
+        opacity: 0,
+        y: dir === 'up' ? 10 : -10,
+        scale: 0.96,
+        boxShadow: '0 0 0 rgba(0,0,0,0)',
+        backdropFilter: 'blur(0px)',
+      },
+      enter: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.18)',
+        backdropFilter: 'blur(8px)',
+        transition: { type: 'spring', stiffness: 200, damping: 18 },
+      },
+      leave: {
+        opacity: 0,
+        y: dir === 'up' ? 10 : -10,
+        scale: 0.96,
+        boxShadow: '0 0 0 rgba(0,0,0,0)',
+        backdropFilter: 'blur(0px)',
+        transition: { duration: 0.25, ease: 'easeInOut' },
+      },
+    }
+  })
+
+  provide('closeDropdown', () => {
+    isOpen.value = false
+  })
+
+  watch(isOpen, (open) => {
+    if (open) updatePosition()
+  })
+
+  const dynamicPlaceholder = computed(() => {
+    if (props.readonly) return 'Sélection impossible (Lecture seule)'
+    if (computedItems.value.length === 0) return 'Aucun élément disponible'
+    if (!props.selectedLabel) return props.placeholder || 'Sélectionner une option'
+    return props.placeholder
+  })
 
   const canClear = computed(
     () =>
@@ -106,6 +148,7 @@
       !props.readonly &&
       !props.disabled &&
       !props.forceValue &&
+      props.mode !== 'single' &&
       (isFocused.value || isOpen.value) &&
       computedItems.value.length > 0,
   )
@@ -126,8 +169,13 @@
     isOpen.value = !isOpen.value
     if (isOpen.value) updateDropdownVisibilityAndDirection()
   }
+
+  provide('closeDropdown', (force = false) => {
+    if (props.mode === 'multiple' && !force) return
+    isOpen.value = false
+  })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   @import 'DropdownContainer.less';
 </style>

@@ -1,0 +1,81 @@
+-- Script SQL de mise à jour des images produits
+-- Généré le 2025-12-03T22:52:33.192Z
+
+BEGIN;
+
+-- Fichier source : bpc-157-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/bpc-157-10mg.webp' WHERE slug ILIKE '%bpc-157-10mg%';
+
+-- Fichier source : cjc-1295-dac-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/cjc-1295-dac-5mg.webp' WHERE slug ILIKE '%cjc-1295-dac-5mg%';
+
+-- Fichier source : default-product-image.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/default-product-image.webp' WHERE slug ILIKE '%default-product-image%';
+
+-- Fichier source : dsip-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/dsip-5mg.webp' WHERE slug ILIKE '%dsip-5mg%';
+
+-- Fichier source : ghk-cu-100mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ghk-cu-100mg.webp' WHERE slug ILIKE '%ghk-cu-100mg%';
+
+-- Fichier source : ghrp-6-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ghrp-6-10mg.webp' WHERE slug ILIKE '%ghrp-6-10mg%';
+
+-- Fichier source : hexarelin-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/hexarelin-5mg.webp' WHERE slug ILIKE '%hexarelin-5mg%';
+
+-- Fichier source : ipamorelin-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ipamorelin-5mg.webp' WHERE slug ILIKE '%ipamorelin-5mg%';
+
+-- Fichier source : kisspeptine-10-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/kisspeptine-10-10mg.webp' WHERE slug ILIKE '%kisspeptine-10-10mg%';
+
+-- Fichier source : klow-80mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/klow-80mg.webp' WHERE slug ILIKE '%klow-80mg%';
+
+-- Fichier source : Melanotan 2-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/melanotan-2-10mg.webp' WHERE slug ILIKE '%melanotan-2-10mg%';
+
+-- Fichier source : nad+-500mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/nad-500mg.webp' WHERE slug ILIKE '%nad-500mg%';
+
+-- Fichier source : peg-mgf-2mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/peg-mgf-2mg.webp' WHERE slug ILIKE '%peg-mgf-2mg%';
+
+-- Fichier source : pt-141-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/pt-141-10mg.webp' WHERE slug ILIKE '%pt-141-10mg%';
+
+-- Fichier source : retatrutide-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/retatrutide-10mg.webp' WHERE slug ILIKE '%retatrutide-10mg%';
+
+-- Fichier source : selank-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/selank-5mg.webp' WHERE slug ILIKE '%selank-5mg%';
+
+-- Fichier source : semaglutide-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/semaglutide-10mg.webp' WHERE slug ILIKE '%semaglutide-10mg%';
+
+-- Fichier source : semax-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/semax-5mg.webp' WHERE slug ILIKE '%semax-5mg%';
+
+-- Fichier source : sermorelin-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/sermorelin-5mg.webp' WHERE slug ILIKE '%sermorelin-5mg%';
+
+-- Fichier source : slu-pp-332-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/slu-pp-332-10mg.webp' WHERE slug ILIKE '%slu-pp-332-10mg%';
+
+-- Fichier source : ss-31-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ss-31-10mg.webp' WHERE slug ILIKE '%ss-31-10mg%';
+
+-- Fichier source : tb-500-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tb-500-5mg.webp' WHERE slug ILIKE '%tb-500-5mg%';
+
+-- Fichier source : tesamorelin-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tesamorelin-10mg.webp' WHERE slug ILIKE '%tesamorelin-10mg%';
+
+-- Fichier source : thymosin Alpha-1-5mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/thymosin-alpha-1-5mg.webp' WHERE slug ILIKE '%thymosin-alpha-1-5mg%';
+
+-- Fichier source : tirzepatide-10mg.png
+UPDATE products SET image_url = 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tirzepatide-10mg.webp' WHERE slug ILIKE '%tirzepatide-10mg%';
+
+COMMIT;

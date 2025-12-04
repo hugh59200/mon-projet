@@ -1,0 +1,14 @@
+{
+  "type": "http",
+  "transform": {
+    "table": "orders",
+    "type": "update",
+    "schema": "public",
+    "filter": {
+      "status": {
+        "neq": "OLD.status"
+      }
+    }
+  },
+  "endpoint": "/functions/v1/send-order-update"
+}

@@ -1,130 +1,143 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// supabase/functions/order-confirmation/index.ts
+// Email "Commande en attente de paiement" (Paiement Asynchrone)
 
-type OrderPayload = {
-  order_id: string
-  email: string
-  full_name?: string
-  total_amount: number
-  items: { name: string; quantity: number; price: number }[]
-  created_at: string
+import { APP_BASE_URL, supabase } from '../../utils/clients.ts'
+import { createHandler } from '../../utils/createHandler.ts'
+import { getValidLocale, translations } from '../../utils/i18n.ts'
+import { sendEmail } from '../../utils/sendEmail.ts'
+import { renderEmailTemplate } from '../../utils/templates/renderEmailTemplate.ts'
+import type { BankTransferDetails, CryptoDetails, PaymentMethod } from '../../utils/templates/pendingPaymentTemplate.ts'
+
+interface OrderConfirmationBody {
+  order_id?: string
+  orderId?: string
+  locale?: string
 }
 
-// ✅ Gestion CORS universelle
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  }
+// ============================================================
+// CONFIGURATION PAIEMENT (depuis variables d'environnement)
+// ============================================================
+
+const BANK_DETAILS: BankTransferDetails = {
+  beneficiary: Deno.env.get('BANK_BENEFICIARY') || 'Atlas Lab Solutions LLC',
+  iban: Deno.env.get('BANK_IBAN') || '',
+  bic: Deno.env.get('BANK_BIC') || '',
 }
 
-serve(async (req) => {
-  // 🔸 Réponse aux preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders() })
-  }
+const CRYPTO_DETAILS: CryptoDetails = {
+  btc_address: Deno.env.get('CRYPTO_BTC_ADDRESS') || '',
+  usdt_address: Deno.env.get('CRYPTO_USDT_ADDRESS') || '',
+}
 
-  try {
-    // 🔑 Variables d’environnement
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const env = Deno.env.get('ENV') || 'development'
+// ============================================================
+// HANDLER PRINCIPAL
+// ============================================================
 
-    if (!resendApiKey) {
-      throw new Error('RESEND_API_KEY manquant dans les variables Supabase')
+Deno.serve(
+  createHandler<OrderConfirmationBody>(async (_req, body) => {
+    const order_id = body.order_id ?? body.orderId
+    if (!order_id) throw new Error('Missing order_id')
+
+    console.log(`📧 Traitement commande en attente: ${order_id}`)
+
+    // 1. Récupération de la commande via le client ADMIN
+    const { data: order, error } = await supabase
+      .from('orders_full_view')
+      .select('*')
+      .eq('order_id', order_id)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Erreur DB:', error)
+      throw error
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
-    // 📦 Lecture du corps JSON
-    const body: OrderPayload = await req.json()
-    const { order_id, email, full_name, total_amount, items, created_at } = body
-
-    if (!email || !order_id || !items?.length) {
-      return new Response(JSON.stringify({ success: false, error: 'Requête incomplète.' }), {
-        status: 400,
-        headers: corsHeaders(),
-      })
+    if (!order) {
+      console.error('Commande introuvable')
+      throw new Error('Order not found')
     }
 
-    // 💬 Choix de l’expéditeur selon l’environnement
-    const fromEmail = env === 'production' ? 'contact@peptidestore.com' : 'onboarding@resend.dev'
+    // 2. Déterminer la locale
+    const locale = getValidLocale(body.locale ?? 'fr')
+    const t = translations.pendingPayment
 
-    // 🧾 Contenu de l’email HTML
-    const itemsHtml = items
-      .map((i) => `<li>${i.name} — ${i.quantity} × ${i.price.toFixed(2)} €</li>`)
-      .join('')
+    const orderNumber = order.order_number ?? order_id
+    const isGuest = !order.user_id
 
-    const html = `
-      <h2>Merci pour votre commande, ${full_name || 'cher client'} !</h2>
-      <p>Votre commande <b>#${order_id}</b> a bien été enregistrée.</p>
-      <ul>${itemsHtml}</ul>
-      <p><b>Total :</b> ${total_amount.toFixed(2)} €</p>
-      <p>Date : ${new Date(created_at).toLocaleString('fr-FR')}</p>
-      <p>Nous vous tiendrons informé de l’expédition sous peu 🚚</p>
-      <hr/>
-      <small>Merci de votre confiance,<br/>L’équipe PeptideStore</small>
-    `
+    // 3. Validation email
+    if (!order.shipping_email || !order.shipping_email.includes('@')) {
+      throw new Error(`Email invalide: ${order.shipping_email}`)
+    }
 
-    console.info(`📤 Envoi email via Resend → ${email} (${env})`)
+    // 4. Déterminer la méthode de paiement
+    const rawPaymentMethod = (order.payment_method || 'bank_transfer').toLowerCase()
+    let paymentMethod: PaymentMethod = 'bank_transfer'
 
-    // 📧 Appel à Resend API
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: email,
-        subject: `Confirmation de votre commande #${order_id}`,
-        html,
-      }),
+    if (rawPaymentMethod.includes('crypto') || rawPaymentMethod.includes('btc') || rawPaymentMethod.includes('usdt')) {
+      paymentMethod = 'crypto'
+    }
+
+    console.log(`Méthode de paiement détectée: ${paymentMethod}`)
+
+    // 5. Construire la liste des articles (OpSec: pas de noms de produits)
+    const detailedItems = order.detailed_items ?? []
+    const items = detailedItems.map((item: { quantity?: number; product_price?: number }) => ({
+      quantity: Number(item.quantity ?? 1),
+      unit_price: Number(item.product_price ?? 0),
+    }))
+
+    // 6. Construire le lien de suivi
+    let ctaUrl: string
+
+    if (isGuest) {
+      if (order.tracking_token) {
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?token=${order.tracking_token}`
+      } else {
+        ctaUrl = `${APP_BASE_URL}/suivi-commande?email=${encodeURIComponent(order.shipping_email)}&ref=${orderNumber}`
+      }
+    } else {
+      ctaUrl = `${APP_BASE_URL}/profil/commandes/${order_id}`
+    }
+
+    // 7. Générer le HTML avec le template pending_payment
+    const html = renderEmailTemplate('pending_payment', {
+      order_number: orderNumber,
+      full_name: order.shipping_name,
+      payment_method: paymentMethod,
+      items,
+      subtotal: order.subtotal ?? order.total_amount,
+      shipping_cost: order.shipping_cost ?? 0,
+      total_amount: order.total_amount,
+      bank_details: paymentMethod === 'bank_transfer' ? BANK_DETAILS : undefined,
+      crypto_details: paymentMethod === 'crypto' ? CRYPTO_DETAILS : undefined,
+      ctaUrl,
+      locale,
     })
 
-    const data = await res.json()
-    console.info('📨 Réponse Resend:', data)
+    // 8. Envoyer l'email avec le nouveau sujet
+    const emailSubject = t.subject[locale](orderNumber)
 
-    if (!res.ok) {
-      console.error('❌ Erreur Resend:', data)
-      return new Response(JSON.stringify({ success: false, error: data }), {
-        status: 400,
-        headers: corsHeaders(),
-      })
-    }
+    console.log(`📤 Envoi email à ${order.shipping_email}`)
 
-    // ✅ Met à jour le statut de la commande
-    const { error: updateError } = await supabase
-      .from('orders')
-      .update({ status: 'confirmed' })
-      .eq('id', order_id)
-
-    if (updateError) {
-      console.error('⚠️ Erreur lors de la mise à jour du statut :', updateError)
-    }
-
-    // 📘 Log optionnel dans une table dédiée
-    await supabase.from('logs').insert([
-      {
-        type: 'email_sent',
-        order_id,
-        email,
-        created_at: new Date().toISOString(),
-      },
-    ])
-
-    return new Response(JSON.stringify({ success: true, message: 'Email envoyé avec succès ✅' }), {
-      status: 200,
-      headers: corsHeaders(),
+    const emailResult = await sendEmail({
+      to: order.shipping_email,
+      subject: emailSubject,
+      html,
+      type: 'pending_payment',
+      order_id,
     })
-  } catch (err) {
-    console.error('❌ Erreur Edge Function:', err)
-    return new Response(JSON.stringify({ success: false, error: err.message }), {
-      status: 500,
-      headers: corsHeaders(),
-    })
-  }
-})
+
+    console.log(`✅ Email envoyé: ${order.shipping_email}`)
+
+    return {
+      success: true,
+      email_sent_to: order.shipping_email,
+      mode: isGuest ? 'guest' : 'authenticated',
+      payment_method: paymentMethod,
+      tracking_link: ctaUrl,
+      order_number: orderNumber,
+      has_tracking_token: !!order.tracking_token,
+      locale,
+    }
+  }),
+)

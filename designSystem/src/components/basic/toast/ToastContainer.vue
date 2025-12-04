@@ -1,8 +1,10 @@
 <template>
   <div class="toast-container">
-    <BasicToast
+    <component
       v-for="t in toastStore.toasts"
       :key="t.id"
+      :is="t.component || BasicToast"
+      v-bind="t.props"
       :id="t.id"
       :message="t.message"
       :type="t.type"
@@ -12,26 +14,25 @@
 </template>
 
 <script setup lang="ts">
-  import { useToastStore } from '@/features/interface/toast/useToastStore'
+  import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import BasicToast from './BasicToast.vue'
-
   const toastStore = useToastStore()
 </script>
 
 <style scoped lang="less">
   .toast-container {
     position: fixed;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    z-index: 2000;
-    pointer-events: none; // évite de bloquer les clics sur la page
+    z-index: @z-toast;
+    pointer-events: none;
   }
-
   .toast-container > * {
-    pointer-events: auto; // réactive les clics sur les boutons ✖
+    pointer-events: auto;
   }
 </style>

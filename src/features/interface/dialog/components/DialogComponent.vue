@@ -42,18 +42,16 @@
       </section>
     </template>
     <template #actions>
-      <div class="flex-gap-4 flex">
-        <BasicButton
-          v-for="action in actions"
-          :key="action"
-          type="secondary"
-          size="large"
-          :label="wording.actions[action]"
-          :variant="variantType(action)"
-          @click="store.triggerUserAction(action)"
-          class="flex-1"
-        />
-      </div>
+      <PremiumButton
+        v-for="action in actions"
+        :key="action"
+        type="secondary"
+        size="lg"
+        :label="wording.actions[action]"
+        :variant="variantType(action)"
+        @click="store.triggerUserAction(action)"
+        width="full"
+      />
     </template>
   </ModalComponent>
 </template>
@@ -83,10 +81,10 @@
       case 'Ok':
       case 'Yes':
       case 'Retry':
-        return 'outlined'
+        return 'outline'
       case 'Cancel':
       case 'No':
-        return 'filled'
+        return 'solid'
     }
   }
 

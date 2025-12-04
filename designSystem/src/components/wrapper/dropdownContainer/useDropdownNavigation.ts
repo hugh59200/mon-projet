@@ -1,7 +1,7 @@
-import { ref } from 'vue'
-import type { Ref, ComputedRef } from 'vue'
-import type { DropdownItem } from '@designSystem/components'
 import { useScrollIntoView } from '@/features/interface/composables/useScrollIntoView'
+import type { DropdownItem } from '@designSystem/components'
+import type { ComputedRef, Ref } from 'vue'
+import { ref } from 'vue'
 
 export function useDropdownNavigation<TDropdownItem = DropdownItem>(
   computedItems: ComputedRef<TDropdownItem[]>,

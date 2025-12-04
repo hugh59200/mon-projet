@@ -17,21 +17,23 @@
     <span v-if="inline">{{ label }} :</span>
     <BasicTooltip :label="tooltipToShow!">
       <BasicIcon
+        class="icon"
+        :class="{ 'icon--danger': danger }"
         :name="iconName"
         :focusable="!isDisabled"
         :pointer="!isDisabled"
         :disabled="isDisabled"
-        @click="onClick"
+        @click.stop="onClick"
       />
     </BasicTooltip>
   </component>
 </template>
 
 <script setup lang="ts">
+  import BasicIcon from '@designSystem/components/basic/icon/BasicIcon.vue'
+  import BasicTooltip from '@designSystem/components/basic/tooltip/BasicTooltip.vue'
   import { computed } from 'vue'
   import BasicCell from './BasicCell.vue'
-  import BasicTooltip from '@designSystem/components/basic/tooltip/BasicTooltip.vue'
-  import BasicIcon from '@designSystem/components/basic/icon/BasicIcon.vue'
   import type { BasicCellActionIconProps } from './BasicCellActionIcon.types'
 
   const props = withDefaults(defineProps<BasicCellActionIconProps>(), {
@@ -54,7 +56,7 @@
 <style scoped lang="less">
   .elem {
     svg {
-      fill: @primary-600;
+      fill: var(--primary-600);
     }
 
     &:not(.elem--readonly)&--danger {

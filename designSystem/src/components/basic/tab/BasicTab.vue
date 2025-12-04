@@ -1,62 +1,125 @@
 <template>
   <div
-    :class="['tab', `tab--${tabClass}`]"
-    @click="handleTabClick"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
+    ref="tabRef"
+    class="tab"
+    :class="{ 'tab--selected': isSelected, 'tab--unselected': !isSelected }"
+    @click="handleSelect"
   >
     <BasicText
-      :wrap-all="!selected && !isHovered"
-      :nb-max-lines="selected || isHovered ? '2' : '1'"
-      :size="selected ? 'body-xl' : 'body-l'"
-      :weight="selected ? 'semibold' : 'regular'"
+      :wrap-all="!isSelected"
+      :nb-max-lines="isSelected ? '2' : '1'"
+      :size="isSelected ? 'body-l' : 'body-m'"
+      :weight="isSelected ? 'semibold' : 'regular'"
+      class="tab__label"
+      :color="computedTextColor"
     >
-      <slot
-        name="tab-text"
-        :tabKey
-        :tabState
-        :selected
-      />
-      <template v-if="!$slots['tab-text']">
-        {{ tabKey }}
-      </template>
+      {{ tabKey }}
     </BasicText>
+
     <slot
       name="tab-icon"
-      :tabKey
-      :tabState
-      :selected
+      :tabKey="tabKey"
+      :selected="isSelected"
     />
-    <BasicIcon
-      v-if="!$slots['tab-icon'] && tabState"
-      :class="[`tab--${tabState}`]"
-      :name="tabState"
-      active
+
+    <!-- ✅ Couleur icône selon sélection -->
+    <BasicIconNext
+      v-if="!$slots['tab-icon'] && icon"
+      class="tab__icon"
+      :name="icon"
+      :color="isSelected ? color : ('neutral-600' as IconColor)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, inject, ref } from 'vue'
+  import { computed } from 'vue'
+  import type { IconColor } from '../icon'
+  import type { TextColor } from '../text'
   import type { TabProps } from './BasicTab.types'
-  import { BasicTabsKey, type BasicTabsProvided } from '../tabs/BasicTabs.types'
 
-  const tabs = inject<BasicTabsProvided>(BasicTabsKey, null as any)
   const props = defineProps<TabProps>()
+  const modelValue = defineModel<string | number | null | undefined>()
 
-  const tabClass = computed(() => {
-    return tabs?.selectedTab?.value === props.tabKey ? 'selected' : 'unselected'
-  })
+  const isSelected = computed(
+    () => modelValue.value === props.routeName || modelValue.value === props.tabKey,
+  )
 
-  const handleTabClick = () => {
-    tabs?.change(props.tabKey)
+  const handleSelect = () => {
+    modelValue.value = props.routeName ?? props.tabKey
   }
 
-  const selected = computed(() => tabClass.value === 'selected')
-
-  const isHovered = ref(false)
+  // ✅ Couleur du texte (normal / sélectionné)
+  const computedTextColor = computed<TextColor>(() => {
+    if (isSelected.value && props.color) return props.color
+    return 'neutral-600'
+  })
 </script>
 
-<style lang="less">
-  @import './BasicTab.less';
+<style scoped lang="less">
+  .tab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: transparent;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 13px;
+
+    // Effet de hover subtil
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%,
+        color-mix(in srgb, var(--primary-500) 5%, transparent) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 12px;
+    }
+
+    &:hover:not(.tab--selected) {
+      background: @neutral-100;
+
+      &::before {
+        opacity: 1;
+      }
+
+      .tab__label {
+        color: @neutral-700 !important;
+      }
+    }
+
+    &--selected {
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+      box-shadow:
+        0 2px 8px color-mix(in srgb, var(--primary-600) 30%, transparent),
+        0 4px 16px color-mix(in srgb, var(--primary-700) 20%, transparent);
+
+      .tab__label {
+        color: white !important;
+      }
+
+      .tab__icon {
+        color: white !important;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 4px 12px color-mix(in srgb, var(--primary-600) 40%, transparent),
+          0 6px 20px color-mix(in srgb, var(--primary-700) 25%, transparent);
+      }
+    }
+  }
 </style>

@@ -3,12 +3,71 @@
   align-items: center;
   flex-wrap: wrap;
 
+  &--small {
+    .pagination__button {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
+    .pagination__span {
+      font-size: 12px;
+      margin-left: 10px;
+    }
+
+    .arrow {
+      transform: scale(0.55);
+    }
+  }
+
+  /* ---------- MEDIUM (défaut) ---------- */
+  &--medium {
+    .pagination__button {
+      min-width: 26px;
+      height: 26px;
+      padding: 0 10px;
+      margin: @spacing-5;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+
+    .pagination__span {
+      font-size: 14px;
+      margin-left: 14px;
+    }
+
+    .arrow {
+      transform: scale(0.7);
+    }
+  }
+
+  /* ---------- LARGE ---------- */
+  &--large {
+    .pagination__button {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 14px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    .pagination__span {
+      font-size: 16px;
+      margin-left: 18px;
+    }
+
+    .arrow {
+      transform: scale(0.95);
+    }
+  }
+
   > * {
     margin: @spacing-5 0;
   }
 
   &__span {
-    color: @secondary-800;
     margin-left: 16px;
   }
 
@@ -20,7 +79,7 @@
     min-width: 24px;
     height: 24px;
     background-color: @neutral-0;
-    color: @secondary-800;
+    color: var(--secondary-800);
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -38,13 +97,13 @@
     }
 
     &:not(.pagination__button--active):not(.pagination__ellipsis):hover {
-      border: 1px solid @secondary-800;
+      border: 1px solid var(--secondary-800);
       background-color: @neutral-100;
-      color: @secondary-800;
+      color: var(--secondary-800);
     }
 
     &--active {
-      background-color: @secondary-800;
+      background-color: var(--secondary-800);
       color: white;
     }
 
@@ -63,7 +122,7 @@
 
 .arrow {
   cursor: pointer;
-  fill: @secondary-800;
+  fill: white;
   transition:
     fill 0.3s ease,
     opacity 0.3s ease;
@@ -71,11 +130,11 @@
 
   &:not(.arrow--disabled):hover {
     background-color: @neutral-0;
-    fill: @secondary-800;
+    fill: var(--secondary-800);
   }
 
   &--disabled {
-    fill: @neutral-200;
+    fill: white;
     cursor: auto;
   }
 }

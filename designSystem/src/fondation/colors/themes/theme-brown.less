@@ -1,0 +1,89 @@
+@import "./color-utils.less";
+
+/* Primary — Beige / Marron clair */
+.theme-brown() {
+  /* Primary */
+  @primary-950: #5c4326;
+  @primary-900: #775c38;
+  @primary-800: #a07a4f;
+  @primary-700: #c9a97a; // principale warm beige
+  @primary-600: lighten(@primary-700, 5%);
+  @primary-500: lighten(@primary-700, 12%);
+  @primary-400: lighten(@primary-700, 22%);
+  @primary-300: lighten(@primary-700, 32%);
+  @primary-200: lighten(@primary-700, 42%);
+  @primary-100: lighten(@primary-700, 52%);
+  @primary-50: lighten(@primary-700, 60%);
+  @primary-0: @primary-50;
+
+  /* Secondary — Brun foncé neutre */
+  @secondary-base: #4b3424;
+  @secondary-1000: #000000;
+  @secondary-950: #1e140d;
+  @secondary-900: #2f2115;
+  @secondary-800: lighten(@secondary-base, 0%);
+  @secondary-700: lighten(@secondary-base, 10%);
+  @secondary-600: lighten(@secondary-base, 18%);
+  @secondary-500: lighten(@secondary-base, 26%);
+  @secondary-400: lighten(@secondary-base, 36%);
+  @secondary-300: lighten(@secondary-base, 46%);
+  @secondary-200: lighten(@secondary-base, 56%);
+  @secondary-100: lighten(@secondary-base, 66%);
+  @secondary-50: lighten(@secondary-base, 75%);
+  @secondary-0: @secondary-50;
+
+  /* Export en variables CSS */
+  --primary-950: @primary-950;
+  --primary-900: @primary-900;
+  --primary-800: @primary-800;
+  --primary-700: @primary-700;
+  --primary-600: @primary-600;
+  --primary-500: @primary-500;
+  --primary-400: @primary-400;
+  --primary-300: @primary-300;
+  --primary-200: @primary-200;
+  --primary-100: @primary-100;
+  --primary-50: @primary-50;
+  --primary-0: @primary-0;
+
+  .declare-rgb-var(primary-950, @primary-950);
+  .declare-rgb-var(primary-900, @primary-900);
+  .declare-rgb-var(primary-800, @primary-800);
+  .declare-rgb-var(primary-700, @primary-700);
+  .declare-rgb-var(primary-600, @primary-600);
+  .declare-rgb-var(primary-500, @primary-500);
+  .declare-rgb-var(primary-400, @primary-400);
+  .declare-rgb-var(primary-300, @primary-300);
+  .declare-rgb-var(primary-200, @primary-200);
+  .declare-rgb-var(primary-100, @primary-100);
+  .declare-rgb-var(primary-50, @primary-50);
+  .declare-rgb-var(primary-0, @primary-0);
+
+  --secondary-1000: @secondary-1000;
+  --secondary-950: @secondary-950;
+  --secondary-900: @secondary-900;
+  --secondary-800: @secondary-800;
+  --secondary-700: @secondary-700;
+  --secondary-600: @secondary-600;
+  --secondary-500: @secondary-500;
+  --secondary-400: @secondary-400;
+  --secondary-300: @secondary-300;
+  --secondary-200: @secondary-200;
+  --secondary-100: @secondary-100;
+  --secondary-50: @secondary-50;
+  --secondary-0: @secondary-0;
+
+  .declare-rgb-var(secondary-1000, @secondary-1000);
+  .declare-rgb-var(secondary-950, @secondary-950);
+  .declare-rgb-var(secondary-900, @secondary-900);
+  .declare-rgb-var(secondary-800, @secondary-800);
+  .declare-rgb-var(secondary-700, @secondary-700);
+  .declare-rgb-var(secondary-600, @secondary-600);
+  .declare-rgb-var(secondary-500, @secondary-500);
+  .declare-rgb-var(secondary-400, @secondary-400);
+  .declare-rgb-var(secondary-300, @secondary-300);
+  .declare-rgb-var(secondary-200, @secondary-200);
+  .declare-rgb-var(secondary-100, @secondary-100);
+  .declare-rgb-var(secondary-50, @secondary-50);
+  .declare-rgb-var(secondary-0, @secondary-0);
+}

@@ -1,0 +1,212 @@
+{
+  "generatedAt": "2025-12-03T22:52:33.198Z",
+  "stats": {
+    "total": 25,
+    "success": 25,
+    "failed": 0,
+    "totalOriginalSize": 123246010,
+    "totalOptimizedSize": 754754
+  },
+  "results": [
+    {
+      "originalFile": "bpc-157-10mg.png",
+      "slug": "bpc-157-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/bpc-157-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "cjc-1295-dac-5mg.png",
+      "slug": "cjc-1295-dac-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/cjc-1295-dac-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "default-product-image.png",
+      "slug": "default-product-image",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/default-product-image.webp",
+      "success": true,
+      "error": null,
+      "compression": "98.7%"
+    },
+    {
+      "originalFile": "dsip-5mg.png",
+      "slug": "dsip-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/dsip-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "ghk-cu-100mg.png",
+      "slug": "ghk-cu-100mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ghk-cu-100mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "ghrp-6-10mg.png",
+      "slug": "ghrp-6-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ghrp-6-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "hexarelin-5mg.png",
+      "slug": "hexarelin-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/hexarelin-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "ipamorelin-5mg.png",
+      "slug": "ipamorelin-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ipamorelin-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "kisspeptine-10-10mg.png",
+      "slug": "kisspeptine-10-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/kisspeptine-10-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "klow-80mg.png",
+      "slug": "klow-80mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/klow-80mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "Melanotan 2-10mg.png",
+      "slug": "melanotan-2-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/melanotan-2-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "nad+-500mg.png",
+      "slug": "nad-500mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/nad-500mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "peg-mgf-2mg.png",
+      "slug": "peg-mgf-2mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/peg-mgf-2mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "pt-141-10mg.png",
+      "slug": "pt-141-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/pt-141-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "retatrutide-10mg.png",
+      "slug": "retatrutide-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/retatrutide-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "selank-5mg.png",
+      "slug": "selank-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/selank-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "semaglutide-10mg.png",
+      "slug": "semaglutide-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/semaglutide-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "semax-5mg.png",
+      "slug": "semax-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/semax-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "sermorelin-5mg.png",
+      "slug": "sermorelin-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/sermorelin-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "slu-pp-332-10mg.png",
+      "slug": "slu-pp-332-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/slu-pp-332-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "ss-31-10mg.png",
+      "slug": "ss-31-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/ss-31-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "tb-500-5mg.png",
+      "slug": "tb-500-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tb-500-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "tesamorelin-10mg.png",
+      "slug": "tesamorelin-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tesamorelin-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "thymosin Alpha-1-5mg.png",
+      "slug": "thymosin-alpha-1-5mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/thymosin-alpha-1-5mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    },
+    {
+      "originalFile": "tirzepatide-10mg.png",
+      "slug": "tirzepatide-10mg",
+      "publicUrl": "https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/products/tirzepatide-10mg.webp",
+      "success": true,
+      "error": null,
+      "compression": "99.4%"
+    }
+  ]
+}

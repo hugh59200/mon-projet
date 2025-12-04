@@ -1,0 +1,80 @@
+<template>
+  <div
+    class="progress-container"
+    :class="color"
+  />
+</template>
+
+<script setup lang="ts">
+  defineProps<{ color?: 'success' | 'primary' | 'danger' }>()
+</script>
+
+<style scoped lang="less">
+  .progress-container {
+    position: relative;
+    width: 140px;
+    height: 6px;
+    background: color-mix(in srgb, @neutral-300 40%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 28px;
+    box-shadow: inset 0 0 3px color-mix(in srgb, @neutral-900 8%, transparent);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      transform: translateX(-100%);
+      animation: loadbar 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      background-size: 200% auto;
+    }
+
+    /* ✅ Couleurs dynamiques */
+    &.success::after {
+      background: linear-gradient(90deg, @success-500, color-mix(in srgb, white 10%, @success-600), @success-500);
+    }
+
+    &.primary::after {
+      background: linear-gradient(90deg, var(--primary-500), color-mix(in srgb, white 10%, var(--primary-600)), var(--primary-500));
+    }
+
+    &.danger::after {
+      background: linear-gradient(90deg, @danger-500, color-mix(in srgb, white 10%, @danger-600), @danger-500);
+    }
+
+    /* ✨ Effet de brillance subtile */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -40%;
+      width: 40%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.25);
+      transform: skewX(-20deg);
+      animation: shine 1.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+  }
+
+  /* Animation principale du remplissage */
+  @keyframes loadbar {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  /* Animation du reflet brillant */
+  @keyframes shine {
+    0% {
+      left: -40%;
+    }
+    100% {
+      left: 140%;
+    }
+  }
+</style>

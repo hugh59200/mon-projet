@@ -1,40 +1,49 @@
 .tab {
-  flex: 1;
-  display: flex;
+  position: relative;
+  flex: none;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: @spacing-20;
+  padding: @spacing-15 @spacing-20;
   gap: @spacing-5;
-  border-top-left-radius: @spacing-10;
-  border-top-right-radius: @spacing-10;
-  user-select: none;
-  transition:
-    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s,
-    color 0.3s;
-  max-height: 0;
+  border-radius: @spacing-10 @spacing-10 0 0;
+  cursor: pointer;
+  color: @neutral-600;
+  background-color: color-mix(in srgb, @neutral-100 60%, transparent);
+  transition: all 0.25s ease;
+  font-weight: 500;
+  border-bottom: 3px solid transparent; // base neutre
 
-  &--selected,
-  &--unselected:hover {
-    line-height: 1.1;
-    background: @white;
-    z-index: 2;
+  &:hover {
+    background-color: color-mix(in srgb, @neutral-200 80%, transparent);
+    color: var(--primary-700);
   }
 
+  /* ✅ Onglet actif — mise en avant claire */
+  &--selected {
+    background-color: @white;
+    color: var(--primary-700);
+    font-weight: 600;
+    border-bottom: 3px solid var(--primary-600); // ligne visible sous l'onglet
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(var(--primary-500-rgb), 0.15);
+  }
+
+  /* ⚪ Onglet inactif */
   &--unselected {
     color: @neutral-500;
-    cursor: pointer;
-    z-index: 1;
+    border-bottom: 3px solid transparent;
   }
 
   svg {
-    transform: scale(0.7);
+    transform: scale(0.85);
     flex: none;
   }
 
   &--success {
     fill: @success-500;
   }
+
   &--danger {
     fill: @danger-500;
   }

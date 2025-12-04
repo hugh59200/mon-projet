@@ -2,7 +2,6 @@
   <component
     v-if="loadedIcon"
     :is="loadedIcon"
-    v-focusable="{ focusable }"
     :class="[
       'icon',
       { show: isVisible },

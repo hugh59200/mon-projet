@@ -1,5 +1,5 @@
-@font-family-primary: 'Mont';
-@font-family-secondary: 'sans-serif';
+@font-family-primary: "Mont";
+@font-family-secondary: "sans-serif";
 
 @font-weight-light: 300;
 @font-weight-regular: 600;
@@ -27,7 +27,7 @@ input {
   background: @white;
   font-weight: @font-weight-regular;
   border: 1px solid @neutral-200;
-  caret-color: @primary-600;
+  caret-color: var(--primary-600);
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -80,15 +80,15 @@ input {
   }
 }
 
-/* Style partagés aux éléments de grid */
+/* Style partagés aux éléments de grid — Dark Theme Support */
 .gridElemWrapper:nth-child(odd),
 .listCardDesktopWrapper:nth-child(odd) {
-  background-color: @light-blue;
+  background-color: var(--admin-bg-card, @light-blue);
 }
 
 .gridElemWrapper:nth-child(even),
 .listCardDesktopWrapper:nth-child(even) {
-  background-color: @white;
+  background-color: var(--admin-bg-card-hover, @white);
 }
 
 .cardLayoutWrapper {
@@ -97,12 +97,13 @@ input {
   align-items: center;
   grid-template-columns: repeat(36, 1fr);
   padding: 12px;
-  border-bottom: 1px solid @neutral-200;
+  border-bottom: 1px solid var(--admin-border-subtle, @neutral-200);
+  transition: background-color 0.15s ease;
 
   &--selectionnable {
     cursor: pointer;
     &:hover {
-      background-color: @neutral-100;
+      background-color: var(--admin-bg-card-hover, @neutral-100);
     }
   }
 
@@ -111,7 +112,7 @@ input {
   }
 
   &--drawer {
-    background-color: #eeeeee;
+    background-color: var(--admin-bg-header, #eeeeee);
   }
 
   &--factureList {
@@ -128,17 +129,19 @@ input {
   }
 
   &--header {
-    border-radius: 8px 8px 0px 0px;
-    background: @indigo-900;
+    border-radius: 12px 12px 0px 0px;
+    background: var(--admin-bg-header, @indigo-900);
+    border-bottom: 1px solid var(--admin-border, transparent);
 
     .elem {
       display: flex;
       justify-content: space-between;
 
       span {
-        color: @white;
-        font-weight: 800;
+        color: var(--admin-text-primary, @white);
+        font-weight: 700;
         font-size: 12px;
+        letter-spacing: 0.02em;
       }
 
       &--sort {
@@ -146,7 +149,7 @@ input {
       }
 
       svg {
-        fill: @white;
+        fill: var(--admin-text-secondary, @white);
         transform: scale(0.65);
         overflow: visible;
       }
@@ -178,7 +181,7 @@ input {
 }
 
 .color-recherche-virements {
-  background-color: @secondary-400;
+  background-color: var(--secondary-400);
 }
 
 .color-recherche-factures {
@@ -198,12 +201,13 @@ input {
   display: flex;
   align-items: center;
   padding: 6px;
-  color: @primary-950;
+  color: var(--admin-text-primary, var(--primary-950));
   font-size: @font-size-body-m;
 
   span {
     font-weight: 600;
     font-size: 12px;
+    color: var(--admin-text-primary, inherit);
   }
 
   svg {
@@ -325,6 +329,9 @@ input {
 
   &--span-14 {
     grid-column: span 14;
+  }
+  &--span-16 {
+    grid-column: span 16;
   }
 
   &--span-18 {

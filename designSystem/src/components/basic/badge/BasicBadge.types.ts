@@ -2,7 +2,7 @@ export type BadgeType = 'default' | 'pending' | 'error' | 'success' | 'info' | '
 export type BadgeSize = 'medium' | 'small'
 
 export type BadgeProps = {
-  label: string
+  label?: string
   type?: BadgeType
   size?: BadgeSize
   deletable?: boolean

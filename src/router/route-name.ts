@@ -1,17 +1,39 @@
 // Auto-generated from router/index.ts
 export type RouteName =
+  'AdminMessagerie' |
+  'AdminNews' |
+  'AdminOrders' |
+  'AdminProducts' |
+  'AdminStats' |
+  'AdminTopics' |
+  'AdminUsers' |
+  'about' |
   'access-denied' |
-  'admin-order-detail' |
-  'admin-orders' |
-  'admin-users' |
+  'actualite-detail' |
+  'actualites' |
+  'auth-callback' |
+  'auth-login' |
+  'auth-register' |
+  'auth-reset' |
   'cart' |
   'catalogue' |
+  'cgu' |
   'checkout' |
-  'confirmation' |
+  'checkout-confirmation' |
+  'cookies' |
+  'email-sent' |
+  'faq' |
+  'favorites' |
   'home' |
-  'login' |
+  'mentions-legales' |
+  'mfa-challenge' |
+  'mfa-setup' |
+  'order-detail' |
+  'orders' |
+  'politique-confidentialite' |
   'product-detail' |
   'profil' |
-  'register' |
-  'user-order-detail' |
-  'user-orders'
+  'reconstitution' |
+  'track-order' |
+  'update-password' |
+  'update-password-success'

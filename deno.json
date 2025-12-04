@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true
+  },
+  "importMap": "./import_map.json",
+  "tasks": {
+    "check": "deno check supabase/functions/**/*.ts"
+  }
+}

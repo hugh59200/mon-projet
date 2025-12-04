@@ -1,3 +1,4 @@
-import type { DropdownItem, DropdownId, DropdownProps, WrapperFormElementProps } from '@designSystem/components'
+import type { DropdownItem, DropdownProps, WrapperFormElementProps } from '@designSystem/components'
 
-export type WrapperDropdownProps<T = DropdownItem<DropdownId>> = WrapperFormElementProps & DropdownProps<T>
+export type WrapperDropdownProps<T = DropdownItem> = WrapperFormElementProps &
+  DropdownProps<T extends DropdownItem ? T : DropdownItem>

@@ -5,7 +5,7 @@
   padding: @spacing-10 @spacing-10;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: @secondary-1000;
+  color: var(--secondary-100);
 
   &--small {
     font-size: @font-size-body-s;
@@ -29,23 +29,27 @@
   }
 
   &--active {
-    background-color: @secondary-800;
+    background-color: var(--secondary-800);
     color: @white;
+
+    .dropdown-item__label {
+      color: white;
+    }
     .icon {
       fill: @white;
     }
   }
 
   &--highlighted {
-    background-color: @secondary-200;
+    background-color: var(--secondary-200);
   }
 
   &--active&--highlighted {
-    background-color: @secondary-600;
+    background-color: var(--secondary-600);
   }
 
   &:not(.dropdown-item--active):hover {
-    background-color: @secondary-0;
+    background-color: var(--secondary-0);
   }
 
   &__label {
@@ -53,7 +57,7 @@
   }
 
   .icon {
-    fill: @secondary-1000;
+    fill: var(--secondary-100);
     width: 25px;
   }
 }

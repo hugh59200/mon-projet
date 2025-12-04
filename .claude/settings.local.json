@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(tree:*)",
+      "Bash(node scripts/upload-images.js:*)",
+      "Bash(npx cypress run:*)",
+      "Bash(node scripts/upload-images.cjs:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(npm run deploy:functions:*)",
+      "Bash(node -e:*)",
+      "Bash(npx supabase:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "maxFileTokens": 50000
+}

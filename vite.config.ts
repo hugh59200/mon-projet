@@ -1,62 +1,25 @@
-import BasicSSL from '@vitejs/plugin-basic-ssl'
 import vue from '@vitejs/plugin-vue'
+import fs from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
-import path from 'path'
+import path from 'node:path'
+import { defineConfig, type BuildEnvironmentOptions } from 'vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import svgLoader from 'vite-svg-loader'
-
-import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer'
-
-import { defineConfig } from 'vite'
+import sitemap from 'vite-plugin-sitemap'
+import { assetFileNameOptimizer, manualChunksOptimizer } from './vite/chunkOptimizer.ts'
 import {
   generateGlobalComponents,
   generateIconsList,
   generateRouteNamesUnion,
-} from './vite/generator'
+} from './vite/generator.ts'
 
-// === Config globale ===
-const outDir = 'dist'
+const outDir = 'dist' // Output directory for the build
+const isProd = process.env.NODE_ENV === 'production'
 
-// 🧩 Pré-build automatiques
-generateIconsList(__dirname)
-generateRouteNamesUnion(__dirname)
-generateGlobalComponents(__dirname)
-
-export default defineConfig({
-  // === Plugins ===
-  plugins: [
-    vue(),
-    svgLoader(),
-    VueDevTools(),
-    BasicSSL(), // SSL local
-  ],
-
-  // === Résolution des alias ===
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@designSystem': path.resolve(__dirname, 'designSystem/src'),
-      '@designSystem/components': path.resolve(__dirname, 'designSystem/src/components/index.ts'),
-    },
-  },
-
-  // === Configuration CSS (LESS global) ===
-  css: {
-    transformer: 'postcss',
-    preprocessorOptions: {
-      less: {
-        additionalData: `@import "@designSystem/index.less";`,
-      },
-    },
-  },
-
-  // === Build optimisé (Cloudflare-ready) ===
-  build: {
+const config = {
+  APP: {
     outDir,
-    sourcemap: true,
-    cssMinify: false,
-    chunkSizeWarningLimit: 2500,
-
+    sourcemap: !isProd, // Désactivé en production
     rollupOptions: {
       output: {
         manualChunks: manualChunksOptimizer,
@@ -70,11 +33,54 @@ export default defineConfig({
     target: 'esnext',
   },
 
-  // === Serveur local ===
+export default defineConfig({
+  plugins: [
+    vue(),
+    !isProd && VueDevTools(), // Désactivé en production
+    svgLoader(),
+    sitemap({
+      hostname: 'https://fast-peptides.com',
+      dynamicRoutes: [
+        '/',
+        '/catalogue',
+        '/about',
+        '/contact',
+        '/faq',
+        '/actualites',
+        '/reconstitution',
+        '/legal/cgv',
+        '/legal/privacy',
+        '/legal/mentions',
+      ],
+    }),
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@designSystem': path.resolve(__dirname, 'designSystem/src'),
+      '@designSystem/components': path.resolve(__dirname, 'designSystem/src/components/index.ts'),
+    },
+  },
+  css: {
+    transformer: 'postcss',
+    preprocessorOptions: {
+      less: {
+        additionalData: `@import "@designSystem/index.less";`,
+      },
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 2500,
+    ...config.APP,
+    cssMinify: false,
+  },
   server: {
     port: 5278,
-    strictPort: true,
     host: 'localhost',
+    https: {
+      key: fs.readFileSync('./localhost+2-key.pem'),
+      cert: fs.readFileSync('./localhost+2.pem'),
+    },
   },
 
   // === Optimisation dépendances ===

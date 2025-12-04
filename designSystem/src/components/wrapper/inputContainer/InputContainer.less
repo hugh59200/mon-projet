@@ -1,9 +1,56 @@
 .input-container {
   position: relative;
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   background: @white;
   border: 1px solid @neutral-200;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  min-width: 0; // Permet au conteneur de rétrécir dans un contexte flex
+
+  /* --- Champs --- */
+  &__field {
+    flex: 1;
+    min-width: 0; // Permet au champ de rétrécir
+    display: flex;
+    align-items: center;
+  }
+
+  /* --- Icônes droites (pile, œil, etc.) --- */
+  &__icons-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 6px;
+    margin-left: 4px;
+  }
+
+  /* --- Icône gauche --- */
+  &__icon-left {
+    margin-right: 6px;
+    margin-left: 4px;
+  }
+
+  /* --- Icône delete / close --- */
+  &__icon-delete {
+    margin: 0 4px;
+  }
+
+  /* --- Hover / Focus / Disabled --- */
+  &:not(.input-container--disabled, .input-container--readonly):hover {
+    border-color: var(--primary-600);
+  }
+
+  &:not(
+      .input-container--error,
+      .input-container--success,
+      .input-container--disabled,
+      .input-container--readonly
+    ):focus-within {
+    box-shadow: @focus-global;
+    border-color: var(--primary-600);
+  }
 
   &--disabled,
   &--readonly {
@@ -14,69 +61,28 @@
     svg {
       fill: @neutral-400;
       background: @neutral-100;
-
-      &:hover {
-        cursor: default;
-      }
+      pointer-events: none;
     }
   }
 
   &--disabled {
     background-color: @neutral-100;
-    opacity: 0.9;
-    svg {
-      background: @neutral-100;
-    }
   }
 
   &--readonly {
     background-color: @neutral-0;
-    svg {
-      background: @neutral-0;
-    }
-  }
-
-  svg {
-    flex: none;
-    cursor: pointer;
-    fill: @neutral-600;
   }
 
   &--large {
-    padding: @spacing-10;
-    gap: @spacing-5;
-    svg {
-      transform: scale(0.8);
-    }
+    padding: 10px;
   }
 
   &--medium {
     padding: 6px;
-    gap: 3px;
-    svg {
-      transform: scale(0.7);
-    }
   }
 
   &--small {
     padding: 3px;
-    svg {
-      transform: scale(0.5);
-    }
-  }
-
-  &:not(.input-container--disabled, .input-container--readonly):hover {
-    border-color: @primary-600;
-  }
-
-  &:not(
-      .input-container--error,
-      .input-container--success,
-      .input-container--disabled,
-      .input-container--readonly
-    ):focus-within {
-    box-shadow: @focus-global;
-    border-color: @success-600;
   }
 
   &--table {
@@ -84,6 +90,42 @@
 
     :deep(.alert__icon) {
       transform: scale(0.7) !important;
+    }
+  }
+
+  // Variante Ghost (transparent, pour dark mode)
+  &--ghost {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.12);
+
+    input {
+      background: transparent;
+      color: @neutral-100;
+
+      &::placeholder {
+        color: @neutral-500;
+      }
+    }
+
+    svg {
+      background: transparent;
+      color: @neutral-400;
+    }
+
+    &:not(.input-container--disabled, .input-container--readonly):hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    &:not(
+        .input-container--error,
+        .input-container--success,
+        .input-container--disabled,
+        .input-container--readonly
+      ):focus-within {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.03);
+      box-shadow: none;
     }
   }
 }

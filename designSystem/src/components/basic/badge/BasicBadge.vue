@@ -9,18 +9,21 @@
       },
     ]"
   >
-    <BasicText
-      class="badge__label"
-      :size="textSizeMapping[size]"
-      weight="semibold"
-      wrapAll
-      :nbMaxLines
-    >
-      {{ label }}
-    </BasicText>
+    <slot>
+      <BasicText
+        class="badge__label"
+        :size="textSizeMapping[size]"
+        weight="semibold"
+        wrapAll
+        :nbMaxLines
+      >
+        {{ label }}
+      </BasicText>
+    </slot>
     <BasicIcon
       v-if="deletable"
       name="close-square"
+      class="badge__close-icon"
       @click="$emit('click-delete')"
     />
   </div>

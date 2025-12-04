@@ -1,12 +1,9 @@
 <template>
   <div class="noData">
     <div class="svg-container">
-      <img
-        class="image"
-        src="@designSystem/fondation/img/happy_announcement.svg?url"
-      />
       <BasicText
         class="overlay-text"
+        size="h4"
         color="white"
         weight="light"
       >
@@ -20,20 +17,14 @@
 
 <style lang="less">
   .noData {
-    background-color: #f0f3f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-
     .svg-container {
       position: relative;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 20px;
-      background-color: @secondary-800;
+      border-radius: 16px;
+      background-color: var(--secondary-800);
       padding: 24px 48px;
       max-width: 60%;
       min-height: 180px;

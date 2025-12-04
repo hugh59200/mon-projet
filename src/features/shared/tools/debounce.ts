@@ -1,5 +1,5 @@
 export function useDebounce(delay: number) {
-  let timeoutId: any
+  let timeoutId: ReturnType<typeof setTimeout>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return function (callback: Function) {
     clearTimeout(timeoutId)

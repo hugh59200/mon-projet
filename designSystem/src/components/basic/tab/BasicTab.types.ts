@@ -1,8 +1,18 @@
+import type { RouteName } from '@/router/route-name'
+import type { IconNameNext } from '../icon/BasicIconNext.types'
 import type { TabsModel } from '../tabs/BasicTabs.types'
-
-export type TabState = 'success' | 'danger'
+import type { TextColor } from '../text'
 
 export type TabProps = {
+  /** Nom de route unique (clé logique) */
+  routeName: RouteName
+
+  /** Libellé lisible affiché dans l’onglet */
   tabKey: TabsModel
-  tabState?: TabState
+
+  /** Icône associée à l’onglet */
+  icon?: IconNameNext
+
+  /** Couleur de l’icône ou de l’onglet */
+  color?: TextColor
 }
