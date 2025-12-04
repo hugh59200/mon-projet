@@ -6,6 +6,9 @@
       <div class="navbar__bg-shine"></div>
     </div>
 
+    <!-- Mobile Drawer -->
+    <MobileDrawer v-model="isMenuOpen" />
+
     <div
       ref="containerRef"
       class="navbar__container"
@@ -79,6 +82,7 @@
   import HeaderLogo from './HeaderLogo.vue'
   import LanguageSelector from './LanguageSelector.vue'
   import MainNavLinks from './MainNavLinks.vue'
+  import MobileDrawer from './MobileDrawer.vue'
 
   const router = useRouter()
   const { t } = useI18n()

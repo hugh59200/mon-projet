@@ -1,9 +1,7 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-export const ENV = Deno.env.get('ENV') || 'development'
-
-export const APP_BASE_URL =
-  ENV === 'development' ? 'https://localhost:5278' : 'https://fast-peptides.com'
+// URL de l'application - configurable via secret ou valeur par défaut prod
+export const APP_BASE_URL = Deno.env.get('APP_BASE_URL') || 'https://fast-peptides.com'
 
 export const PAYMENT_SUCCESS_URL_BASE = `${APP_BASE_URL}/paiement/success` // J'ai ajusté cette ligne pour utiliser APP_BASE_URL si besoin de tester les redirections de paiement via tunnel
 export const PAYMENT_CANCEL_URL = `${APP_BASE_URL}/paiement/cancel`
