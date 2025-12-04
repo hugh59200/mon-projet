@@ -3,7 +3,7 @@ import type { Database } from '@/supabase/types/supabase'
 
 // DEBUG: À supprimer après le test
 console.log("🔍 DEBUG SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("🔍 DEBUG SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY ? "Présente (Cachée)?" : "Manquante");
+console.log("🔍 DEBUG SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY ? "Présente (Cachée) ?" : "Manquante");
 
 
 // Votre code habituel
