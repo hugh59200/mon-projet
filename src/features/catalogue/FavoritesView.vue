@@ -7,6 +7,7 @@ import { supabase } from '@/supabase/supabaseClient'
 import type { Products } from '@/supabase/types/supabase.types'
 import ProductCart from './cart/ProductCart.vue'
 import PageHeader from '@/features/shared/components/PageHeader.vue'
+import PageContent from '@/features/shared/components/PageContent.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -32,14 +33,10 @@ async function fetchFavoriteProducts(): Promise<void> {
   error.value = null
 
   try {
-    console.log('[Favorites] Fetching products for IDs:', wishlistIds.value)
-
     const { data, error: fetchError } = await supabase
       .from('products')
       .select('*')
       .in('id', wishlistIds.value)
-
-    console.log('[Favorites] Fetch result:', { data, error: fetchError })
 
     if (fetchError) {
       throw new Error(fetchError.message)
@@ -47,7 +44,6 @@ async function fetchFavoriteProducts(): Promise<void> {
 
     products.value = data ?? []
   } catch (err) {
-    console.error('[Favorites] Error:', err)
     error.value = err instanceof Error ? err.message : t('common.error')
     products.value = []
   } finally {
@@ -76,162 +72,144 @@ function viewProduct(productId: string): void {
 </script>
 
 <template>
-  <div class="favorites-view">
-    <!-- Header -->
-    <header class="favorites-view__header">
-      <BasicText
-        size="h2"
-        weight="bold"
-        color="neutral-100"
-      >
-        {{ t('wishlist.title') }}
-      </BasicText>
-      <BasicText
-        v-if="!isEmpty"
-        size="body-m"
-        color="neutral-400"
-      >
-        {{ t('wishlist.count', { count: wishlistStore.count }) }}
-      </BasicText>
-    </header>
+  <div class="favorites-page">
+    <PageHeader />
 
-    <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="favorites-view__loading"
-    >
-      <BasicIconNext
-        name="Loader2"
-        :size="32"
-        color="primary-500"
-        class="favorites-view__spinner"
-      />
-      <BasicText
-        size="body-m"
-        color="neutral-600"
+    <PageContent size="xl">
+      <!-- Loading State -->
+      <div
+        v-if="loading"
+        class="favorites-view__loading"
       >
-        {{ t('common.loading') }}
-      </BasicText>
-    </div>
+        <BasicIconNext
+          name="Loader2"
+          :size="32"
+          color="primary-500"
+          class="favorites-view__spinner"
+        />
+        <BasicText
+          size="body-m"
+          color="neutral-600"
+        >
+          {{ t('common.loading') }}
+        </BasicText>
+      </div>
 
-    <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="favorites-view__error"
-    >
-      <BasicIconNext
-        name="AlertCircle"
-        :size="48"
-        color="danger-500"
-      />
-      <BasicText
-        size="body-m"
-        color="danger-500"
+      <!-- Error State -->
+      <div
+        v-else-if="error"
+        class="favorites-view__error"
       >
-        {{ error }}
-      </BasicText>
-      <PremiumButton
-        :label="t('common.retry')"
-        type="secondary"
-        variant="outline"
-        size="md"
-        @click="fetchFavoriteProducts"
-      />
-    </div>
+        <BasicIconNext
+          name="AlertCircle"
+          :size="48"
+          color="danger-500"
+        />
+        <BasicText
+          size="body-m"
+          color="danger-500"
+        >
+          {{ error }}
+        </BasicText>
+        <PremiumButton
+          :label="t('common.retry')"
+          type="secondary"
+          variant="outline"
+          size="md"
+          @click="fetchFavoriteProducts"
+        />
+      </div>
 
-    <!-- Empty State -->
-    <div
-      v-else-if="isEmpty"
-      class="favorites-view__empty"
-    >
-      <BasicIconNext
-        name="Heart"
-        :size="64"
-        color="neutral-500"
-      />
-      <BasicText
-        size="h4"
-        weight="bold"
-        color="neutral-100"
+      <!-- Empty State -->
+      <div
+        v-else-if="isEmpty"
+        class="favorites-view__empty"
       >
-        {{ t('wishlist.empty.title') }}
-      </BasicText>
-      <BasicText
-        size="body-m"
-        color="neutral-400"
-      >
-        {{ t('wishlist.empty.description') }}
-      </BasicText>
-      <PremiumButton
-        :label="t('wishlist.empty.cta')"
-        type="primary"
-        variant="solid"
-        size="lg"
-        icon-left="ArrowLeft"
-        @click="goToCatalogue"
-      />
-    </div>
+        <BasicIconNext
+          name="Heart"
+          :size="64"
+          color="neutral-500"
+        />
+        <BasicText
+          size="h4"
+          weight="bold"
+          color="neutral-100"
+        >
+          {{ t('wishlist.empty.title') }}
+        </BasicText>
+        <BasicText
+          size="body-m"
+          color="neutral-400"
+        >
+          {{ t('wishlist.empty.description') }}
+        </BasicText>
+        <PremiumButton
+          :label="t('wishlist.empty.cta')"
+          type="primary"
+          variant="solid"
+          size="lg"
+          icon-left="ArrowLeft"
+          @click="goToCatalogue"
+        />
+      </div>
 
-    <!-- Products Grid -->
-    <div
-      v-else-if="products.length > 0"
-      class="favorites-view__grid"
-    >
-      <ProductCart
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-        view-mode="grid"
-        @view="viewProduct"
-      />
-    </div>
+      <!-- Products Grid -->
+      <template v-else-if="products.length > 0">
+        <div class="favorites-view__grid">
+          <ProductCart
+            v-for="product in products"
+            :key="product.id"
+            :product="product"
+            view-mode="grid"
+            @view="viewProduct"
+          />
+        </div>
 
-    <!-- No products found (IDs in store but products deleted from DB) -->
-    <div
-      v-else
-      class="favorites-view__empty"
-    >
-      <BasicIconNext
-        name="Heart"
-        :size="64"
-        color="neutral-500"
-      />
-      <BasicText
-        size="h4"
-        weight="bold"
-        color="neutral-100"
-      >
-        {{ t('wishlist.empty.title') }}
-      </BasicText>
-      <BasicText
-        size="body-m"
-        color="neutral-400"
-      >
-        {{ t('wishlist.empty.description') }}
-      </BasicText>
-      <PremiumButton
-        :label="t('wishlist.clearAll')"
-        type="secondary"
-        variant="outline"
-        size="md"
-        @click="wishlistStore.clear()"
-      />
-    </div>
+        <!-- Clear All Button -->
+        <div class="favorites-view__actions">
+          <PremiumButton
+            :label="t('wishlist.clearAll')"
+            type="secondary"
+            variant="ghost"
+            size="sm"
+            icon-left="Trash2"
+            @click="wishlistStore.clear()"
+          />
+        </div>
+      </template>
 
-    <!-- Clear All Button -->
-    <div
-      v-if="!isEmpty && !loading"
-      class="favorites-view__actions"
-    >
-      <PremiumButton
-        :label="t('wishlist.clearAll')"
-        type="secondary"
-        variant="ghost"
-        size="sm"
-        icon-left="Trash2"
-        @click="wishlistStore.clear()"
-      />
-    </div>
+      <!-- No products found (IDs in store but products deleted from DB) -->
+      <div
+        v-else
+        class="favorites-view__empty"
+      >
+        <BasicIconNext
+          name="Heart"
+          :size="64"
+          color="neutral-500"
+        />
+        <BasicText
+          size="h4"
+          weight="bold"
+          color="neutral-100"
+        >
+          {{ t('wishlist.empty.title') }}
+        </BasicText>
+        <BasicText
+          size="body-m"
+          color="neutral-400"
+        >
+          {{ t('wishlist.empty.description') }}
+        </BasicText>
+        <PremiumButton
+          :label="t('wishlist.clearAll')"
+          type="secondary"
+          variant="outline"
+          size="md"
+          @click="wishlistStore.clear()"
+        />
+      </div>
+    </PageContent>
   </div>
 </template>
 
@@ -239,19 +217,12 @@ function viewProduct(productId: string): void {
 @import '@designSystem/fondation/colors/colors.less';
 @import '@designSystem/fondation/spacing/spacing.less';
 
-.favorites-view {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: @spacing-25 @spacing-20;
+.favorites-page {
+  position: relative;
   min-height: 100vh;
+}
 
-  &__header {
-    display: flex;
-    flex-direction: column;
-    gap: @spacing-10;
-    margin-bottom: @spacing-25;
-  }
-
+.favorites-view {
   &__loading,
   &__error,
   &__empty {
@@ -296,8 +267,6 @@ function viewProduct(productId: string): void {
 // Responsive
 @media (max-width: 768px) {
   .favorites-view {
-    padding: @spacing-20 @spacing-15;
-
     &__grid {
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: @spacing-15;

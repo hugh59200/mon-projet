@@ -328,6 +328,7 @@ export default {
     register: 'Sign Up',
     admin: 'Admin',
     guest: 'Guest',
+    tracking: 'Track Order',
   },
 
   // ============================================

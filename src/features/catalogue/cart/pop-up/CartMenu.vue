@@ -1,6 +1,28 @@
 <template>
   <div class="cart">
+    <!-- Empty State: Simple tooltip -->
+    <BasicTooltip
+      v-if="cart.items.length === 0"
+      :label="t('cart.empty')"
+      position="bottom"
+    >
+      <div
+        class="cart__trigger"
+        @click="goToCart"
+      >
+        <div class="cart__icon">
+          <BasicIconNext
+            name="ShoppingCart"
+            :size="24"
+          />
+          <div class="cart__icon-glow"></div>
+        </div>
+      </div>
+    </BasicTooltip>
+
+    <!-- Filled State: Dropdown menu -->
     <FloatingDropdownWrapper
+      v-else
       v-model="isOpen"
       :width="380"
       align="right"
@@ -29,103 +51,78 @@
       </template>
 
       <div class="cart__dropdown">
-        <!-- Empty State -->
-        <div
-          v-if="cart.items.length === 0"
-          class="cart__empty"
-        >
-          <div class="cart__empty-icon">
-            <BasicIconNext
-              name="ShoppingBag"
-              :size="36"
-            />
-          </div>
-          <h4>{{ t('cart.empty') }}</h4>
-          <p>{{ t('cart.emptyText') }}</p>
-          <PremiumButton
-            :label="t('cart.continueShopping')"
-            type="primary"
-            size="sm"
-            width="full"
-            @click="goToProducts"
-          />
-        </div>
+        <header class="cart__header">
+          <span>{{ t('nav.cart') }}</span>
+          <span class="cart__header-count">
+            {{ cart.totalItems }} {{ cart.totalItems > 1 ? t('cart.items') : t('cart.item') }}
+          </span>
+        </header>
 
-        <!-- Filled State -->
-        <template v-else>
-          <header class="cart__header">
-            <span>{{ t('nav.cart') }}</span>
-            <span class="cart__header-count">
-              {{ cart.totalItems }} {{ cart.totalItems > 1 ? t('cart.items') : t('cart.item') }}
-            </span>
-          </header>
-
-          <div class="cart__list">
-            <TransitionGroup name="item">
-              <div
-                v-for="item in cart.items"
-                :key="item.cart_item_id ?? item.product_id ?? `item-${item.product_name}`"
-                class="cart__item"
-              >
-                <div class="cart__item-image">
-                  <img
-                    :src="item.product_image || defaultImage"
-                    :alt="item.product_name!"
-                  />
-                </div>
-                <div class="cart__item-info">
-                  <span class="cart__item-name">{{ item.product_name }}</span>
-                  <div class="cart__item-meta">
-                    <span class="cart__item-qty">{{ t('cart.quantity') }}: {{ item.quantity }}</span>
-                    <div class="cart__item-price">
-                      <template v-if="item.is_on_sale">
-                        <span class="cart__item-price--old">
-                          {{ formatPrice(item.product_price) }}
-                        </span>
-                        <span class="cart__item-price--new">
-                          {{ formatPrice(item.product_sale_price) }}
-                        </span>
-                      </template>
-                      <span v-else>{{ formatPrice(item.product_price) }}</span>
-                    </div>
-                  </div>
-                </div>
-                <PremiumButton
-                  type="danger"
-                  variant="ghost"
-                  size="xs"
-                  icon-left="X"
-                  class="cart__item-remove"
-                  @click.stop="cart.removeFromCart(item.product_id!)"
+        <div class="cart__list">
+          <TransitionGroup name="item">
+            <div
+              v-for="item in cart.items"
+              :key="item.cart_item_id ?? item.product_id ?? `item-${item.product_name}`"
+              class="cart__item"
+            >
+              <div class="cart__item-image">
+                <img
+                  :src="item.product_image || defaultImage"
+                  :alt="item.product_name!"
                 />
               </div>
-            </TransitionGroup>
-          </div>
+              <div class="cart__item-info">
+                <span class="cart__item-name">{{ item.product_name }}</span>
+                <div class="cart__item-meta">
+                  <span class="cart__item-qty">{{ t('cart.quantity') }}: {{ item.quantity }}</span>
+                  <div class="cart__item-price">
+                    <template v-if="item.is_on_sale">
+                      <span class="cart__item-price--old">
+                        {{ formatPrice(item.product_price) }}
+                      </span>
+                      <span class="cart__item-price--new">
+                        {{ formatPrice(item.product_sale_price) }}
+                      </span>
+                    </template>
+                    <span v-else>{{ formatPrice(item.product_price) }}</span>
+                  </div>
+                </div>
+              </div>
+              <PremiumButton
+                type="danger"
+                variant="ghost"
+                size="xs"
+                icon-left="X"
+                class="cart__item-remove"
+                @click.stop="cart.removeFromCart(item.product_id!)"
+              />
+            </div>
+          </TransitionGroup>
+        </div>
 
-          <footer class="cart__footer">
-            <div class="cart__total">
-              <span>{{ t('cart.total') }}</span>
-              <strong>{{ formatPrice(cart.totalPrice) }}</strong>
-            </div>
-            <div class="cart__actions">
-              <PremiumButton
-                type="secondary"
-                size="sm"
-                :label="t('cart.title')"
-                @click="goToCart"
-              />
-              <PremiumButton
-                type="primary"
-                variant="solid"
-                size="sm"
-                :label="t('checkout.placeOrder')"
-                icon-left="Shield"
-                :shine="true"
-                @click="goToCheckout"
-              />
-            </div>
-          </footer>
-        </template>
+        <footer class="cart__footer">
+          <div class="cart__total">
+            <span>{{ t('cart.total') }}</span>
+            <strong>{{ formatPrice(cart.totalPrice) }}</strong>
+          </div>
+          <div class="cart__actions">
+            <PremiumButton
+              type="secondary"
+              size="sm"
+              :label="t('cart.title')"
+              @click="goToCart"
+            />
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              :label="t('checkout.placeOrder')"
+              icon-left="Shield"
+              :shine="true"
+              @click="goToCheckout"
+            />
+          </div>
+        </footer>
       </div>
     </FloatingDropdownWrapper>
   </div>
@@ -159,10 +156,6 @@
   const goToCheckout = () => {
     isOpen.value = false
     router.push('/checkout')
-  }
-  const goToProducts = () => {
-    isOpen.value = false
-    router.push('/catalogue')
   }
 </script>
 
@@ -236,41 +229,6 @@
     &__dropdown {
       display: flex;
       flex-direction: column;
-    }
-
-    // Empty
-    &__empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 32px 20px;
-      gap: 12px;
-
-      &-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        background: rgba(var(--neutral-100-rgb), 0.04);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: @neutral-500;
-        margin-bottom: 8px;
-      }
-
-      h4 {
-        font-size: 16px;
-        font-weight: 600;
-        color: @neutral-100;
-        margin: 0;
-      }
-
-      p {
-        font-size: 14px;
-        color: @neutral-400;
-        margin: 0 0 8px;
-      }
     }
 
     // Header

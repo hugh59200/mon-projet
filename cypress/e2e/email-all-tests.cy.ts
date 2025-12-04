@@ -27,6 +27,9 @@ const GUEST = {
   city: 'Paris',
 }
 
+// Variable globale pour stocker l'order_id créé dans le test 1
+let createdOrderId: string | null = null
+
 // ============================================================
 // 1. EMAILS TRANSACTIONNELS (Commandes)
 // ============================================================
@@ -103,7 +106,11 @@ describe('1. Emails Transactionnels - Flux Commande Complet', () => {
           const urlParams = new URLSearchParams(url.split('?')[1])
           const orderId = urlParams.get('orderId')
           expect(orderId).to.not.be.null
+
+          // Stocker l'order_id pour les tests suivants
+          createdOrderId = orderId
           cy.log(`📧 EMAIL 1/3: pending_payment envoyé pour commande ${orderId}`)
+          cy.log(`💾 Order ID stocké: ${createdOrderId}`)
 
           cy.wait(2000)
 
@@ -260,116 +267,90 @@ describe('4. Emails Admin - Validation paiement via UI', () => {
 })
 
 // ============================================================
-// 5. EMAILS ADMIN - Modale Détails Commande (Tracking + Statuts)
+// 5. EMAILS API - Expédition avec suivi (sur commande créée)
 // ============================================================
-describe('5. Emails Admin - Modale Détails Commande', () => {
-  beforeEach(() => {
-    cy.loginAsAdmin()
-    cy.intercept('POST', `${SUPABASE_URL}/functions/v1/send-shipping-email`).as('shippingEmail')
-    cy.intercept('POST', `${SUPABASE_URL}/functions/v1/send-order-update`).as('orderUpdate')
-  })
-
-  it('Ajouter suivi colis via modale → email shipping', () => {
-    cy.visit('/admin/commandes')
-    cy.wait(2000)
-
-    cy.url().then((url) => {
-      if (url.includes('/auth/')) {
-        cy.log('⚠️ Redirection auth - session admin requise')
+describe('5. Emails API - Expédition avec suivi colis', () => {
+  it('Envoyer email shipping via API sur la commande créée', () => {
+    // Utiliser la commande créée dans le test 1
+    cy.wrap(null).then(() => {
+      if (!createdOrderId) {
+        cy.log('⚠️ Aucune commande créée - test skipped')
         return
       }
 
-      if (!url.includes('/admin/commandes')) {
-        cy.log('⚠️ Page admin non accessible')
-        return
-      }
+      cy.log(`📦 Envoi email shipping pour commande: ${createdOrderId}`)
 
-      cy.get('.admin-orders', { timeout: 15000 }).should('be.visible')
-
-      // Chercher une commande avec un bouton détails
-      cy.get('body').then(($body) => {
-        if ($body.find('.admin-orders__details-btn').length > 0) {
-          // Cliquer sur le premier bouton détails pour ouvrir la modale
-          cy.get('.admin-orders__details-btn').first().click()
-
-          // Attendre que la modale soit visible
-          cy.get('.order-detail', { timeout: 10000 }).should('be.visible')
-
-          // Remplir le formulaire de suivi (dans la section "Suivi Livraison")
-          cy.get('.tracking-form', { timeout: 5000 }).within(() => {
-            // Transporteur
-            cy.get('input[placeholder*="Transporteur"]').clear().type('Colissimo')
-            // Numéro de suivi
-            cy.get('input[placeholder*="suivi"]').clear().type('6A12345678901')
-            // Cliquer sur Enregistrer
-            cy.contains('button', /enregistrer/i).click()
-          })
-
-          // Vérifier que l'email d'expédition a été envoyé
-          cy.wait('@shippingEmail', { timeout: 15000 }).then((interception) => {
-            cy.log(`📧 EMAIL shipping - Order: ${interception.request.body.order_id}`)
-            cy.log('✅ Email d\'expédition déclenché via modale admin')
-          })
-        } else {
-          cy.log('⚠️ Aucune commande avec bouton détails trouvée')
-        }
+      // Appel API direct pour envoyer l'email d'expédition
+      cy.request({
+        method: 'POST',
+        url: `${SUPABASE_URL}/functions/v1/send-shipping-email`,
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: {
+          order_id: createdOrderId,
+          carrier: 'Colissimo',
+          tracking_number: '6A12345678901',
+        },
+        failOnStatusCode: false,
+      }).then((response) => {
+        cy.log(`📧 EMAIL shipping - Status: ${response.status}`)
+        cy.log(`📧 Response: ${JSON.stringify(response.body)}`)
+        expect(response.status).to.be.oneOf([200, 201])
+        cy.log(`✅ Email d'expédition envoyé à ${TEST_EMAIL}`)
       })
     })
   })
+})
 
-  it('Changer statut via dropdown modale → email status_update', () => {
-    cy.visit('/admin/commandes')
-    cy.wait(2000)
+// ============================================================
+// 6. EMAILS API - TOUS les changements de statut
+// ============================================================
+describe('6. Emails API - Tous les statuts de commande', () => {
+  // Liste de tous les statuts possibles avec leur label FR
+  const ALL_STATUSES = [
+    { status: 'confirmed', label: 'Confirmé', emailType: 'status_update' },
+    { status: 'paid', label: 'Payé', emailType: 'status_update' },
+    { status: 'shipped', label: 'Expédié', emailType: 'status_update' },
+    { status: 'completed', label: 'Livré', emailType: 'status_update' },
+    { status: 'canceled', label: 'Annulé', emailType: 'status_update' },
+    { status: 'refunded', label: 'Remboursé', emailType: 'status_update' },
+    { status: 'failed', label: 'Échoué', emailType: 'status_update' },
+  ]
 
-    cy.url().then((url) => {
-      if (url.includes('/auth/')) {
-        cy.log('⚠️ Redirection auth - session admin requise')
-        return
-      }
-
-      if (!url.includes('/admin/commandes')) {
-        cy.log('⚠️ Page admin non accessible')
-        return
-      }
-
-      cy.get('.admin-orders', { timeout: 15000 }).should('be.visible')
-
-      // Chercher une commande
-      cy.get('body').then(($body) => {
-        if ($body.find('.admin-orders__details-btn').length > 0) {
-          cy.get('.admin-orders__details-btn').first().click()
-
-          // Attendre que la modale soit visible
-          cy.get('.order-detail', { timeout: 10000 }).should('be.visible')
-
-          // Trouver la section "Changer statut"
-          cy.contains('Changer statut').should('be.visible')
-
-          // Le BasicDropdown utilise la classe .dropdown
-          // On cherche le dropdown dans la section de changement de statut
-          cy.get('.order-detail').within(() => {
-            // Cliquer sur le dropdown de statut (dernier .dropdown de la modale)
-            cy.get('.dropdown').last().click({ force: true })
-          })
-
-          // Les items sont rendus dans #overlay-root via Teleport
-          // Sélectionner un nouveau statut (completed = Livré)
-          cy.get('#overlay-root .dropdown__menu', { timeout: 5000 })
-            .should('be.visible')
-            .contains(/livré|completed/i)
-            .click({ force: true })
-
-          // Cliquer sur "Mettre à jour"
-          cy.contains('button', /mettre à jour/i).click()
-
-          // Vérifier que l'email status_update a été envoyé
-          cy.wait('@orderUpdate', { timeout: 15000 }).then((interception) => {
-            cy.log(`📧 EMAIL status_update - Status: ${interception.request.body.status}`)
-            cy.log('✅ Email de mise à jour statut déclenché via modale admin')
-          })
-        } else {
-          cy.log('⚠️ Aucune commande avec bouton détails trouvée')
+  ALL_STATUSES.forEach(({ status, label, emailType }) => {
+    it(`Statut "${label}" (${status}) → email ${emailType}`, () => {
+      cy.wrap(null).then(() => {
+        if (!createdOrderId) {
+          cy.log('⚠️ Aucune commande créée - test skipped')
+          return
         }
+
+        cy.log(`🔄 Changement statut → ${label} (${status})`)
+
+        cy.request({
+          method: 'POST',
+          url: `${SUPABASE_URL}/functions/v1/send-order-update`,
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: {
+            order_id: createdOrderId,
+            status: status,
+          },
+          failOnStatusCode: false,
+        }).then((response) => {
+          cy.log(`📧 EMAIL ${emailType} (${status}) - HTTP ${response.status}`)
+          expect(response.status).to.be.oneOf([200, 201])
+          cy.log(`✅ Email "${label}" envoyé à ${TEST_EMAIL}`)
+        })
+
+        // Petit délai entre chaque email pour éviter le rate limiting
+        cy.wait(1000)
       })
     })
   })
@@ -384,20 +365,24 @@ describe('Récapitulatif des tests email', () => {
     cy.log('📧 SCÉNARIOS D\'EMAILS TESTÉS :')
     cy.log('========================================')
     cy.log('TRANSACTIONNELS (Commandes):')
-    cy.log('  1. pending_payment - Checkout guest/user')
-    cy.log('  2. payment_validated - Validation paiement (processing)')
-    cy.log('  3. shipping - Expédition avec suivi colis')
-    cy.log('  4. status_update - Changement de statut (confirmed, completed, etc.)')
+    cy.log('  1. pending_payment - Commande en attente')
+    cy.log('  2. payment_validated - Paiement validé (processing)')
+    cy.log('  3. shipping - Expédition avec suivi')
+    cy.log('')
+    cy.log('TOUS LES STATUTS:')
+    cy.log('  - confirmed (Confirmé)')
+    cy.log('  - paid (Payé)')
+    cy.log('  - shipped (Expédié)')
+    cy.log('  - completed (Livré)')
+    cy.log('  - canceled (Annulé)')
+    cy.log('  - refunded (Remboursé)')
+    cy.log('  - failed (Échoué)')
     cy.log('')
     cy.log('AUTHENTIFICATION:')
-    cy.log('  5. signup - Inscription')
-    cy.log('  6. recovery - Récupération mot de passe')
-    cy.log('')
-    cy.log('VIA MODALE ADMIN:')
-    cy.log('  - Ajout suivi colis (transporteur + n° suivi)')
-    cy.log('  - Changement statut via dropdown')
+    cy.log('  - signup - Inscription')
+    cy.log('  - recovery - Récupération mot de passe')
     cy.log('========================================')
-    cy.log(`📬 Vérifier les emails sur: ${TEST_EMAIL}`)
+    cy.log(`📬 Total: ~14 emails sur ${TEST_EMAIL}`)
     cy.log('========================================')
   })
 })

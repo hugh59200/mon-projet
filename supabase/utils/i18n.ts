@@ -484,6 +484,10 @@ export const translations = {
       fr: 'Elle a bien été confirmée ✅ et sera bientôt préparée.',
       en: 'It has been confirmed ✅ and will be prepared soon.',
     },
+    paid: {
+      fr: 'Le paiement a été reçu 💳. Votre commande va être préparée.',
+      en: 'Payment has been received 💳. Your order will be prepared.',
+    },
     processing: {
       fr: 'Elle est actuellement en cours de préparation. 🧪',
       en: 'It is currently being prepared. 🧪',
@@ -499,6 +503,14 @@ export const translations = {
     canceled: {
       fr: "Elle a été annulée ❌. Si vous pensez qu'il s'agit d'une erreur, contactez notre support.",
       en: 'It has been canceled ❌. If you believe this is an error, please contact our support.',
+    },
+    refunded: {
+      fr: 'Votre commande a été remboursée 💰. Le montant sera crédité sous 5-10 jours ouvrés.',
+      en: 'Your order has been refunded 💰. The amount will be credited within 5-10 business days.',
+    },
+    failed: {
+      fr: "Une erreur s'est produite avec votre commande ⚠️. Veuillez contacter notre support.",
+      en: 'An error occurred with your order ⚠️. Please contact our support.',
     },
     defaultUpdate: {
       fr: (status: string) => `Son statut a été mis à jour : <b>${status}</b>`,

@@ -328,6 +328,7 @@ export default {
     register: "S'inscrire",
     admin: 'Administration',
     guest: 'Invité',
+    tracking: 'Suivi de commande',
   },
 
   // ============================================

@@ -17,6 +17,9 @@ export function getStatusMessage(
     case 'confirmed':
       return t.confirmed[validLocale]
 
+    case 'paid':
+      return t.paid[validLocale]
+
     case 'processing':
       return t.processing[validLocale]
 
@@ -43,6 +46,12 @@ export function getStatusMessage(
 
     case 'canceled':
       return t.canceled[validLocale]
+
+    case 'refunded':
+      return t.refunded[validLocale]
+
+    case 'failed':
+      return t.failed[validLocale]
 
     default:
       return t.defaultUpdate[validLocale](status)

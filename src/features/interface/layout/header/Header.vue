@@ -45,14 +45,19 @@
         ref="rightRef"
         class="navbar__right"
       >
-        <PremiumButton
-          type="secondary"
-          variant="ghost"
-          size="sm"
-          icon-left="Package"
-          class="navbar__icon-btn"
-          @click="$router.push('/suivi-commande')"
-        />
+        <BasicTooltip
+          :label="t('nav.tracking')"
+          position="bottom"
+        >
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="sm"
+            icon-left="Package"
+            class="navbar__icon-btn"
+            @click="$router.push('/suivi-commande')"
+          />
+        </BasicTooltip>
         <LanguageSelector />
         <WishlistIcon />
         <CartMenu />
@@ -68,6 +73,7 @@
   import WishlistIcon from '@/features/catalogue/components/WishlistIcon.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { computed, onUnmounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import HeaderActions from './HeaderActions.vue'
   import HeaderLogo from './HeaderLogo.vue'
@@ -75,6 +81,7 @@
   import MainNavLinks from './MainNavLinks.vue'
 
   const router = useRouter()
+  const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
 
   // Refs pour la détection d'overflow
@@ -262,6 +269,14 @@
           transform: translateY(-7px) rotate(-45deg);
         }
       }
+    }
+  }
+
+  // Package icon button - slightly larger icon
+  .navbar__icon-btn {
+    :deep(svg) {
+      width: 20px;
+      height: 20px;
     }
   }
 

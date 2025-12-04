@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useWishlistStore } from '../stores/useWishlistStore'
 
 const router = useRouter()
+const { t } = useI18n()
 const wishlistStore = useWishlistStore()
 
 const count = computed(() => wishlistStore.count)
@@ -15,32 +17,37 @@ function goToFavorites(): void {
 </script>
 
 <template>
-  <button
-    class="wishlist-icon"
-    :class="{ 'wishlist-icon--active': hasItems }"
-    :aria-label="`Favoris (${count})`"
-    @click="goToFavorites"
+  <BasicTooltip
+    :label="hasItems ? '' : t('nav.favorites')"
+    position="bottom"
   >
-    <div class="wishlist-icon__inner">
-      <BasicIconNext
-        name="Heart"
-        :size="22"
-        :color="hasItems ? 'danger-400' : 'neutral-200'"
-      />
-      <div
-        v-if="hasItems"
-        class="wishlist-icon__glow"
-      ></div>
-    </div>
-    <Transition name="badge">
-      <div
-        v-if="hasItems"
-        class="wishlist-icon__badge"
-      >
-        {{ count > 9 ? '9+' : count }}
+    <button
+      class="wishlist-icon"
+      :class="{ 'wishlist-icon--active': hasItems }"
+      :aria-label="`Favoris (${count})`"
+      @click="goToFavorites"
+    >
+      <div class="wishlist-icon__inner">
+        <BasicIconNext
+          name="Heart"
+          :size="20"
+          :color="hasItems ? 'danger-400' : 'neutral-200'"
+        />
+        <div
+          v-if="hasItems"
+          class="wishlist-icon__glow"
+        ></div>
       </div>
-    </Transition>
-  </button>
+      <Transition name="badge">
+        <div
+          v-if="hasItems"
+          class="wishlist-icon__badge"
+        >
+          {{ count > 9 ? '9+' : count }}
+        </div>
+      </Transition>
+    </button>
+  </BasicTooltip>
 </template>
 
 <style scoped lang="less">
@@ -103,18 +110,18 @@ function goToFavorites(): void {
     position: absolute;
     top: -4px;
     right: -4px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 3px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
-    border-radius: 9px;
-    font-size: 10px;
+    border-radius: 7px;
+    font-size: 8px;
     font-weight: 700;
     color: white;
-    box-shadow: 0 2px 8px rgba(var(--danger-500-rgb), 0.4);
+    box-shadow: 0 2px 6px rgba(var(--danger-500-rgb), 0.4);
   }
 }
 
