@@ -5,6 +5,7 @@ import type { Database } from '@/supabase/types/supabase'
 console.log("🔍 DEBUG SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
 console.log("🔍 DEBUG SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY ? "Présente (Cachée)" : "Manquante");
 
+
 // Votre code habituel
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
