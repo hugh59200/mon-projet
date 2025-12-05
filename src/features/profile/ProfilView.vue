@@ -93,14 +93,16 @@
             <WrapperInput
               v-model="editableName"
               :label="t('profile.fullName')"
-              :placeholder="t('profile.fullNamePlaceholder')"
+              :placeholder="t('profile.placeholders.fullName')"
+              :hint="t('profile.hints.fullName')"
               input-type="form"
               icon-left="User"
             />
             <WrapperInput
               v-model="phone"
               :label="t('profile.phone')"
-              :placeholder="t('profile.phonePlaceholder')"
+              :placeholder="t('profile.placeholders.phone')"
+              :hint="t('profile.hints.phone')"
               input-type="form"
               icon-left="Phone"
             />
@@ -121,7 +123,8 @@
             v-if="country === 'France' || country === ''"
             v-model="address"
             :label="t('profile.addressLabel')"
-            :placeholder="t('profile.addressPlaceholder')"
+            :placeholder="t('profile.placeholders.address')"
+            :hint="t('profile.hints.address')"
             class="mb-4"
             @fill="onAddressFill"
           />
@@ -130,7 +133,8 @@
             v-else
             v-model="address"
             :label="t('profile.addressLabel')"
-            :placeholder="t('profile.addressPlaceholder')"
+            :placeholder="t('profile.placeholders.address')"
+            :hint="t('profile.hints.address')"
             input-type="form"
             icon-left="MapPin"
             class="mb-4"
@@ -140,7 +144,8 @@
             <WrapperInput
               v-model="zip"
               :label="t('profile.postalCode')"
-              placeholder="75000"
+              :placeholder="t('profile.placeholders.postalCode')"
+              :hint="t('profile.hints.postalCode')"
               input-type="form"
               inputmode="numeric"
               pattern="[0-9]*"
@@ -150,7 +155,8 @@
             <WrapperInput
               v-model="city"
               :label="t('profile.city')"
-              placeholder="Paris"
+              :placeholder="t('profile.placeholders.city')"
+              :hint="t('profile.hints.city')"
               input-type="form"
               minlength="2"
             />
@@ -159,7 +165,8 @@
           <WrapperInput
             v-model="country"
             :label="t('profile.country')"
-            placeholder="France"
+            :placeholder="t('profile.placeholders.country')"
+            :hint="t('profile.hints.country')"
             input-type="form"
             icon-left="Globe"
           />
@@ -339,6 +346,7 @@
               v-model="newPassword"
               type="password"
               :label="t('profile.newPassword')"
+              :hint="t('profile.hints.newPassword')"
               input-type="form"
               icon-left="Key"
               minlength="8"
@@ -349,6 +357,7 @@
               v-model="confirmPassword"
               type="password"
               :label="t('profile.confirmNewPassword')"
+              :hint="t('profile.hints.confirmPassword')"
               input-type="form"
               icon-left="Key"
               minlength="8"

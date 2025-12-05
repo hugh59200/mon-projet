@@ -8,7 +8,8 @@
       "Bash(ls:*)",
       "Bash(node scripts/convert-og-image.cjs:*)",
       "Bash(cat:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

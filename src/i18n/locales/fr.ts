@@ -398,6 +398,18 @@ export default {
       registrationFailed: "Erreur lors de l'inscription.",
       resetFailed: "Impossible d'envoyer l'e-mail.",
     },
+    hints: {
+      emailLogin: 'Adresse email utilisée lors de l\'inscription',
+      emailRegister: 'Privilégiez une adresse professionnelle',
+      emailReset: 'Adresse email associée à votre compte',
+      password: 'Minimum 8 caractères',
+      passwordNew: 'Choisissez un mot de passe sécurisé',
+      confirmPassword: 'Saisissez à nouveau votre mot de passe',
+    },
+    placeholders: {
+      email: 'nom@entreprise.com',
+      password: '••••••••',
+    },
   },
 
   // ============================================
@@ -599,6 +611,23 @@ export default {
       relay: 'Point Relais',
       home: 'Domicile',
       whereToDeliver: 'Destination du colis',
+      hints: {
+        email: 'Pour la confirmation de commande',
+        fullName: 'Tel qu\'il apparaîtra sur le colis',
+        address: 'Numéro et nom de rue',
+        postalCode: '5 chiffres',
+        city: 'Ville de livraison',
+        relayZip: 'Pour trouver les points relais proches',
+      },
+      placeholders: {
+        email: 'votre@email.com',
+        fullName: 'Prénom Nom',
+        address: 'Numéro et nom de rue',
+        addressAuto: 'Commencez à taper votre adresse...',
+        postalCode: '75001',
+        city: 'Paris',
+        relayZip: 'Entrez votre code postal',
+      },
     },
     payment: {
       title: 'Règlement',
@@ -777,6 +806,14 @@ export default {
     carrier: 'Transporteur',
     trackingNumber: 'N° Suivi',
     estimatedDelivery: 'Estimation',
+    hints: {
+      orderNumber: 'Format: FP-XXXX-XXXXXX',
+      email: 'Email utilisé lors de la commande',
+    },
+    placeholders: {
+      orderNumber: 'FP-2025-000123',
+      email: 'exemple@email.com',
+    },
   },
 
   // ============================================
@@ -827,6 +864,24 @@ export default {
     support: 'Support Client',
     supportDesc: 'Une question ? Ouvrez un ticket via la messagerie sécurisée.',
     openMessaging: 'Messagerie',
+    hints: {
+      fullName: 'Prénom et nom de famille',
+      phone: 'Format international recommandé',
+      address: 'Numéro et nom de rue',
+      postalCode: '5 chiffres',
+      city: 'Ville de résidence',
+      country: 'Pays de résidence',
+      newPassword: 'Minimum 8 caractères, majuscule et chiffre',
+      confirmPassword: 'Doit correspondre au nouveau mot de passe',
+    },
+    placeholders: {
+      fullName: 'Prénom Nom',
+      phone: '+33 6 12 34 56 78',
+      address: '12 rue de la Paix',
+      postalCode: '75000',
+      city: 'Paris',
+      country: 'France',
+    },
   },
 
   // ============================================

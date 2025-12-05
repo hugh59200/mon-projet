@@ -103,7 +103,8 @@
                   <WrapperInput
                     v-model="form.orderNumber"
                     label="Numéro de commande"
-                    placeholder="Ex: FP-2025-000123"
+                    :placeholder="t('tracking.placeholders.orderNumber')"
+                    :hint="t('tracking.hints.orderNumber')"
                     icon-name="Type"
                     icon-state="iconLeft"
                     :alert-label="errorMessage || undefined"
@@ -116,7 +117,8 @@
                   <WrapperInput
                     v-model="form.email"
                     label="Adresse email"
-                    placeholder="exemple@email.com"
+                    :placeholder="t('tracking.placeholders.email')"
+                    :hint="t('tracking.hints.email')"
                     icon-name="Mail"
                     icon-state="iconLeft"
                     autocomplete="email"
@@ -515,7 +517,10 @@ import type { OrdersFullView } from '@/supabase/types/supabase.types'
 import { getLabelBadge } from '@/utils'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+
+const { t } = useI18n()
 
 // Configuration SEO pour le suivi de commande
 useHead({

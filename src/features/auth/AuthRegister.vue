@@ -11,7 +11,8 @@
         <WrapperInput
           v-model.trim="fields.email.value.value"
           :label="t('auth.register.email')"
-          placeholder="nom@entreprise.com"
+          :placeholder="t('auth.placeholders.email')"
+          :hint="t('auth.hints.emailRegister')"
           inputmode="email"
           autocomplete="email"
           iconName="Mail"
@@ -33,7 +34,8 @@
         <WrapperInputPassword
           v-model="fields.password.value.value"
           :label="t('auth.register.password')"
-          placeholder="••••••••"
+          :placeholder="t('auth.placeholders.password')"
+          :hint="t('auth.hints.passwordNew')"
           autocomplete="new-password"
           required
           :showStrength="false"
@@ -57,7 +59,8 @@
         <WrapperInputPassword
           v-model="fields.confirmPassword.value.value"
           :label="t('auth.register.confirmPassword')"
-          placeholder="••••••••"
+          :placeholder="t('auth.placeholders.password')"
+          :hint="t('auth.hints.confirmPassword')"
           autocomplete="new-password"
           required
           :showStrength="false"

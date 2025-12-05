@@ -49,6 +49,7 @@
     </aside>
 
     <main class="auth-form-container">
+      <!-- Header mobile avec logo centré et bouton skip à droite -->
       <div
         v-if="!isDesktop"
         class="mobile-header"
@@ -59,7 +60,7 @@
         >
           <BasicIconNext
             name="fastPeptides"
-            :size="32"
+            :size="28"
             class="mobile-logo-icon"
           />
           <div class="logo-text-container mobile-text-size">
@@ -67,10 +68,22 @@
             <span class="brand-peptides">Peptides</span>
           </div>
         </div>
+        <!-- Bouton skip dans le header mobile -->
+        <PremiumButton
+          v-if="showSkip"
+          type="secondary"
+          variant="ghost"
+          size="xs"
+          label="Passer"
+          icon-right="ArrowRight"
+          class="mobile-skip-btn"
+          @click="$router.push('/')"
+        />
       </div>
 
+      <!-- Bouton skip desktop uniquement -->
       <div
-        v-if="showSkip"
+        v-if="showSkip && isDesktop"
         class="skip-container"
       >
         <PremiumButton
@@ -309,10 +322,15 @@
     top: 0;
     left: 0;
     right: 0;
-    padding: 30px 20px 0; /* Plus d'espace en haut */
+    padding: 16px 20px;
     display: flex;
-    justify-content: center; /* ✅ CENTRÉ sur mobile */
+    justify-content: space-between;
+    align-items: center;
     z-index: 10;
+  }
+
+  .mobile-skip-btn {
+    flex-shrink: 0;
   }
 
   .mobile-logo-wrapper {
@@ -408,43 +426,30 @@
 
   /* --- RESPONSIVE - Tablet (≤ 1160px) --- */
   .respond-tablet({
-    .skip-container {
-      top: auto;
-      bottom: 30px;
-      right: 0;
-      left: 0;
-      display: flex;
-      justify-content: center;
-
-      .btn-skip {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(4px);
-        padding: 10px 20px;
-        font-size: 0.9rem;
-        span {
-          display: inline;
-        }
-      }
+    .auth-form-container {
+      padding: 70px 20px 30px;
     }
   });
 
   /* --- RESPONSIVE - Mobile (≤ 720px) --- */
   .respond-mobile({
     .auth-form-container {
-      padding: 30px 16px;
+      padding: 60px 16px 24px;
     }
 
     .auth-form-wrapper {
-      padding: 16px;
+      padding: 12px;
       max-width: 100%;
     }
 
     .mobile-header {
-      padding: 24px 16px 0;
+      padding: 12px 16px;
     }
 
-    .skip-container {
-      bottom: 24px;
+    .mobile-logo-wrapper {
+      .mobile-text-size {
+        font-size: 18px;
+      }
     }
   });
 </style>

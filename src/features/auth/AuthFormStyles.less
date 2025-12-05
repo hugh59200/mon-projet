@@ -23,7 +23,7 @@
   &__subtitle {
     font-size: 1rem; /* Taille de corps standard */
     color: #64748b; /* Slate 500 - Gris neutre professionnel */
-    margin-bottom: 40px; /* Plus d'espace avant le formulaire */
+    margin-bottom: 28px; /* Espace optimisé avant le formulaire */
     line-height: 1.5;
     max-width: 90%; /* Évite que le texte soit trop large sur grand écran */
   }
@@ -34,7 +34,7 @@
     max-width: 400px; /* Largeur fixe pour le formulaire lui-même */
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espacement uniforme entre les champs */
+    gap: 24px; /* Espacement généreux entre les champs */
     background: transparent; /* On laisse le fond du layout gérer */
     animation: fadeInUp 0.4s ease forwards;
   }
@@ -62,9 +62,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 20px 0;
+    margin: 12px 0;
     color: #94a3b8; /* Slate 400 */
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase; /* Plus moderne */
     letter-spacing: 0.5px;
@@ -75,7 +75,7 @@
       flex: 1;
       height: 1px;
       background: #e2e8f0; /* Slate 200 - Ligne subtile */
-      margin: 0 16px;
+      margin: 0 12px;
     }
   }
 
@@ -83,16 +83,16 @@
   &__providers {
     display: flex;
     justify-content: center;
-    gap: 16px; /* Espacement plus large */
+    gap: 24px; /* Espacement généreux entre les providers */
   }
 
   /* LIENS DE BAS DE PAGE */
   &__links {
-    margin-top: 32px; /* Espace avant les liens */
+    margin-top: 20px; /* Espace compact avant les liens */
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    font-size: 0.9rem;
+    gap: 8px;
+    font-size: 0.875rem;
     color: #64748b;
 
     a {
@@ -115,31 +115,31 @@
 .respond-mobile({
   .auth {
     &__title {
-      font-size: 1.75rem;
-      margin-bottom: 10px;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
     }
 
     &__subtitle {
-      font-size: 0.95rem;
-      margin-bottom: 32px;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
       max-width: 100%;
     }
 
     &__form {
-      gap: 16px;
+      gap: 20px;
     }
 
     &__divider {
-      margin: 16px 0;
+      margin: 10px 0;
     }
 
     &__providers {
-      gap: 12px;
+      gap: 20px;
     }
 
     &__links {
-      margin-top: 24px;
-      gap: 10px;
+      margin-top: 16px;
+      gap: 6px;
     }
   }
 });

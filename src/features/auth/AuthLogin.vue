@@ -1,6 +1,6 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">{{ t('auth.login.welcome') }}</h1>
+    <h1 class="auth__title">{{ t('auth.login.title') }}</h1>
     <p class="auth__subtitle">
       {{ t('auth.login.subtitle') }}
     </p>
@@ -11,7 +11,8 @@
         <WrapperInput
           v-model.trim="fields.email.value.value"
           :label="t('auth.login.email')"
-          placeholder="nom@entreprise.com"
+          :placeholder="t('auth.placeholders.email')"
+          :hint="t('auth.hints.emailLogin')"
           inputmode="email"
           autocomplete="email"
           iconName="Mail"
@@ -33,7 +34,8 @@
         <WrapperInputPassword
           v-model="fields.password.value.value"
           :label="t('auth.login.password')"
-          placeholder="••••••••"
+          :placeholder="t('auth.placeholders.password')"
+          :hint="t('auth.hints.password')"
           autocomplete="current-password"
           required
           :showStrength="false"

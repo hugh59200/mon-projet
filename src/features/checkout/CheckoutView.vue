@@ -304,7 +304,8 @@
                     v-model="email"
                     label="Email"
                     required
-                    placeholder="votre@email.com"
+                    :placeholder="t('checkout.shipping.placeholders.email')"
+                    :hint="t('checkout.shipping.hints.email')"
                     icon-name="Mail"
                     icon-state="iconLeft"
                     autocomplete="email"
@@ -319,7 +320,8 @@
                     v-model="fullName"
                     label="Nom complet"
                     required
-                    placeholder="Prénom Nom"
+                    :placeholder="t('checkout.shipping.placeholders.fullName')"
+                    :hint="t('checkout.shipping.hints.fullName')"
                     icon-name="User"
                     icon-state="iconLeft"
                     autocomplete="name"
@@ -338,7 +340,8 @@
                   <AddressAutocomplete
                     v-model="address"
                     label="Adresse *"
-                    placeholder="Commencez à taper votre adresse..."
+                    :placeholder="t('checkout.shipping.placeholders.addressAuto')"
+                    :hint="t('checkout.shipping.hints.address')"
                     :required="true"
                     :alert-label="touched.address && errors.address ? errors.address : undefined"
                     :alert-type="touched.address && errors.address ? 'danger' : undefined"
@@ -352,7 +355,8 @@
                     v-model="address"
                     label="Adresse"
                     required
-                    placeholder="Numéro et nom de rue"
+                    :placeholder="t('checkout.shipping.placeholders.address')"
+                    :hint="t('checkout.shipping.hints.address')"
                     icon-name="MapPin"
                     icon-state="iconLeft"
                     autocomplete="street-address"
@@ -368,7 +372,8 @@
                       :model-value="zip"
                       :label="t('checkout.shipping.postalCode')"
                       required
-                      placeholder="75001"
+                      :placeholder="t('checkout.shipping.placeholders.postalCode')"
+                      :hint="t('checkout.shipping.hints.postalCode')"
                       :maxlength="10"
                       autocomplete="postal-code"
                       :alert-label="touched.zip && errors.zip ? errors.zip : undefined"
@@ -382,7 +387,8 @@
                       v-model="city"
                       :label="t('checkout.shipping.city')"
                       required
-                      placeholder="Paris"
+                      :placeholder="t('checkout.shipping.placeholders.city')"
+                      :hint="t('checkout.shipping.hints.city')"
                       autocomplete="address-level2"
                       :alert-label="touched.city && errors.city ? errors.city : undefined"
                       :alert-type="touched.city && errors.city ? 'danger' : undefined"
@@ -410,7 +416,8 @@
                 <WrapperInput
                   v-model="zip"
                   label="Code postal (pour la recherche)"
-                  placeholder="Entrez votre code postal pour trouver les points relais"
+                  :placeholder="t('checkout.shipping.placeholders.relayZip')"
+                  :hint="t('checkout.shipping.hints.relayZip')"
                   icon-name="Search"
                   icon-state="iconLeft"
                   autocomplete="postal-code"

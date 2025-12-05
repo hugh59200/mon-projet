@@ -9,7 +9,8 @@
       <WrapperInput
         v-model.trim="email"
         :label="t('auth.reset.email')"
-        placeholder="nom@entreprise.com"
+        :placeholder="t('auth.placeholders.email')"
+        :hint="t('auth.hints.emailReset')"
         inputmode="email"
         autocomplete="email"
         iconName="Mail"

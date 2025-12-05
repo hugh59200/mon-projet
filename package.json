@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node node_modules/vite/bin/vite.js",
     "build": "vue-tsc -b && vite build",
-    "build:full": "npm run gen:sitemap && vue-tsc -b && vite build",
+    "build:full": "npm run gen:sitemap && vue-tsc -b && vite build && npm run prerender",
+    "prerender": "node scripts/prerender.cjs",
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.vue src",
     "lint:fix": "eslint --ext .ts,.vue src --fix",
@@ -70,6 +71,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.0",
+    "puppeteer": "^24.32.0",
     "supabase": "^2.54.11",
     "typescript": "^5.9.3",
     "vite-plugin-sitemap": "^0.8.2",

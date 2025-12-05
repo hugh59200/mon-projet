@@ -398,6 +398,18 @@ export default {
       registrationFailed: 'Registration error.',
       resetFailed: 'Unable to send email.',
     },
+    hints: {
+      emailLogin: 'Email address used during registration',
+      emailRegister: 'Professional email recommended',
+      emailReset: 'Email address associated with your account',
+      password: 'Minimum 8 characters',
+      passwordNew: 'Choose a secure password',
+      confirmPassword: 'Enter your password again',
+    },
+    placeholders: {
+      email: 'name@company.com',
+      password: '••••••••',
+    },
   },
 
   // ============================================
@@ -599,6 +611,23 @@ export default {
       relay: 'Pickup Point',
       home: 'Home',
       whereToDeliver: 'Package destination',
+      hints: {
+        email: 'For order confirmation',
+        fullName: 'As it will appear on the package',
+        address: 'Street number and name',
+        postalCode: '5 digits',
+        city: 'Delivery city',
+        relayZip: 'To find nearby pickup points',
+      },
+      placeholders: {
+        email: 'your@email.com',
+        fullName: 'First Last',
+        address: 'Street number and name',
+        addressAuto: 'Start typing your address...',
+        postalCode: '75001',
+        city: 'Paris',
+        relayZip: 'Enter your postal code',
+      },
     },
     payment: {
       title: 'Payment',
@@ -777,6 +806,14 @@ export default {
     carrier: 'Carrier',
     trackingNumber: 'Tracking #',
     estimatedDelivery: 'Estimate',
+    hints: {
+      orderNumber: 'Format: FP-XXXX-XXXXXX',
+      email: 'Email used when ordering',
+    },
+    placeholders: {
+      orderNumber: 'FP-2025-000123',
+      email: 'example@email.com',
+    },
   },
 
   // ============================================
@@ -827,6 +864,24 @@ export default {
     support: 'Customer Support',
     supportDesc: 'Have a question? Open a ticket via secure messaging.',
     openMessaging: 'Messaging',
+    hints: {
+      fullName: 'First and last name',
+      phone: 'International format recommended',
+      address: 'Street number and name',
+      postalCode: '5 digits',
+      city: 'City of residence',
+      country: 'Country of residence',
+      newPassword: 'Min 8 characters, uppercase and number',
+      confirmPassword: 'Must match new password',
+    },
+    placeholders: {
+      fullName: 'First Last',
+      phone: '+1 555 123 4567',
+      address: '123 Main Street',
+      postalCode: '10001',
+      city: 'New York',
+      country: 'United States',
+    },
   },
 
   // ============================================
