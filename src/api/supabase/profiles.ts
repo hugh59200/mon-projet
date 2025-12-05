@@ -94,3 +94,30 @@ export function getAvatarPublicUrl(path: string): string {
   const { data } = supabase.storage.from('avatars').getPublicUrl(path)
   return data.publicUrl
 }
+
+/**
+ * Retourne l'URL d'affichage de l'avatar (gère les chemins et URLs complètes)
+ */
+export function getAvatarDisplayUrl(avatarUrl: string | null): string | null {
+  if (!avatarUrl) return null
+  // Si c'est déjà une URL complète, la retourner telle quelle
+  if (avatarUrl.startsWith('http')) return avatarUrl
+  // Sinon, convertir le chemin en URL publique
+  return getAvatarPublicUrl(avatarUrl)
+}
+
+/**
+ * Récupère le profil du support (premier admin disponible)
+ */
+export async function getSupportProfile(): Promise<Pick<
+  Profiles,
+  'id' | 'avatar_url' | 'full_name'
+> | null> {
+  const res = await supabase
+    .from('profiles')
+    .select('id, avatar_url, full_name')
+    .eq('role', 'admin')
+    .limit(1)
+    .maybeSingle()
+  return handleApiMaybe(res)
+}

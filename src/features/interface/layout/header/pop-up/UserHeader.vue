@@ -100,8 +100,12 @@
   async function loadProfile() {
     if (!user) return
     const data = await getProfile(user.id)
-    if (data) {
-      avatarPreview.value = data.avatar_url ? getAvatarPublicUrl(data.avatar_url) : null
+    if (data && data.avatar_url) {
+      // Si c'est déjà une URL complète, l'utiliser directement
+      // Sinon, convertir le chemin en URL publique
+      avatarPreview.value = data.avatar_url.startsWith('http')
+        ? data.avatar_url
+        : getAvatarPublicUrl(data.avatar_url)
     }
   }
 

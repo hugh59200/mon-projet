@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
   import { getSession, verifyOtp } from '@/api'
+  import { createWelcomePromo } from '@/api/supabase/autoPromo'
   import { useAppLoader } from '@/composables/useAppLoader'
   import { getPostLoginRedirect } from '@/router'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
@@ -89,6 +90,12 @@
   async function handleSuccess(user: any) {
     auth.user = user
     await auth.fetchProfile()
+
+    // Envoyer le code promo de bienvenue si c'est une nouvelle inscription
+    const type = route.query.type as string | undefined
+    if (type === 'signup' || type === 'email') {
+      createWelcomePromo(user.id, user.email).catch(console.error)
+    }
 
     const storedRedirect = sessionStorage.getItem('redirectAfterOAuth')
     const userRole = auth.profile?.role || 'user'

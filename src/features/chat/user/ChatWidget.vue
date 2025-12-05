@@ -59,7 +59,14 @@
         <header class="chat-widget__header">
           <div class="chat-widget__header-left">
             <div class="chat-widget__header-avatar">
+              <img
+                v-if="supportAvatar"
+                :src="supportAvatar"
+                alt="Support"
+                class="chat-widget__header-avatar-img"
+              />
               <BasicIconNext
+                v-else
                 name="Headphones"
                 :size="18"
                 :color="'white' as IconColor"
@@ -97,6 +104,7 @@
           :send-typing="sendTyping"
           :height="chatHeight"
           :conversation-id="userId"
+          :other-role-avatar="supportAvatar"
         />
       </div>
     </Transition>
@@ -110,6 +118,7 @@
   import { useChat } from '@/features/chat/shared/composables/useChat'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
+  import { getSupportProfile, getAvatarDisplayUrl } from '@/api/supabase/profiles'
 
   const { isMobile } = useDeviceBreakpoint()
   const chatHeight = computed(() => (isMobile.value ? undefined : 400))
@@ -119,6 +128,16 @@
   const userChat = useChat('user')
 
   const { sendMessage, sendTyping, userId, messages, newMessage, isTyping, isReady } = userChat
+
+  // Avatar du support
+  const supportAvatar = ref<string | null>(null)
+
+  async function loadSupportAvatar() {
+    const profile = await getSupportProfile()
+    if (profile?.avatar_url) {
+      supportAvatar.value = getAvatarDisplayUrl(profile.avatar_url)
+    }
+  }
 
   // Auto-hide logic
   const isButtonVisible = ref(true)
@@ -149,6 +168,7 @@
     chatNotif.setRole('user')
     chatNotif.listenRealtime()
     await chatNotif.fetchUnreadByUser()
+    await loadSupportAvatar()
     window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
@@ -306,6 +326,14 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      overflow: hidden;
+
+      &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
     }
 
     &__header-status-dot {

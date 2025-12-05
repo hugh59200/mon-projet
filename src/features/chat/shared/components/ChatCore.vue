@@ -80,6 +80,7 @@
             :message="msg"
             :isMine="msg.sender_role === currentRole"
             :isGrouped="isGroupedMessage(i)"
+            :avatar="msg.sender_role !== currentRole ? otherRoleAvatar : undefined"
           />
         </div>
 
@@ -154,6 +155,8 @@
     aiSuggestion?: string | null
     /** ID de la conversation pour la persistance du scroll */
     conversationId?: string | null
+    /** Avatar URL pour les messages de l'autre rôle (admin pour user, user pour admin) */
+    otherRoleAvatar?: string | null
   }>()
 
   defineEmits<{

@@ -17,7 +17,14 @@
         v-if="!isGrouped"
         class="chat-message__avatar"
       >
+        <img
+          v-if="avatar"
+          :src="avatar"
+          alt="Avatar"
+          class="chat-message__avatar-img"
+        />
         <BasicIconNext
+          v-else
           name="Headphones"
           :size="14"
           color="white"
@@ -104,6 +111,7 @@
     message: Messages
     isMine: boolean
     isGrouped?: boolean
+    avatar?: string | null
   }>()
 
   const formattedTime = computed(() => {
@@ -170,6 +178,14 @@
         0 2px 8px color-mix(in srgb, var(--primary-600) 35%, transparent),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
       position: relative;
+      overflow: hidden;
+
+      &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+      }
 
       // Status ring
       &::before {
