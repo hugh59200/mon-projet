@@ -611,6 +611,34 @@
       }
     }
 
+    // Success state for compact variant (footer)
+    &--compact&--success {
+      .newsletter-signup__success {
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        padding: 16px 20px;
+        gap: 14px;
+      }
+
+      .newsletter-signup__success-icon {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+      }
+
+      .newsletter-signup__success-title {
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .newsletter-signup__success-desc {
+        font-size: 12px;
+        max-width: none;
+        margin: 2px 0 0;
+      }
+    }
+
     // ============================================
     // SHARED ELEMENTS
     // ============================================
