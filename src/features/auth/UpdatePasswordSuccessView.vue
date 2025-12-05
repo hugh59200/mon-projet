@@ -1,107 +1,60 @@
 <template>
-  <section class="auth-success">
-    <transition name="fade">
-      <div class="auth-success__card">
-        <div class="auth-success__icon">
-          <BasicIconNext
-            name="CheckCircle"
-            :size="20"
-          />
-        </div>
+  <div class="auth">
+    <div class="auth__icon-wrapper">
+      <BasicIconNext
+        name="CheckCircle"
+        color="success-500"
+        :size="64"
+      />
+    </div>
 
-        <BasicText
-          size="h4"
-          weight="bold"
-        >
-          Mot de passe mis à jour ✅
-        </BasicText>
+    <h1 class="auth__title">{{ t('auth.updatePasswordSuccess.title') }}</h1>
+    <p class="auth__subtitle">
+      {{ t('auth.updatePasswordSuccess.subtitle') }}
+    </p>
 
-        <BasicText
-          size="body-m"
-          color="neutral-500"
-          class="auth-success__subtitle"
-        >
-          Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous reconnecter à
-          votre compte.
-        </BasicText>
-
-        <PremiumButton
-          label="Se connecter"
-          type="primary"
-          variant="solid"
-          size="md"
-          width="full"
-          @click="router.push('/auth/login')"
-        />
-      </div>
-    </transition>
-  </section>
+    <div class="auth__form">
+      <PremiumButton
+        type="primary"
+        variant="solid"
+        size="lg"
+        width="full"
+        :label="t('auth.updatePasswordSuccess.login')"
+        icon-left="LogIn"
+        :shine="true"
+        @click="router.push('/auth/login')"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
 
+  const { t } = useI18n()
   const router = useRouter()
 </script>
 
 <style scoped lang="less">
-  .auth-success {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 120px);
-    background-color: @neutral-50;
+  @import './AuthFormStyles.less';
 
-    &__card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      padding: 40px 32px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-      animation: fadeInUp 0.4s ease forwards;
-    }
-
-    &__icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-700);
-      margin-bottom: 8px;
-    }
-
-    &__subtitle {
-      margin-bottom: 8px;
-    }
-
-    button {
-      margin-top: 8px;
-    }
+  .auth__icon-wrapper {
+    animation: popin 0.4s ease-out forwards;
   }
 
-  /* ✨ Animations */
-  @keyframes fadeInUp {
-    from {
+  @keyframes popin {
+    0% {
+      transform: scale(0.3);
       opacity: 0;
-      transform: translateY(10px);
     }
-    to {
+    60% {
+      transform: scale(1.05);
       opacity: 1;
-      transform: translateY(0);
     }
-  }
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.3s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
+    100% {
+      transform: scale(1);
+    }
   }
 </style>

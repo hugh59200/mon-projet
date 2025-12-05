@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "build:full": "npm run gen:sitemap && vue-tsc -b && vite build && npm run prerender",
+    "build:full": "npm run gen:sitemap && vue-tsc -b && vite build",
+    "build:full:prerender": "npm run gen:sitemap && vue-tsc -b && vite build && npm run prerender",
     "prerender": "node scripts/prerender.cjs",
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.vue src",

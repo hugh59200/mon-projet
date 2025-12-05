@@ -371,6 +371,24 @@ export default {
       backToLogin: 'Back to login',
       success: 'If an account exists, you will receive an email shortly.',
     },
+    emailSent: {
+      title: 'Check your email',
+      subtitle: 'A confirmation link has been sent to your address.',
+      description: 'Click on it to activate your Fast Peptides account.',
+    },
+    updatePassword: {
+      title: 'New password',
+      subtitle: 'Set a new password for your account.',
+      password: 'New password',
+      confirmPassword: 'Confirm password',
+      submit: 'Update',
+      success: 'Your password has been updated.',
+    },
+    updatePasswordSuccess: {
+      title: 'Password updated',
+      subtitle: 'Your password has been successfully changed. You can now log in to your account.',
+      login: 'Log in',
+    },
     callback: {
       loading: 'Secure login',
       verifying: 'Verifying access...',

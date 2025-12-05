@@ -371,6 +371,24 @@ export default {
       backToLogin: 'Retour à la connexion',
       success: 'Si un compte existe, vous recevrez un email sous peu.',
     },
+    emailSent: {
+      title: 'Vérifiez votre e-mail',
+      subtitle: 'Un lien de confirmation vient d\'être envoyé à votre adresse.',
+      description: 'Cliquez dessus pour activer votre compte Fast Peptides.',
+    },
+    updatePassword: {
+      title: 'Nouveau mot de passe',
+      subtitle: 'Définissez un nouveau mot de passe pour votre compte.',
+      password: 'Nouveau mot de passe',
+      confirmPassword: 'Confirmer le mot de passe',
+      submit: 'Mettre à jour',
+      success: 'Votre mot de passe a été mis à jour.',
+    },
+    updatePasswordSuccess: {
+      title: 'Mot de passe mis à jour',
+      subtitle: 'Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous reconnecter à votre compte.',
+      login: 'Se connecter',
+    },
     callback: {
       loading: 'Connexion sécurisée',
       verifying: 'Vérification des accès...',

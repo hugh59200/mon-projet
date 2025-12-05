@@ -75,7 +75,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 2500,
     ...config.APP,
     cssMinify: false,
-    target: 'esnext',
+    target: ['es2022', 'edge89', 'firefox89', 'chrome89', 'safari15'],
   },
   server: {
     port: 5278,

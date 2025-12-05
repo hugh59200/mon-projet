@@ -1,70 +1,36 @@
 <template>
-  <div
-    v-motion="{
-      initial: { opacity: 0, y: 10 },
-      enter: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120 } },
-    }"
-    class="auth-email"
-  >
-    <div class="auth-email__icon-wrapper">
+  <div class="auth">
+    <div class="auth__icon-wrapper">
       <BasicIconNext
         name="Mail"
         color="primary-600"
-        :size="74"
+        :size="64"
       />
     </div>
 
-    <BasicText
-      size="h2"
-      weight="bold"
-      color="neutral-900"
-    >
-      Vérifiez votre e-mail
-    </BasicText>
-
-    <BasicText
-      size="body-m"
-      color="neutral-600"
-      class="auth-email__subtitle"
-    >
-      Un lien de confirmation vient d’être envoyé à votre adresse.
+    <h1 class="auth__title">{{ t('auth.emailSent.title') }}</h1>
+    <p class="auth__subtitle">
+      {{ t('auth.emailSent.subtitle') }}
       <br />
-      Cliquez dessus pour activer votre compte Fast Peptides.
-    </BasicText>
+      {{ t('auth.emailSent.description') }}
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
-  import BasicText from '@designSystem/components/basic/text/BasicText.vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 </script>
 
 <style scoped lang="less">
-  .auth-email {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 16px;
-    padding: 20px;
+  @import './AuthFormStyles.less';
 
-    &__icon-wrapper {
-      animation:
-        popin 0.4s ease-out forwards,
-        bounce-end 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    &__subtitle {
-      line-height: 1.5;
-      max-width: 300px;
-      margin-top: 4px;
-    }
+  .auth__icon-wrapper {
+    animation: popin 0.4s ease-out forwards;
   }
 
-  /* Animations */
   @keyframes popin {
     0% {
       transform: scale(0.3);
@@ -73,18 +39,6 @@
     60% {
       transform: scale(1.05);
       opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  @keyframes bounce-end {
-    0%,
-    90% {
-      transform: scale(1);
-    }
-    95% {
-      transform: scale(1.05);
     }
     100% {
       transform: scale(1);
