@@ -1,12 +1,14 @@
 <template>
   <AppLayout />
   <AgeGate />
+  <AppLoaderOverlay />
 </template>
 
 <script setup lang="ts">
   import { useHead } from '@vueuse/head'
   import AppLayout from '@/features/interface/layout/AppLayout.vue'
   import AgeGate from '@/features/interface/components/AgeGate.vue'
+  import AppLoaderOverlay from '@/components/AppLoaderOverlay.vue'
   import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo'
 
   // Schema JSON-LD pour Organization et WebSite (SEO + GEO)

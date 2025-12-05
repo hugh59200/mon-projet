@@ -201,6 +201,7 @@ const productSchema = computed(() => {
       url: productUrl?.value || getCanonicalUrl(`/catalogue/${sku.value}`),
       priceCurrency: currency.value,
       price: price.value.toFixed(2),
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: inStock.value
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
@@ -220,15 +221,40 @@ const productSchema = computed(() => {
         returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
         merchantReturnDays: 0,
       },
+      // Détails de livraison
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'EUR',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'FR',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+        },
+      },
     },
     // Audience cible - crucial pour GEO
     audience: {
-      '@type': 'Audience',
+      '@type': 'PeopleAudience',
+      suggestedMinAge: 18,
       audienceType: 'Researchers',
-      geographicArea: {
-        '@type': 'Place',
-        name: 'Europe',
-      },
     },
     // Catégorie produit
     category: 'Research Chemicals > Peptides',
@@ -247,11 +273,6 @@ const productSchema = computed(() => {
   // Ajoute les identifiants si présents
   if (productIdentifiers.value.length > 0) {
     schema.identifier = productIdentifiers.value
-  }
-
-  // Ajoute le GTIN/CAS si disponible (pour une meilleure indexation)
-  if (casNumber?.value) {
-    schema.gtin = casNumber.value // Certains crawlers utilisent ce champ
   }
 
   return schema
