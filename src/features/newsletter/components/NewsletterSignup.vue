@@ -509,14 +509,13 @@
 
       .newsletter-signup__form {
         display: flex;
-        align-items: center;
-        gap: 10px;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
       }
 
       .newsletter-signup__input-wrapper {
-        flex: 1;
-        min-width: 0;
-        max-width: 180px;
+        width: 100%;
       }
 
       .newsletter-signup__input {
@@ -537,23 +536,12 @@
       }
 
       .newsletter-signup__btn {
-        flex-shrink: 0;
+        // Aligné à droite par le parent
       }
 
       .newsletter-signup__privacy {
         display: none;
       }
-
-      // Responsive
-      .respond-mobile({
-        .newsletter-signup__input-wrapper {
-          max-width: none;
-        }
-
-        .newsletter-signup__btn {
-          width: auto;
-        }
-      });
     }
 
     // ============================================
