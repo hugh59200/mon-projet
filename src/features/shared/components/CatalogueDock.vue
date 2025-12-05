@@ -265,7 +265,7 @@
 
     return Array.from(categoryMap.entries())
       .map(([categoryKey, data]) => ({
-        name: getTranslated(data.i18n, categoryKey, locale.value), // Nom traduit pour l'affichage
+        name: getTranslated(data.i18n as any, categoryKey, locale.value), // Nom traduit pour l'affichage
         key: categoryKey, // Clé originale (français) pour le filtrage
         color: colorMap[categoryKey] || '#a67c5b',
         count: data.count,

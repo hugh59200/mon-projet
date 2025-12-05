@@ -380,8 +380,6 @@ Deno.serve(
         .eq('id', campaign_id)
     }
 
-    console.log(`✅ Newsletter envoyée: ${results.sent} succès, ${results.failed} échecs`)
-
     return {
       success: true,
       sent_count: results.sent,

@@ -75,6 +75,7 @@ export async function signUp(
     password,
     options: {
       captchaToken,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         locale, // Stocké dans user_metadata pour les emails
       },

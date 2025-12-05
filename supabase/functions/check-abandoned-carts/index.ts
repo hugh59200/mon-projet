@@ -60,16 +60,13 @@ Deno.serve(
       })
 
     if (cartsError) {
-      console.error('❌ Erreur recherche paniers:', cartsError)
+      console.error('Erreur recherche paniers:', cartsError)
       throw cartsError
     }
 
     if (!abandonedCarts || abandonedCarts.length === 0) {
-      console.log('✅ Aucun panier abandonné trouvé')
       return { success: true, message: 'No abandoned carts', processed: 0 }
     }
-
-    console.log(`📦 ${abandonedCarts.length} panier(s) abandonné(s) trouvé(s)`)
 
     // 3. Traiter chaque panier abandonné
     const results = []
@@ -84,7 +81,6 @@ Deno.serve(
         })
 
         if (!promoResult?.success) {
-          console.log(`⏭️ Skip ${cart.email}: ${promoResult?.reason}`)
           results.push({ email: cart.email, success: false, reason: promoResult?.reason })
           continue
         }
@@ -102,10 +98,9 @@ Deno.serve(
           },
         })
 
-        console.log(`✅ Email envoyé à ${cart.email} avec code ${promoResult.code}`)
         results.push({ email: cart.email, success: true, code: promoResult.code })
       } catch (err) {
-        console.error(`❌ Erreur traitement ${cart.email}:`, err)
+        console.error(`Erreur traitement ${cart.email}:`, err)
         results.push({ email: cart.email, success: false, error: String(err) })
       }
     }

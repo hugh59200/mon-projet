@@ -127,8 +127,6 @@ Deno.serve(
       order_id,
     })
 
-    console.log(`✅ Email envoyé: ${order.shipping_email}`)
-
     return {
       success: true,
       email_sent_to: order.shipping_email,

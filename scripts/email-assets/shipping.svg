@@ -1,0 +1,29 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+
+  <!-- Truck body -->
+  <rect x="20" y="50" width="45" height="28" rx="3" fill="#3B82F6"/>
+
+  <!-- Truck cabin -->
+  <path d="M65 50H80C83 50 85 52 87 55L93 65V75C93 77 91 78 89 78H65V50Z" fill="#2563EB"/>
+
+  <!-- Window -->
+  <rect x="70" y="54" width="15" height="10" rx="2" fill="#BFDBFE"/>
+
+  <!-- Wheels -->
+  <circle cx="35" cy="78" r="8" fill="#1E40AF"/>
+  <circle cx="35" cy="78" r="4" fill="#93C5FD"/>
+  <circle cx="80" cy="78" r="8" fill="#1E40AF"/>
+  <circle cx="80" cy="78" r="4" fill="#93C5FD"/>
+
+  <!-- Speed lines -->
+  <line x1="10" y1="55" x2="18" y2="55" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+  <line x1="8" y1="62" x2="16" y2="62" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="69" x2="18" y2="69" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Package on truck -->
+  <rect x="30" y="55" width="12" height="12" rx="1" fill="#FCD34D" stroke="#F59E0B" stroke-width="1"/>
+  <line x1="36" y1="55" x2="36" y2="67" stroke="#F59E0B" stroke-width="1"/>
+  <line x1="30" y1="61" x2="42" y2="61" stroke="#F59E0B" stroke-width="1"/>
+</svg>

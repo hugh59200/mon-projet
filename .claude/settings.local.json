@@ -22,7 +22,8 @@
       "Bash(node scripts/convert-logo.cjs:*)",
       "Bash(mkcert:*)",
       "Bash(where:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

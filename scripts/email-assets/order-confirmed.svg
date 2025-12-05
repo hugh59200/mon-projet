@@ -1,0 +1,16 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="#F0FDF4" stroke="#22C55E" stroke-width="2"/>
+
+  <!-- Check circle -->
+  <circle cx="60" cy="60" r="35" fill="#22C55E"/>
+
+  <!-- Checkmark -->
+  <path d="M45 60L55 70L77 48" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Sparkles -->
+  <circle cx="25" cy="30" r="3" fill="#FCD34D"/>
+  <circle cx="95" cy="35" r="2.5" fill="#FCD34D"/>
+  <circle cx="90" cy="85" r="2" fill="#FCD34D"/>
+  <circle cx="30" cy="90" r="2.5" fill="#FCD34D"/>
+</svg>

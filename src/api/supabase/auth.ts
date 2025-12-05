@@ -60,6 +60,7 @@ export async function signUpWithMetadata(options: SignUpWithMetadataOptions): Pr
     email: options.email,
     password: options.password,
     options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         full_name: options.fullName || '',
       },

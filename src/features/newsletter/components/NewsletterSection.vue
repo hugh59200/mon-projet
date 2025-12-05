@@ -98,9 +98,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
-
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   .newsletter-section {

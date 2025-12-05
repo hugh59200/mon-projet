@@ -1,80 +1,85 @@
 <template>
-  <article class="review-card" :class="[review.author_type, { featured: review.is_featured }]">
-    <header class="review-header">
-      <div class="author-info">
-        <div class="author-avatar">
-          {{ getInitials(review.author_name) }}
+  <article class="review-item" :class="[review.author_type, { expanded: isExpanded }]">
+    <!-- Header compact - toujours visible -->
+    <header class="review-item__header" @click="toggle">
+      <!-- Avatar -->
+      <div class="review-item__avatar" :class="review.author_type">
+        {{ getInitials(review.author_name) }}
+      </div>
+
+      <!-- Infos principales -->
+      <div class="review-item__main">
+        <div class="review-item__top">
+          <span class="review-item__name">{{ review.author_name }}</span>
+          <span v-if="review.author_type !== 'standard'" class="review-item__badge" :class="review.author_type">
+            {{ getBadgeLabel(review.author_type) }}
+          </span>
         </div>
-        <div class="author-details">
-          <div class="author-name">
-            {{ review.author_name }}
-            <span v-if="review.author_type !== 'standard'" class="author-badge" :class="review.author_type">
-              <svg v-if="review.author_type === 'premium'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-              </svg>
-              <svg v-else-if="review.author_type === 'pro'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM10 17L6 13L7.41 11.59L10 14.17L16.59 7.58L18 9L10 17Z"/>
-              </svg>
-              <svg v-else-if="review.author_type === 'verified'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-              </svg>
-              {{ getBadgeLabel(review.author_type) }}
-            </span>
-          </div>
-          <div v-if="review.author_title || review.author_institution" class="author-title">
-            {{ [review.author_title, review.author_institution].filter(Boolean).join(' - ') }}
-          </div>
+        <div class="review-item__meta">
+          <StarRating :rating="review.rating" size="sm" />
+          <span class="review-item__date">{{ formatDate(review.created_at) }}</span>
         </div>
       </div>
 
-      <div class="review-meta">
-        <StarRating :rating="review.rating" size="sm" />
-        <time class="review-date" :datetime="review.created_at">
-          {{ formatDate(review.created_at) }}
-        </time>
-      </div>
+      <!-- Chevron -->
+      <BasicIconNext
+        :name="isExpanded ? 'ChevronUp' : 'ChevronDown'"
+        :size="16"
+        class="review-item__chevron"
+      />
     </header>
 
-    <div class="review-content">
-      <h4 v-if="review.title" class="review-title">{{ review.title }}</h4>
-      <p v-if="review.content" class="review-text">{{ review.content }}</p>
-    </div>
+    <!-- Contenu déplié -->
+    <div v-show="isExpanded" v-motion="contentMotion" class="review-item__content">
+      <!-- Titre et texte -->
+      <div v-if="review.title || review.content" class="review-item__body">
+        <p v-if="review.title" class="review-item__title">{{ review.title }}</p>
+        <p v-if="review.content" class="review-item__text">{{ review.content }}</p>
+      </div>
 
-    <div v-if="hasDetailedRatings" class="detailed-ratings">
-      <div v-if="review.rating_quality" class="rating-item">
-        <span class="rating-label">Qualité</span>
-        <StarRating :rating="review.rating_quality" size="sm" />
+      <!-- Infos pro -->
+      <div v-if="review.author_title || review.author_institution" class="review-item__pro">
+        <BasicIconNext name="Briefcase" :size="14" />
+        <span>{{ [review.author_title, review.author_institution].filter(Boolean).join(' - ') }}</span>
       </div>
-      <div v-if="review.rating_purity" class="rating-item">
-        <span class="rating-label">Pureté</span>
-        <StarRating :rating="review.rating_purity" size="sm" />
+
+      <!-- Notes détaillées -->
+      <div v-if="hasDetailedRatings" class="review-item__details">
+        <div v-if="review.rating_quality" class="review-item__detail">
+          <span>Qualité</span>
+          <StarRating :rating="review.rating_quality" size="sm" />
+        </div>
+        <div v-if="review.rating_purity" class="review-item__detail">
+          <span>Pureté</span>
+          <StarRating :rating="review.rating_purity" size="sm" />
+        </div>
+        <div v-if="review.rating_shipping" class="review-item__detail">
+          <span>Livraison</span>
+          <StarRating :rating="review.rating_shipping" size="sm" />
+        </div>
+        <div v-if="review.rating_value" class="review-item__detail">
+          <span>Rapport Q/P</span>
+          <StarRating :rating="review.rating_value" size="sm" />
+        </div>
       </div>
-      <div v-if="review.rating_shipping" class="rating-item">
-        <span class="rating-label">Livraison</span>
-        <StarRating :rating="review.rating_shipping" size="sm" />
-      </div>
-      <div v-if="review.rating_value" class="rating-item">
-        <span class="rating-label">Rapport qualité/prix</span>
-        <StarRating :rating="review.rating_value" size="sm" />
+
+      <!-- Badges -->
+      <div v-if="review.is_verified_purchase || review.is_featured" class="review-item__tags">
+        <span v-if="review.is_verified_purchase" class="review-item__tag review-item__tag--verified">
+          <BasicIconNext name="CheckCircle" :size="12" />
+          Achat vérifié
+        </span>
+        <span v-if="review.is_featured" class="review-item__tag review-item__tag--featured">
+          <BasicIconNext name="Award" :size="12" />
+          Mis en avant
+        </span>
       </div>
     </div>
-
-    <footer v-if="review.is_verified_purchase || review.is_featured" class="review-footer">
-      <span v-if="review.is_verified_purchase" class="verified-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
-        Achat vérifié
-      </span>
-      <span v-if="review.is_featured" class="featured-badge">
-        Avis mis en avant
-      </span>
-    </footer>
   </article>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import type { Review } from '@/api/supabase/reviews'
 import StarRating from './StarRating.vue'
 import dayjs from 'dayjs'
@@ -86,6 +91,8 @@ const props = defineProps<{
   review: Review
 }>()
 
+const isExpanded = ref(false)
+
 const hasDetailedRatings = computed(() => {
   return (
     props.review.rating_quality ||
@@ -94,6 +101,26 @@ const hasDetailedRatings = computed(() => {
     props.review.rating_value
   )
 })
+
+const contentMotion = computed(() => ({
+  initial: { opacity: 0, y: -8, scaleY: 0.96 },
+  enter: {
+    opacity: 1,
+    y: 0,
+    scaleY: 1,
+    transition: { type: 'spring', stiffness: 180, damping: 20 },
+  },
+  leave: {
+    opacity: 0,
+    y: -6,
+    scaleY: 0.96,
+    transition: { duration: 0.2 },
+  },
+}))
+
+function toggle() {
+  isExpanded.value = !isExpanded.value
+}
 
 function getInitials(name: string): string {
   return name
@@ -114,222 +141,247 @@ function getBadgeLabel(type: string): string {
 }
 
 function formatDate(date: string): string {
-  return dayjs(date).format('D MMMM YYYY')
+  return dayjs(date).format('D MMM YYYY')
 }
 </script>
 
 <style scoped lang="less">
-.review-card {
-  padding: var(--spacing-15);
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+@import '@designSystem/fondation/colors/colors.less';
+
+.review-item {
   position: relative;
+  border-radius: 12px;
+  background: color-mix(in srgb, @neutral-100 60%, transparent);
+  border: 1px solid color-mix(in srgb, @neutral-200 50%, transparent);
   overflow: hidden;
+  transition: all 0.2s ease;
 
-  &.featured {
-    border-color: var(--color-primary);
-    background: var(--color-primary-light);
+  &.expanded {
+    background: white;
+    border-color: @neutral-200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
-  // Style Premium - élégant et luxueux
+  // Types spéciaux
   &.premium {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.03) 0%, rgba(255, 183, 0, 0.08) 100%);
-    border: 1px solid rgba(255, 195, 0, 0.3);
-    box-shadow: 0 2px 12px rgba(255, 195, 0, 0.1);
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #ffd700, #ffb700, #ffd700);
-    }
+    border-left: 3px solid #ffd700;
   }
 
-  // Style Pro - professionnel et moderne
   &.pro {
-    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.03) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
-    border: 1px solid rgba(var(--primary-500-rgb), 0.25);
-    box-shadow: 0 2px 12px rgba(var(--primary-500-rgb), 0.08);
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--color-primary), rgba(var(--primary-500-rgb), 0.7), var(--color-primary));
-    }
+    border-left: 3px solid var(--primary-500);
   }
 
-  // Style Verified - confiance
   &.verified {
-    background: linear-gradient(135deg, rgba(var(--success-rgb, 34, 197, 94), 0.02) 0%, rgba(var(--success-rgb, 34, 197, 94), 0.06) 100%);
-    border: 1px solid rgba(var(--success-rgb, 34, 197, 94), 0.2);
-  }
-}
-
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--spacing-15);
-  margin-bottom: var(--spacing-10);
-  flex-wrap: wrap;
-}
-
-.author-info {
-  display: flex;
-  gap: var(--spacing-10);
-  align-items: center;
-}
-
-.author-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: var(--font-size-body-s);
-
-  .premium & {
-    background: linear-gradient(135deg, #ffd700, #ffb700);
-    color: #000;
-    box-shadow: 0 2px 8px rgba(255, 195, 0, 0.3);
+    border-left: 3px solid @success-500;
   }
 
-  .pro & {
-    background: var(--color-primary);
-    box-shadow: 0 2px 8px rgba(var(--primary-500-rgb), 0.3);
-  }
-}
-
-.author-details {
-  .author-name {
-    font-weight: 600;
+  // Header
+  &__header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-5);
+    gap: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: color-mix(in srgb, @neutral-200 30%, transparent);
+    }
   }
 
-  .author-title {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
-  }
-}
-
-.author-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-
-  svg {
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--primary-500);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
     flex-shrink: 0;
+
+    &.premium {
+      background: linear-gradient(135deg, #ffd700, #ffb700);
+      color: #1a1a1a;
+    }
+
+    &.pro {
+      background: var(--primary-500);
+    }
+
+    &.verified {
+      background: @success-500;
+    }
   }
 
-  &.premium {
-    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
-    color: #000;
-    box-shadow: 0 2px 6px rgba(255, 195, 0, 0.25);
+  &__main {
+    flex: 1;
+    min-width: 0;
   }
 
-  &.pro {
-    background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--primary-500-rgb), 0.85) 100%);
-    color: white;
-    box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.25);
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
-  &.verified {
-    background: linear-gradient(135deg, var(--color-success), rgba(var(--success-rgb, 34, 197, 94), 0.85));
-    color: white;
-    box-shadow: 0 2px 6px rgba(var(--success-rgb, 34, 197, 94), 0.25);
-  }
-}
-
-.review-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-5);
-}
-
-.review-date {
-  font-size: var(--font-size-body-s);
-  color: var(--color-text-secondary);
-}
-
-.review-content {
-  margin-bottom: var(--spacing-10);
-
-  .review-title {
-    font-size: var(--font-size-body);
+  &__name {
+    font-size: 14px;
     font-weight: 600;
-    margin: 0 0 var(--spacing-5);
+    color: @neutral-800;
   }
 
-  .review-text {
-    margin: 0;
-    color: var(--color-text);
-    line-height: 1.6;
+  &__badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 2px 6px;
+    border-radius: 4px;
+
+    &.premium {
+      background: linear-gradient(135deg, #ffd700, #ffb700);
+      color: #1a1a1a;
+    }
+
+    &.pro {
+      background: var(--primary-500);
+      color: white;
+    }
+
+    &.verified {
+      background: @success-500;
+      color: white;
+    }
   }
-}
 
-.detailed-ratings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-15);
-  padding-top: var(--spacing-10);
-  border-top: 1px solid var(--color-border);
-  margin-top: var(--spacing-10);
-}
-
-.rating-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-5);
-
-  .rating-label {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
   }
-}
 
-.review-footer {
-  display: flex;
-  gap: var(--spacing-10);
-  margin-top: var(--spacing-10);
-  padding-top: var(--spacing-10);
-  border-top: 1px solid var(--color-border);
-}
+  &__date {
+    font-size: 12px;
+    color: @neutral-400;
+  }
 
-.verified-badge,
-.featured-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--font-size-body-s);
-  color: var(--color-success);
-
-  svg {
+  &__chevron {
     flex-shrink: 0;
-  }
-}
+    color: @neutral-400;
+    transition: transform 0.2s ease;
 
-.featured-badge {
-  color: var(--color-primary);
+    .expanded & {
+      transform: rotate(180deg);
+    }
+  }
+
+  // Contenu
+  &__content {
+    padding: 0 14px 14px;
+    border-top: 1px solid @neutral-100;
+    margin-top: 0;
+    transform-origin: top;
+  }
+
+  &__body {
+    padding-top: 12px;
+  }
+
+  &__title {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: @neutral-800;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: @neutral-600;
+  }
+
+  &__pro {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: @neutral-50;
+    border-radius: 6px;
+    font-size: 12px;
+    color: @neutral-500;
+
+    :deep(svg) {
+      color: @neutral-400;
+      fill: @neutral-400;
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  &__detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: @neutral-50;
+    border-radius: 6px;
+
+    span {
+      font-size: 11px;
+      color: @neutral-500;
+    }
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  &__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+
+    :deep(svg) {
+      flex-shrink: 0;
+    }
+
+    &--verified {
+      background: color-mix(in srgb, @success-500 12%, transparent);
+      color: @success-600;
+
+      :deep(svg) {
+        fill: @success-600;
+      }
+    }
+
+    &--featured {
+      background: color-mix(in srgb, var(--primary-500) 12%, transparent);
+      color: var(--primary-600);
+
+      :deep(svg) {
+        fill: var(--primary-600);
+      }
+    }
+  }
 }
 </style>

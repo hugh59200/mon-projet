@@ -185,8 +185,6 @@ Deno.serve(
       throw new Error('Aucune suggestion générée')
     }
 
-    console.log('✅ Suggestion générée avec succès')
-
     return {
       suggestion: result.suggestion,
       tokensUsed: result.tokensUsed,

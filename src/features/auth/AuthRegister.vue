@@ -11,7 +11,6 @@
           v-model.trim="fields.email.value.value"
           :label="t('auth.register.email')"
           :placeholder="t('auth.placeholders.email')"
-          :hint="t('auth.hints.emailRegister')"
           inputmode="email"
           autocomplete="email"
           iconName="Mail"
@@ -42,12 +41,6 @@
           :touched="fields.password.touched.value"
           @input="(e: Event) => { fields.password.onInput(e); clear() }"
           @blur="fields.password.onBlur"
-        />
-
-        <PasswordStrengthIndicator
-          :model-value="fields.password.value.value"
-          :min-strength="2"
-          :show-checklist="true"
         />
       </div>
 
@@ -115,7 +108,6 @@
 <script setup lang="ts">
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import ValidationIcon from '@designSystem/components/basic/validationIcon/ValidationIcon.vue'
-  import PasswordStrengthIndicator from '@designSystem/components/basic/passwordStrength/PasswordStrengthIndicator.vue'
   import type { FieldHelpers } from '@/composables/validation'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'

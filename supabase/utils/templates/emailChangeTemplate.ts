@@ -1,5 +1,6 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 import { type Locale, translations } from '../i18n.ts'
+import { EMAIL_ASSETS } from '../emailAssets.ts'
 
 export function emailChangeTemplate({
   url,
@@ -15,6 +16,7 @@ export function emailChangeTemplate({
     bodyHTML: `<p>${t.confirmPrompt[locale]}</p>`,
     ctaLabel: t.ctaConfirm[locale],
     ctaUrl: url,
+    heroImage: EMAIL_ASSETS['email-verify'],
     locale,
   })
 }

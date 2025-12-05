@@ -130,7 +130,7 @@
                   <div class="product__coa-preview">
                     <!-- Affiche le produit quand COA est ouvert, et vice-versa -->
                     <img
-                      :src="showCoa ? product.image : product.coa_url"
+                      :src="(showCoa ? product.image : product.coa_url) as string | undefined"
                       :alt="showCoa ? `${productName}` : `COA ${productName}`"
                       loading="lazy"
                     />
@@ -250,7 +250,7 @@
                     :disabled="(product.stock ?? 0) <= 0"
                     :shine="true"
                     :glow="(product.stock ?? 0) > 0"
-                    @click="addToCart(product!)"
+                    @click="addToCart(product as any)"
                   />
 
                   <PremiumButton
@@ -261,7 +261,7 @@
                     :label="t('product.buyNow')"
                     icon-left="Zap"
                     :shine="true"
-                    @click="buyNow(product!)"
+                    @click="buyNow(product as any)"
                   />
 
                   <WishlistButton
@@ -434,7 +434,7 @@
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, type Ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import InnerImageZoom from 'vue-inner-image-zoom'
   import { useRoute, useRouter } from 'vue-router'
@@ -461,7 +461,7 @@
     name: productName,
     category: productCategory,
     description: productDescription,
-  } = useTranslatedProduct(product)
+  } = useTranslatedProduct(product as Ref<Products | null>)
 
   // ============================================
   // DONNÉES POUR LE SCHEMA JSON-LD (GEO/SEO)

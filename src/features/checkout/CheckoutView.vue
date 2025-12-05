@@ -1226,8 +1226,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-
   @font-display:
     'Instrument Sans',
     'SF Pro Display',

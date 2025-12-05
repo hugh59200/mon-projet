@@ -237,8 +237,6 @@ Deno.serve(
     // Parsing des résultats
     const points = parseRelayPoints(xml)
 
-    console.log(`✅ ${points.length} points relais trouvés`)
-
     return {
       points,
       count: points.length,

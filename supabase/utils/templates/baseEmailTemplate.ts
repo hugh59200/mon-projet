@@ -8,12 +8,14 @@ export function baseEmailTemplate({
   bodyHTML,
   ctaLabel,
   ctaUrl,
+  heroImage,
   locale = 'en',
 }: {
   title: string
   bodyHTML: string
   ctaLabel?: string
   ctaUrl?: string
+  heroImage?: string
   locale?: Locale
 }) {
   const primary = '#00796B'
@@ -89,7 +91,17 @@ export function baseEmailTemplate({
         </h1>
       </div>
 
-      <div style="padding:40px 32px;color:#334155;line-height:1.6;font-size:16px;">
+      ${
+        heroImage
+          ? `
+      <div style="text-align:center;padding:32px 20px 0;">
+        <img src="${heroImage}" width="120" height="120" alt="" style="display:inline-block;border:0;outline:none;" />
+      </div>
+      `
+          : ''
+      }
+
+      <div style="padding:${heroImage ? '24px' : '40px'} 32px 40px;color:#334155;line-height:1.6;font-size:16px;">
         ${bodyHTML}
 
         ${ctaBlock}

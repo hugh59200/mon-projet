@@ -3,6 +3,7 @@
 
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 import { type Locale, translations } from '../i18n.ts'
+import { EMAIL_ASSETS } from '../emailAssets.ts'
 
 export function paymentValidatedTemplate({
   order_number,
@@ -44,7 +45,7 @@ export function paymentValidatedTemplate({
     <!-- Message principal dans une box verte de succès -->
     <div style="background:${successBg};border:1px solid ${successBorder};border-radius:12px;padding:24px;margin-bottom:28px;">
       <p style="margin:0 0 12px;font-size:16px;color:#065f46;font-weight:600;">
-        ✅ ${t.confirmationTitle[locale]}
+        ${t.confirmationTitle[locale]}
       </p>
       <p style="margin:0;font-size:15px;color:#047857;">
         ${t.confirmationMessage[locale]}
@@ -98,6 +99,7 @@ export function paymentValidatedTemplate({
     bodyHTML,
     ctaLabel: t.ctaLabel[locale],
     ctaUrl,
+    heroImage: EMAIL_ASSETS['payment-success'],
     locale,
   })
 }

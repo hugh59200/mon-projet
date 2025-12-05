@@ -1359,6 +1359,21 @@ BEGIN
     jsonb_build_object('discount_value', v_settings->>'discount_value', 'discount_type', v_settings->>'discount_type')
   );
 
+  -- Envoyer l'email via Edge Function (async via pg_net)
+  PERFORM net.http_post(
+    url := 'https://dwomsbawthlktapmtmqu.supabase.co/functions/v1/send-promo-email',
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    body := jsonb_build_object(
+      'type', 'welcome',
+      'user_id', p_user_id,
+      'user_email', p_user_email,
+      'promo_code', v_code,
+      'discount_type', v_settings->>'discount_type',
+      'discount_value', (v_settings->>'discount_value')::numeric,
+      'expires_at', v_expires_at
+    )
+  );
+
   RETURN jsonb_build_object(
     'success', true,
     'code', v_code,

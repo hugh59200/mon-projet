@@ -19,13 +19,12 @@ Deno.serve(
     if (email) {
       await sendEmail({
         to: email,
-        subject: 'Compte supprimé ✅',
+        subject: 'Compte supprimé',
         html: renderEmailTemplate('account_deleted', { email }),
         type: 'account_deleted',
       })
     }
 
-    console.log(`✅ [ADMIN] Deleted user: ${user_id}`)
     return { deleted_user: user_id }
   }),
 )

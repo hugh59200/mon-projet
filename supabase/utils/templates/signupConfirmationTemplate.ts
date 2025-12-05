@@ -1,5 +1,6 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 import { type Locale, translations } from '../i18n.ts'
+import { EMAIL_ASSETS } from '../emailAssets.ts'
 
 export function signupConfirmationTemplate({
   full_name,
@@ -20,6 +21,7 @@ export function signupConfirmationTemplate({
       <p>${t.activatePrompt[locale]}</p>`,
     ctaLabel: t.ctaActivate[locale],
     ctaUrl: url,
+    heroImage: EMAIL_ASSETS['email-verify'],
     locale,
   })
 }

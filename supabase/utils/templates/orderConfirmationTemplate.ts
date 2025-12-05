@@ -1,5 +1,6 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 import { type Locale, formatDate, pluralizeItem, translations } from '../i18n.ts'
+import { EMAIL_ASSETS } from '../emailAssets.ts'
 
 export function orderConfirmationTemplate({
   order_number,
@@ -101,6 +102,7 @@ export function orderConfirmationTemplate({
     bodyHTML,
     ctaLabel,
     ctaUrl,
+    heroImage: EMAIL_ASSETS['order-confirmed'],
     locale,
   })
 }

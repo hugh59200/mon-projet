@@ -291,9 +291,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
-
   // Variables
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
   @ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);

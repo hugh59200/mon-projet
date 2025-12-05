@@ -20,7 +20,6 @@ export type RouteName =
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
   fs.writeFileSync(outputPath, union, 'utf-8')
 
-  console.log(`✅ RouteName generated in ${outputPath} (${uniqueNames.length} routes)`)
 }
 
 export function generateGlobalComponents(baseDir: string) {

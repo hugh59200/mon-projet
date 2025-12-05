@@ -1,0 +1,25 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+
+  <!-- Cart body -->
+  <path d="M30 45H38L48 75H85L92 50H42" stroke="#D97706" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Cart wheels -->
+  <circle cx="52" cy="82" r="5" fill="#D97706"/>
+  <circle cx="52" cy="82" r="2" fill="#FEF3C7"/>
+  <circle cx="78" cy="82" r="5" fill="#D97706"/>
+  <circle cx="78" cy="82" r="2" fill="#FEF3C7"/>
+
+  <!-- Items in cart -->
+  <rect x="50" y="55" width="10" height="15" rx="2" fill="#3B82F6"/>
+  <rect x="62" y="58" width="8" height="12" rx="2" fill="#22C55E"/>
+  <rect x="72" y="56" width="9" height="14" rx="2" fill="#A855F7"/>
+
+  <!-- Question mark / attention -->
+  <circle cx="85" cy="35" r="12" fill="#EF4444"/>
+  <text x="85" y="41" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial">?</text>
+
+  <!-- Sparkle -->
+  <circle cx="25" cy="70" r="2.5" fill="#FCD34D"/>
+</svg>

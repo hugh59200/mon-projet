@@ -8,12 +8,15 @@
           </svg>
           Avis clients
         </h2>
-        <BasicButton v-if="canReview" @click="showReviewForm = true" variant="secondary" size="small">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          Donner mon avis
-        </BasicButton>
+        <PremiumButton
+          v-if="canReview"
+          type="secondary"
+          variant="outline"
+          size="sm"
+          label="Donner mon avis"
+          icon-left="Plus"
+          @click="showReviewForm = true"
+        />
       </div>
 
       <div v-if="summary" class="reviews-summary">
@@ -46,9 +49,13 @@
         </svg>
         <p class="empty-title">Aucun avis pour le moment</p>
         <p class="cta">Soyez le premier à partager votre expérience !</p>
-        <BasicButton v-if="canReview" @click="showReviewForm = true" variant="primary" size="small">
-          Donner mon avis
-        </BasicButton>
+        <PremiumButton
+          v-if="canReview"
+          type="primary"
+          size="sm"
+          label="Donner mon avis"
+          @click="showReviewForm = true"
+        />
       </div>
     </div>
 
@@ -149,23 +156,24 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-@import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+@import '../../../../../designSystem/src/fondation/breakpoints/responsive-mixins.less';
+@import '../../../../../designSystem/src/fondation/colors/colors.less';
 
 .product-reviews {
-  margin-top: var(--spacing-30);
-  padding-top: var(--spacing-30);
-  border-top: 1px solid var(--color-border);
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid @neutral-200;
 }
 
 .reviews-header {
-  margin-bottom: var(--spacing-25);
+  margin-bottom: 24px;
 
   &__top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-20);
-    gap: var(--spacing-15);
+    margin-bottom: 16px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 }
@@ -173,28 +181,28 @@ onMounted(() => {
 .reviews-title {
   display: flex;
   align-items: center;
-  gap: var(--spacing-10);
-  font-size: var(--font-size-h3);
+  gap: 8px;
+  font-size: 20px;
   font-weight: 600;
   margin: 0;
 
   .reviews-icon {
-    color: var(--color-warning);
+    color: #f59e0b;
   }
 }
 
 .reviews-summary {
   display: flex;
-  gap: var(--spacing-30);
+  gap: 32px;
   align-items: stretch;
-  padding: var(--spacing-20);
-  background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
-  border: 1px solid rgba(var(--primary-500-rgb), 0.1);
-  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-500) 2%, transparent) 0%, color-mix(in srgb, var(--primary-500) 6%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
+  border-radius: 12px;
 
   .respond-mobile({
     flex-direction: column;
-    gap: var(--spacing-20);
+    gap: 16px;
   });
 }
 
@@ -203,16 +211,16 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-10);
-  padding-right: var(--spacing-30);
-  border-right: 1px solid var(--color-border);
+  gap: 8px;
+  padding-right: 32px;
+  border-right: 1px solid @neutral-200;
   min-width: 160px;
 
   .respond-mobile({
     border-right: none;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid @neutral-200;
     padding-right: 0;
-    padding-bottom: var(--spacing-20);
+    padding-bottom: 16px;
     min-width: auto;
   });
 
@@ -225,19 +233,19 @@ onMounted(() => {
   .average-rating {
     font-size: 56px;
     font-weight: 700;
-    color: var(--color-text);
+    color: @neutral-800;
     line-height: 1;
   }
 
   .rating-max {
-    font-size: var(--font-size-h4);
+    font-size: 18px;
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: @neutral-500;
   }
 
   .review-count {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
+    font-size: 12px;
+    color: @neutral-500;
   }
 }
 
@@ -246,20 +254,20 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: var(--spacing-10);
+  gap: 8px;
   min-width: 200px;
 }
 
 .rating-bar {
   display: flex;
   align-items: center;
-  gap: var(--spacing-10);
+  gap: 8px;
 
   .star-label {
     width: 16px;
-    font-size: var(--font-size-body-s);
+    font-size: 12px;
     font-weight: 600;
-    color: var(--color-text);
+    color: @neutral-800;
     text-align: right;
   }
 
@@ -270,14 +278,14 @@ onMounted(() => {
   .bar-container {
     flex: 1;
     height: 10px;
-    background: var(--color-background-secondary);
+    background: @neutral-100;
     border-radius: 5px;
     overflow: hidden;
   }
 
   .bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-warning), #ffb700);
+    background: linear-gradient(90deg, #f59e0b, #ffb700);
     border-radius: 5px;
     transition: width 0.4s ease;
   }
@@ -285,9 +293,9 @@ onMounted(() => {
   .bar-count {
     width: 28px;
     text-align: right;
-    font-size: var(--font-size-body-s);
+    font-size: 12px;
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: @neutral-500;
   }
 }
 
@@ -296,39 +304,39 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: var(--spacing-30);
-  background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
-  border: 1px dashed rgba(var(--primary-500-rgb), 0.2);
-  border-radius: var(--radius-lg);
-  gap: var(--spacing-10);
+  padding: 32px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-500) 2%, transparent) 0%, color-mix(in srgb, var(--primary-500) 6%, transparent) 100%);
+  border: 1px dashed color-mix(in srgb, var(--primary-500) 20%, transparent);
+  border-radius: 12px;
+  gap: 8px;
 
   .empty-icon {
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--spacing-5);
+    color: @neutral-400;
+    margin-bottom: 4px;
   }
 
   .empty-title {
     margin: 0;
-    font-size: var(--font-size-body);
+    font-size: 14px;
     font-weight: 600;
-    color: var(--color-text);
+    color: @neutral-800;
   }
 
   .cta {
     margin: 0;
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
+    font-size: 12px;
+    color: @neutral-500;
   }
 }
 
 .reviews-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-20);
+  gap: 16px;
 
   .respond-tablet({
     grid-template-columns: 1fr;
-    gap: var(--spacing-15);
+    gap: 12px;
   });
 }
 
@@ -337,20 +345,20 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-10);
-  padding: var(--spacing-15) var(--spacing-20);
+  gap: 8px;
+  padding: 12px 16px;
   background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-body-s);
+  border: 1px solid @neutral-200;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: @neutral-500;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    border-color: var(--primary-500);
+    color: var(--primary-500);
   }
 
   svg {

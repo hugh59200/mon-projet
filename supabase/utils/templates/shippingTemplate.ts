@@ -1,5 +1,6 @@
 import { baseEmailTemplate } from './baseEmailTemplate.ts'
 import { type Locale, pluralizeItem, translations } from '../i18n.ts'
+import { EMAIL_ASSETS } from '../emailAssets.ts'
 
 export function shippingTemplate({
   order_number,
@@ -81,6 +82,7 @@ export function shippingTemplate({
     bodyHTML,
     ctaLabel: tracking_number ? t.ctaTrackPackage[locale] : t.ctaViewOrder[locale],
     ctaUrl: tracking_number ? finalTrackingUrl : ctaUrl,
+    heroImage: EMAIL_ASSETS['shipping'],
     locale,
   })
 }

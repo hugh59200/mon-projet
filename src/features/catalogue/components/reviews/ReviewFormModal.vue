@@ -1,135 +1,108 @@
 <template>
-  <div class="review-modal-overlay" @click.self="$emit('close')">
-    <div class="review-modal">
-      <header class="modal-header">
-        <h3>Donner mon avis</h3>
-        <p class="product-name">{{ productName }}</p>
-        <button type="button" class="close-btn" @click="$emit('close')">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </header>
+  <ModalComponent v-model="isOpen" @close="$emit('close')">
+    <template #header>
+      Donner mon avis sur {{ productName }}
+    </template>
 
+    <template #content>
       <form @submit.prevent="submitReview" class="review-form">
         <!-- Note globale -->
-        <div class="form-group rating-group">
-          <label class="form-label required">Note globale</label>
-          <div class="rating-input">
-            <StarRating v-model="form.rating" :interactive="true" />
-            <span class="rating-text">{{ getRatingText(form.rating) }}</span>
+        <div class="review-form__rating">
+          <BasicText weight="semibold" color="neutral-700">Note globale *</BasicText>
+          <div class="review-form__stars">
+            <StarRating v-model="form.rating" :interactive="true" size="lg" />
+            <BasicText size="body-s" :color="form.rating > 0 ? 'primary-600' : 'neutral-400'">
+              {{ getRatingText(form.rating) }}
+            </BasicText>
           </div>
         </div>
 
         <!-- Titre -->
-        <div class="form-group">
-          <label class="form-label">Titre de votre avis</label>
-          <BasicInput v-model="form.title" placeholder="Résumez votre expérience en une phrase" />
-        </div>
+        <WrapperInput
+          v-model="form.title"
+          label="Titre de votre avis"
+          placeholder="Résumez votre expérience en une phrase"
+        />
 
         <!-- Contenu -->
-        <div class="form-group">
-          <label class="form-label">Votre avis détaillé</label>
+        <WrapperFormElements label="Votre avis détaillé">
           <textarea
             v-model="form.content"
-            class="form-textarea"
-            rows="4"
+            class="review-form__textarea"
+            rows="3"
             placeholder="Partagez votre expérience avec ce produit..."
           ></textarea>
-        </div>
+        </WrapperFormElements>
 
-        <!-- Notes détaillées (optionnel) -->
-        <div class="detailed-ratings-section">
-          <button type="button" class="toggle-detailed" @click="showDetailedRatings = !showDetailedRatings">
-            {{ showDetailedRatings ? 'Masquer' : 'Ajouter' }} les notes détaillées
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              :class="{ rotated: showDetailedRatings }"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-
-          <div v-if="showDetailedRatings" class="detailed-ratings-grid">
-            <div class="rating-row">
-              <label>Qualité</label>
-              <StarRating v-model="form.rating_quality" :interactive="true" />
+        <!-- Notes détaillées -->
+        <FilterSection v-model="showDetailedRatings" title="Notes détaillées (optionnel)">
+          <div class="review-form__rating-grid">
+            <div class="review-form__rating-row">
+              <span>Qualité</span>
+              <StarRating v-model="form.rating_quality" :interactive="true" size="sm" />
             </div>
-            <div class="rating-row">
-              <label>Pureté</label>
-              <StarRating v-model="form.rating_purity" :interactive="true" />
+            <div class="review-form__rating-row">
+              <span>Pureté</span>
+              <StarRating v-model="form.rating_purity" :interactive="true" size="sm" />
             </div>
-            <div class="rating-row">
-              <label>Livraison</label>
-              <StarRating v-model="form.rating_shipping" :interactive="true" />
+            <div class="review-form__rating-row">
+              <span>Livraison</span>
+              <StarRating v-model="form.rating_shipping" :interactive="true" size="sm" />
             </div>
-            <div class="rating-row">
-              <label>Rapport qualité/prix</label>
-              <StarRating v-model="form.rating_value" :interactive="true" />
+            <div class="review-form__rating-row">
+              <span>Rapport Q/P</span>
+              <StarRating v-model="form.rating_value" :interactive="true" size="sm" />
             </div>
           </div>
+        </FilterSection>
+
+        <!-- Informations professionnelles -->
+        <FilterSection v-model="showProfessionalInfo" title="Informations professionnelles (optionnel)">
+          <WrapperInput
+            v-model="form.author_title"
+            label="Titre / Fonction"
+            placeholder="Ex: PhD Researcher"
+          />
+          <WrapperInput
+            v-model="form.author_institution"
+            label="Institution"
+            placeholder="Ex: Université de Paris"
+          />
+        </FilterSection>
+
+        <!-- Notice -->
+        <div class="review-form__notice">
+          <BasicIconNext name="Info" :size="14" />
+          <BasicText size="body-s" color="neutral-500">Votre avis sera publié après modération</BasicText>
         </div>
-
-        <!-- Informations professionnelles (optionnel) -->
-        <div class="professional-section">
-          <button type="button" class="toggle-detailed" @click="showProfessionalInfo = !showProfessionalInfo">
-            {{ showProfessionalInfo ? 'Masquer' : 'Ajouter' }} mes informations professionnelles
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              :class="{ rotated: showProfessionalInfo }"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-
-          <div v-if="showProfessionalInfo" class="professional-grid">
-            <div class="form-group">
-              <label class="form-label">Titre / Fonction</label>
-              <BasicInput v-model="form.author_title" placeholder="Ex: PhD Researcher, Lab Technician" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Institution</label>
-              <BasicInput v-model="form.author_institution" placeholder="Ex: Université de Paris" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <footer class="form-footer">
-          <p class="moderation-notice">
-            Votre avis sera publié après modération.
-          </p>
-          <div class="form-actions">
-            <BasicButton type="button" variant="ghost" @click="$emit('close')">Annuler</BasicButton>
-            <BasicButton type="submit" :disabled="!isValid || isSubmitting">
-              {{ isSubmitting ? 'Envoi...' : 'Publier mon avis' }}
-            </BasicButton>
-          </div>
-        </footer>
       </form>
-    </div>
-  </div>
+    </template>
+
+    <template #actions>
+      <PremiumButton
+        type="secondary"
+        variant="outline"
+        label="Annuler"
+        @click="$emit('close')"
+      />
+      <PremiumButton
+        type="primary"
+        :label="isSubmitting ? 'Envoi...' : 'Publier mon avis'"
+        :disabled="!isValid"
+        :loading="isSubmitting"
+        @click="submitReview"
+      />
+    </template>
+  </ModalComponent>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { createReview } from '@/api'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+import FilterSection from '@/features/shared/components/FilterSection.vue'
 import StarRating from './StarRating.vue'
-
-// ============================================
-// PROPS & EMITS
-// ============================================
 
 const props = defineProps<{
   productId: string
@@ -141,11 +114,8 @@ const emit = defineEmits<{
   submitted: []
 }>()
 
-// ============================================
-// STATE
-// ============================================
-
 const authStore = useAuthStore()
+const isOpen = ref(true)
 const isSubmitting = ref(false)
 const showDetailedRatings = ref(false)
 const showProfessionalInfo = ref(false)
@@ -162,17 +132,16 @@ const form = reactive({
   author_institution: '',
 })
 
-// ============================================
-// COMPUTED
-// ============================================
+// Propager la fermeture vers le parent
+watch(isOpen, (value) => {
+  if (!value) {
+    emit('close')
+  }
+})
 
 const isValid = computed(() => {
   return form.rating >= 1 && form.rating <= 5
 })
-
-// ============================================
-// METHODS
-// ============================================
 
 function getRatingText(rating: number): string {
   const texts: Record<number, string> = {
@@ -216,174 +185,90 @@ async function submitReview() {
 </script>
 
 <style scoped lang="less">
-.review-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-15);
-}
-
-.review-modal {
-  background: var(--color-background);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  position: relative;
-  padding: var(--spacing-20);
-  border-bottom: 1px solid var(--color-border);
-
-  h3 {
-    margin: 0;
-    font-size: var(--font-size-h4);
-  }
-
-  .product-name {
-    margin: var(--spacing-5) 0 0;
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-body-s);
-  }
-
-  .close-btn {
-    position: absolute;
-    top: var(--spacing-15);
-    right: var(--spacing-15);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    padding: var(--spacing-5);
-
-    &:hover {
-      color: var(--color-text);
-    }
-  }
-}
+@import '@designSystem/fondation/colors/colors.less';
 
 .review-form {
-  padding: var(--spacing-20);
-}
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px;
 
-.form-group {
-  margin-bottom: var(--spacing-15);
+  &__rating {
+    text-align: center;
+    padding: 20px;
+    background: @neutral-50;
+    border-radius: 12px;
+    border: 1px solid @neutral-200;
+  }
 
-  .form-label {
-    display: block;
-    margin-bottom: var(--spacing-5);
-    font-weight: 500;
-    font-size: var(--font-size-body-s);
+  &__stars {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
 
-    &.required::after {
-      content: ' *';
-      color: var(--color-error);
+  &__textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid @neutral-200;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    color: @neutral-800;
+    background: white;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: @neutral-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-500);
     }
   }
-}
 
-.rating-group {
-  .rating-input {
+  &__rating-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  &__rating-row {
     display: flex;
     align-items: center;
-    gap: var(--spacing-10);
-  }
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid @neutral-100;
 
-  .rating-text {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
-  }
-}
-
-.form-textarea {
-  width: 100%;
-  padding: var(--spacing-10);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: var(--font-size-body);
-  resize: vertical;
-  min-height: 100px;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
-}
-
-.toggle-detailed {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-5);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-primary);
-  font-size: var(--font-size-body-s);
-  padding: 0;
-  margin-bottom: var(--spacing-10);
-
-  svg {
-    transition: transform 0.2s ease;
-
-    &.rotated {
-      transform: rotate(180deg);
+    span {
+      font-size: 13px;
+      color: @neutral-600;
     }
   }
-}
 
-.detailed-ratings-section,
-.professional-section {
-  margin-bottom: var(--spacing-15);
-  padding-top: var(--spacing-10);
-  border-top: 1px solid var(--color-border);
-}
-
-.detailed-ratings-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-10);
-}
-
-.rating-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  label {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
-  }
-}
-
-.professional-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-10);
-}
-
-.form-footer {
-  margin-top: var(--spacing-20);
-  padding-top: var(--spacing-15);
-  border-top: 1px solid var(--color-border);
-
-  .moderation-notice {
-    font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
-    margin: 0 0 var(--spacing-15);
-    text-align: center;
-  }
-
-  .form-actions {
+  &__notice {
     display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-10);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: @neutral-50;
+    border-radius: 8px;
+    margin: 0;
+
+    :deep(svg) {
+      color: @neutral-400;
+      fill: @neutral-400;
+      flex-shrink: 0;
+    }
   }
 }
 </style>

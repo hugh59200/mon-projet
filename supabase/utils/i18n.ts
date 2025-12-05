@@ -225,8 +225,8 @@ export const translations = {
       en: 'Welcome to FP Store',
     },
     subject: {
-      fr: 'Confirmez votre inscription ✅',
-      en: 'Confirm your registration ✅',
+      fr: 'Confirmez votre inscription',
+      en: 'Confirm your registration',
     },
     greeting: {
       fr: (name: string) => `Bonjour ${name || ''},`,
@@ -293,8 +293,8 @@ export const translations = {
   // ========== ACCOUNT DELETED ==========
   accountDeleted: {
     title: {
-      fr: 'Votre compte a été supprimé ✅',
-      en: 'Your account has been deleted ✅',
+      fr: 'Votre compte a été supprimé',
+      en: 'Your account has been deleted',
     },
     greeting: {
       fr: 'Bonjour,',
@@ -433,8 +433,8 @@ export const translations = {
       en: 'Payment successfully validated',
     },
     subject: {
-      fr: (orderNumber: string) => `Paiement Reçu - Commande #${orderNumber} en préparation ✅`,
-      en: (orderNumber: string) => `Payment Received - Order #${orderNumber} in preparation ✅`,
+      fr: (orderNumber: string) => `Paiement Reçu - Commande #${orderNumber} en préparation`,
+      en: (orderNumber: string) => `Payment Received - Order #${orderNumber} in preparation`,
     },
     greeting: {
       fr: (name: string) => `Bonjour <strong>${name}</strong>,`,

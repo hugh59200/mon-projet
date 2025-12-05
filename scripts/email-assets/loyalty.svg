@@ -1,0 +1,20 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="#FDF4FF" stroke="#A855F7" stroke-width="2"/>
+
+  <!-- Heart -->
+  <path d="M60 85C60 85 30 65 30 48C30 38 38 30 50 30C56 30 60 34 60 34C60 34 64 30 70 30C82 30 90 38 90 48C90 65 60 85 60 85Z" fill="#A855F7"/>
+
+  <!-- Star 1 -->
+  <path d="M60 40L62 46L68 46L63 50L65 56L60 52L55 56L57 50L52 46L58 46L60 40Z" fill="#FCD34D"/>
+
+  <!-- Sparkles -->
+  <circle cx="28" cy="35" r="3" fill="#FCD34D"/>
+  <circle cx="92" cy="40" r="2.5" fill="#FCD34D"/>
+  <circle cx="25" cy="75" r="2" fill="#FCD34D"/>
+  <circle cx="95" cy="80" r="2" fill="#FCD34D"/>
+
+  <!-- Small hearts -->
+  <path d="M25 55C25 55 20 50 20 47C20 44 22 42 25 42C27 42 28 43 28 43C28 43 29 42 31 42C34 42 36 44 36 47C36 50 31 55 28 55" fill="#C084FC" transform="scale(0.6) translate(10, 20)"/>
+  <path d="M25 55C25 55 20 50 20 47C20 44 22 42 25 42C27 42 28 43 28 43C28 43 29 42 31 42C34 42 36 44 36 47C36 50 31 55 28 55" fill="#C084FC" transform="scale(0.5) translate(150, 30)"/>
+</svg>

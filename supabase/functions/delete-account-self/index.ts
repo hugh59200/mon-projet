@@ -24,7 +24,7 @@ export default Deno.serve(
     if (user.email) {
       await sendEmail({
         to: user.email,
-        subject: 'Compte supprimé ✅',
+        subject: 'Compte supprimé',
         html: renderEmailTemplate('account_deleted', { email: user.email }),
         type: 'account_deleted',
       })
