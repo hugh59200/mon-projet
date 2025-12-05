@@ -67,10 +67,14 @@
   const renderWidget = () => {
     if (!window.turnstile || !widgetContainer.value) return
 
-    // Nettoyage préventif
+    // Nettoyage préventif du widget précédent
     if (widgetId.value) {
       window.turnstile.remove(widgetId.value)
+      widgetId.value = null
     }
+
+    // Nettoyage du conteneur (fix HMR double-render)
+    widgetContainer.value.innerHTML = ''
 
     try {
       if (!SITE_KEY) {

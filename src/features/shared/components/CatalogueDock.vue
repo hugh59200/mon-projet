@@ -222,6 +222,9 @@
     // Ne pas afficher sur mobile
     if (isMobile.value) return false
 
+    // Ne jamais afficher sur les pages auth (pleine page)
+    if (route.path.startsWith('/auth')) return false
+
     // Ne pas afficher sur les routes exclues
     if (!isRouteAllowed.value) return false
 
@@ -327,11 +330,20 @@
 
   // 🆕 Setup IntersectionObserver pour le header
   function setupHeaderObserver() {
+    // Ne pas observer sur les pages auth ou routes non autorisées
+    if (route.path.startsWith('/auth') || !isRouteAllowed.value) {
+      isHeaderVisible.value = true // Masque le dock
+      return
+    }
+
     const header = document.querySelector(props.headerSelector)
 
     if (!header) {
-      console.warn(`[CatalogueDock] Header element "${props.headerSelector}" not found`)
-      isHeaderVisible.value = false // Afficher le dock si pas de header
+      // Log silencieux en dev uniquement
+      if (import.meta.env.DEV) {
+        console.debug(`[CatalogueDock] Header "${props.headerSelector}" non trouvé sur cette page`)
+      }
+      isHeaderVisible.value = false
       return
     }
 
@@ -361,10 +373,19 @@
 
   // 🆕 Setup IntersectionObserver pour le footer
   function setupFooterObserver() {
+    // Ne pas observer sur les pages auth ou routes non autorisées
+    if (route.path.startsWith('/auth') || !isRouteAllowed.value) {
+      isFooterVisible.value = false
+      return
+    }
+
     const footer = document.querySelector(props.footerSelector)
 
     if (!footer) {
-      console.warn(`[CatalogueDock] Footer element "${props.footerSelector}" not found`)
+      // Log silencieux en dev uniquement
+      if (import.meta.env.DEV) {
+        console.debug(`[CatalogueDock] Footer "${props.footerSelector}" non trouvé sur cette page`)
+      }
       isFooterVisible.value = false
       return
     }

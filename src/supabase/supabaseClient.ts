@@ -19,12 +19,8 @@ export const supabaseSilent = supabase
  * Client Supabase sans typage strict
  * À utiliser pour les nouvelles tables/fonctions en attendant la régénération des types
  * Après `npm run gen:types`, migrer vers le client typé `supabase`
+ *
+ * Note: Réutilise le même client pour éviter l'erreur "Multiple GoTrueClient instances"
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const supabaseUntyped = createClient<any>(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-})
+export const supabaseUntyped = supabase as unknown as ReturnType<typeof createClient<any>>
