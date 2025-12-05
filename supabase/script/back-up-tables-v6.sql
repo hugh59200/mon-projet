@@ -72,7 +72,8 @@ DROP FUNCTION IF EXISTS
   public.sync_conversation_on_admin_read,
   public.touch_conversation_updated_at,
   public.generate_order_number,
-  public.is_admin,
+  public.is_admin(uuid),
+  public.is_admin(),
   public.jwt_custom_claims,
   public.user_exists_by_email,
   public.create_order_with_items_full,
@@ -149,12 +150,15 @@ CREATE TABLE public.products (
   -- i18n : traductions multilingues (JSONB)
   name_i18n jsonb DEFAULT '{}'::jsonb,
   description_i18n jsonb DEFAULT '{}'::jsonb,
-  category_i18n jsonb DEFAULT '{}'::jsonb
+  category_i18n jsonb DEFAULT '{}'::jsonb,
+  -- COA (Certificate of Analysis)
+  coa_url text
 );
 
 COMMENT ON COLUMN public.products.name_i18n IS 'Traductions du nom: {"en": "...", "de": "...", "es": "..."}';
 COMMENT ON COLUMN public.products.description_i18n IS 'Traductions de la description';
 COMMENT ON COLUMN public.products.category_i18n IS 'Traductions de la categorie';
+COMMENT ON COLUMN public.products.coa_url IS 'URL du Certificate of Analysis (COA) - Preuve de purete du peptide';
 
 CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
 CREATE INDEX idx_products_category ON public.products (category);
@@ -522,6 +526,11 @@ CREATE POLICY "Public read topics" ON public.news_topics FOR SELECT USING (true)
 
 CREATE OR REPLACE FUNCTION public.is_admin(uid uuid) RETURNS boolean AS $$
   SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = uid AND role = 'admin');
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
+
+-- Version sans argument (utilise auth.uid() par défaut)
+CREATE OR REPLACE FUNCTION public.is_admin() RETURNS boolean AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin');
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 CREATE POLICY "Admin full profiles" ON public.profiles FOR ALL TO authenticated USING (public.is_admin(auth.uid()));

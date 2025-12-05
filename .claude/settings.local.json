@@ -20,7 +20,9 @@
       "Bash(npm run deploy:functions:*)",
       "Bash(npm run gen:types:*)",
       "Bash(node scripts/convert-logo.cjs:*)",
-      "Bash(mkcert:*)"
+      "Bash(mkcert:*)",
+      "Bash(where:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

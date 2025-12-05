@@ -1,5 +1,5 @@
 <template>
-  <article class="review-card" :class="{ featured: review.is_featured }">
+  <article class="review-card" :class="[review.author_type, { featured: review.is_featured }]">
     <header class="review-header">
       <div class="author-info">
         <div class="author-avatar">
@@ -9,6 +9,15 @@
           <div class="author-name">
             {{ review.author_name }}
             <span v-if="review.author_type !== 'standard'" class="author-badge" :class="review.author_type">
+              <svg v-if="review.author_type === 'premium'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+              <svg v-else-if="review.author_type === 'pro'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM10 17L6 13L7.41 11.59L10 14.17L16.59 7.58L18 9L10 17Z"/>
+              </svg>
+              <svg v-else-if="review.author_type === 'verified'" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
               {{ getBadgeLabel(review.author_type) }}
             </span>
           </div>
@@ -115,10 +124,52 @@ function formatDate(date: string): string {
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
 
   &.featured {
     border-color: var(--color-primary);
     background: var(--color-primary-light);
+  }
+
+  // Style Premium - élégant et luxueux
+  &.premium {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.03) 0%, rgba(255, 183, 0, 0.08) 100%);
+    border: 1px solid rgba(255, 195, 0, 0.3);
+    box-shadow: 0 2px 12px rgba(255, 195, 0, 0.1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ffd700, #ffb700, #ffd700);
+    }
+  }
+
+  // Style Pro - professionnel et moderne
+  &.pro {
+    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.03) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.25);
+    box-shadow: 0 2px 12px rgba(var(--primary-500-rgb), 0.08);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-primary), rgba(var(--primary-500-rgb), 0.7), var(--color-primary));
+    }
+  }
+
+  // Style Verified - confiance
+  &.verified {
+    background: linear-gradient(135deg, rgba(var(--success-rgb, 34, 197, 94), 0.02) 0%, rgba(var(--success-rgb, 34, 197, 94), 0.06) 100%);
+    border: 1px solid rgba(var(--success-rgb, 34, 197, 94), 0.2);
   }
 }
 
@@ -148,6 +199,17 @@ function formatDate(date: string): string {
   justify-content: center;
   font-weight: 600;
   font-size: var(--font-size-body-s);
+
+  .premium & {
+    background: linear-gradient(135deg, #ffd700, #ffb700);
+    color: #000;
+    box-shadow: 0 2px 8px rgba(255, 195, 0, 0.3);
+  }
+
+  .pro & {
+    background: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(var(--primary-500-rgb), 0.3);
+  }
 }
 
 .author-details {
@@ -165,25 +227,36 @@ function formatDate(date: string): string {
 }
 
 .author-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 10px;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &.premium {
-    background: linear-gradient(135deg, #ffd700, #ffb700);
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
     color: #000;
+    box-shadow: 0 2px 6px rgba(255, 195, 0, 0.25);
   }
 
   &.pro {
-    background: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--primary-500-rgb), 0.85) 100%);
     color: white;
+    box-shadow: 0 2px 6px rgba(var(--primary-500-rgb), 0.25);
   }
 
   &.verified {
-    background: var(--color-success);
+    background: linear-gradient(135deg, var(--color-success), rgba(var(--success-rgb, 34, 197, 94), 0.85));
     color: white;
+    box-shadow: 0 2px 6px rgba(var(--success-rgb, 34, 197, 94), 0.25);
   }
 }
 

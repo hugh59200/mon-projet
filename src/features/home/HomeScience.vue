@@ -392,14 +392,14 @@
 <style scoped lang="less">
   .hero-banner {
     max-width: 1200px;
-    align-self: center;
+    margin: 0 auto;
+    padding: 0 40px;
     position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
     border-radius: 24px;
     overflow: hidden;
-    margin-top: 40px;
     background: linear-gradient(135deg, var(--secondary-600), var(--secondary-600));
 
     &::before {

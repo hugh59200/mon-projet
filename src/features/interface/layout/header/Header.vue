@@ -32,7 +32,7 @@
       </div>
 
       <div
-        v-if="!shouldShowMobileNav"
+        v-if="!shouldHideNavLinks"
         ref="centerRef"
         class="navbar__center"
       >
@@ -99,7 +99,9 @@
     { minGap: 20 }
   )
 
-  const shouldShowMobileNav = computed(() => isMobile.value || isOverflowing.value)
+  // Sur mobile, on cache la nav (bottom nav la remplace) mais on garde le burger si overflow sur tablet
+  const shouldShowMobileNav = computed(() => isOverflowing.value && !isMobile.value)
+  const shouldHideNavLinks = computed(() => isMobile.value || isOverflowing.value)
 
   const isMenuOpen = ref(false)
 

@@ -5,7 +5,7 @@
     :class="{ 'language-selector--open': isOpen }"
   >
     <BasicTooltip
-      :label="isOpen ? '' : currentLocaleInfo?.name"
+      :label="isOpen ? '' : currentLocaleInfo?.name ?? ''"
       position="bottom"
     >
       <button

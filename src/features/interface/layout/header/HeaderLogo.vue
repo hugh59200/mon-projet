@@ -8,9 +8,15 @@
       :size="32"
       color="primary-400"
     />
-    <div class="header-logo__text">
+    <!-- Version complète (desktop/tablet) -->
+    <div class="header-logo__text header-logo__text--full">
       <span class="header-logo__fast">Fast</span>
       <span class="header-logo__peptides">Peptides</span>
+    </div>
+    <!-- Version initiales (mobile) -->
+    <div class="header-logo__text header-logo__text--short">
+      <span class="header-logo__fast">F</span>
+      <span class="header-logo__peptides">P</span>
     </div>
   </RouterLink>
 </template>
@@ -49,6 +55,10 @@
       display: flex;
       align-items: baseline;
       gap: 4px;
+
+      &--short {
+        display: none;
+      }
     }
 
     &__fast {
@@ -82,8 +92,20 @@
   // Responsive - Mobile
   .respond-mobile({
     .header-logo {
-      &__text {
+      gap: 8px;
+
+      &__text--full {
         display: none;
+      }
+
+      &__text--short {
+        display: flex;
+        gap: 2px;
+      }
+
+      &__fast,
+      &__peptides {
+        font-size: 22px;
       }
     }
   });

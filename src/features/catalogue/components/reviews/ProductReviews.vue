@@ -1,20 +1,37 @@
 <template>
   <div class="product-reviews">
     <div class="reviews-header">
-      <h2 class="reviews-title">Avis clients</h2>
+      <div class="reviews-header__top">
+        <h2 class="reviews-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="reviews-icon">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+          Avis clients
+        </h2>
+        <BasicButton v-if="canReview" @click="showReviewForm = true" variant="secondary" size="small">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Donner mon avis
+        </BasicButton>
+      </div>
 
       <div v-if="summary" class="reviews-summary">
         <div class="rating-overview">
-          <span class="average-rating">{{ summary.average_rating }}</span>
-          <div class="stars">
-            <StarRating :rating="summary.average_rating" />
+          <div class="rating-score">
+            <span class="average-rating">{{ summary.average_rating }}</span>
+            <span class="rating-max">/5</span>
           </div>
-          <span class="review-count">{{ summary.review_count }} avis</span>
+          <StarRating :rating="summary.average_rating" size="lg" />
+          <span class="review-count">Basé sur {{ summary.review_count }} avis</span>
         </div>
 
         <div class="rating-breakdown">
           <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="rating-bar">
-            <span class="star-label">{{ star }} ★</span>
+            <span class="star-label">{{ star }}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-warning)">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
             <div class="bar-container">
               <div class="bar-fill" :style="{ width: getPercentage(star) + '%' }"></div>
             </div>
@@ -24,28 +41,30 @@
       </div>
 
       <div v-else class="no-reviews-summary">
-        <p>Aucun avis pour le moment</p>
-        <p class="cta">Soyez le premier à donner votre avis !</p>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <p class="empty-title">Aucun avis pour le moment</p>
+        <p class="cta">Soyez le premier à partager votre expérience !</p>
+        <BasicButton v-if="canReview" @click="showReviewForm = true" variant="primary" size="small">
+          Donner mon avis
+        </BasicButton>
       </div>
-    </div>
-
-    <div v-if="canReview" class="add-review-section">
-      <BasicButton @click="showReviewForm = true" variant="secondary">
-        Donner mon avis
-      </BasicButton>
     </div>
 
     <div v-if="reviews.length > 0" class="reviews-list">
       <ReviewCard v-for="review in displayedReviews" :key="review.id" :review="review" />
 
-      <BasicButton
+      <button
         v-if="reviews.length > displayLimit"
         @click="showAll = !showAll"
-        variant="ghost"
         class="show-more-btn"
       >
         {{ showAll ? 'Voir moins' : `Voir tous les avis (${reviews.length})` }}
-      </BasicButton>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :class="{ rotated: showAll }">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
     </div>
 
     <ReviewFormModal
@@ -130,41 +149,90 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+@import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+
 .product-reviews {
-  margin-top: var(--spacing-25);
-  padding-top: var(--spacing-25);
+  margin-top: var(--spacing-30);
+  padding-top: var(--spacing-30);
   border-top: 1px solid var(--color-border);
 }
 
 .reviews-header {
-  margin-bottom: var(--spacing-20);
+  margin-bottom: var(--spacing-25);
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-20);
+    gap: var(--spacing-15);
+    flex-wrap: wrap;
+  }
 }
 
 .reviews-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-10);
   font-size: var(--font-size-h3);
   font-weight: 600;
-  margin-bottom: var(--spacing-15);
+  margin: 0;
+
+  .reviews-icon {
+    color: var(--color-warning);
+  }
 }
 
 .reviews-summary {
   display: flex;
-  gap: var(--spacing-25);
-  align-items: flex-start;
-  flex-wrap: wrap;
+  gap: var(--spacing-30);
+  align-items: stretch;
+  padding: var(--spacing-20);
+  background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
+  border: 1px solid rgba(var(--primary-500-rgb), 0.1);
+  border-radius: var(--radius-lg);
+
+  .respond-mobile({
+    flex-direction: column;
+    gap: var(--spacing-20);
+  });
 }
 
 .rating-overview {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-5);
-  min-width: 120px;
+  justify-content: center;
+  gap: var(--spacing-10);
+  padding-right: var(--spacing-30);
+  border-right: 1px solid var(--color-border);
+  min-width: 160px;
+
+  .respond-mobile({
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-right: 0;
+    padding-bottom: var(--spacing-20);
+    min-width: auto;
+  });
+
+  .rating-score {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
 
   .average-rating {
-    font-size: 48px;
+    font-size: 56px;
     font-weight: 700;
     color: var(--color-text);
     line-height: 1;
+  }
+
+  .rating-max {
+    font-size: var(--font-size-h4);
+    font-weight: 500;
+    color: var(--color-text-secondary);
   }
 
   .review-count {
@@ -175,75 +243,122 @@ onMounted(() => {
 
 .rating-breakdown {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--spacing-10);
   min-width: 200px;
-  max-width: 300px;
 }
 
 .rating-bar {
   display: flex;
   align-items: center;
   gap: var(--spacing-10);
-  margin-bottom: var(--spacing-5);
 
   .star-label {
-    width: 40px;
+    width: 16px;
     font-size: var(--font-size-body-s);
-    color: var(--color-text-secondary);
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: right;
+  }
+
+  svg {
+    flex-shrink: 0;
   }
 
   .bar-container {
     flex: 1;
-    height: 8px;
+    height: 10px;
     background: var(--color-background-secondary);
-    border-radius: 4px;
+    border-radius: 5px;
     overflow: hidden;
   }
 
   .bar-fill {
     height: 100%;
-    background: var(--color-warning);
-    border-radius: 4px;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, var(--color-warning), #ffb700);
+    border-radius: 5px;
+    transition: width 0.4s ease;
   }
 
   .bar-count {
-    width: 30px;
+    width: 28px;
     text-align: right;
     font-size: var(--font-size-body-s);
+    font-weight: 500;
     color: var(--color-text-secondary);
   }
 }
 
 .no-reviews-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: var(--spacing-20);
-  background: var(--color-background-secondary);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-30);
+  background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
+  border: 1px dashed rgba(var(--primary-500-rgb), 0.2);
+  border-radius: var(--radius-lg);
+  gap: var(--spacing-10);
 
-  p {
+  .empty-icon {
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--spacing-5);
+  }
+
+  .empty-title {
     margin: 0;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    color: var(--color-text);
   }
 
   .cta {
-    margin-top: var(--spacing-10);
-    font-weight: 500;
-    color: var(--color-primary);
+    margin: 0;
+    font-size: var(--font-size-body-s);
+    color: var(--color-text-secondary);
   }
 }
 
-.add-review-section {
-  margin-bottom: var(--spacing-20);
-}
-
 .reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-15);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-20);
+
+  .respond-tablet({
+    grid-template-columns: 1fr;
+    gap: var(--spacing-15);
+  });
 }
 
 .show-more-btn {
-  align-self: center;
-  margin-top: var(--spacing-10);
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-10);
+  padding: var(--spacing-15) var(--spacing-20);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body-s);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>

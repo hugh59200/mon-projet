@@ -105,27 +105,29 @@
 
   .newsletter-section {
     position: relative;
-    padding: 100px 0;
-    overflow: hidden;
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 40px;
 
     // ============================================
-    // BACKGROUND
+    // BACKGROUND (now contained)
     // ============================================
 
     &__bg {
       position: absolute;
       inset: 0;
       z-index: 0;
+      border-radius: 24px;
+      overflow: hidden;
     }
 
     &__gradient {
       position: absolute;
       inset: 0;
       background: linear-gradient(
-        180deg,
-        rgba(10, 10, 15, 0.98) 0%,
-        rgba(26, 26, 46, 0.95) 50%,
-        rgba(10, 10, 15, 0.98) 100%
+        135deg,
+        rgba(26, 26, 46, 0.95) 0%,
+        rgba(15, 15, 25, 0.98) 100%
       );
     }
 
@@ -146,15 +148,14 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 800px;
-      height: 400px;
+      width: 600px;
+      height: 300px;
       background: radial-gradient(
         ellipse at center,
-        rgba(var(--primary-500-rgb), 0.1) 0%,
+        rgba(var(--primary-500-rgb), 0.12) 0%,
         transparent 60%
       );
       pointer-events: none;
-      animation: pulse 6s ease-in-out infinite;
     }
 
     // ============================================
@@ -166,11 +167,11 @@
       z-index: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 80px;
+      gap: 60px;
       align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 40px;
+      padding: 60px 50px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
     }
 
     // ============================================
@@ -292,11 +293,13 @@
     // ============================================
 
     .respond-tablet({
-      padding: 80px 0;
+      margin: 40px auto;
+      padding: 0 24px;
 
       &__container {
         grid-template-columns: 1fr;
-        gap: 48px;
+        gap: 40px;
+        padding: 40px 32px;
       }
 
       &__content {
@@ -305,7 +308,7 @@
       }
 
       &__title {
-        font-size: 36px;
+        font-size: 32px;
       }
 
       &__description {
@@ -330,15 +333,21 @@
     });
 
     .respond-mobile({
-      padding: 60px 0;
+      margin: 32px auto;
+      padding: 0 16px;
+
+      &__bg {
+        border-radius: 16px;
+      }
 
       &__container {
-        padding: 0 20px;
-        gap: 32px;
+        padding: 32px 20px;
+        gap: 28px;
+        border-radius: 16px;
       }
 
       &__title {
-        font-size: 28px;
+        font-size: 26px;
       }
 
       &__description {

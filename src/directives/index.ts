@@ -30,7 +30,6 @@ export default {
       const directiveName = nameMatch[1]?.replace(/^v/, '') // retire le "v" initial pour usage naturel
 
       app.directive(directiveName!, directive)
-      console.info(`✅ Directive auto-registrée : v-${directiveName}`)
     }
   },
 }

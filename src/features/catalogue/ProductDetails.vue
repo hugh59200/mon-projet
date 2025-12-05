@@ -52,7 +52,7 @@
               <div class="product__image-card">
                 <!-- Badge Promo -->
                 <div
-                  v-if="product.is_on_sale"
+                  v-if="product.is_on_sale && !showCoa"
                   class="product__badge product__badge--promo"
                 >
                   <BasicIconNext name="Star" :size="14" />
@@ -60,25 +60,46 @@
                 </div>
 
                 <!-- Badge RUO -->
-                <div class="product__badge product__badge--ruo">
+                <div
+                  v-if="!showCoa"
+                  class="product__badge product__badge--ruo"
+                >
                   <BasicIconNext name="Lightbulb" :size="12" />
                   {{ t('product.researchOnly') }}
                 </div>
 
                 <!-- Image principale avec zoom -->
                 <div class="product__image-wrapper">
+                  <!-- Image produit -->
                   <InnerImageZoom
-                    v-if="product.image"
+                    v-if="product.image && !showCoa"
                     :src="product.image"
                     :zoomSrc="product.image"
                     :alt="`Peptide ${productName}`"
                     class="product__image"
-                    moveType="drag"
-                    zoomType="click"
+                    :zoomScale="1.5"
+                    :fullscreenOnMobile="true"
+                    hideHint
+                  />
+                  <!-- COA en grand -->
+                  <InnerImageZoom
+                    v-else-if="product.coa_url && showCoa"
+                    :src="product.coa_url"
+                    :zoomSrc="product.coa_url"
+                    :alt="`COA ${productName}`"
+                    class="product__image product__image--coa"
+                    :zoomScale="2"
+                    :fullscreenOnMobile="true"
+                    hideHint
                   />
                   <div class="product__image-hint">
                     <BasicIconNext name="ZoomIn" :size="16" />
                     {{ t('product.clickToZoom') }}
+                  </div>
+                  <!-- Badge COA affiché -->
+                  <div v-if="showCoa" class="product__coa-displayed">
+                    <BasicIconNext name="FileCheck" :size="14" />
+                    <span>Certificate of Analysis</span>
                   </div>
                 </div>
 
@@ -97,6 +118,33 @@
                     <span>{{ t('product.shipping24h') }}</span>
                   </div>
                 </div>
+
+                <!-- Miniature cliquable pour basculer entre produit et COA -->
+                <button
+                  v-if="product.coa_url"
+                  type="button"
+                  class="product__coa"
+                  :class="{ 'product__coa--active': showCoa }"
+                  @click="showCoa = !showCoa"
+                >
+                  <div class="product__coa-preview">
+                    <!-- Affiche le produit quand COA est ouvert, et vice-versa -->
+                    <img
+                      :src="showCoa ? product.image : product.coa_url"
+                      :alt="showCoa ? `${productName}` : `COA ${productName}`"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="product__coa-info">
+                    <div class="product__coa-badge" :class="{ 'product__coa-badge--product': showCoa }">
+                      <BasicIconNext :name="showCoa ? 'Package' : 'FileCheck'" :size="14" />
+                      <span>{{ showCoa ? t('product.productLabel') : 'COA' }}</span>
+                    </div>
+                    <span class="product__coa-label">
+                      {{ showCoa ? t('product.showProduct') : t('product.viewCoa') }}
+                    </span>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -406,6 +454,7 @@
   const loading = ref(true)
   const activeTab = ref<'description' | 'protocol' | 'shipping'>('description')
   const reviewSummary = ref<ReviewSummary | null>(null)
+  const showCoa = ref(false)
 
   // Traductions automatiques du produit
   const {
@@ -794,16 +843,46 @@
     &__image-wrapper {
       position: relative;
       border-radius: 16px;
-      overflow: hidden;
       background: linear-gradient(135deg, @neutral-50 0%, white 100%);
+      height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-in;
+
+      // Permet au zoom de déborder
+      &:has(.iiz__zooming) {
+        overflow: visible;
+        z-index: 100;
+      }
     }
 
     &__image {
       width: 100%;
+      max-height: 100%;
       border-radius: 16px;
+
+      :deep(figure) {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
 
       :deep(img) {
         border-radius: 16px;
+        max-height: 450px;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        margin: 0 auto;
+      }
+
+      :deep(.iiz__zoom-img) {
+        border-radius: 0;
+        max-height: none;
+        max-width: none;
       }
     }
 
@@ -827,6 +906,31 @@
       pointer-events: none;
     }
 
+    &__coa-displayed {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--primary-500);
+      border-radius: 8px;
+      font-family: @font-display;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.3);
+
+      svg {
+        color: white;
+      }
+    }
+
+    &__image--coa {
+      background: white;
+    }
+
     &__trust-strip {
       display: flex;
       justify-content: center;
@@ -848,6 +952,78 @@
         color: var(--primary-500);
       }
     }
+
+    // ============ COA PREVIEW ============
+    &__coa {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.04) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    &__coa-preview {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid @neutral-200;
+      background: white;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__coa-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &__coa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--primary-500);
+      border-radius: 6px;
+      width: fit-content;
+      transition: background 0.2s @ease;
+
+      svg {
+        color: white;
+      }
+
+      span {
+        font-family: @font-display;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      &--product {
+        background: @neutral-700;
+      }
+    }
+
+    &__coa-label {
+      font-family: @font-body;
+      font-size: 13px;
+      color: @neutral-600;
+    }
+
 
     // ============ INFO PANEL ============
     &__info {
@@ -1325,6 +1501,7 @@
       align-items: flex-start;
       gap: 14px;
       padding: 20px 24px;
+      margin-bottom: 40px;
       background: linear-gradient(135deg, @danger-50 0%, @danger-100 100%);
       border: 1px solid @danger-200;
       border-radius: 16px;
@@ -1428,6 +1605,16 @@
       &__image-card {
         padding: 16px;
         border-radius: 16px;
+      }
+
+      &__image-wrapper {
+        height: 320px;
+      }
+
+      &__image {
+        :deep(img) {
+          max-height: 320px;
+        }
       }
 
       &__badge {

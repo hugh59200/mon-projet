@@ -1,38 +1,34 @@
 <template>
   <div class="home">
     <HomeHero />
-    <section class="category-section">
-      <div class="category-wrapper">
-        <CategoryHeroBanner />
-      </div>
+    <HomeTrustBar />
+    <section class="home__section home__section--left">
+      <HomeQuality />
     </section>
-    <HomeStats />
-    <HomeProcess />
-    <section class="category-section">
-      <div class="category-wrapper">
-        <HeroBanner />
-      </div>
+    <section class="home__section home__section--full">
+      <CategoryHeroBanner />
     </section>
-    <HomeQuality />
-    <NewsletterSection />
-    <HomeFaq />
-    <HomeCta />
-    <HomeDisclaimer />
+    <section class="home__section home__section--right">
+      <NewsletterSection />
+    </section>
+    <section class="home__section home__section--left">
+      <HomeScience />
+    </section>
+    <section class="home__section home__section--right">
+      <HomeCta />
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
+  import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
   import { useHead } from '@vueuse/head'
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
-  import HeroBanner from './HeroBanner.vue'
   import HomeCta from './HomeCta.vue'
-  import HomeDisclaimer from './HomeDisclaimer.vue'
-  import HomeFaq from './HomeFaq.vue'
   import HomeHero from './HomeHero.vue'
-  import HomeProcess from './HomeProcess.vue'
   import HomeQuality from './HomeQuality.vue'
-  import HomeStats from './HomeStats.vue'
-  import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
+  import HomeScience from './HomeScience.vue'
+  import HomeTrustBar from './HomeTrustBar.vue'
 
   // Configuration SEO pour la page d'accueil
   useHead({
@@ -73,26 +69,60 @@
     gap: 0;
     overflow-x: hidden;
     padding: 50px 0;
-  }
 
-  .category-section {
-    padding: 60px 0;
-    background: transparent;
-  }
+    &__section {
+      // Full-width (mais contenu limité à 1200px)
+      &--full {
+        width: 100%;
+        margin: 60px 0;
+      }
 
-  .category-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
-  }
+      // Décalé gauche
+      &--left {
+        max-width: 1200px;
+        width: 100%;
+        margin: 60px auto;
+        padding: 0 80px 0 40px; // Plus de padding à droite = décalé gauche
+      }
 
-  // Responsive - Mobile (≤ 720px)
-  .respond-mobile({
-    .category-section {
-      padding: 40px 0;
+      // Décalé droite
+      &--right {
+        max-width: 1200px;
+        width: 100%;
+        margin: 60px auto;
+        padding: 0 40px 0 80px; // Plus de padding à gauche = décalé droite
+      }
     }
-    .category-wrapper {
-      padding: 0 20px;
+  }
+
+  // Responsive - Tablet
+  .respond-tablet({
+    .home__section {
+      &--full {
+        margin: 40px 0;
+      }
+      &--left {
+        margin: 40px auto;
+        padding: 0 60px 0 24px;
+      }
+      &--right {
+        margin: 40px auto;
+        padding: 0 24px 0 60px;
+      }
+    }
+  });
+
+  // Responsive - Mobile (tout centré sur mobile)
+  .respond-mobile({
+    .home__section {
+      &--full {
+        margin: 32px 0;
+      }
+      &--left,
+      &--right {
+        margin: 32px auto;
+        padding: 0 16px;
+      }
     }
   });
 </style>

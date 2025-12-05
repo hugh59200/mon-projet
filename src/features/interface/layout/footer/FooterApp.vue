@@ -4,19 +4,25 @@
     <div class="footer__glow"></div>
 
     <div class="footer__container">
-      <!-- Top Section: Logo + Nav + Newsletter -->
-      <div class="footer__top">
-        <!-- Brand -->
+      <!-- Main grid: Brand + Nav + Newsletter -->
+      <div class="footer__main">
+        <!-- Brand column -->
         <div class="footer__brand">
           <BasicIconNext
             name="fastPeptides"
-            :size="32"
+            :size="36"
             class="footer__logo"
           />
           <p class="footer__tagline">{{ t('footer.description') }}</p>
+          <div class="footer__contact-inline">
+            <a href="mailto:contact@fast-peptides.com" class="footer__contact-link">
+              <BasicIconNext name="Mail" :size="14" />
+              <span>contact@fast-peptides.com</span>
+            </a>
+          </div>
         </div>
 
-        <!-- Navigation -->
+        <!-- Navigation columns -->
         <nav class="footer__nav">
           <div class="footer__nav-col">
             <h5 class="footer__nav-title">{{ t('footer.quickLinks') }}</h5>
@@ -48,57 +54,17 @@
               <li><RouterLink to="/guide-reconstitution">{{ t('reconstitution.title') }}</RouterLink></li>
             </ul>
           </div>
-
-          <div class="footer__nav-col">
-            <h5 class="footer__nav-title">{{ t('footer.contact') }}</h5>
-            <ul class="footer__nav-list footer__nav-list--contact">
-              <li>
-                <BasicIconNext name="Mail" :size="14" />
-                <a href="mailto:contact@fast-peptides.com">contact@fast-peptides.com</a>
-              </li>
-              <li>
-                <BasicIconNext name="Clock" :size="14" />
-                <span>{{ t('footer.hours') }}</span>
-              </li>
-              <li>
-                <BasicIconNext name="MapPin" :size="14" />
-                <span>{{ t('footer.region') }}</span>
-              </li>
-            </ul>
-          </div>
         </nav>
-      </div>
 
-      <!-- Disclaimer + Newsletter row -->
-      <div class="footer__middle">
-        <div class="footer__disclaimer">
-          <div class="footer__disclaimer-badge">
-            <BasicIconNext name="Shield" :size="16" />
-            <span>{{ t('footer.researchOnly') }}</span>
-          </div>
-          <div class="footer__disclaimer-items">
-            <span>
-              <strong>{{ t('footer.disclaimer.research') }}</strong>
-              — {{ t('footer.disclaimer.researchDesc') }}
-            </span>
-            <span class="footer__disclaimer-sep">•</span>
-            <span>
-              <strong>{{ t('footer.disclaimer.noHuman') }}</strong>
-              — {{ t('footer.disclaimer.noHumanDesc') }}
-            </span>
-            <span class="footer__disclaimer-sep">•</span>
-            <span>
-              <strong>{{ t('footer.disclaimer.responsibility') }}</strong>
-              — {{ t('footer.disclaimer.responsibilityDesc') }}
-            </span>
-          </div>
+        <!-- Newsletter column -->
+        <div class="footer__newsletter-col">
+          <h5 class="footer__nav-title">{{ t('newsletter.title') }}</h5>
+          <NewsletterSignup
+            variant="compact"
+            source="footer"
+            class="footer__newsletter"
+          />
         </div>
-
-        <NewsletterSignup
-          variant="compact"
-          source="footer"
-          class="footer__newsletter"
-        />
       </div>
 
       <!-- Trust bar -->
@@ -212,25 +178,14 @@
     }
 
     // ============================================
-    // TOP SECTION
+    // MAIN GRID (Brand + Nav + Newsletter)
     // ============================================
-    &__top {
+    &__main {
       display: grid;
-      grid-template-columns: 200px repeat(4, 1fr);
-      gap: 32px;
+      grid-template-columns: 1.4fr 2fr 1fr;
+      gap: 48px;
       padding-bottom: 32px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    // ============================================
-    // MIDDLE SECTION (Disclaimer + Newsletter)
-    // ============================================
-    &__middle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 32px;
-      margin-top: 24px;
     }
 
     // ============================================
@@ -249,16 +204,47 @@
     &__tagline {
       font-family: @font-body;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.45);
-      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 1.6;
       margin: 0;
+      max-width: 260px;
+    }
+
+    &__contact-inline {
+      margin-top: 4px;
+    }
+
+    &__contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: @font-body;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+      text-decoration: none;
+      transition: color 0.2s @ease;
+
+      svg {
+        color: var(--primary-500);
+        opacity: 0.7;
+      }
+
+      &:hover {
+        color: var(--primary-400);
+
+        svg {
+          opacity: 1;
+        }
+      }
     }
 
     // ============================================
     // NAVIGATION
     // ============================================
     &__nav {
-      display: contents; // Les colonnes vont directement dans le grid parent
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
     }
 
     &__nav-col {
@@ -320,67 +306,16 @@
     }
 
     // ============================================
-    // NEWSLETTER
+    // NEWSLETTER COLUMN
     // ============================================
+    &__newsletter-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
     &__newsletter {
-      flex-shrink: 0;
-      width: 220px;
-    }
-
-    // ============================================
-    // DISCLAIMER - Compact
-    // ============================================
-    &__disclaimer {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex: 1;
-      padding: 16px 20px;
-      background: rgba(var(--primary-500-rgb), 0.04);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.08);
-      border-radius: 10px;
-    }
-
-    &__disclaimer-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      background: rgba(var(--primary-500-rgb), 0.1);
-      border-radius: 6px;
-      flex-shrink: 0;
-
-      svg {
-        color: var(--primary-400);
-      }
-
-      span {
-        font-family: @font-display;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--primary-300);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-    }
-
-    &__disclaimer-items {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      font-family: @font-body;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-
-      strong {
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 500;
-      }
-    }
-
-    &__disclaimer-sep {
-      color: rgba(255, 255, 255, 0.2);
+      width: 100%;
     }
 
     // ============================================
@@ -393,7 +328,6 @@
       gap: 32px;
       margin-top: 24px;
       padding: 20px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
@@ -518,112 +452,203 @@
 
     // Tablet (≤ 1160px)
     .respond-tablet({
-      &__top {
-        grid-template-columns: 1fr;
+      &__main {
+        grid-template-columns: 1fr 1fr;
         gap: 32px;
       }
 
       &__brand {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       }
 
       &__tagline {
-        display: block;
-        max-width: 280px;
+        max-width: 300px;
       }
 
-      &__top {
-        grid-template-columns: 1fr;
-        gap: 24px;
+      &__contact-inline {
+        margin-top: 0;
+        margin-left: auto;
       }
 
       &__nav {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 24px;
       }
 
-      &__middle {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      &__disclaimer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      &__disclaimer-items {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-
-      &__disclaimer-sep {
-        display: none;
-      }
-
-      &__newsletter {
-        width: 100%;
-        max-width: 280px;
+      &__newsletter-col {
+        justify-self: end;
+        max-width: 240px;
       }
     });
 
     // Mobile (≤ 720px)
     .respond-mobile({
       &__container {
-        padding: 32px 16px 16px;
+        padding: 32px 20px 20px;
       }
 
-      &__nav {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+      &__main {
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
         gap: 20px;
+
+        // Micro résolution : stack vertical
+        @media (max-width: 480px) {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto auto;
+          gap: 24px;
+        }
+      }
+
+      // Brand à gauche, row 1
+      &__brand {
+        grid-row: 1;
+        grid-column: 1;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding-bottom: 0;
+        border-bottom: none;
+
+        @media (max-width: 480px) {
+          align-items: center;
+          text-align: center;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+      }
+
+      &__tagline {
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      &__contact-inline {
+        margin-left: 0;
+        margin-top: 4px;
+      }
+
+      &__contact-link {
+        font-size: 11px;
+      }
+
+      // Newsletter à droite, row 1
+      &__newsletter-col {
+        grid-row: 1;
+        grid-column: 2;
+        justify-self: end;
+        align-self: start;
+        max-width: 160px;
+
+        .footer__nav-title {
+          font-size: 9px;
+          margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+          grid-row: 2;
+          grid-column: 1;
+          justify-self: stretch;
+          max-width: none;
+          text-align: center;
+
+          .footer__nav-title {
+            text-align: center;
+          }
+        }
+      }
+
+      // Nav en dessous, row 2, pleine largeur
+      &__nav {
+        grid-row: 2;
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding-top: 20px;
+        margin-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+        @media (max-width: 480px) {
+          grid-row: 3;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px 16px;
+        }
+      }
+
+      &__nav-col {
+        gap: 8px;
       }
 
       &__nav-title {
-        font-size: 10px;
+        font-size: 9px;
+        letter-spacing: 0.6px;
+        margin-bottom: 2px;
+      }
+
+      &__nav-list {
+        gap: 5px;
       }
 
       &__nav-list a,
       &__nav-list span {
-        font-size: 12px;
+        font-size: 11px;
       }
 
-      &__newsletter {
-        max-width: none;
-        width: 100%;
-      }
-
+      // Trust bar compact
       &__trust {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 16px;
+        padding: 16px 0;
+      }
+
+      &__trust-payments {
+        flex-direction: row;
+        gap: 12px;
+        align-items: center;
       }
 
       &__trust-badges {
         flex-wrap: wrap;
-        gap: 12px;
+        justify-content: center;
+        gap: 12px 20px;
       }
 
+      &__trust-badge {
+        font-size: 11px;
+      }
+
+      // Bottom centré
       &__bottom {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       &__legal-links {
         justify-content: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 6px 14px;
+
+        a {
+          font-size: 11px;
+        }
       }
 
       &__copyright {
-        font-size: 11px;
+        font-size: 10px;
+        order: 1;
+      }
+
+      &__bottom-right {
+        order: 0;
+        margin-bottom: 2px;
       }
     });
 

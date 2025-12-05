@@ -83,14 +83,33 @@ function isActive(path: string): boolean {
   return route.path.startsWith(path)
 }
 
-// Masquer au scroll vers le bas
+// Masquer au scroll vers le bas (avec threshold pour éviter les micro-scrolls)
 const lastScrollY = ref(0)
 const isScrollingDown = ref(false)
+const scrollThreshold = 30
 
 function handleScroll() {
   const currentScrollY = window.scrollY
-  isScrollingDown.value = currentScrollY > lastScrollY.value && currentScrollY > 100
-  lastScrollY.value = currentScrollY
+  const delta = currentScrollY - lastScrollY.value
+  const isAtTop = currentScrollY < 80
+
+  // Toujours visible en haut de page
+  if (isAtTop) {
+    isScrollingDown.value = false
+    lastScrollY.value = currentScrollY
+    return
+  }
+
+  // Appliquer le threshold pour éviter les changements trop sensibles
+  if (delta > scrollThreshold) {
+    // Scroll vers le bas significatif → cacher
+    isScrollingDown.value = true
+    lastScrollY.value = currentScrollY
+  } else if (delta < -scrollThreshold) {
+    // Scroll vers le haut significatif → montrer
+    isScrollingDown.value = false
+    lastScrollY.value = currentScrollY
+  }
 }
 
 onMounted(() => {

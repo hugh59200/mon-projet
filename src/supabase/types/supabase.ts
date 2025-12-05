@@ -1,6 +1,10 @@
-// Type Json simplifié pour éviter les erreurs "Type instantiation is excessively deep"
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Json = any
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -739,6 +743,7 @@ export type Database = {
           cas_number: string | null
           category: string
           category_i18n: Json | null
+          coa_url: string | null
           created_at: string | null
           description: string | null
           description_i18n: Json | null
@@ -759,6 +764,7 @@ export type Database = {
           cas_number?: string | null
           category: string
           category_i18n?: Json | null
+          coa_url?: string | null
           created_at?: string | null
           description?: string | null
           description_i18n?: Json | null
@@ -779,6 +785,7 @@ export type Database = {
           cas_number?: string | null
           category?: string
           category_i18n?: Json | null
+          coa_url?: string | null
           created_at?: string | null
           description?: string | null
           description_i18n?: Json | null

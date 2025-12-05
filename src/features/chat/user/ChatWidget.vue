@@ -1,7 +1,10 @@
 <template>
   <div
     class="chat-widget"
-    :class="{ 'chat-widget--open': chatStore.isOpen }"
+    :class="{
+      'chat-widget--open': chatStore.isOpen,
+      'chat-widget--hidden': !isButtonVisible && !chatStore.isOpen
+    }"
   >
     <!-- Bouton flottant -->
     <button
@@ -102,7 +105,7 @@
 <script setup lang="ts">
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { IconColor } from '@designSystem/index'
-  import { computed, onMounted, onUnmounted } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import ChatCore from '@/features/chat/shared/components/ChatCore.vue'
   import { useChat } from '@/features/chat/shared/composables/useChat'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
@@ -117,10 +120,36 @@
 
   const { sendMessage, sendTyping, userId, messages, newMessage, isTyping, isReady } = userChat
 
+  // Auto-hide logic
+  const isButtonVisible = ref(true)
+  const lastScrollY = ref(0)
+  const scrollThreshold = 50
+
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY
+    const scrollingDown = currentScrollY > lastScrollY.value + scrollThreshold
+    const scrollingUp = currentScrollY < lastScrollY.value - scrollThreshold
+    const isAtTop = currentScrollY < 100
+
+    // Toujours visible si chat ouvert ou notifs non lues
+    if (chatStore.isOpen || chatNotif.unreadCount > 0) {
+      isButtonVisible.value = true
+    } else if (isAtTop) {
+      isButtonVisible.value = true
+    } else if (scrollingDown) {
+      isButtonVisible.value = false
+      lastScrollY.value = currentScrollY
+    } else if (scrollingUp) {
+      isButtonVisible.value = true
+      lastScrollY.value = currentScrollY
+    }
+  }
+
   onMounted(async () => {
     chatNotif.setRole('user')
     chatNotif.listenRealtime()
     await chatNotif.fetchUnreadByUser()
+    window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
   const toggleChat = async () => {
@@ -134,6 +163,7 @@
 
   onUnmounted(() => {
     document.removeEventListener('click', handleClickAnywhere)
+    window.removeEventListener('scroll', handleScroll)
   })
 
   const handleClickAnywhere = () => chatStore.resetUnread()
@@ -146,6 +176,12 @@
     bottom: 24px;
     right: 24px;
     z-index: 9999;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &--hidden {
+      transform: translateY(100px);
+      pointer-events: none;
+    }
 
     // ─────────────────────────────────────────
     // Bouton flottant

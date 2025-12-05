@@ -23,8 +23,15 @@
           </div>
         </div>
         
-        <div class="cta__visual">
-          <BasicIconNext name="moleculeCta" class="cta__molecule" />
+        <div class="cta__disclaimer">
+          <div class="cta__disclaimer-badge">
+            <BasicIconNext name="Shield" :size="18" />
+            <span>{{ t('footer.researchOnly') }}</span>
+          </div>
+          <div class="cta__disclaimer-content">
+            <p class="cta__disclaimer-title">{{ t('home.disclaimer.title') }}</p>
+            <p class="cta__disclaimer-text">{{ t('home.disclaimer.text') }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -164,43 +171,106 @@ onMounted(() => {
     margin-top: 8px;
   }
 
-  &__visual {
+  &__disclaimer {
     display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    max-width: 280px;
+    backdrop-filter: blur(8px);
+  }
+
+  &__disclaimer-badge {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(var(--primary-500-rgb), 0.15);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.25);
+    border-radius: 8px;
+    width: fit-content;
+
+    svg {
+      color: var(--primary-400);
+    }
+
+    span {
+      font-family: @font-display;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary-300);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
   }
 
-  &__molecule {
-    width: 180px;
-    height: 180px;
-    animation: rotateSlow 20s linear infinite;
-
-    :deep(.molecule-cta__center) { fill: rgba(255, 255, 255, 0.9); }
-    :deep(.molecule-cta__line) { stroke: rgba(255, 255, 255, 0.3); stroke-width: 1.5; }
-    :deep(.molecule-cta__dot--1) { fill: rgba(@success-500, 0.8); }
-    :deep(.molecule-cta__dot--2) { fill: rgba(var(--primary-400-rgb), 0.8); }
-    :deep(.molecule-cta__dot--3) { fill: rgba(@warning-500, 0.8); }
-    :deep(.molecule-cta__dot--4) { fill: rgba(@info-500, 0.8); }
+  &__disclaimer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  &__disclaimer-title {
+    font-family: @font-display;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  &__disclaimer-text {
+    font-family: @font-body;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
   }
 }
 
 // Responsive - Tablet (≤ 1160px)
 .respond-tablet({
-  .cta__inner { grid-template-columns: 1fr; text-align: center; }
+  .cta__inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 32px;
+  }
   .cta__content { align-items: center; }
   .cta__actions { justify-content: center; }
-  .cta__visual { display: none; }
+  .cta__disclaimer {
+    max-width: 400px;
+    margin: 0 auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+  .cta__disclaimer-badge {
+    flex-shrink: 0;
+  }
+  .cta__disclaimer-content {
+    text-align: left;
+  }
 });
 
 // Responsive - Mobile (≤ 720px)
 .respond-mobile({
   .cta-section { padding: 40px 20px; }
-  .cta__inner { padding: 48px 24px; }
+  .cta__inner { padding: 40px 24px; gap: 24px; }
   .cta__actions { flex-direction: column; width: 100%; }
+  .cta__disclaimer {
+    flex-direction: column;
+    max-width: none;
+    padding: 20px;
+    gap: 12px;
+  }
+  .cta__disclaimer-content {
+    text-align: center;
+  }
+  .cta__disclaimer-badge {
+    margin: 0 auto;
+  }
 });
 </style>

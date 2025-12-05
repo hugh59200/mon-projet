@@ -80,8 +80,6 @@ export function useRelayPoint() {
     try {
       // ============ MODE DEV : Mock data ============
       if (import.meta.env.DEV) {
-        console.log('[useRelayPoint] 🧪 Mode DEV - Mock pour:', postcode)
-
         // Simuler un délai réseau
         await new Promise((resolve) => setTimeout(resolve, 600))
 
@@ -96,8 +94,6 @@ export function useRelayPoint() {
       }
 
       // ============ MODE PROD : Edge Function ============
-      console.log('[useRelayPoint] 🚀 Mode PROD - Appel API:', postcode, country)
-
       const { data, error: fnError } = await supabase.functions.invoke('search-relay-points', {
         body: { postcode, country, nbResults: 10 },
       })
@@ -113,12 +109,10 @@ export function useRelayPoint() {
       const points = data.data.points as RelayPoint[]
       searchResults.value = points
 
-      console.log(`[useRelayPoint] ✅ ${points.length} résultats`)
       return points
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur de recherche'
       error.value = message
-      console.error('[useRelayPoint] ❌ Erreur:', err)
       return []
     } finally {
       isLoading.value = false
