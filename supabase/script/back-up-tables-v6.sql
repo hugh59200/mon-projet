@@ -1,6 +1,10 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V5.3 — PROMO CODES SYSTEM
+-- SUPABASE CLEAN BACKUP V6.0 — REVIEWS + NEWSLETTER
 -- ============================================================
+-- V6.0 : Système d'avis produits (reviews) + Newsletter
+--        - Table reviews avec types (standard, premium, pro, verified)
+--        - Vue product_reviews_summary pour SEO aggregateRating
+--        - Tables newsletter (subscribers, campaigns, sends)
 -- V5.3 : Système complet de codes promo (manuels + automatiques)
 --        - Table promo_codes avec validation RPC
 --        - Codes automatiques (bienvenue, fidélité, abandon panier)
@@ -25,10 +29,16 @@ DROP VIEW IF EXISTS
   public.messages_by_conversation_view,
   public.user_overview,
   public.user_cart_view,
-  public.promo_codes_admin
+  public.promo_codes_admin,
+  public.product_reviews_summary,
+  public.newsletter_stats
 CASCADE;
 
 DROP TABLE IF EXISTS
+  public.newsletter_sends,
+  public.newsletter_campaigns,
+  public.newsletter_subscribers,
+  public.reviews,
   public.user_promo_rewards,
   public.promo_code_usage,
   public.auto_promo_settings,
@@ -83,7 +93,14 @@ DROP FUNCTION IF EXISTS
   public.create_cart_abandonment_promo,
   public.find_abandoned_carts,
   public.trigger_welcome_promo,
-  public.trigger_check_loyalty
+  public.trigger_check_loyalty,
+  -- Reviews functions
+  public.update_reviews_updated_at,
+  -- Newsletter functions
+  public.update_newsletter_subscribers_updated_at,
+  public.subscribe_to_newsletter,
+  public.unsubscribe_from_newsletter,
+  public.confirm_newsletter_subscription
 CASCADE;
 
 -- ============================================================
@@ -2081,8 +2098,376 @@ BEGIN
 END $$;
 
 -- ============================================================
--- FIN DU BACKUP V5.3 — PROMO CODES SYSTEM
+-- BLOC 12 — REVIEWS SYSTEM (V6.0)
 -- ============================================================
--- Codes promo manuels + automatiques (bienvenue, fidelite, abandon panier)
--- Interface admin + tracking utilisation + triggers automatiques
+
+-- ============================
+-- REVIEWS TABLE
+-- ============================
+CREATE TABLE public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+
+  -- Informations de l'auteur
+  author_name VARCHAR(100) NOT NULL,
+  author_type VARCHAR(20) DEFAULT 'standard' CHECK (author_type IN ('standard', 'premium', 'pro', 'verified')),
+  author_title VARCHAR(100),
+  author_institution VARCHAR(200),
+
+  -- Contenu de l'avis
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title VARCHAR(200),
+  content TEXT,
+
+  -- Critères détaillés (optionnels)
+  rating_quality INTEGER CHECK (rating_quality >= 1 AND rating_quality <= 5),
+  rating_purity INTEGER CHECK (rating_purity >= 1 AND rating_purity <= 5),
+  rating_shipping INTEGER CHECK (rating_shipping >= 1 AND rating_shipping <= 5),
+  rating_value INTEGER CHECK (rating_value >= 1 AND rating_value <= 5),
+
+  -- Métadonnées
+  is_verified_purchase BOOLEAN DEFAULT false,
+  is_approved BOOLEAN DEFAULT false,
+  is_featured BOOLEAN DEFAULT false,
+
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_reviews_product_id ON public.reviews(product_id);
+CREATE INDEX idx_reviews_approved ON public.reviews(is_approved) WHERE is_approved = true;
+CREATE INDEX idx_reviews_rating ON public.reviews(rating);
+
+COMMENT ON TABLE public.reviews IS 'Avis produits avec types (standard, premium, pro, verified) pour SEO aggregateRating';
+
+-- ============================
+-- REVIEWS SUMMARY VIEW
+-- ============================
+CREATE OR REPLACE VIEW public.product_reviews_summary AS
+SELECT
+  product_id,
+  COUNT(*) as review_count,
+  ROUND(AVG(rating)::numeric, 1) as average_rating,
+  ROUND(AVG(rating_quality)::numeric, 1) as avg_quality,
+  ROUND(AVG(rating_purity)::numeric, 1) as avg_purity,
+  ROUND(AVG(rating_shipping)::numeric, 1) as avg_shipping,
+  ROUND(AVG(rating_value)::numeric, 1) as avg_value,
+  COUNT(*) FILTER (WHERE rating = 5) as five_star_count,
+  COUNT(*) FILTER (WHERE rating = 4) as four_star_count,
+  COUNT(*) FILTER (WHERE rating = 3) as three_star_count,
+  COUNT(*) FILTER (WHERE rating = 2) as two_star_count,
+  COUNT(*) FILTER (WHERE rating = 1) as one_star_count
+FROM public.reviews
+WHERE is_approved = true
+GROUP BY product_id;
+
+-- ============================
+-- REVIEWS RLS POLICIES
+-- ============================
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Reviews are viewable by everyone"
+  ON public.reviews FOR SELECT
+  USING (is_approved = true);
+
+CREATE POLICY "Users can create reviews"
+  ON public.reviews FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own pending reviews"
+  ON public.reviews FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id AND is_approved = false);
+
+CREATE POLICY "Users can delete own reviews"
+  ON public.reviews FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Admin full reviews"
+  ON public.reviews FOR ALL
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- ============================
+-- REVIEWS TRIGGER
+-- ============================
+CREATE OR REPLACE FUNCTION public.update_reviews_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_reviews_updated_at
+  BEFORE UPDATE ON public.reviews
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_reviews_updated_at();
+
+-- ============================================================
+-- BLOC 13 — NEWSLETTER SYSTEM (V6.0)
+-- ============================================================
+
+-- ============================
+-- NEWSLETTER SUBSCRIBERS
+-- ============================
+CREATE TABLE public.newsletter_subscribers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  first_name VARCHAR(100),
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'unsubscribed', 'bounced')),
+  preferences JSONB DEFAULT '{"frequency": "weekly", "topics": ["products", "research", "promotions", "news"], "format": "html"}'::jsonb,
+  source VARCHAR(50) DEFAULT 'website' CHECK (source IN ('website', 'checkout', 'popup', 'footer', 'admin', 'import')),
+  confirmation_token TEXT,
+  confirmed_at TIMESTAMPTZ,
+  locale VARCHAR(5) DEFAULT 'fr',
+  country VARCHAR(2),
+  last_email_sent_at TIMESTAMPTZ,
+  last_email_opened_at TIMESTAMPTZ,
+  emails_sent_count INTEGER DEFAULT 0,
+  emails_opened_count INTEGER DEFAULT 0,
+  unsubscribed_at TIMESTAMPTZ,
+  unsubscribe_reason TEXT,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_newsletter_status ON public.newsletter_subscribers(status) WHERE status = 'active';
+CREATE INDEX idx_newsletter_locale ON public.newsletter_subscribers(locale);
+CREATE INDEX idx_newsletter_source ON public.newsletter_subscribers(source);
+CREATE INDEX idx_newsletter_created ON public.newsletter_subscribers(created_at DESC);
+CREATE INDEX idx_newsletter_preferences ON public.newsletter_subscribers USING GIN (preferences);
+
+-- ============================
+-- NEWSLETTER CAMPAIGNS
+-- ============================
+CREATE TABLE public.newsletter_campaigns (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  subject VARCHAR(200) NOT NULL,
+  preview_text VARCHAR(300),
+  content_html TEXT NOT NULL,
+  content_text TEXT,
+  target_status VARCHAR(20) DEFAULT 'active',
+  target_locales TEXT[] DEFAULT ARRAY['fr', 'en'],
+  target_topics TEXT[],
+  recipients_count INTEGER DEFAULT 0,
+  sent_count INTEGER DEFAULT 0,
+  opened_count INTEGER DEFAULT 0,
+  clicked_count INTEGER DEFAULT 0,
+  unsubscribed_count INTEGER DEFAULT 0,
+  bounced_count INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'sending', 'sent', 'cancelled')),
+  scheduled_at TIMESTAMPTZ,
+  sent_at TIMESTAMPTZ,
+  created_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================
+-- NEWSLETTER SENDS
+-- ============================
+CREATE TABLE public.newsletter_sends (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_id UUID NOT NULL REFERENCES public.newsletter_campaigns(id) ON DELETE CASCADE,
+  subscriber_id UUID NOT NULL REFERENCES public.newsletter_subscribers(id) ON DELETE CASCADE,
+  sent_at TIMESTAMPTZ DEFAULT NOW(),
+  opened_at TIMESTAMPTZ,
+  clicked_at TIMESTAMPTZ,
+  bounced_at TIMESTAMPTZ,
+  bounce_reason TEXT,
+  provider_message_id TEXT,
+  UNIQUE(campaign_id, subscriber_id)
+);
+
+CREATE INDEX idx_newsletter_sends_campaign ON public.newsletter_sends(campaign_id);
+CREATE INDEX idx_newsletter_sends_subscriber ON public.newsletter_sends(subscriber_id);
+
+-- ============================
+-- NEWSLETTER STATS VIEW
+-- ============================
+CREATE OR REPLACE VIEW public.newsletter_stats AS
+SELECT
+  COUNT(*) as total_subscribers,
+  COUNT(*) FILTER (WHERE status = 'active') as active_subscribers,
+  COUNT(*) FILTER (WHERE status = 'pending') as pending_subscribers,
+  COUNT(*) FILTER (WHERE status = 'unsubscribed') as unsubscribed_count,
+  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days') as new_last_30_days,
+  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') as new_last_7_days,
+  ROUND(
+    COUNT(*) FILTER (WHERE status = 'active')::numeric /
+    NULLIF(COUNT(*)::numeric, 0) * 100,
+    1
+  ) as active_rate,
+  COUNT(DISTINCT locale) as locales_count
+FROM public.newsletter_subscribers;
+
+-- ============================
+-- NEWSLETTER RLS POLICIES
+-- ============================
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.newsletter_campaigns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.newsletter_sends ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public can check email existence"
+  ON public.newsletter_subscribers FOR SELECT
+  USING (true);
+
+CREATE POLICY "Anyone can subscribe"
+  ON public.newsletter_subscribers FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Users can update own subscription"
+  ON public.newsletter_subscribers FOR UPDATE
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Admin full newsletter_subscribers"
+  ON public.newsletter_subscribers FOR ALL
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+CREATE POLICY "Admin full newsletter_campaigns"
+  ON public.newsletter_campaigns FOR ALL
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+CREATE POLICY "Admin full newsletter_sends"
+  ON public.newsletter_sends FOR ALL
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+-- ============================
+-- NEWSLETTER TRIGGERS
+-- ============================
+CREATE OR REPLACE FUNCTION public.update_newsletter_subscribers_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_newsletter_subscribers_updated_at
+  BEFORE UPDATE ON public.newsletter_subscribers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_newsletter_subscribers_updated_at();
+
+CREATE TRIGGER trigger_newsletter_campaigns_updated_at
+  BEFORE UPDATE ON public.newsletter_campaigns
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_newsletter_subscribers_updated_at();
+
+-- ============================
+-- NEWSLETTER FUNCTIONS
+-- ============================
+CREATE OR REPLACE FUNCTION public.subscribe_to_newsletter(
+  p_email TEXT,
+  p_first_name TEXT DEFAULT NULL,
+  p_source TEXT DEFAULT 'website',
+  p_locale TEXT DEFAULT 'fr',
+  p_preferences JSONB DEFAULT NULL
+)
+RETURNS JSON AS $$
+DECLARE
+  v_subscriber_id UUID;
+  v_confirmation_token TEXT;
+  v_existing_status TEXT;
+BEGIN
+  SELECT id, status INTO v_subscriber_id, v_existing_status
+  FROM public.newsletter_subscribers
+  WHERE email = LOWER(TRIM(p_email));
+
+  IF v_existing_status = 'active' THEN
+    RETURN json_build_object('success', true, 'message', 'already_subscribed', 'subscriber_id', v_subscriber_id);
+  END IF;
+
+  IF v_existing_status = 'unsubscribed' THEN
+    UPDATE public.newsletter_subscribers
+    SET status = 'active', unsubscribed_at = NULL, unsubscribe_reason = NULL, confirmed_at = NOW()
+    WHERE id = v_subscriber_id;
+    RETURN json_build_object('success', true, 'message', 'resubscribed', 'subscriber_id', v_subscriber_id);
+  END IF;
+
+  v_confirmation_token := encode(gen_random_bytes(32), 'hex');
+
+  INSERT INTO public.newsletter_subscribers (email, first_name, source, locale, preferences, confirmation_token, status)
+  VALUES (
+    LOWER(TRIM(p_email)),
+    p_first_name,
+    p_source,
+    p_locale,
+    COALESCE(p_preferences, '{"frequency": "weekly", "topics": ["products", "research", "promotions", "news"]}'::jsonb),
+    v_confirmation_token,
+    'active'
+  )
+  ON CONFLICT (email) DO UPDATE SET
+    first_name = COALESCE(EXCLUDED.first_name, public.newsletter_subscribers.first_name),
+    source = EXCLUDED.source,
+    locale = EXCLUDED.locale,
+    preferences = COALESCE(EXCLUDED.preferences, public.newsletter_subscribers.preferences),
+    status = 'active',
+    confirmed_at = NOW()
+  RETURNING id INTO v_subscriber_id;
+
+  RETURN json_build_object('success', true, 'message', 'subscribed', 'subscriber_id', v_subscriber_id, 'confirmation_token', v_confirmation_token);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.subscribe_to_newsletter TO anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.unsubscribe_from_newsletter(
+  p_email TEXT,
+  p_reason TEXT DEFAULT NULL
+)
+RETURNS JSON AS $$
+DECLARE
+  v_subscriber_id UUID;
+BEGIN
+  UPDATE public.newsletter_subscribers
+  SET status = 'unsubscribed', unsubscribed_at = NOW(), unsubscribe_reason = p_reason
+  WHERE email = LOWER(TRIM(p_email))
+  RETURNING id INTO v_subscriber_id;
+
+  IF v_subscriber_id IS NULL THEN
+    RETURN json_build_object('success', false, 'message', 'not_found');
+  END IF;
+
+  RETURN json_build_object('success', true, 'message', 'unsubscribed', 'subscriber_id', v_subscriber_id);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.unsubscribe_from_newsletter TO anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.confirm_newsletter_subscription(p_token TEXT)
+RETURNS JSON AS $$
+DECLARE
+  v_subscriber_id UUID;
+BEGIN
+  UPDATE public.newsletter_subscribers
+  SET status = 'active', confirmed_at = NOW(), confirmation_token = NULL
+  WHERE confirmation_token = p_token AND status = 'pending'
+  RETURNING id INTO v_subscriber_id;
+
+  IF v_subscriber_id IS NULL THEN
+    RETURN json_build_object('success', false, 'message', 'invalid_token');
+  END IF;
+
+  RETURN json_build_object('success', true, 'message', 'confirmed', 'subscriber_id', v_subscriber_id);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.confirm_newsletter_subscription TO anon, authenticated;
+
+-- ============================================================
+-- FIN DU BACKUP V6.0 — REVIEWS + NEWSLETTER
+-- ============================================================
+-- V6.0 : Système d'avis produits + Newsletter complète
+-- Inclut toutes les tables, vues, fonctions, RLS et triggers
 -- ============================================================
