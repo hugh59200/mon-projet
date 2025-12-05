@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-  import peptidesHeroImage from '@/assets/peptides-hero-2.png'
+  import peptidesHeroImage from '@/assets/peptides-hero.png'
   import { useI18n } from 'vue-i18n'
   import BaseButton from './shared/BaseButton.vue'
 

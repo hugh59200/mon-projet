@@ -18,7 +18,8 @@
       "Bash(git commit:*)",
       "Bash(npx supabase:*)",
       "Bash(npm run deploy:functions:*)",
-      "Bash(npm run gen:types:*)"
+      "Bash(npm run gen:types:*)",
+      "Bash(node scripts/convert-logo.cjs:*)"
     ],
     "deny": [],
     "ask": []
