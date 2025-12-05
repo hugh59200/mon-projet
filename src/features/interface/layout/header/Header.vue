@@ -1,19 +1,16 @@
 <template>
   <nav class="navbar">
-    <!-- Background Effects -->
     <div class="navbar__bg">
       <div class="navbar__bg-gradient"></div>
       <div class="navbar__bg-shine"></div>
     </div>
 
-    <!-- Mobile Drawer -->
     <MobileDrawer v-model="isMenuOpen" />
 
     <div
       ref="containerRef"
       class="navbar__container"
     >
-      <!-- Left: Burger + Logo -->
       <div
         ref="leftRef"
         class="navbar__left"
@@ -34,7 +31,6 @@
         <HeaderLogo />
       </div>
 
-      <!-- Center: Navigation -->
       <div
         v-if="!shouldShowMobileNav"
         ref="centerRef"
@@ -43,7 +39,6 @@
         <MainNavLinks />
       </div>
 
-      <!-- Right: Actions -->
       <div
         ref="rightRef"
         class="navbar__right"
@@ -52,14 +47,16 @@
           :label="t('nav.tracking')"
           position="bottom"
         >
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="sm"
-            icon-left="Package"
-            class="navbar__icon-btn"
+          <button
+            class="navbar__icon-btn navbar__icon-btn--ghost"
             @click="$router.push('/suivi-commande')"
-          />
+          >
+            <BasicIconNext
+              name="Package"
+              :size="20"
+              color="neutral-200"
+            />
+          </button>
         </BasicTooltip>
         <LanguageSelector />
         <WishlistIcon />
@@ -75,6 +72,7 @@
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import WishlistIcon from '@/features/catalogue/components/WishlistIcon.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
+  import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, onUnmounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
@@ -88,13 +86,11 @@
   const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
 
-  // Refs pour la détection d'overflow
   const containerRef = ref<HTMLElement | null>(null)
   const leftRef = ref<HTMLElement | null>(null)
   const centerRef = ref<HTMLElement | null>(null)
   const rightRef = ref<HTMLElement | null>(null)
 
-  // Détection dynamique du chevauchement
   const { isOverflowing } = useNavOverflow(
     containerRef,
     leftRef,
@@ -103,7 +99,6 @@
     { minGap: 20 }
   )
 
-  // On passe en mode mobile si device mobile OU si overflow détecté
   const shouldShowMobileNav = computed(() => isMobile.value || isOverflowing.value)
 
   const isMenuOpen = ref(false)
@@ -133,7 +128,6 @@
     z-index: 1000;
     height: 68px;
 
-    // Background
     &__bg {
       position: absolute;
       inset: 0;
@@ -167,7 +161,6 @@
       );
     }
 
-    // Container
     &__container {
       position: relative;
       z-index: 1;
@@ -181,7 +174,6 @@
       gap: 20px;
     }
 
-    // Sections
     &__left {
       display: flex;
       align-items: center;
@@ -203,7 +195,6 @@
       flex-shrink: 0;
     }
 
-    // Icon button (tracking)
     &__icon-btn {
       display: flex;
       align-items: center;
@@ -220,15 +211,24 @@
       &:hover {
         background: rgba(255, 255, 255, 0.08);
         border-color: rgba(255, 255, 255, 0.12);
-        transform: scale(1.02);
       }
 
       &:active {
-        transform: scale(0.98);
+        opacity: 0.8;
+      }
+
+      // Mode ghost : uniquement l'icône visible
+      &--ghost {
+        background: transparent;
+        border-color: transparent;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.06);
+          border-color: transparent;
+        }
       }
     }
 
-    // Burger
     &__burger {
       display: flex;
       flex-direction: column;
@@ -249,7 +249,7 @@
       }
 
       &:active {
-        transform: scale(0.95);
+        opacity: 0.8;
       }
 
       &-line {
@@ -276,15 +276,7 @@
     }
   }
 
-  // Package icon button - slightly larger icon
-  .navbar__icon-btn {
-    :deep(svg) {
-      width: 20px;
-      height: 20px;
-    }
-  }
 
-  // Responsive - utilise les breakpoints harmonisés
   @media (min-width: 1301px) {
     .navbar__container {
       padding: 0 32px;
@@ -292,7 +284,6 @@
     }
   }
 
-  // Tablet large
   .respond-tablet({
     .navbar__container {
       gap: 20px;
@@ -300,7 +291,6 @@
     }
   });
 
-  // Mobile (≤ 720px)
   .respond-mobile({
     .navbar {
       height: 60px;
@@ -312,8 +302,8 @@
     }
 
     .navbar__icon-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
     }
 
     .navbar__burger {
@@ -326,17 +316,4 @@
     }
   });
 
-  // Deep styles for trigger buttons only (not dropdown items)
-  .navbar :deep(.cart-menu > button),
-  .navbar :deep(.user-trigger__avatar) {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    transition: all 0.2s @ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.12);
-    }
-  }
 </style>

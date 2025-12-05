@@ -166,13 +166,17 @@
   }
 
   /* ✅ Contenu principal */
-  .content {
+  .main-wrapper {
     position: relative;
     z-index: 1;
-    min-width: 250px;
-    flex: 1; /* Pousse le footer en bas */
+    flex: 1 0 auto; /* Grow, don't shrink, auto basis */
     display: flex;
     flex-direction: column;
+  }
+
+  .content {
+    min-width: 250px;
+    min-height: calc(100vh - 68px - 200px); /* viewport - header - footer approx */
 
     /* Fond transparent pour laisser voir le gradient de l'app-layout */
     background: transparent;
@@ -190,7 +194,14 @@
     /* Mobile: padding pour la bottom nav */
     .respond-mobile({
       padding-bottom: 72px;
+      min-height: calc(100vh - 60px - 150px); /* header mobile + footer mobile */
     });
+  }
+
+  /* Footer toujours en bas */
+  .footer {
+    flex-shrink: 0;
+    margin-top: auto;
   }
 
   /* Mode Auth plein écran */

@@ -14,6 +14,7 @@
       </div>
     </section>
     <HomeQuality />
+    <NewsletterSection />
     <HomeFaq />
     <HomeCta />
     <HomeDisclaimer />
@@ -31,6 +32,7 @@
   import HomeProcess from './HomeProcess.vue'
   import HomeQuality from './HomeQuality.vue'
   import HomeStats from './HomeStats.vue'
+  import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
 
   // Configuration SEO pour la page d'accueil
   useHead({

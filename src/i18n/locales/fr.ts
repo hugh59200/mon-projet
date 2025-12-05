@@ -1216,6 +1216,53 @@ export default {
   },
 
   // ============================================
+  // NEWSLETTER
+  // ============================================
+  newsletter: {
+    badge: 'Newsletter exclusive',
+    title: 'Restez informé',
+    description: 'Recevez en avant-première nos nouveautés, actualités scientifiques et offres exclusives.',
+    placeholder: 'Votre adresse email',
+    namePlaceholder: 'Votre prénom (optionnel)',
+    cta: "S'inscrire gratuitement",
+    privacy: 'Vos données restent confidentielles. Désinscription en 1 clic.',
+    features: {
+      exclusive: 'Offres exclusives réservées aux abonnés',
+      research: 'Actualités et études scientifiques',
+      promotions: 'Codes promo et réductions',
+      unsubscribe: 'Désinscription en 1 clic',
+    },
+    success: {
+      title: 'Inscription confirmée !',
+      description: 'Bienvenue ! Vous recevrez bientôt nos dernières actualités.',
+    },
+    errors: {
+      required: 'Veuillez entrer votre adresse email',
+      invalid: 'Adresse email invalide',
+      alreadySubscribed: 'Cette adresse est déjà inscrite',
+      generic: 'Une erreur est survenue, veuillez réessayer',
+    },
+    unsubscribe: {
+      title: 'Se désinscrire',
+      description: 'Vous ne souhaitez plus recevoir nos emails ?',
+      confirm: 'Confirmer la désinscription',
+      success: 'Vous avez été désinscrit avec succès',
+    },
+    preferences: {
+      title: 'Préférences de newsletter',
+      frequency: 'Fréquence',
+      weekly: 'Hebdomadaire',
+      biweekly: 'Bi-mensuelle',
+      monthly: 'Mensuelle',
+      topics: 'Sujets',
+      products: 'Nouveaux produits',
+      research: 'Actualités scientifiques',
+      promotions: 'Promotions et offres',
+      news: 'Actualités de la boutique',
+    },
+  },
+
+  // ============================================
   // ADMIN
   // ============================================
   admin: {

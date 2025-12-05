@@ -6,7 +6,6 @@
     </p>
 
     <form class="auth__form" @submit.prevent="submit">
-      <!-- Email avec validation visuelle premium -->
       <div class="auth__field">
         <WrapperInput
           v-model.trim="fields.email.value.value"
@@ -29,7 +28,6 @@
         </WrapperInput>
       </div>
 
-      <!-- Password -->
       <div class="auth__field">
         <WrapperInputPassword
           v-model="fields.password.value.value"
@@ -68,7 +66,6 @@
         :glow="!!(captchaToken && canSubmit && !loading)"
       />
 
-      <!-- Error feedback premium -->
       <div class="auth__feedback">
         <Transition name="slide-fade" mode="out-in">
           <div v-if="error" class="auth__error-box">
@@ -110,7 +107,6 @@
   const { t } = useI18n()
   const auth = useAuthStore()
 
-  // Formulaire avec validation premium
   const { fields, canSubmit, validate } = useAuthForm({
     mode: 'login',
   }) as ReturnType<typeof useAuthForm> & {
@@ -123,7 +119,6 @@
   const error = ref('')
   const loading = ref(false)
 
-  // Captcha
   const captchaToken = ref('')
   const turnstileWidget = ref()
 
@@ -142,11 +137,9 @@
   }
 
   async function submit() {
-    // 1. Validation formulaire
     const isValid = await validate()
     if (!isValid) return
 
-    // 2. Sécurité Bot
     if (!captchaToken.value) {
       error.value = t('auth.errors.captchaRequired')
       return
@@ -154,7 +147,6 @@
 
     loading.value = true
 
-    // 3. Appel au store
     const success = await auth.signIn(
       fields.email.value.value,
       fields.password.value.value,
@@ -203,7 +195,6 @@
     }
   }
 
-  // Animations premium
   .slide-fade-enter-active,
   .slide-fade-leave-active {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -293,6 +293,214 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_campaigns: {
+        Row: {
+          bounced_count: number | null
+          clicked_count: number | null
+          content_html: string
+          content_text: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          opened_count: number | null
+          preview_text: string | null
+          recipients_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          sent_count: number | null
+          status: string | null
+          subject: string
+          target_locales: string[] | null
+          target_status: string | null
+          target_topics: string[] | null
+          unsubscribed_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          bounced_count?: number | null
+          clicked_count?: number | null
+          content_html: string
+          content_text?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          opened_count?: number | null
+          preview_text?: string | null
+          recipients_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string | null
+          subject: string
+          target_locales?: string[] | null
+          target_status?: string | null
+          target_topics?: string[] | null
+          unsubscribed_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          bounced_count?: number | null
+          clicked_count?: number | null
+          content_html?: string
+          content_text?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          opened_count?: number | null
+          preview_text?: string | null
+          recipients_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string | null
+          subject?: string
+          target_locales?: string[] | null
+          target_status?: string | null
+          target_topics?: string[] | null
+          unsubscribed_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_overview"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_sends: {
+        Row: {
+          bounce_reason: string | null
+          bounced_at: string | null
+          campaign_id: string
+          clicked_at: string | null
+          id: string
+          opened_at: string | null
+          provider_message_id: string | null
+          sent_at: string | null
+          subscriber_id: string
+        }
+        Insert: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id: string
+          clicked_at?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          sent_at?: string | null
+          subscriber_id: string
+        }
+        Update: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id?: string
+          clicked_at?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          sent_at?: string | null
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_sends_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          confirmation_token: string | null
+          confirmed_at: string | null
+          country: string | null
+          created_at: string | null
+          email: string
+          emails_opened_count: number | null
+          emails_sent_count: number | null
+          first_name: string | null
+          id: string
+          ip_address: unknown
+          last_email_opened_at: string | null
+          last_email_sent_at: string | null
+          locale: string | null
+          preferences: Json | null
+          source: string | null
+          status: string | null
+          unsubscribe_reason: string | null
+          unsubscribed_at: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          country?: string | null
+          created_at?: string | null
+          email: string
+          emails_opened_count?: number | null
+          emails_sent_count?: number | null
+          first_name?: string | null
+          id?: string
+          ip_address?: unknown
+          last_email_opened_at?: string | null
+          last_email_sent_at?: string | null
+          locale?: string | null
+          preferences?: Json | null
+          source?: string | null
+          status?: string | null
+          unsubscribe_reason?: string | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string
+          emails_opened_count?: number | null
+          emails_sent_count?: number | null
+          first_name?: string | null
+          id?: string
+          ip_address?: unknown
+          last_email_opened_at?: string | null
+          last_email_sent_at?: string | null
+          locale?: string | null
+          preferences?: Json | null
+          source?: string | null
+          status?: string | null
+          unsubscribe_reason?: string | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_subscribers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_overview"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -654,6 +862,87 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          author_institution: string | null
+          author_name: string
+          author_title: string | null
+          author_type: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          is_approved: boolean | null
+          is_featured: boolean | null
+          is_verified_purchase: boolean | null
+          product_id: string
+          rating: number
+          rating_purity: number | null
+          rating_quality: number | null
+          rating_shipping: number | null
+          rating_value: number | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          author_institution?: string | null
+          author_name: string
+          author_title?: string | null
+          author_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          is_featured?: boolean | null
+          is_verified_purchase?: boolean | null
+          product_id: string
+          rating: number
+          rating_purity?: number | null
+          rating_quality?: number | null
+          rating_shipping?: number | null
+          rating_value?: number | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          author_institution?: string | null
+          author_name?: string
+          author_title?: string | null
+          author_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          is_featured?: boolean | null
+          is_verified_purchase?: boolean | null
+          product_id?: string
+          rating?: number
+          rating_purity?: number | null
+          rating_quality?: number | null
+          rating_shipping?: number | null
+          rating_value?: number | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_overview"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_cart_items: {
         Row: {
           id: string
@@ -804,6 +1093,19 @@ export type Database = {
           },
         ]
       }
+      newsletter_stats: {
+        Row: {
+          active_rate: number | null
+          active_subscribers: number | null
+          locales_count: number | null
+          new_last_30_days: number | null
+          new_last_7_days: number | null
+          pending_subscribers: number | null
+          total_subscribers: number | null
+          unsubscribed_count: number | null
+        }
+        Relationships: []
+      }
       orders_detailed_view: {
         Row: {
           address: string | null
@@ -944,6 +1246,31 @@ export type Database = {
           },
         ]
       }
+      product_reviews_summary: {
+        Row: {
+          average_rating: number | null
+          avg_purity: number | null
+          avg_quality: number | null
+          avg_shipping: number | null
+          avg_value: number | null
+          five_star_count: number | null
+          four_star_count: number | null
+          one_star_count: number | null
+          product_id: string | null
+          review_count: number | null
+          three_star_count: number | null
+          two_star_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_cart_view: {
         Row: {
           cart_item_id: string | null
@@ -1015,6 +1342,10 @@ export type Database = {
       }
       claim_order_for_user: {
         Args: { p_order_id: string; p_user_id: string }
+        Returns: Json
+      }
+      confirm_newsletter_subscription: {
+        Args: { p_token: string }
         Returns: Json
       }
       create_full_order:
@@ -1123,6 +1454,20 @@ export type Database = {
       is_admin: { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
       remove_order_relay: { Args: { p_order_id: string }; Returns: Json }
+      subscribe_to_newsletter: {
+        Args: {
+          p_email: string
+          p_first_name?: string
+          p_locale?: string
+          p_preferences?: Json
+          p_source?: string
+        }
+        Returns: Json
+      }
+      unsubscribe_from_newsletter: {
+        Args: { p_email: string; p_reason?: string }
+        Returns: Json
+      }
       update_order_relay: {
         Args: {
           p_order_id: string

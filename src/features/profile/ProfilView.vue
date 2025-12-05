@@ -118,7 +118,6 @@
             {{ t('profile.defaultAddress').toUpperCase() }}
           </BasicText>
 
-          <!-- Autocomplétion pour la France -->
           <AddressAutocomplete
             v-if="country === 'France' || country === ''"
             v-model="address"
@@ -128,7 +127,6 @@
             class="mb-4"
             @fill="onAddressFill"
           />
-          <!-- Champ classique pour les autres pays -->
           <WrapperInput
             v-else
             v-model="address"
@@ -262,7 +260,6 @@
           icon="Settings"
         >
           <div class="profil__preferences">
-            <!-- Appearance Card with Premium Theme Selector -->
             <div class="profil__pref-card profil__pref-card--premium">
               <div class="profil__pref-card-header">
                 <BasicIconNext
@@ -294,7 +291,6 @@
               />
             </div>
 
-            <!-- Notifications Card -->
             <div class="profil__pref-card profil__pref-card--secondary">
               <div class="profil__pref-card-header">
                 <BasicIconNext
@@ -366,7 +362,6 @@
             />
           </div>
 
-          <!-- Indicateur de force du mot de passe -->
           <div v-if="newPassword" class="profil__password-strength">
             <div class="profil__password-strength-bar">
               <div
@@ -447,7 +442,6 @@
   import { calculatePasswordStrength } from '@/composables/validation'
   import AddressAutocomplete from '@/features/shared/components/AddressAutocomplete.vue'
 
-  // --- Stores et Hooks ---
   const { t } = useI18n()
   const auth = useAuthStore()
   const chatStore = useChatWidgetStore()
@@ -459,21 +453,18 @@
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
 
-  // --- États Locaux ---
   const isBrownTheme = ref(false)
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
 
-  // Données Personnelles Éditables (pour le formulaire)
   const editableName = ref('')
   const phone = ref('')
   const address = ref('')
-  const zip = ref('') // 🆕
-  const city = ref('') // 🆕
-  const country = ref('') // 🆕
+  const zip = ref('')
+  const city = ref('')
+  const country = ref('')
   const avatarPreview = ref<string | null>(null)
 
-  // Données d'Origine (pour vérifier si des changements ont été faits)
   const originalProfile = ref<{
     full_name?: string
     phone?: string
@@ -484,14 +475,11 @@
   }>({})
   const originalNewsletter = ref(false)
 
-  // Préférences
   const newsletter = ref(false)
   const preferencesLoading = ref(false)
 
-  // Avatar upload
   const isUploadingAvatar = ref(false)
 
-  // Sécurité
   const loading = ref(false)
   const newPassword = ref('')
   const confirmPassword = ref('')
@@ -506,8 +494,6 @@
       passwordStrength.value.score >= 2
     )
   })
-
-  // --- Computed pour l'UX des boutons ---
 
   const hasPersonalChanges = computed(() => {
     return (
@@ -528,8 +514,6 @@
     )
   })
 
-  // --- Watchers et Logique de Thème Persistant ---
-
   const THEME_STORAGE_KEY = 'theme-preference'
 
   watch(isBrownTheme, (isBrown) => {
@@ -548,8 +532,6 @@
     html.classList.add(isBrown ? 'theme-brown' : 'theme-blue')
   }
 
-  // --- Fonctions Utilitaires ---
-
   function formatOrderDate(date: string) {
     return new Date(date).toLocaleDateString()
   }
@@ -559,28 +541,20 @@
     router.push(`/profil/commandes/${id}`)
   }
 
-  // Handler pour filtrer le code postal (chiffres uniquement)
   function onZipInput(event: Event) {
     const input = event.target as HTMLInputElement
-    // Formater le code postal (France par défaut = 5 chiffres)
     input.value = formatPostalCode(input.value, 'FR')
     zip.value = input.value
   }
 
-  /**
-   * Auto-remplissage depuis l'autocomplétion d'adresse
-   */
   function onAddressFill(data: { address: string; city: string; postcode: string }) {
     address.value = data.address
     city.value = data.city
     zip.value = data.postcode
-    // Mettre France par défaut si vide (API Adresse = France uniquement)
     if (!country.value) {
       country.value = 'France'
     }
   }
-
-  // --- Actions Profil ---
 
   async function fetchProfileData() {
     if (!auth.user) return
@@ -590,11 +564,10 @@
 
     profile.value = data
 
-    // Initialisation des données éditables et de l'état d'origine
     editableName.value = data.full_name ?? ''
     phone.value = data.phone ?? ''
     address.value = data.address ?? ''
-    // @ts-ignore - Pour éviter les erreurs TS tant que les types ne sont pas régénérés
+    // @ts-ignore
     zip.value = data.zip ?? ''
     // @ts-ignore
     city.value = data.city ?? ''
@@ -609,13 +582,10 @@
       country: country.value,
     }
 
-    // Avatar
     avatarPreview.value = data.avatar_url ? data.avatar_url : null
 
-    // Commandes
     lastOrders.value = await loadLastOrdersAction(auth.user.id)
 
-    // Préférences
     newsletter.value = false
     originalNewsletter.value = newsletter.value
   }
@@ -651,7 +621,7 @@
       country: country.value,
     }
 
-    // @ts-ignore - Bypass TS pour les nouveaux champs
+    // @ts-ignore
     const success = await updateProfile(auth.user.id, updatedData)
 
     if (success) {
@@ -716,7 +686,6 @@
     }
   }
 
-  // --- Lifecycle Hook ---
   onMounted(async () => {
     loadThemePreference()
     await sections.loadFromSupabase()
@@ -804,9 +773,6 @@
       }
     }
 
-    /* -----------------------------
-    🖼️ Cover
-    ----------------------------- */
     &__cover {
       height: 280px;
       overflow: hidden;
@@ -822,12 +788,9 @@
       }
     }
 
-    /* -----------------------------
-    🧊 MAIN CONTAINER (glass)
-    ----------------------------- */
     &__container {
-      width: 1200px;
-      max-width: calc(100% - 40px);
+      width: 90%;
+      max-width: 1000px;
       margin: -100px auto 70px;
       padding: 40px;
 
@@ -844,9 +807,6 @@
       z-index: 10;
     }
 
-    /* -----------------------------
-    👤 HEADER (titre + avatar)
-    ----------------------------- */
     &__header {
       display: flex;
       align-items: center;
@@ -856,7 +816,6 @@
       border-bottom: 1px solid @neutral-800;
     }
 
-    /* AVATAR */
     &__avatar {
       position: relative;
       width: 130px;
@@ -932,9 +891,6 @@
       }
     }
 
-    /* -----------------------------
-    Header texte
-    ----------------------------- */
     &__header-info {
       display: flex;
       flex-direction: column;
@@ -970,9 +926,6 @@
       }
     }
 
-    /* -----------------------------
-    SECTIONS
-    ----------------------------- */
     &__sections {
       display: flex;
       flex-direction: column;
@@ -980,7 +933,6 @@
       margin-top: 16px;
 
       :deep(.FilterSection) {
-        /* ⬅️ AJOUT :deep() */
         border: 1px solid fade(@neutral-500, 12%);
         background: rgba(var(--secondary-900-rgb), 0.55);
         border-radius: 20px;
@@ -994,7 +946,6 @@
       }
 
       :deep(.FilterSection__content) {
-        /* ⬅️ AJOUT :deep() */
         padding-top: 24px;
 
         .BasicInput:not(:last-child) {
@@ -1003,16 +954,12 @@
       }
 
       :deep(.FilterSection__head .BasicText) {
-        /* ⬅️ AJOUT :deep() */
         color: @neutral-50;
         font-size: 18px;
         letter-spacing: -0.3px;
       }
     }
 
-    /* -----------------------------
-    CARDS
-    ----------------------------- */
     &__orders {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1093,9 +1040,6 @@
       }
     }
 
-    /* -----------------------------
-    PREFERENCES - PREMIUM EDITION
-    ----------------------------- */
     &__preferences {
       display: flex;
       flex-direction: column;
@@ -1114,7 +1058,6 @@
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-      /* Default Card Style */
       background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.95) 0%,
@@ -1147,7 +1090,6 @@
         }
       }
 
-      /* Premium Variant - pour la carte Apparence */
       &--premium {
         background: linear-gradient(
           135deg,
@@ -1173,7 +1115,6 @@
         }
       }
 
-      /* Secondary Variant - pour les autres cartes */
       &--secondary {
         background: linear-gradient(
           135deg,
@@ -1182,7 +1123,6 @@
         );
       }
 
-      /* Card Header avec Icône */
       &-header {
         display: flex;
         align-items: center;
@@ -1253,7 +1193,6 @@
         }
       }
 
-      /* Styles pour le PremiumThemeSelector dans les cartes blanches */
       :deep(.premium-theme-selector) {
         .premium-theme-selector__option {
           background: rgba(0, 0, 0, 0.05);
@@ -1281,22 +1220,16 @@
       }
     }
 
-    /* Ciblage direct des WrapperInput dans les formulaires */
     :deep(.WrapperInput) {
-      /* ⬅️ AJOUT :deep() pour tous les WrapperInput */
       .BasicInput {
         border-color: @neutral-300;
         background: @neutral-50;
       }
     }
 
-    /* --- Responsive --- */
-
-    // Tablet (≤ 1160px)
     .respond-tablet({
       &__container {
-        width: auto;
-        max-width: calc(100% - 32px);
+        width: 94%;
         padding: 32px;
       }
 
@@ -1310,14 +1243,14 @@
       }
     });
 
-    // Mobile (≤ 720px)
     .respond-mobile({
       &__cover {
         height: 180px;
       }
 
       &__container {
-        margin: -60px 16px 50px;
+        width: calc(100% - 32px);
+        margin: -60px auto 50px;
         padding: 24px 16px;
       }
 

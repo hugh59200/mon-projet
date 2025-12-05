@@ -4,19 +4,23 @@
     class="language-selector"
     :class="{ 'language-selector--open': isOpen }"
   >
-    <button
-      class="language-selector__trigger"
-      :aria-expanded="isOpen"
-      aria-haspopup="listbox"
-      :title="currentLocaleInfo?.name"
-      @click="toggleDropdown"
+    <BasicTooltip
+      :label="isOpen ? '' : currentLocaleInfo?.name"
+      position="bottom"
     >
-      <BasicIconNext
-        :name="flagIcons[locale]"
-        :size="20"
-        class="language-selector__flag"
-      />
-    </button>
+      <button
+        class="language-selector__trigger language-selector__trigger--ghost"
+        :aria-expanded="isOpen"
+        aria-haspopup="listbox"
+        @click="toggleDropdown"
+      >
+        <BasicIconNext
+          :name="flagIcons[locale]"
+          :size="20"
+          class="language-selector__flag"
+        />
+      </button>
+    </BasicTooltip>
 
     <Transition name="dropdown">
       <div
@@ -117,17 +121,27 @@ function selectLocale(newLocale: SupportedLocale) {
     &:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.12);
-      transform: scale(1.02);
     }
 
     &:active {
-      transform: scale(0.98);
+      opacity: 0.8;
+    }
+
+    // Mode ghost : uniquement l'icône visible
+    &--ghost {
+      background: transparent;
+      border-color: transparent;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: transparent;
+      }
     }
   }
 
   &--open &__trigger {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(var(--primary-500-rgb), 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: transparent;
   }
 
   &__flag {

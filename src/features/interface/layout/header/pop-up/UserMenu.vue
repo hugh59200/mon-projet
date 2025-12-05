@@ -207,27 +207,31 @@
   .user-trigger {
     position: relative;
     cursor: pointer;
-    padding: 4px;
+    padding: 0;
 
     &__avatar {
       width: 36px;
       height: 36px;
-      border-radius: 50%;
-      background: rgba(var(--secondary-800-rgb), 0.8);
-      border: 1px solid rgba(var(--neutral-100-rgb), 0.08);
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
       color: @neutral-200;
-      transition: all 0.3s @ease;
+      transition: all 0.2s @ease;
       position: relative;
       z-index: 1;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
     }
 
     &__badge {
       position: absolute;
-      top: 0;
-      right: 0;
+      top: -4px;
+      right: -4px;
       min-width: 16px;
       height: 16px;
       padding: 0 4px;
@@ -244,25 +248,12 @@
     }
 
     &__glow {
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(var(--primary-500-rgb), 0.2), transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 0;
+      display: none;
     }
 
-    &:hover {
+    &:active {
       .user-trigger__avatar {
-        background: rgba(var(--secondary-700-rgb), 0.9);
-        border-color: rgba(var(--primary-500-rgb), 0.3);
-        color: @neutral-50;
-        transform: scale(1.02);
-      }
-
-      .user-trigger__glow {
-        opacity: 1;
+        opacity: 0.8;
       }
     }
   }

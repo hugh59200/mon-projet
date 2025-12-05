@@ -49,7 +49,6 @@
     </aside>
 
     <main class="auth-form-container">
-      <!-- Header mobile avec logo centré et bouton skip à droite -->
       <div
         v-if="!isDesktop"
         class="mobile-header"
@@ -68,7 +67,6 @@
             <span class="brand-peptides">Peptides</span>
           </div>
         </div>
-        <!-- Bouton skip dans le header mobile -->
         <PremiumButton
           v-if="showSkip"
           type="primary"
@@ -81,7 +79,6 @@
         />
       </div>
 
-      <!-- Bouton skip desktop uniquement -->
       <div
         v-if="showSkip && isDesktop"
         class="skip-container"
@@ -133,9 +130,6 @@
     overflow-x: hidden;
   }
 
-  /* =========================================
-   🎨 SECTION VISUELLE (GAUCHE - DESKTOP)
-   ========================================= */
   .auth-visual {
     width: 45%;
     height: 100vh;
@@ -202,7 +196,6 @@
     }
   }
 
-  /* --- LOGO COMMON --- */
   .logo-text-container {
     display: flex;
     align-items: center;
@@ -286,9 +279,6 @@
     }
   }
 
-  /* =========================================
-   📝 SECTION FORMULAIRE (DROITE + MOBILE)
-   ========================================= */
   .auth-form-container {
     flex: 1;
     display: flex;
@@ -298,7 +288,6 @@
     position: relative;
     padding: 40px 20px;
 
-    /* Fond blanc avec points */
     background-color: #ffffff;
     background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
     background-size: 24px 24px;
@@ -311,7 +300,6 @@
     padding: 20px;
   }
 
-  /* 📱 MOBILE HEADER REVAMPED */
   .mobile-header {
     position: absolute;
     top: 0;
@@ -335,34 +323,26 @@
     gap: 10px;
     cursor: pointer;
 
-    /* Suppression de la pillule blanche, on assume le fond */
-
     .mobile-logo-icon {
       color: var(--primary-600) !important;
-      filter: drop-shadow(
-        0 4px 10px rgba(var(--primary-500-rgb), 0.3)
-      ); /* Petit glow sur l'icône */
+      filter: drop-shadow(0 4px 10px rgba(var(--primary-500-rgb), 0.3));
     }
 
     .mobile-text-size {
-      font-size: 22px; /* Plus gros sur mobile */
+      font-size: 22px;
     }
 
-    /* ✅ FORCE LA COULEUR FONCÉE */
     .brand-fast.text-dark {
-      color: #1e293b !important; /* Slate 800 - Très lisible */
+      color: #1e293b !important;
     }
-    /* .brand-peptides garde sa couleur primary définie plus haut */
   }
 
-  /* Bouton Skip */
   .skip-container {
     position: absolute;
     top: 30px;
     right: 30px;
     z-index: 10;
 
-    /* Désactiver l'effet de grossissement */
     :deep(.pbtn) {
       &:hover {
         transform: none !important;
@@ -411,7 +391,6 @@
     }
   }
 
-  /* Transitions */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -425,12 +404,10 @@
     transform: translateY(-10px) scale(0.98);
   }
 
-  /* --- RESPONSIVE - Tablet (≤ 1160px) --- */
   .respond-tablet({
     .auth-form-container {
       padding: 60px 20px 20px;
 
-      /* Fond coloré quand auth-visual disparaît */
       background-color: #f8fafc;
       background-image:
         linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.1) 0%, transparent 50%),
@@ -440,7 +417,6 @@
     }
   });
 
-  /* --- RESPONSIVE - Mobile (≤ 720px) --- */
   .respond-mobile({
     .auth-form-container {
       padding: 56px 16px 16px;

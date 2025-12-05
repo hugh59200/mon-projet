@@ -1,5 +1,4 @@
 <template>
-  <!-- Error : affiche le layout auth complet (le loading est géré par AppLoaderOverlay) -->
   <div
     v-if="state === 'error'"
     class="auth"
@@ -49,14 +48,12 @@
   onMounted(async () => {
     loader.show(t('auth.callback.verifying'))
 
-    // 1️⃣ Cas OAuth (Google, etc.) : code dans l'URL
     const code = route.query.code as string | undefined
     if (code) {
       const { user } = await getSession()
       if (user) return handleSuccess(user)
     }
 
-    // 2️⃣ Cas Email Links (Signup / Reset Password) : token_hash + type
     const token = (route.query.token_hash as string) || (route.query.token as string)
     const type = route.query.type as any
 
@@ -79,16 +76,13 @@
       if (user) return handleSuccess(user)
     }
 
-    // 3️⃣ Cas Fallback : Déjà connecté ?
     const { user } = await getSession()
     if (user) return handleSuccess(user)
 
-    // ❌ Échec
     fail(t('auth.callback.noSession'))
   })
 
   onUnmounted(() => {
-    // Délai pour laisser la nouvelle page se rendre avant de cacher le loader
     setTimeout(() => loader.hide(), 150)
   })
 
@@ -96,14 +90,11 @@
     auth.user = user
     await auth.fetchProfile()
 
-    // Redirection immédiate basée sur le rôle
     const storedRedirect = sessionStorage.getItem('redirectAfterOAuth')
     const userRole = auth.profile?.role || 'user'
     const redirectUrl = getPostLoginRedirect(userRole, storedRedirect || null)
     sessionStorage.removeItem('redirectAfterOAuth')
 
-    // Ne pas cacher le loader ici - il restera visible pendant la navigation
-    // et sera caché par onUnmounted ou par la page de destination
     router.replace(redirectUrl)
   }
 

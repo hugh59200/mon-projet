@@ -1216,6 +1216,53 @@ export default {
   },
 
   // ============================================
+  // NEWSLETTER
+  // ============================================
+  newsletter: {
+    badge: 'Exclusive newsletter',
+    title: 'Stay informed',
+    description: 'Get early access to new products, scientific news and exclusive offers.',
+    placeholder: 'Your email address',
+    namePlaceholder: 'Your first name (optional)',
+    cta: 'Subscribe for free',
+    privacy: 'Your data stays confidential. Unsubscribe in 1 click.',
+    features: {
+      exclusive: 'Exclusive offers for subscribers only',
+      research: 'Scientific news and studies',
+      promotions: 'Promo codes and discounts',
+      unsubscribe: 'Unsubscribe in 1 click',
+    },
+    success: {
+      title: 'Subscription confirmed!',
+      description: 'Welcome! You will soon receive our latest news.',
+    },
+    errors: {
+      required: 'Please enter your email address',
+      invalid: 'Invalid email address',
+      alreadySubscribed: 'This email is already subscribed',
+      generic: 'An error occurred, please try again',
+    },
+    unsubscribe: {
+      title: 'Unsubscribe',
+      description: "Don't want to receive our emails anymore?",
+      confirm: 'Confirm unsubscription',
+      success: 'You have been successfully unsubscribed',
+    },
+    preferences: {
+      title: 'Newsletter preferences',
+      frequency: 'Frequency',
+      weekly: 'Weekly',
+      biweekly: 'Bi-weekly',
+      monthly: 'Monthly',
+      topics: 'Topics',
+      products: 'New products',
+      research: 'Scientific news',
+      promotions: 'Promotions and offers',
+      news: 'Shop news',
+    },
+  },
+
+  // ============================================
   // ADMIN
   // ============================================
   admin: {

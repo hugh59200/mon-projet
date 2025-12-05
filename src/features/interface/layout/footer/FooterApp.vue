@@ -69,32 +69,11 @@
         </nav>
 
         <!-- Newsletter -->
-        <div class="footer__newsletter">
-          <div class="footer__newsletter-header">
-            <BasicIconNext name="Mail" :size="20" />
-            <div>
-              <h4 class="footer__newsletter-title">{{ t('footer.newsletter.title') }}</h4>
-              <p class="footer__newsletter-desc">{{ t('footer.newsletter.subtitle') }}</p>
-            </div>
-          </div>
-          <div class="footer__newsletter-form">
-            <BasicInput
-              :placeholder="t('footer.newsletter.placeholder')"
-              icon-name="Mail"
-              icon-state="iconLeft"
-              autocomplete="email"
-              size="medium"
-              class="footer__newsletter-input"
-            />
-            <PremiumButton
-              type="primary"
-              variant="solid"
-              size="sm"
-              icon-left="ArrowRight"
-              class="footer__newsletter-btn"
-            />
-          </div>
-        </div>
+        <NewsletterSignup
+          variant="compact"
+          source="footer"
+          class="footer__newsletter"
+        />
       </div>
 
       <!-- Disclaimer compact -->
@@ -169,6 +148,7 @@
 
 <script setup lang="ts">
   import { useLanguage } from '@/composables/useLanguage'
+  import NewsletterSignup from '@/features/newsletter/components/NewsletterSignup.vue'
 
   const { t, currentLocaleInfo } = useLanguage()
 </script>

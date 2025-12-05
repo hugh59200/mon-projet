@@ -210,7 +210,6 @@ const productSchema = computed(() => {
     },
   }
 
-  // Ajoute les propriétés additionnelles si présentes
   if (additionalProperties.value.length > 0) {
     schema.additionalProperty = additionalProperties.value
   }

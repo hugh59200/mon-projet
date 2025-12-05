@@ -6,7 +6,6 @@
     </p>
 
     <form class="auth__form" @submit.prevent="submit">
-      <!-- Email avec validation visuelle -->
       <div class="auth__field">
         <WrapperInput
           v-model.trim="fields.email.value.value"
@@ -29,7 +28,6 @@
         </WrapperInput>
       </div>
 
-      <!-- Password avec indicateur de force -->
       <div class="auth__field">
         <WrapperInputPassword
           v-model="fields.password.value.value"
@@ -46,7 +44,6 @@
           @blur="fields.password.onBlur"
         />
 
-        <!-- Indicateur de force premium -->
         <PasswordStrengthIndicator
           :model-value="fields.password.value.value"
           :min-strength="2"
@@ -54,7 +51,6 @@
         />
       </div>
 
-      <!-- Confirmation mot de passe -->
       <div class="auth__field">
         <WrapperInputPassword
           v-model="fields.confirmPassword.value.value"
@@ -97,7 +93,6 @@
         :glow="!!(captchaToken && canSubmit && !loading)"
       />
 
-      <!-- Error feedback premium -->
       <div class="auth__feedback">
         <Transition name="slide-fade" mode="out-in">
           <div v-if="error" class="auth__error-box">
@@ -132,7 +127,6 @@
   const auth = useAuthStore()
   const router = useRouter()
 
-  // Formulaire avec validation premium
   const { fields, canSubmit, validate } = useAuthForm({
     mode: 'register',
     minPasswordStrength: 2,
@@ -147,7 +141,6 @@
   const loading = ref(false)
   const error = ref('')
 
-  // Captcha
   const captchaToken = ref('')
   const turnstileWidget = ref()
 
@@ -166,11 +159,9 @@
   }
 
   async function submit() {
-    // 1. Validation formulaire
     const isValid = await validate()
     if (!isValid) return
 
-    // 2. Sécurité Bot
     if (!captchaToken.value) {
       error.value = t('auth.errors.captchaRequired')
       return
@@ -178,7 +169,6 @@
 
     loading.value = true
 
-    // 3. Appel au store avec la locale courante
     const success = await auth.signUp(
       fields.email.value.value,
       fields.password.value.value,
@@ -224,7 +214,6 @@
     }
   }
 
-  // Animations premium
   .slide-fade-enter-active,
   .slide-fade-leave-active {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
