@@ -91,8 +91,8 @@
       widgetId.value = window.turnstile.render(container, {
         sitekey: SITE_KEY,
         theme: 'light',
-        size: 'flexible',
-        appearance: 'interaction-only',
+        size: 'normal',
+        appearance: 'always',
         language: 'fr',
         callback: (token: string) => {
           error.value = false
@@ -143,7 +143,6 @@
   onMounted(async () => {
     // Mode dev/test : Auto-validation du CAPTCHA
     if (isCaptchaDisabled()) {
-      console.info('ℹ️ CAPTCHA désactivé (mode dev/test)')
       setTimeout(() => {
         if (isMounted.value) {
           emit('verify', 'dev-captcha-bypass-token')
