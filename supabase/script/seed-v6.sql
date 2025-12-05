@@ -1,5 +1,5 @@
 -- =========================================
--- 🚀 SEED DATA V6.1 - AVEC SUPPORT I18N + SEO/GEO + PROMO
+-- 🚀 SEED DATA V6.2 - AVEC SUPPORT I18N + SEO/GEO + PROMO + REVIEWS
 -- =========================================
 -- Ce script inclut :
 -- 1. Migration pour les colonnes i18n (JSONB)
@@ -7,6 +7,8 @@
 -- 3. Données produits avec traductions EN + données scientifiques
 -- 4. Données news et topics
 -- 5. Configuration codes promo automatiques (V5.3)
+-- 6. Système de reviews avec RLS policies (V6.2)
+-- 7. Profil admin "Paloma" avec avatar
 -- =========================================
 
 -- ============================
@@ -204,17 +206,18 @@ END $$;
 -- ============================
 -- 👤 SEED — PROFILES
 -- ============================
-INSERT INTO public.profiles (id, email, full_name, role, address, zip, city)
+INSERT INTO public.profiles (id, email, full_name, role, address, zip, city, avatar_url)
 VALUES
-  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'contact@fast-peptides.com', 'Hugo Bogrand', 'admin', '11 rue du Général Leclerc', '59126', 'Linselles'),
-  ('b2c3d4e5-f6a7-8901-bcde-f23456789012', 'h.bogrand@yopmail.com', 'Hugo Test', 'user', '123 rue de Test', '75001', 'Paris')
+  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'contact@fast-peptides.com', 'Paloma', 'admin', '5850 Eubank Blvd NE, Suite B13', '87111', 'Albuquerque', 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/avatars/admin-paloma.jpg'),
+  ('b2c3d4e5-f6a7-8901-bcde-f23456789012', 'h.bogrand@yopmail.com', 'Hugo Test', 'user', '123 rue de Test', '75001', 'Paris', NULL)
 ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   full_name = EXCLUDED.full_name,
   role = EXCLUDED.role,
   address = EXCLUDED.address,
   zip = EXCLUDED.zip,
-  city = EXCLUDED.city;
+  city = EXCLUDED.city,
+  avatar_url = EXCLUDED.avatar_url;
 
 -- ============================
 -- 📦 SEED — PRODUCTS AVEC I18N + SEO
@@ -1226,6 +1229,126 @@ ON CONFLICT (id) DO UPDATE SET
   valid_until = EXCLUDED.valid_until,
   active = EXCLUDED.active;
 
+-- ============================
+-- ⭐ MIGRATION — REVIEWS
+-- ============================
+
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  author_name VARCHAR(100) NOT NULL,
+  author_type VARCHAR(20) DEFAULT 'standard' CHECK (author_type IN ('standard', 'premium', 'pro', 'verified')),
+  author_title VARCHAR(100),
+  author_institution VARCHAR(200),
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title VARCHAR(200),
+  content TEXT,
+  rating_quality INTEGER CHECK (rating_quality >= 1 AND rating_quality <= 5),
+  rating_purity INTEGER CHECK (rating_purity >= 1 AND rating_purity <= 5),
+  rating_shipping INTEGER CHECK (rating_shipping >= 1 AND rating_shipping <= 5),
+  rating_value INTEGER CHECK (rating_value >= 1 AND rating_value <= 5),
+  is_verified_purchase BOOLEAN DEFAULT false,
+  is_approved BOOLEAN DEFAULT false,
+  is_featured BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_approved ON reviews(is_approved) WHERE is_approved = true;
+
+CREATE OR REPLACE VIEW product_reviews_summary AS
+SELECT
+  product_id,
+  COUNT(*) as review_count,
+  ROUND(AVG(rating)::numeric, 1) as average_rating,
+  ROUND(AVG(rating_quality)::numeric, 1) as avg_quality,
+  ROUND(AVG(rating_purity)::numeric, 1) as avg_purity,
+  ROUND(AVG(rating_shipping)::numeric, 1) as avg_shipping,
+  ROUND(AVG(rating_value)::numeric, 1) as avg_value,
+  COUNT(*) FILTER (WHERE rating = 5) as five_star_count,
+  COUNT(*) FILTER (WHERE rating = 4) as four_star_count,
+  COUNT(*) FILTER (WHERE rating = 3) as three_star_count,
+  COUNT(*) FILTER (WHERE rating = 2) as two_star_count,
+  COUNT(*) FILTER (WHERE rating = 1) as one_star_count
+FROM reviews
+WHERE is_approved = true
+GROUP BY product_id;
+
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON reviews;
+CREATE POLICY "Reviews are viewable by everyone"
+  ON reviews FOR SELECT
+  USING (is_approved = true);
+
+DROP POLICY IF EXISTS "Users can create reviews" ON reviews;
+CREATE POLICY "Users can create reviews"
+  ON reviews FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own pending reviews" ON reviews;
+CREATE POLICY "Users can update own pending reviews"
+  ON reviews FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id AND is_approved = false);
+
+DROP POLICY IF EXISTS "Users can delete own reviews" ON reviews;
+CREATE POLICY "Users can delete own reviews"
+  ON reviews FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE OR REPLACE FUNCTION update_reviews_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_reviews_updated_at ON reviews;
+CREATE TRIGGER trigger_reviews_updated_at
+  BEFORE UPDATE ON reviews
+  FOR EACH ROW
+  EXECUTE FUNCTION update_reviews_updated_at();
+
+-- ============================
+-- ⭐ SEED — SAMPLE REVIEWS
+-- ============================
+-- Avis de démonstration pour le SEO (aggregateRating)
+
+DO $$
+DECLARE
+  v_product_id uuid;
+BEGIN
+  -- Récupérer l'ID du premier produit (BPC-157)
+  SELECT id INTO v_product_id FROM products WHERE name = 'BPC-157' LIMIT 1;
+
+  IF v_product_id IS NOT NULL THEN
+    INSERT INTO reviews (product_id, author_name, author_type, author_title, author_institution, rating, title, content, rating_quality, rating_purity, rating_shipping, rating_value, is_verified_purchase, is_approved, is_featured, created_at)
+    VALUES
+      (v_product_id, 'Dr. Marie Laurent', 'pro', 'PhD Researcher', 'CNRS Lyon', 5, 'Excellent peptide pour nos recherches', 'Nous utilisons ce BPC-157 pour nos études sur la régénération tissulaire. La pureté est excellente et les résultats sont très reproductibles. Livraison rapide et COA conforme.', 5, 5, 5, 5, true, true, true, NOW() - INTERVAL '45 days'),
+      (v_product_id, 'Thomas B.', 'verified', NULL, NULL, 5, 'Qualité conforme aux attentes', 'Produit reçu rapidement, bien emballé. Le certificat d''analyse confirme la pureté annoncée. Je recommande.', 5, 5, 4, 4, true, true, false, NOW() - INTERVAL '30 days'),
+      (v_product_id, 'Sophie M.', 'premium', 'Lab Technician', 'Université Paris-Saclay', 4, 'Bon produit, service client réactif', 'Bonne qualité globale. J''ai eu une question sur la reconstitution et le support a répondu très rapidement.', 4, 5, 5, 4, true, true, false, NOW() - INTERVAL '20 days'),
+      (v_product_id, 'Jean-Pierre D.', 'standard', NULL, NULL, 5, 'Parfait', 'Exactement ce qu''il me fallait pour mes travaux de recherche. Livraison express impeccable.', 5, 5, 5, 5, false, true, false, NOW() - INTERVAL '10 days')
+    ON CONFLICT DO NOTHING;
+  END IF;
+
+  -- Récupérer l'ID du TB-500
+  SELECT id INTO v_product_id FROM products WHERE name = 'TB-500' LIMIT 1;
+
+  IF v_product_id IS NOT NULL THEN
+    INSERT INTO reviews (product_id, author_name, author_type, author_title, rating, title, content, rating_quality, rating_purity, rating_shipping, is_verified_purchase, is_approved, is_featured, created_at)
+    VALUES
+      (v_product_id, 'Prof. Alain Dubois', 'pro', 'Director of Research', 5, 'Qualité pharmaceutique', 'Nous avons testé plusieurs fournisseurs et Atlas Lab Solutions offre la meilleure qualité/prix. Le TB-500 est parfaitement lyophilisé.', 5, 5, 5, true, true, true, NOW() - INTERVAL '25 days'),
+      (v_product_id, 'Claire R.', 'verified', NULL, 4, 'Très satisfaite', 'Premier achat sur ce site, je suis agréablement surprise par la qualité et la rapidité.', 4, 4, 5, true, true, false, NOW() - INTERVAL '15 days')
+    ON CONFLICT DO NOTHING;
+  END IF;
+END $$;
+
 -- =========================================
--- ✅ FIN DU SEED V6.1
+-- ✅ FIN DU SEED V6.2
 -- =========================================
