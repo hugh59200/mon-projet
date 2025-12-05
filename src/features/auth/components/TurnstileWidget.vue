@@ -1,5 +1,13 @@
 <template>
   <div class="turnstile-wrapper">
+    <div class="turnstile-badge">
+      <BasicIconNext
+        name="ShieldCheck"
+        :size="14"
+        class="turnstile-icon"
+      />
+      <span class="turnstile-label">Protection anti-bot</span>
+    </div>
     <div
       ref="widgetContainer"
       class="cf-turnstile"
@@ -14,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { onMounted, onUnmounted, ref } from 'vue'
 
   // Props & Emits
@@ -35,7 +44,7 @@
   const isCaptchaDisabled = () => {
     return (
       import.meta.env.VITE_DISABLE_CAPTCHA === 'true' ||
-      import.meta.env.DEV || // Mode dev Vite
+      // import.meta.env.DEV || // Désactivé temporairement pour voir le captcha en dev
       typeof (window as any).Cypress !== 'undefined' // Tests Cypress
     )
   }
@@ -52,6 +61,7 @@
             'error-callback': () => void
             'expired-callback': () => void
             theme?: 'light' | 'dark' | 'auto'
+            size?: 'normal' | 'compact'
           },
         ) => string
         remove: (widgetId: string) => void
@@ -77,7 +87,8 @@
 
       widgetId.value = window.turnstile.render(widgetContainer.value, {
         sitekey: SITE_KEY,
-        theme: 'auto',
+        theme: 'light',
+        size: 'compact',
         callback: (token: string) => {
           error.value = false
           emit('verify', token)
@@ -138,19 +149,49 @@
   })
 </script>
 
-<style scoped>
+<style scoped lang="less">
   .turnstile-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 1rem 0;
-    min-height: 65px; /* Évite que le formulaire saute quand le widget charge */
+    gap: 6px;
+    margin: 4px 0;
+  }
+
+  .turnstile-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(var(--primary-500-rgb), 0.06);
+    border-radius: 20px;
+  }
+
+  .turnstile-icon {
+    color: var(--primary-500);
+  }
+
+  .turnstile-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* Override du widget Cloudflare pour le rendre plus discret */
+  :deep(.cf-turnstile) {
+    transform: scale(0.9);
+    transform-origin: center;
+
+    iframe {
+      border-radius: 8px !important;
+    }
   }
 
   .error-text {
     color: @danger-500;
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    margin: 0;
   }
 </style>

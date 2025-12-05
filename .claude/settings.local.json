@@ -9,7 +9,8 @@
       "Bash(node scripts/convert-og-image.cjs:*)",
       "Bash(cat:*)",
       "Bash(npx vite build)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b21zYmF3dGhsa3RhcG10bXF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDUyMjY0NSwiZXhwIjoyMDc2MDk4NjQ1fQ.L-wn7W2MLZM9mFIVLZendBYhWsCw3WWt3adXfWZkwvc\" npm run prerender:*)"
     ],
     "deny": [],
     "ask": []

@@ -34,7 +34,7 @@
     max-width: 400px; /* Largeur fixe pour le formulaire lui-même */
     display: flex;
     flex-direction: column;
-    gap: 24px; /* Espacement généreux entre les champs */
+    gap: 18px; /* Espacement compact entre les champs */
     background: transparent; /* On laisse le fond du layout gérer */
     animation: fadeInUp 0.4s ease forwards;
   }
@@ -62,9 +62,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 12px 0;
+    margin: 4px 0;
     color: #94a3b8; /* Slate 400 */
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase; /* Plus moderne */
     letter-spacing: 0.5px;
@@ -88,11 +88,11 @@
 
   /* LIENS DE BAS DE PAGE */
   &__links {
-    margin-top: 20px; /* Espace compact avant les liens */
+    margin-top: 12px; /* Espace minimal avant les liens */
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 0.875rem;
+    gap: 6px;
+    font-size: 0.85rem;
     color: #64748b;
 
     a {
@@ -115,31 +115,31 @@
 .respond-mobile({
   .auth {
     &__title {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
+      font-size: 1.4rem;
+      margin-bottom: 6px;
     }
 
     &__subtitle {
-      font-size: 0.9rem;
-      margin-bottom: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
       max-width: 100%;
     }
 
     &__form {
-      gap: 20px;
+      gap: 14px;
     }
 
     &__divider {
-      margin: 10px 0;
+      margin: 2px 0;
     }
 
     &__providers {
-      gap: 20px;
+      gap: 16px;
     }
 
     &__links {
-      margin-top: 16px;
-      gap: 6px;
+      margin-top: 10px;
+      gap: 4px;
     }
   }
 });

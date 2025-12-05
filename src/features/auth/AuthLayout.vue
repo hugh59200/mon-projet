@@ -71,10 +71,10 @@
         <!-- Bouton skip dans le header mobile -->
         <PremiumButton
           v-if="showSkip"
-          type="secondary"
-          variant="ghost"
-          size="xs"
-          label="Passer"
+          type="primary"
+          variant="outline"
+          size="sm"
+          label="Voir le catalogue"
           icon-right="ArrowRight"
           class="mobile-skip-btn"
           @click="$router.push('/')"
@@ -87,10 +87,10 @@
         class="skip-container"
       >
         <PremiumButton
-          type="secondary"
-          variant="ghost"
-          size="sm"
-          label="Continuer sans compte"
+          type="primary"
+          variant="outline"
+          size="md"
+          label="Voir le catalogue"
           icon-right="ArrowRight"
           @click="$router.push('/')"
         />
@@ -296,17 +296,12 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    background: #ffffff;
     padding: 40px 20px;
 
-    /* ✅ FOND AMÉLIORÉ : Points + Glow en haut */
-    background-image:
-      radial-gradient(circle at 50% 0%, rgba(var(--primary-500-rgb), 0.08), transparent 40%),
-      radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      24px 24px;
-    background-repeat: no-repeat, repeat;
+    /* Fond blanc avec points */
+    background-color: #ffffff;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
   .auth-form-wrapper {
@@ -366,6 +361,13 @@
     top: 30px;
     right: 30px;
     z-index: 10;
+
+    /* Désactiver l'effet de grossissement */
+    :deep(.pbtn) {
+      &:hover {
+        transform: none !important;
+      }
+    }
   }
 
   .btn-skip {
@@ -388,7 +390,6 @@
       color: var(--primary-600);
       background: @white;
       box-shadow: 0 6px 12px -2px rgba(var(--primary-500-rgb), 0.15);
-      transform: translateY(-2px);
     }
 
     svg {
@@ -427,28 +428,45 @@
   /* --- RESPONSIVE - Tablet (≤ 1160px) --- */
   .respond-tablet({
     .auth-form-container {
-      padding: 70px 20px 30px;
+      padding: 60px 20px 20px;
+
+      /* Fond coloré quand auth-visual disparaît */
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.1) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(var(--primary-500-rgb), 0.06) 0%, transparent 50%),
+        radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px;
     }
   });
 
   /* --- RESPONSIVE - Mobile (≤ 720px) --- */
   .respond-mobile({
     .auth-form-container {
-      padding: 60px 16px 24px;
+      padding: 56px 16px 16px;
     }
 
     .auth-form-wrapper {
-      padding: 12px;
+      padding: 8px;
       max-width: 100%;
     }
 
     .mobile-header {
-      padding: 12px 16px;
+      padding: 10px 12px;
     }
 
     .mobile-logo-wrapper {
       .mobile-text-size {
-        font-size: 18px;
+        font-size: 16px;
+      }
+    }
+
+    .mobile-skip-btn {
+      :deep(.pbtn__label) {
+        font-size: 0.8rem;
+      }
+      &:hover {
+        transform: none !important;
       }
     }
   });

@@ -75,6 +75,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 2500,
     ...config.APP,
     cssMinify: false,
+    target: 'esnext',
   },
   server: {
     port: 5278,
