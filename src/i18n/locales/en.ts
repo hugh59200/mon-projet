@@ -425,7 +425,7 @@ export default {
       confirmPassword: 'Enter your password again',
     },
     placeholders: {
-      email: 'name@company.com',
+      email: "name{'@'}company.com",
       password: '••••••••',
     },
   },
@@ -641,7 +641,7 @@ export default {
         relayZip: 'To find nearby pickup points',
       },
       placeholders: {
-        email: 'your@email.com',
+        email: "your{'@'}email.com",
         fullName: 'First Last',
         address: 'Street number and name',
         addressAuto: 'Start typing your address...',
@@ -833,7 +833,7 @@ export default {
     },
     placeholders: {
       orderNumber: 'FP-2025-000123',
-      email: 'example@email.com',
+      email: "example{'@'}email.com",
     },
   },
 

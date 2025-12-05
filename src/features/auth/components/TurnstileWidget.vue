@@ -1,7 +1,7 @@
 <template>
   <div class="turnstile-wrapper">
     <div
-      ref="widgetContainer"
+      :id="containerId"
       class="cf-turnstile"
     ></div>
     <p
@@ -23,24 +23,25 @@
     (e: 'error'): void
   }>()
 
-  const widgetContainer = ref<HTMLElement | null>(null)
+  // ID unique pour éviter "already rendered in this container" lors du HMR
+  const containerId = `turnstile-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
   const widgetId = ref<string | null>(null)
   const error = ref(false)
+  const isMounted = ref(true)
 
   // Récupération de la clé publique depuis le .env
-  const SITE_KEY = import.meta.env.VITE_CLOUDFLARE_SITE_KEY
+  const SITE_KEY = import.meta.env.VITE_CLOUDFLARE_SITE_KEY as string | undefined
 
   // Détection automatique du mode dev/test pour désactiver le CAPTCHA
-  // Contrôlé via VITE_DISABLE_CAPTCHA=true dans .env.local
   const isCaptchaDisabled = () => {
     return (
       import.meta.env.VITE_DISABLE_CAPTCHA === 'true' ||
-      // import.meta.env.DEV || // Désactivé temporairement pour voir le captcha en dev
-      typeof (window as any).Cypress !== 'undefined' // Tests Cypress
+      import.meta.env.DEV || // Auto-désactivé en dev
+      typeof (window as any).Cypress !== 'undefined'
     )
   }
 
-  // Déclaration globale pour TypeScript (évite les erreurs de linter)
+  // Déclaration globale pour TypeScript
   declare global {
     interface Window {
       turnstile?: {
@@ -59,34 +60,39 @@
         ) => string
         remove: (widgetId: string) => void
         reset: (widgetId: string) => void
+        isExpired: (widgetId: string) => boolean
       }
-      onloadTurnstileCallback?: () => void
     }
   }
 
   const renderWidget = () => {
-    if (!window.turnstile || !widgetContainer.value) return
+    if (!isMounted.value) return
 
-    // Nettoyage préventif du widget précédent
+    const container = document.getElementById(containerId)
+    if (!window.turnstile || !container) return
+
+    // Nettoyage préventif
     if (widgetId.value) {
-      window.turnstile.remove(widgetId.value)
+      try {
+        window.turnstile.remove(widgetId.value)
+      } catch {
+        // Ignore
+      }
       widgetId.value = null
     }
 
-    // Nettoyage du conteneur (fix HMR double-render)
-    widgetContainer.value.innerHTML = ''
+    // Vérifier que le sitekey est valide
+    if (!SITE_KEY || typeof SITE_KEY !== 'string') {
+      console.error('[Turnstile] VITE_CLOUDFLARE_SITE_KEY manquant ou invalide')
+      return
+    }
 
     try {
-      if (!SITE_KEY) {
-        console.error('VITE_CLOUDFLARE_SITE_KEY est manquant dans le .env')
-        return
-      }
-
-      widgetId.value = window.turnstile.render(widgetContainer.value, {
+      widgetId.value = window.turnstile.render(container, {
         sitekey: SITE_KEY,
         theme: 'light',
-        size: 'flexible', // S'adapte à la largeur du conteneur
-        appearance: 'interaction-only', // Ne s'affiche que si interaction nécessaire
+        size: 'flexible',
+        appearance: 'interaction-only',
         language: 'fr',
         callback: (token: string) => {
           error.value = false
@@ -101,44 +107,74 @@
         },
       })
     } catch (e) {
-      console.error('Erreur chargement Turnstile:', e)
+      console.error('[Turnstile] Erreur rendu:', e)
     }
   }
 
-  onMounted(() => {
+  const loadScript = (): Promise<void> => {
+    return new Promise((resolve) => {
+      // Script déjà chargé
+      if (window.turnstile) {
+        resolve()
+        return
+      }
+
+      // Script en cours de chargement
+      const existing = document.querySelector(
+        'script[src*="challenges.cloudflare.com/turnstile"]'
+      ) as HTMLScriptElement | null
+
+      if (existing) {
+        existing.addEventListener('load', () => resolve())
+        // Si déjà chargé
+        if (window.turnstile) resolve()
+        return
+      }
+
+      // Charger le script (sans callback global pour éviter les conflits)
+      const script = document.createElement('script')
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.onload = () => resolve()
+      document.head.appendChild(script)
+    })
+  }
+
+  onMounted(async () => {
     // Mode dev/test : Auto-validation du CAPTCHA
     if (isCaptchaDisabled()) {
-      if (import.meta.env.DEV) {
-        console.info('ℹ️ CAPTCHA désactivé en mode développement')
-      }
-      // Émet automatiquement un token factice après un court délai
+      console.info('ℹ️ CAPTCHA désactivé (mode dev/test)')
       setTimeout(() => {
-        emit('verify', 'dev-captcha-bypass-token')
+        if (isMounted.value) {
+          emit('verify', 'dev-captcha-bypass-token')
+        }
       }, 100)
       return
     }
 
-    // Chargement dynamique du script Cloudflare s'il n'est pas là
-    if (window.turnstile) {
-      renderWidget()
-    } else {
-      window.onloadTurnstileCallback = renderWidget
-      const script = document.createElement('script')
-      script.src =
-        'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback'
-      script.async = true
-      script.defer = true
-      document.head.appendChild(script)
-    }
+    // Charger le script et rendre le widget
+    await loadScript()
+
+    // Attendre que le DOM soit prêt
+    requestAnimationFrame(() => {
+      if (isMounted.value) {
+        renderWidget()
+      }
+    })
   })
 
   onUnmounted(() => {
+    isMounted.value = false
     if (window.turnstile && widgetId.value) {
-      window.turnstile.remove(widgetId.value)
+      try {
+        window.turnstile.remove(widgetId.value)
+      } catch {
+        // Ignore
+      }
     }
   })
 
-  // Exposer une méthode reset pour le parent (en cas d'erreur de login)
+  // Exposer une méthode reset pour le parent
   defineExpose({
     reset: () => {
       if (window.turnstile && widgetId.value) {
@@ -156,12 +192,11 @@
     margin: 2px 0;
   }
 
-  /* Override du widget Cloudflare pour le rendre plus discret */
   .cf-turnstile {
     max-width: 280px;
     transform: scale(0.85);
     transform-origin: center;
-    margin: -4px 0; /* Compense le scale */
+    margin: -4px 0;
 
     :deep(iframe) {
       border-radius: 10px !important;
