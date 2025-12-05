@@ -521,16 +521,30 @@
       .newsletter-signup__form {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
       }
 
       .newsletter-signup__input-wrapper {
-        flex: 1;
+        flex: 0 1 200px;
         min-width: 0;
       }
 
       .newsletter-signup__input {
         width: 100%;
+
+        // Style l'input natif transparent
+        input {
+          background: transparent;
+          border: none;
+          color: @white;
+          font-size: 13px;
+          width: 100%;
+          outline: none;
+
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+          }
+        }
       }
 
       .newsletter-signup__btn {
@@ -546,6 +560,11 @@
         .newsletter-signup__form {
           flex-direction: column;
           gap: 10px;
+        }
+
+        .newsletter-signup__input-wrapper {
+          flex: 1;
+          width: 100%;
         }
 
         .newsletter-signup__btn {
