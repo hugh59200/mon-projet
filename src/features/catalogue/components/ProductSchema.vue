@@ -1,53 +1,26 @@
-<template>
-  <!-- Composant headless - aucun rendu visuel -->
-</template>
+<template></template>
 
 <script setup lang="ts">
-/**
- * ProductSchema.vue
- * Composant headless pour l'injection de données structurées JSON-LD (Schema.org)
- *
- * Stratégie GEO (Generative Engine Optimization):
- * - Signale explicitement aux IA que les produits sont des réactifs de laboratoire
- * - Ajoute "Research Use Only (RUO)" à la description
- * - Inclut des identifiants scientifiques (CAS Number, pureté HPLC)
- * - Cible l'audience "Researchers" pour éviter toute confusion avec des médicaments
- */
-
 import { useHead } from '@vueuse/head'
 import { computed, toRefs } from 'vue'
 import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo'
 
-// ============================================
-// PROPS
-// ============================================
 export interface ProductSchemaProps {
-  /** Nom du produit (ex: "BPC-157 5mg") */
   name: string
-  /** Description du produit */
   description: string
-  /** Prix en nombre */
   price: number
-  /** Devise (default: EUR) */
   currency?: string
-  /** SKU / Référence produit */
   sku: string
-  /** URL de l'image produit */
   image: string
-  /** Disponibilité en stock */
   inStock: boolean
-  /** Pureté (ex: "≥99%") */
   purity?: string
-  /** Numéro CAS - crucial pour la crédibilité scientifique */
   casNumber?: string
-  /** Séquence d'acides aminés */
   sequence?: string
-  /** URL de la page produit */
   productUrl?: string
-  /** Nom de la marque */
   brand?: string
-  /** Catégorie du produit */
   category?: string
+  averageRating?: number
+  reviewCount?: number
 }
 
 const props = withDefaults(defineProps<ProductSchemaProps>(), {
@@ -69,20 +42,14 @@ const {
   productUrl,
   brand,
   category,
+  averageRating,
+  reviewCount,
 } = toRefs(props)
 
-// ============================================
-// COMPUTED: JSON-LD SCHEMA
-// ============================================
-
-/**
- * Construit la description enrichie avec mention RUO
- */
 const enrichedDescription = computed(() => {
   const rouPrefix = 'Research Use Only (RUO) - '
   const baseDesc = description.value || ''
 
-  // Évite de dupliquer si déjà présent
   if (baseDesc.toLowerCase().includes('research use only')) {
     return baseDesc
   }
@@ -90,9 +57,6 @@ const enrichedDescription = computed(() => {
   return `${rouPrefix}${baseDesc}`
 })
 
-/**
- * Génère les propriétés additionnelles (pureté, séquence)
- */
 const additionalProperties = computed(() => {
   const properties: Array<{
     '@type': 'PropertyValue'
@@ -101,7 +65,6 @@ const additionalProperties = computed(() => {
     unitText?: string
   }> = []
 
-  // Pureté HPLC
   if (purity?.value) {
     properties.push({
       '@type': 'PropertyValue',
@@ -111,7 +74,6 @@ const additionalProperties = computed(() => {
     })
   }
 
-  // Séquence d'acides aminés
   if (sequence?.value) {
     properties.push({
       '@type': 'PropertyValue',
@@ -120,7 +82,6 @@ const additionalProperties = computed(() => {
     })
   }
 
-  // Catégorie scientifique
   if (category?.value) {
     properties.push({
       '@type': 'PropertyValue',
@@ -129,14 +90,12 @@ const additionalProperties = computed(() => {
     })
   }
 
-  // Type de produit (toujours présent pour GEO)
   properties.push({
     '@type': 'PropertyValue',
     name: 'Product Type',
     value: 'Research Peptide',
   })
 
-  // Usage autorisé
   properties.push({
     '@type': 'PropertyValue',
     name: 'Intended Use',
@@ -146,9 +105,6 @@ const additionalProperties = computed(() => {
   return properties
 })
 
-/**
- * Génère les identifiants (CAS Number, SKU)
- */
 const productIdentifiers = computed(() => {
   const identifiers: Array<{
     '@type': 'PropertyValue'
@@ -156,7 +112,6 @@ const productIdentifiers = computed(() => {
     value: string
   }> = []
 
-  // CAS Number - identifiant scientifique crucial
   if (casNumber?.value) {
     identifiers.push({
       '@type': 'PropertyValue',
@@ -165,7 +120,6 @@ const productIdentifiers = computed(() => {
     })
   }
 
-  // SKU
   if (sku.value) {
     identifiers.push({
       '@type': 'PropertyValue',
@@ -177,9 +131,6 @@ const productIdentifiers = computed(() => {
   return identifiers
 })
 
-/**
- * Schema JSON-LD complet
- */
 const productSchema = computed(() => {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -209,19 +160,16 @@ const productSchema = computed(() => {
         '@type': 'Organization',
         name: SEO_CONFIG.SITE_NAME,
       },
-      // Région de vente (Europe)
       eligibleRegion: {
         '@type': 'Place',
         name: 'European Union',
       },
-      // Conditions de vente
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'FR',
         returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
         merchantReturnDays: 0,
       },
-      // Détails de livraison
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         shippingRate: {
@@ -250,15 +198,12 @@ const productSchema = computed(() => {
         },
       },
     },
-    // Audience cible - crucial pour GEO
     audience: {
       '@type': 'PeopleAudience',
       suggestedMinAge: 18,
       audienceType: 'Researchers',
     },
-    // Catégorie produit
     category: 'Research Chemicals > Peptides',
-    // Usage prévu
     isAccessoryOrSparePartFor: {
       '@type': 'Thing',
       name: 'Laboratory Research Equipment',
@@ -270,17 +215,23 @@ const productSchema = computed(() => {
     schema.additionalProperty = additionalProperties.value
   }
 
-  // Ajoute les identifiants si présents
   if (productIdentifiers.value.length > 0) {
     schema.identifier = productIdentifiers.value
+  }
+
+  if (reviewCount?.value && reviewCount.value > 0 && averageRating?.value) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: averageRating.value.toFixed(1),
+      bestRating: '5',
+      worstRating: '1',
+      ratingCount: reviewCount.value,
+    }
   }
 
   return schema
 })
 
-// ============================================
-// INJECTION DANS LE HEAD
-// ============================================
 useHead({
   script: [
     {

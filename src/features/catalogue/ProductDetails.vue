@@ -363,6 +363,13 @@
               consommation humaine ou animale.
             </p>
           </div>
+
+          <!-- Section Avis Clients -->
+          <ProductReviews
+            v-if="product"
+            :product-id="product.id"
+            :product-name="productName || product.name"
+          />
         </article>
       </WrapperLoader>
     </div>
@@ -373,6 +380,9 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useTranslatedProduct } from '@/composables/useTranslated'
   import { fetchProductById } from '@/api/supabase/products'
+  import { fetchReviewSummary } from '@/api/supabase/reviews'
+  import type { ReviewSummary } from '@/api/supabase/reviews'
+  import ProductReviews from './components/reviews/ProductReviews.vue'
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
@@ -395,6 +405,7 @@
   const product = ref<Products | null>(null)
   const loading = ref(true)
   const activeTab = ref<'description' | 'protocol' | 'shipping'>('description')
+  const reviewSummary = ref<ReviewSummary | null>(null)
 
   // Traductions automatiques du produit
   const {
@@ -425,6 +436,9 @@
       category: productCategory.value || p.category,
       casNumber: p.cas_number ?? undefined,
       sequence: p.sequence ?? undefined,
+      // Avis clients pour le schema SEO
+      averageRating: reviewSummary.value?.average_rating,
+      reviewCount: reviewSummary.value?.review_count,
     }
   })
 
@@ -553,10 +567,15 @@
     loading.value = true
 
     try {
-      const data = await fetchProductById(id)
-      if (data) {
-        product.value = data
+      const [productData, reviewData] = await Promise.all([
+        fetchProductById(id),
+        fetchReviewSummary(id),
+      ])
+
+      if (productData) {
+        product.value = productData
       }
+      reviewSummary.value = reviewData
     } catch (e) {
       console.error('Erreur loading product:', e)
       product.value = null
