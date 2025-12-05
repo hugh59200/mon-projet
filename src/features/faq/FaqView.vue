@@ -1407,64 +1407,75 @@
     }
 
     // ============================================
-    // RESPONSIVE
+    // RESPONSIVE - Mixins harmonisés
     // ============================================
-    @media (max-width: 1000px) {
+
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       &__layout {
         grid-template-columns: 260px 1fr;
         gap: 24px;
       }
-    }
 
-    @media (max-width: 900px) {
+      &__footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+
+      &__trust {
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+    });
+
+    // Mobile (≤ 720px)
+    .respond-mobile({
       &__layout {
         grid-template-columns: 1fr;
       }
 
       &__sidebar {
         position: static;
-        flex-direction: column; // ← Garder en colonne
+        flex-direction: column;
         gap: 16px;
       }
 
       &__sidebar-card {
         width: auto;
+        padding: 20px;
       }
 
       &__help-card {
         width: auto;
+        padding: 20px;
       }
 
-      &__footer-content {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      &__footer-text {
-        h3 {
-          font-size: 18px;
-        }
+      &__footer-text h3 {
+        font-size: 18px;
       }
 
       &__trust {
-        flex-wrap: wrap;
-        gap: 24px;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
       }
-    }
+    });
 
-    @media (max-width: 768px) {
+    // Mobile détaillé (continuation du .respond-mobile)
+    .respond-mobile({
       &__title {
-        font-size: 36px;
+        font-size: 28px;
       }
 
       &__subtitle {
-        font-size: 16px;
+        font-size: 15px;
       }
 
       &__stats {
         flex-direction: column;
-        gap: 16px;
-        padding: 20px;
+        gap: 12px;
+        padding: 16px;
       }
 
       &__stat-divider {
@@ -1472,13 +1483,9 @@
         height: 1px;
       }
 
-      &__sidebar {
-        flex-direction: column;
-      }
-
       &__categories {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 8px;
       }
 
@@ -1487,11 +1494,12 @@
       }
 
       &__category {
-        padding: 10px 12px;
+        padding: 12px 14px;
+        min-height: 44px;
       }
 
       &__category-label {
-        font-size: 12px;
+        font-size: 13px;
       }
 
       &__category-count {
@@ -1499,78 +1507,90 @@
       }
 
       &__group {
-        padding: 20px;
-        border-radius: 20px;
+        padding: 18px;
+        border-radius: 18px;
       }
 
       &__group-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+      }
+
+      &__group-icon {
+        width: 44px;
+        height: 44px;
+      }
+
+      &__group-title {
+        font-size: 18px;
       }
 
       &__item-header {
-        padding: 16px;
+        padding: 14px;
+        min-height: 44px;
       }
 
       &__item-question {
-        gap: 12px;
+        gap: 10px;
       }
 
       &__item-indicator {
-        width: 28px;
-        height: 28px;
-
-        svg {
-          width: 14px;
-          height: 14px;
-        }
+        display: none;
       }
 
       &__item-text {
         font-size: 14px;
       }
 
+      &__item-toggle {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+      }
+
       &__item-body {
-        padding: 0 16px 20px;
+        padding: 0 14px 18px;
       }
 
       &__item-answer {
-        padding-left: 40px;
+        padding-left: 0;
         font-size: 14px;
       }
 
       &__item-ruo {
-        margin-left: 40px;
+        margin-left: 0;
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+        padding: 10px 14px;
       }
 
       &__footer {
-        padding: 28px 20px;
-        border-radius: 20px;
+        padding: 24px 16px;
+        border-radius: 18px;
       }
 
       &__footer-icon {
-        width: 56px;
-        height: 56px;
+        width: 52px;
+        height: 52px;
       }
 
       &__footer-btn {
         justify-content: center;
+        width: 100%;
+        min-height: 44px;
       }
 
-      &__trust {
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
+      &__empty {
+        padding: 48px 20px;
       }
-    }
 
-    @media (max-width: 480px) {
-      &__title {
-        font-size: 28px;
+      &__empty-icon {
+        width: 80px;
+        height: 80px;
       }
 
       &__header-badge {
@@ -1580,22 +1600,6 @@
           font-size: 12px;
         }
       }
-
-      &__categories {
-        grid-template-columns: 1fr;
-      }
-
-      &__item-indicator {
-        display: none;
-      }
-
-      &__item-answer {
-        padding-left: 0;
-      }
-
-      &__item-ruo {
-        margin-left: 0;
-      }
-    }
+    });
   }
 </style>

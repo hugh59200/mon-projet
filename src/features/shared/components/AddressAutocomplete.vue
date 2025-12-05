@@ -481,7 +481,7 @@ watch(suggestions, (newSuggestions) => {
 }
 
 // Responsive
-@media (max-width: 768px) {
+.respond-mobile({
   .address-autocomplete {
     &__dropdown {
       max-height: 280px;
@@ -489,11 +489,12 @@ watch(suggestions, (newSuggestions) => {
 
     &__item {
       padding: 12px 14px;
+      min-height: 44px;
     }
 
     &__item-icon {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
     }
 
     &__item-postcode {
@@ -501,5 +502,5 @@ watch(suggestions, (newSuggestions) => {
       padding: 3px 8px;
     }
   }
-}
+});
 </style>

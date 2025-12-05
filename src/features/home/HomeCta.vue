@@ -189,16 +189,18 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 1100px) {
+// Responsive - Tablet (≤ 1160px)
+.respond-tablet({
   .cta__inner { grid-template-columns: 1fr; text-align: center; }
   .cta__content { align-items: center; }
   .cta__actions { justify-content: center; }
   .cta__visual { display: none; }
-}
+});
 
-@media (max-width: 768px) {
+// Responsive - Mobile (≤ 720px)
+.respond-mobile({
   .cta-section { padding: 40px 20px; }
   .cta__inner { padding: 48px 24px; }
   .cta__actions { flex-direction: column; width: 100%; }
-}
+});
 </style>

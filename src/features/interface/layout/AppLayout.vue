@@ -26,6 +26,12 @@
       <FooterApp />
     </footer>
 
+    <!-- Bottom Navigation Mobile -->
+    <BottomNavigation
+      v-if="!isAuthPage && !isCheckoutPage"
+      :hidden="isCheckoutPage"
+    />
+
     <AppRegisterGlobals />
   </div>
 </template>
@@ -37,6 +43,7 @@
   import { vFocusable } from '@/directives/vFocus'
   import { vResponsiveAnimate } from '@/directives/vResponsiveAnimate'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import BottomNavigation from '@/features/interface/layout/BottomNavigation.vue'
   import FooterApp from '@/features/interface/layout/footer/FooterApp.vue'
   import HeaderApp from '@/features/interface/layout/header/Header.vue'
   import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -55,6 +62,10 @@
 
   const isAuthPage = computed(() => {
     return route.path.startsWith('/auth') || route.path.startsWith('/paiement')
+  })
+
+  const isCheckoutPage = computed(() => {
+    return route.path.startsWith('/checkout')
   })
 
   onAuthStateChange((_event, session) => {
@@ -175,6 +186,11 @@
       display: flex;
       flex-direction: column;
     }
+
+    /* Mobile: padding pour la bottom nav */
+    .respond-mobile({
+      padding-bottom: 72px;
+    });
   }
 
   /* Mode Auth plein écran */

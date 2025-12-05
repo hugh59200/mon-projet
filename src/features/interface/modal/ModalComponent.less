@@ -203,7 +203,7 @@
   }
 }
 
-// Responsive premium
+// Responsive premium - Petits écrans en hauteur
 @media (max-height: 700px) {
   .modal {
     padding: 50px 8px;
@@ -237,28 +237,67 @@
   }
 }
 
-@media (max-width: 640px) {
+// Responsive - Mobile (≤ 720px)
+.respond-mobile({
   .modal {
-    padding: 20px 12px;
+    padding: 16px 12px;
+    // Sur mobile, modale plus proche du plein écran
+    align-items: flex-end; // Modale en bas pour les pouces
 
     &__dialog {
-      max-height: calc(100vh - 40px);
-      border-radius: 16px;
-      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 32px);
+      max-height: calc(100dvh - 32px); // Dynamic viewport pour iOS
+      border-radius: 20px 20px 0 0; // Arrondi uniquement en haut
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
     }
 
     &__header {
       padding: 20px;
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      // Barre de poignée pour le swipe
+      &::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+      }
+
+      .basic-text,
+      h4,
+      span,
+      div {
+        font-size: 1rem;
+        padding-top: 8px; // Espace pour la barre
+      }
     }
 
     &__content {
-      padding: 8px;
+      padding: 12px;
+      // Safe area pour iPhone
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     }
 
     &__actions {
       padding: 16px 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      flex-direction: column;
+      gap: 10px;
+
+      // Boutons en full width sur mobile
+      > * {
+        width: 100%;
+      }
     }
   }
-}
+});

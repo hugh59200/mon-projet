@@ -432,7 +432,7 @@
   }
 
   // Responsive
-  @media (max-width: 768px) {
+  .respond-mobile({
     .user-detail {
       gap: 20px;
       padding: 4px;
@@ -455,5 +455,5 @@
         padding: 10px 12px;
       }
     }
-  }
+  });
 </style>

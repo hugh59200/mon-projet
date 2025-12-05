@@ -676,13 +676,14 @@
       }
     }
 
-    @media (max-width: 768px) {
+    .respond-mobile({
       height: auto;
-      min-height: 50vh;
+      min-height: 50dvh;
       border-radius: 0;
 
       &__messages {
         padding: 16px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
       }
 
       &__empty-icon {
@@ -690,7 +691,11 @@
         height: 64px;
         border-radius: 18px;
       }
-    }
+
+      &__new-messages-btn {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      }
+    });
   }
 
   // ─────────────────────────────────────────

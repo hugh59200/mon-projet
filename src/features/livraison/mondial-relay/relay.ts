@@ -1,4 +1,3 @@
-// useRelayPoint.ts - Composable pour la sélection de points relais
 import { computed, ref } from 'vue'
 
 export interface RelayPoint {
@@ -116,14 +115,6 @@ export function useRelayPoint() {
         searchResults.value = results
         return results
       }
-
-      // En PRODUCTION : appeler ton Edge Function Supabase
-      // const { data, error: fetchError } = await supabase.functions.invoke('search-relay-points', {
-      //   body: { postcode, country: 'FR' }
-      // })
-      // if (fetchError) throw fetchError
-      // searchResults.value = data.points
-      // return data.points
 
       return []
     } catch (err) {

@@ -257,9 +257,9 @@ function selectLocale(newLocale: SupportedLocale) {
   }
 
   // ==========================================
-  // RESPONSIVE
+  // RESPONSIVE - Mobile (≤ 720px)
   // ==========================================
-  @media (max-width: 750px) {
+  .respond-mobile({
     &__trigger {
       width: 32px;
       height: 32px;
@@ -272,6 +272,6 @@ function selectLocale(newLocale: SupportedLocale) {
     &__dropdown {
       right: -8px;
     }
-  }
+  });
 }
 </style>

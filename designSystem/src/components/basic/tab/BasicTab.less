@@ -13,6 +13,14 @@
   transition: all 0.25s ease;
   font-weight: 500;
   border-bottom: 3px solid transparent; // base neutre
+  white-space: nowrap; // évite retour à la ligne
+
+  // Mobile : padding réduit, hauteur touch-friendly
+  .respond-mobile({
+    padding: @spacing-10 @spacing-15;
+    min-height: 44px;
+    font-size: @font-size-body-m;
+  });
 
   &:hover {
     background-color: color-mix(in srgb, @neutral-200 80%, transparent);
@@ -47,4 +55,21 @@
   &--danger {
     fill: @danger-500;
   }
+}
+
+// Container de tabs avec scroll horizontal sur mobile
+.tabs-container {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; // Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome/Safari
+  }
+
+  .respond-mobile({
+    margin: 0 -@spacing-15;
+    padding: 0 @spacing-15;
+  });
 }

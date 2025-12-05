@@ -1,76 +1,298 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-
-  <!-- Page d'accueil -->
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://fast-peptides.com/</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- Catalogue -->
   <url>
     <loc>https://fast-peptides.com/catalogue</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- À propos -->
-  <url>
-    <loc>https://fast-peptides.com/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Contact -->
-  <url>
-    <loc>https://fast-peptides.com/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <!-- FAQ -->
-  <url>
-    <loc>https://fast-peptides.com/faq</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Actualités -->
   <url>
     <loc>https://fast-peptides.com/actualites</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Guide Reconstitution -->
   <url>
-    <loc>https://fast-peptides.com/reconstitution</loc>
+    <loc>https://fast-peptides.com/faq</loc>
+    <lastmod>2025-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/about</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- Pages légales -->
+  <url>
+    <loc>https://fast-peptides.com/reconstitution</loc>
+    <lastmod>2025-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/contact</loc>
+    <lastmod>2025-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
   <url>
     <loc>https://fast-peptides.com/legal/cgv</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-
   <url>
     <loc>https://fast-peptides.com/legal/privacy</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-
   <url>
     <loc>https://fast-peptides.com/legal/mentions</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-
+  <url>
+    <loc>https://fast-peptides.com/catalogue/27fc5a01-6494-41b4-bb3f-0a81a3cbc980</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/bc0485be-1ac7-480d-8f65-bd445a914630</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/9424b24d-461c-49e9-a392-49068a586809</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/76726beb-0660-402a-8490-04d2a74af982</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/2b2da525-ffa3-4f51-ba0a-fc62d2530265</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/7abca1fa-a724-4e62-824c-cd705a716ecf</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/1649b11e-03dc-4e75-9777-9fdb817e808a</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/b7e14c49-ebd7-4817-af2b-dfd08b89f736</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/ef9f8d92-709c-4475-8bd5-8ac5d4a1e0a5</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/124ce3d1-a23e-4c72-b8e2-35963adabd7d</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/63372c2a-7dd5-4a42-8b62-e520140b281b</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/316ae7d6-6c9c-4957-a3e6-fe06d5176ae6</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/78865482-0ea8-4a4e-8ff4-e3cf7a56ce46</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/4e5f717b-78a8-4715-a540-0eac0b2e9fd9</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/ac87ef8f-7376-4026-a4ff-f3d9b662c2aa</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/8ab78f98-759d-4346-8407-b974919702a6</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/24865ef7-0326-4097-8d83-eab99aa917ac</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/6dd54280-6220-4d17-928b-0699f27ffef5</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/e1bb7d86-5dae-4785-8043-3c7c626671c2</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/d32c312c-baa1-41f0-ac02-32d2636c0ab4</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/05598ad6-5061-4b7b-bf02-d3aef549381d</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/6bc12568-b696-48f0-8b57-2b16516659f3</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/e07c0ea7-502b-4388-ad25-2a608dc2b44d</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/catalogue/7aae0947-866e-4497-85f1-f37445c3e709</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/lire-certificat-analyse-peptide</loc>
+    <lastmod>2025-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/retatrutide-triple-agoniste-eli-lilly-2025</loc>
+    <lastmod>2025-05-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/marche-mondial-peptides-2025</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/glp1-cerveau-decouverte-2024-ut-southwestern</loc>
+    <lastmod>2025-04-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/peptides-sport-regles-ama-antidopage</loc>
+    <lastmod>2025-04-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/guide-reconstitution-conservation-peptides</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/fda-bpc157-category-2-reglementation</loc>
+    <lastmod>2025-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/collagene-oral-efficacite-rides-etude</loc>
+    <lastmod>2025-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/peptides-recherche-cadre-legal-europe</loc>
+    <lastmod>2025-03-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/ghk-cu-peptide-cuivre-anti-age</loc>
+    <lastmod>2025-03-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/glp1-ozempic-revolution-peptides</loc>
+    <lastmod>2025-02-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/peptides-medecine-sport-revue-2025</loc>
+    <lastmod>2025-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/collagene-peptides-recuperation-sportive-2024</loc>
+    <lastmod>2025-02-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/tb500-bpc157-synergie-recuperation</loc>
+    <lastmod>2025-01-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fast-peptides.com/actualites/bpc-157-etudes-scientifiques</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

@@ -54,11 +54,12 @@
     }
   }
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .disclaimer {
       margin: 0 20px 40px;
       flex-direction: column;
       text-align: center;
     }
-  }
+  });
 </style>

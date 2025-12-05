@@ -35,14 +35,17 @@
         @click.stop
       >
         <div class="separator"></div>
-        <BasicIconNext
-          name="Trash2"
-          :size="20"
-          color="danger-600"
-          pointer
+        <button
+          type="button"
+          class="action-btn"
           @click="handleDelete(user)"
-          class="action-icon"
-        />
+        >
+          <BasicIconNext
+            name="Trash2"
+            :size="20"
+            color="danger-600"
+          />
+        </button>
       </div>
     </div>
   </div>
@@ -117,11 +120,30 @@
     background: @neutral-300;
   }
 
-  .action-icon {
-    transition: opacity 0.2s ease;
-    opacity: 0.7;
+  // Zone tactile minimum 44px
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin: -12px -8px -12px 0;
 
-    &:hover {
+    &:active {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    svg {
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover svg {
       opacity: 1;
     }
   }

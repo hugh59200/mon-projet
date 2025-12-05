@@ -202,12 +202,13 @@
     }
   }
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .faq {
       padding: 60px 20px;
       &__question span {
         font-size: 15px;
       }
     }
-  }
+  });
 </style>

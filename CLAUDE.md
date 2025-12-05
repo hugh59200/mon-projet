@@ -148,3 +148,76 @@ Requises dans `.env` :
 **Espacements** : Utiliser les tokens `spacing-5` (4px) à `spacing-35` (64px) pour les marges/paddings cohérents.
 
 **Icônes** : Disponibles dans `designSystem/src/fondation/icons/` avec variantes bold et outline.
+
+## Responsive Design
+
+### Breakpoints
+
+Les breakpoints sont définis dans `designSystem/src/fondation/breakpoints/breakpoints.less` et synchronisés avec `src/plugin/device-breakpoint/DeviceBreakpoint.types.ts` :
+
+| Nom | LESS Variable | Valeur | Usage |
+|-----|---------------|--------|-------|
+| Mobile | `@breakpoint-mobile` | 720px | Smartphones |
+| Tablet | `@breakpoint-tablet` | 1160px | Tablettes |
+| Desktop | `@breakpoint-desktop` | 1400px | Grands écrans |
+
+### Mixins LESS Responsive
+
+Utiliser les mixins de `designSystem/src/fondation/breakpoints/responsive-mixins.less` :
+
+```less
+.my-component {
+  padding: 24px;
+  gap: 16px;
+
+  // Tablet et moins (≤ 1160px)
+  .respond-tablet({
+    padding: 16px;
+    gap: 12px;
+  });
+
+  // Mobile (≤ 720px)
+  .respond-mobile({
+    padding: 12px;
+    gap: 8px;
+  });
+}
+```
+
+**Mixins disponibles** :
+- `.respond-mobile(@rules)` - Styles pour ≤ 720px
+- `.respond-tablet(@rules)` - Styles pour ≤ 1160px
+- `.respond-tablet-only(@rules)` - Styles pour 721px à 1160px
+- `.respond-desktop-only(@rules)` - Styles pour > 1160px
+- `.respond-desktop-large(@rules)` - Styles pour ≥ 1400px
+
+**Classes utilitaires** :
+- `.hide-mobile` / `.hide-tablet` - Masquer sur mobile/tablet
+- `.show-mobile-only` / `.show-tablet-only` / `.show-desktop-only`
+
+**Helpers** :
+- `.padding-responsive(@desktop, @tablet, @mobile)`
+- `.gap-responsive(@desktop, @tablet, @mobile)`
+- `.font-size-responsive(@desktop, @tablet, @mobile)`
+- `.stack-mobile()` - Passe en flex-direction: column sur mobile
+- `.full-width-mobile()` - 100% width sur mobile
+
+### JavaScript : useDeviceBreakpoint
+
+Pour la logique conditionnelle (v-if), utiliser le composable :
+
+```typescript
+import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
+
+const { isMobile, isTablet, isDesktop, currentBreakpoint } = useDeviceBreakpoint()
+```
+
+### Quand utiliser quoi ?
+
+| Cas d'usage | Solution |
+|-------------|----------|
+| Ajuster padding, font-size, gap | Mixins LESS (`.respond-mobile()`) |
+| Réorganiser un layout (grid/flex) | Mixins LESS |
+| Masquer/afficher un élément complet | `v-if="isMobile"` ou classes `.hide-*` |
+| Charger un composant différent | `v-if` avec `useDeviceBreakpoint()` |
+| Grid responsive (colonnes) | Classes `.col-*`, `.col-md-*`, `.col-sm-*` |

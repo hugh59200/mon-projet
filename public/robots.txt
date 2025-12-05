@@ -3,13 +3,23 @@
 
 User-agent: *
 Allow: /
+
+# Pages privées / admin
 Disallow: /admin
+Disallow: /admin/*
 Disallow: /checkout
 Disallow: /profile
+Disallow: /auth/
 Disallow: /api/
+
+# Pages techniques
+Disallow: /order-success
+Disallow: /order-error
+Disallow: /access-denied
+
+# Paramètres de recherche (évite le duplicate content)
+Disallow: /*?*sort=
+Disallow: /*?*page=
 
 # Sitemap
 Sitemap: https://fast-peptides.com/sitemap.xml
-
-# Crawl-delay (optionnel, pour éviter la surcharge)
-Crawl-delay: 1

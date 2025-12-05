@@ -663,14 +663,15 @@
       gap: 16px;
     }
 
-    /* MEDIA QUERIES */
-    @media (max-width: 900px) {
+    /* RESPONSIVE - Tablet (≤ 1160px) */
+    .respond-tablet({
       &__grid {
         grid-template-columns: 1fr;
       }
-    }
+    });
 
-    @media (max-width: 768px) {
+    /* RESPONSIVE - Mobile (≤ 720px) */
+    .respond-mobile({
       &__header {
         flex-direction: column;
         align-items: flex-start;
@@ -699,6 +700,6 @@
       &__timeline-label {
         font-size: 11px;
       }
-    }
+    });
   }
 </style>

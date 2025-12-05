@@ -449,9 +449,11 @@ const qualityPoints = computed(() => [
     grid-template-columns: repeat(2, 1fr);
     gap: 32px;
 
-    @media (max-width: 768px) {
+    // Mobile (≤ 720px)
+    .respond-mobile({
       grid-template-columns: 1fr;
-    }
+      gap: 24px;
+    });
   }
 }
 
@@ -581,13 +583,16 @@ const qualityPoints = computed(() => [
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
 
-    @media (max-width: 1024px) {
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       grid-template-columns: repeat(2, 1fr);
-    }
+    });
 
-    @media (max-width: 600px) {
+    // Mobile (≤ 720px)
+    .respond-mobile({
       grid-template-columns: 1fr;
-    }
+      gap: 16px;
+    });
   }
 }
 
@@ -666,9 +671,11 @@ const qualityPoints = computed(() => [
     gap: 60px;
     align-items: center;
 
-    @media (max-width: 900px) {
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       grid-template-columns: 1fr;
-    }
+      gap: 40px;
+    });
   }
 
   &__badge {
@@ -819,11 +826,13 @@ const qualityPoints = computed(() => [
     gap: 24px;
     align-items: flex-start;
 
-    @media (max-width: 600px) {
+    // Mobile (≤ 720px)
+    .respond-mobile({
       flex-direction: column;
       text-align: center;
       align-items: center;
-    }
+      gap: 16px;
+    });
   }
 
   &__icon {
@@ -899,4 +908,165 @@ const qualityPoints = computed(() => [
     margin: 40px 0 0;
   }
 }
+
+// ============================================
+// RESPONSIVE GLOBAL
+// ============================================
+
+// Mobile (≤ 720px)
+.respond-mobile({
+  .about-hero {
+    padding: 80px 16px 60px;
+
+    &__badge {
+      font-size: 11px;
+      padding: 6px 12px;
+    }
+
+    &__subtitle {
+      font-size: 16px;
+    }
+  }
+
+  .about-dna {
+    padding: 60px 16px;
+
+    &__intro {
+      margin-bottom: 40px;
+    }
+
+    &__title {
+      font-size: 28px;
+    }
+
+    &__desc {
+      font-size: 16px;
+    }
+  }
+
+  .dna-card {
+    padding: 24px;
+
+    &__icon {
+      width: 48px;
+      height: 48px;
+    }
+
+    &__flag {
+      font-size: 24px;
+      top: 16px;
+      right: 16px;
+    }
+
+    &__title {
+      font-size: 20px;
+    }
+
+    &__list li {
+      font-size: 13px;
+    }
+  }
+
+  .about-advantages {
+    padding: 60px 16px;
+
+    &__header {
+      margin-bottom: 40px;
+    }
+
+    &__title {
+      font-size: 28px;
+    }
+  }
+
+  .advantage-card {
+    padding: 24px;
+
+    &__icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    &__title {
+      font-size: 16px;
+    }
+  }
+
+  .about-quality {
+    padding: 60px 16px;
+
+    &__title {
+      font-size: 28px;
+    }
+
+    &__desc {
+      margin-bottom: 32px;
+    }
+  }
+
+  .quality-point {
+    gap: 16px;
+
+    &__number {
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+    }
+
+    &__content h4 {
+      font-size: 16px;
+    }
+  }
+
+  .quality-badge-card {
+    padding: 40px 24px;
+
+    &__icon {
+      width: 80px;
+      height: 80px;
+    }
+
+    &__value {
+      font-size: 44px;
+    }
+  }
+
+  .about-disclaimer {
+    padding: 40px 16px;
+
+    &__icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    &__title {
+      font-size: 18px;
+    }
+
+    &__text {
+      font-size: 14px;
+    }
+  }
+
+  .about-cta {
+    padding: 60px 16px;
+
+    &__title {
+      font-size: 26px;
+    }
+
+    &__text {
+      font-size: 15px;
+    }
+
+    &__buttons {
+      flex-direction: column;
+      width: 100%;
+
+      .PremiumButton {
+        width: 100%;
+      }
+    }
+  }
+});
 </style>

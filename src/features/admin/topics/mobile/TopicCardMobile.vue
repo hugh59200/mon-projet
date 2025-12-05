@@ -31,14 +31,17 @@
         class="actions"
         @click.stop
       >
-        <BasicIconNext
-          name="Trash2"
-          :size="18"
-          color="danger-600"
-          pointer
+        <button
+          type="button"
+          class="action-btn"
           @click="handleDelete(topic)"
-          class="action-icon"
-        />
+        >
+          <BasicIconNext
+            name="Trash2"
+            :size="18"
+            color="danger-600"
+          />
+        </button>
       </div>
     </div>
 
@@ -123,11 +126,30 @@
     align-items: center;
   }
 
-  .action-icon {
-    opacity: 0.8;
-    transition: opacity 0.2s ease;
+  // Zone tactile minimum 44px
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin: -8px -8px -8px 0;
 
-    &:hover {
+    &:active {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    svg {
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover svg {
       opacity: 1;
     }
   }

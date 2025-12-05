@@ -1150,6 +1150,7 @@ export default {
     users: 'Customers',
     orders: 'Orders',
     products: 'Catalogue',
+    promo: 'Promo Codes',
     news: 'Blog',
     categories: 'Categories',
     messaging: 'Messaging',

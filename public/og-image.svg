@@ -1,0 +1,73 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background solid dark navy -->
+  <rect width="1200" height="630" fill="#0f172a"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.02">
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="white" stroke-width="1"/>
+    </pattern>
+    <rect width="1200" height="630" fill="url(#grid)"/>
+  </g>
+
+  <!-- LOGO: 4 white circles with yellow star in negative space -->
+  <g transform="translate(120, 195)">
+    <!-- Yellow/orange star in center (behind circles) -->
+    <path d="M120 30 L135 105 L210 120 L135 135 L120 210 L105 135 L30 120 L105 105 Z" fill="#f97316"/>
+
+    <!-- 4 white circles arranged in 2x2 grid -->
+    <!-- Top-left circle -->
+    <circle cx="70" cy="70" r="55" fill="white"/>
+    <!-- Top-right circle -->
+    <circle cx="170" cy="70" r="55" fill="white"/>
+    <!-- Bottom-left circle -->
+    <circle cx="70" cy="170" r="55" fill="white"/>
+    <!-- Bottom-right circle -->
+    <circle cx="170" cy="170" r="55" fill="white"/>
+  </g>
+
+  <!-- Main Text: Atlas Lab Solutions -->
+  <text x="480" y="260" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="80" font-weight="700" fill="white" letter-spacing="-2">
+    Atlas Lab
+  </text>
+  <text x="480" y="350" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="80" font-weight="700" fill="white" letter-spacing="-2">
+    Solutions
+  </text>
+
+  <!-- Tagline -->
+  <text x="480" y="410" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="400" fill="#94a3b8" letter-spacing="0.5">
+    Peptides de Recherche Haute Pureté
+  </text>
+
+  <!-- Blue accent line -->
+  <rect x="480" y="430" width="100" height="3" rx="1.5" fill="#3b82f6"/>
+
+  <!-- Badges -->
+  <g transform="translate(300, 520)">
+    <!-- Badge 1 -->
+    <rect x="0" y="0" width="160" height="44" rx="6" fill="white" fill-opacity="0.08"/>
+    <text x="80" y="28" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="white" text-anchor="middle">
+      Pureté ≥99%
+    </text>
+
+    <!-- Badge 2 -->
+    <rect x="180" y="0" width="170" height="44" rx="6" fill="white" fill-opacity="0.08"/>
+    <text x="265" y="28" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="white" text-anchor="middle">
+      Expédition 48h
+    </text>
+
+    <!-- Badge 3 -->
+    <rect x="370" y="0" width="150" height="44" rx="6" fill="white" fill-opacity="0.08"/>
+    <text x="445" y="28" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="white" text-anchor="middle">
+      COA inclus
+    </text>
+  </g>
+
+  <!-- URL bottom right -->
+  <text x="1100" y="590" font-family="system-ui, sans-serif" font-size="16" font-weight="400" fill="#64748b" text-anchor="end">
+    fast-peptides.com
+  </text>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="622" width="1200" height="8" fill="#3b82f6"/>
+</svg>

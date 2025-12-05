@@ -1281,32 +1281,86 @@
       }
     }
 
-    /* --- Media Queries --- */
-    @media (max-width: 768px) {
+    /* --- Responsive --- */
+
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       &__container {
-        margin: -60px 20px 50px;
-        padding: 30px 20px;
+        width: auto;
+        max-width: calc(100% - 32px);
+        padding: 32px;
+      }
+
+      &__avatar {
+        width: 100px;
+        height: 100px;
+      }
+
+      :deep(.FilterSection) {
+        padding: 24px;
+      }
+    });
+
+    // Mobile (≤ 720px)
+    .respond-mobile({
+      &__cover {
+        height: 180px;
+      }
+
+      &__container {
+        margin: -60px 16px 50px;
+        padding: 24px 16px;
       }
 
       &__header {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
+        gap: 16px;
         border-bottom: none;
         padding-bottom: 0;
       }
 
+      &__avatar {
+        width: 90px;
+        height: 90px;
+      }
+
       &__meta {
         justify-content: center;
+        flex-direction: column;
+        gap: 8px;
       }
 
       &__form-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
 
       &__orders {
         grid-template-columns: 1fr;
       }
-    }
+
+      &__order-card,
+      &__pref-card {
+        padding: 18px 20px;
+      }
+
+      :deep(.FilterSection) {
+        padding: 20px 16px;
+        border-radius: 16px;
+      }
+
+      &__sections {
+        gap: 24px;
+      }
+
+      &__actions .PremiumButton {
+        font-size: 14px;
+      }
+
+      &__danger .PremiumButton {
+        max-width: 100%;
+      }
+    });
   }
 </style>

@@ -164,18 +164,27 @@
     }
   }
 
-  @media (max-width: 1100px) {
+  // Responsive - Tablet (≤ 1160px)
+  .respond-tablet({
     .stats__grid {
       grid-template-columns: repeat(2, 1fr);
     }
-  }
+  });
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .stats {
       padding: 60px 20px;
       &__grid {
         grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      &__item {
+        padding: 24px 20px;
+      }
+      &__value {
+        font-size: 28px;
       }
     }
-  }
+  });
 </style>

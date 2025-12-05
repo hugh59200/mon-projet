@@ -601,10 +601,10 @@
     gap: 16px;
     align-items: flex-start;
 
-    @media (max-width: 600px) {
+    .respond-mobile({
       flex-direction: column;
       gap: 12px;
-    }
+    });
   }
 
   // Classes utilitaires flex pour remplacer Tailwind
@@ -828,11 +828,11 @@
       background: @white;
       animation: slideDown 0.3s ease-out;
 
-      @media (max-width: 768px) {
+      .respond-mobile({
         grid-template-columns: 1fr;
         gap: 20px;
         padding: 16px;
-      }
+      });
     }
 
     .language-group {
@@ -902,7 +902,7 @@
   }
 
   // Responsive amélioré
-  @media (max-width: 768px) {
+  .respond-mobile({
     .product-form {
       gap: 20px;
       padding: 4px;
@@ -915,5 +915,5 @@
     .image-preview img {
       max-height: 180px;
     }
-  }
+  });
 </style>

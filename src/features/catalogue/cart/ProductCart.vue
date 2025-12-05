@@ -488,9 +488,20 @@
     }
 
     // ============ RESPONSIVE ============
-    @media (max-width: 600px) {
+    // Mobile (≤ 720px) - Breakpoint harmonisé
+    .respond-mobile({
+      // Feedback tactile optimisé
+      -webkit-tap-highlight-color: transparent;
+
+      // Active state pour retour tactile
+      &:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+      }
+
       &__content {
-        padding: 0 16px 16px;
+        padding: 0 14px 14px;
+        gap: 10px;
       }
 
       &__name {
@@ -503,12 +514,29 @@
 
       &__actions {
         flex-direction: column;
+        gap: 6px;
       }
 
       &__btn {
         padding: 10px 12px;
         font-size: 12px;
       }
-    }
+
+      // Wishlist toujours visible sur mobile
+      &__wishlist {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      // Image légèrement plus grande sur mobile
+      &__image {
+        padding: 12px;
+      }
+
+      &__image-inner img {
+        max-width: 90%;
+        max-height: 90%;
+      }
+    });
   }
 </style>

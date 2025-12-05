@@ -237,6 +237,23 @@
     label: string
   }
 
+  export interface NewsDetail extends News {
+    topic: NewsTopic | null
+  }
+
+  // ===========================
+  // COMPOSABLES
+  // ===========================
+  const route = useRoute()
+
+  // ===========================
+  // STATE
+  // ===========================
+  const loading = ref(true)
+  const article = ref<NewsDetail | null>(null)
+  const relatedArticles = ref<NewsDetail[]>([])
+  const linkCopied = ref(false)
+
   // Configuration SEO dynamique pour les articles
   const pageTitle = computed(() => {
     if (!article.value) return 'Article - Atlas Lab Solutions'
@@ -248,6 +265,64 @@
     // Extraire un extrait du contenu sans HTML
     const textContent = (article.value.content ?? '').replace(/<[^>]*>/g, '').substring(0, 155)
     return textContent + '...'
+  })
+
+  // Schema BreadcrumbList pour les rich snippets de navigation
+  const breadcrumbSchema = computed(() => {
+    if (!article.value) return null
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Accueil',
+          item: 'https://fast-peptides.com/',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Actualités',
+          item: 'https://fast-peptides.com/actualites',
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: article.value.title,
+          item: `https://fast-peptides.com/actualites/${route.params.slug}`,
+        },
+      ],
+    }
+  })
+
+  // Schema Article pour les rich snippets
+  const articleSchema = computed(() => {
+    if (!article.value) return null
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.value.title,
+      description: pageDescription.value,
+      image: article.value.image || 'https://fast-peptides.com/default-article.jpg',
+      datePublished: article.value.published_at || article.value.created_at,
+      author: {
+        '@type': 'Organization',
+        name: 'Atlas Lab Solutions',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Atlas Lab Solutions',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://fast-peptides.com/logo.png',
+        },
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `https://fast-peptides.com/actualites/${route.params.slug}`,
+      },
+    }
   })
 
   useHead({
@@ -275,7 +350,24 @@
       },
       {
         property: 'article:published_time',
-        content: computed(() => article.value?.created_at || ''),
+        content: computed(() => article.value?.published_at || article.value?.created_at || ''),
+      },
+      // Twitter Cards
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: pageTitle,
+      },
+      {
+        name: 'twitter:description',
+        content: pageDescription,
+      },
+      {
+        name: 'twitter:image',
+        content: computed(() => article.value?.image || 'https://fast-peptides.com/default-article.jpg'),
       },
     ],
     link: [
@@ -284,24 +376,17 @@
         href: computed(() => `https://fast-peptides.com/actualites/${route.params.slug}`),
       },
     ],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: computed(() => (breadcrumbSchema.value ? JSON.stringify(breadcrumbSchema.value) : '')),
+      },
+      {
+        type: 'application/ld+json',
+        innerHTML: computed(() => (articleSchema.value ? JSON.stringify(articleSchema.value) : '')),
+      },
+    ],
   })
-
-  export interface NewsDetail extends News {
-    topic: NewsTopic | null
-  }
-
-  // ===========================
-  // COMPOSABLES
-  // ===========================
-  const route = useRoute()
-
-  // ===========================
-  // STATE
-  // ===========================
-  const loading = ref(true)
-  const article = ref<NewsDetail | null>(null)
-  const relatedArticles = ref<NewsDetail[]>([])
-  const linkCopied = ref(false)
 
   // ===========================
   // COMPUTED
@@ -1137,14 +1222,10 @@
       animation-delay: var(--delay);
 
       &:hover {
-        transform: translateY(-6px);
+        border-color: var(--primary-200);
         box-shadow:
           0 1px 3px rgba(0, 0, 0, 0.04),
-          0 12px 32px rgba(0, 0, 0, 0.12);
-
-        .article-detail__related-image img {
-          transform: scale(1.02);
-        }
+          0 6px 20px rgba(0, 0, 0, 0.08);
       }
     }
 
@@ -1252,7 +1333,7 @@
     // ===========================
     // RESPONSIVE
     // ===========================
-    @media (max-width: 768px) {
+    .respond-mobile({
       &__container {
         padding: 24px 16px;
       }
@@ -1264,6 +1345,11 @@
       &__back {
         padding: 10px 16px;
         font-size: 13px;
+        min-height: 44px;
+
+        span {
+          display: none;
+        }
       }
 
       &__meta {
@@ -1280,7 +1366,7 @@
       }
 
       &__title {
-        font-size: 26px;
+        font-size: 22px;
         margin-bottom: 16px;
       }
 
@@ -1293,8 +1379,12 @@
         border-radius: 16px;
 
         :deep(img) {
-          max-height: 320px;
+          max-height: 240px;
         }
+      }
+
+      &__cover-hint {
+        display: none;
       }
 
       &__body {
@@ -1329,71 +1419,25 @@
         gap: 12px;
       }
 
+      &__share-btn {
+        width: 44px;
+        height: 44px;
+      }
+
       &__related {
         margin-top: 48px;
         padding-top: 36px;
-      }
-
-      &__related-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      &__related-card {
-        flex-direction: row;
-
-        .article-detail__related-image {
-          width: 120px;
-          flex-shrink: 0;
-          aspect-ratio: 1;
-        }
-
-        .article-detail__related-content {
-          padding: 14px;
-          justify-content: center;
-        }
-      }
-
-      &__trust {
-        gap: 20px;
-      }
-
-      &__trust-item {
-        font-size: 13px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      &__back {
-        span {
-          display: none;
-        }
-
-        padding: 10px;
-        border-radius: 10px;
-      }
-
-      &__title {
-        font-size: 22px;
-      }
-
-      &__cover-wrapper :deep(img) {
-        max-height: 240px;
-      }
-
-      &__cover-hint {
-        display: none;
-      }
-
-      &__share-btn {
-        width: 38px;
-        height: 38px;
       }
 
       &__related-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+      }
+
+      &__related-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
       &__related-card {
@@ -1403,12 +1447,21 @@
           width: 100%;
           aspect-ratio: 16 / 10;
         }
+
+        .article-detail__related-content {
+          padding: 14px;
+          justify-content: center;
+        }
       }
 
       &__trust {
         flex-direction: column;
         align-items: center;
         gap: 14px;
+      }
+
+      &__trust-item {
+        font-size: 13px;
       }
 
       &__empty {
@@ -1424,6 +1477,6 @@
           height: 36px;
         }
       }
-    }
+    });
   }
 </style>

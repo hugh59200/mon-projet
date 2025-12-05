@@ -1,6 +1,7 @@
 import AdminNewsTable from '@/features/admin/news/AdminNewsView.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsView.vue'
+import AdminPromoCodesView from '@/features/admin/promo/AdminPromoCodesView.vue'
 import AdminTopicsTable from '@/features/admin/topics/AdminTopicsView.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import AuthLayout from '@/features/auth/AuthLayout.vue'
@@ -247,6 +248,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AdminProducts',
         component: AdminProductsTable,
         meta: { labelKey: 'admin.products', icon: 'PackageSearch' },
+      },
+      {
+        path: 'codes-promo',
+        name: 'AdminPromoCodes',
+        component: AdminPromoCodesView,
+        meta: { labelKey: 'admin.promo', icon: 'Tag' },
       },
       {
         path: 'actualites',

@@ -43,6 +43,9 @@ export type CreateOrderPayload = {
   relayZipcode?: string
   relayCity?: string
   relayCountry?: string
+  // Code promo
+  promoCodeId?: string | null
+  promoCodeSnapshot?: string | null
 }
 
 export type CreateOrderResponse = {
@@ -86,6 +89,9 @@ export async function createOrder(payload: CreateOrderPayload): Promise<CreateOr
     p_total_amount: payload.totalAmount,
     p_user_id: payload.userId!,
     p_zip: payload.zip,
+    // Code promo
+    p_promo_code_id: payload.promoCodeId ?? undefined,
+    p_promo_code_snapshot: payload.promoCodeSnapshot ?? undefined,
   })
 
   const result = handleApi(res)

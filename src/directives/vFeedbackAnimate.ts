@@ -101,6 +101,8 @@ export const vFeedbackAnimate = {
     if (!repeat) {
       el.addEventListener('mouseenter', play)
       el.addEventListener('focus', play)
+      // Support tactile pour mobile
+      el.addEventListener('touchstart', play, { passive: true })
     } else {
       play()
     }
@@ -109,6 +111,7 @@ export const vFeedbackAnimate = {
       if (currentAnimation) currentAnimation.cancel()
       el.removeEventListener('mouseenter', play)
       el.removeEventListener('focus', play)
+      el.removeEventListener('touchstart', play)
     }
   },
 

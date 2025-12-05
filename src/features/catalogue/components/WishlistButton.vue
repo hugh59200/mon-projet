@@ -59,6 +59,14 @@ function handleClick(event: Event): void {
   backdrop-filter: blur(8px);
   cursor: pointer;
   transition: all 0.25s @ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  // Mobile: Taille touch-friendly (≤ 720px)
+  .respond-mobile({
+    width: 44px;
+    height: 44px;
+  });
 
   .wishlist-icon {
     color: @neutral-400;

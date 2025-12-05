@@ -100,8 +100,8 @@
     }
   }
 
-  // Responsive
-  @media (max-width: 750px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .header-actions__guest {
       padding: 4px;
       background: transparent;
@@ -113,5 +113,5 @@
     .header-actions__guest-indicator {
       display: none;
     }
-  }
+  });
 </style>

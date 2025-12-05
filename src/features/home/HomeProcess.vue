@@ -220,7 +220,8 @@
     }
   }
 
-  @media (max-width: 1100px) {
+  // Responsive - Tablet (≤ 1160px)
+  .respond-tablet({
     .process__timeline {
       grid-template-columns: 1fr;
       gap: 60px;
@@ -228,11 +229,22 @@
     .process__line {
       display: none;
     }
-  }
+  });
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .process {
       padding: 60px 20px;
     }
-  }
+    .process__card h3 {
+      font-size: 20px;
+    }
+    .process__marker {
+      width: 64px;
+      height: 64px;
+      span {
+        font-size: 24px;
+      }
+    }
+  });
 </style>

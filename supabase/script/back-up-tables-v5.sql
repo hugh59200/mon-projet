@@ -1,6 +1,10 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V5.2 — i18n + GUEST + RELAY + MANUAL PAYMENT
+-- SUPABASE CLEAN BACKUP V5.3 — PROMO CODES SYSTEM
 -- ============================================================
+-- V5.3 : Système complet de codes promo (manuels + automatiques)
+--        - Table promo_codes avec validation RPC
+--        - Codes automatiques (bienvenue, fidélité, abandon panier)
+--        - Interface admin + tracking utilisation
 -- V5.2 : Suppression Stripe/PayPal - Paiements manuels uniquement (Virement/Crypto)
 -- V5.1 : Ajout payment_method dans orders_overview_for_admin (validation paiement manuel)
 -- V5.0 : Support multilingue (colonnes JSONB i18n)
@@ -20,14 +24,19 @@ DROP VIEW IF EXISTS
   public.messages_unread_view,
   public.messages_by_conversation_view,
   public.user_overview,
-  public.user_cart_view
+  public.user_cart_view,
+  public.promo_codes_admin
 CASCADE;
 
 DROP TABLE IF EXISTS
+  public.user_promo_rewards,
+  public.promo_code_usage,
+  public.auto_promo_settings,
   public.payment_events,
   public.emails_sent,
   public.order_items,
   public.orders,
+  public.promo_codes,
   public.user_cart_items,
   public.news,
   public.news_topics,
@@ -64,7 +73,17 @@ DROP FUNCTION IF EXISTS
   public.get_guest_order_by_token,
   public.claim_guest_orders,
   public.update_order_relay,
-  public.remove_order_relay
+  public.remove_order_relay,
+  -- Promo codes functions
+  public.validate_promo_code,
+  public.apply_promo_code,
+  public.generate_unique_promo_code,
+  public.create_welcome_promo,
+  public.check_loyalty_reward,
+  public.create_cart_abandonment_promo,
+  public.find_abandoned_carts,
+  public.trigger_welcome_promo,
+  public.trigger_check_loyalty
 CASCADE;
 
 -- ============================================================
@@ -161,6 +180,33 @@ CREATE TABLE public.user_cart_items (
 CREATE UNIQUE INDEX uniq_cart_user_product ON public.user_cart_items (user_id, product_id);
 
 -- ============================
+-- PROMO CODES
+-- ============================
+CREATE TABLE public.promo_codes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code text UNIQUE NOT NULL,
+  description text,
+  discount_type text NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value numeric(10,2) NOT NULL CHECK (discount_value > 0),
+  min_order_amount numeric(10,2) DEFAULT 0 CHECK (min_order_amount >= 0),
+  max_discount_amount numeric(10,2),
+  max_uses integer,
+  max_uses_per_user integer DEFAULT 1,
+  current_uses integer DEFAULT 0,
+  valid_from timestamptz DEFAULT now(),
+  valid_until timestamptz,
+  active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX idx_promo_codes_code ON public.promo_codes (upper(code));
+CREATE INDEX idx_promo_codes_active ON public.promo_codes (active) WHERE active = true;
+
+COMMENT ON TABLE public.promo_codes IS 'Codes promotionnels pour remises sur commandes';
+COMMENT ON COLUMN public.promo_codes.discount_type IS 'percentage = remise en %, fixed = remise en euros';
+
+-- ============================
 -- ORDERS (Guest Ready + Relay)
 -- ============================
 DO $$ BEGIN
@@ -215,6 +261,10 @@ CREATE TABLE public.orders (
   relay_city text,
   relay_country text DEFAULT 'FR',
 
+  -- Code promo appliqué
+  promo_code_id uuid REFERENCES public.promo_codes(id) ON DELETE SET NULL,
+  promo_code_snapshot text,
+
   -- Timestamps
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -246,6 +296,85 @@ CREATE TABLE public.order_items (
 );
 CREATE INDEX idx_order_items_order_id ON public.order_items (order_id);
 CREATE INDEX idx_order_items_product_id ON public.order_items (product_id);
+
+-- ============================
+-- PROMO CODE USAGE (tracking par utilisateur)
+-- ============================
+CREATE TABLE public.promo_code_usage (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  promo_code_id uuid NOT NULL REFERENCES public.promo_codes(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  user_email text NOT NULL,
+  order_id uuid REFERENCES public.orders(id) ON DELETE SET NULL,
+  discount_applied numeric(10,2) NOT NULL,
+  used_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX idx_promo_usage_code ON public.promo_code_usage (promo_code_id);
+CREATE INDEX idx_promo_usage_user ON public.promo_code_usage (user_id) WHERE user_id IS NOT NULL;
+CREATE INDEX idx_promo_usage_email ON public.promo_code_usage (lower(user_email));
+
+-- ============================
+-- USER PROMO REWARDS (codes automatiques attribués)
+-- ============================
+CREATE TABLE public.user_promo_rewards (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_email text NOT NULL,
+  promo_code_id uuid REFERENCES public.promo_codes(id) ON DELETE SET NULL,
+  reward_type text NOT NULL CHECK (reward_type IN ('welcome', 'loyalty', 'cart_abandonment', 'birthday')),
+  generated_code text,
+  is_used boolean DEFAULT false,
+  expires_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX idx_user_promo_rewards_user ON public.user_promo_rewards (user_id);
+CREATE INDEX idx_user_promo_rewards_email ON public.user_promo_rewards (lower(user_email));
+CREATE INDEX idx_user_promo_rewards_type ON public.user_promo_rewards (reward_type);
+
+COMMENT ON TABLE public.user_promo_rewards IS 'Codes promo automatiques attribués aux utilisateurs';
+
+-- ============================
+-- AUTO PROMO SETTINGS (configuration codes automatiques)
+-- ============================
+CREATE TABLE public.auto_promo_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  setting_key text UNIQUE NOT NULL,
+  setting_value jsonb NOT NULL,
+  is_enabled boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Configuration par défaut
+INSERT INTO public.auto_promo_settings (setting_key, setting_value, is_enabled) VALUES
+  ('welcome', '{
+    "discount_type": "percentage",
+    "discount_value": 10,
+    "min_order_amount": 0,
+    "expires_days": 30,
+    "email_subject": "Bienvenue ! Voici votre code promo",
+    "max_uses_per_code": 1
+  }'::jsonb, true),
+  ('loyalty', '{
+    "orders_threshold": 3,
+    "discount_type": "percentage",
+    "discount_value": 15,
+    "min_order_amount": 0,
+    "expires_days": 60,
+    "email_subject": "Merci pour votre fidélité !"
+  }'::jsonb, true),
+  ('cart_abandonment', '{
+    "delay_hours": 24,
+    "discount_type": "percentage",
+    "discount_value": 10,
+    "min_order_amount": 30,
+    "expires_days": 7,
+    "email_subject": "Vous avez oublié quelque chose..."
+  }'::jsonb, true)
+ON CONFLICT (setting_key) DO NOTHING;
 
 -- ============================
 -- EMAILS SENT
@@ -483,7 +612,10 @@ CREATE OR REPLACE FUNCTION public.create_order_with_items_full(
   p_relay_address text DEFAULT NULL,
   p_relay_zipcode text DEFAULT NULL,
   p_relay_city text DEFAULT NULL,
-  p_relay_country text DEFAULT 'FR'
+  p_relay_country text DEFAULT 'FR',
+  -- Parametres optionnels pour le code promo
+  p_promo_code_id uuid DEFAULT NULL,
+  p_promo_code_snapshot text DEFAULT NULL
 )
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -504,12 +636,13 @@ BEGIN
     RAISE EXCEPTION 'Montant invalide';
   END IF;
 
-  -- 1. Creation Commande avec infos relay optionnelles
+  -- 1. Creation Commande avec infos relay et promo optionnelles
   INSERT INTO public.orders (
     user_id, email, full_name, address, zip, city, country,
     payment_method, status,
     subtotal, tax_amount, shipping_cost, discount_amount, total_amount,
-    relay_id, relay_name, relay_address, relay_zipcode, relay_city, relay_country
+    relay_id, relay_name, relay_address, relay_zipcode, relay_city, relay_country,
+    promo_code_id, promo_code_snapshot
   )
   VALUES (
     p_user_id, p_email, p_full_name, p_address, p_zip, p_city, p_country,
@@ -518,7 +651,8 @@ BEGIN
     COALESCE(p_shipping_cost, 0), COALESCE(p_discount_amount, 0),
     p_total_amount,
     p_relay_id, p_relay_name, p_relay_address, p_relay_zipcode, p_relay_city,
-    CASE WHEN p_relay_id IS NOT NULL THEN COALESCE(p_relay_country, 'FR') ELSE NULL END
+    CASE WHEN p_relay_id IS NOT NULL THEN COALESCE(p_relay_country, 'FR') ELSE NULL END,
+    p_promo_code_id, p_promo_code_snapshot
   )
   RETURNING id, tracking_token INTO new_order_id, new_tracking_token;
 
@@ -897,6 +1031,699 @@ $$;
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
 
 -- ============================================================
+-- BLOC 9.5 — PROMO CODE FUNCTIONS
+-- ============================================================
+
+-- ============================
+-- FONCTION: validate_promo_code
+-- Valide un code promo et calcule la remise
+-- ============================
+CREATE OR REPLACE FUNCTION public.validate_promo_code(
+  p_code text,
+  p_subtotal numeric,
+  p_user_id uuid DEFAULT NULL,
+  p_user_email text DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_promo promo_codes%ROWTYPE;
+  v_discount_amount numeric(10,2);
+  v_user_usage_count integer;
+  v_effective_email text;
+BEGIN
+  -- Normaliser le code (majuscules, trim)
+  p_code := upper(trim(p_code));
+
+  -- Email effectif (user connecte ou guest)
+  v_effective_email := COALESCE(
+    p_user_email,
+    (SELECT email FROM profiles WHERE id = p_user_id)
+  );
+
+  -- Rechercher le code
+  SELECT * INTO v_promo
+  FROM promo_codes
+  WHERE upper(code) = p_code;
+
+  -- Code non trouve
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'CODE_NOT_FOUND',
+      'message', 'Ce code promo n''existe pas'
+    );
+  END IF;
+
+  -- Code inactif
+  IF NOT v_promo.active THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'CODE_INACTIVE',
+      'message', 'Ce code promo n''est plus actif'
+    );
+  END IF;
+
+  -- Verifier la periode de validite
+  IF v_promo.valid_from IS NOT NULL AND now() < v_promo.valid_from THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'CODE_NOT_YET_VALID',
+      'message', 'Ce code promo n''est pas encore valide'
+    );
+  END IF;
+
+  IF v_promo.valid_until IS NOT NULL AND now() > v_promo.valid_until THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'CODE_EXPIRED',
+      'message', 'Ce code promo a expire'
+    );
+  END IF;
+
+  -- Verifier la limite totale d'utilisation
+  IF v_promo.max_uses IS NOT NULL AND v_promo.current_uses >= v_promo.max_uses THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'CODE_MAX_USES_REACHED',
+      'message', 'Ce code promo a atteint sa limite d''utilisation'
+    );
+  END IF;
+
+  -- Verifier la limite par utilisateur
+  IF v_promo.max_uses_per_user IS NOT NULL AND v_effective_email IS NOT NULL THEN
+    SELECT COUNT(*) INTO v_user_usage_count
+    FROM promo_code_usage
+    WHERE promo_code_id = v_promo.id
+      AND lower(user_email) = lower(v_effective_email);
+
+    IF v_user_usage_count >= v_promo.max_uses_per_user THEN
+      RETURN jsonb_build_object(
+        'valid', false,
+        'error', 'CODE_USER_LIMIT_REACHED',
+        'message', 'Vous avez deja utilise ce code promo'
+      );
+    END IF;
+  END IF;
+
+  -- Verifier le montant minimum
+  IF p_subtotal < v_promo.min_order_amount THEN
+    RETURN jsonb_build_object(
+      'valid', false,
+      'error', 'MIN_AMOUNT_NOT_REACHED',
+      'message', format('Montant minimum requis: %s EUR', v_promo.min_order_amount),
+      'min_amount', v_promo.min_order_amount
+    );
+  END IF;
+
+  -- Calculer la remise
+  IF v_promo.discount_type = 'percentage' THEN
+    v_discount_amount := ROUND(p_subtotal * v_promo.discount_value / 100, 2);
+    -- Appliquer le plafond si defini
+    IF v_promo.max_discount_amount IS NOT NULL AND v_discount_amount > v_promo.max_discount_amount THEN
+      v_discount_amount := v_promo.max_discount_amount;
+    END IF;
+  ELSE
+    -- Remise fixe
+    v_discount_amount := v_promo.discount_value;
+    -- Ne pas depasser le subtotal
+    IF v_discount_amount > p_subtotal THEN
+      v_discount_amount := p_subtotal;
+    END IF;
+  END IF;
+
+  -- Succes
+  RETURN jsonb_build_object(
+    'valid', true,
+    'promo_code_id', v_promo.id,
+    'code', v_promo.code,
+    'discount_type', v_promo.discount_type,
+    'discount_value', v_promo.discount_value,
+    'discount_amount', v_discount_amount,
+    'message', CASE
+      WHEN v_promo.discount_type = 'percentage'
+      THEN format('-%s%% applique', v_promo.discount_value::integer)
+      ELSE format('-%s EUR applique', v_promo.discount_value)
+    END
+  );
+END;
+$$;
+
+COMMENT ON FUNCTION public.validate_promo_code IS 'Valide un code promo et retourne le montant de remise calcule';
+GRANT EXECUTE ON FUNCTION public.validate_promo_code TO authenticated, anon;
+
+-- ============================
+-- FONCTION: apply_promo_code
+-- Enregistre l'utilisation d'un code promo
+-- ============================
+CREATE OR REPLACE FUNCTION public.apply_promo_code(
+  p_promo_code_id uuid,
+  p_order_id uuid,
+  p_user_id uuid,
+  p_user_email text,
+  p_discount_applied numeric
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- Incrementer le compteur d'utilisation
+  UPDATE promo_codes
+  SET current_uses = current_uses + 1,
+      updated_at = now()
+  WHERE id = p_promo_code_id;
+
+  -- Enregistrer l'utilisation
+  INSERT INTO promo_code_usage (
+    promo_code_id,
+    user_id,
+    user_email,
+    order_id,
+    discount_applied
+  ) VALUES (
+    p_promo_code_id,
+    p_user_id,
+    p_user_email,
+    p_order_id,
+    p_discount_applied
+  );
+
+  RETURN true;
+END;
+$$;
+
+-- ============================
+-- FONCTION: generate_unique_promo_code
+-- Genere un code promo unique
+-- ============================
+CREATE OR REPLACE FUNCTION public.generate_unique_promo_code(
+  p_prefix text DEFAULT 'AUTO'
+)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_code text;
+  v_exists boolean;
+BEGIN
+  LOOP
+    -- Generer un code: PREFIX + 6 caracteres alphanumeriques
+    v_code := p_prefix || '-' || upper(substr(md5(random()::text), 1, 6));
+
+    -- Verifier qu'il n'existe pas deja
+    SELECT EXISTS(SELECT 1 FROM promo_codes WHERE code = v_code) INTO v_exists;
+
+    IF NOT v_exists THEN
+      RETURN v_code;
+    END IF;
+  END LOOP;
+END;
+$$;
+
+-- ============================
+-- FONCTION: create_welcome_promo
+-- Cree un code de bienvenue pour un nouvel utilisateur
+-- ============================
+CREATE OR REPLACE FUNCTION public.create_welcome_promo(
+  p_user_id uuid,
+  p_user_email text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_settings jsonb;
+  v_is_enabled boolean;
+  v_code text;
+  v_promo_id uuid;
+  v_expires_at timestamptz;
+  v_already_exists boolean;
+BEGIN
+  -- Verifier si le systeme est active
+  SELECT setting_value, is_enabled INTO v_settings, v_is_enabled
+  FROM auto_promo_settings
+  WHERE setting_key = 'welcome';
+
+  IF NOT v_is_enabled THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'welcome_promo_disabled');
+  END IF;
+
+  -- Verifier si l'utilisateur a deja recu un code de bienvenue
+  SELECT EXISTS(
+    SELECT 1 FROM user_promo_rewards
+    WHERE (user_id = p_user_id OR lower(user_email) = lower(p_user_email))
+    AND reward_type = 'welcome'
+  ) INTO v_already_exists;
+
+  IF v_already_exists THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'already_received');
+  END IF;
+
+  -- Generer un code unique
+  v_code := generate_unique_promo_code('WELCOME');
+  v_expires_at := now() + ((v_settings->>'expires_days')::integer || ' days')::interval;
+
+  -- Creer le code promo
+  INSERT INTO promo_codes (
+    code,
+    description,
+    discount_type,
+    discount_value,
+    min_order_amount,
+    max_uses,
+    max_uses_per_user,
+    valid_until,
+    active
+  ) VALUES (
+    v_code,
+    'Code de bienvenue pour ' || p_user_email,
+    v_settings->>'discount_type',
+    (v_settings->>'discount_value')::numeric,
+    COALESCE((v_settings->>'min_order_amount')::numeric, 0),
+    1,
+    1,
+    v_expires_at,
+    true
+  )
+  RETURNING id INTO v_promo_id;
+
+  -- Enregistrer l'attribution
+  INSERT INTO user_promo_rewards (
+    user_id,
+    user_email,
+    promo_code_id,
+    reward_type,
+    generated_code,
+    expires_at,
+    metadata
+  ) VALUES (
+    p_user_id,
+    p_user_email,
+    v_promo_id,
+    'welcome',
+    v_code,
+    v_expires_at,
+    jsonb_build_object('discount_value', v_settings->>'discount_value', 'discount_type', v_settings->>'discount_type')
+  );
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'code', v_code,
+    'promo_code_id', v_promo_id,
+    'discount_type', v_settings->>'discount_type',
+    'discount_value', v_settings->>'discount_value',
+    'expires_at', v_expires_at
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_welcome_promo TO authenticated;
+
+-- ============================
+-- FONCTION: check_loyalty_reward
+-- Verifie et attribue un code de fidelite apres X commandes
+-- ============================
+CREATE OR REPLACE FUNCTION public.check_loyalty_reward(
+  p_user_id uuid,
+  p_user_email text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_settings jsonb;
+  v_is_enabled boolean;
+  v_orders_count integer;
+  v_threshold integer;
+  v_code text;
+  v_promo_id uuid;
+  v_expires_at timestamptz;
+  v_already_rewarded boolean;
+  v_reward_level integer;
+BEGIN
+  -- Verifier si le systeme est active
+  SELECT setting_value, is_enabled INTO v_settings, v_is_enabled
+  FROM auto_promo_settings
+  WHERE setting_key = 'loyalty';
+
+  IF NOT v_is_enabled THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'loyalty_promo_disabled');
+  END IF;
+
+  v_threshold := (v_settings->>'orders_threshold')::integer;
+
+  -- Compter les commandes confirmees de l'utilisateur
+  SELECT COUNT(*) INTO v_orders_count
+  FROM orders
+  WHERE (user_id = p_user_id OR lower(email) = lower(p_user_email))
+  AND status IN ('confirmed', 'processing', 'shipped', 'delivered');
+
+  -- Calculer le niveau de recompense (multiples du seuil)
+  v_reward_level := v_orders_count / v_threshold;
+
+  IF v_reward_level < 1 THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'reason', 'threshold_not_reached',
+      'orders_count', v_orders_count,
+      'threshold', v_threshold
+    );
+  END IF;
+
+  -- Verifier si deja recompense pour ce niveau
+  SELECT EXISTS(
+    SELECT 1 FROM user_promo_rewards
+    WHERE (user_id = p_user_id OR lower(user_email) = lower(p_user_email))
+    AND reward_type = 'loyalty'
+    AND (metadata->>'reward_level')::integer = v_reward_level
+  ) INTO v_already_rewarded;
+
+  IF v_already_rewarded THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'already_rewarded_for_level', 'level', v_reward_level);
+  END IF;
+
+  -- Generer un code unique
+  v_code := generate_unique_promo_code('MERCI');
+  v_expires_at := now() + ((v_settings->>'expires_days')::integer || ' days')::interval;
+
+  -- Creer le code promo
+  INSERT INTO promo_codes (
+    code,
+    description,
+    discount_type,
+    discount_value,
+    min_order_amount,
+    max_uses,
+    max_uses_per_user,
+    valid_until,
+    active
+  ) VALUES (
+    v_code,
+    'Code fidelite niveau ' || v_reward_level || ' pour ' || p_user_email,
+    v_settings->>'discount_type',
+    (v_settings->>'discount_value')::numeric,
+    COALESCE((v_settings->>'min_order_amount')::numeric, 0),
+    1,
+    1,
+    v_expires_at,
+    true
+  )
+  RETURNING id INTO v_promo_id;
+
+  -- Enregistrer l'attribution
+  INSERT INTO user_promo_rewards (
+    user_id,
+    user_email,
+    promo_code_id,
+    reward_type,
+    generated_code,
+    expires_at,
+    metadata
+  ) VALUES (
+    p_user_id,
+    p_user_email,
+    v_promo_id,
+    'loyalty',
+    v_code,
+    v_expires_at,
+    jsonb_build_object(
+      'reward_level', v_reward_level,
+      'orders_count', v_orders_count,
+      'discount_value', v_settings->>'discount_value',
+      'discount_type', v_settings->>'discount_type'
+    )
+  );
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'code', v_code,
+    'promo_code_id', v_promo_id,
+    'reward_level', v_reward_level,
+    'orders_count', v_orders_count,
+    'discount_type', v_settings->>'discount_type',
+    'discount_value', v_settings->>'discount_value',
+    'expires_at', v_expires_at
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.check_loyalty_reward TO authenticated;
+
+-- ============================
+-- FONCTION: create_cart_abandonment_promo
+-- Cree un code pour panier abandonne
+-- ============================
+CREATE OR REPLACE FUNCTION public.create_cart_abandonment_promo(
+  p_user_id uuid,
+  p_user_email text,
+  p_cart_value numeric DEFAULT 0
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_settings jsonb;
+  v_is_enabled boolean;
+  v_code text;
+  v_promo_id uuid;
+  v_expires_at timestamptz;
+  v_recent_abandonment boolean;
+BEGIN
+  -- Verifier si le systeme est active
+  SELECT setting_value, is_enabled INTO v_settings, v_is_enabled
+  FROM auto_promo_settings
+  WHERE setting_key = 'cart_abandonment';
+
+  IF NOT v_is_enabled THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'cart_abandonment_disabled');
+  END IF;
+
+  -- Verifier qu'on n'a pas envoye de code recemment (7 jours)
+  SELECT EXISTS(
+    SELECT 1 FROM user_promo_rewards
+    WHERE (user_id = p_user_id OR lower(user_email) = lower(p_user_email))
+    AND reward_type = 'cart_abandonment'
+    AND created_at > now() - interval '7 days'
+  ) INTO v_recent_abandonment;
+
+  IF v_recent_abandonment THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'recent_abandonment_code_sent');
+  END IF;
+
+  -- Generer un code unique
+  v_code := generate_unique_promo_code('PANIER');
+  v_expires_at := now() + ((v_settings->>'expires_days')::integer || ' days')::interval;
+
+  -- Creer le code promo
+  INSERT INTO promo_codes (
+    code,
+    description,
+    discount_type,
+    discount_value,
+    min_order_amount,
+    max_uses,
+    max_uses_per_user,
+    valid_until,
+    active
+  ) VALUES (
+    v_code,
+    'Code panier abandonne pour ' || p_user_email,
+    v_settings->>'discount_type',
+    (v_settings->>'discount_value')::numeric,
+    COALESCE((v_settings->>'min_order_amount')::numeric, 0),
+    1,
+    1,
+    v_expires_at,
+    true
+  )
+  RETURNING id INTO v_promo_id;
+
+  -- Enregistrer l'attribution
+  INSERT INTO user_promo_rewards (
+    user_id,
+    user_email,
+    promo_code_id,
+    reward_type,
+    generated_code,
+    expires_at,
+    metadata
+  ) VALUES (
+    p_user_id,
+    p_user_email,
+    v_promo_id,
+    'cart_abandonment',
+    v_code,
+    v_expires_at,
+    jsonb_build_object(
+      'cart_value', p_cart_value,
+      'discount_value', v_settings->>'discount_value',
+      'discount_type', v_settings->>'discount_type'
+    )
+  );
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'code', v_code,
+    'promo_code_id', v_promo_id,
+    'discount_type', v_settings->>'discount_type',
+    'discount_value', v_settings->>'discount_value',
+    'expires_at', v_expires_at,
+    'cart_value', p_cart_value
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_cart_abandonment_promo TO authenticated;
+
+-- ============================
+-- FONCTION: find_abandoned_carts
+-- Trouve les paniers abandonnes pour le cron job
+-- ============================
+CREATE OR REPLACE FUNCTION public.find_abandoned_carts(
+  p_cutoff_time timestamptz,
+  p_min_value numeric DEFAULT 30
+)
+RETURNS TABLE (
+  user_id uuid,
+  email text,
+  cart_total numeric,
+  last_activity timestamptz,
+  items_count bigint
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    p.id as user_id,
+    p.email,
+    COALESCE(SUM(
+      CASE
+        WHEN pr.is_on_sale AND pr.sale_price IS NOT NULL
+        THEN pr.sale_price * ci.quantity
+        ELSE pr.price * ci.quantity
+      END
+    ), 0) as cart_total,
+    MAX(ci.updated_at) as last_activity,
+    COUNT(ci.id) as items_count
+  FROM profiles p
+  INNER JOIN user_cart_items ci ON ci.user_id = p.id
+  INNER JOIN products pr ON pr.id = ci.product_id
+  WHERE
+    -- Panier mis a jour avant le cutoff (abandonne)
+    ci.updated_at < p_cutoff_time
+    -- Pas de commande recente (dans les dernieres 48h)
+    AND NOT EXISTS (
+      SELECT 1 FROM orders o
+      WHERE o.user_id = p.id
+      AND o.created_at > p_cutoff_time - interval '24 hours'
+    )
+    -- Pas de code abandon envoye recemment (7 jours)
+    AND NOT EXISTS (
+      SELECT 1 FROM user_promo_rewards upr
+      WHERE upr.user_id = p.id
+      AND upr.reward_type = 'cart_abandonment'
+      AND upr.created_at > now() - interval '7 days'
+    )
+  GROUP BY p.id, p.email
+  HAVING COALESCE(SUM(
+    CASE
+      WHEN pr.is_on_sale AND pr.sale_price IS NOT NULL
+      THEN pr.sale_price * ci.quantity
+      ELSE pr.price * ci.quantity
+    END
+  ), 0) >= p_min_value;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.find_abandoned_carts TO authenticated;
+
+-- ============================
+-- TRIGGER: Creer code bienvenue a l'inscription
+-- ============================
+CREATE OR REPLACE FUNCTION public.trigger_welcome_promo()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  -- Creer le code de bienvenue directement
+  v_result := create_welcome_promo(NEW.id, NEW.email);
+
+  -- Log le resultat (pour debug)
+  IF (v_result->>'success')::boolean THEN
+    RAISE NOTICE 'Code bienvenue cree pour %: %', NEW.email, v_result->>'code';
+  END IF;
+
+  RETURN NEW;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Ne pas bloquer l'inscription si la creation du code echoue
+    RAISE WARNING 'Erreur creation code bienvenue pour %: %', NEW.email, SQLERRM;
+    RETURN NEW;
+END;
+$$;
+
+-- Trigger sur creation de profil
+DROP TRIGGER IF EXISTS tr_welcome_promo ON public.profiles;
+CREATE TRIGGER tr_welcome_promo
+  AFTER INSERT ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION trigger_welcome_promo();
+
+-- ============================
+-- TRIGGER: Verifier fidelite apres commande confirmee
+-- ============================
+CREATE OR REPLACE FUNCTION public.trigger_check_loyalty()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  -- Verifier seulement si le statut passe a 'confirmed'
+  IF NEW.status = 'confirmed' AND (OLD.status IS NULL OR OLD.status <> 'confirmed') THEN
+    -- Verifier et attribuer un code de fidelite
+    v_result := check_loyalty_reward(NEW.user_id, NEW.email);
+
+    IF (v_result->>'success')::boolean THEN
+      RAISE NOTICE 'Code fidelite cree pour %: % (niveau %)',
+        NEW.email, v_result->>'code', v_result->>'reward_level';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Ne pas bloquer la commande si le check fidelite echoue
+    RAISE WARNING 'Erreur check fidelite pour %: %', NEW.email, SQLERRM;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS tr_check_loyalty ON public.orders;
+CREATE TRIGGER tr_check_loyalty
+  AFTER INSERT OR UPDATE ON public.orders
+  FOR EACH ROW
+  EXECUTE FUNCTION trigger_check_loyalty();
+
+-- ============================================================
 -- BLOC 10 — VUES (VIEWS) V5.0
 -- ============================================================
 
@@ -1135,6 +1962,103 @@ SELECT
 FROM auth.users u
 LEFT JOIN public.profiles p ON u.id = p.id;
 
+-- 6. Vue Admin des Codes Promo
+CREATE OR REPLACE VIEW public.promo_codes_admin AS
+SELECT
+  pc.id,
+  pc.code,
+  pc.description,
+  pc.discount_type,
+  pc.discount_value,
+  pc.min_order_amount,
+  pc.max_discount_amount,
+  pc.max_uses,
+  pc.max_uses_per_user,
+  pc.current_uses,
+  pc.valid_from,
+  pc.valid_until,
+  pc.active,
+  pc.created_at,
+  pc.updated_at,
+  -- Statistiques d'utilisation
+  COALESCE(usage_stats.total_uses, 0) AS total_uses,
+  COALESCE(usage_stats.total_discount_given, 0) AS total_discount_given,
+  usage_stats.last_used_at,
+  -- Type de code (manuel ou automatique)
+  CASE
+    WHEN pc.code LIKE 'WELCOME-%' THEN 'welcome'
+    WHEN pc.code LIKE 'MERCI-%' THEN 'loyalty'
+    WHEN pc.code LIKE 'PANIER-%' THEN 'cart_abandonment'
+    ELSE 'manual'
+  END AS code_type
+FROM public.promo_codes pc
+LEFT JOIN (
+  SELECT
+    promo_code_id,
+    COUNT(*) AS total_uses,
+    SUM(discount_applied) AS total_discount_given,
+    MAX(used_at) AS last_used_at
+  FROM public.promo_code_usage
+  GROUP BY promo_code_id
+) usage_stats ON usage_stats.promo_code_id = pc.id
+ORDER BY pc.created_at DESC;
+
+ALTER VIEW public.promo_codes_admin SET (security_invoker = true);
+GRANT SELECT ON public.promo_codes_admin TO authenticated;
+
+-- ============================================================
+-- BLOC 10.5 — RLS POLICIES PROMO CODES
+-- ============================================================
+
+-- Activer RLS sur les tables promo
+ALTER TABLE public.promo_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.promo_code_usage ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_promo_rewards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.auto_promo_settings ENABLE ROW LEVEL SECURITY;
+
+-- PROMO_CODES: Les codes actifs sont lisibles par tous (pour validation)
+CREATE POLICY "promo_codes_select_active" ON public.promo_codes
+  FOR SELECT USING (active = true);
+
+-- PROMO_CODES: Seuls les admins peuvent gerer les codes
+CREATE POLICY "promo_codes_admin_all" ON public.promo_codes
+  FOR ALL USING (public.is_admin());
+
+-- PROMO_CODE_USAGE: Les utilisateurs peuvent voir leurs propres utilisations
+CREATE POLICY "promo_usage_user_select" ON public.promo_code_usage
+  FOR SELECT USING (
+    user_id = auth.uid()
+    OR public.is_admin()
+  );
+
+-- PROMO_CODE_USAGE: Seul le systeme (via SECURITY DEFINER) peut inserer
+CREATE POLICY "promo_usage_insert_system" ON public.promo_code_usage
+  FOR INSERT WITH CHECK (public.is_admin());
+
+-- USER_PROMO_REWARDS: Les utilisateurs peuvent voir leurs propres recompenses
+CREATE POLICY "user_promo_rewards_user_select" ON public.user_promo_rewards
+  FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
+
+-- USER_PROMO_REWARDS: Seuls les admins peuvent tout gerer
+CREATE POLICY "user_promo_rewards_admin_all" ON public.user_promo_rewards
+  FOR ALL USING (public.is_admin());
+
+-- AUTO_PROMO_SETTINGS: Lecture publique, ecriture admin
+CREATE POLICY "auto_promo_settings_select" ON public.auto_promo_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "auto_promo_settings_admin" ON public.auto_promo_settings
+  FOR ALL USING (public.is_admin());
+
+-- ============================================================
+-- BLOC 10.6 — GRANTS PROMO CODES
+-- ============================================================
+
+GRANT SELECT ON public.promo_codes TO authenticated, anon;
+GRANT SELECT ON public.promo_code_usage TO authenticated;
+GRANT SELECT ON public.user_promo_rewards TO authenticated;
+GRANT SELECT ON public.auto_promo_settings TO authenticated, anon;
+
 -- ============================================================
 -- BLOC 11 — REALTIME CONFIGURATION
 -- ============================================================
@@ -1157,5 +2081,8 @@ BEGIN
 END $$;
 
 -- ============================================================
--- FIN DU BACKUP V5.2 — i18n + GUEST + RELAY + MANUAL PAYMENT
+-- FIN DU BACKUP V5.3 — PROMO CODES SYSTEM
+-- ============================================================
+-- Codes promo manuels + automatiques (bienvenue, fidelite, abandon panier)
+-- Interface admin + tracking utilisation + triggers automatiques
 -- ============================================================

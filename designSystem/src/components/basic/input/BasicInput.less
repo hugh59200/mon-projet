@@ -27,6 +27,11 @@
     input {
       font-size: @font-size-body-m;
     }
+
+    // Mobile : hauteur minimum 44px pour touch
+    .respond-mobile({
+      height: 44px;
+    });
   }
 
   &--small {
@@ -35,6 +40,14 @@
     input {
       font-size: @font-size-body-s;
     }
+
+    // Mobile : minimum 44px pour accessibilité touch
+    .respond-mobile({
+      height: 44px;
+      input {
+        font-size: @font-size-body-m;
+      }
+    });
   }
 
   &--success {

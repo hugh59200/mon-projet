@@ -284,7 +284,7 @@
     }
   }
 
-  // Responsive
+  // Responsive - utilise les breakpoints harmonisés
   @media (min-width: 1301px) {
     .navbar__container {
       padding: 0 32px;
@@ -292,41 +292,39 @@
     }
   }
 
-  @media (max-width: 1300px) {
+  // Tablet large
+  .respond-tablet({
     .navbar__container {
-      gap: 24px;
-    }
-  }
-
-  @media (max-width: 1100px) {
-    .navbar__container {
-      gap: 16px;
+      gap: 20px;
       padding: 0 20px;
     }
-  }
+  });
 
-  @media (max-width: 1000px) {
-    .navbar__container {
-      gap: 12px;
-      padding: 0 16px;
-    }
-  }
-
-  @media (max-width: 750px) {
+  // Mobile (≤ 720px)
+  .respond-mobile({
     .navbar {
       height: 60px;
     }
 
     .navbar__container {
       padding: 0 16px;
-      gap: 12px;
+      gap: 8px;
     }
 
     .navbar__icon-btn {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
     }
-  }
+
+    .navbar__burger {
+      width: 40px;
+      height: 40px;
+    }
+
+    .navbar__right {
+      gap: 8px;
+    }
+  });
 
   // Deep styles for trigger buttons only (not dropdown items)
   .navbar :deep(.cart-menu > button),

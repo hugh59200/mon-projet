@@ -650,79 +650,40 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // RESPONSIVE
+    // RESPONSIVE - Breakpoints harmonisés
     // ═══════════════════════════════════════════════════════════════
 
-    // Tablet landscape
-    @media (max-width: 1100px) {
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       &__top {
         gap: 20px;
         padding: 28px;
+        flex-direction: column;
       }
       &__panel {
-        flex: 0 0 320px;
+        flex: none;
         padding: 24px;
       }
       &__personas {
+        grid-template-columns: repeat(4, 1fr);
         gap: 10px;
       }
       .persona-card {
         padding: 8px;
         border-radius: 12px;
-      }
-    }
-
-    // Tablet portrait - Stack
-    @media (max-width: 900px) {
-      border-radius: 20px;
-
-      &__top {
-        flex-direction: column;
-        padding: 24px;
-      }
-
-      &__panel {
-        flex: none;
-      }
-
-      &__personas {
-        grid-template-columns: repeat(4, 1fr);
-      }
-
-      .persona-card {
         &__tag {
           font-size: 0.5rem;
           padding: 2px 6px;
         }
       }
-
       &__bottom-header,
       .scroll-track {
         padding: 0 24px;
       }
-    }
+    });
 
-    // Small tablet
-    @media (max-width: 768px) {
-      &__personas {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
-
-      .scroll-track {
-        gap: 20px;
-        .peptide-item {
-          width: 90px;
-          &__img-wrapper {
-            width: 64px;
-            height: 64px;
-          }
-        }
-      }
-    }
-
-    // Mobile
-    @media (max-width: 500px) {
+    // Mobile (≤ 720px)
+    .respond-mobile({
       border-radius: 16px;
       margin-top: 20px;
 
@@ -739,7 +700,7 @@
       }
 
       &__personas {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
         .persona-card {
           min-width: 100%;
@@ -765,6 +726,6 @@
           }
         }
       }
-    }
+    });
   }
 </style>

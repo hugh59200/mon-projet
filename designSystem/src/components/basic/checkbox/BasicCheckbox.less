@@ -3,12 +3,23 @@
   display: flex;
   align-items: flex-start;
   cursor: pointer;
+  // Mobile : zone de tap minimum 44px
+  min-height: 44px;
+  padding: @spacing-10 0;
+
+  .respond-mobile({
+    padding: @spacing-15 0;
+  });
 
   &__label {
     margin: @spacing-10 0 0 @spacing-10;
     font-size: @font-size-body-l;
     font-weight: @font-weight-regular;
     caret-color: transparent;
+
+    .respond-mobile({
+      margin-top: @spacing-5;
+    });
   }
 
   &__icon {
@@ -24,6 +35,12 @@
     transition:
       background-color 0.15s ease,
       border-color 0.15s ease;
+
+    // Mobile : checkbox légèrement plus grande
+    .respond-mobile({
+      width: 20px;
+      height: 20px;
+    });
 
     &--checked {
       background-color: var(--primary-600);
@@ -48,6 +65,11 @@
       align-items: center;
       width: 16px;
       height: 16px;
+
+      .respond-mobile({
+        width: 20px;
+        height: 20px;
+      });
     }
   }
 

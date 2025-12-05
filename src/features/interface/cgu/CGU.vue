@@ -283,9 +283,9 @@
     gap: 40px;
     align-items: start;
 
-    @media (max-width: 900px) {
+    .respond-tablet({
       grid-template-columns: 1fr; // Une seule colonne sur mobile/tablette
-    }
+    });
   }
 
   // --- SIDEBAR (NAVIGATION) ---
@@ -483,13 +483,13 @@
   }
 
   // --- RESPONSIVE ---
-  @media (max-width: 900px) {
+  .respond-tablet({
     .cgu-sidebar {
       display: none; // On cache le sommaire sticky sur mobile pour simplifier
     }
-  }
+  });
 
-  @media (max-width: 600px) {
+  .respond-mobile({
     .cgu-page {
       padding: 20px 10px;
     }
@@ -511,7 +511,7 @@
     .cgu-article__content p {
       text-align: left;
     }
-  }
+  });
 
   // --- PRINT ---
   @media print {

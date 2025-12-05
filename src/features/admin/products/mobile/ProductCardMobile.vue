@@ -81,6 +81,7 @@
           variant="ghost"
           size="sm"
           icon-left="Trash2"
+          class="action-btn"
           @click="handleDelete(product)"
         />
       </div>
@@ -193,5 +194,11 @@
   .purity-text {
     font-size: 12px;
     color: @neutral-500;
+  }
+
+  // Zone tactile minimum 44px
+  .action-btn {
+    min-width: 44px;
+    min-height: 44px;
   }
 </style>

@@ -1391,7 +1391,7 @@
     // ============================================
     // RESPONSIVE
     // ============================================
-    @media (max-width: 1000px) {
+    .respond-tablet({
       &__calc-grid {
         grid-template-columns: 1fr;
         gap: 32px;
@@ -1405,13 +1405,13 @@
       &__step-connector {
         display: none;
       }
-    }
+    });
 
-    @media (max-width: 768px) {
+    .respond-mobile({
       padding: 24px 16px 60px;
 
       &__title {
-        font-size: 32px;
+        font-size: 28px;
       }
 
       &__subtitle {
@@ -1499,12 +1499,6 @@
       &__syringe-body {
         height: 150px;
       }
-    }
-
-    @media (max-width: 480px) {
-      &__title {
-        font-size: 28px;
-      }
 
       &__presets-btns {
         flex-direction: column;
@@ -1512,6 +1506,7 @@
 
       &__preset-btn {
         width: 100%;
+        min-height: 44px;
         text-align: center;
       }
 
@@ -1525,6 +1520,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 16px;
       }
-    }
+    });
   }
 </style>

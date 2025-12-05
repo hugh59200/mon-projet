@@ -1,0 +1,5 @@
+export { default as CheckoutProgress } from './CheckoutProgress.vue'
+export { default as CheckoutCartSection } from './CheckoutCartSection.vue'
+export { default as CheckoutShippingSection } from './CheckoutShippingSection.vue'
+export { default as CheckoutPaymentSection } from './CheckoutPaymentSection.vue'
+export { default as CheckoutSummary } from './CheckoutSummary.vue'

@@ -591,9 +591,11 @@
     }
 
     // ============================================
-    // RESPONSIVE
+    // RESPONSIVE - Utilise les mixins harmonisés
     // ============================================
-    @media (max-width: 1100px) {
+
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       &__top {
         grid-template-columns: 1fr;
         gap: 32px;
@@ -624,26 +626,6 @@
       &__newsletter-form {
         width: 280px;
       }
-    }
-
-    @media (max-width: 768px) {
-      &__container {
-        padding: 40px 24px 20px;
-      }
-
-      &__nav {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-      }
-
-      &__newsletter {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      &__newsletter-form {
-        width: 100%;
-      }
 
       &__disclaimer {
         flex-direction: column;
@@ -659,6 +641,43 @@
 
       &__disclaimer-sep {
         display: none;
+      }
+    });
+
+    // Mobile (≤ 720px)
+    .respond-mobile({
+      &__container {
+        padding: 32px 16px 16px;
+      }
+
+      &__nav {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      &__nav-title {
+        font-size: 10px;
+      }
+
+      &__nav-list a,
+      &__nav-list span {
+        font-size: 12px;
+      }
+
+      &__newsletter {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+      }
+
+      &__newsletter-form {
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      &__newsletter-btn {
+        width: 100%;
       }
 
       &__trust {
@@ -684,21 +703,11 @@
         flex-wrap: wrap;
         gap: 12px;
       }
-    }
 
-    @media (max-width: 480px) {
-      &__brand {
-        flex-direction: column;
-        align-items: flex-start;
+      &__copyright {
+        font-size: 11px;
       }
+    });
 
-      &__nav {
-        grid-template-columns: 1fr;
-      }
-
-      &__trust-icons {
-        flex-wrap: wrap;
-      }
-    }
   }
 </style>

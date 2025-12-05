@@ -700,10 +700,23 @@
 }
 
 // ============================================
-// RESPONSIVE
+// RESPONSIVE - Mobile (≤ 720px)
 // ============================================
-@media (max-width: 640px) {
+.respond-mobile({
   .pbtn {
+    // Feedback tactile optimisé
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    // Transition plus rapide sur mobile pour le retour haptique
+    transition: all 0.15s @ease;
+
+    // Active state plus prononcé pour le feedback tactile
+    &:active:not(.pbtn--disabled):not(.pbtn--loading) {
+      transform: scale(0.96) !important;
+      transition: transform 0.1s ease;
+    }
+
     &--xl {
       height: 52px;
       padding: 0 24px;
@@ -715,5 +728,15 @@
       padding: 0 20px;
       font-size: 14px;
     }
+
+    // Taille minimum touch-friendly pour sm et xs
+    &--sm {
+      min-height: 44px; // Touch target minimum
+    }
+
+    &--xs {
+      min-height: 40px;
+      padding: 0 14px;
+    }
   }
-}
+});

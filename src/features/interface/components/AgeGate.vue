@@ -280,7 +280,7 @@ function handleBackdropClick() {
 }
 
 // Responsive
-@media (max-width: 480px) {
+.respond-mobile({
   .age-gate {
     padding: 16px;
 
@@ -304,12 +304,12 @@ function handleBackdropClick() {
 
     &__list li {
       padding: 10px 14px;
+      min-height: 44px;
 
       span {
         font-size: 13px;
       }
     }
-
   }
-}
+});
 </style>

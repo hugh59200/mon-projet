@@ -2334,17 +2334,15 @@ onMounted(async () => {
   }
 
   // ===========================
-  // RESPONSIVE
+  // RESPONSIVE - Tablet (≤ 1160px)
   // ===========================
-  @media (max-width: 1100px) {
+  .respond-tablet({
     &__grid,
     &__skeleton-grid {
       grid-template-columns: 1fr 360px;
       gap: 28px;
     }
-  }
 
-  @media (max-width: 960px) {
     &__search-layout {
       grid-template-columns: 1fr;
       max-width: 560px;
@@ -2355,30 +2353,41 @@ onMounted(async () => {
       order: 1;
     }
 
+    &__sidebar,
+    &__skeleton-sidebar {
+      position: static;
+    }
+  });
+
+  // ===========================
+  // RESPONSIVE - Mobile (≤ 720px)
+  // ===========================
+  .respond-mobile({
     &__grid,
     &__skeleton-grid {
       grid-template-columns: 1fr;
     }
 
-    &__sidebar,
-    &__skeleton-sidebar {
-      position: static;
-    }
-  }
-
-  @media (max-width: 768px) {
     &__header {
       margin-bottom: 36px;
     }
 
+    &__title {
+      font-size: 28px;
+    }
+
     &__search-card {
-      padding: 28px 24px;
-      border-radius: 24px;
+      padding: 24px 20px;
+      border-radius: 20px;
     }
 
     &__form-row {
       grid-template-columns: 1fr;
       gap: 16px;
+    }
+
+    &__submit {
+      padding: 16px 24px;
     }
 
     &__details,
@@ -2405,52 +2414,18 @@ onMounted(async () => {
       gap: 20px;
     }
 
+    &__status-card {
+      padding: 24px;
+      border-radius: 20px;
+    }
+
     &__timeline {
       padding: 24px 16px;
       overflow-x: auto;
     }
 
     &__timeline-progress {
-      left: 60px;
-      right: 60px;
-    }
-
-    &__timeline-step {
-      min-width: 80px;
-    }
-
-    &__timeline-icon {
-      width: 44px;
-      height: 44px;
-    }
-
-    &__timeline-label {
-      font-size: 12px;
-    }
-
-    &__trust {
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    &__title {
-      font-size: 28px;
-    }
-
-    &__search-card {
-      padding: 24px 20px;
-    }
-
-    &__submit {
-      padding: 16px 24px;
-    }
-
-    &__status-card {
-      padding: 24px;
-      border-radius: 20px;
+      display: none;
     }
 
     &__timeline-steps {
@@ -2461,10 +2436,16 @@ onMounted(async () => {
 
     &__timeline-step {
       width: 45%;
+      min-width: 80px;
     }
 
-    &__timeline-progress {
-      display: none;
+    &__timeline-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    &__timeline-label {
+      font-size: 12px;
     }
 
     &__detail-card {
@@ -2478,6 +2459,12 @@ onMounted(async () => {
     &__register {
       padding: 24px 20px;
     }
-  }
+
+    &__trust {
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+  });
 }
 </style>

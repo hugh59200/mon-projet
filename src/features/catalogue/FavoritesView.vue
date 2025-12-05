@@ -264,21 +264,23 @@ function viewProduct(productId: string): void {
   }
 }
 
-// Responsive
-@media (max-width: 768px) {
+// Responsive - Tablet (≤ 1160px)
+.respond-tablet({
   .favorites-view {
     &__grid {
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: @spacing-15;
     }
   }
-}
+});
 
-@media (max-width: 480px) {
+// Responsive - Mobile (≤ 720px)
+.respond-mobile({
   .favorites-view {
     &__grid {
       grid-template-columns: 1fr;
+      gap: @spacing-15;
     }
   }
-}
+});
 </style>

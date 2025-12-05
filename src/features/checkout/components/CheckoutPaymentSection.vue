@@ -1,0 +1,416 @@
+<template>
+  <section class="checkout-payment">
+    <div class="checkout-payment__header">
+      <div class="checkout-payment__icon">
+        <BasicIconNext name="CreditCard" :size="20" />
+      </div>
+      <div>
+        <h2 class="checkout-payment__title">{{ t('checkout.steps.payment') }}</h2>
+        <p class="checkout-payment__subtitle">{{ t('checkout.payment.method') }}</p>
+      </div>
+    </div>
+
+    <div class="checkout-payment__methods">
+      <!-- Méthodes disponibles -->
+      <div class="checkout-payment__available">
+        <!-- Crypto-monnaie -->
+        <button
+          class="payment-card"
+          :class="{ 'payment-card--active': modelValue === 'crypto' }"
+          type="button"
+          @click="$emit('update:modelValue', 'crypto')"
+        >
+          <div class="payment-card__radio">
+            <div class="payment-card__radio-inner" />
+          </div>
+          <div class="payment-card__icon payment-card__icon--crypto">
+            <BasicIconNext name="Bitcoin" :size="24" />
+          </div>
+          <div class="payment-card__content">
+            <span class="payment-card__title">{{ t('checkout.payment.crypto') }}</span>
+            <span class="payment-card__desc">{{ t('checkout.payment.cryptoDesc') }}</span>
+          </div>
+          <div class="payment-card__crypto-icons">
+            <span class="payment-card__crypto-badge">BTC</span>
+            <span class="payment-card__crypto-badge">USDT</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Section Bientôt disponible -->
+      <div class="checkout-payment__coming-soon">
+        <button
+          class="checkout-payment__coming-header"
+          type="button"
+          @click="showComingSoon = !showComingSoon"
+        >
+          <div class="checkout-payment__coming-left">
+            <BasicIconNext name="Clock" :size="16" />
+            <span>{{ t('checkout.payment.otherMethods') }}</span>
+            <span class="checkout-payment__coming-badge">{{ t('common.comingSoon') }}</span>
+          </div>
+          <BasicIconNext
+            name="ChevronDown"
+            :size="20"
+            class="checkout-payment__coming-chevron"
+            :class="{ 'checkout-payment__coming-chevron--open': showComingSoon }"
+          />
+        </button>
+
+        <!-- Contenu collapsible - Virement bancaire -->
+        <Transition name="collapse">
+          <div v-if="showComingSoon" class="checkout-payment__coming-content">
+            <div class="payment-card payment-card--disabled">
+              <div class="payment-card__icon payment-card__icon--bank">
+                <BasicIconNext name="Landmark" :size="24" />
+              </div>
+              <div class="payment-card__content">
+                <span class="payment-card__title">{{ t('checkout.payment.bankTransfer') }}</span>
+                <span class="payment-card__desc">{{ t('checkout.payment.bankTransferDesc') }}</span>
+              </div>
+              <div class="payment-card__badge-coming">
+                {{ t('common.comingSoon') }}
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+type PaymentMethod = 'bank_transfer' | 'crypto'
+
+defineProps<{
+  modelValue: PaymentMethod
+}>()
+
+defineEmits<{
+  (e: 'update:modelValue', value: PaymentMethod): void
+}>()
+
+const { t } = useI18n()
+const showComingSoon = ref(false)
+</script>
+
+<style scoped lang="less">
+.checkout-payment {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid @neutral-100;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+    border-radius: 14px;
+    color: var(--primary-600);
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: @neutral-900;
+    margin: 0 0 4px;
+  }
+
+  &__subtitle {
+    font-size: 14px;
+    color: @neutral-500;
+    margin: 0;
+  }
+
+  &__methods {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__coming-soon {
+    border: 1px solid @neutral-200;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  &__coming-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: @neutral-50;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: @neutral-100;
+    }
+  }
+
+  &__coming-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: @neutral-600;
+  }
+
+  &__coming-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: @warning-700;
+    background: @warning-100;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  &__coming-chevron {
+    color: @neutral-400;
+    transition: transform 0.3s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__coming-content {
+    padding: 16px;
+    border-top: 1px solid @neutral-200;
+  }
+}
+
+.payment-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px;
+  background: white;
+  border: 2px solid @neutral-200;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 44px;
+
+  &:hover:not(&--disabled) {
+    border-color: var(--primary-300);
+    background: color-mix(in srgb, var(--primary-500) 2%, white);
+  }
+
+  &--active {
+    border-color: var(--primary-500);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary-500) 4%, white) 0%,
+      color-mix(in srgb, var(--primary-500) 2%, white) 100%
+    );
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-500) 15%, transparent);
+
+    .payment-card__radio-inner {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    background: @neutral-50;
+  }
+
+  &__radio {
+    width: 20px;
+    height: 20px;
+    border: 2px solid @neutral-300;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+
+    .payment-card--active & {
+      border-color: var(--primary-500);
+    }
+  }
+
+  &__radio-inner {
+    width: 10px;
+    height: 10px;
+    background: var(--primary-500);
+    border-radius: 50%;
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.2s ease;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+
+    &--crypto {
+      background: linear-gradient(135deg, @orange-100 0%, @orange-50 100%);
+      color: @orange-600;
+    }
+
+    &--bank {
+      background: linear-gradient(135deg, @blue-100 0%, @blue-50 100%);
+      color: @blue-600;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  &__title {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: @neutral-900;
+    margin-bottom: 2px;
+  }
+
+  &__desc {
+    display: block;
+    font-size: 13px;
+    color: @neutral-500;
+  }
+
+  &__crypto-icons {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  &__crypto-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: @orange-700;
+    background: @orange-100;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  &__badge-coming {
+    font-size: 11px;
+    font-weight: 600;
+    color: @neutral-500;
+    background: @neutral-200;
+    padding: 4px 10px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+}
+
+// Collapse animation
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+// Tablet
+.respond-tablet({
+  .checkout-payment {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .payment-card {
+    padding: 16px;
+    gap: 12px;
+
+    &__icon {
+      width: 44px;
+      height: 44px;
+    }
+  }
+});
+
+// Mobile
+.respond-mobile({
+  .checkout-payment {
+    padding: 16px;
+    border-radius: 16px;
+
+    &__header {
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    &__title {
+      font-size: 16px;
+    }
+  }
+
+  .payment-card {
+    padding: 14px;
+    gap: 10px;
+    border-radius: 12px;
+    min-height: 60px;
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    &__title {
+      font-size: 14px;
+    }
+
+    &__desc {
+      font-size: 12px;
+    }
+
+    &__crypto-icons {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &__crypto-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+    }
+  }
+});
+</style>

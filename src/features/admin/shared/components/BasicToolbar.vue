@@ -65,8 +65,8 @@
       margin-left: auto;
     }
 
-    // Tablette
-    @media (max-width: 1024px) {
+    // Tablet (≤ 1160px)
+    .respond-tablet({
       padding: 10px 14px;
 
       &__row {
@@ -82,11 +82,12 @@
         margin-left: auto;
         flex-shrink: 0;
       }
-    }
+    });
 
-    // Mobile
-    @media (max-width: 768px) {
+    // Mobile (≤ 720px)
+    .respond-mobile({
       padding: 10px 12px;
+      border-radius: 12px;
 
       &__row {
         gap: 8px;
@@ -106,6 +107,12 @@
         display: flex;
         order: 20;
       }
-    }
+
+      // Réduire taille boutons sur mobile
+      :deep(.PremiumButton) {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+    });
   }
 </style>

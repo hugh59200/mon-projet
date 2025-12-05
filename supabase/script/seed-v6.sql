@@ -1,11 +1,12 @@
 -- =========================================
--- 🚀 SEED DATA V6 - AVEC SUPPORT I18N + SEO/GEO
+-- 🚀 SEED DATA V6.1 - AVEC SUPPORT I18N + SEO/GEO + PROMO
 -- =========================================
 -- Ce script inclut :
 -- 1. Migration pour les colonnes i18n (JSONB)
 -- 2. Migration SEO/GEO (cas_number, sequence)
 -- 3. Données produits avec traductions EN + données scientifiques
 -- 4. Données news et topics
+-- 5. Configuration codes promo automatiques (V5.3)
 -- =========================================
 
 -- ============================
@@ -49,18 +50,94 @@ COMMENT ON COLUMN public.products.sequence IS 'Séquence d''acides aminés du pe
 -- ============================
 -- 👤 SEED — AUTH USERS
 -- ============================
--- Création de l'utilisateur admin avec mot de passe: 162497
+-- Création des utilisateurs :
+-- 1. Admin (contact@fast-peptides.com) - mdp: 162497
+-- 2. User test (h.bogrand@yopmail.com) - mdp: 162497
 
--- Utiliser un UUID fixe pour pouvoir référencer l'utilisateur
+-- Utiliser des UUID fixes pour pouvoir référencer les utilisateurs
 DO $$
 DECLARE
-  v_user_id uuid := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+  v_admin_id uuid := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+  v_user_id uuid := 'b2c3d4e5-f6a7-8901-bcde-f23456789012';
 BEGIN
-  -- Supprimer les identities et l'utilisateur existants (par UUID pour éviter les conflits)
+  -- ============================
+  -- ADMIN USER
+  -- ============================
+  -- Supprimer les identities et l'utilisateur existants
+  DELETE FROM auth.identities WHERE user_id = v_admin_id;
+  DELETE FROM auth.users WHERE id = v_admin_id;
+
+  -- Créer l'utilisateur admin
+  INSERT INTO auth.users (
+    id,
+    instance_id,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    updated_at,
+    role,
+    aud,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    confirmation_token,
+    recovery_token,
+    email_change_token_new,
+    email_change
+  )
+  VALUES (
+    v_admin_id,
+    '00000000-0000-0000-0000-000000000000',
+    'contact@fast-peptides.com',
+    crypt('162497', gen_salt('bf')),
+    now(),
+    now(),
+    now(),
+    'authenticated',
+    'authenticated',
+    '{"provider": "email", "providers": ["email"]}',
+    '{}',
+    '',
+    '',
+    '',
+    ''
+  );
+
+  -- Créer l'identity pour l'admin
+  INSERT INTO auth.identities (
+    id,
+    user_id,
+    provider_id,
+    provider,
+    identity_data,
+    last_sign_in_at,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    v_admin_id,
+    v_admin_id,
+    'contact@fast-peptides.com',
+    'email',
+    jsonb_build_object(
+      'sub', v_admin_id::text,
+      'email', 'contact@fast-peptides.com',
+      'email_verified', true,
+      'provider', 'email'
+    ),
+    now(),
+    now(),
+    now()
+  );
+
+  -- ============================
+  -- TEST USER
+  -- ============================
+  -- Supprimer les identities et l'utilisateur existants
   DELETE FROM auth.identities WHERE user_id = v_user_id;
   DELETE FROM auth.users WHERE id = v_user_id;
 
-  -- Créer l'utilisateur avec le mot de passe
+  -- Créer l'utilisateur test
   INSERT INTO auth.users (
     id,
     instance_id,
@@ -81,7 +158,7 @@ BEGIN
   VALUES (
     v_user_id,
     '00000000-0000-0000-0000-000000000000',
-    'contact@fast-peptides.com',
+    'h.bogrand@yopmail.com',
     crypt('162497', gen_salt('bf')),
     now(),
     now(),
@@ -96,7 +173,7 @@ BEGIN
     ''
   );
 
-  -- Créer l'identity pour l'authentification email
+  -- Créer l'identity pour l'utilisateur test
   INSERT INTO auth.identities (
     id,
     user_id,
@@ -110,11 +187,11 @@ BEGIN
   VALUES (
     v_user_id,
     v_user_id,
-    'contact@fast-peptides.com',
+    'h.bogrand@yopmail.com',
     'email',
     jsonb_build_object(
       'sub', v_user_id::text,
-      'email', 'contact@fast-peptides.com',
+      'email', 'h.bogrand@yopmail.com',
       'email_verified', true,
       'provider', 'email'
     ),
@@ -129,7 +206,8 @@ END $$;
 -- ============================
 INSERT INTO public.profiles (id, email, full_name, role, address, zip, city)
 VALUES
-('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'contact@fast-peptides.com', 'Hugo Bogrand', 'admin', '11 rue du Général Leclerc', '59126', 'Linselles')
+  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'contact@fast-peptides.com', 'Hugo Bogrand', 'admin', '11 rue du Général Leclerc', '59126', 'Linselles'),
+  ('b2c3d4e5-f6a7-8901-bcde-f23456789012', 'h.bogrand@yopmail.com', 'Hugo Test', 'user', '123 rue de Test', '75001', 'Paris')
 ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   full_name = EXCLUDED.full_name,
@@ -509,165 +587,645 @@ ON CONFLICT (id) DO UPDATE SET
   description_i18n = EXCLUDED.description_i18n;
 
 -- ============================
--- 📰 SEED — NEWS
+-- 📰 SEED — NEWS (6 articles réalistes)
 -- ============================
+
+-- Suppression des anciennes news
+DELETE FROM public.news WHERE id IN (
+  '9d4a3f43-40b4-47a2-863b-9c6dd5c6af43',
+  'a2bab8fc-943b-4b32-acb9-044d54828014',
+  'facb0cb2-d70d-4fcb-a0b2-04466bfb9904',
+  '62d44c97-953f-4dee-8752-9eb287afb017',
+  '67170960-eef3-4ead-b88c-f6ebed45be0f',
+  '2474f359-cf06-494a-887d-60cd534e95be',
+  '47080cad-079c-450a-a8e4-544a58e57010',
+  '4ff13258-7338-4de2-8ed9-7c9b8ff85368',
+  'a1178be8-e547-4a28-8677-07404bcc5f67',
+  '9c165271-a61d-4ff2-aba5-061289cdff3c',
+  'a76da968-bc21-4122-ba61-f11e69f1af78',
+  '22c306ec-1546-4a72-96c1-52bca32d29fe',
+  '78f05eef-ae13-479a-944c-88928052bfab',
+  'a7848dff-911e-41e8-beb2-559aaf5d7263',
+  '1584153b-0144-484b-91a9-6abf00d53e35'
+);
+
 INSERT INTO public.news (id, slug, title, title_i18n, excerpt, excerpt_i18n, content, content_i18n, image, published_at, author_id, topic_id)
 VALUES
-('9d4a3f43-40b4-47a2-863b-9c6dd5c6af43', 'peptides-regeneration-cellulaire',
- 'Des peptides capables de stimuler la régénération cellulaire',
- '{"en": "Peptides capable of stimulating cellular regeneration"}',
- 'De nouveaux peptides bioactifs montrent un fort potentiel pour la réparation des tissus endommagés.',
- '{"en": "New bioactive peptides show strong potential for repairing damaged tissues."}',
- 'Ces peptides biomimétiques pourraient transformer la médecine régénérative et favoriser la cicatrisation avancée.',
- '{"en": "These biomimetic peptides could transform regenerative medicine and promote advanced healing."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/des-peptides-capables-de-stimuler-la-regeneration-cellulaire-1761755829537/news-des-peptides-capables-de-stimuler-la-regeneration-cellulaire-1761755829537.png',
- NOW(), NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
 
-('a2bab8fc-943b-4b32-acb9-044d54828014', 'ia-decouverte-peptides-therapeutiques',
- 'L''intelligence artificielle accélère la découverte de peptides thérapeutiques',
- '{"en": "Artificial intelligence accelerates the discovery of therapeutic peptides"}',
- 'L''IA révolutionne la recherche en identifiant des séquences peptidiques prometteuses en un temps record.',
- '{"en": "AI is revolutionizing research by identifying promising peptide sequences in record time."}',
- 'En combinant modélisation moléculaire et machine learning, les chercheurs découvrent plus rapidement de nouveaux candidats thérapeutiques.',
- '{"en": "By combining molecular modeling and machine learning, researchers are discovering new therapeutic candidates faster."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/l-intelligence-artificielle-accelere-la-decouverte-de-peptides-therapeutiques-1761755758519/news-l-intelligence-artificielle-accelere-la-decouverte-de-peptides-therapeutiques-1761755758519.png',
- NOW(), NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
+-- Article 1 : BPC-157 (très recherché)
+('9d4a3f43-40b4-47a2-863b-9c6dd5c6af43', 'bpc-157-etudes-scientifiques',
+ 'BPC-157 : ce que disent vraiment les études scientifiques',
+ '{"en": "BPC-157: what the scientific studies really say"}',
+ 'Le BPC-157 intrigue la communauté scientifique depuis plus de 30 ans. Retour sur les travaux du Pr Sikiric et l''état actuel de la recherche.',
+ '{"en": "BPC-157 has intrigued the scientific community for over 30 years. A look back at Prof. Sikiric''s work and the current state of research."}',
+ 'Découvert dans les années 1990 par une équipe croate dirigée par le Pr Predrag Sikiric, le BPC-157 (Body Protection Compound) est un fragment de 15 acides aminés isolé du suc gastrique humain. À ce jour, plus de 100 études sur modèles animaux ont été publiées dans des revues à comité de lecture.
 
-('facb0cb2-d70d-4fcb-a0b2-04466bfb9904', 'avancee-peptides-synthetiques',
- 'Une avancée majeure dans la conception de peptides synthétiques',
- '{"en": "A major breakthrough in synthetic peptide design"}',
- 'Des chercheurs développent de nouveaux peptides plus stables et efficaces pour la recherche biomédicale.',
- '{"en": "Researchers are developing new, more stable and effective peptides for biomedical research."}',
- 'Cette innovation ouvre la voie à des peptides de nouvelle génération capables de résister à la dégradation et d''améliorer la précision thérapeutique.',
- '{"en": "This innovation paves the way for next-generation peptides capable of resisting degradation and improving therapeutic precision."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/une-avancee-majeure-dans-la-conception-de-peptides-synthetiques-1761755661276/news-une-avancee-majeure-dans-la-conception-de-peptides-synthetiques-1761755661276.png',
- NOW(), NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
+Les résultats précliniques sont prometteurs. Une étude publiée dans le Journal of Orthopaedic Research (Staresinic et al., 2003) a montré une accélération significative de la cicatrisation tendineuse chez le rat. D''autres travaux suggèrent un rôle dans la protection gastrique et la cicatrisation des plaies.
 
-('62d44c97-953f-4dee-8752-9eb287afb017', 'marche-peptides-2025',
- 'Le marché mondial des peptides atteint un nouveau record en 2025',
- '{"en": "The global peptide market reaches a new record in 2025"}',
- 'Le secteur des peptides connaît une croissance sans précédent, portée par la demande pharmaceutique et cosmétique.',
- '{"en": "The peptide sector is experiencing unprecedented growth, driven by pharmaceutical and cosmetic demand."}',
- 'L''essor de la biotechnologie et des traitements personnalisés stimule fortement le marché international des peptides.',
- '{"en": "The rise of biotechnology and personalized treatments is strongly stimulating the international peptide market."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/le-marche-mondial-des-peptides-atteint-un-nouveau-record-en-2025-1761755894429/news-le-marche-mondial-des-peptides-atteint-un-nouveau-record-en-2025-1761755894429.png',
- NOW(), NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a'),
+Il est important de noter qu''aucun essai clinique de phase III n''a été mené chez l''humain à ce jour. Le BPC-157 reste un outil de recherche in vitro et in vivo, pas un médicament approuvé.
 
-('67170960-eef3-4ead-b88c-f6ebed45be0f', 'startups-biotech-peptides',
- 'Les startups biotechs se tournent vers les peptides de nouvelle génération',
- '{"en": "Biotech startups turn to next-generation peptides"}',
- 'Un nombre croissant de jeunes entreprises investissent dans la recherche et la production de peptides innovants.',
- '{"en": "A growing number of young companies are investing in the research and production of innovative peptides."}',
- 'Ces nouvelles sociétés combinent IA, automatisation et biologie synthétique pour créer des peptides plus performants.',
- '{"en": "These new companies combine AI, automation and synthetic biology to create more efficient peptides."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/les-startups-biotechs-se-tournent-vers-les-peptides-de-nouvelle-generation-1761755973847/news-les-startups-biotechs-se-tournent-vers-les-peptides-de-nouvelle-generation-1761755973847.png',
- NOW(), NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a'),
+Pour les laboratoires de recherche, ce peptide offre un terrain d''investigation fascinant sur les mécanismes de réparation tissulaire impliquant la voie NO et l''angiogenèse.',
+ '{"en": "Discovered in the 1990s by a Croatian team led by Prof. Predrag Sikiric, BPC-157 (Body Protection Compound) is a 15 amino acid fragment isolated from human gastric juice. To date, over 100 studies on animal models have been published in peer-reviewed journals.\n\nPreclinical results are promising. A study published in the Journal of Orthopaedic Research (Staresinic et al., 2003) showed significant acceleration of tendon healing in rats. Other work suggests a role in gastric protection and wound healing.\n\nIt is important to note that no Phase III clinical trials have been conducted in humans to date. BPC-157 remains an in vitro and in vivo research tool, not an approved drug.\n\nFor research laboratories, this peptide offers a fascinating field of investigation into tissue repair mechanisms involving the NO pathway and angiogenesis."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/bpc-157-recherche.png',
+ '2025-01-15 10:00:00', NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
 
-('2474f359-cf06-494a-887d-60cd534e95be', 'economie-des-peptides',
- 'L''économie des peptides : un pilier de la biotechnologie moderne',
- '{"en": "The peptide economy: a pillar of modern biotechnology"}',
- 'Les peptides deviennent un acteur économique clé dans le développement pharmaceutique et nutritionnel.',
- '{"en": "Peptides are becoming a key economic player in pharmaceutical and nutritional development."}',
- 'Entre investissement public et privé, le marché des peptides se positionne comme une source d''innovation durable.',
- '{"en": "Between public and private investment, the peptide market is positioning itself as a source of sustainable innovation."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/l-economie-des-peptides-un-pilier-de-la-biotechnologie-moderne-1761756061388/news-l-economie-des-peptides-un-pilier-de-la-biotechnologie-moderne-1761756061388.png',
- NOW(), NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a'),
+-- Article 2 : Ozempic et GLP-1 (actualité mainstream)
+('a2bab8fc-943b-4b32-acb9-044d54828014', 'glp1-ozempic-revolution-peptides',
+ 'D''Ozempic à Mounjaro : comment les peptides GLP-1 ont conquis la médecine',
+ '{"en": "From Ozempic to Mounjaro: how GLP-1 peptides conquered medicine"}',
+ 'Avec plus de 20 milliards de dollars de ventes en 2024, le sémaglutide illustre le potentiel médical et commercial des peptides thérapeutiques.',
+ '{"en": "With over $20 billion in sales in 2024, semaglutide illustrates the medical and commercial potential of therapeutic peptides."}',
+ 'Le GLP-1 (Glucagon-Like Peptide-1) est une hormone incrétine sécrétée naturellement par l''intestin. Sa découverte a ouvert la voie à l''une des révolutions thérapeutiques majeures du XXIe siècle.
 
-('47080cad-079c-450a-a8e4-544a58e57010', 'harmonisation-normes-peptides',
- 'Vers une harmonisation mondiale des normes sur les peptides',
- '{"en": "Towards global harmonization of peptide standards"}',
- 'Les agences de régulation cherchent à unifier les standards internationaux pour les peptides.',
- '{"en": "Regulatory agencies are seeking to unify international standards for peptides."}',
- 'Une meilleure coopération entre autorités permettra de faciliter les essais cliniques et la commercialisation globale.',
- '{"en": "Better cooperation between authorities will facilitate clinical trials and global commercialization."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/vers-une-harmonisation-mondiale-des-normes-sur-les-peptides-1761756968952/news-vers-une-harmonisation-mondiale-des-normes-sur-les-peptides-1761756968952.png',
- NOW(), NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+Le sémaglutide, commercialisé sous les noms Ozempic et Wegovy par Novo Nordisk, a généré plus de 20 milliards de dollars de revenus en 2024. Ce peptide analogue résiste à la dégradation enzymatique et présente une demi-vie prolongée permettant une injection hebdomadaire.
 
-('4ff13258-7338-4de2-8ed9-7c9b8ff85368', 'directives-europeennes-peptides',
- 'Nouvelles directives européennes sur les peptides en recherche',
- '{"en": "New European guidelines on peptides in research"}',
- 'L''Union européenne renforce la réglementation sur la production et l''utilisation des peptides.',
- '{"en": "The European Union is strengthening regulations on the production and use of peptides."}',
- 'Ces nouvelles règles visent à assurer la traçabilité et la sécurité dans la recherche scientifique et médicale.',
- '{"en": "These new rules aim to ensure traceability and safety in scientific and medical research."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/nouvelles-directives-europeennes-sur-les-peptides-en-recherche-1761756981526/news-nouvelles-directives-europeennes-sur-les-peptides-en-recherche-1761756981526.png',
- NOW(), NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+Le tirzepatide (Mounjaro, Zepbound) d''Eli Lilly va encore plus loin. Ce double agoniste GIP/GLP-1 a montré des pertes de poids moyennes de 20-25% dans les essais cliniques SURMOUNT, surpassant les résultats du sémaglutide.
 
-('a1178be8-e547-4a28-8677-07404bcc5f67', 'controle-peptides-recherche',
- 'Contrôle renforcé sur les peptides destinés à la recherche',
- '{"en": "Enhanced control on peptides for research"}',
- 'Les autorités mettent en place de nouveaux protocoles de contrôle pour les peptides de laboratoire.',
- '{"en": "Authorities are implementing new control protocols for laboratory peptides."}',
- 'L''objectif est de prévenir les abus et d''assurer la conformité aux bonnes pratiques scientifiques.',
- '{"en": "The goal is to prevent abuse and ensure compliance with good scientific practices."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/controle-renforce-sur-les-peptides-destines-a-la-recherche-1761757065279/news-controle-renforce-sur-les-peptides-destines-a-la-recherche-1761757065279.png',
- NOW(), NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+Ces succès cliniques valident l''approche peptidique et stimulent la recherche. Des dizaines de nouveaux analogues sont en développement, ciblant non seulement l''obésité et le diabète, mais aussi les maladies cardiovasculaires et neurodégénératives.
 
-('9c165271-a61d-4ff2-aba5-061289cdff3c', 'peptides-recuperation-musculaire',
- 'Les peptides révolutionnent la récupération musculaire',
- '{"en": "Peptides revolutionize muscle recovery"}',
- 'De nouvelles études montrent que certains peptides favorisent la réparation rapide des fibres musculaires après l''effort.',
- '{"en": "New studies show that certain peptides promote rapid repair of muscle fibers after exercise."}',
- 'Ces composés naturels stimulent la régénération tissulaire et optimisent la récupération sportive.',
- '{"en": "These natural compounds stimulate tissue regeneration and optimize sports recovery."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/les-peptides-revolutionnent-la-recuperation-musculaire-1761757146896/news-les-peptides-revolutionnent-la-recuperation-musculaire-1761757146896.png',
- NOW(), NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+Pour les chercheurs, les agonistes GLP-1 démontrent qu''un peptide bien conçu peut devenir un blockbuster pharmaceutique.',
+ '{"en": "GLP-1 (Glucagon-Like Peptide-1) is an incretin hormone naturally secreted by the intestine. Its discovery paved the way for one of the major therapeutic revolutions of the 21st century.\n\nSemaglutide, marketed under the names Ozempic and Wegovy by Novo Nordisk, generated over $20 billion in revenue in 2024. This analog peptide resists enzymatic degradation and has an extended half-life allowing weekly injection.\n\nEli Lilly''s tirzepatide (Mounjaro, Zepbound) goes even further. This dual GIP/GLP-1 agonist showed average weight losses of 20-25% in SURMOUNT clinical trials, surpassing semaglutide results.\n\nThese clinical successes validate the peptide approach and stimulate research. Dozens of new analogs are in development, targeting not only obesity and diabetes, but also cardiovascular and neurodegenerative diseases.\n\nFor researchers, GLP-1 agonists demonstrate that a well-designed peptide can become a pharmaceutical blockbuster."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/glp1-ozempic.png',
+ '2025-02-20 14:30:00', NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a'),
 
-('a76da968-bc21-4122-ba61-f11e69f1af78', 'peptides-performance-physique',
- 'Le rôle des peptides dans la performance physique',
- '{"en": "The role of peptides in physical performance"}',
- 'Les peptides bioactifs améliorent la force, l''endurance et la récupération musculaire.',
- '{"en": "Bioactive peptides improve strength, endurance and muscle recovery."}',
- 'Une nouvelle génération de peptides naturels offre un soutien métabolique inédit pour les athlètes.',
- '{"en": "A new generation of natural peptides offers unprecedented metabolic support for athletes."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/le-role-des-peptides-dans-la-performance-physique-1761757260028/news-le-role-des-peptides-dans-la-performance-physique-1761757260028.png',
- NOW(), NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+-- Article 3 : Réglementation (important pour acheteurs)
+('facb0cb2-d70d-4fcb-a0b2-04466bfb9904', 'peptides-recherche-cadre-legal-europe',
+ 'Peptides de recherche en Europe : comprendre le cadre légal',
+ '{"en": "Research peptides in Europe: understanding the legal framework"}',
+ 'La vente de peptides à des fins de recherche est strictement encadrée en UE. Ce qu''il faut savoir avant de passer commande.',
+ '{"en": "The sale of peptides for research purposes is strictly regulated in the EU. What you need to know before ordering."}',
+ 'En Union Européenne, les peptides destinés à la recherche in vitro sont légalement commercialisables sous certaines conditions strictes :
 
-('22c306ec-1546-4a72-96c1-52bca32d29fe', 'peptides-metabolisme-performance',
- 'Peptides et métabolisme : une approche biochimique de la performance',
- '{"en": "Peptides and metabolism: a biochemical approach to performance"}',
- 'Les recherches explorent comment les peptides régulent l''énergie et le métabolisme musculaire.',
- '{"en": "Research explores how peptides regulate energy and muscle metabolism."}',
- 'Ces découvertes pourraient transformer les approches nutritionnelles du sport de haut niveau.',
- '{"en": "These discoveries could transform nutritional approaches in high-level sports."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/peptides-et-metabolisme-une-approche-biochimique-de-la-performance-1761757342295/news-peptides-et-metabolisme-une-approche-biochimique-de-la-performance-1761757342295.png',
- NOW(), NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+1. Ils ne doivent pas être présentés comme des médicaments
+2. Ils ne sont pas destinés à la consommation humaine ou animale
+3. Ils doivent être vendus exclusivement à des fins de recherche scientifique
 
-('78f05eef-ae13-479a-944c-88928052bfab', 'peptides-cosmetique-regeneratrice',
- 'Les peptides au cœur de la nouvelle cosmétique régénératrice',
- '{"en": "Peptides at the heart of new regenerative cosmetics"}',
- 'Les laboratoires misent sur les peptides pour stimuler la production naturelle de collagène.',
- '{"en": "Laboratories are betting on peptides to stimulate natural collagen production."}',
- 'Ces formules peptidiques promettent une peau plus ferme, plus lisse et visiblement rajeunie.',
- '{"en": "These peptide formulas promise firmer, smoother and visibly rejuvenated skin."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/les-peptides-au-c-ur-de-la-nouvelle-cosmetique-regeneratrice-1761757413848/news-les-peptides-au-c-ur-de-la-nouvelle-cosmetique-regeneratrice-1761757413848.png',
- NOW(), NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91'),
+Le règlement REACH (CE n°1907/2006) encadre les substances chimiques sur le marché européen. Les fabricants et distributeurs sérieux respectent ces obligations et peuvent fournir les documents de conformité sur demande.
 
-('a7848dff-911e-41e8-beb2-559aaf5d7263', 'peptides-soins-peau',
- 'Peptides et soins de la peau : la science du rajeunissement',
- '{"en": "Peptides and skincare: the science of rejuvenation"}',
- 'Les peptides deviennent un ingrédient clé dans les crèmes anti-âge de nouvelle génération.',
- '{"en": "Peptides are becoming a key ingredient in next-generation anti-aging creams."}',
- 'En agissant directement sur les cellules cutanées, ils restaurent l''élasticité et l''éclat du visage.',
- '{"en": "By acting directly on skin cells, they restore elasticity and radiance to the face."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/peptides-et-soins-de-la-peau-la-science-du-rajeunissement-1761757489202/news-peptides-et-soins-de-la-peau-la-science-du-rajeunissement-1761757489202.png',
- NOW(), NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91'),
+Pour les acheteurs, quelques critères de qualité essentiels :
+- Certificat d''analyse (CoA) fourni pour chaque lot
+- Pureté vérifiée par HPLC (minimum 98%)
+- Identité confirmée par spectrométrie de masse
+- Conditions de stockage et transport respectées
 
-('1584153b-0144-484b-91a9-6abf00d53e35', 'biotechnologie-bien-etre-cutane',
- 'La biotechnologie au service du bien-être cutané',
- '{"en": "Biotechnology serving skin wellness"}',
- 'Les innovations en biotechnologie cosmétique exploitent les peptides pour une peau plus saine.',
- '{"en": "Innovations in cosmetic biotechnology exploit peptides for healthier skin."}',
- 'Ces avancées associent nature et science pour une approche durable et efficace du soin de la peau.',
- '{"en": "These advances combine nature and science for a sustainable and effective approach to skincare."}',
- 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/la-biotechnologie-au-service-du-bien-etre-cutane-1761757555625/news-la-biotechnologie-au-service-du-bien-etre-cutane-1761757555625.png',
- NOW(), NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91')
+Les peptides vendus comme "compléments alimentaires" ou avec des allégations santé sont illégaux dans la plupart des pays de l''UE s''ils ne disposent pas d''une autorisation de mise sur le marché (AMM).
+
+Chez Fast Peptides, nous respectons scrupuleusement ce cadre réglementaire et fournissons une documentation complète pour chaque commande.',
+ '{"en": "In the European Union, peptides intended for in vitro research are legally marketable under certain strict conditions:\n\n1. They must not be presented as medicines\n2. They are not intended for human or animal consumption\n3. They must be sold exclusively for scientific research purposes\n\nThe REACH regulation (EC No 1907/2006) governs chemical substances on the European market. Serious manufacturers and distributors respect these obligations and can provide compliance documents upon request.\n\nFor buyers, some essential quality criteria:\n- Certificate of analysis (CoA) provided for each batch\n- Purity verified by HPLC (minimum 98%)\n- Identity confirmed by mass spectrometry\n- Storage and transport conditions respected\n\nPeptides sold as \"dietary supplements\" or with health claims are illegal in most EU countries if they do not have a marketing authorization (MA).\n\nAt Fast Peptides, we scrupulously respect this regulatory framework and provide complete documentation for each order."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/reglementation-peptides.png',
+ '2025-03-10 09:00:00', NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+
+-- Article 4 : Guide pratique reconstitution
+('62d44c97-953f-4dee-8752-9eb287afb017', 'guide-reconstitution-conservation-peptides',
+ 'Guide pratique : reconstitution et conservation des peptides',
+ '{"en": "Practical guide: peptide reconstitution and storage"}',
+ 'La stabilité des peptides dépend de leur manipulation. Nos recommandations pour préserver l''intégrité de vos composés de recherche.',
+ '{"en": "Peptide stability depends on handling. Our recommendations to preserve the integrity of your research compounds."}',
+ 'Les peptides lyophilisés sont stables pendant le transport à température ambiante, mais leur conservation à long terme nécessite des précautions spécifiques.
+
+AVANT RECONSTITUTION
+- Stockage optimal : -20°C (congélateur standard)
+- Durée de conservation : jusqu''à 24 mois
+- Éviter absolument les cycles gel/dégel répétés
+- Protéger de l''humidité et de la lumière directe
+
+RECONSTITUTION
+Pour la plupart des peptides hydrosolubles :
+- Utiliser de l''eau bactériostatique (0.9% alcool benzylique)
+- Ajouter le solvant doucement le long de la paroi du flacon
+- Laisser dissoudre naturellement - ne pas agiter vigoureusement
+- Attendre 5-10 minutes que la solution soit homogène
+
+Pour les peptides hydrophobes (contenant beaucoup de Leu, Ile, Val, Met, Phe) :
+- Pré-dissoudre dans 10% d''acide acétique ou DMSO
+- Diluer ensuite avec de l''eau bactériostatique
+
+APRÈS RECONSTITUTION
+- Conservation à 4°C : 2 à 4 semaines maximum
+- Conservation à -20°C en aliquots : plusieurs mois
+- Toujours utiliser du matériel stérile
+- Noter la date de reconstitution sur le flacon
+
+Un peptide dégradé perd progressivement son efficacité sans signe visible. En cas de doute, un nouveau lot est préférable.',
+ '{"en": "Lyophilized peptides are stable during transport at room temperature, but their long-term storage requires specific precautions.\n\nBEFORE RECONSTITUTION\n- Optimal storage: -20°C (standard freezer)\n- Shelf life: up to 24 months\n- Absolutely avoid repeated freeze/thaw cycles\n- Protect from moisture and direct light\n\nRECONSTITUTION\nFor most water-soluble peptides:\n- Use bacteriostatic water (0.9% benzyl alcohol)\n- Add the solvent gently along the vial wall\n- Let dissolve naturally - do not shake vigorously\n- Wait 5-10 minutes for the solution to be homogeneous\n\nFor hydrophobic peptides (containing lots of Leu, Ile, Val, Met, Phe):\n- Pre-dissolve in 10% acetic acid or DMSO\n- Then dilute with bacteriostatic water\n\nAFTER RECONSTITUTION\n- Storage at 4°C: 2 to 4 weeks maximum\n- Storage at -20°C in aliquots: several months\n- Always use sterile equipment\n- Note the reconstitution date on the vial\n\nA degraded peptide gradually loses its effectiveness without visible signs. When in doubt, a new batch is preferable."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/guide-reconstitution.png',
+ '2025-04-05 11:00:00', NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
+
+-- Article 5 : Marché des peptides (économie)
+('67170960-eef3-4ead-b88c-f6ebed45be0f', 'marche-mondial-peptides-2025',
+ 'Le marché mondial des peptides dépassera 60 milliards de dollars en 2030',
+ '{"en": "The global peptide market will exceed $60 billion by 2030"}',
+ 'Selon Grand View Research, le secteur des peptides thérapeutiques connaît une croissance annuelle de 9,8%. Les raisons de cet engouement.',
+ '{"en": "According to Grand View Research, the therapeutic peptide sector is experiencing annual growth of 9.8%. The reasons for this enthusiasm."}',
+ 'Le marché des peptides thérapeutiques est en pleine expansion. Selon les analystes de Grand View Research, il devrait passer de 42 milliards de dollars en 2024 à plus de 60 milliards en 2030.
+
+Plusieurs facteurs expliquent cette croissance :
+
+AVANTAGES DES PEPTIDES
+- Haute spécificité : moins d''effets secondaires que les petites molécules
+- Biodégradabilité : pas d''accumulation dans l''organisme
+- Synthèse modulable : personnalisation possible des séquences
+- Tolérance : profil de sécurité généralement favorable
+
+CHIFFRES CLÉS
+- 80+ peptides approuvés par la FDA
+- 150+ peptides en essais cliniques
+- 7 des 10 médicaments les plus vendus en 2024 sont des biologiques
+
+DOMAINES PORTEURS
+- Métabolisme : GLP-1 agonistes (Ozempic, Mounjaro)
+- Oncologie : peptides ciblant les récepteurs tumoraux
+- Maladies rares : thérapies peptidiques orphelines
+- Cosmétique : peptides anti-âge et réparation cutanée
+
+Les grands laboratoires (Novo Nordisk, Eli Lilly, Amgen, Ipsen) investissent massivement dans la R&D peptidique. L''innovation se concentre notamment sur l''amélioration de la biodisponibilité orale, longtemps considérée comme le Saint Graal du secteur.',
+ '{"en": "The therapeutic peptide market is booming. According to Grand View Research analysts, it is expected to grow from $42 billion in 2024 to over $60 billion by 2030.\n\nSeveral factors explain this growth:\n\nADVANTAGES OF PEPTIDES\n- High specificity: fewer side effects than small molecules\n- Biodegradability: no accumulation in the body\n- Modular synthesis: sequence customization possible\n- Tolerance: generally favorable safety profile\n\nKEY FIGURES\n- 80+ peptides approved by the FDA\n- 150+ peptides in clinical trials\n- 7 of the 10 best-selling drugs in 2024 are biologics\n\nGROWING AREAS\n- Metabolism: GLP-1 agonists (Ozempic, Mounjaro)\n- Oncology: peptides targeting tumor receptors\n- Rare diseases: orphan peptide therapies\n- Cosmetics: anti-aging peptides and skin repair\n\nMajor laboratories (Novo Nordisk, Eli Lilly, Amgen, Ipsen) are investing heavily in peptide R&D. Innovation is particularly focused on improving oral bioavailability, long considered the Holy Grail of the sector."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/marche-peptides-2025.png',
+ '2025-05-12 16:00:00', NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a'),
+
+-- Article 6 : Certificat d''analyse (qualité)
+('2474f359-cf06-494a-887d-60cd534e95be', 'lire-certificat-analyse-peptide',
+ 'Décrypter un certificat d''analyse : les indicateurs de qualité',
+ '{"en": "Decoding a certificate of analysis: quality indicators"}',
+ 'Pureté HPLC, masse moléculaire, teneur en peptide... Comment interpréter les données d''un CoA pour évaluer la qualité de vos peptides.',
+ '{"en": "HPLC purity, molecular weight, peptide content... How to interpret CoA data to evaluate the quality of your peptides."}',
+ 'Le certificat d''analyse (CoA) est le document de référence pour évaluer la qualité d''un peptide. Voici comment le lire :
+
+PURETÉ HPLC
+La chromatographie liquide haute performance sépare les composants d''un échantillon. Le pourcentage indique la proportion du peptide cible par rapport aux impuretés.
+- Excellent : >98%
+- Acceptable : 95-98%
+- À éviter : <95%
+
+Les impuretés sont généralement des peptides tronqués (synthèse incomplète) ou des produits de dégradation.
+
+SPECTROMÉTRIE DE MASSE (MS)
+La masse moléculaire observée doit correspondre à la masse théorique calculée à partir de la séquence.
+- Écart acceptable : ±0.1%
+- Un écart plus important peut indiquer une modification chimique ou une erreur de synthèse
+
+APPARENCE
+La description de l''apparence (poudre blanche, lyophilisat) permet de vérifier la cohérence avec le produit reçu.
+
+TENEUR EN PEPTIDE NET
+Attention : un flacon étiqueté "5mg" contient rarement 5mg de peptide pur. La teneur nette est généralement de 70-85%, le reste étant des sels (TFA, acétate) et de l''eau résiduelle.
+
+Le CoA doit préciser ce ratio pour permettre un calcul de dosage précis. Les fournisseurs sérieux indiquent toujours cette information.
+
+Méfiez-vous des CoA génériques ou sans numéro de lot spécifique : ils peuvent ne pas correspondre au produit réellement livré.',
+ '{"en": "The certificate of analysis (CoA) is the reference document for evaluating peptide quality. Here is how to read it:\n\nHPLC PURITY\nHigh-performance liquid chromatography separates the components of a sample. The percentage indicates the proportion of the target peptide relative to impurities.\n- Excellent: >98%\n- Acceptable: 95-98%\n- To avoid: <95%\n\nImpurities are usually truncated peptides (incomplete synthesis) or degradation products.\n\nMASS SPECTROMETRY (MS)\nThe observed molecular mass must match the theoretical mass calculated from the sequence.\n- Acceptable deviation: ±0.1%\n- A larger deviation may indicate chemical modification or synthesis error\n\nAPPEARANCE\nThe description of appearance (white powder, lyophilisate) verifies consistency with the product received.\n\nNET PEPTIDE CONTENT\nNote: a vial labeled \"5mg\" rarely contains 5mg of pure peptide. Net content is typically 70-85%, the rest being salts (TFA, acetate) and residual water.\n\nThe CoA must specify this ratio to allow accurate dosage calculation. Serious suppliers always indicate this information.\n\nBeware of generic CoAs or those without a specific batch number: they may not correspond to the product actually delivered."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/certificat-analyse.png',
+ '2025-06-01 08:30:00', NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9')
 
 ON CONFLICT (id) DO UPDATE SET
+  slug = EXCLUDED.slug,
+  title = EXCLUDED.title,
   title_i18n = EXCLUDED.title_i18n,
+  excerpt = EXCLUDED.excerpt,
   excerpt_i18n = EXCLUDED.excerpt_i18n,
-  content_i18n = EXCLUDED.content_i18n;
+  content = EXCLUDED.content,
+  content_i18n = EXCLUDED.content_i18n,
+  image = EXCLUDED.image,
+  published_at = EXCLUDED.published_at;
+
+-- ============================
+-- 📰 SEED — NEWS COMPLÉMENTAIRES (9 articles)
+-- ============================
+
+INSERT INTO public.news (id, slug, title, title_i18n, excerpt, excerpt_i18n, content, content_i18n, image, published_at, author_id, topic_id)
+VALUES
+
+-- Article 7 : TB-500 et BPC-157 synergie (Usages & Performances)
+('47080cad-079c-450a-a8e4-544a58e57010', 'tb500-bpc157-synergie-recuperation',
+ 'TB-500 et BPC-157 : pourquoi les chercheurs étudient leur synergie',
+ '{"en": "TB-500 and BPC-157: why researchers are studying their synergy"}',
+ 'Ces deux peptides activent des voies biologiques complémentaires. Une revue systématique 2025 fait le point sur les études précliniques.',
+ '{"en": "These two peptides activate complementary biological pathways. A 2025 systematic review summarizes preclinical studies."}',
+ 'Le TB-500 (fragment de la Thymosine Beta-4) et le BPC-157 (Body Protection Compound) sont deux peptides qui suscitent un intérêt croissant dans la recherche sur la réparation tissulaire.
+
+MÉCANISMES D''ACTION COMPLÉMENTAIRES
+
+Le BPC-157, isolé du suc gastrique humain, favoriserait :
+- L''activité des fibroblastes
+- La synthèse de collagène
+- L''angiogenèse via la voie VEGFR2-Akt-eNOS
+
+Le TB-500, peptide synthétique dérivé de la thymosine β4, agirait sur :
+- La différenciation des cellules progénitrices
+- La croissance vasculaire
+- La migration cellulaire
+
+CE QUE DIT LA RECHERCHE
+
+Une revue systématique publiée en 2025 dans PMC a analysé 36 études (1993-2024) sur le BPC-157. Les modèles animaux montrent une amélioration de la cicatrisation des muscles, tendons, ligaments et os.
+
+Une étude humaine préliminaire rapporte que 7 patients sur 12 souffrant de douleurs chroniques au genou ont ressenti un soulagement pendant plus de 6 mois après une injection de BPC-157.
+
+LIMITES IMPORTANTES
+
+Ces peptides ne sont pas approuvés par la FDA pour usage thérapeutique. En 2023, le BPC-157 a été classé "Category 2", signifiant qu''il ne peut être préparé par les pharmacies de préparation commerciales.
+
+Les études humaines de grande envergure font encore défaut. Ces composés restent des outils de recherche, non des traitements validés.',
+ '{"en": "TB-500 (a fragment of Thymosin Beta-4) and BPC-157 (Body Protection Compound) are two peptides that are generating growing interest in tissue repair research.\n\nCOMPLEMENTARY MECHANISMS OF ACTION\n\nBPC-157, isolated from human gastric juice, is thought to promote:\n- Fibroblast activity\n- Collagen synthesis\n- Angiogenesis via the VEGFR2-Akt-eNOS pathway\n\nTB-500, a synthetic peptide derived from thymosin β4, is thought to act on:\n- Progenitor cell differentiation\n- Vascular growth\n- Cell migration\n\nWHAT THE RESEARCH SAYS\n\nA systematic review published in 2025 in PMC analyzed 36 studies (1993-2024) on BPC-157. Animal models show improved healing of muscles, tendons, ligaments and bones.\n\nA preliminary human study reports that 7 out of 12 patients with chronic knee pain experienced relief for more than 6 months after a BPC-157 injection.\n\nIMPORTANT LIMITATIONS\n\nThese peptides are not FDA-approved for therapeutic use. In 2023, BPC-157 was classified as \"Category 2,\" meaning it cannot be prepared by commercial compounding pharmacies.\n\nLarge-scale human studies are still lacking. These compounds remain research tools, not validated treatments."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/tb500-bpc157-synergie.png',
+ '2025-01-28 09:00:00', NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+
+-- Article 8 : Collagène et récupération sportive (Usages & Performances)
+('4ff13258-7338-4de2-8ed9-7c9b8ff85368', 'collagene-peptides-recuperation-sportive-2024',
+ 'Peptides de collagène : l''étude 2024 sur la récupération sportive',
+ '{"en": "Collagen peptides: the 2024 study on sports recovery"}',
+ 'Une étude randomisée contrôlée montre que 15g de peptides de collagène par jour réduisent les marqueurs de stress musculaire après l''effort.',
+ '{"en": "A randomized controlled study shows that 15g of collagen peptides per day reduce muscle stress markers after exercise."}',
+ 'Une étude publiée dans Frontiers in Nutrition en 2024 (Bischof et al.) apporte de nouvelles données sur l''intérêt des peptides de collagène dans la récupération sportive.
+
+PROTOCOLE DE L''ÉTUDE
+
+Les chercheurs ont suivi des athlètes pendant 12 semaines :
+- Groupe supplémenté : 15g de peptides de collagène/jour
+- Groupe placebo : substance inactive
+- Mesure des marqueurs de stress musculaire après exercice intense
+
+RÉSULTATS PRINCIPAUX
+
+Le groupe supplémenté présentait des niveaux plus bas de marqueurs de stress systémique après les dommages musculaires induits par l''exercice.
+
+Une étude antérieure sur l''hydrolysat de whey avait montré :
+- Niveaux de créatine kinase (CK) plus bas à 48h
+- Meilleur indice de force réactive
+- Flexibilité accrue
+
+POIDS MOLÉCULAIRE : UN FACTEUR CLÉ
+
+Les peptides de collagène de faible poids moléculaire présentent de meilleures propriétés pharmacocinétiques. Les peptides plus petits sont absorbés plus efficacement, ce qui renforce l''importance du poids moléculaire dans la biodisponibilité.
+
+APPLICATIONS PRATIQUES
+
+Ces résultats suggèrent un intérêt potentiel pour :
+- Les athlètes en phase de récupération intensive
+- Les protocoles de rééducation
+- La prévention des blessures récurrentes
+
+La recherche continue pour déterminer les dosages optimaux et les populations qui bénéficieraient le plus de cette supplémentation.',
+ '{"en": "A study published in Frontiers in Nutrition in 2024 (Bischof et al.) provides new data on the value of collagen peptides in sports recovery.\n\nSTUDY PROTOCOL\n\nResearchers followed athletes for 12 weeks:\n- Supplemented group: 15g of collagen peptides/day\n- Placebo group: inactive substance\n- Measurement of muscle stress markers after intense exercise\n\nMAIN RESULTS\n\nThe supplemented group had lower levels of systemic stress markers after exercise-induced muscle damage.\n\nA previous study on whey hydrolysate had shown:\n- Lower creatine kinase (CK) levels at 48h\n- Better reactive strength index\n- Increased flexibility\n\nMOLECULAR WEIGHT: A KEY FACTOR\n\nLow molecular weight collagen peptides have better pharmacokinetic properties. Smaller peptides are absorbed more efficiently, reinforcing the importance of molecular weight in bioavailability.\n\nPRACTICAL APPLICATIONS\n\nThese results suggest potential value for:\n- Athletes in intensive recovery phases\n- Rehabilitation protocols\n- Prevention of recurring injuries\n\nResearch continues to determine optimal dosages and populations that would benefit most from this supplementation."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/collagene-recuperation-sport.png',
+ '2025-02-05 11:30:00', NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+
+-- Article 9 : Revue systématique 2025 (Usages & Performances)
+('a1178be8-e547-4a28-8677-07404bcc5f67', 'peptides-medecine-sport-revue-2025',
+ 'Peptides thérapeutiques en médecine du sport : la revue systématique 2025',
+ '{"en": "Therapeutic peptides in sports medicine: the 2025 systematic review"}',
+ '36 études analysées de 1993 à 2024. Les chercheurs font le point sur ce que la science sait vraiment des peptides injectables.',
+ '{"en": "36 studies analyzed from 1993 to 2024. Researchers take stock of what science really knows about injectable peptides."}',
+ 'Une revue systématique publiée dans Arthroscopy Journal en 2025 analyse l''état des connaissances sur les peptides thérapeutiques injectables en médecine du sport.
+
+CONTEXTE
+
+Les athlètes de haut niveau et les bodybuilders recherchent constamment de nouvelles thérapies pour améliorer la récupération. Les peptides injectables représentent une tendance émergente dans la recherche en médecine régénérative.
+
+MÉTHODOLOGIE
+
+Les chercheurs ont analysé 36 études publiées entre 1993 et 2024, couvrant principalement :
+- Le BPC-157
+- Le TB-500
+- D''autres peptides régénératifs
+
+CONCLUSIONS PRINCIPALES
+
+Les études précliniques (animaux) montrent que le BPC-157 :
+- Favorise la cicatrisation en stimulant les facteurs de croissance
+- Réduit l''inflammation
+- Améliore les résultats dans les modèles de blessures musculaires, tendineuses, ligamentaires et osseuses
+
+LIMITES MAJEURES
+
+1. Absence d''essais cliniques de grande envergure chez l''humain
+2. Profil de sécurité à long terme inconnu
+3. Aucun événement indésirable aigu (<6 semaines) rapporté dans les modèles animaux
+
+RECOMMANDATIONS DES AUTEURS
+
+"En raison des preuves cliniques de haute qualité limitées, les cliniciens et les athlètes doivent faire preuve de prudence lorsqu''ils envisagent l''utilisation du BPC-157."
+
+L''industrie des peptides représente plusieurs milliards de dollars, mais la littérature orthopédique clinique reste rare sur ces composés.',
+ '{"en": "A systematic review published in Arthroscopy Journal in 2025 analyzes the state of knowledge on injectable therapeutic peptides in sports medicine.\n\nBACKGROUND\n\nHigh-level athletes and bodybuilders are constantly seeking new therapies to improve recovery. Injectable peptides represent an emerging trend in regenerative medicine research.\n\nMETHODOLOGY\n\nResearchers analyzed 36 studies published between 1993 and 2024, mainly covering:\n- BPC-157\n- TB-500\n- Other regenerative peptides\n\nMAIN CONCLUSIONS\n\nPreclinical studies (animals) show that BPC-157:\n- Promotes healing by stimulating growth factors\n- Reduces inflammation\n- Improves outcomes in muscle, tendon, ligament and bone injury models\n\nMAJOR LIMITATIONS\n\n1. Lack of large-scale human clinical trials\n2. Unknown long-term safety profile\n3. No acute adverse events (<6 weeks) reported in animal models\n\nAUTHORS'' RECOMMENDATIONS\n\n\"Due to limited high-quality clinical evidence, clinicians and athletes should exercise caution when considering BPC-157 use.\"\n\nThe peptide industry represents billions of dollars, but clinical orthopedic literature on these compounds remains scarce."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/peptides-medecine-sport.png',
+ '2025-02-18 14:00:00', NULL, 'b24c81ab-d24d-4860-91f7-faabad0892f7'),
+
+-- Article 10 : GHK-Cu anti-âge (Bien-être & Cosmétiques)
+('9c165271-a61d-4ff2-aba5-061289cdff3c', 'ghk-cu-peptide-cuivre-anti-age',
+ 'GHK-Cu : le peptide de cuivre star des sérums anti-âge',
+ '{"en": "GHK-Cu: the copper peptide star of anti-aging serums"}',
+ 'Stimulation du collagène, cicatrisation, antioxydant : pourquoi ce peptide est devenu incontournable dans les formulations cosmétiques premium.',
+ '{"en": "Collagen stimulation, healing, antioxidant: why this peptide has become essential in premium cosmetic formulations."}',
+ 'Le GHK-Cu (glycyl-L-histidyl-L-lysine-cuivre) est l''un des peptides les plus étudiés et les plus utilisés en cosmétique anti-âge.
+
+QU''EST-CE QUE LE GHK-Cu ?
+
+Découvert dans les années 1970, ce tripeptide naturellement présent dans le plasma humain possède une forte affinité pour le cuivre. Sa concentration diminue avec l''âge : de 200 ng/mL à 20 ans à 80 ng/mL à 60 ans.
+
+MÉCANISMES D''ACTION DOCUMENTÉS
+
+Les études montrent que le GHK-Cu :
+- Stimule la production de collagène et d''élastine
+- Favorise la cicatrisation et le renouvellement cutané
+- Offre une protection antioxydante
+- Améliore la fermeté et la clarté de la peau
+- Réduit les ridules et les dommages photo-induits
+
+TENDANCES 2024
+
+Selon une revue publiée dans PMC en 2025, les peptides ont pris une place centrale dans les formulations skincare. Le GHK-Cu se retrouve désormais dans :
+- Les sérums anti-âge premium
+- Les crèmes réparatrices post-acte
+- Les soins contour des yeux
+
+CONSEILS D''UTILISATION
+
+Les peptides ne sont pas compatibles avec tous les ingrédients. Les acides (AHA, BHA) peuvent briser les liaisons peptidiques. Recommandation : utiliser les acides le matin, les peptides le soir, ou attendre 30 minutes entre les applications.
+
+Les technologies avancées comme la nanotechnologie améliorent désormais la stabilité et l''efficacité des formulations peptidiques.',
+ '{"en": "GHK-Cu (glycyl-L-histidyl-L-lysine-copper) is one of the most studied and widely used peptides in anti-aging cosmetics.\n\nWHAT IS GHK-Cu?\n\nDiscovered in the 1970s, this tripeptide naturally present in human plasma has a strong affinity for copper. Its concentration decreases with age: from 200 ng/mL at age 20 to 80 ng/mL at age 60.\n\nDOCUMENTED MECHANISMS OF ACTION\n\nStudies show that GHK-Cu:\n- Stimulates collagen and elastin production\n- Promotes healing and skin renewal\n- Offers antioxidant protection\n- Improves skin firmness and clarity\n- Reduces fine lines and photo-induced damage\n\n2024 TRENDS\n\nAccording to a review published in PMC in 2025, peptides have taken center stage in skincare formulations. GHK-Cu is now found in:\n- Premium anti-aging serums\n- Post-procedure repair creams\n- Eye contour treatments\n\nUSAGE TIPS\n\nPeptides are not compatible with all ingredients. Acids (AHA, BHA) can break peptide bonds. Recommendation: use acids in the morning, peptides in the evening, or wait 30 minutes between applications.\n\nAdvanced technologies like nanotechnology are now improving the stability and efficacy of peptide formulations."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/ghk-cu-peptide-cuivre.png',
+ '2025-03-05 10:00:00', NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91'),
+
+-- Article 11 : Collagène oral (Bien-être & Cosmétiques)
+('a76da968-bc21-4122-ba61-f11e69f1af78', 'collagene-oral-efficacite-rides-etude',
+ 'Collagène oral : efficacité prouvée sur les rides en 6 semaines',
+ '{"en": "Oral collagen: proven effectiveness on wrinkles in 6 weeks"}',
+ 'Un essai clinique randomisé en double aveugle confirme l''amélioration de l''hydratation cutanée et la réduction des rides avec les peptides de collagène.',
+ '{"en": "A randomized double-blind clinical trial confirms improved skin hydration and wrinkle reduction with collagen peptides."}',
+ 'Une étude publiée dans MDPI Cosmetics en 2024 apporte des preuves cliniques solides sur l''efficacité des peptides de collagène par voie orale.
+
+DESIGN DE L''ÉTUDE
+
+- Type : essai randomisé, double aveugle, contrôlé par placebo
+- Durée : 6 semaines
+- Substance testée : peptides de collagène de faible poids moléculaire
+- Paramètres mesurés : rides faciales, hydratation cutanée
+
+RÉSULTATS
+
+Les participants du groupe collagène ont montré :
+- Une réduction significative des rides faciales
+- Une amélioration mesurable de l''hydratation de la peau
+- Des effets visibles dès 6 semaines de supplémentation
+
+POURQUOI LE POIDS MOLÉCULAIRE COMPTE
+
+Les peptides de collagène de faible poids moléculaire (<3000 Da) sont mieux absorbés par l''intestin et atteignent plus efficacement les couches profondes de la peau.
+
+CONTEXTE DU MARCHÉ
+
+Les suppléments de collagène représentent un marché en pleine expansion. On les trouve sous forme de :
+- Poudres à diluer
+- Boissons "beauty drinks"
+- Gélules et comprimés
+
+Avec l''âge, les niveaux de collagène chutent drastiquement : à 70 ans, ils ne représentent plus que 40% des niveaux initiaux. Cette baisse explique l''intérêt croissant pour la supplémentation.
+
+LIMITES À NOTER
+
+Tous les produits ne se valent pas. La qualité, la source (marin, bovin, porcin) et le poids moléculaire influencent directement l''efficacité.',
+ '{"en": "A study published in MDPI Cosmetics in 2024 provides solid clinical evidence on the effectiveness of oral collagen peptides.\n\nSTUDY DESIGN\n\n- Type: randomized, double-blind, placebo-controlled trial\n- Duration: 6 weeks\n- Substance tested: low molecular weight collagen peptides\n- Parameters measured: facial wrinkles, skin hydration\n\nRESULTS\n\nParticipants in the collagen group showed:\n- Significant reduction in facial wrinkles\n- Measurable improvement in skin hydration\n- Visible effects from 6 weeks of supplementation\n\nWHY MOLECULAR WEIGHT MATTERS\n\nLow molecular weight collagen peptides (<3000 Da) are better absorbed by the intestine and more effectively reach the deep layers of the skin.\n\nMARKET CONTEXT\n\nCollagen supplements represent a rapidly expanding market. They are available as:\n- Powder to dilute\n- Beauty drinks\n- Capsules and tablets\n\nWith age, collagen levels drop drastically: at 70, they represent only 40% of initial levels. This decline explains the growing interest in supplementation.\n\nLIMITATIONS TO NOTE\n\nNot all products are equal. Quality, source (marine, bovine, porcine) and molecular weight directly influence effectiveness."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/collagene-oral-rides.png',
+ '2025-03-20 09:30:00', NULL, '82334ce4-0fcd-4947-9aa8-1bb16da64d91'),
+
+-- Article 12 : FDA Category 2 (Réglementation)
+('22c306ec-1546-4a72-96c1-52bca32d29fe', 'fda-bpc157-category-2-reglementation',
+ 'FDA et BPC-157 : comprendre la classification "Category 2"',
+ '{"en": "FDA and BPC-157: understanding the \"Category 2\" classification"}',
+ 'En 2023, la FDA a classé le BPC-157 en catégorie 2. Ce que cette décision signifie pour les chercheurs, les fournisseurs et les utilisateurs.',
+ '{"en": "In 2023, the FDA classified BPC-157 as Category 2. What this decision means for researchers, suppliers, and users."}',
+ 'En 2023, la Food and Drug Administration (FDA) américaine a pris une décision importante concernant le BPC-157 en le classant comme "Category 2 bulk drug substance".
+
+QUE SIGNIFIE "CATEGORY 2" ?
+
+Cette classification indique que :
+1. Le BPC-157 ne peut PAS être préparé par les pharmacies de préparation commerciales (compounding pharmacies)
+2. Il n''existe pas suffisamment de preuves pour déterminer s''il pourrait causer des dommages chez l''humain
+3. Le peptide n''est pas approuvé comme médicament
+
+CE QUI RESTE LÉGAL
+
+Malgré cette classification, de nombreux produits BPC-157 sont légalement vendus comme :
+- "Produits chimiques de recherche" (research chemicals)
+- "Compléments alimentaires" (dietary supplements)
+
+Ces catégories ne sont pas soumises aux mêmes réglementations que les médicaments.
+
+SITUATION AU ROYAUME-UNI
+
+Au Royaume-Uni, la MHRA (Medicines and Healthcare products Regulatory Agency) maintient une position stricte : ces peptides ne sont autorisés qu''à des fins de recherche, dans le cadre d''études approuvées.
+
+IMPLICATIONS PRATIQUES
+
+Pour les chercheurs : le BPC-157 reste accessible pour la recherche in vitro et préclinique.
+
+Pour les fournisseurs : la vente est possible sous réserve d''un étiquetage clair "à des fins de recherche uniquement".
+
+Pour les consommateurs : la prudence est de mise. L''absence d''approbation signifie l''absence de garanties sur la sécurité et l''efficacité.',
+ '{"en": "In 2023, the U.S. Food and Drug Administration (FDA) made an important decision regarding BPC-157 by classifying it as a \"Category 2 bulk drug substance.\"\n\nWHAT DOES \"CATEGORY 2\" MEAN?\n\nThis classification indicates that:\n1. BPC-157 CANNOT be prepared by commercial compounding pharmacies\n2. There is insufficient evidence to determine whether it could cause harm in humans\n3. The peptide is not approved as a drug\n\nWHAT REMAINS LEGAL\n\nDespite this classification, many BPC-157 products are legally sold as:\n- \"Research chemicals\"\n- \"Dietary supplements\"\n\nThese categories are not subject to the same regulations as drugs.\n\nSITUATION IN THE UK\n\nIn the UK, the MHRA (Medicines and Healthcare products Regulatory Agency) maintains a strict position: these peptides are only authorized for research purposes, within approved studies.\n\nPRACTICAL IMPLICATIONS\n\nFor researchers: BPC-157 remains accessible for in vitro and preclinical research.\n\nFor suppliers: sale is possible subject to clear labeling \"for research purposes only.\"\n\nFor consumers: caution is advised. Lack of approval means lack of guarantees on safety and efficacy."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/fda-bpc157-category2.png',
+ '2025-04-01 08:00:00', NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+
+-- Article 13 : Règles AMA antidopage (Réglementation)
+('78f05eef-ae13-479a-944c-88928052bfab', 'peptides-sport-regles-ama-antidopage',
+ 'Peptides et sport professionnel : les règles antidopage de l''AMA',
+ '{"en": "Peptides and professional sports: WADA anti-doping rules"}',
+ 'Certains peptides sont interdits en compétition par l''Agence Mondiale Antidopage. Le point sur la réglementation 2024 et les substances concernées.',
+ '{"en": "Certain peptides are banned in competition by the World Anti-Doping Agency. An overview of 2024 regulations and substances involved."}',
+ 'L''Agence Mondiale Antidopage (AMA/WADA) maintient une liste stricte des substances interdites en compétition sportive. Plusieurs peptides y figurent.
+
+PEPTIDES INTERDITS PAR L''AMA
+
+La liste des substances interdites inclut notamment :
+- Les hormones de croissance et leurs facteurs de libération
+- Les peptides mimétiques de l''EPO
+- Certains facteurs de croissance (IGF-1, MGF, etc.)
+- Les modulateurs métaboliques
+
+STATUT DU BPC-157
+
+Le BPC-157 n''est pas explicitement nommé sur la liste de l''AMA. Cependant, son utilisation pose des questions :
+- Il pourrait être considéré comme "méthode interdite" s''il améliore la récupération
+- Son statut reste ambigu selon les fédérations
+
+RISQUES POUR LES ATHLÈTES
+
+1. Détection : les méthodes de détection évoluent constamment
+2. Contamination : les produits non réglementés peuvent contenir des substances interdites
+3. Sanctions : les violations peuvent entraîner des suspensions de 2 à 4 ans
+
+RECOMMANDATIONS
+
+Pour les athlètes professionnels :
+- Vérifier systématiquement le statut de toute substance sur le site de l''AMA
+- Consulter les autorités antidopage nationales
+- Privilégier les produits certifiés et testés
+- En cas de doute, s''abstenir
+
+Les sportifs amateurs ne sont généralement pas soumis aux mêmes contrôles, mais les compétitions officielles peuvent imposer des tests.',
+ '{"en": "The World Anti-Doping Agency (WADA) maintains a strict list of substances prohibited in sports competition. Several peptides are included.\n\nPEPTIDES BANNED BY WADA\n\nThe list of prohibited substances notably includes:\n- Growth hormones and their releasing factors\n- EPO mimetic peptides\n- Certain growth factors (IGF-1, MGF, etc.)\n- Metabolic modulators\n\nBPC-157 STATUS\n\nBPC-157 is not explicitly named on the WADA list. However, its use raises questions:\n- It could be considered a \"prohibited method\" if it enhances recovery\n- Its status remains ambiguous depending on federations\n\nRISKS FOR ATHLETES\n\n1. Detection: detection methods are constantly evolving\n2. Contamination: unregulated products may contain prohibited substances\n3. Sanctions: violations can result in 2 to 4 year suspensions\n\nRECOMMENDATIONS\n\nFor professional athletes:\n- Systematically check the status of any substance on the WADA website\n- Consult national anti-doping authorities\n- Favor certified and tested products\n- When in doubt, abstain\n\nAmateur athletes are generally not subject to the same controls, but official competitions may impose tests."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/peptides-sport-ama.png',
+ '2025-04-15 15:00:00', NULL, 'f5401164-9929-413d-8a7b-6f1bfdabf9dc'),
+
+-- Article 14 : GLP-1 et cerveau (Recherche & Innovation)
+('a7848dff-911e-41e8-beb2-559aaf5d7263', 'glp1-cerveau-decouverte-2024-ut-southwestern',
+ 'Découverte 2024 : comment le GLP-1 agit dans le cerveau',
+ '{"en": "2024 Discovery: how GLP-1 acts in the brain"}',
+ 'Des chercheurs de UT Southwestern ont identifié les neurones ciblés par le sémaglutide. Une avancée majeure pour comprendre ces médicaments.',
+ '{"en": "UT Southwestern researchers have identified the neurons targeted by semaglutide. A major advance in understanding these drugs."}',
+ 'Une équipe de chercheurs du UT Southwestern Medical Center a publié en août 2024 dans la revue Science une découverte majeure sur le mécanisme d''action des médicaments GLP-1.
+
+LA DÉCOUVERTE
+
+Les scientifiques ont identifié un sous-ensemble spécifique de cellules cérébrales dont l''activation serait partiellement responsable des effets des médicaments de perte de poids comme le sémaglutide (Ozempic, Wegovy).
+
+POURQUOI C''EST IMPORTANT
+
+Jusqu''à présent, le mécanisme précis par lequel les agonistes GLP-1 induisent la perte de poids n''était pas entièrement compris. On savait qu''ils :
+- Ralentissent la vidange gastrique
+- Réduisent l''appétit
+- Agissent sur le pancréas
+
+Cette découverte révèle un mécanisme central (cérébral) qui explique l''efficacité remarquable de ces traitements.
+
+IMPLICATIONS POUR LA RECHERCHE
+
+Ces résultats pourraient permettre :
+- D''optimiser l''efficacité des médicaments existants
+- De développer des molécules plus ciblées
+- De réduire potentiellement les effets secondaires
+- De mieux comprendre les mécanismes de la satiété
+
+CONTEXTE
+
+Les médicaments GLP-1 représentent une révolution thérapeutique. Le sémaglutide a généré plus de 20 milliards de dollars de ventes en 2024. Comprendre précisément leur fonctionnement est crucial pour améliorer les traitements futurs.
+
+Cette recherche illustre l''importance de la science fondamentale dans le développement de thérapies peptidiques.',
+ '{"en": "A team of researchers from UT Southwestern Medical Center published a major discovery in August 2024 in the journal Science on the mechanism of action of GLP-1 drugs.\n\nTHE DISCOVERY\n\nScientists identified a specific subset of brain cells whose activation would be partially responsible for the effects of weight loss drugs like semaglutide (Ozempic, Wegovy).\n\nWHY IT MATTERS\n\nUntil now, the precise mechanism by which GLP-1 agonists induce weight loss was not fully understood. It was known that they:\n- Slow gastric emptying\n- Reduce appetite\n- Act on the pancreas\n\nThis discovery reveals a central (brain) mechanism that explains the remarkable effectiveness of these treatments.\n\nIMPLICATIONS FOR RESEARCH\n\nThese results could allow:\n- Optimization of existing drug efficacy\n- Development of more targeted molecules\n- Potential reduction of side effects\n- Better understanding of satiety mechanisms\n\nCONTEXT\n\nGLP-1 drugs represent a therapeutic revolution. Semaglutide generated over $20 billion in sales in 2024. Understanding precisely how they work is crucial for improving future treatments.\n\nThis research illustrates the importance of fundamental science in the development of peptide therapies."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/glp1-cerveau-decouverte.png',
+ '2025-04-28 12:00:00', NULL, '76bb3e2d-d0c7-41aa-a59c-32f4c77379e9'),
+
+-- Article 15 : Retatrutide (Marché & Économie)
+('1584153b-0144-484b-91a9-6abf00d53e35', 'retatrutide-triple-agoniste-eli-lilly-2025',
+ 'Retatrutide : le triple agoniste qui surpasse Ozempic et Mounjaro',
+ '{"en": "Retatrutide: the triple agonist that outperforms Ozempic and Mounjaro"}',
+ 'Eli Lilly annonce des résultats précoces pour 2025. Ce nouveau peptide a montré jusqu''à 24% de perte de poids en phase 2, dépassant tous les traitements existants.',
+ '{"en": "Eli Lilly announces early results for 2025. This new peptide showed up to 24% weight loss in phase 2, surpassing all existing treatments."}',
+ 'Eli Lilly développe un nouveau peptide qui pourrait redéfinir le traitement de l''obésité : le retatrutide (LY3437943).
+
+UN TRIPLE AGONISTE INÉDIT
+
+Contrairement au sémaglutide (GLP-1 seul) et au tirzepatide (GLP-1 + GIP), le retatrutide cible TROIS récepteurs :
+- GLP-1 (comme Ozempic)
+- GIP (comme Mounjaro)
+- Glucagon
+
+Cette triple action lui confère une efficacité supérieure dans les essais cliniques.
+
+RÉSULTATS DE PHASE 2 (NEJM)
+
+Publiés dans le New England Journal of Medicine :
+- Perte de poids moyenne à 48 semaines : -24,2% (58 livres / 26 kg)
+- Groupe placebo : -2,1%
+- Certains participants : jusqu''à -31% en 8 mois
+
+À titre de comparaison, le tirzepatide (Mounjaro) atteint -22,5% dans les études de phase 3.
+
+CALENDRIER ACCÉLÉRÉ
+
+En février 2025, Eli Lilly a annoncé que les données de phase 3 seraient publiées plus tôt que prévu :
+- Initialement attendues : février 2026
+- Nouvelle projection : courant 2025
+
+L''étude de 68 semaines concerne des patients obèses souffrant d''arthrose du genou.
+
+EFFETS SECONDAIRES À SURVEILLER
+
+Les effets indésirables rapportés incluent :
+- Nausées (fréquentes pendant la titration)
+- Troubles gastro-intestinaux
+- Cas de calculs rénaux signalés
+
+L''approbation FDA est attendue dans plusieurs années, le temps de compléter les essais de phase 3.
+
+Ce peptide illustre l''innovation continue dans le domaine des agonistes incrétines.',
+ '{"en": "Eli Lilly is developing a new peptide that could redefine obesity treatment: retatrutide (LY3437943).\n\nAN UNPRECEDENTED TRIPLE AGONIST\n\nUnlike semaglutide (GLP-1 alone) and tirzepatide (GLP-1 + GIP), retatrutide targets THREE receptors:\n- GLP-1 (like Ozempic)\n- GIP (like Mounjaro)\n- Glucagon\n\nThis triple action gives it superior efficacy in clinical trials.\n\nPHASE 2 RESULTS (NEJM)\n\nPublished in the New England Journal of Medicine:\n- Average weight loss at 48 weeks: -24.2% (58 lbs / 26 kg)\n- Placebo group: -2.1%\n- Some participants: up to -31% in 8 months\n\nFor comparison, tirzepatide (Mounjaro) achieves -22.5% in phase 3 studies.\n\nACCELERATED TIMELINE\n\nIn February 2025, Eli Lilly announced that phase 3 data would be released earlier than expected:\n- Originally expected: February 2026\n- New projection: during 2025\n\nThe 68-week study involves obese patients with knee osteoarthritis.\n\nSIDE EFFECTS TO WATCH\n\nReported adverse effects include:\n- Nausea (common during titration)\n- Gastrointestinal disorders\n- Kidney stone cases reported\n\nFDA approval is expected in several years, pending completion of phase 3 trials.\n\nThis peptide illustrates ongoing innovation in the field of incretin agonists."}',
+ 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/news/retatrutide-eli-lilly.png',
+ '2025-05-25 10:30:00', NULL, 'ac5e9b57-ff9b-43d6-a69d-498a136c799a')
+
+ON CONFLICT (id) DO UPDATE SET
+  slug = EXCLUDED.slug,
+  title = EXCLUDED.title,
+  title_i18n = EXCLUDED.title_i18n,
+  excerpt = EXCLUDED.excerpt,
+  excerpt_i18n = EXCLUDED.excerpt_i18n,
+  content = EXCLUDED.content,
+  content_i18n = EXCLUDED.content_i18n,
+  image = EXCLUDED.image,
+  published_at = EXCLUDED.published_at;
+
+-- ============================
+-- 🎫 SEED — PROMO CODES (V5.3)
+-- ============================
+
+-- Configuration des codes automatiques (si pas déjà insérée par le backup)
+INSERT INTO public.auto_promo_settings (setting_key, setting_value, is_enabled) VALUES
+  ('welcome', '{
+    "discount_type": "percentage",
+    "discount_value": 10,
+    "min_order_amount": 0,
+    "expires_days": 30,
+    "email_subject": "Bienvenue ! Voici votre code promo",
+    "max_uses_per_code": 1
+  }'::jsonb, true),
+  ('loyalty', '{
+    "orders_threshold": 3,
+    "discount_type": "percentage",
+    "discount_value": 15,
+    "min_order_amount": 0,
+    "expires_days": 60,
+    "email_subject": "Merci pour votre fidélité !"
+  }'::jsonb, true),
+  ('cart_abandonment', '{
+    "delay_hours": 24,
+    "discount_type": "percentage",
+    "discount_value": 10,
+    "min_order_amount": 30,
+    "expires_days": 7,
+    "email_subject": "Vous avez oublié quelque chose..."
+  }'::jsonb, true)
+ON CONFLICT (setting_key) DO UPDATE SET
+  setting_value = EXCLUDED.setting_value,
+  is_enabled = EXCLUDED.is_enabled;
+
+-- Codes promo de test
+INSERT INTO public.promo_codes (id, code, description, discount_type, discount_value, min_order_amount, max_discount_amount, max_uses, max_uses_per_user, valid_from, valid_until, active)
+VALUES
+  -- Code pourcentage sans limite
+  ('11111111-1111-1111-1111-111111111111', 'TEST10', 'Code de test -10%', 'percentage', 10, 0, NULL, NULL, NULL, now(), NULL, true),
+  -- Code pourcentage avec plafond
+  ('22222222-2222-2222-2222-222222222222', 'SUMMER20', 'Promo été -20% (max 50€)', 'percentage', 20, 50, 50, 100, 1, now(), '2025-09-30', true),
+  -- Code montant fixe
+  ('33333333-3333-3333-3333-333333333333', 'FLAT5', 'Remise fixe 5€', 'fixed', 5, 20, NULL, NULL, 2, now(), NULL, true),
+  -- Code expiré (pour tester la validation)
+  ('44444444-4444-4444-4444-444444444444', 'EXPIRE', 'Code expiré pour test', 'percentage', 15, 0, NULL, NULL, NULL, '2024-01-01', '2024-12-31', true),
+  -- Code désactivé
+  ('55555555-5555-5555-5555-555555555555', 'INACTIVE', 'Code désactivé', 'percentage', 50, 0, NULL, NULL, NULL, now(), NULL, false)
+ON CONFLICT (id) DO UPDATE SET
+  code = EXCLUDED.code,
+  description = EXCLUDED.description,
+  discount_type = EXCLUDED.discount_type,
+  discount_value = EXCLUDED.discount_value,
+  min_order_amount = EXCLUDED.min_order_amount,
+  max_discount_amount = EXCLUDED.max_discount_amount,
+  max_uses = EXCLUDED.max_uses,
+  max_uses_per_user = EXCLUDED.max_uses_per_user,
+  valid_from = EXCLUDED.valid_from,
+  valid_until = EXCLUDED.valid_until,
+  active = EXCLUDED.active;
 
 -- =========================================
--- ✅ FIN DU SEED V6
+-- ✅ FIN DU SEED V6.1
 -- =========================================

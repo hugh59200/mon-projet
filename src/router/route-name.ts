@@ -4,6 +4,7 @@ export type RouteName =
   'AdminNews' |
   'AdminOrders' |
   'AdminProducts' |
+  'AdminPromoCodes' |
   'AdminStats' |
   'AdminTopics' |
   'AdminUsers' |

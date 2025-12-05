@@ -281,11 +281,11 @@
   }
 
   // ============================================
-  // RESPONSIVE - Assombrissement progressif
+  // RESPONSIVE - Breakpoints harmonisés
   // ============================================
 
-  // TABLETTE LARGE (1100px) - Un peu plus sombre
-  @media (max-width: 1100px) {
+  // TABLETTE (≤ 1160px)
+  .respond-tablet({
     .hero-section {
       &__bg-image img {
         object-position: 70% center;
@@ -293,27 +293,6 @@
         -webkit-mask-image: none;
       }
 
-      &__bg-overlay {
-        background: linear-gradient(
-          90deg,
-          rgba(2, 2, 2, 0.95) 0%,
-          rgba(2, 2, 2, 0.8) 25%,
-          rgba(2, 2, 2, 0.4) 50%,
-          rgba(2, 2, 2, 0.3) 70%,
-          rgba(2, 2, 2, 0.6) 100%
-        );
-      }
-
-      &__content {
-        max-width: 500px;
-        padding: 50px;
-      }
-    }
-  }
-
-  // TABLETTE (900px) - Plus sombre
-  @media (max-width: 900px) {
-    .hero-section {
       &__bg-overlay {
         background: linear-gradient(
           90deg,
@@ -325,13 +304,14 @@
       }
 
       &__content {
+        max-width: 500px;
         padding: 40px;
       }
     }
-  }
+  });
 
-  // MOBILE LARGE (768px) - Encore plus sombre
-  @media (max-width: 768px) {
+  // MOBILE (≤ 720px)
+  .respond-mobile({
     .hero-wrapper {
       padding: 0 16px;
     }
@@ -345,7 +325,7 @@
       }
 
       &__bg-overlay {
-        background: rgba(2, 2, 2, 0.8);
+        background: rgba(2, 2, 2, 0.85);
 
         &::after {
           background: linear-gradient(
@@ -360,9 +340,10 @@
 
       &__content {
         max-width: 100%;
-        padding: 40px 24px;
+        padding: 32px 20px;
         text-align: center;
         align-items: center;
+        gap: 20px;
       }
     }
 
@@ -372,6 +353,14 @@
         & > span:last-of-type {
           display: none;
         }
+      }
+
+      &__title {
+        font-size: 32px;
+      }
+
+      &__desc {
+        font-size: 14px;
       }
 
       &__actions {
@@ -386,41 +375,13 @@
 
       &__trust {
         flex-direction: column;
-        gap: 12px;
-        align-items: center;
-      }
-    }
-  }
-
-  // MOBILE PETIT (480px) - Le plus sombre
-  @media (max-width: 480px) {
-    .hero-section {
-      &__bg-overlay {
-        background: rgba(2, 2, 2, 0.85);
-      }
-
-      &__content {
-        padding: 32px 20px;
-        gap: 20px;
-      }
-    }
-
-    .hero {
-      &__title {
-        font-size: 32px;
-      }
-
-      &__desc {
-        font-size: 14px;
-      }
-
-      &__trust {
         gap: 10px;
+        align-items: center;
 
         &-item {
           font-size: 12px;
         }
       }
     }
-  }
+  });
 </style>

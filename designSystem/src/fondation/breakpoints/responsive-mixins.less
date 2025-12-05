@@ -1,0 +1,152 @@
+// ============================================
+// MIXINS RESPONSIVE
+// ============================================
+// Utilisation :
+//   .my-class {
+//     padding: 24px;
+//     .respond-tablet({ padding: 16px; });
+//     .respond-mobile({ padding: 12px; });
+//   }
+// ============================================
+
+// Mobile : <= 720px
+.respond-mobile(@rules) {
+  @media (max-width: @breakpoint-mobile) {
+    @rules();
+  }
+}
+
+// Tablet : <= 1160px (inclut mobile)
+.respond-tablet(@rules) {
+  @media (max-width: @breakpoint-tablet) {
+    @rules();
+  }
+}
+
+// Desktop large : >= 1400px
+.respond-desktop-large(@rules) {
+  @media (min-width: @breakpoint-desktop) {
+    @rules();
+  }
+}
+
+// Tablet only : entre 721px et 1160px
+.respond-tablet-only(@rules) {
+  @media (min-width: (@breakpoint-mobile + 1)) and (max-width: @breakpoint-tablet) {
+    @rules();
+  }
+}
+
+// Desktop only : > 1160px
+.respond-desktop-only(@rules) {
+  @media (min-width: (@breakpoint-tablet + 1)) {
+    @rules();
+  }
+}
+
+// ============================================
+// CLASSES UTILITAIRES SHOW/HIDE
+// ============================================
+
+// Masquer sur mobile
+.hide-mobile {
+  @media (max-width: @breakpoint-mobile) {
+    display: none !important;
+  }
+}
+
+// Masquer sur tablet et moins
+.hide-tablet {
+  @media (max-width: @breakpoint-tablet) {
+    display: none !important;
+  }
+}
+
+// Afficher uniquement sur mobile
+.show-mobile-only {
+  @media (min-width: (@breakpoint-mobile + 1)) {
+    display: none !important;
+  }
+}
+
+// Afficher uniquement sur tablet
+.show-tablet-only {
+  @media (max-width: @breakpoint-mobile) {
+    display: none !important;
+  }
+  @media (min-width: (@breakpoint-tablet + 1)) {
+    display: none !important;
+  }
+}
+
+// Afficher uniquement sur desktop
+.show-desktop-only {
+  @media (max-width: @breakpoint-tablet) {
+    display: none !important;
+  }
+}
+
+// ============================================
+// SPACING RESPONSIVE
+// ============================================
+
+// Padding responsive (desktop -> tablet -> mobile)
+.padding-responsive(@desktop, @tablet, @mobile) {
+  padding: @desktop;
+  .respond-tablet({ padding: @tablet; });
+  .respond-mobile({ padding: @mobile; });
+}
+
+// Gap responsive
+.gap-responsive(@desktop, @tablet, @mobile) {
+  gap: @desktop;
+  .respond-tablet({ gap: @tablet; });
+  .respond-mobile({ gap: @mobile; });
+}
+
+// ============================================
+// TYPOGRAPHY RESPONSIVE
+// ============================================
+
+// Font-size fluide avec clamp
+.font-size-fluid(@min, @preferred, @max) {
+  font-size: clamp(@min, @preferred, @max);
+}
+
+// Font-size responsive (valeurs fixes par breakpoint)
+.font-size-responsive(@desktop, @tablet, @mobile) {
+  font-size: @desktop;
+  .respond-tablet({ font-size: @tablet; });
+  .respond-mobile({ font-size: @mobile; });
+}
+
+// ============================================
+// LAYOUT HELPERS
+// ============================================
+
+// Stack vertical sur mobile (flex -> column)
+.stack-mobile() {
+  .respond-mobile({
+    flex-direction: column;
+  });
+}
+
+// Full width sur mobile
+.full-width-mobile() {
+  .respond-mobile({
+    width: 100%;
+    max-width: 100%;
+  });
+}
+
+// Container avec max-width responsive
+.container-responsive(@max-desktop: 1200px, @padding-mobile: 16px) {
+  max-width: @max-desktop;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  .respond-mobile({
+    padding-left: @padding-mobile;
+    padding-right: @padding-mobile;
+  });
+}

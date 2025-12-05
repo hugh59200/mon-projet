@@ -337,7 +337,7 @@
     // ─────────────────────────────────────────
     // Mobile Responsive
     // ─────────────────────────────────────────
-    @media (max-width: 768px) {
+    .respond-mobile({
       &__filters {
         margin-left: 0;
         flex-wrap: wrap;
@@ -375,6 +375,6 @@
           border-radius: 14px;
         }
       }
-    }
+    });
   }
 </style>

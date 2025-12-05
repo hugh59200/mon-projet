@@ -109,6 +109,41 @@
   }
 }
 
+/* =========================================
+   📱 RESPONSIVE - Mobile (≤ 720px)
+   ========================================= */
+.respond-mobile({
+  .auth {
+    &__title {
+      font-size: 1.75rem;
+      margin-bottom: 10px;
+    }
+
+    &__subtitle {
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+      max-width: 100%;
+    }
+
+    &__form {
+      gap: 16px;
+    }
+
+    &__divider {
+      margin: 16px 0;
+    }
+
+    &__providers {
+      gap: 12px;
+    }
+
+    &__links {
+      margin-top: 24px;
+      gap: 10px;
+    }
+  }
+});
+
 /* ANIMATIONS */
 @keyframes fadeInUp {
   from {

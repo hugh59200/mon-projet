@@ -367,7 +367,7 @@
     // ─────────────────────────────────────────
     // Mobile
     // ─────────────────────────────────────────
-    @media (max-width: 768px) {
+    .respond-mobile({
       left: 12px;
       right: 12px;
       bottom: 68px;
@@ -378,8 +378,9 @@
       }
 
       &__icon {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
         border-radius: 10px;
       }
 
@@ -389,7 +390,7 @@
       }
 
       &__text {
-        font-size: 13px;
+        font-size: 14px;
         line-height: 1.6;
       }
 
@@ -402,19 +403,26 @@
       &__action-btn {
         flex: 1;
         min-width: calc(50% - 4px);
+        min-height: 44px;
 
         &:last-child {
           flex-basis: 100%;
         }
       }
 
+      &__close {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+      }
+
       &__badge {
         top: 10px;
-        right: 48px;
-        padding: 3px 8px;
-        font-size: 9px;
+        right: 56px;
+        padding: 4px 10px;
+        font-size: 10px;
       }
-    }
+    });
   }
 
   // ─────────────────────────────────────────

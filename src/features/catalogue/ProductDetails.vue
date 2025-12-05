@@ -443,6 +443,35 @@
     return `${name} - Peptide de recherche ${category}. Pureté ≥99%. Expédition rapide et certificat d'analyse inclus.`
   })
 
+  // Schema BreadcrumbList pour les rich snippets de navigation
+  const breadcrumbSchema = computed(() => {
+    if (!product.value) return null
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Accueil',
+          item: 'https://fast-peptides.com/',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Catalogue',
+          item: 'https://fast-peptides.com/catalogue',
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: productName.value || product.value.name,
+          item: `https://fast-peptides.com/catalogue/${route.params.id}`,
+        },
+      ],
+    }
+  })
+
   useHead({
     title: pageTitle,
     meta: [
@@ -466,11 +495,34 @@
         property: 'og:image',
         content: computed(() => product.value?.image || 'https://fast-peptides.com/default-product.jpg'),
       },
+      // Twitter Cards pour les produits
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: pageTitle,
+      },
+      {
+        name: 'twitter:description',
+        content: pageDescription,
+      },
+      {
+        name: 'twitter:image',
+        content: computed(() => product.value?.image || 'https://fast-peptides.com/default-product.jpg'),
+      },
     ],
     link: [
       {
         rel: 'canonical',
         href: computed(() => `https://fast-peptides.com/catalogue/${route.params.id}`),
+      },
+    ],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: computed(() => (breadcrumbSchema.value ? JSON.stringify(breadcrumbSchema.value) : '')),
       },
     ],
   })
@@ -1302,9 +1354,11 @@
   }
 
   // ============================================================
-  // RESPONSIVE
+  // RESPONSIVE - Utilise les mixins harmonisés
   // ============================================================
-  @media (max-width: 1024px) {
+
+  // Tablet (≤ 1160px)
+  .respond-tablet({
     .product {
       &__main {
         grid-template-columns: 1fr;
@@ -1313,54 +1367,168 @@
 
       &__gallery {
         position: static;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      &__trust-strip {
+        flex-wrap: wrap;
+        gap: 16px;
       }
     }
-  }
+  });
 
-  @media (max-width: 768px) {
+  // Mobile (≤ 720px)
+  .respond-mobile({
     .product-page {
       &__container {
-        padding: 16px;
+        padding: 16px 16px 60px;
       }
 
       &__nav {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 24px;
       }
 
       &__breadcrumb {
         display: none;
       }
+
+      &__back {
+        padding: 12px 16px;
+      }
     }
 
     .product {
+      &__main {
+        gap: 24px;
+      }
+
+      &__image-card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      &__badge {
+        padding: 5px 10px;
+        font-size: 10px;
+
+        &--promo {
+          top: 12px;
+          left: 12px;
+        }
+
+        &--ruo {
+          top: 12px;
+          right: 12px;
+        }
+      }
+
+      &__trust-strip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      &__title {
+        font-size: 28px;
+      }
+
+      &__subtitle {
+        font-size: 16px;
+      }
+
       &__specs {
         flex-direction: column;
+        gap: 8px;
       }
 
       &__spec {
         min-width: auto;
+        padding: 10px 14px;
+      }
+
+      &__pricing {
+        padding: 20px;
+        border-radius: 16px;
+      }
+
+      &__price-current {
+        font-size: 32px;
+
+        span {
+          font-size: 20px;
+        }
       }
 
       &__actions {
         flex-direction: column;
+        gap: 10px;
       }
 
-      &__price-current {
-        font-size: 36px;
+      &__wishlist-btn {
+        width: 100%;
+        height: 48px;
+      }
+
+      &__guarantees {
+        gap: 8px;
+      }
+
+      &__guarantee {
+        padding: 12px 14px;
+      }
+
+      &__guarantee-icon {
+        width: 38px;
+        height: 38px;
+      }
+
+      &__details {
+        border-radius: 16px;
       }
 
       &__details-tabs {
         flex-direction: column;
+        gap: 2px;
+        padding: 6px;
       }
 
       &__tab {
         justify-content: flex-start;
+        padding: 12px 16px;
+        border-radius: 10px;
+      }
+
+      &__details-content {
+        padding: 20px 16px;
+      }
+
+      &__description {
+        font-size: 15px;
       }
 
       &__shipping-info {
         grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      &__shipping-card {
+        padding: 16px;
+      }
+
+      &__disclaimer {
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 13px;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
       }
     }
-  }
+  });
 </style>

@@ -148,8 +148,8 @@ function goToFavorites(): void {
   }
 }
 
-// Responsive
-@media (max-width: 750px) {
+// Responsive - Mobile (≤ 720px)
+.respond-mobile({
   .wishlist-icon {
     width: 32px;
     height: 32px;
@@ -162,5 +162,5 @@ function goToFavorites(): void {
       right: -3px;
     }
   }
-}
+});
 </style>

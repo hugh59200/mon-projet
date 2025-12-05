@@ -421,7 +421,7 @@
   // ─────────────────────────────────────────
   // Mobile responsive
   // ─────────────────────────────────────────
-  @media (max-width: 480px) {
+  .respond-mobile({
     .chat-widget {
       bottom: 16px;
       right: 16px;
@@ -445,7 +445,7 @@
       }
 
       &__header {
-        padding: 16px 20px;
+        padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
         border-radius: 0;
       }
 
@@ -463,8 +463,9 @@
       }
 
       &__header-close {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
       }
     }
 
@@ -477,5 +478,5 @@
       opacity: 0;
       transform: translateY(50%);
     }
-  }
+  });
 </style>

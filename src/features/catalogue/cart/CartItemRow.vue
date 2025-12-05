@@ -374,7 +374,7 @@
   }
 
   /* MOBILE */
-  @media (max-width: 600px) {
+  .respond-mobile({
     .cart-card {
       .content-bottom {
         flex-direction: column-reverse;
@@ -388,8 +388,6 @@
         border-top: 1px solid @neutral-100;
       }
       .price-unit-block {
-        /* En mobile, on peut vouloir cacher le prix unitaire pour épurer, 
-           ou le laisser. Ici je le laisse mais discret */
         flex-direction: row;
         align-items: baseline;
         gap: 8px;
@@ -399,5 +397,5 @@
         }
       }
     }
-  }
+  });
 </style>

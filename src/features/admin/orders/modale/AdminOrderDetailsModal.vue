@@ -853,9 +853,9 @@
     grid-template-columns: 1fr 1fr auto;
     gap: 12px;
 
-    @media (max-width: 600px) {
+    .respond-mobile({
       grid-template-columns: 1fr;
-    }
+    });
   }
 
   .products-table {
@@ -942,8 +942,8 @@
     }
   }
 
-  // Responsive
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .order-detail {
       gap: 20px;
       padding: 4px;
@@ -969,5 +969,5 @@
         display: none;
       }
     }
-  }
+  });
 </style>

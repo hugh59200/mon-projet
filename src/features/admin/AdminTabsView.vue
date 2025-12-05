@@ -98,10 +98,12 @@
     flex-direction: column;
     gap: 20px;
 
-    @media (max-width: 768px) {
-      padding: 16px;
-      border-radius: 16px;
-    }
+    // Mobile (≤ 720px)
+    .respond-mobile({
+      padding: 12px;
+      border-radius: 14px;
+      gap: 16px;
+    });
 
     &__nav {
       background: @neutral-100;
@@ -110,6 +112,17 @@
       padding: 6px;
       display: inline-flex;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+
+      // Mobile : scroll horizontal pour les tabs
+      .respond-mobile({
+        width: 100%;
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      });
     }
   }
 

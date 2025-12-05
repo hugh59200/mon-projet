@@ -1383,30 +1383,62 @@
   }
 
   // ============================================
-  // RESPONSIVE
+  // RESPONSIVE - Mixins harmonisés
   // ============================================
-  @media (max-width: 1024px) {
+
+  // Tablet (≤ 1160px)
+  .respond-tablet({
     .cart {
       &__content {
         grid-template-columns: 1fr;
+        gap: 24px;
       }
 
       &__sidebar {
         position: static;
+        order: -1; // Summary en haut sur tablet
+      }
+
+      &__summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+
+        &-title {
+          grid-column: 1 / -1;
+        }
+
+        &-rows {
+          grid-column: 1;
+        }
+
+        .PremiumButton {
+          grid-column: 2;
+          align-self: end;
+        }
+      }
+
+      &__trust,
+      &__payment-methods {
+        display: none;
       }
     }
-  }
+  });
 
-  @media (max-width: 768px) {
+  // Mobile (≤ 720px)
+  .respond-mobile({
     .cart {
       &__container {
-        padding: 16px;
+        padding: 16px 16px 100px;
       }
 
       &__header {
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         text-align: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
 
         &-left,
         &-right {
@@ -1416,29 +1448,108 @@
         }
       }
 
-      &__back {
-        width: 100%;
-        justify-content: center;
+      &__title {
+        font-size: 22px;
+        gap: 8px;
+
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      &__title-count {
+        min-width: 24px;
+        height: 24px;
+        font-size: 12px;
       }
 
       &__table-header {
         display: none;
+      }
+
+      &__main {
+        border-radius: 16px;
+      }
+
+      &__empty {
+        padding: 48px 20px;
+        border-radius: 16px;
+      }
+
+      &__empty-title {
+        font-size: 20px;
+      }
+
+      &__empty-text {
+        font-size: 14px;
+      }
+
+      &__suggestions {
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+
+      &__suggestions-tags {
+        gap: 8px;
+      }
+
+      // Summary mobile
+      &__sidebar {
+        order: 1;
+      }
+
+      &__summary {
+        display: block;
+        padding: 20px;
+        border-radius: 16px;
+      }
+
+      &__summary-title {
+        font-size: 16px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+      }
+
+      &__summary-row--total span:last-child {
+        font-size: 20px;
+      }
+
+      &__trust {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+
+      &__trust-item {
+        font-size: 11px;
+        gap: 6px;
+      }
+
+      &__payment-methods {
+        display: block;
       }
     }
 
     .cart-item {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      padding: 20px;
+      gap: 12px;
+      padding: 16px;
 
       &__product {
         width: 100%;
       }
 
       &__image {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
+
+        img {
+          border-radius: 10px;
+        }
       }
 
       &__price,
@@ -1453,7 +1564,11 @@
       }
 
       &__name {
-        font-size: 16px;
+        font-size: 15px;
+      }
+
+      &__dosage {
+        font-size: 12px;
       }
 
       &__mobile-bottom {
@@ -1461,12 +1576,20 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        padding-top: 16px;
+        padding-top: 12px;
         border-top: 1px dashed @neutral-200;
       }
 
       &__qty-control--mobile {
         display: flex;
+        background: @neutral-100;
+        border-radius: 8px;
+        padding: 2px;
+      }
+
+      &__qty-btn {
+        width: 36px;
+        height: 36px;
       }
 
       &__mobile-total {
@@ -1476,14 +1599,9 @@
         color: var(--primary-700);
       }
 
-      // Show mobile remove button
-      &__info::after {
-        content: none;
-      }
-
       &__product {
         position: relative;
       }
     }
-  }
+  });
 </style>

@@ -106,40 +106,18 @@
     }
   }
 
-  // Responsive
-  @media (max-width: 1100px) {
-    .header-logo {
-      &__fast,
-      &__peptides {
-        font-size: 20px;
-      }
-    }
-  }
-
-  @media (max-width: 1000px) {
+  // Responsive - Tablet
+  .respond-tablet({
     .header-logo {
       &__fast,
       &__peptides {
         font-size: 18px;
       }
     }
-  }
+  });
 
-  @media (max-width: 750px) {
-    .header-logo {
-      &__icon {
-        width: 36px;
-        height: 36px;
-      }
-
-      &__fast,
-      &__peptides {
-        font-size: 18px;
-      }
-    }
-  }
-
-  @media (max-width: 480px) {
+  // Responsive - Mobile
+  .respond-mobile({
     .header-logo {
       &__text {
         display: none;
@@ -148,7 +126,8 @@
       &__icon {
         width: 40px;
         height: 40px;
+        min-width: 40px;
       }
     }
-  }
+  });
 </style>

@@ -406,11 +406,11 @@
     transform: translateY(-10px) scale(0.98);
   }
 
-  /* --- MEDIA QUERY MOBILE --- */
-  @media (max-width: 1024px) {
+  /* --- RESPONSIVE - Tablet (≤ 1160px) --- */
+  .respond-tablet({
     .skip-container {
       top: auto;
-      bottom: 30px; /* On déplace le bouton "Continuer sans compte" en bas sur mobile pour ne pas gêner le logo */
+      bottom: 30px;
       right: 0;
       left: 0;
       display: flex;
@@ -423,8 +423,28 @@
         font-size: 0.9rem;
         span {
           display: inline;
-        } /* On réaffiche le texte car on est en bas */
+        }
       }
     }
-  }
+  });
+
+  /* --- RESPONSIVE - Mobile (≤ 720px) --- */
+  .respond-mobile({
+    .auth-form-container {
+      padding: 30px 16px;
+    }
+
+    .auth-form-wrapper {
+      padding: 16px;
+      max-width: 100%;
+    }
+
+    .mobile-header {
+      padding: 24px 16px 0;
+    }
+
+    .skip-container {
+      bottom: 24px;
+    }
+  });
 </style>

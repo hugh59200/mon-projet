@@ -67,25 +67,25 @@
     &--padding-sm {
       padding: 16px;
 
-      @media (max-width: 768px) {
+      .respond-mobile({
         padding: 12px;
-      }
+      });
     }
 
     &--padding-md {
       padding: 24px;
 
-      @media (max-width: 768px) {
+      .respond-mobile({
         padding: 16px;
-      }
+      });
     }
 
     &--padding-lg {
       padding: 32px;
 
-      @media (max-width: 768px) {
+      .respond-mobile({
         padding: 24px;
-      }
+      });
     }
 
     // ========================================

@@ -494,6 +494,10 @@
 </script>
 
 <style scoped lang="less">
+  @import '@designSystem/fondation/colors/colors.less';
+  @import '@designSystem/fondation/breakpoints/breakpoints.less';
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+
   .admin-orders {
     // Onglets de statut
     &__tabs {
@@ -576,7 +580,7 @@
     }
 
     // Responsive - Tablette
-    @media (max-width: 1024px) {
+    .respond-tablet({
       &__tabs {
         margin-left: 0;
         margin-top: 8px;
@@ -588,10 +592,10 @@
         padding: 6px 10px;
         font-size: 12px;
       }
-    }
+    });
 
     // Responsive - Mobile
-    @media (max-width: 768px) {
+    .respond-mobile({
       &__tabs {
         justify-content: center;
       }
@@ -603,6 +607,7 @@
         align-items: center;
         gap: 4px;
         min-width: 60px;
+        min-height: 44px;
         padding: 8px 6px;
       }
 
@@ -619,7 +624,7 @@
         height: 18px;
         font-size: 10px;
       }
-    }
+    });
 
     // Ligne commande
     &__row {

@@ -631,11 +631,11 @@
       background: @white;
       animation: slideDown 0.3s ease-out;
 
-      @media (max-width: 768px) {
+      .respond-mobile({
         grid-template-columns: 1fr;
         gap: 20px;
         padding: 16px;
-      }
+      });
     }
 
     .language-group {
@@ -675,7 +675,7 @@
   }
 
   // Responsive
-  @media (max-width: 768px) {
+  .respond-mobile({
     .news-form {
       gap: 20px;
       padding: 4px;
@@ -690,5 +690,5 @@
       max-width: 240px;
       max-height: 180px;
     }
-  }
+  });
 </style>

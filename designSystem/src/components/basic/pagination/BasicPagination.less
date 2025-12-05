@@ -20,6 +20,16 @@
     .arrow {
       transform: scale(0.55);
     }
+
+    // Mobile : boutons plus gros pour touch
+    .respond-mobile({
+      .pagination__button {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 8px;
+        font-size: 14px;
+      }
+    });
   }
 
   /* ---------- MEDIUM (défaut) ---------- */
@@ -41,6 +51,19 @@
     .arrow {
       transform: scale(0.7);
     }
+
+    // Mobile : boutons 44px minimum (recommandation Apple)
+    .respond-mobile({
+      .pagination__button {
+        min-width: 40px;
+        height: 40px;
+        margin: @spacing-5 2px;
+      }
+      .pagination__span {
+        margin-left: 8px;
+        font-size: 13px;
+      }
+    });
   }
 
   /* ---------- LARGE ---------- */
@@ -61,6 +84,15 @@
     .arrow {
       transform: scale(0.95);
     }
+
+    // Mobile : déjà assez grand, juste ajuster marges
+    .respond-mobile({
+      .pagination__button {
+        min-width: 44px;
+        height: 44px;
+        margin: @spacing-5 2px;
+      }
+    });
   }
 
   > * {
@@ -69,10 +101,19 @@
 
   &__span {
     margin-left: 16px;
+
+    // Mobile : masquer "sur X" pour gagner de la place
+    .respond-mobile({
+      display: none;
+    });
   }
 
   &__dropdown {
     margin-left: 24px;
+
+    .respond-mobile({
+      margin-left: 12px;
+    });
   }
 
   &__button {
@@ -117,6 +158,12 @@
     border: none;
     cursor: default;
     margin: 0 -2px;
+
+    // Mobile : réduire espacement ellipsis
+    .respond-mobile({
+      margin: 0;
+      min-width: 24px;
+    });
   }
 }
 

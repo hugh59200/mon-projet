@@ -547,6 +547,57 @@
                 </p>
               </div>
 
+              <!-- Code Promo -->
+              <div class="checkout__promo">
+                <div
+                  v-if="!promo.isValid.value"
+                  class="checkout__promo-input"
+                >
+                  <input
+                    v-model="promo.promoCode.value"
+                    type="text"
+                    placeholder="Code promo"
+                    class="checkout__promo-field"
+                    :disabled="promo.isValidating.value"
+                    @keyup.enter="handleValidatePromo"
+                  />
+                  <PremiumButton
+                    type="primary"
+                    variant="outline"
+                    size="sm"
+                    label="Appliquer"
+                    :loading="promo.isValidating.value"
+                    :disabled="!promo.promoCode.value.trim()"
+                    @click="handleValidatePromo"
+                  />
+                </div>
+                <div
+                  v-if="promo.errorMessage.value"
+                  class="checkout__promo-error"
+                >
+                  <BasicIconNext name="AlertCircle" :size="14" />
+                  <span>{{ promo.errorMessage.value }}</span>
+                </div>
+                <div
+                  v-if="promo.isValid.value"
+                  class="checkout__promo-applied"
+                >
+                  <div class="checkout__promo-badge">
+                    <BasicIconNext name="Tag" :size="14" />
+                    <span>{{ promo.promoCode.value.toUpperCase() }}</span>
+                    <button
+                      class="checkout__promo-remove"
+                      @click="promo.remove()"
+                    >
+                      <BasicIconNext name="X" :size="12" />
+                    </button>
+                  </div>
+                  <span class="checkout__promo-discount">
+                    -{{ formatPrice(promo.discountAmount.value) }}
+                  </span>
+                </div>
+              </div>
+
               <div class="checkout__summary-divider"></div>
 
               <div class="checkout__summary-row checkout__summary-row--total">
@@ -634,6 +685,7 @@
   import { formatPostalCode } from '@/composables/validation/formatters'
   import { COUNTRY_CONFIGS } from '@/composables/validation/validators'
   import type { SupportedCountry } from '@/composables/validation/types'
+  import { usePromoCode } from './composables/usePromoCode'
 
   // Types de paiement manuel
   type ManualPaymentMethod = 'bank_transfer' | 'crypto'
@@ -643,6 +695,7 @@
   const auth = useAuthStore()
   const cart = useCartStore()
   const toast = useToastStore()
+  const promo = usePromoCode()
 
   // State
   const currentStep = ref(2)
@@ -852,7 +905,24 @@
     return cartSubtotal.value >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE
   })
 
-  const finalTotal = computed(() => cartSubtotal.value + shippingCost.value)
+  const finalTotal = computed(() =>
+    cartSubtotal.value + shippingCost.value - promo.discountAmount.value,
+  )
+
+  // Fonction pour valider le code promo
+  async function handleValidatePromo() {
+    if (!promo.promoCode.value.trim()) return
+
+    const isValid = await promo.validate(
+      cartSubtotal.value,
+      auth.user?.id,
+      email.value || auth.user?.email,
+    )
+
+    if (isValid) {
+      toast.show(promo.successMessage.value, 'success')
+    }
+  }
 
   // 🆕 Validation du formulaire
   const canSubmit = computed(() => {
@@ -1081,9 +1151,11 @@
         subtotal: cartSubtotal.value,
         shippingCost: shippingCost.value,
         taxAmount: 0,
-        discountAmount: 0,
+        discountAmount: promo.discountAmount.value,
         totalAmount: finalTotal.value,
         items: orderItemsPayload,
+        promoCodeId: promo.promoCodeId.value,
+        promoCodeSnapshot: promo.isValid.value ? promo.promoCode.value.toUpperCase() : null,
       }
 
       // Ajouter les données relay si en mode point relais
@@ -1097,6 +1169,17 @@
       }
 
       const orderResponse = await createOrder(orderPayload)
+
+      // Appliquer le code promo (incrémente le compteur d'utilisation)
+      if (promo.isValid.value && promo.promoCodeId.value) {
+        promo.apply(
+          orderResponse.order_id,
+          auth.user?.id ?? null,
+          email.value,
+        ).catch((err) => {
+          console.warn('Erreur application code promo (non bloquant):', err)
+        })
+      }
 
       // Envoyer l'email de confirmation de commande (non bloquant)
       invokeOrderConfirmation(orderResponse.order_id).catch((err) => {
@@ -1136,6 +1219,8 @@
 </script>
 
 <style scoped lang="less">
+  @import '@designSystem/fondation/colors/colors.less';
+
   @font-display:
     'Instrument Sans',
     'SF Pro Display',
@@ -1534,10 +1619,10 @@
         display: grid;
         grid-template-columns: 120px 1fr 160px;
 
-        @media (max-width: 640px) {
+        .respond-mobile({
           display: flex;
           flex-direction: column;
-        }
+        });
       }
     }
 
@@ -2223,7 +2308,7 @@
   // ============================================
   // RESPONSIVE
   // ============================================
-  @media (max-width: 768px) {
+  .respond-mobile({
     .payment-methods__coming-header {
       padding: 12px 14px;
     }
@@ -2250,7 +2335,7 @@
     .payment-methods__divider-mini {
       margin: 4px 0;
     }
-  }
+  });
   .payment-card {
     display: flex;
     align-items: center;
@@ -2420,107 +2505,152 @@
   }
 
   // ============================================
-  // RESPONSIVE
+  // RESPONSIVE - Mixins harmonisés
   // ============================================
-  @media (max-width: 1100px) {
+
+  // Tablet (≤ 1160px)
+  .respond-tablet({
     .checkout {
       &__content {
         grid-template-columns: 1fr;
+        gap: 24px;
       }
 
       &__sidebar {
         position: static;
         order: -1;
       }
-    }
-  }
 
-  @media (max-width: 768px) {
-    .checkout {
-      // Bouton sticky en bas sur mobile
-      &__sidebar {
-        .checkout__submit {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          margin: 0;
-          border-radius: 0;
-          padding: 18px 24px;
-          z-index: 100;
-          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-        }
+      &__summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
 
-        // Masquer les trust badges en mobile pour alléger
-        .checkout__trust {
-          display: none;
-        }
-
-        // Ajouter du padding en bas pour compenser le bouton sticky
-        .checkout__summary {
-          padding-bottom: 80px;
+        &-title {
+          grid-column: 1 / -1;
         }
       }
+    }
+  });
 
+  // Mobile (≤ 720px)
+  .respond-mobile({
+    .checkout {
       &__container {
         padding: 16px;
-        padding-bottom: 100px; // Extra padding pour le bouton sticky
+        padding-bottom: 100px;
       }
 
       &__header {
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         align-items: stretch;
+        margin-bottom: 20px;
       }
 
       &__back {
         justify-content: center;
       }
 
+      &__title {
+        font-size: 22px;
+        text-align: center;
+      }
+
       &__steps {
-        padding: 16px 12px;
+        padding: 12px 8px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
       }
 
       &__step-label {
         display: none;
       }
 
+      &__step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
       &__step-line {
-        width: 40px;
+        width: 32px;
       }
 
       &__section {
-        padding: 20px;
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      &__section-title {
+        font-size: 16px;
+        margin-bottom: 16px;
       }
 
       &__form-row,
       &__form-row--3 {
         grid-template-columns: 1fr;
+        gap: 12px;
       }
 
       &__address-toggle {
         flex-direction: column;
+        gap: 8px;
+      }
+
+      // Summary mobile
+      &__sidebar {
+        order: 1;
+      }
+
+      &__summary {
+        display: block;
+        padding: 16px;
+        border-radius: 16px;
+        padding-bottom: 16px;
+      }
+
+      &__trust {
+        display: none;
+      }
+
+      // Bouton sticky en bas
+      &__submit {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        border-radius: 0;
+        padding: 16px 20px;
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
       }
     }
 
     .checkout-item {
       flex-direction: column;
       gap: 12px;
+      padding: 12px;
 
       &__image {
         width: 100%;
-        height: 120px;
+        height: 100px;
 
         img {
           object-fit: contain;
         }
       }
 
+      &__info {
+        text-align: center;
+      }
+
       &__bottom {
         flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
+        gap: 10px;
+        align-items: center;
       }
 
       &__quantity {
@@ -2534,21 +2664,36 @@
 
     .payment-card {
       flex-wrap: wrap;
-      padding: 16px;
+      padding: 14px;
+      border-radius: 12px;
+
+      &__icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      &__info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      &__name {
+        font-size: 14px;
+      }
 
       &__cards {
         width: 100%;
         justify-content: flex-start;
         margin-top: 8px;
-        padding-top: 12px;
+        padding-top: 10px;
         border-top: 1px solid @neutral-100;
       }
-
-      &__apple-badge {
-        margin-left: auto;
-      }
     }
-  }
+
+    .payment-methods {
+      gap: 10px;
+    }
+  });
 
   // ============================================
   // PAYMENT METHODS DIVIDER
@@ -2578,12 +2723,7 @@
     }
   }
 
-  // ============================================
-  // PAYMENT CARD - Ajouts pour les nouveaux providers
-  // ============================================
   .payment-card {
-    // ... (garder les styles existants)
-
     // Google Pay icon
     &__icon--google {
       background: white;
@@ -2683,7 +2823,7 @@
   // ============================================
   // RESPONSIVE - Ajouts pour les nouveaux éléments
   // ============================================
-  @media (max-width: 768px) {
+  .respond-mobile({
     .payment-methods__divider {
       margin: 16px 0 8px;
 
@@ -2712,7 +2852,7 @@
         margin-left: auto;
       }
     }
-  }
+  });
 
   // ============================================
   // DELIVERY MODE SELECTOR (NOUVEAU)
@@ -2942,6 +3082,111 @@
   }
 
   // ============================================
+  // PROMO CODE
+  // ============================================
+  .checkout__promo {
+    margin: 16px 0;
+  }
+
+  .checkout__promo-input {
+    display: flex;
+    gap: 8px;
+  }
+
+  .checkout__promo-field {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid @neutral-200;
+    border-radius: 8px;
+    font-family: @font-body;
+    font-size: 14px;
+    color: @neutral-900;
+    background: @white;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: @neutral-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: @primary-500;
+      box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
+    }
+
+    &:disabled {
+      background: @neutral-50;
+      cursor: not-allowed;
+    }
+  }
+
+  .checkout__promo-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(var(--danger-500-rgb), 0.08);
+    border-radius: 6px;
+    font-size: 13px;
+    color: @danger-600;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .checkout__promo-applied {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.08) 0%, rgba(var(--success-500-rgb), 0.04) 100%);
+    border-radius: 10px;
+  }
+
+  .checkout__promo-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: @font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: @success-700;
+
+    svg {
+      color: @success-500;
+    }
+  }
+
+  .checkout__promo-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(var(--success-500-rgb), 0.15);
+    color: @success-700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(var(--danger-500-rgb), 0.15);
+      color: @danger-600;
+    }
+  }
+
+  .checkout__promo-discount {
+    font-family: @font-display;
+    font-size: 14px;
+    font-weight: 600;
+    color: @success-600;
+  }
+
+  // ============================================
   // SUMMARY DELIVERY INFO
   // ============================================
   .checkout__summary-delivery {
@@ -2968,7 +3213,7 @@
   // ============================================
   // RESPONSIVE UPDATES
   // ============================================
-  @media (max-width: 768px) {
+  .respond-mobile({
     .checkout__delivery-mode {
       flex-direction: column;
       gap: 12px;
@@ -2976,11 +3221,12 @@
 
     .checkout__delivery-option {
       padding: 16px;
+      min-height: 44px;
     }
 
     .checkout__delivery-icon {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
     }
-  }
+  });
 </style>

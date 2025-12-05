@@ -231,7 +231,7 @@
     }
   }
 
-  @media (max-width: 600px) {
+  .respond-mobile({
     .product-modal {
       gap: 14px;
       padding: 12px;
@@ -248,5 +248,5 @@
         font-size: 13px;
       }
     }
-  }
+  });
 </style>

@@ -555,9 +555,10 @@
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 20px;
 
-      @media (max-width: 900px) {
+      // Masquer sur mobile (la barre mobile est affichée via v-if="isMobile")
+      .respond-mobile({
         display: none;
-      }
+      });
     }
 
     // =========================================
@@ -665,13 +666,25 @@
         }
       }
 
-      @media (max-width: 900px) {
+      // Mobile (≤ 720px)
+      .respond-mobile({
         flex-wrap: wrap;
+        padding: 12px 14px;
+        gap: 12px;
 
         &__results {
           order: -1;
           width: 100%;
           justify-content: center;
+          padding: 6px 12px;
+        }
+
+        &__count {
+          font-size: 16px;
+        }
+
+        &__label {
+          font-size: 13px;
         }
 
         &__right {
@@ -679,7 +692,11 @@
           width: 100%;
           justify-content: space-between;
         }
-      }
+
+        &__dropdown {
+          min-width: 110px;
+        }
+      });
     }
 
     // =========================================
@@ -696,9 +713,10 @@
         min-width: 0;
       }
 
-      @media (max-width: 900px) {
+      // Masquer le search desktop sur mobile
+      .respond-mobile({
         display: none;
-      }
+      });
     }
 
     // =========================================
@@ -797,10 +815,11 @@
         gap: 12px;
       }
 
-      @media (max-width: 600px) {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      // Mobile (≤ 720px)
+      .respond-mobile({
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 12px;
-      }
+      });
     }
 
     // =========================================
@@ -900,10 +919,18 @@
         color: @neutral-500;
       }
 
-      @media (max-width: 600px) {
+      // Mobile (≤ 720px)
+      .respond-mobile({
         flex-direction: column;
         gap: 12px;
-      }
+        margin-top: 24px;
+        padding-top: 20px;
+
+        &__btn {
+          width: 100%;
+          justify-content: center;
+        }
+      });
     }
 
     // =========================================

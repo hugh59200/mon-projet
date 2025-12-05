@@ -282,7 +282,7 @@
   }
 
   /* ------------------------- Mobile responsive ------------------------- */
-  @media (max-width: 768px) {
+  .respond-mobile({
     .chat-sidebar {
       width: 100%;
       border-right: none;
@@ -293,9 +293,14 @@
         padding: 14px 16px;
       }
 
+      &__avatar {
+        width: 44px;
+        height: 44px;
+      }
+
       &__conversation-list {
         border-radius: 0 0 12px 12px;
       }
     }
-  }
+  });
 </style>

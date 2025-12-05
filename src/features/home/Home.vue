@@ -84,12 +84,13 @@
     padding: 0 40px;
   }
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .category-section {
       padding: 40px 0;
     }
     .category-wrapper {
       padding: 0 20px;
     }
-  }
+  });
 </style>

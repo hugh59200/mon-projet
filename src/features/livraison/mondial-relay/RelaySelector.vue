@@ -1057,14 +1057,14 @@
   // ============================================
   // RESPONSIVE
   // ============================================
-  @media (max-width: 480px) {
+  .respond-mobile({
     .relay-modal-overlay {
       align-items: flex-end;
       padding: 0;
     }
 
     .relay-modal {
-      max-height: 90vh;
+      max-height: 90dvh;
       border-radius: 20px 20px 0 0;
     }
 
@@ -1074,6 +1074,7 @@
 
     .relay-modal__search-btn {
       width: 100%;
+      min-height: 44px;
     }
 
     .relay-selector__selected {
@@ -1084,5 +1085,5 @@
       width: 100%;
       justify-content: flex-end;
     }
-  }
+  });
 </style>

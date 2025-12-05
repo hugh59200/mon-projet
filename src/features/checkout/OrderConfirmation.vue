@@ -1028,9 +1028,9 @@ onMounted(() => {
 }
 
 // ============================================
-// RESPONSIVE
+// RESPONSIVE - Tablet (≤ 1160px)
 // ============================================
-@media (max-width: 1100px) {
+.respond-tablet({
   .confirmation {
     &__grid {
       grid-template-columns: 1fr;
@@ -1041,9 +1041,12 @@ onMounted(() => {
       order: -1;
     }
   }
-}
+});
 
-@media (max-width: 768px) {
+// ============================================
+// RESPONSIVE - Mobile (≤ 720px)
+// ============================================
+.respond-mobile({
   .confirmation {
     &__container {
       padding: 16px;
@@ -1089,5 +1092,5 @@ onMounted(() => {
       flex-direction: column;
     }
   }
-}
+});
 </style>

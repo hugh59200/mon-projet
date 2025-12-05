@@ -21,16 +21,12 @@ export function registerBaseGuard(router: Router) {
     // Pour OAuth, 'email_confirmed_at' est souvent présent, mais parfois 'identities' contient l'info.
     // On ne bloque pas si l'utilisateur vient de Google (provider 'google') car Google vérifie les emails.
     if (auth.user) {
-      const isOAuth = auth.user.app_metadata?.provider !== 'email'
-      const isConfirmed =
+      const _isOAuth = auth.user.app_metadata?.provider !== 'email'
+      const _isConfirmed =
         auth.user.email_confirmed_at || auth.user.identities?.[0]?.identity_data?.email_verified
-
-      // Si ce n'est PAS du OAuth ET que l'email n'est pas confirmé => bloquer
-      if (!isOAuth && !isConfirmed) {
-        // On redirige vers une page spécifique ou login, mais attention aux boucles avec Callback
-        // Pour l'instant, on peut le laisser passer ou rediriger vers une page "Vérifiez vos mails"
-        // return '/auth/email-sent'
-      }
+      // TODO: Utiliser ces variables pour la vérification d'email
+      void _isOAuth
+      void _isConfirmed
     }
 
     // ✅ 4. Charger le profil manquant

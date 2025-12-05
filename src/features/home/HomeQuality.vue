@@ -425,7 +425,8 @@
     }
   }
 
-  @media (max-width: 1100px) {
+  // Responsive - Tablet (≤ 1160px)
+  .respond-tablet({
     .layout-section__inner--two-cols {
       grid-template-columns: 1fr;
       gap: 60px;
@@ -437,9 +438,10 @@
     .quality__visual {
       order: -1;
     }
-  }
+  });
 
-  @media (max-width: 768px) {
+  // Responsive - Mobile (≤ 720px)
+  .respond-mobile({
     .layout-section {
       padding: 60px 20px;
     }
@@ -449,5 +451,5 @@
     .coa-card {
       width: 100%;
     }
-  }
+  });
 </style>

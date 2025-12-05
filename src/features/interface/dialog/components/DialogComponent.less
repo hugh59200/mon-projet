@@ -11,8 +11,8 @@
 }
 
 :deep(.modal__dialog) {
-  max-width: 800px;
-  border-radius: 8px;
+  max-width: 500px;
+  border-radius: 16px;
   margin: 18px;
 }
 
@@ -39,3 +39,20 @@
 .image {
   height: 20vh;
 }
+
+// Responsive - Mobile (≤ 720px)
+.respond-mobile({
+  :deep(.modal__dialog) {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .image {
+    height: 15vh;
+  }
+
+  .content {
+    margin-top: 16px;
+    max-height: 35vh;
+  }
+});

@@ -4,8 +4,10 @@ import { getCurrentInstance, inject, readonly, ref, type App, type Ref } from 'v
 export const Breakpoint = ['mobile', 'tablet', 'desktop'] as const
 export type Breakpoint = (typeof Breakpoint)[number]
 
-export const MOBILE_MAX = 750 as const
-export const TABLET_MAX = 1000 as const
+// ⚠️ Ces valeurs doivent correspondre à designSystem/src/fondation/breakpoints/breakpoints.less
+export const MOBILE_MAX = 720 as const // @breakpoint-mobile
+export const TABLET_MAX = 1160 as const // @breakpoint-tablet
+export const DESKTOP_MIN = 1400 as const // @breakpoint-desktop
 
 export type DeviceBreakpointData = {
   currentWindowsWidth: Ref<number>
