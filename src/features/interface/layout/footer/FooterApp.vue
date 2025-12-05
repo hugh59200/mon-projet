@@ -215,8 +215,8 @@
     // ============================================
     &__top {
       display: grid;
-      grid-template-columns: 200px 1fr 280px;
-      gap: 48px;
+      grid-template-columns: 200px repeat(5, 1fr);
+      gap: 32px;
       padding-bottom: 32px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
@@ -246,9 +246,7 @@
     // NAVIGATION
     // ============================================
     &__nav {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 32px;
+      display: contents; // Les colonnes vont directement dans le grid parent
     }
 
     &__nav-col {
@@ -523,12 +521,19 @@
         max-width: 280px;
       }
 
+      &__top {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
       &__nav {
+        display: grid;
         grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
       }
 
       &__newsletter {
-        width: 100%;
+        max-width: 200px;
       }
 
       &__disclaimer {
@@ -555,6 +560,7 @@
       }
 
       &__nav {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
       }
@@ -569,7 +575,7 @@
       }
 
       &__newsletter {
-        width: 100%;
+        max-width: none;
       }
 
       &__trust {
