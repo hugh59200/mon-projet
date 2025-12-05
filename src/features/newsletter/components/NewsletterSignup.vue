@@ -88,15 +88,37 @@
           @submit.prevent="handleSubmit"
         >
           <div class="newsletter-signup__input-wrapper">
+            <!-- Compact: use InputContainer directly for lighter look -->
+            <InputContainer
+              v-if="variant === 'compact'"
+              v-model="email"
+              size="small"
+              variant="ghost"
+              icon-name="Mail"
+              icon-state="iconLeft"
+              :disabled="isLoading"
+              class="newsletter-signup__input"
+            >
+              <input
+                v-model="email"
+                type="email"
+                :placeholder="t('newsletter.placeholder')"
+                autocomplete="email"
+                :disabled="isLoading"
+                @keydown.enter="handleSubmit"
+              />
+            </InputContainer>
+
+            <!-- Premium/Default: use BasicInput -->
             <BasicInput
+              v-else
               v-model="email"
               type="email"
               :placeholder="t('newsletter.placeholder')"
               icon-name="Mail"
               icon-state="iconLeft"
               autocomplete="email"
-              :size="variant === 'premium' ? 'large' : 'small'"
-              :variant="variant === 'compact' ? 'ghost' : 'default'"
+              :size="variant === 'premium' ? 'large' : 'medium'"
               :disabled="isLoading"
               class="newsletter-signup__input"
               @keydown.enter="handleSubmit"
@@ -162,6 +184,7 @@
   import { computed, ref } from 'vue'
   import { subscribeToNewsletter } from '@/api/supabase/newsletter'
   import { useLanguage } from '@/composables/useLanguage'
+  import InputContainer from '@designSystem/components/wrapper/inputContainer/InputContainer.vue'
   import type { NewsletterSource } from '@/api/supabase/newsletter'
 
   // ============================================
