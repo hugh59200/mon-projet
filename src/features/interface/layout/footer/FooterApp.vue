@@ -313,76 +313,7 @@
     // NEWSLETTER
     // ============================================
     &__newsletter {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 20px;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.03) 0%,
-        rgba(255, 255, 255, 0.01) 100%
-      );
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      height: fit-content;
-    }
-
-    &__newsletter-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-
-      > svg {
-        color: var(--primary-400);
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-    }
-
-    &__newsletter-title {
-      font-family: @font-display;
-      font-size: 14px;
-      font-weight: 600;
-      color: white;
-      margin: 0;
-    }
-
-    &__newsletter-desc {
-      font-family: @font-body;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.45);
-      margin: 2px 0 0;
-    }
-
-    &__newsletter-form {
-      display: flex;
-      gap: 8px;
-    }
-
-    &__newsletter-input {
-      flex: 1;
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      font-family: @font-body;
-      font-size: 13px;
-      color: white;
-      transition: all 0.2s @ease;
-
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.3);
-      }
-
-      &:focus {
-        outline: none;
-        border-color: var(--primary-500);
-        box-shadow: 0 0 0 3px rgba(var(--primary-500-rgb), 0.1);
-      }
-    }
-
-    &__newsletter-btn {
-      flex-shrink: 0;
+      align-self: flex-start;
     }
 
     // ============================================
@@ -597,14 +528,7 @@
       }
 
       &__newsletter {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-      }
-
-      &__newsletter-form {
-        width: 280px;
+        width: 100%;
       }
 
       &__disclaimer {
@@ -645,18 +569,6 @@
       }
 
       &__newsletter {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 16px;
-      }
-
-      &__newsletter-form {
-        width: 100%;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      &__newsletter-btn {
         width: 100%;
       }
 

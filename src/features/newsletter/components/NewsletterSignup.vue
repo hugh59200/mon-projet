@@ -95,7 +95,8 @@
               icon-name="Mail"
               icon-state="iconLeft"
               autocomplete="email"
-              :size="variant === 'premium' ? 'large' : 'medium'"
+              :size="variant === 'premium' ? 'large' : 'small'"
+              :variant="variant === 'compact' ? 'ghost' : 'default'"
               :disabled="isLoading"
               class="newsletter-signup__input"
               @keydown.enter="handleSubmit"
@@ -467,25 +468,16 @@
     &--compact {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      padding: 20px;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.03) 0%,
-        rgba(255, 255, 255, 0.01) 100%
-      );
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
+      gap: 12px;
 
       .newsletter-signup__header {
         display: flex;
-        align-items: flex-start;
-        gap: 12px;
+        align-items: center;
+        gap: 10px;
       }
 
       .newsletter-signup__icon-wrapper {
         flex-shrink: 0;
-        margin-top: 2px;
       }
 
       .newsletter-signup__icon {
@@ -493,25 +485,25 @@
       }
 
       .newsletter-signup__title {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
         color: @white;
         margin: 0;
       }
 
       .newsletter-signup__desc {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.45);
-        margin: 2px 0 0;
+        display: none;
       }
 
       .newsletter-signup__form {
         display: flex;
+        align-items: center;
         gap: 8px;
       }
 
       .newsletter-signup__input-wrapper {
         flex: 1;
+        min-width: 0;
       }
 
       .newsletter-signup__input {
@@ -523,15 +515,14 @@
       }
 
       .newsletter-signup__privacy {
-        font-size: 11px;
-        margin-top: 4px;
+        display: none;
       }
 
       // Responsive
       .respond-mobile({
         .newsletter-signup__form {
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
         }
 
         .newsletter-signup__btn {
