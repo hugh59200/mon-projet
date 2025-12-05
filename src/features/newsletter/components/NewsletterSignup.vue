@@ -491,30 +491,9 @@
     &--compact {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
 
       .newsletter-signup__header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .newsletter-signup__icon-wrapper {
-        flex-shrink: 0;
-      }
-
-      .newsletter-signup__icon {
-        color: var(--primary-400);
-      }
-
-      .newsletter-signup__title {
-        font-size: 13px;
-        font-weight: 600;
-        color: @white;
-        margin: 0;
-      }
-
-      .newsletter-signup__desc {
         display: none;
       }
 
@@ -522,6 +501,17 @@
         display: flex;
         align-items: center;
         gap: 12px;
+
+        // Label "Newsletter" avant l'input
+        &::before {
+          content: 'Newsletter';
+          font-size: 11px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.5);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          flex-shrink: 0;
+        }
       }
 
       .newsletter-signup__input-wrapper {
