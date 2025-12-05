@@ -491,7 +491,17 @@
     &--compact {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+
+      // Titre style nav-title du footer
+      &::before {
+        content: 'Newsletter';
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
 
       .newsletter-signup__header {
         display: none;
@@ -500,29 +510,18 @@
       .newsletter-signup__form {
         display: flex;
         align-items: center;
-        gap: 12px;
-
-        // Label "Newsletter" avant l'input
-        &::before {
-          content: 'Newsletter';
-          font-size: 11px;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.5);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          flex-shrink: 0;
-        }
+        gap: 10px;
       }
 
       .newsletter-signup__input-wrapper {
-        flex: 0 1 200px;
+        flex: 1;
         min-width: 0;
+        max-width: 180px;
       }
 
       .newsletter-signup__input {
         width: 100%;
 
-        // Style l'input natif transparent
         input {
           background: transparent;
           border: none;
@@ -547,18 +546,12 @@
 
       // Responsive
       .respond-mobile({
-        .newsletter-signup__form {
-          flex-direction: column;
-          gap: 10px;
-        }
-
         .newsletter-signup__input-wrapper {
-          flex: 1;
-          width: 100%;
+          max-width: none;
         }
 
         .newsletter-signup__btn {
-          width: 100%;
+          width: auto;
         }
       });
     }
