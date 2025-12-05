@@ -67,37 +67,38 @@
             </ul>
           </div>
         </nav>
+      </div>
 
-        <!-- Newsletter -->
+      <!-- Disclaimer + Newsletter row -->
+      <div class="footer__middle">
+        <div class="footer__disclaimer">
+          <div class="footer__disclaimer-badge">
+            <BasicIconNext name="Shield" :size="16" />
+            <span>{{ t('footer.researchOnly') }}</span>
+          </div>
+          <div class="footer__disclaimer-items">
+            <span>
+              <strong>{{ t('footer.disclaimer.research') }}</strong>
+              — {{ t('footer.disclaimer.researchDesc') }}
+            </span>
+            <span class="footer__disclaimer-sep">•</span>
+            <span>
+              <strong>{{ t('footer.disclaimer.noHuman') }}</strong>
+              — {{ t('footer.disclaimer.noHumanDesc') }}
+            </span>
+            <span class="footer__disclaimer-sep">•</span>
+            <span>
+              <strong>{{ t('footer.disclaimer.responsibility') }}</strong>
+              — {{ t('footer.disclaimer.responsibilityDesc') }}
+            </span>
+          </div>
+        </div>
+
         <NewsletterSignup
           variant="compact"
           source="footer"
           class="footer__newsletter"
         />
-      </div>
-
-      <!-- Disclaimer compact -->
-      <div class="footer__disclaimer">
-        <div class="footer__disclaimer-badge">
-          <BasicIconNext name="Shield" :size="16" />
-          <span>{{ t('footer.researchOnly') }}</span>
-        </div>
-        <div class="footer__disclaimer-items">
-          <span>
-            <strong>{{ t('footer.disclaimer.research') }}</strong>
-            — {{ t('footer.disclaimer.researchDesc') }}
-          </span>
-          <span class="footer__disclaimer-sep">•</span>
-          <span>
-            <strong>{{ t('footer.disclaimer.noHuman') }}</strong>
-            — {{ t('footer.disclaimer.noHumanDesc') }}
-          </span>
-          <span class="footer__disclaimer-sep">•</span>
-          <span>
-            <strong>{{ t('footer.disclaimer.responsibility') }}</strong>
-            — {{ t('footer.disclaimer.responsibilityDesc') }}
-          </span>
-        </div>
       </div>
 
       <!-- Trust bar -->
@@ -215,10 +216,21 @@
     // ============================================
     &__top {
       display: grid;
-      grid-template-columns: 200px repeat(5, 1fr);
+      grid-template-columns: 200px repeat(4, 1fr);
       gap: 32px;
       padding-bottom: 32px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    // ============================================
+    // MIDDLE SECTION (Disclaimer + Newsletter)
+    // ============================================
+    &__middle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      margin-top: 24px;
     }
 
     // ============================================
@@ -311,7 +323,8 @@
     // NEWSLETTER
     // ============================================
     &__newsletter {
-      align-self: flex-start;
+      flex-shrink: 0;
+      width: 220px;
     }
 
     // ============================================
@@ -321,7 +334,7 @@
       display: flex;
       align-items: center;
       gap: 20px;
-      margin-top: 24px;
+      flex: 1;
       padding: 16px 20px;
       background: rgba(var(--primary-500-rgb), 0.04);
       border: 1px solid rgba(var(--primary-500-rgb), 0.08);
@@ -532,8 +545,9 @@
         gap: 24px;
       }
 
-      &__newsletter {
-        max-width: 200px;
+      &__middle {
+        flex-direction: column;
+        align-items: stretch;
       }
 
       &__disclaimer {
@@ -550,6 +564,11 @@
 
       &__disclaimer-sep {
         display: none;
+      }
+
+      &__newsletter {
+        width: 100%;
+        max-width: 280px;
       }
     });
 
@@ -576,6 +595,7 @@
 
       &__newsletter {
         max-width: none;
+        width: 100%;
       }
 
       &__trust {

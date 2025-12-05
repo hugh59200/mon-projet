@@ -19,7 +19,8 @@
       "Bash(npx supabase:*)",
       "Bash(npm run deploy:functions:*)",
       "Bash(npm run gen:types:*)",
-      "Bash(node scripts/convert-logo.cjs:*)"
+      "Bash(node scripts/convert-logo.cjs:*)",
+      "Bash(mkcert:*)"
     ],
     "deny": [],
     "ask": []

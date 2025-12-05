@@ -109,16 +109,6 @@ export function statusUpdateTemplate({
   const config = STATUS_CONFIG[status.toLowerCase() as OrderStatus] || STATUS_CONFIG.pending
 
   const bodyHTML = `
-    <!-- Status Badge avec icône -->
-    <div style="text-align:center;margin-bottom:32px;">
-      <div style="display:inline-block;margin-bottom:16px;">
-        ${config.iconSvg}
-      </div>
-      <div style="display:inline-block;background:${config.badgeBg};color:${config.badgeColor};font-size:13px;font-weight:600;padding:8px 20px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;">
-        ${statusLabel}
-      </div>
-    </div>
-
     <!-- Message principal dans une box colorée -->
     <div style="background:${config.bgColor};border:1px solid ${config.borderColor};border-radius:12px;padding:24px;margin-bottom:28px;">
       <p style="margin:0;font-size:15px;color:${config.textColor};line-height:1.7;">
