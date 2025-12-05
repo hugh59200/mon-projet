@@ -89,7 +89,11 @@
       console.log(error)
       if (error) {
         // Si le jeton est mauvais maintenant, c'est qu'il est expiré.
-        fail(type === 'recovery' ? t('auth.callback.linkExpired') : t('auth.callback.invalidValidation'))
+        fail(
+          type === 'recovery'
+            ? t('auth.callback.linkExpired')
+            : t('auth.callback.invalidValidation'),
+        )
         return
       }
       // Session active après verifyOtp
@@ -127,7 +131,7 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="less">
   .callback-page {
     text-align: center;
     width: 100%;
