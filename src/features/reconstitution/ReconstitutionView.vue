@@ -4,6 +4,21 @@
     <PageHeader />
 
     <PageContent size="lg">
+      <!-- Avertissement RUO visible en haut -->
+      <div class="recon__ruo-warning">
+        <div class="recon__ruo-icon">
+          <BasicIconNext name="AlertTriangle" :size="24" />
+        </div>
+        <div class="recon__ruo-content">
+          <strong class="recon__ruo-title">Usage Recherche Uniquement (RUO)</strong>
+          <p class="recon__ruo-text">
+            Cet outil de calcul est fourni à titre <strong>éducatif pour la recherche en laboratoire</strong>.
+            Ne constitue en aucun cas une recommandation médicale.
+            <span class="recon__ruo-highlight">Interdit pour usage humain ou vétérinaire.</span>
+          </p>
+        </div>
+      </div>
+
       <!-- Calculator Section -->
       <section class="recon__calculator">
         <div class="recon__calc-card">
@@ -70,8 +85,8 @@
               </svg>
             </div>
             <div class="recon__calc-title">
-              <h2>Calculateur de Dosage</h2>
-              <p>Entrez vos paramètres pour obtenir le volume exact</p>
+              <h2>Calculateur de Dilution</h2>
+              <p>Outil de calcul pour préparation de solutions de recherche</p>
             </div>
           </div>
 
@@ -122,11 +137,11 @@
               <!-- Desired Dose -->
               <div class="recon__input-group">
                 <WrapperFormElements
-                  label="Dose de Recherche Désirée"
+                  label="Quantité Cible par Prélèvement"
                   hint="Ex: 100mcg, 250mcg..."
                 >
                   <div class="recon__input-with-unit">
-                    <InputContainer size="medium" icon-name="Heart" icon-state="iconLeft">
+                    <InputContainer size="medium" icon-name="Target" icon-state="iconLeft">
                       <input
                         type="number"
                         v-model.number="doseMcg"
@@ -442,20 +457,20 @@
 
   // Configuration SEO pour la page Reconstitution
   useHead({
-    title: 'Guide de Reconstitution des Peptides - Atlas Lab Solutions',
+    title: 'Outils de Laboratoire - Calculateur de Dilution | Atlas Lab Solutions',
     meta: [
       {
         name: 'description',
         content:
-          'Guide complet et calculateur de reconstitution des peptides lyophilisés. Instructions étape par étape pour préparer vos solutions de recherche en toute sécurité.',
+          'Calculateur de dilution pour peptides lyophilisés. Outil de laboratoire pour préparer des solutions de recherche. Usage scientifique uniquement (RUO).',
       },
       {
         property: 'og:title',
-        content: 'Guide de Reconstitution des Peptides',
+        content: 'Calculateur de Dilution - Outils de Laboratoire',
       },
       {
         property: 'og:description',
-        content: 'Calculateur et guide pratique pour reconstituer vos peptides de recherche.',
+        content: 'Outil de calcul pour la préparation de solutions peptidiques en laboratoire de recherche.',
       },
     ],
     link: [
@@ -640,6 +655,72 @@
   .recon {
     position: relative;
     min-height: 100vh;
+
+    // ============================================
+    // RUO WARNING BANNER (TOP)
+    // ============================================
+    &__ruo-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 60%, white) 100%);
+      border: 2px solid @danger-200;
+      border-radius: 16px;
+    }
+
+    &__ruo-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: @danger-100;
+      border-radius: 12px;
+
+      svg {
+        color: @danger-600;
+      }
+    }
+
+    &__ruo-content {
+      flex: 1;
+    }
+
+    &__ruo-title {
+      display: block;
+      font-family: @font-body;
+      font-size: 15px;
+      font-weight: 700;
+      color: @danger-700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    &__ruo-text {
+      font-family: @font-body;
+      font-size: 14px;
+      line-height: 1.6;
+      color: @neutral-700;
+      margin: 0;
+
+      strong {
+        color: @neutral-900;
+      }
+    }
+
+    &__ruo-highlight {
+      display: inline;
+      padding: 2px 10px;
+      margin: 0 4px;
+      background: @danger-100;
+      border-radius: 4px;
+      color: @danger-700;
+      font-weight: 700;
+    }
 
     // ============================================
     // CALCULATOR CARD

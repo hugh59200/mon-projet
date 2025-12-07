@@ -75,7 +75,6 @@ function handleClick(event: Event): void {
 
   &:hover {
     background: rgba(var(--danger-500-rgb), 0.85);
-    transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(var(--danger-500-rgb), 0.4);
 
     .wishlist-icon {
@@ -110,13 +109,7 @@ function handleClick(event: Event): void {
 }
 
 @keyframes heartPop {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
+  0%, 100% {
     transform: scale(1);
   }
 }

@@ -112,7 +112,6 @@
       }
 
       .tab--selected:active .tab__icon {
-        transform: scale(1.05);
         opacity: 0.7;
       }
     }

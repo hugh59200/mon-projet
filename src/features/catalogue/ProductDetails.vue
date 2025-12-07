@@ -68,6 +68,15 @@
                   {{ t('product.researchOnly') }}
                 </div>
 
+                <!-- Badge Déjà acquis -->
+                <div
+                  v-if="hasBeenOrdered && !showCoa"
+                  class="product__badge product__badge--ordered"
+                >
+                  <BasicIconNext name="CheckCircle2" :size="12" />
+                  {{ t('aov.alreadyOrdered.badge') }}
+                </div>
+
                 <!-- Image principale avec zoom -->
                 <div class="product__image-wrapper">
                   <!-- Image produit -->
@@ -145,6 +154,49 @@
                     </span>
                   </div>
                 </button>
+
+                <!-- Bloc Analyse Indépendante -->
+                <div v-if="product.coa_url" class="product__lab-verification">
+                  <div class="product__lab-header">
+                    <BasicIconNext name="ShieldCheck" :size="20" />
+                    <span class="product__lab-title">Analyse indépendante</span>
+                  </div>
+                  <p class="product__lab-description">
+                    Test réalisé par <strong>Freedom Diagnostics Testing</strong> (USA),
+                    laboratoire tiers spécialisé dans les peptides RUO.
+                  </p>
+                  <div class="product__lab-details">
+                    <div v-if="(product as any).batch_number" class="product__lab-detail">
+                      <span class="product__lab-detail-label">Lot actuel</span>
+                      <span class="product__lab-detail-value">{{ (product as any).batch_number }}</span>
+                    </div>
+                    <div class="product__lab-detail">
+                      <span class="product__lab-detail-label">Pureté</span>
+                      <span class="product__lab-detail-value product__lab-detail-value--success">
+                        {{ product.purity ? `${product.purity.toFixed(3)} %` : '≥99 %' }} (HPLC/MS)
+                      </span>
+                    </div>
+                  </div>
+                  <div class="product__lab-actions">
+                    <a
+                      href="https://freedomdiagnosticstesting.com/search-for-your-coa-based-on-the-unique-accession-number/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="product__lab-link"
+                    >
+                      <BasicIconNext name="ExternalLink" :size="14" />
+                      <span>Vérifier sur FreedomDiagnosticsTesting.com</span>
+                    </a>
+                    <button
+                      type="button"
+                      class="product__lab-download"
+                      @click="downloadCoa"
+                    >
+                      <BasicIconNext name="Download" :size="14" />
+                      <span>{{ t('product.downloadCoa') }}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -239,6 +291,15 @@
                   <div class="product__price-info">{{ t('product.priceInfo') }}</div>
                 </div>
 
+                <!-- Sélecteur de quantité avec prix dégressifs -->
+                <QuantitySelector
+                  v-if="(product.stock ?? 0) > 0"
+                  v-model="selectedQuantity"
+                  :base-price="product.is_on_sale && product.sale_price ? product.sale_price : product.price"
+                  :bulk-pricing="bulkPricing"
+                  class="product__quantity-selector"
+                />
+
                 <!-- Boutons d'action -->
                 <div class="product__actions">
                   <PremiumButton
@@ -280,6 +341,15 @@
                   <span>
                     {{ t('product.lowStockWarning', { count: product.stock }) }}
                   </span>
+                </div>
+
+                <!-- Message urgence expédition -->
+                <div
+                  v-if="(product.stock ?? 0) > 0 && canShipToday"
+                  class="product__urgency"
+                >
+                  <BasicIconNext name="Clock" :size="16" />
+                  <span>{{ t('product.urgency.shipToday') }}</span>
                 </div>
               </div>
 
@@ -402,14 +472,21 @@
             </div>
           </div>
 
-          <!-- Disclaimer -->
+          <!-- Disclaimer RUO renforcé -->
           <div class="product__disclaimer">
-            <BasicIconNext name="Info" :size="20" />
-            <p>
-              <strong>Usage Recherche Uniquement (RUO)</strong>
-              — Ce produit est strictement destiné à la recherche en laboratoire. Non destiné à la
-              consommation humaine ou animale.
-            </p>
+            <div class="product__disclaimer-icon">
+              <BasicIconNext name="AlertTriangle" :size="24" />
+            </div>
+            <div class="product__disclaimer-content">
+              <strong class="product__disclaimer-title">Usage Recherche Uniquement (RUO)</strong>
+              <p class="product__disclaimer-text">
+                Ce réactif chimique est <strong>strictement réservé à la recherche en laboratoire</strong>.
+                <span class="product__disclaimer-warning">
+                  Interdit pour usage humain ou vétérinaire.
+                </span>
+                Manipulation par personnel qualifié uniquement.
+              </p>
+            </div>
           </div>
 
           <!-- Section Avis Clients -->
@@ -418,9 +495,45 @@
             :product-id="product.id"
             :product-name="productName || product.name"
           />
+
+          <!-- Section Produits Complémentaires (AOV) -->
+          <RelatedProducts
+            v-if="product"
+            :current-product-id="product.id"
+            :category="product.category"
+          />
         </article>
       </WrapperLoader>
     </div>
+
+    <!-- Sticky CTA Mobile -->
+    <Teleport to="body">
+      <Transition name="slide-up">
+        <div
+          v-if="product && (product.stock ?? 0) > 0 && isMobile"
+          class="product-sticky-cta"
+        >
+          <div class="product-sticky-cta__price">
+            <span v-if="product.is_on_sale && product.sale_price" class="product-sticky-cta__price-old">
+              {{ product.price.toFixed(2) }}€
+            </span>
+            <span class="product-sticky-cta__price-current" :class="{ 'product-sticky-cta__price-current--sale': product.is_on_sale }">
+              {{ (product.is_on_sale && product.sale_price ? product.sale_price : product.price).toFixed(2) }}€
+            </span>
+          </div>
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="md"
+            :label="t('catalogue.product.addToCart')"
+            icon-left="ShoppingCart"
+            :shine="true"
+            class="product-sticky-cta__btn"
+            @click="addToCart(product as any)"
+          />
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -431,6 +544,9 @@
   import { fetchReviewSummary } from '@/api/supabase/reviews'
   import type { ReviewSummary } from '@/api/supabase/reviews'
   import ProductReviews from './components/reviews/ProductReviews.vue'
+  import RelatedProducts from './components/RelatedProducts.vue'
+  import QuantitySelector from './components/QuantitySelector.vue'
+  import type { BulkPricingItem } from './components/QuantitySelector.vue'
   import type { Products } from '@/supabase/types/supabase.types'
   import { sanitizeHTML } from '@/utils'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
@@ -443,11 +559,17 @@
   import WishlistButton from './components/WishlistButton.vue'
   import { useHead } from '@vueuse/head'
   import { getCanonicalUrl } from '@/config/seo'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
+  import { useOrderHistoryStore } from '@/features/order/stores/useOrderHistoryStore'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 
   const { t } = useI18n()
+  const { isMobile } = useDeviceBreakpoint()
   const route = useRoute()
   const router = useRouter()
   const cart = useCartStore()
+  const auth = useAuthStore()
+  const orderHistory = useOrderHistoryStore()
   const { showAddToCartToast } = useSmartToast()
 
   const product = ref<Products | null>(null)
@@ -455,6 +577,64 @@
   const activeTab = ref<'description' | 'protocol' | 'shipping'>('description')
   const reviewSummary = ref<ReviewSummary | null>(null)
   const showCoa = ref(false)
+
+  // AOV - Quantité sélectionnée
+  const selectedQuantity = ref(1)
+
+  // Prix dégressifs du produit (vient de la DB)
+  const bulkPricing = computed<BulkPricingItem[] | null>(() => {
+    if (!product.value) return null
+    // Le champ bulk_pricing est un JSONB en DB
+    const pricing = (product.value as Products & { bulk_pricing?: BulkPricingItem[] | null }).bulk_pricing
+    return pricing || null
+  })
+
+  
+  // Vérifie si on peut expédier aujourd'hui (avant 14h, jours ouvrés)
+  const canShipToday = computed(() => {
+    const now = new Date()
+    const hour = now.getHours()
+    const day = now.getDay() // 0 = dimanche, 6 = samedi
+    // Avant 14h et jours ouvrés (lundi-vendredi)
+    return hour < 14 && day >= 1 && day <= 5
+  })
+
+  // Nom de fichier formaté pour téléchargement COA
+  const coaFilename = computed(() => {
+    if (!product.value) return 'COA.pdf'
+    const name = (productName.value || product.value.name || 'Peptide')
+      .replace(/[^a-zA-Z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+    const batchNumber = (product.value as any).batch_number
+    // Déterminer l'extension depuis l'URL
+    const url = product.value.coa_url || ''
+    const ext = url.match(/\.(pdf|png|jpg|jpeg|webp)$/i)?.[1]?.toLowerCase() || 'pdf'
+    if (batchNumber) {
+      return `${name}_FreedomDiagnostics_Lot-${batchNumber}.${ext}`
+    }
+    return `${name}_FreedomDiagnostics_COA.${ext}`
+  })
+
+  // Télécharger le COA (contourne la restriction cross-origin)
+  async function downloadCoa() {
+    if (!product.value?.coa_url) return
+    try {
+      const response = await fetch(product.value.coa_url)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = coaFilename.value
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Erreur téléchargement COA:', error)
+      // Fallback: ouvrir dans un nouvel onglet
+      window.open(product.value.coa_url, '_blank')
+    }
+  }
 
   // Traductions automatiques du produit
   const {
@@ -590,24 +770,30 @@
     ],
   })
 
-  // Couleurs par catégorie
+  // Couleurs par catégorie utilisant les variables du design system
   const categoryColors: Record<string, string> = {
-    Récupération: '#10B981',
-    'Perte de poids': '#F59E0B',
-    Croissance: '#3B82F6',
-    'Anti-âge': '#8B5CF6',
-    Performance: '#EF4444',
-    'Bien-être': '#EC4899',
-    Hormonal: '#6366F1',
-    Nootropique: '#14B8A6',
-    Cosmétique: '#F472B6',
-    Santé: '#22C55E',
+    Récupération: 'var(--success-500)',
+    'Perte de poids': 'var(--warning-500)',
+    Croissance: 'var(--blue-500)',
+    'Anti-âge': 'var(--purple-500)',
+    Performance: 'var(--danger-500)',
+    'Bien-être': 'var(--pink-500)',
+    Hormonal: 'var(--purple-600)',
+    Nootropique: 'var(--persian-500)',
+    Cosmétique: 'var(--pink-400)',
+    Santé: 'var(--success-500)',
   }
 
   const getCategoryColor = (category: string | null | undefined): string => {
     if (!category) return 'var(--primary-500)'
     return categoryColors[category] || 'var(--primary-500)'
   }
+
+  // Vérifier si le produit a déjà été commandé par l'utilisateur
+  const hasBeenOrdered = computed(() => {
+    if (!auth.user || !product.value) return false
+    return orderHistory.hasOrderedProduct(product.value.id)
+  })
 
   onMounted(async () => {
     const { id } = route.params
@@ -616,6 +802,11 @@
     loading.value = true
 
     try {
+      // Charger l'historique des commandes si l'utilisateur est connecté
+      if (auth.user) {
+        orderHistory.loadOrders()
+      }
+
       const [productData, reviewData] = await Promise.all([
         fetchProductById(id),
         fetchReviewSummary(id),
@@ -635,13 +826,21 @@
 
   const addToCart = (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    cart.addToCart(p)
+    // Ajouter la quantité sélectionnée
+    for (let i = 0; i < selectedQuantity.value; i++) {
+      cart.addToCart(p)
+    }
     showAddToCartToast(p)
+    // Reset la quantité après ajout
+    selectedQuantity.value = 1
   }
 
   const buyNow = async (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    await cart.addToCart(p)
+    // Ajouter la quantité sélectionnée
+    for (let i = 0; i < selectedQuantity.value; i++) {
+      await cart.addToCart(p)
+    }
     router.push('/checkout')
   }
 </script>
@@ -838,6 +1037,14 @@
         color: white;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
+
+      &--ordered {
+        top: 52px;
+        right: 16px;
+        background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.95) 0%, rgba(var(--success-600-rgb), 0.95) 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(var(--success-500-rgb), 0.3);
+      }
     }
 
     &__image-wrapper {
@@ -1024,6 +1231,130 @@
       color: @neutral-600;
     }
 
+    // ============ LAB VERIFICATION (Analyse indépendante) ============
+    &__lab-verification {
+      margin-top: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(16, 185, 129, 0.08) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+    }
+
+    &__lab-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      svg {
+        color: @success-500;
+      }
+    }
+
+    &__lab-title {
+      font-family: @font-display;
+      font-size: 15px;
+      font-weight: 700;
+      color: @neutral-800;
+    }
+
+    &__lab-description {
+      font-family: @font-body;
+      font-size: 13px;
+      line-height: 1.6;
+      color: @neutral-600;
+      margin: 0 0 16px;
+
+      strong {
+        color: @neutral-800;
+        font-weight: 600;
+      }
+    }
+
+    &__lab-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid @neutral-100;
+    }
+
+    &__lab-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    &__lab-detail-label {
+      font-family: @font-body;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: @neutral-500;
+    }
+
+    &__lab-detail-value {
+      font-family: @font-body;
+      font-size: 14px;
+      font-weight: 600;
+      color: @neutral-800;
+
+      &--success {
+        color: @success-600;
+      }
+    }
+
+    &__lab-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    &__lab-link,
+    &__lab-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: @font-body;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+    }
+
+    &__lab-link {
+      background: white;
+      color: var(--primary-700);
+      border: 1px solid var(--primary-200);
+
+      &:hover {
+        background: rgba(var(--primary-500-rgb), 0.05);
+        border-color: var(--primary-400);
+        transform: translateY(-1px);
+      }
+    }
+
+    &__lab-download {
+      background: linear-gradient(135deg, @success-500 0%, @success-600 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        transform: translateY(-1px);
+      }
+    }
 
     // ============ INFO PANEL ============
     &__info {
@@ -1294,6 +1625,31 @@
       }
     }
 
+    &__urgency {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, @success-50 0%, color-mix(in srgb, @success-100 50%, white) 100%);
+      border: 1px solid @success-200;
+      border-radius: 10px;
+      font-family: @font-body;
+      font-size: 13px;
+      font-weight: 500;
+      color: @success-700;
+
+      svg {
+        color: @success-500;
+        flex-shrink: 0;
+        animation: pulse 2s ease-in-out infinite;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
     // ============ GUARANTEES ============
     &__guarantees {
       display: flex;
@@ -1495,34 +1851,68 @@
       margin: 0;
     }
 
-    // ============ DISCLAIMER ============
+    // ============ DISCLAIMER RUO ============
     &__disclaimer {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      padding: 20px 24px;
+      gap: 16px;
+      padding: 24px;
       margin-bottom: 40px;
-      background: linear-gradient(135deg, @danger-50 0%, @danger-100 100%);
-      border: 1px solid @danger-200;
+      background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 60%, white) 100%);
+      border: 2px solid @danger-200;
       border-radius: 16px;
+    }
+
+    &__disclaimer-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: @danger-100;
+      border-radius: 12px;
 
       svg {
         color: @danger-600;
-        flex-shrink: 0;
-        margin-top: 2px;
       }
+    }
 
-      p {
-        font-family: @font-body;
-        font-size: 14px;
-        line-height: 1.6;
-        color: @danger-800;
-        margin: 0;
+    &__disclaimer-content {
+      flex: 1;
+    }
 
-        strong {
-          font-weight: 700;
-        }
+    &__disclaimer-title {
+      display: block;
+      font-family: @font-body;
+      font-size: 15px;
+      font-weight: 700;
+      color: @danger-700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    &__disclaimer-text {
+      font-family: @font-body;
+      font-size: 14px;
+      line-height: 1.6;
+      color: @neutral-700;
+      margin: 0;
+
+      strong {
+        color: @neutral-900;
       }
+    }
+
+    &__disclaimer-warning {
+      display: inline;
+      padding: 2px 10px;
+      margin: 0 4px;
+      background: @danger-100;
+      border-radius: 4px;
+      color: @danger-700;
+      font-weight: 700;
     }
   }
 
@@ -1725,6 +2115,30 @@
         padding: 16px;
       }
 
+      &__lab-verification {
+        padding: 16px;
+      }
+
+      &__lab-details {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      &__lab-detail {
+        min-width: auto;
+      }
+
+      &__lab-actions {
+        gap: 8px;
+      }
+
+      &__lab-link,
+      &__lab-download {
+        padding: 12px 14px;
+        font-size: 12px;
+      }
+
       &__disclaimer {
         padding: 16px;
         border-radius: 12px;
@@ -1737,4 +2151,62 @@
       }
     }
   });
+
+// Sticky CTA Mobile (global car téléporté)
+:global(.product-sticky-cta) {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(15, 15, 25, 0.98) 0%, rgba(10, 10, 20, 1) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+
+  &__price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__price-old {
+    font-size: 12px;
+    color: @neutral-500;
+    text-decoration: line-through;
+  }
+
+  &__price-current {
+    font-size: 22px;
+    font-weight: 700;
+    color: @white;
+
+    &--sale {
+      color: @danger-500;
+    }
+  }
+
+  &__btn {
+    flex: 1;
+    max-width: 200px;
+  }
+}
+
+// Animation slide-up
+:global(.slide-up-enter-active),
+:global(.slide-up-leave-active) {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+:global(.slide-up-enter-from),
+:global(.slide-up-leave-to) {
+  transform: translateY(100%);
+  opacity: 0;
+}
 </style>

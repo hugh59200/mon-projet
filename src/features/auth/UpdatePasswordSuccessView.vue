@@ -49,12 +49,9 @@
       transform: scale(0.3);
       opacity: 0;
     }
-    60% {
-      transform: scale(1.05);
-      opacity: 1;
-    }
     100% {
       transform: scale(1);
+      opacity: 1;
     }
   }
 </style>

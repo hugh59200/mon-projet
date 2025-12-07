@@ -152,13 +152,21 @@ CREATE TABLE public.products (
   description_i18n jsonb DEFAULT '{}'::jsonb,
   category_i18n jsonb DEFAULT '{}'::jsonb,
   -- COA (Certificate of Analysis)
-  coa_url text
+  coa_url text,
+  -- SEO/GEO : donnees scientifiques
+  cas_number varchar(50),
+  sequence text,
+  -- AOV : Prix degressifs par quantite
+  bulk_pricing jsonb DEFAULT '[{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]'::jsonb
 );
 
 COMMENT ON COLUMN public.products.name_i18n IS 'Traductions du nom: {"en": "...", "de": "...", "es": "..."}';
 COMMENT ON COLUMN public.products.description_i18n IS 'Traductions de la description';
 COMMENT ON COLUMN public.products.category_i18n IS 'Traductions de la categorie';
 COMMENT ON COLUMN public.products.coa_url IS 'URL du Certificate of Analysis (COA) - Preuve de purete du peptide';
+COMMENT ON COLUMN public.products.cas_number IS 'Numero CAS (Chemical Abstracts Service) - Identifiant unique international';
+COMMENT ON COLUMN public.products.sequence IS 'Sequence d''acides amines du peptide';
+COMMENT ON COLUMN public.products.bulk_pricing IS 'Prix degressifs: [{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]';
 
 CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
 CREATE INDEX idx_products_category ON public.products (category);

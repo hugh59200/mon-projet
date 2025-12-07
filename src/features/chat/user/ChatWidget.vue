@@ -399,11 +399,9 @@
   // ─────────────────────────────────────────
   @keyframes pulse-ring {
     0% {
-      transform: scale(1);
       opacity: 0.6;
     }
     100% {
-      transform: scale(1.2);
       opacity: 0;
     }
   }

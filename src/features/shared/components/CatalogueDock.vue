@@ -563,7 +563,6 @@
         background: rgba(255, 255, 255, 0.06);
 
         .catalogue-dock__icon-wrapper {
-          transform: scale(1.05);
           border-color: @dock-accent;
         }
       }
@@ -737,10 +736,6 @@
         &::before {
           transform: translateY(-50%) scaleY(1);
         }
-
-        .catalogue-dock__item-icon {
-          transform: scale(1.05);
-        }
       }
 
       &.router-link-active {
@@ -876,13 +871,8 @@
   // ═══════════════════════════════════════════════════════════════
 
   @keyframes badge-pulse {
-    0%,
-    100% {
+    0%, 50%, 100% {
       transform: scale(1);
-    }
-
-    50% {
-      transform: scale(1.02);
     }
   }
 

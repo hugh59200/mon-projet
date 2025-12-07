@@ -38,6 +38,12 @@
               <p v-if="item.product_dosage" class="checkout-item__dosage">
                 {{ item.product_dosage }}
               </p>
+              <div class="checkout-item__badges">
+                <span class="checkout-item__coa-badge">
+                  <BasicIconNext name="FileCheck" :size="12" />
+                  {{ t('aov.quality.coaIncluded') }}
+                </span>
+              </div>
             </div>
             <PremiumButton
               type="danger"
@@ -279,6 +285,24 @@ function getLineTotal(item: CartView) {
     font-size: 13px;
     color: @neutral-500;
     margin: 4px 0 0;
+  }
+
+  &__badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  &__coa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(var(--primary-500-rgb), 0.1);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--primary-500);
   }
 
   &__remove {

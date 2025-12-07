@@ -152,7 +152,7 @@ export const email = (message?: string): ValidatorFn => {
 
 /**
  * Calcul de la force du mot de passe
- * Score 0-4 avec feedback détaillé
+ * Score simplifié : 6 caractères minimum requis
  */
 export function calculatePasswordStrength(password: string): PasswordStrength {
   const feedback: string[] = []
@@ -167,47 +167,23 @@ export function calculatePasswordStrength(password: string): PasswordStrength {
     }
   }
 
-  // Longueur
+  // Longueur minimale : 6 caractères
+  if (password.length < 6) {
+    feedback.push('validation.password.minLength')
+    return {
+      score: 0,
+      label: 'very_weak',
+      feedback,
+      color: 'var(--color-danger-500)',
+    }
+  }
+
+  // 6+ caractères = score 2 (suffisant pour l'inscription)
+  score = 2
+
+  // Bonus pour longueur supplémentaire
   if (password.length >= 8) score++
-  else feedback.push('validation.password.minLength')
-
   if (password.length >= 12) score++
-
-  // Minuscules
-  if (/[a-z]/.test(password)) score += 0.5
-  else feedback.push('validation.password.lowercase')
-
-  // Majuscules
-  if (/[A-Z]/.test(password)) score += 0.5
-  else feedback.push('validation.password.uppercase')
-
-  // Chiffres
-  if (/\d/.test(password)) score += 0.5
-  else feedback.push('validation.password.number')
-
-  // Caractères spéciaux
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 0.5
-  else feedback.push('validation.password.special')
-
-  // Pénalités
-  // Séquences répétitives
-  if (/(.)\1{2,}/.test(password)) {
-    score -= 0.5
-    feedback.push('validation.password.noRepeat')
-  }
-
-  // Séquences numériques (123, 321)
-  if (/(?:012|123|234|345|456|567|678|789|987|876|765|654|543|432|321|210)/.test(password)) {
-    score -= 0.5
-    feedback.push('validation.password.noSequence')
-  }
-
-  // Mots de passe courants
-  const commonPasswords = ['password', 'azerty', 'qwerty', '123456', 'motdepasse', 'admin']
-  if (commonPasswords.some(p => password.toLowerCase().includes(p))) {
-    score = 0
-    feedback.push('validation.password.tooCommon')
-  }
 
   // Normaliser le score
   const normalizedScore = Math.max(0, Math.min(4, Math.round(score)))

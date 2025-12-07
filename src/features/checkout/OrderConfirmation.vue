@@ -1018,11 +1018,9 @@ onMounted(() => {
 
 @keyframes pulse {
   0%, 100% {
-    transform: scale(1);
     opacity: 0.5;
   }
   50% {
-    transform: scale(1.05);
     opacity: 0;
   }
 }

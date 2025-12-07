@@ -95,6 +95,18 @@ export function orderConfirmationTemplate({
     <p style="margin-top: 24px;">
       ${t.trackingEmailNotice[locale]}
     </p>
+
+    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+      <p style="font-size: 16px; font-weight: 600; color: #0369a1; margin: 0 0 8px;">
+        ${t.createAccountTitle[locale]}
+      </p>
+      <p style="font-size: 14px; color: #475569; margin: 0 0 16px;">
+        ${t.createAccountDesc[locale]}
+      </p>
+      <a href="${ctaUrl.replace('/suivi-commande', '/inscription')}" style="display: inline-block; background: #0ea5e9; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+        ${t.createAccountCta[locale]}
+      </a>
+    </div>
   `
 
   return baseEmailTemplate({

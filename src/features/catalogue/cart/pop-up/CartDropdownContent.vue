@@ -50,10 +50,41 @@
     </div>
 
     <footer class="cart__footer">
+      <!-- Barre livraison gratuite -->
+      <div v-if="cart.totalPrice < FREE_SHIPPING_THRESHOLD" class="cart__shipping-progress">
+        <div class="cart__shipping-bar">
+          <div
+            class="cart__shipping-fill"
+            :style="{ width: `${Math.min((cart.totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }"
+          />
+        </div>
+        <p class="cart__shipping-text">
+          <BasicIconNext name="Truck" :size="14" />
+          <span>{{ t('aov.freeShipping.progress', { amount: formatPrice(FREE_SHIPPING_THRESHOLD - cart.totalPrice) }) }}</span>
+        </p>
+      </div>
+      <div v-else class="cart__shipping-unlocked">
+        <BasicIconNext name="Check" :size="14" />
+        <span>{{ t('aov.freeShipping.unlocked') }}</span>
+      </div>
+
       <div class="cart__total">
         <span>{{ t('cart.total') }}</span>
         <strong>{{ formatPrice(cart.totalPrice) }}</strong>
       </div>
+
+      <!-- Mini trust badges -->
+      <div class="cart__trust">
+        <div class="cart__trust-item">
+          <BasicIconNext name="ShieldCheck" :size="14" />
+          <span>{{ t('aov.quality.purityCertified') }}</span>
+        </div>
+        <div class="cart__trust-item">
+          <BasicIconNext name="FileCheck" :size="14" />
+          <span>{{ t('aov.quality.coaIncluded') }}</span>
+        </div>
+      </div>
+
       <div class="cart__actions">
         <PremiumButton
           type="secondary"
@@ -79,6 +110,8 @@
   import defaultImage from '@/assets/products/default/default-product-image.png'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useI18n } from 'vue-i18n'
+
+  const FREE_SHIPPING_THRESHOLD = 150
 
   const { t } = useI18n()
   const cart = useCartStore()
@@ -255,7 +288,81 @@
     border-top: 1px solid rgba(var(--neutral-100-rgb), 0.06);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  // Shipping progress
+  .cart__shipping-progress {
+    padding: 10px 12px;
+    background: rgba(var(--primary-500-rgb), 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+  }
+
+  .cart__shipping-bar {
+    height: 4px;
+    background: rgba(var(--neutral-100-rgb), 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .cart__shipping-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-400) 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .cart__shipping-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--primary-300);
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .cart__shipping-unlocked {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: rgba(var(--success-500-rgb), 0.12);
+    border: 1px solid rgba(var(--success-500-rgb), 0.2);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: @success-400;
+
+    svg {
+      color: @success-400;
+    }
+  }
+
+  // Trust badges
+  .cart__trust {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .cart__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: @neutral-400;
+
+    svg {
+      color: @success-500;
+      flex-shrink: 0;
+    }
   }
 
   .cart__total {

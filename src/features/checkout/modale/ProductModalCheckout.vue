@@ -171,7 +171,7 @@
       transition: transform 0.3s ease;
 
       &:hover {
-        transform: scale(1.03);
+        // Pas de grossissement
       }
     }
 

@@ -254,6 +254,61 @@
           />
         </FilterSection>
 
+        <!-- Section Lots précédents -->
+        <FilterSection
+          v-if="previousLots.length > 0"
+          :title="t('profile.previousLots')"
+          v-model="sections.lots"
+          icon="Beaker"
+        >
+          <BasicText
+            size="body-s"
+            color="neutral-400"
+            style="margin-bottom: 16px"
+          >
+            {{ t('profile.lotsDescription') }}
+          </BasicText>
+          <div class="profil__lots">
+            <div
+              v-for="lot in previousLots.slice(0, 6)"
+              :key="lot.id"
+              class="profil__lot-card"
+            >
+              <img
+                v-if="lot.productImage"
+                :src="lot.productImage"
+                :alt="lot.productName"
+                class="profil__lot-card-img"
+              />
+              <div class="profil__lot-card-info">
+                <BasicText
+                  size="body-m"
+                  weight="semibold"
+                  color="neutral-900"
+                >
+                  {{ lot.productName }}
+                </BasicText>
+                <div class="profil__lot-card-details">
+                  <BasicText size="body-s" color="primary-500" weight="semibold">
+                    Lot {{ lot.batchNumber }}
+                  </BasicText>
+                  <BasicText size="body-s" color="neutral-400">
+                    {{ formatOrderDate(lot.orderDate) }}
+                  </BasicText>
+                </div>
+              </div>
+              <PremiumButton
+                type="secondary"
+                variant="outline"
+                size="xs"
+                label="Recommander"
+                icon-left="RefreshCw"
+                @click="reorderLot(lot)"
+              />
+            </div>
+          </div>
+        </FilterSection>
+
         <FilterSection
           :title="t('profile.preferences')"
           v-model="sections.preferences"
@@ -441,6 +496,8 @@
   import { formatPostalCode } from '@/composables/validation/formatters'
   import { calculatePasswordStrength } from '@/composables/validation'
   import AddressAutocomplete from '@/features/shared/components/AddressAutocomplete.vue'
+  import { useOrderHistoryStore, type LotHistory } from '@/features/order/stores/useOrderHistoryStore'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
 
   const { t } = useI18n()
   const auth = useAuthStore()
@@ -448,6 +505,8 @@
   const sections = useProfileSectionsStore()
   const router = useRouter()
   const toast = useToastStore()
+  const orderHistory = useOrderHistoryStore()
+  const cart = useCartStore()
 
   const { loadProfile, updateProfile, changeAvatar, loadLastOrdersAction, updatePassword } =
     useProfileActions()
@@ -513,6 +572,22 @@
         (localStorage.getItem('theme-preference') === 'brown').toString()
     )
   })
+
+  // Lots précédents depuis l'historique des commandes
+  const previousLots = computed(() => orderHistory.previousLots)
+
+  // Recommander un lot depuis le profil
+  async function reorderLot(lot: LotHistory) {
+    // Récupérer le produit complet depuis la DB
+    const { fetchProductById } = await import('@/api/supabase/products')
+    const product = await fetchProductById(lot.productId)
+    if (product) {
+      cart.addToCart(product)
+      toast.show(t('profile.reorderSuccess'), 'success')
+    } else {
+      toast.show(t('profile.reorderError'), 'danger')
+    }
+  }
 
   const THEME_STORAGE_KEY = 'theme-preference'
 
@@ -690,6 +765,8 @@
     loadThemePreference()
     await sections.loadFromSupabase()
     await fetchProfileData()
+    // Charger l'historique des commandes pour les lots précédents
+    orderHistory.loadOrders()
   })
 </script>
 
@@ -965,6 +1042,51 @@
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       margin-bottom: 24px;
+    }
+
+    // Section Lots précédents
+    &__lots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    &__lot-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: @neutral-50;
+      border: 1px solid @neutral-200;
+      padding: 16px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--primary-300);
+        box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.1);
+      }
+
+      &-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid @neutral-200;
+        flex-shrink: 0;
+      }
+
+      &-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      &-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 4px;
+      }
     }
 
     &__order-card,

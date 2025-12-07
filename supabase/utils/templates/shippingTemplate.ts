@@ -72,6 +72,17 @@ export function shippingTemplate({
 
     ${trackingBlock}
 
+    <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 20px; margin: 20px 0;">
+      <p style="font-size: 14px; font-weight: 600; color: #92400e; margin: 0 0 12px;">
+        ⚠️ ${t.storageTipsTitle[locale]}
+      </p>
+      <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #78350f;">
+        <li style="margin-bottom: 6px;">${t.storageTip1[locale]}</li>
+        <li style="margin-bottom: 6px;">${t.storageTip2[locale]}</li>
+        <li style="margin-bottom: 6px;">${t.storageTip3[locale]}</li>
+      </ul>
+    </div>
+
     <p style="margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px; font-size: 14px; color: #475569;">
       ${t.viewOrderDetails[locale]}
     </p>

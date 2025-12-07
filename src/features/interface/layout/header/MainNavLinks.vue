@@ -116,7 +116,6 @@
 
           .nav__icon {
             color: var(--primary-400);
-            transform: scale(1.05);
           }
 
           .nav__glow {
@@ -259,7 +258,7 @@
 
           .nav__icon {
             color: var(--primary-400);
-            transform: scale(1.05) rotate(-3deg);
+            transform: rotate(-3deg);
           }
         }
 

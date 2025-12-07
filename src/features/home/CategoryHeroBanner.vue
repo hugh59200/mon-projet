@@ -724,13 +724,9 @@
       background-size: cover;
       background-position: center;
       opacity: 0;
-      transform: scale(1.02);
-      transition:
-        opacity 1.2s @ease,
-        transform 8s @ease;
+      transition: opacity 1.2s @ease;
       &.active {
         opacity: 1;
-        transform: scale(1);
       }
     }
     &__bg-overlay {
@@ -1167,15 +1163,12 @@
       cursor: pointer;
       transition: transform 0.4s @ease;
       &:hover {
-        transform: translateY(-8px) scale(1.02);
+        transform: translateY(-8px);
         .category-hero__card-glow {
           opacity: 1;
         }
         .category-hero__card-shine {
           transform: translateX(100%);
-        }
-        .category-hero__card-play {
-          transform: scale(1.05);
         }
       }
       &-glow {

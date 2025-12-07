@@ -1,10 +1,6 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+// Type simplifié pour éviter "Type instantiation is excessively deep"
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Json = any
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -14,6 +10,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_promo_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           last_admin_message_id: number | null
@@ -586,6 +609,8 @@ export type Database = {
           is_guest_order: boolean | null
           order_number: string | null
           payment_method: string | null
+          promo_code_id: string | null
+          promo_code_snapshot: string | null
           relay_address: string | null
           relay_city: string | null
           relay_country: string | null
@@ -618,6 +643,8 @@ export type Database = {
           is_guest_order?: boolean | null
           order_number?: string | null
           payment_method?: string | null
+          promo_code_id?: string | null
+          promo_code_snapshot?: string | null
           relay_address?: string | null
           relay_city?: string | null
           relay_country?: string | null
@@ -650,6 +677,8 @@ export type Database = {
           is_guest_order?: boolean | null
           order_number?: string | null
           payment_method?: string | null
+          promo_code_id?: string | null
+          promo_code_snapshot?: string | null
           relay_address?: string | null
           relay_city?: string | null
           relay_country?: string | null
@@ -669,6 +698,20 @@ export type Database = {
           zip?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes_admin"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
@@ -740,6 +783,7 @@ export type Database = {
       }
       products: {
         Row: {
+          bulk_pricing: Json | null
           cas_number: string | null
           category: string
           category_i18n: Json | null
@@ -761,6 +805,7 @@ export type Database = {
           tags: string[] | null
         }
         Insert: {
+          bulk_pricing?: Json | null
           cas_number?: string | null
           category: string
           category_i18n?: Json | null
@@ -782,6 +827,7 @@ export type Database = {
           tags?: string[] | null
         }
         Update: {
+          bulk_pricing?: Json | null
           cas_number?: string | null
           category?: string
           category_i18n?: Json | null
@@ -868,6 +914,147 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promo_code_usage: {
+        Row: {
+          discount_applied: number
+          id: string
+          order_id: string | null
+          promo_code_id: string
+          used_at: string | null
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          discount_applied: number
+          id?: string
+          order_id?: string | null
+          promo_code_id: string
+          used_at?: string | null
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          discount_applied?: number
+          id?: string
+          order_id?: string | null
+          promo_code_id?: string
+          used_at?: string | null
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_detailed_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_full_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_overview_for_admin"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          active: boolean | null
+          code: string
+          created_at: string | null
+          current_uses: number | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          max_discount_amount: number | null
+          max_uses: number | null
+          max_uses_per_user: number | null
+          min_order_amount: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          created_at?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          max_discount_amount?: number | null
+          max_uses?: number | null
+          max_uses_per_user?: number | null
+          min_order_amount?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          created_at?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          max_discount_amount?: number | null
+          max_uses?: number | null
+          max_uses_per_user?: number | null
+          min_order_amount?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
       }
       reviews: {
         Row: {
@@ -989,6 +1176,74 @@ export type Database = {
           },
           {
             foreignKeyName: "user_cart_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_promo_rewards: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          generated_code: string | null
+          id: string
+          is_used: boolean | null
+          metadata: Json | null
+          promo_code_id: string | null
+          reward_type: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          generated_code?: string | null
+          id?: string
+          is_used?: boolean | null
+          metadata?: Json | null
+          promo_code_id?: string | null
+          reward_type: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          generated_code?: string | null
+          id?: string
+          is_used?: boolean | null
+          metadata?: Json | null
+          promo_code_id?: string | null
+          reward_type?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_promo_rewards_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_promo_rewards_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_promo_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_promo_rewards_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1278,6 +1533,30 @@ export type Database = {
           },
         ]
       }
+      promo_codes_admin: {
+        Row: {
+          active: boolean | null
+          code: string | null
+          code_type: string | null
+          created_at: string | null
+          current_uses: number | null
+          description: string | null
+          discount_type: string | null
+          discount_value: number | null
+          id: string | null
+          last_used_at: string | null
+          max_discount_amount: number | null
+          max_uses: number | null
+          max_uses_per_user: number | null
+          min_order_amount: number | null
+          total_discount_given: number | null
+          total_uses: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Relationships: []
+      }
       user_cart_view: {
         Row: {
           cart_item_id: string | null
@@ -1343,6 +1622,20 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_promo_code: {
+        Args: {
+          p_discount_applied: number
+          p_order_id: string
+          p_promo_code_id: string
+          p_user_email: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      check_loyalty_reward: {
+        Args: { p_user_email: string; p_user_id: string }
+        Returns: Json
+      }
       claim_guest_orders: {
         Args: { p_email: string; p_user_id: string }
         Returns: Json
@@ -1353,6 +1646,10 @@ export type Database = {
       }
       confirm_newsletter_subscription: {
         Args: { p_token: string }
+        Returns: Json
+      }
+      create_cart_abandonment_promo: {
+        Args: { p_cart_value?: number; p_user_email: string; p_user_id: string }
         Returns: Json
       }
       create_full_order:
@@ -1430,6 +1727,8 @@ export type Database = {
           p_full_name: string
           p_items: Json
           p_payment_method: string
+          p_promo_code_id?: string
+          p_promo_code_snapshot?: string
           p_relay_address?: string
           p_relay_city?: string
           p_relay_country?: string
@@ -1445,6 +1744,24 @@ export type Database = {
         }
         Returns: Json
       }
+      create_welcome_promo: {
+        Args: { p_user_email: string; p_user_id: string }
+        Returns: Json
+      }
+      find_abandoned_carts: {
+        Args: { p_cutoff_time: string; p_min_value?: number }
+        Returns: {
+          cart_total: number
+          email: string
+          items_count: number
+          last_activity: string
+          user_id: string
+        }[]
+      }
+      generate_unique_promo_code: {
+        Args: { p_prefix?: string }
+        Returns: string
+      }
       get_guest_order_by_token: {
         Args: { p_tracking_token: string }
         Returns: Json
@@ -1458,7 +1775,9 @@ export type Database = {
         Returns: Json
       }
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
-      is_admin: { Args: { uid: string }; Returns: boolean }
+      is_admin:
+        | { Args: { uid: string }; Returns: boolean }
+        | { Args: never; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
       remove_order_relay: { Args: { p_order_id: string }; Returns: Json }
       subscribe_to_newsletter: {
@@ -1488,6 +1807,15 @@ export type Database = {
         Returns: Json
       }
       user_exists_by_email: { Args: { p_email: string }; Returns: boolean }
+      validate_promo_code: {
+        Args: {
+          p_code: string
+          p_subtotal: number
+          p_user_email?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       order_status:

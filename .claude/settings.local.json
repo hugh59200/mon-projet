@@ -23,7 +23,8 @@
       "Bash(mkcert:*)",
       "Bash(where:*)",
       "Bash(node:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

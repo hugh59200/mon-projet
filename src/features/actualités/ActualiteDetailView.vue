@@ -561,13 +561,13 @@
     @keyframes float-orb {
       0%,
       100% {
-        transform: translate(0, 0) scale(1);
+        transform: translate(0, 0);
       }
       33% {
-        transform: translate(20px, -25px) scale(1.03);
+        transform: translate(20px, -25px);
       }
       66% {
-        transform: translate(-15px, 15px) scale(0.97);
+        transform: translate(-15px, 15px);
       }
     }
 
@@ -852,7 +852,7 @@
       }
 
       &:hover :deep(img) {
-        transform: scale(1.02);
+        // Pas d'effet de grossissement
       }
     }
 

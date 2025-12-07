@@ -46,21 +46,21 @@ export default {
     hero: {
       badge: {
         certified: 'US Expertise • French Stock',
-        researchOnly: 'Research Use Only (RUO)',
+        researchOnly: 'RUO Certified Reagents',
       },
       title: {
         line1: 'Research peptides',
         accent: 'high purity',
         line2: 'for laboratories',
       },
-      description: "US sourcing, laboratory standards. Stock in France, 24-48h delivery with no customs. Purity ≥98% certified with CoA.",
+      description: "US sourcing, laboratory standards. Stock in France, 24-48h delivery with no customs. Purity ≥98% certified with COA.",
       cta: {
         explore: 'Explore the catalog',
         learnMore: 'Learn more',
       },
       trust: {
         purity: 'Purity ≥98%',
-        coa: 'CoA included',
+        coa: 'COA included',
         delivery: '24-48h delivery',
       },
     },
@@ -93,7 +93,7 @@ export default {
         },
         step2: {
           title: 'Analyze',
-          description: 'Review technical specifications and Certificates of Analysis (CoA).',
+          description: 'Review technical specifications and Certificates of Analysis (COA).',
         },
         step3: {
           title: 'Receive',
@@ -115,7 +115,7 @@ export default {
         lcms: 'LC-MS mass',
         purity: 'Purity ≥98%',
         batch: 'Batch traceability',
-        download: 'Download CoA',
+        download: 'Download COA',
       },
       features: {
         f1: {
@@ -146,7 +146,7 @@ export default {
         },
         q2: {
           q: 'Do you provide Certificates of Analysis?',
-          a: 'Yes, a CoA is provided with each batch, including HPLC chromatogram, observed mass (LC-MS), and purity.',
+          a: 'Yes, a COA is provided with each batch, including HPLC chromatogram, observed mass (LC-MS), and purity.',
         },
         q3: {
           q: 'What are the shipping times?',
@@ -174,8 +174,8 @@ export default {
       },
     },
     disclaimer: {
-      title: 'Research Use Only (RUO)',
-      text: 'Products offered are intended exclusively for in vitro scientific research. Not intended for clinical use.',
+      title: 'Laboratory Reagents (RUO)',
+      text: 'Products intended for in vitro scientific research. Compliant with quality standards for research. Not intended for diagnostic or therapeutic use.',
     },
     banner: {
       eyebrow: 'Scientific resources',
@@ -502,7 +502,7 @@ export default {
     storage: 'Storage',
     research: 'Research Applications',
     coa: 'Certificate of Analysis',
-    downloadCoa: 'Download CoA',
+    downloadCoa: 'Download COA',
     relatedProducts: 'Similar molecules',
     reviews: 'Verified Reviews',
     addToCart: 'Add to Cart',
@@ -516,11 +516,12 @@ export default {
       secure: 'Secure Payment',
     },
     promo: 'OFFER',
-    researchOnly: 'RESEARCH ONLY',
+    researchOnly: 'RUO REAGENT',
     clickToZoom: 'Zoom',
     certified: 'Certified',
-    coaIncluded: 'CoA included',
+    coaIncluded: 'COA included',
     viewCoa: 'View Certificate of Analysis',
+    downloadCoa: 'Download certificate',
     showProduct: 'View product',
     productLabel: 'Product',
     shipping24h: '24h Shipping',
@@ -530,6 +531,10 @@ export default {
     europeanUnion: 'USA / EU',
     priceInfo: 'Incl. tax',
     lowStockWarning: 'Last units!',
+    urgency: {
+      shipToday: 'Order before 2pm, ships today',
+      shipTomorrow: 'Order ships tomorrow morning',
+    },
     notFound: 'Product not found.',
     tabs: {
       specs: 'Technical Data',
@@ -666,11 +671,23 @@ export default {
       bankTransfer: 'Bank Transfer',
       bankTransferDesc: 'SEPA • Processing 24-48h',
       crypto: 'Cryptocurrency',
-      cryptoDesc: 'Bitcoin, USDT • Instant',
+      cryptoDesc: 'Bitcoin, USDT, ETH • Secure payment via NowPayments',
+      cryptoHelp: {
+        title: 'How does it work?',
+        step1: 'Confirm your order',
+        step2: 'Receive a secure payment link by email',
+        step3: 'Pay with your wallet or via exchange',
+        step4: 'Automatic confirmation in ~10 min',
+        guide: 'Need help? Check our crypto guide',
+      },
     },
     summary: {
       title: 'To pay',
       orderTotal: 'Total amount',
+    },
+    trust: {
+      stockFrance: 'Stock available in France',
+      shipping24h: 'Ships within 24h',
     },
     placeOrder: 'Pay order',
     processing: 'Securing...',
@@ -929,16 +946,16 @@ export default {
     responseTime: 'Response < 24h',
     items: {
       q1: {
-        q: "Do you provide a Certificate of Analysis (CoA)?",
-        a: "Yes. Each batch is provided with a CoA including, as applicable: <strong>HPLC</strong> chromatogram, observed mass (<strong>LC-MS</strong>) and purity.",
+        q: "Do you provide a Certificate of Analysis (COA)?",
+        a: "Yes. Each batch is analyzed by an <strong>independent third-party laboratory</strong> (Freedom Diagnostics Testing, USA). The COA includes: <strong>HPLC</strong> chromatogram, observed mass (<strong>LC-MS</strong>) and purity. Verifiable at FreedomDiagnosticsTesting.com.",
       },
       q2: {
         q: 'What purity do you target?',
-        a: "Our partners aim for ≥ 98% purity for most references.",
+        a: "Our partners aim for ≥ 98% purity (HPLC) for most references. Exact purity is stated on each batch's COA.",
       },
       q3: {
         q: 'Are your peptides sterile?',
-        a: "Vials are delivered <strong>lyophilized</strong> for <strong>research use (RUO)</strong>. They are not intended for human use.",
+        a: "Vials are delivered <strong>lyophilized</strong>, intended exclusively for <strong>in vitro research (RUO)</strong>. These are not pharmaceutical products.",
       },
       q4: {
         q: 'How to store lyophilized powder?',
@@ -990,7 +1007,7 @@ export default {
       },
       q16: {
         q: 'Traceability',
-        a: "Unique batch number on each vial, corresponding to the CoA.",
+        a: "Unique batch number on each vial, corresponding to the COA. Each certificate is verifiable with the testing laboratory.",
       },
       q17: {
         q: 'Returns',
@@ -1223,9 +1240,10 @@ export default {
   // ============================================
   newsletter: {
     badge: 'Exclusive newsletter',
-    title: 'Stay informed',
-    description: 'Get early access to new products, scientific news and exclusive offers.',
-    placeholder: 'Your email address',
+    title: 'Alerts & news',
+    compactTitle: 'Research updates',
+    description: 'New peptides, recent studies and exclusive offers directly in your inbox.',
+    placeholder: 'Professional email',
     namePlaceholder: 'Your first name (optional)',
     cta: 'Subscribe for free',
     privacy: 'Your data stays confidential. Unsubscribe in 1 click.',
@@ -1700,6 +1718,61 @@ export default {
       title: 'No favorites yet',
       description: "You haven't added any products to your favorites yet.",
       cta: 'Browse catalogue',
+    },
+  },
+
+  // ============================================
+  // AOV - CROSS-SELL / UPSELL
+  // ============================================
+  aov: {
+    // Cross-sell on product page
+    relatedProducts: {
+      title: 'Complementary reagents',
+      subtitle: 'Often ordered for this type of protocol',
+      viewProduct: 'View product',
+      addToOrder: 'Add',
+    },
+    // Quantity selector with bulk pricing
+    quantity: {
+      title: 'Quantity',
+      unit: 'unit',
+      units: 'units',
+      pricePerUnit: 'Unit price',
+      pack: 'Pack',
+      sameLot: 'Same lot guaranteed',
+      sameLotDesc: 'Uniformity for research protocols',
+      savings: 'Savings',
+      labRate: 'Lab rate',
+      popular: 'Popular',
+    },
+    // Checkout upsell
+    checkout: {
+      title: 'Optimize your order',
+      addSameVial: 'Add another vial',
+      sameLotBenefit: 'Same lot for your experiments',
+      suggestions: 'Suggestions',
+      completeOrder: 'Complete your order',
+      addToCart: 'Add',
+      added: 'Added',
+    },
+    // Free shipping
+    freeShipping: {
+      unlocked: 'Free shipping unlocked!',
+      progress: 'Only {amount} left for free shipping',
+      suggestion: 'Add a reagent to reach the threshold',
+      threshold: 'Free from {amount}',
+    },
+    // Lot consistency
+    lotConsistency: {
+      title: 'Lot consistency',
+      description: 'Ordering multiple units from the same lot ensures uniformity in your protocols',
+      badge: 'Same lot',
+    },
+    // Mini-reassurance
+    quality: {
+      coaIncluded: 'COA included',
+      purityCertified: 'Purity ≥99% HPLC certified',
+      thirdParty: 'Third-party analysis',
     },
   },
 } as const

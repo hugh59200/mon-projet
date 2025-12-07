@@ -364,12 +364,16 @@
       }
 
       &__actions {
-        flex-direction: column;
         width: 100%;
 
         :deep(button) {
           width: 100%;
           justify-content: center;
+        }
+
+        // Masquer le CTA secondaire sur mobile pour simplifier
+        :deep(button:nth-child(2)) {
+          display: none;
         }
       }
 

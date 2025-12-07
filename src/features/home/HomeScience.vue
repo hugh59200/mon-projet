@@ -642,7 +642,6 @@
         }
 
         &:hover &__img-wrapper {
-          transform: scale(1.05);
           border-color: var(--primary-300);
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }

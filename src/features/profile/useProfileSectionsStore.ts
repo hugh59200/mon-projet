@@ -14,6 +14,7 @@ export const useProfileSectionsStore = defineStore(
     const preferences = ref(false)
     const security = ref(false)
     const support = ref(true)
+    const lots = ref(true)
 
     async function loadFromSupabase() {
       if (!auth.user) return
@@ -28,6 +29,7 @@ export const useProfileSectionsStore = defineStore(
         preferences.value = prefs.preferences ?? preferences.value
         security.value = prefs.security ?? security.value
         support.value = prefs.support ?? support.value
+        lots.value = prefs.lots ?? lots.value
       } catch (err) {
         console.warn('⚠️ ui_preferences JSON invalide')
       }
@@ -42,6 +44,7 @@ export const useProfileSectionsStore = defineStore(
         preferences: preferences.value,
         security: security.value,
         support: support.value,
+        lots: lots.value,
       })
 
       await save(auth.user.id, prefs)
@@ -53,6 +56,7 @@ export const useProfileSectionsStore = defineStore(
       preferences,
       security,
       support,
+      lots,
       loadFromSupabase,
       saveToSupabase,
     }
@@ -61,7 +65,7 @@ export const useProfileSectionsStore = defineStore(
     persist: {
       key: 'profile:sections',
       storage: localStorage,
-      pick: ['personal', 'orders', 'preferences', 'security', 'support'],
+      pick: ['personal', 'orders', 'preferences', 'security', 'support', 'lots'],
     },
   },
 )

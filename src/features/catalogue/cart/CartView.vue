@@ -1165,7 +1165,7 @@
       }
 
       &:hover img {
-        transform: scale(1.02);
+        // Pas de grossissement
       }
     }
 

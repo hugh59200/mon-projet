@@ -68,7 +68,7 @@ function isHalfStar(star: number): boolean {
       cursor: pointer;
 
       &:hover {
-        transform: scale(1.1);
+        // Pas de grossissement
       }
     }
   }

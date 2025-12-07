@@ -365,11 +365,11 @@
     0%,
     100% {
       opacity: 0.5;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%);
     }
     50% {
       opacity: 0.8;
-      transform: translate(-50%, -50%) scale(1.1);
+      transform: translate(-50%, -50%);
     }
   }
 </style>

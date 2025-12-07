@@ -72,8 +72,9 @@
         <div class="footer__trust-payments">
           <span class="footer__trust-label">{{ t('footer.securePayments') }}</span>
           <div class="footer__trust-icons">
-            <BasicIconNext name="visa" :size="32" class="footer__payment-icon" />
-            <BasicIconNext name="mastercard" :size="32" class="footer__payment-icon" />
+            <BasicIconNext name="Bitcoin" :size="20" class="footer__payment-icon footer__payment-icon--crypto" />
+            <span class="footer__crypto-label">BTC</span>
+            <span class="footer__crypto-label">USDT</span>
           </div>
         </div>
 
@@ -348,18 +349,30 @@
 
     &__trust-icons {
       display: flex;
+      align-items: center;
       gap: 8px;
     }
 
     &__payment-icon {
-      height: 24px;
-      width: auto;
-      border-radius: 3px;
-      opacity: 0.6;
-      transition: opacity 0.2s @ease;
+      &--crypto {
+        color: #f7931a;
+        opacity: 0.7;
+      }
+    }
+
+    &__crypto-label {
+      font-family: @font-body;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      transition: all 0.2s @ease;
 
       &:hover {
-        opacity: 1;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
       }
     }
 

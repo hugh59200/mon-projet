@@ -91,8 +91,24 @@
         </div>
       </div>
 
-      <!-- Disclaimer -->
-      <div class="checkout-summary__disclaimer">
+      <!-- Disclaimer RUO - Bloc visible et obligatoire -->
+      <div
+        class="checkout-summary__disclaimer"
+        :class="{ 'checkout-summary__disclaimer--accepted': disclaimerAccepted }"
+      >
+        <div class="checkout-summary__disclaimer-header">
+          <div class="checkout-summary__disclaimer-icon">
+            <BasicIconNext name="AlertTriangle" :size="20" />
+          </div>
+          <span class="checkout-summary__disclaimer-title">Déclaration obligatoire</span>
+        </div>
+        <p class="checkout-summary__disclaimer-content">
+          Je certifie être un <strong>professionnel ou chercheur qualifié</strong>, avoir plus de 18 ans,
+          et comprendre que ces produits sont <strong>exclusivement destinés à la recherche en laboratoire</strong>.
+          <span class="checkout-summary__disclaimer-highlight">
+            Interdit pour usage humain ou vétérinaire.
+          </span>
+        </p>
         <label class="checkout-summary__disclaimer-checkbox">
           <input
             :checked="disclaimerAccepted"
@@ -103,12 +119,12 @@
           <span class="checkout-summary__disclaimer-checkmark">
             <BasicIconNext name="Check" :size="12" />
           </span>
-          <span class="checkout-summary__disclaimer-text">
-            {{ t('checkout.disclaimer.text') }}
+          <span class="checkout-summary__disclaimer-label">
+            Je comprends et j'accepte ces conditions
           </span>
         </label>
         <div v-if="!disclaimerAccepted" class="checkout-summary__disclaimer-warning">
-          <BasicIconNext name="AlertTriangle" :size="14" />
+          <BasicIconNext name="AlertCircle" :size="14" />
           <span>{{ t('checkout.disclaimer.required') }}</span>
         </div>
       </div>
@@ -134,16 +150,20 @@
       <!-- Trust Badges -->
       <div class="checkout-summary__trust">
         <div class="checkout-summary__trust-item">
+          <BasicIconNext name="MapPin" :size="20" />
+          <span>{{ t('checkout.trust.stockFrance') }}</span>
+        </div>
+        <div class="checkout-summary__trust-item">
+          <BasicIconNext name="Truck" :size="20" />
+          <span>{{ t('checkout.trust.shipping24h') }}</span>
+        </div>
+        <div class="checkout-summary__trust-item">
           <BasicIconNext name="Lock" :size="20" />
           <span>{{ t('checkout.payment.securePayment') }}</span>
         </div>
         <div class="checkout-summary__trust-item">
           <BasicIconNext name="Shield" :size="20" />
           <span>{{ t('checkout.payment.sslProtected') }}</span>
-        </div>
-        <div class="checkout-summary__trust-item">
-          <BasicIconNext name="CheckCircle2" :size="20" />
-          <span>{{ t('checkout.payment.satisfaction') }}</span>
         </div>
       </div>
     </div>
@@ -389,24 +409,98 @@ function formatPrice(value: number | null | undefined) {
 
   &__disclaimer {
     margin: 20px 0;
-    padding: 16px;
-    background: @neutral-50;
+    padding: 20px;
+    background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 50%, white) 100%);
+    border: 2px solid @danger-200;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+
+    &--accepted {
+      background: linear-gradient(135deg, @success-50 0%, color-mix(in srgb, @success-100 50%, white) 100%);
+      border-color: @success-300;
+
+      .checkout-summary__disclaimer-icon {
+        background: @success-100;
+        svg { color: @success-600; }
+      }
+      .checkout-summary__disclaimer-title { color: @success-700; }
+      .checkout-summary__disclaimer-highlight { background: @success-100; color: @success-700; }
+    }
+  }
+
+  &__disclaimer-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  &__disclaimer-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: @danger-100;
     border-radius: 12px;
+    flex-shrink: 0;
+
+    svg {
+      color: @danger-600;
+    }
+  }
+
+  &__disclaimer-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: @danger-700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__disclaimer-content {
+    font-size: 13px;
+    line-height: 1.6;
+    color: @neutral-700;
+    margin: 0 0 16px;
+
+    strong {
+      color: @neutral-900;
+    }
+  }
+
+  &__disclaimer-highlight {
+    display: inline;
+    padding: 2px 8px;
+    background: @danger-100;
+    border-radius: 4px;
+    color: @danger-700;
+    font-weight: 600;
   }
 
   &__disclaimer-checkbox {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     cursor: pointer;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid @neutral-200;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary-300);
+      background: @neutral-50;
+    }
   }
 
   &__disclaimer-input {
     display: none;
 
     &:checked + .checkout-summary__disclaimer-checkmark {
-      background: var(--primary-500);
-      border-color: var(--primary-500);
+      background: @success-500;
+      border-color: @success-500;
 
       svg {
         opacity: 1;
@@ -416,9 +510,9 @@ function formatPrice(value: number | null | undefined) {
   }
 
   &__disclaimer-checkmark {
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -435,10 +529,10 @@ function formatPrice(value: number | null | undefined) {
     }
   }
 
-  &__disclaimer-text {
-    font-size: 12px;
-    line-height: 1.5;
-    color: @neutral-600;
+  &__disclaimer-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: @neutral-700;
   }
 
   &__disclaimer-warning {
@@ -446,14 +540,16 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 8px;
     margin-top: 12px;
-    padding: 10px 12px;
-    background: @warning-50;
-    border-radius: 8px;
-    font-size: 12px;
-    color: @warning-700;
+    padding: 10px 14px;
+    background: @warning-100;
+    border: 1px solid @warning-300;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: @warning-800;
 
     svg {
-      color: @warning-500;
+      color: @warning-600;
       flex-shrink: 0;
     }
   }
@@ -528,11 +624,34 @@ function formatPrice(value: number | null | undefined) {
     }
 
     &__disclaimer {
-      padding: 12px;
+      padding: 16px;
     }
 
-    &__disclaimer-text {
-      font-size: 11px;
+    &__disclaimer-header {
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    &__disclaimer-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    &__disclaimer-title {
+      font-size: 13px;
+    }
+
+    &__disclaimer-content {
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    &__disclaimer-checkbox {
+      padding: 10px 12px;
+    }
+
+    &__disclaimer-label {
+      font-size: 13px;
     }
 
     &__trust-item {

@@ -192,7 +192,7 @@
       transition: transform 0.25s ease;
     }
     &:hover .logo-img {
-      transform: scale(1.05) rotate(5deg);
+      transform: rotate(5deg);
     }
   }
 
@@ -275,7 +275,7 @@
       transition: transform 6s ease;
     }
     &:hover .illustration-img {
-      transform: scale(1.02);
+      // Pas de grossissement
     }
   }
 
@@ -382,11 +382,9 @@
 
   @keyframes pulseGlow {
     0% {
-      transform: scale(1);
       opacity: 0.6;
     }
     100% {
-      transform: scale(1.05);
       opacity: 0.9;
     }
   }

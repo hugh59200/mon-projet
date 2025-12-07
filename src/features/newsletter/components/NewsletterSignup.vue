@@ -87,27 +87,52 @@
           class="newsletter-signup__form"
           @submit.prevent="handleSubmit"
         >
+          <!-- Compact title -->
+          <span
+            v-if="variant === 'compact'"
+            class="newsletter-signup__compact-title"
+          >
+            {{ t('newsletter.compactTitle') }}
+          </span>
+
           <div class="newsletter-signup__input-wrapper">
-            <!-- Compact: use InputContainer directly for lighter look -->
-            <InputContainer
+            <!-- Compact: input avec bouton intégré à droite -->
+            <div
               v-if="variant === 'compact'"
-              v-model="email"
-              size="small"
-              variant="ghost"
-              icon-name="Mail"
-              icon-state="iconLeft"
-              :disabled="isLoading"
-              class="newsletter-signup__input"
+              class="newsletter-signup__input-inline"
             >
+              <BasicIconNext
+                name="Mail"
+                :size="16"
+                class="newsletter-signup__input-icon"
+              />
               <input
                 v-model="email"
                 type="email"
                 :placeholder="t('newsletter.placeholder')"
                 autocomplete="email"
                 :disabled="isLoading"
+                class="newsletter-signup__input-field"
                 @keydown.enter="handleSubmit"
               />
-            </InputContainer>
+              <button
+                type="submit"
+                class="newsletter-signup__input-btn"
+                :disabled="isLoading"
+              >
+                <BasicIconNext
+                  v-if="!isLoading"
+                  name="ArrowRight"
+                  :size="16"
+                />
+                <BasicIconNext
+                  v-else
+                  name="Loader2"
+                  :size="16"
+                  class="newsletter-signup__input-btn-loading"
+                />
+              </button>
+            </div>
 
             <!-- Premium/Default: use BasicInput -->
             <BasicInput
@@ -140,11 +165,12 @@
           </div>
 
           <PremiumButton
+            v-if="variant !== 'compact'"
             type="primary"
             variant="solid"
             :size="variant === 'premium' ? 'lg' : 'sm'"
             :icon-left="variant === 'premium' ? 'ArrowRight' : undefined"
-            :icon-right="variant === 'compact' ? 'ArrowRight' : undefined"
+            :icon-right="variant === 'inline' ? 'ArrowRight' : undefined"
             :label="variant === 'premium' ? t('newsletter.cta') : ''"
             :loading="isLoading"
             :glow="variant === 'premium'"
@@ -184,7 +210,6 @@
   import { computed, ref } from 'vue'
   import { subscribeToNewsletter } from '@/api/supabase/newsletter'
   import { useLanguage } from '@/composables/useLanguage'
-  import InputContainer from '@designSystem/components/wrapper/inputContainer/InputContainer.vue'
   import type { NewsletterSource } from '@/api/supabase/newsletter'
 
   // ============================================
@@ -490,18 +515,16 @@
       flex-direction: column;
       gap: 12px;
 
-      // Titre style nav-title du footer
-      &::before {
-        content: 'Newsletter';
+      .newsletter-signup__header {
+        display: none;
+      }
+
+      .newsletter-signup__compact-title {
         font-size: 11px;
         font-weight: 600;
         color: rgba(255, 255, 255, 0.7);
         text-transform: uppercase;
         letter-spacing: 0.8px;
-      }
-
-      .newsletter-signup__header {
-        display: none;
       }
 
       .newsletter-signup__form {
@@ -530,6 +553,83 @@
             color: rgba(255, 255, 255, 0.4);
           }
         }
+      }
+
+      // Input inline avec bouton intégré
+      .newsletter-signup__input-inline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        transition: all 0.2s @ease;
+
+        &:focus-within {
+          border-color: rgba(var(--primary-500-rgb), 0.4);
+          background: rgba(255, 255, 255, 0.07);
+        }
+      }
+
+      .newsletter-signup__input-icon {
+        color: rgba(255, 255, 255, 0.4);
+        flex-shrink: 0;
+      }
+
+      .newsletter-signup__input-field {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: @white;
+        font-size: 13px;
+        outline: none;
+        min-width: 0;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+        }
+      }
+
+      .newsletter-signup__input-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s @ease;
+        flex-shrink: 0;
+
+        svg {
+          color: @white;
+        }
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+          transform: translateX(2px);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .newsletter-signup__input-btn-loading {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
       }
 
       .newsletter-signup__btn {
@@ -688,11 +788,11 @@
     0%,
     100% {
       opacity: 0.5;
-      transform: translateX(-50%) scale(1);
+      transform: translateX(-50%);
     }
     50% {
       opacity: 0.8;
-      transform: translateX(-50%) scale(1.05);
+      transform: translateX(-50%);
     }
   }
 
@@ -700,9 +800,6 @@
     0% {
       transform: scale(0);
       opacity: 0;
-    }
-    50% {
-      transform: scale(1.1);
     }
     100% {
       transform: scale(1);
@@ -733,6 +830,6 @@
 
   .fade-scale-leave-to {
     opacity: 0;
-    transform: scale(1.02);
+    transform: scale(1);
   }
 </style>

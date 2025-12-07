@@ -157,25 +157,22 @@
 
         .premium-theme-selector__gradient {
           opacity: 0.3;
-          transform: scale(1.05);
         }
 
         .premium-theme-selector__icon {
-          transform: scale(1.05) rotate(5deg);
+          transform: rotate(5deg);
         }
       }
 
       &--active {
         border-color: rgba(255, 255, 255, 0.3);
         background: rgba(var(--secondary-600-rgb), 0.5);
-        transform: scale(1.02);
 
         .premium-theme-selector__gradient {
           opacity: 0.5;
         }
 
         .premium-theme-selector__icon {
-          transform: scale(1.08);
           filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
         }
 
@@ -296,11 +293,11 @@
       0%,
       100% {
         opacity: 1;
-        transform: scale(1) rotate(0deg);
+        transform: rotate(0deg);
       }
       50% {
         opacity: 0.6;
-        transform: scale(1.05) rotate(20deg);
+        transform: rotate(20deg);
       }
     }
 

@@ -170,13 +170,24 @@
                   Quantité : {{ item.quantity }}
                 </BasicText>
               </div>
-              <BasicText
-                size="body-m"
-                weight="bold"
-                color="primary-700"
-              >
-                {{ formatPrice(item.total) }}
-              </BasicText>
+              <div class="order-detail__item-actions">
+                <BasicText
+                  size="body-m"
+                  weight="bold"
+                  color="primary-700"
+                >
+                  {{ formatPrice(item.total) }}
+                </BasicText>
+                <PremiumButton
+                  label="Recommander"
+                  type="secondary"
+                  variant="outline"
+                  size="xs"
+                  icon-left="RefreshCw"
+                  class="order-detail__reorder-btn"
+                  @click.stop="reorderItem(item)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -313,11 +324,13 @@
   import { formatDate } from '@/utils/index'
   import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
+  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()
   const toast = useToastStore()
+  const cart = useCartStore()
 
   const order = ref<OrdersFullView | null>(null)
   const hasLoaded = ref(false)
@@ -414,6 +427,17 @@
 
   function contactSupport() {
     toast.show('Ouverture de la messagerie pour le support...', 'info')
+  }
+
+  async function reorderItem(item: OrderItemDetailed) {
+    const { fetchProductById } = await import('@/api/supabase/products')
+    const product = await fetchProductById(item.product_id)
+    if (product) {
+      cart.addToCart(product)
+      toast.show('Produit ajouté au panier', 'success')
+    } else {
+      toast.show('Produit non disponible', 'danger')
+    }
   }
 </script>
 
@@ -529,6 +553,17 @@
         justify-content: center;
         gap: 4px;
       }
+
+      &-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+    }
+
+    &__reorder-btn {
+      white-space: nowrap;
     }
 
     /* SUMMARY */

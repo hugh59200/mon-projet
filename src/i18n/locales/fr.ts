@@ -46,14 +46,14 @@ export default {
     hero: {
       badge: {
         certified: 'Expertise US • Stock France',
-        researchOnly: 'Recherche uniquement (RUO)',
+        researchOnly: 'Réactifs certifiés RUO',
       },
       title: {
         line1: 'Peptides de recherche',
         accent: 'haute pureté',
         line2: 'pour laboratoires',
       },
-      description: "Sourcing américain, standards de laboratoire. Stock en France, livraison 24-48h sans douane. Pureté ≥98% certifiée avec CoA.",
+      description: "Sourcing américain, standards de laboratoire. Stock en France, livraison 24-48h sans douane. Pureté ≥98% certifiée avec COA.",
       cta: {
         explore: 'Explorer le catalogue',
         learnMore: 'En savoir plus',
@@ -115,7 +115,7 @@ export default {
         lcms: 'Masse LC-MS',
         purity: 'Pureté ≥98%',
         batch: 'Traçabilité lot',
-        download: 'Télécharger CoA',
+        download: 'Télécharger COA',
       },
       features: {
         f1: {
@@ -146,7 +146,7 @@ export default {
         },
         q2: {
           q: "Fournissez-vous des certificats d'analyse ?",
-          a: "Oui, un CoA est fourni avec chaque lot, comprenant le chromatogramme HPLC, la masse observée (LC-MS) et la pureté.",
+          a: "Oui, un COA est fourni avec chaque lot, comprenant le chromatogramme HPLC, la masse observée (LC-MS) et la pureté.",
         },
         q3: {
           q: 'Quels sont les délais de livraison ?',
@@ -174,8 +174,8 @@ export default {
       },
     },
     disclaimer: {
-      title: 'Usage recherche uniquement (RUO)',
-      text: 'Les produits proposés sont destinés exclusivement à la recherche scientifique in vitro. Non destinés à un usage clinique.',
+      title: 'Réactifs de laboratoire (RUO)',
+      text: 'Produits destinés à la recherche scientifique in vitro. Conformes aux standards de qualité pour la recherche. Non destinés à un usage diagnostique ou thérapeutique.',
     },
     banner: {
       eyebrow: 'Ressources scientifiques',
@@ -464,11 +464,12 @@ export default {
       buyNow: 'Commander',
       outOfStock: 'Indisponible',
       inStock: 'En stock',
-      lowStock: 'Stock faible',
+      lowStock: 'Dernières unités',
       viewDetails: 'Détails',
       viewProduct: 'Voir le produit',
       quantity: 'Qté',
-      purity: 'Pureté',
+      purity: '≥99%',
+      coaIncluded: 'COA inclus',
       format: 'Format',
     },
     results: {
@@ -502,11 +503,11 @@ export default {
     storage: 'Conservation',
     research: 'Applications Recherche',
     coa: "Certificat d'analyse",
-    downloadCoa: 'Télécharger le CoA',
+    downloadCoa: 'Télécharger le COA',
     relatedProducts: 'Molécules similaires',
     reviews: 'Avis Vérifiés',
     addToCart: 'Ajouter au panier',
-    buyNow: 'Acheter maintenant',
+    buyNow: 'Commander',
     selectQuantity: 'Quantité',
     selectFormat: 'Format',
     trustBadges: {
@@ -516,11 +517,12 @@ export default {
       secure: 'Paiement Sécurisé',
     },
     promo: 'OFFRE',
-    researchOnly: 'RECHERCHE UNIQUEMENT',
+    researchOnly: 'RÉACTIF RUO',
     clickToZoom: 'Zoomer',
     certified: 'Certifié',
     coaIncluded: 'COA inclus',
     viewCoa: 'Voir le certificat d\'analyse',
+    downloadCoa: 'Télécharger le certificat',
     showProduct: 'Voir le produit',
     productLabel: 'Produit',
     shipping24h: 'Expédition 24h',
@@ -528,8 +530,12 @@ export default {
     available: 'en stock',
     origin: 'Origine',
     europeanUnion: 'USA / EU',
-    priceInfo: 'TTC',
+    priceInfo: 'TTC • Livraison offerte dès 150€',
     lowStockWarning: 'Dernières unités !',
+    urgency: {
+      shipToday: 'Commandez avant 14h, expédié aujourd\'hui',
+      shipTomorrow: 'Commande expédiée demain matin',
+    },
     notFound: 'Produit introuvable.',
     tabs: {
       specs: 'Données Techniques',
@@ -537,12 +543,12 @@ export default {
       shipping: 'Livraison',
     },
     guarantees: {
-      purity: 'Pureté HPLC ≥99%',
-      purityDesc: "Rapport d'analyse fourni",
-      secureShipping: 'Colis discret',
-      secureShippingDesc: 'Expédition depuis la France',
+      purity: 'Pureté ≥99% certifiée',
+      purityDesc: 'COA laboratoire indépendant',
+      secureShipping: 'Stock France',
+      secureShippingDesc: 'Expédition 24h, livraison 48-72h',
       securePayment: 'Paiement Sécurisé',
-      securePaymentDesc: 'SSL / Crypto / Virement',
+      securePaymentDesc: 'SSL 256-bit • Crypto acceptée',
     },
     shippingOptions: {
       standard: 'Livraison Point Relais',
@@ -666,11 +672,23 @@ export default {
       bankTransfer: 'Virement Bancaire',
       bankTransferDesc: 'SEPA • Traitement sous 24-48h',
       crypto: 'Crypto-monnaie',
-      cryptoDesc: 'Bitcoin, USDT • Instantané',
+      cryptoDesc: 'Bitcoin, USDT, ETH • Paiement sécurisé via NowPayments',
+      cryptoHelp: {
+        title: 'Comment ça fonctionne ?',
+        step1: 'Validez votre commande',
+        step2: 'Recevez un lien de paiement sécurisé par email',
+        step3: 'Payez avec votre wallet ou via exchange',
+        step4: 'Confirmation automatique en ~10 min',
+        guide: 'Besoin d\'aide ? Consultez notre guide crypto',
+      },
     },
     summary: {
       title: 'À payer',
       orderTotal: 'Montant total',
+    },
+    trust: {
+      stockFrance: 'Stock disponible en France',
+      shipping24h: 'Expédition sous 24h',
     },
     placeOrder: 'Payer la commande',
     processing: 'Sécurisation en cours...',
@@ -876,6 +894,8 @@ export default {
     viewAllOrders: 'Tout voir',
     noOrders: "Aucune commande récente.",
     startShopping: 'Accéder au catalogue',
+    previousLots: 'Vos lots précédents',
+    lotsDescription: 'Retrouvez vos numéros de lot pour la reproductibilité de vos recherches.',
     orderNumber: 'N°',
     orderTotal: 'Montant',
     orderDate: 'Le',
@@ -929,16 +949,16 @@ export default {
     responseTime: 'Réponse < 24h',
     items: {
       q1: {
-        q: "Fournissez-vous un certificat d'analyse (CoA) ?",
-        a: "Oui. Chaque lot est fourni avec un CoA comprenant selon les cas : chromatogramme <strong>HPLC</strong>, masse observée (<strong>LC-MS</strong>) et pureté.",
+        q: "Fournissez-vous un certificat d'analyse (COA) ?",
+        a: "Oui. Chaque lot est analysé par un <strong>laboratoire tiers indépendant</strong> (Freedom Diagnostics Testing, USA). Le COA inclut : chromatogramme <strong>HPLC</strong>, masse observée (<strong>LC-MS</strong>) et pureté. Vérifiable sur FreedomDiagnosticsTesting.com.",
       },
       q2: {
         q: 'Quelle est la pureté des produits ?',
-        a: "Nos partenaires visent une pureté ≥ 98% pour la majorité des références.",
+        a: "Nos partenaires visent une pureté ≥ 98% (HPLC) pour la majorité des références. La pureté exacte est indiquée sur le COA de chaque lot.",
       },
       q3: {
         q: 'Vos peptides sont-ils stériles ?',
-        a: "Les flacons sont livrés <strong>lyophilisés</strong> pour <strong>usage recherche (RUO)</strong>. Ils ne sont pas destinés à un usage humain.",
+        a: "Les flacons sont livrés <strong>lyophilisés</strong>, destinés exclusivement à la <strong>recherche in vitro (RUO)</strong>. Ce ne sont pas des produits pharmaceutiques.",
       },
       q4: {
         q: 'Comment stocker la poudre lyophilisée ?',
@@ -990,7 +1010,7 @@ export default {
       },
       q16: {
         q: 'Traçabilité',
-        a: "Numéro de lot unique sur chaque flacon, correspondant au CoA.",
+        a: "Numéro de lot unique sur chaque flacon, correspondant au COA. Chaque certificat est vérifiable auprès du laboratoire d'analyse.",
       },
       q17: {
         q: 'Retours',
@@ -1110,17 +1130,17 @@ export default {
       description: "Atlas Lab Solutions LLC combine l'expertise américaine en biotechnologie avec la proximité logistique européenne.",
       us: {
         title: 'Expertise Américaine',
-        text: "Basés à Albuquerque (NM), nous collaborons avec des laboratoires partenaires certifiés pour le sourcing.",
-        point1: 'Siège social USA',
-        point2: 'Partenaires certifiés',
-        point3: 'Pureté garantie ≥99%',
+        text: "Nos peptides sont synthétisés par des laboratoires partenaires certifiés aux États-Unis. Chaque lot est soumis à une analyse indépendante (HPLC/MS) par Freedom Diagnostics Testing avant validation et expédition.",
+        point1: 'Synthèse USA certifiée',
+        point2: 'Analyse tiers indépendante (COA)',
+        point3: 'Pureté HPLC ≥99%',
       },
       fr: {
-        title: 'Logistique Française',
-        text: 'Plateforme d\'expédition située en France pour éviter les délais douaniers.',
-        point1: 'Stock physique local',
-        point2: 'Pas de frais de douane',
-        point3: 'Livraison 24-48h',
+        title: 'Logistique Européenne',
+        text: "Stock physique en France, réceptionné dans les conditions recommandées par le fabricant. Expédition intracommunautaire : pas de douane, pas de délai d'import, livraison sous 24-48h.",
+        point1: 'Stock contrôlé en France',
+        point2: 'Aucun reconditionnement',
+        point3: 'Livraison EU sans douane',
       },
     },
     advantages: {
@@ -1148,19 +1168,19 @@ export default {
     quality: {
       badge: 'Engagement',
       title: 'Précision analytique',
-      description: "Conservation contrôlée et tests rigoureux.",
+      description: "Chaque lot est analysé par un laboratoire tiers indépendant (Freedom Diagnostics Testing, USA) avant expédition. Nous ne reconditionnons jamais les produits : les flacons vous sont livrés dans leur conditionnement d'origine, scellés et traçables. Notre chaîne logistique US→EU garantit l'intégrité des composés du fabricant jusqu'à votre laboratoire.",
       points: {
         storage: {
           title: 'Conservation',
-          text: "Température et humidité contrôlées.",
+          text: "Stockage à température contrôlée (-20°C). Chaîne du froid maintenue de la réception US à l'expédition EU.",
         },
         testing: {
           title: 'Analyses',
-          text: 'HPLC et Spectrométrie de masse.',
+          text: "Contrôle par laboratoire tiers (HPLC, LC-MS). COA vérifiable pour chaque lot sur FreedomDiagnosticsTesting.com.",
         },
         packaging: {
-          title: 'Packaging',
-          text: "Flacons scellés, emballage neutre et protecteur.",
+          title: 'Conditionnement',
+          text: "Flacons d'origine non reconditionnés. Étiquetage lot/péremption intact. Emballage neutre et protecteur.",
         },
       },
       badge_card: {
@@ -1223,9 +1243,10 @@ export default {
   // ============================================
   newsletter: {
     badge: 'Newsletter exclusive',
-    title: 'Restez informé',
-    description: 'Recevez en avant-première nos nouveautés, actualités scientifiques et offres exclusives.',
-    placeholder: 'Votre adresse email',
+    title: 'Alertes & nouveautés',
+    compactTitle: 'Veille scientifique',
+    description: 'Nouveaux peptides, études récentes et offres exclusives directement dans votre boîte mail.',
+    placeholder: 'Email professionnel',
     namePlaceholder: 'Votre prénom (optionnel)',
     cta: "S'inscrire gratuitement",
     privacy: 'Vos données restent confidentielles. Désinscription en 1 clic.',
@@ -1887,6 +1908,72 @@ export default {
       title: 'Aucun favori',
       description: "Vous n'avez pas encore ajouté de produits à vos favoris.",
       cta: 'Découvrir le catalogue',
+    },
+  },
+
+  // ============================================
+  // AOV - CROSS-SELL / UPSELL
+  // ============================================
+  aov: {
+    // Cross-sell sur fiche produit
+    relatedProducts: {
+      title: 'Réactifs complémentaires',
+      subtitle: 'Souvent commandés pour ce type de protocole',
+      viewProduct: 'Voir le produit',
+      addToOrder: 'Ajouter',
+    },
+    // Sélecteur de quantité avec prix dégressif
+    quantity: {
+      title: 'Quantité',
+      unit: 'unité',
+      units: 'unités',
+      pricePerUnit: 'Prix unitaire',
+      pack: 'Pack',
+      sameLot: 'Même lot garanti',
+      sameLotDesc: 'Uniformité des protocoles de recherche',
+      savings: 'Économie',
+      labRate: 'Tarif laboratoire',
+      popular: 'Populaire',
+    },
+    // Upsell au checkout
+    checkout: {
+      title: 'Optimisez votre commande',
+      addSameVial: 'Ajouter une fiole supplémentaire',
+      sameLotBenefit: 'Même lot pour vos expérimentations',
+      suggestions: 'Suggestions',
+      completeOrder: 'Complétez votre commande',
+      addToCart: 'Ajouter',
+      added: 'Ajouté',
+    },
+    // Livraison gratuite
+    freeShipping: {
+      unlocked: 'Livraison offerte !',
+      progress: 'Plus que {amount} pour la livraison offerte',
+      suggestion: 'Ajoutez un réactif pour atteindre le seuil',
+      threshold: 'Offerte dès {amount}',
+    },
+    // Cohérence de lot
+    lotConsistency: {
+      title: 'Cohérence de lot',
+      description: 'Commander plusieurs unités du même lot garantit l\'uniformité de vos protocoles',
+      badge: 'Même lot',
+    },
+    // Badge déjà commandé
+    alreadyOrdered: {
+      badge: 'Déjà acquis',
+      sameLot: 'Même lot que votre commande du {date}',
+    },
+    // Recommander
+    reorder: {
+      button: 'Recommander ce lot',
+      hint: 'Assurez la continuité de vos recherches',
+      success: 'Produit ajouté au panier',
+    },
+    // Mini-rassurance
+    quality: {
+      coaIncluded: 'COA inclus',
+      purityCertified: 'Pureté ≥99% certifiée HPLC',
+      thirdParty: 'Analyse indépendante',
     },
   },
 } as const

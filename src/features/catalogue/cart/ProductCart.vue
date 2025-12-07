@@ -27,7 +27,8 @@
       v-else-if="(product.stock ?? 0) < 5"
       class="product-card__stock-badge product-card__stock-badge--low"
     >
-      {{ t('catalogue.product.lowStock') }}
+      <BasicIconNext name="AlertCircle" :size="12" />
+      <span>{{ product.stock }} restant{{ (product.stock ?? 0) > 1 ? 's' : '' }}</span>
     </div>
 
     <!-- Image -->
@@ -63,12 +64,19 @@
 
       <!-- Specs -->
       <div class="product-card__specs">
-        <div class="product-card__spec">
+        <div class="product-card__spec product-card__spec--purity">
           <BasicIconNext
             name="FlaskConical"
             :size="14"
           />
-          <span>≥99%</span>
+          <span>{{ t('catalogue.product.purity') }}</span>
+        </div>
+        <div class="product-card__spec product-card__spec--coa">
+          <BasicIconNext
+            name="FileCheck"
+            :size="14"
+          />
+          <span>{{ t('catalogue.product.coaIncluded') }}</span>
         </div>
         <div
           v-if="product.dosage"
@@ -153,17 +161,18 @@
 
   const defaultImage = '/images/default-product.png'
 
+  // Couleurs des catégories utilisant les variables du design system
   const categoryColors: Record<string, string> = {
-    Récupération: '#10B981',
-    'Perte de poids': '#F59E0B',
-    Croissance: '#3B82F6',
-    'Anti-âge': '#8B5CF6',
-    Performance: '#EF4444',
-    'Bien-être': '#EC4899',
-    Hormonal: '#6366F1',
-    Nootropique: '#14B8A6',
-    Cosmétique: '#F472B6',
-    Santé: '#22C55E',
+    Récupération: 'var(--success-500)',
+    'Perte de poids': 'var(--warning-500)',
+    Croissance: 'var(--blue-500)',
+    'Anti-âge': 'var(--purple-500)',
+    Performance: 'var(--danger-500)',
+    'Bien-être': 'var(--pink-500)',
+    Hormonal: 'var(--purple-600)',
+    Nootropique: 'var(--persian-500)',
+    Cosmétique: 'var(--pink-400)',
+    Santé: 'var(--success-500)',
   }
 
   const categoryColor = computed(() => {
@@ -257,10 +266,25 @@
       }
 
       &--low {
-        background: rgba(var(--warning-500-rgb), 0.15);
-        color: @warning-500;
-        border: 1px solid rgba(var(--warning-500-rgb), 0.3);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        background: linear-gradient(135deg, @warning-500 0%, @warning-600 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 2px 8px rgba(var(--warning-500-rgb), 0.4);
+        animation: pulse-stock 2s infinite;
+
+        svg {
+          color: white;
+        }
       }
+    }
+
+    @keyframes pulse-stock {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
     }
 
     // ============ IMAGE ============
@@ -364,6 +388,32 @@
 
       svg {
         color: @neutral-500;
+      }
+
+      // Pureté mise en évidence
+      &--purity {
+        background: rgba(var(--success-500-rgb), 0.12);
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: @success-500;
+        font-weight: 600;
+
+        svg {
+          color: @success-500;
+        }
+      }
+
+      // Badge COA
+      &--coa {
+        background: rgba(var(--primary-500-rgb), 0.1);
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: var(--primary-400);
+        font-weight: 500;
+
+        svg {
+          color: var(--primary-400);
+        }
       }
     }
 
@@ -513,8 +563,13 @@
       }
 
       &__actions {
-        flex-direction: column;
+        flex-direction: row;
         gap: 6px;
+
+        // Masquer le bouton secondaire sur mobile pour simplifier
+        :deep(button:nth-child(2)) {
+          display: none;
+        }
       }
 
       &__btn {

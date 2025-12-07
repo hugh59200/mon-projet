@@ -33,8 +33,29 @@
           <div class="payment-card__crypto-icons">
             <span class="payment-card__crypto-badge">BTC</span>
             <span class="payment-card__crypto-badge">USDT</span>
+            <span class="payment-card__crypto-badge">ETH</span>
           </div>
         </button>
+
+        <!-- Explication crypto -->
+        <Transition name="fade">
+          <div v-if="modelValue === 'crypto'" class="checkout-payment__crypto-help">
+            <div class="crypto-help__header">
+              <BasicIconNext name="Info" :size="18" />
+              <span>{{ t('checkout.payment.cryptoHelp.title') }}</span>
+            </div>
+            <ol class="crypto-help__steps">
+              <li>{{ t('checkout.payment.cryptoHelp.step1') }}</li>
+              <li>{{ t('checkout.payment.cryptoHelp.step2') }}</li>
+              <li>{{ t('checkout.payment.cryptoHelp.step3') }}</li>
+              <li>{{ t('checkout.payment.cryptoHelp.step4') }}</li>
+            </ol>
+            <a href="/faq#crypto" class="crypto-help__link">
+              <BasicIconNext name="HelpCircle" :size="14" />
+              {{ t('checkout.payment.cryptoHelp.guide') }}
+            </a>
+          </div>
+        </Transition>
       </div>
 
       <!-- Section Bientôt disponible -->
@@ -194,6 +215,59 @@ const showComingSoon = ref(false)
     padding: 16px;
     border-top: 1px solid @neutral-200;
   }
+
+  &__crypto-help {
+    margin-top: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, @orange-50 0%, @neutral-50 100%);
+    border: 1px solid @orange-200;
+    border-radius: 14px;
+  }
+}
+
+.crypto-help {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: @orange-700;
+    margin-bottom: 14px;
+  }
+
+  &__steps {
+    margin: 0 0 14px 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: @neutral-700;
+    line-height: 1.8;
+
+    li {
+      margin-bottom: 4px;
+
+      &::marker {
+        color: @orange-500;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary-600);
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--primary-700);
+      text-decoration: underline;
+    }
+  }
 }
 
 .payment-card {
@@ -332,6 +406,17 @@ const showComingSoon = ref(false)
 .collapse-leave-active {
   transition: all 0.3s ease;
   overflow: hidden;
+}
+
+// Fade animation
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .collapse-enter-from,

@@ -96,6 +96,18 @@ export const translations = {
       fr: 'Voir ma commande',
       en: 'View my order',
     },
+    createAccountTitle: {
+      fr: 'Créez votre espace chercheur',
+      en: 'Create your researcher account',
+    },
+    createAccountDesc: {
+      fr: 'Suivez vos commandes, accédez à l\'historique de vos lots et recommandez facilement.',
+      en: 'Track your orders, access your batch history and reorder easily.',
+    },
+    createAccountCta: {
+      fr: 'Créer mon compte',
+      en: 'Create my account',
+    },
   },
 
   // ========== SHIPPING ==========
@@ -149,6 +161,22 @@ export const translations = {
     ctaViewOrder: {
       fr: 'Voir ma commande',
       en: 'View my order',
+    },
+    storageTipsTitle: {
+      fr: 'Conseils de réception',
+      en: 'Reception tips',
+    },
+    storageTip1: {
+      fr: 'Réceptionnez rapidement votre colis',
+      en: 'Receive your package promptly',
+    },
+    storageTip2: {
+      fr: 'Vérifiez l\'intégrité des scellés',
+      en: 'Check the integrity of the seals',
+    },
+    storageTip3: {
+      fr: 'Stockez selon les conditions recommandées sur chaque produit',
+      en: 'Store according to the recommended conditions on each product',
     },
   },
 

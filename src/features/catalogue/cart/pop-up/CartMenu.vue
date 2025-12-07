@@ -198,9 +198,6 @@
       transform: scale(0);
       opacity: 0;
     }
-    50% {
-      transform: scale(1.02);
-    }
     100% {
       transform: scale(1);
       opacity: 1;

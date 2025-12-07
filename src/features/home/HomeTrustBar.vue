@@ -1,10 +1,16 @@
 <template>
   <section class="trust-bar">
     <div class="trust-bar__container">
-      <div
+      <component
+        :is="item.external ? 'a' : item.link ? 'RouterLink' : 'div'"
         v-for="item in trustItems"
         :key="item.label"
+        :to="!item.external ? item.link : undefined"
+        :href="item.external ? item.link : undefined"
+        :target="item.external ? '_blank' : undefined"
+        :rel="item.external ? 'noopener noreferrer' : undefined"
         class="trust-bar__item"
+        :class="{ 'trust-bar__item--link': item.link }"
       >
         <BasicIconNext
           :name="item.icon"
@@ -15,7 +21,13 @@
           <span class="trust-bar__value">{{ item.value }}</span>
           <span class="trust-bar__label">{{ item.label }}</span>
         </div>
-      </div>
+        <BasicIconNext
+          v-if="item.link"
+          :name="item.external ? 'ExternalLink' : 'ChevronRight'"
+          :size="16"
+          class="trust-bar__arrow"
+        />
+      </component>
     </div>
   </section>
 </template>
@@ -31,6 +43,8 @@
     icon: IconNameNext
     value: string
     label: string
+    link?: string
+    external?: boolean
   }
 
   const trustItems = computed<TrustItem[]>(() => [
@@ -53,6 +67,8 @@
       icon: 'ShieldCheck',
       value: 'COA',
       label: t('product.trustBadges.quality'),
+      link: 'https://freedomdiagnosticstesting.com/search-for-your-coa-based-on-the-unique-accession-number/',
+      external: true,
     },
   ])
 </script>
@@ -95,6 +111,7 @@
       padding: 22px 24px;
       border-right: 1px solid rgba(255, 255, 255, 0.08);
       transition: background 0.2s ease;
+      text-decoration: none;
 
       &:last-child {
         border-right: none;
@@ -103,6 +120,26 @@
       &:hover {
         background: rgba(var(--primary-500-rgb), 0.05);
       }
+
+      &--link {
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(var(--primary-500-rgb), 0.1);
+
+          .trust-bar__arrow {
+            transform: translateX(2px);
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    &__arrow {
+      color: var(--primary-400);
+      opacity: 0.5;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
     &__icon {
