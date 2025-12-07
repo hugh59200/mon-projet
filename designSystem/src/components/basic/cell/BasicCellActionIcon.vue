@@ -71,12 +71,4 @@
       }
     }
   }
-
-  .link :deep(.text) {
-    font-weight: bolder;
-  }
-  .sous-titre {
-    font-size: 10px;
-    font-weight: bold;
-  }
 </style>

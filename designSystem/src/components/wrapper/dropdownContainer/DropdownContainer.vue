@@ -6,7 +6,7 @@
       `dropdown--${size}`,
       `dropdown--${dropdownType}`,
       `dropdown--${dropdownDirection}`,
-      { 'dropdown--disabled': disabled, 'dropdown--readonly': readonly },
+      { 'dropdown--disabled': disabled, 'dropdown--readonly': readonly, 'dropdown--dark': variant === 'dark' },
     ]"
     @click="toggleDropdown"
     @focusin="isFocused = true"
@@ -53,7 +53,7 @@
       <div
         v-if="isOpen && !disabled"
         v-motion="motion"
-        class="dropdown__menu"
+        :class="['dropdown__menu', { 'dropdown__menu--dark': variant === 'dark' }]"
         ref="menuRef"
         :style="menuPositionStyle"
         role="listbox"
@@ -87,6 +87,7 @@
     dropdownType: 'form',
     selectedLabel: '',
     mode: 'single',
+    variant: 'light',
   })
 
   const { isOpen, dropdownDirection, computedItems, updateDropdownVisibilityAndDirection } =

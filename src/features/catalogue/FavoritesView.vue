@@ -77,8 +77,10 @@ function viewProduct(productId: string): void {
 
     <PageContent size="xl">
       <!-- Loading State -->
-      <div
+      <ContentBlock
         v-if="loading"
+        variant="card"
+        size="lg"
         class="favorites-view__loading"
       >
         <BasicIconNext
@@ -93,11 +95,13 @@ function viewProduct(productId: string): void {
         >
           {{ t('common.loading') }}
         </BasicText>
-      </div>
+      </ContentBlock>
 
       <!-- Error State -->
-      <div
+      <ContentBlock
         v-else-if="error"
+        variant="danger"
+        size="lg"
         class="favorites-view__error"
       >
         <BasicIconNext
@@ -118,11 +122,13 @@ function viewProduct(productId: string): void {
           size="md"
           @click="fetchFavoriteProducts"
         />
-      </div>
+      </ContentBlock>
 
       <!-- Empty State -->
-      <div
+      <ContentBlock
         v-else-if="isEmpty"
+        variant="card"
+        size="lg"
         class="favorites-view__empty"
       >
         <BasicIconNext
@@ -151,7 +157,7 @@ function viewProduct(productId: string): void {
           icon-left="ArrowLeft"
           @click="goToCatalogue"
         />
-      </div>
+      </ContentBlock>
 
       <!-- Products Grid -->
       <template v-else-if="products.length > 0">
@@ -179,8 +185,10 @@ function viewProduct(productId: string): void {
       </template>
 
       <!-- No products found (IDs in store but products deleted from DB) -->
-      <div
+      <ContentBlock
         v-else
+        variant="card"
+        size="lg"
         class="favorites-view__empty"
       >
         <BasicIconNext
@@ -208,7 +216,7 @@ function viewProduct(productId: string): void {
           size="md"
           @click="wishlistStore.clear()"
         />
-      </div>
+      </ContentBlock>
     </PageContent>
   </div>
 </template>
@@ -226,12 +234,12 @@ function viewProduct(productId: string): void {
   &__loading,
   &__error,
   &__empty {
+    // Styles de base gérés par ContentBlock
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: @spacing-15;
-    padding: @spacing-35 @spacing-20;
     text-align: center;
     min-height: 300px;
   }

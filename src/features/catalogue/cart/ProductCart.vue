@@ -45,6 +45,7 @@
       <WishlistButton
         :product-id="product.id"
         class="product-card__wishlist"
+        :class="{ 'product-card__wishlist--active': isInWishlist }"
       />
     </div>
 
@@ -126,7 +127,7 @@
         />
 
         <PremiumButton
-          v-if="(product.stock ?? 0) > 0"
+          v-if="(product.stock ?? 0) > 0 && !isMobile"
           type="secondary"
           size="sm"
           :label="t('catalogue.product.buyNow')"
@@ -144,13 +145,20 @@
   import { computed, toRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import WishlistButton from '../components/WishlistButton.vue'
+  import { useWishlistStore } from '../stores/useWishlistStore'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
 
   const { t } = useI18n()
+  const wishlistStore = useWishlistStore()
+  const { isMobile } = useDeviceBreakpoint()
 
   const props = defineProps<{
     product: Products
     viewMode?: 'grid' | 'list'
   }>()
+
+  // Vérifier si le produit est dans les favoris
+  const isInWishlist = computed(() => wishlistStore.isInWishlist(props.product.id))
 
   // Traductions automatiques du produit
   const { name: productName, category: productCategory } = useTranslatedProduct(
@@ -329,7 +337,7 @@
     }
 
     // Toujours visible si actif (favori sélectionné)
-    &__wishlist:has(.wishlist-button--active) {
+    &__wishlist--active {
       opacity: 1;
       transform: scale(1);
     }
@@ -565,11 +573,6 @@
       &__actions {
         flex-direction: row;
         gap: 6px;
-
-        // Masquer le bouton secondaire sur mobile pour simplifier
-        :deep(button:nth-child(2)) {
-          display: none;
-        }
       }
 
       &__btn {

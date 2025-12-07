@@ -22,6 +22,7 @@ export type RouteName =
   'checkout' |
   'checkout-confirmation' |
   'cookies' |
+  'crypto-guide' |
   'email-sent' |
   'faq' |
   'favorites' |

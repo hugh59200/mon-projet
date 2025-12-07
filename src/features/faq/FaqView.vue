@@ -3,20 +3,11 @@
     <!-- Header via PageHeader -->
     <PageHeader>
       <template #stats>
-        <div class="stat">
-          <span class="stat__value">{{ faqs.length }}</span>
-          <span class="stat__label">{{ t('faq.title') }}</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat__value">{{ categories.length }}</span>
-          <span class="stat__label">{{ t('faq.categories.all') }}</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat__value">24h</span>
-          <span class="stat__label">Support</span>
-        </div>
+        <PageHeaderStat :value="faqs.length" :label="t('faq.title')" />
+        <PageHeaderStatDivider />
+        <PageHeaderStat :value="categories.length" :label="t('faq.categories.all')" />
+        <PageHeaderStatDivider />
+        <PageHeaderStat value="24h" label="Support" />
       </template>
     </PageHeader>
 
@@ -25,7 +16,7 @@
       <div class="faq__layout">
         <!-- Sidebar -->
         <aside class="faq__sidebar">
-          <div class="faq__sidebar-card">
+          <ContentBlock variant="card" size="md" class="faq__sidebar-card">
             <!-- Search -->
             <BasicInput
               v-model="search"
@@ -80,10 +71,10 @@
               block
               @click="resetSearch"
             />
-          </div>
+          </ContentBlock>
 
           <!-- Help Card -->
-          <div class="faq__help-card">
+          <ContentBlock variant="card" size="md" class="faq__help-card">
             <div class="faq__help-icon">
               <BasicIconNext name="MessageSquare" :size="24" />
             </div>
@@ -96,7 +87,7 @@
               <BasicIconNext name="Mail" :size="16" />
               {{ t('faq.contactSupport') }}
             </RouterLink>
-          </div>
+          </ContentBlock>
         </aside>
 
         <!-- Content -->
@@ -123,8 +114,10 @@
           </div>
 
           <!-- Empty State -->
-          <div
+          <ContentBlock
             v-if="groupedVisible.length === 0"
+            variant="card"
+            size="lg"
             class="faq__empty"
           >
             <div class="faq__empty-icon">
@@ -140,16 +133,18 @@
               icon-left="RotateCcw"
               @click="resetSearch"
             />
-          </div>
+          </ContentBlock>
 
           <!-- FAQ Groups -->
           <div
             v-else
             class="faq__groups"
           >
-            <div
+            <ContentBlock
               v-for="group in groupedVisible"
               :key="group.id"
+              variant="card"
+              size="lg"
               class="faq__group"
             >
               <!-- Group Header -->
@@ -217,13 +212,13 @@
                   </transition>
                 </div>
               </div>
-            </div>
+            </ContentBlock>
           </div>
         </main>
       </div>
 
       <!-- Footer CTA -->
-      <footer class="faq__footer">
+      <ContentBlock as="footer" variant="card" size="lg" class="faq__footer">
         <div class="faq__footer-content">
           <div class="faq__footer-icon">
             <BasicIconNext name="MessageSquare" :size="32" />
@@ -256,7 +251,7 @@
             <span>{{ t('checkout.payment.satisfaction') }}</span>
           </div>
         </div>
-      </footer>
+      </ContentBlock>
     </PageContent>
   </div>
 </template>
@@ -264,6 +259,8 @@
   import { useHead } from '@vueuse/head'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
+  import PageHeaderStat from '@/features/shared/components/PageHeaderStat.vue'
+  import PageHeaderStatDivider from '@/features/shared/components/PageHeaderStatDivider.vue'
   import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
 
@@ -668,13 +665,7 @@
     }
 
     &__sidebar-card {
-      background: white;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -858,9 +849,7 @@
     // HELP CARD
     // ============================================
     &__help-card {
-      background: linear-gradient(135deg, var(--secondary-900) 0%, var(--secondary-800) 100%);
-      border-radius: 20px;
-      padding: 24px;
+      // Styles de base gérés par ContentBlock (theme dark)
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -990,16 +979,10 @@
     // EMPTY STATE
     // ============================================
     &__empty {
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 80px 40px;
-      background: white;
-      border-radius: 24px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
       text-align: center;
     }
 
@@ -1060,13 +1043,7 @@
     }
 
     &__group {
-      background: white;
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
+      // Styles de base gérés par ContentBlock
     }
 
     &__group-header {
@@ -1281,13 +1258,7 @@
     // FOOTER
     // ============================================
     &__footer {
-      background: white;
-      border-radius: 28px;
-      padding: 40px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.06);
-      border: 1px solid @neutral-100;
+      // Styles de base gérés par ContentBlock
     }
 
     &__footer-content {

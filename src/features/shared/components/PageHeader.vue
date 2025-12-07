@@ -550,41 +550,6 @@
       border: 1px solid rgba(var(--neutral-700-rgb), 0.3);
       border-radius: 16px;
       backdrop-filter: blur(10px);
-
-      :deep(.stat) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-
-        &__value {
-          font-size: 24px;
-          font-weight: 700;
-          color: @neutral-100;
-          background: linear-gradient(135deg, var(--primary-400), var(--primary-500));
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        &__label {
-          font-size: 12px;
-          color: @neutral-500;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-      }
-
-      :deep(.stat-divider) {
-        width: 1px;
-        height: 32px;
-        background: linear-gradient(
-          180deg,
-          transparent,
-          rgba(var(--neutral-600-rgb), 0.5),
-          transparent
-        );
-      }
     }
 
     // Stats light theme
@@ -594,18 +559,6 @@
       box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
         0 8px 24px rgba(0, 0, 0, 0.04);
-
-      :deep(.stat__value) {
-        color: var(--primary-600);
-      }
-
-      :deep(.stat__label) {
-        color: @neutral-500;
-      }
-
-      :deep(.stat-divider) {
-        background: @neutral-200;
-      }
     }
 
     // ========================================

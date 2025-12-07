@@ -1,5 +1,5 @@
 <template>
-  <section v-if="relatedProducts.length > 0" class="related-products">
+  <ContentBlock v-if="relatedProducts.length > 0" as="section" variant="card" size="lg" class="related-products">
     <div class="related-products__header">
       <div class="related-products__title-group">
         <h2 class="related-products__title">
@@ -71,7 +71,7 @@
         </button>
       </article>
     </div>
-  </section>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -160,11 +160,8 @@ onMounted(loadProducts)
 @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .related-products {
+  // Styles de base gérés par ContentBlock
   margin-top: 48px;
-  padding: 32px;
-  background: rgba(var(--secondary-900-rgb), 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
 
   &__header {
     display: flex;

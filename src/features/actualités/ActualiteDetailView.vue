@@ -32,8 +32,10 @@
       </div>
 
       <!-- Empty State -->
-      <div
+      <ContentBlock
         v-else-if="!article"
+        variant="card"
+        size="lg"
         class="article-detail__empty"
       >
         <div class="article-detail__empty-icon">
@@ -48,7 +50,7 @@
           <BasicIconNext name="ArrowLeft" :size="16" />
           {{ $t('news.viewAllArticles') }}
         </RouterLink>
-      </div>
+      </ContentBlock>
 
       <!-- Article Content -->
       <article
@@ -166,10 +168,14 @@
         </div>
 
         <div class="article-detail__related-grid">
-          <RouterLink
+          <ContentBlock
             v-for="(related, index) in relatedArticles"
             :key="related.slug"
+            as="RouterLink"
             :to="`/actualites/${related.slug}`"
+            variant="card"
+            size="sm"
+            :interactive="true"
             class="article-detail__related-card"
             :style="{ '--delay': `${index * 0.1}s` }"
           >
@@ -193,7 +199,7 @@
                 {{ formatDate(related.published_at) }}
               </span>
             </div>
-          </RouterLink>
+          </ContentBlock>
         </div>
       </section>
 
@@ -673,13 +679,11 @@
     // EMPTY STATE
     // ===========================
     &__empty {
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 100px 24px;
-      background: white;
-      border-radius: 24px;
       border: 2px dashed @neutral-200;
       text-align: center;
     }
@@ -1206,27 +1210,14 @@
     }
 
     &__related-card {
+      // Styles de base gérés par ContentBlock
       position: relative;
       display: flex;
       flex-direction: column;
-      background: white;
-      border-radius: 18px;
       overflow: hidden;
       text-decoration: none;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 4px 16px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
-      transition: all 0.3s @ease;
       animation: card-appear 0.5s @ease backwards;
       animation-delay: var(--delay);
-
-      &:hover {
-        border-color: var(--primary-200);
-        box-shadow:
-          0 1px 3px rgba(0, 0, 0, 0.04),
-          0 6px 20px rgba(0, 0, 0, 0.08);
-      }
     }
 
     @keyframes card-appear {

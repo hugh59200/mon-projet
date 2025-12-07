@@ -119,6 +119,8 @@ const showComingSoon = ref(false)
 </script>
 
 <style scoped lang="less">
+@import '@designSystem/fondation/selection/selectable-mixins.less';
+
 .checkout-payment {
   background: white;
   border-radius: 24px;
@@ -276,26 +278,15 @@ const showComingSoon = ref(false)
   gap: 16px;
   width: 100%;
   padding: 20px;
-  background: white;
-  border: 2px solid @neutral-200;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
   min-height: 44px;
 
-  &:hover:not(&--disabled) {
-    border-color: var(--primary-300);
-    background: color-mix(in srgb, var(--primary-500) 2%, white);
-  }
+  // Utilise le mixin dark pour cohérence avec QuantitySelector
+  .selectable-card();
+  border-width: 2px;
+  border-radius: 16px;
 
   &--active {
-    border-color: var(--primary-500);
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--primary-500) 4%, white) 0%,
-      color-mix(in srgb, var(--primary-500) 2%, white) 100%
-    );
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-500) 15%, transparent);
+    .selectable-card--active();
 
     .payment-card__radio-inner {
       transform: scale(1);
@@ -305,14 +296,14 @@ const showComingSoon = ref(false)
 
   &--disabled {
     cursor: not-allowed;
-    opacity: 0.7;
-    background: @neutral-50;
+    opacity: 0.5;
+    background: var(--secondary-900);
   }
 
   &__radio {
     width: 20px;
     height: 20px;
-    border: 2px solid @neutral-300;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -365,14 +356,14 @@ const showComingSoon = ref(false)
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: @neutral-900;
+    color: @white;
     margin-bottom: 2px;
   }
 
   &__desc {
     display: block;
     font-size: 13px;
-    color: @neutral-500;
+    color: @neutral-400;
   }
 
   &__crypto-icons {

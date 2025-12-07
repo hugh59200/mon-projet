@@ -24,7 +24,9 @@
       "Bash(where:*)",
       "Bash(node:*)",
       "Bash(find:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

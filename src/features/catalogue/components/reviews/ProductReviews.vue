@@ -19,7 +19,7 @@
         />
       </div>
 
-      <div v-if="summary" class="reviews-summary">
+      <ContentBlock v-if="summary" variant="info" size="md" class="reviews-summary">
         <div class="rating-overview">
           <div class="rating-score">
             <span class="average-rating">{{ summary.average_rating }}</span>
@@ -41,9 +41,9 @@
             <span class="bar-count">{{ getCount(star) }}</span>
           </div>
         </div>
-      </div>
+      </ContentBlock>
 
-      <div v-else class="no-reviews-summary">
+      <ContentBlock v-else variant="card" size="lg" class="no-reviews-summary">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
           <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
         </svg>
@@ -56,7 +56,7 @@
           label="Donner mon avis"
           @click="showReviewForm = true"
         />
-      </div>
+      </ContentBlock>
     </div>
 
     <div v-if="reviews.length > 0" class="reviews-list">
@@ -192,13 +192,10 @@ onMounted(() => {
 }
 
 .reviews-summary {
+  // Styles de base gérés par ContentBlock
   display: flex;
   gap: 32px;
   align-items: stretch;
-  padding: 16px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-500) 2%, transparent) 0%, color-mix(in srgb, var(--primary-500) 6%, transparent) 100%);
-  border: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
-  border-radius: 12px;
 
   .respond-mobile({
     flex-direction: column;
@@ -300,15 +297,13 @@ onMounted(() => {
 }
 
 .no-reviews-summary {
+  // Styles de base gérés par ContentBlock
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 32px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-500) 2%, transparent) 0%, color-mix(in srgb, var(--primary-500) 6%, transparent) 100%);
-  border: 1px dashed color-mix(in srgb, var(--primary-500) 20%, transparent);
-  border-radius: 12px;
   gap: 8px;
+  border: 1px dashed @neutral-200;
 
   .empty-icon {
     color: @neutral-400;

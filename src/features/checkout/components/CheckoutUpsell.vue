@@ -1,8 +1,10 @@
 <template>
   <div v-if="showUpsell" class="checkout-upsell">
     <!-- Section livraison gratuite -->
-    <div
+    <ContentBlock
       v-if="showFreeShippingNudge"
+      variant="info"
+      size="sm"
       class="checkout-upsell__shipping"
     >
       <div class="checkout-upsell__shipping-header">
@@ -42,11 +44,13 @@
           </button>
         </div>
       </div>
-    </div>
+    </ContentBlock>
 
     <!-- Section "Ajouter une fiole du même lot" -->
-    <div
+    <ContentBlock
       v-if="cartItemsForUpsell.length > 0"
+      variant="card"
+      size="md"
       class="checkout-upsell__same-lot"
     >
       <div class="checkout-upsell__header">
@@ -79,7 +83,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </ContentBlock>
   </div>
 </template>
 
@@ -192,10 +196,7 @@ onMounted(() => {
   margin-bottom: 20px;
 
   &__shipping {
-    padding: 16px;
-    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.08) 0%, rgba(var(--primary-600-rgb), 0.04) 100%);
-    border: 1px solid rgba(var(--primary-500-rgb), 0.2);
-    border-radius: 12px;
+    // Styles de base gérés par ContentBlock
   }
 
   &__shipping-header {
@@ -237,31 +238,28 @@ onMounted(() => {
   }
 
   &__same-lot {
-    padding: 16px;
-    background: rgba(var(--secondary-800-rgb), 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    // Styles de base gérés par ContentBlock
   }
 
   &__header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
     font-family: @font-body;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    color: @neutral-200;
+    color: @neutral-800;
 
     svg {
-      color: var(--primary-400);
+      color: var(--primary-500);
     }
   }
 
   &__items {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 }
 
@@ -339,74 +337,64 @@ onMounted(() => {
 
 .upsell-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  background: @neutral-50;
+  border: 1px solid @neutral-100;
   border-radius: 10px;
-
-  .respond-mobile({
-    flex-direction: column;
-    align-items: stretch;
-  });
 
   &__info {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    min-width: 0;
   }
 
   &__name {
     font-family: @font-body;
     font-size: 14px;
-    font-weight: 500;
-    color: @neutral-200;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 600;
+    color: @neutral-800;
+    line-height: 1.3;
   }
 
   &__benefit {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-family: @font-body;
-    font-size: 11px;
+    font-size: 12px;
     color: @neutral-500;
 
     svg {
-      color: var(--primary-400);
+      color: var(--primary-500);
+      flex-shrink: 0;
     }
   }
 
   &__action {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-
-    .respond-mobile({
-      justify-content: space-between;
-    });
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid @neutral-100;
   }
 
   &__price {
     font-family: @font-display;
-    font-size: 14px;
-    font-weight: 600;
-    color: @neutral-300;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-600);
   }
 
   &__btn {
-    padding: 8px 14px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
     border: none;
     border-radius: 8px;
     font-family: @font-body;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: white;
     cursor: pointer;

@@ -193,9 +193,12 @@
           icon="Box"
         >
           <div class="profil__orders">
-            <div
+            <ContentBlock
               v-for="order in lastOrders"
               :key="order.id"
+              variant="card"
+              size="md"
+              :interactive="true"
               class="profil__order-card"
               @click="goToOrder(order.id)"
             >
@@ -230,7 +233,7 @@
                   {{ t('profile.orderDate') }} {{ formatOrderDate(order.created_at!) }}
                 </BasicText>
               </div>
-            </div>
+            </ContentBlock>
 
             <BasicText
               v-if="!lastOrders.length"
@@ -269,9 +272,12 @@
             {{ t('profile.lotsDescription') }}
           </BasicText>
           <div class="profil__lots">
-            <div
+            <ContentBlock
               v-for="lot in previousLots.slice(0, 6)"
               :key="lot.id"
+              variant="card"
+              size="md"
+              :interactive="true"
               class="profil__lot-card"
             >
               <img
@@ -305,7 +311,7 @@
                 icon-left="RefreshCw"
                 @click="reorderLot(lot)"
               />
-            </div>
+            </ContentBlock>
           </div>
         </FilterSection>
 
@@ -315,7 +321,7 @@
           icon="Settings"
         >
           <div class="profil__preferences">
-            <div class="profil__pref-card profil__pref-card--premium">
+            <ContentBlock variant="card" size="lg" class="profil__pref-card profil__pref-card--premium">
               <div class="profil__pref-card-header">
                 <BasicIconNext
                   name="Palette"
@@ -344,9 +350,9 @@
                 label-color="neutral-800"
                 description-color="neutral-600"
               />
-            </div>
+            </ContentBlock>
 
-            <div class="profil__pref-card profil__pref-card--secondary">
+            <ContentBlock variant="card" size="lg" class="profil__pref-card profil__pref-card--secondary">
               <div class="profil__pref-card-header">
                 <BasicIconNext
                   name="Bell"
@@ -368,7 +374,7 @@
                   :label="t('profile.newsletter')"
                 />
               </div>
-            </div>
+            </ContentBlock>
           </div>
 
           <PremiumButton
@@ -1053,19 +1059,10 @@
     }
 
     &__lot-card {
+      // Styles de base gérés par ContentBlock
       display: flex;
       align-items: center;
       gap: 16px;
-      background: @neutral-50;
-      border: 1px solid @neutral-200;
-      padding: 16px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-
-      &:hover {
-        border-color: var(--primary-300);
-        box-shadow: 0 4px 16px rgba(var(--primary-500-rgb), 0.1);
-      }
 
       &-img {
         width: 56px;
@@ -1091,11 +1088,7 @@
 
     &__order-card,
     &__pref-card {
-      background: @neutral-50;
-      border: 1px solid @neutral-200;
-      padding: 22px 26px;
-      border-radius: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      // Styles de base gérés par ContentBlock
 
       .BasicText {
         color: @neutral-900;
@@ -1170,25 +1163,13 @@
     }
 
     &__pref-card {
+      // Styles de base gérés par ContentBlock
       position: relative;
       cursor: default;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      padding: 28px 32px;
-      border-radius: 20px;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.92) 100%
-      );
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.08),
-        0 1px 3px rgba(0, 0, 0, 0.05);
 
       &::before {
         content: '';

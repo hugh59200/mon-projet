@@ -49,7 +49,7 @@
           <div class="product__main">
             <!-- Colonne Image -->
             <div class="product__gallery">
-              <div class="product__image-card">
+              <ContentBlock variant="card" size="lg" class="product__image-card">
                 <!-- Badge Promo -->
                 <div
                   v-if="product.is_on_sale && !showCoa"
@@ -156,7 +156,7 @@
                 </button>
 
                 <!-- Bloc Analyse Indépendante -->
-                <div v-if="product.coa_url" class="product__lab-verification">
+                <ContentBlock v-if="product.coa_url" variant="success" size="md" class="product__lab-verification">
                   <div class="product__lab-header">
                     <BasicIconNext name="ShieldCheck" :size="20" />
                     <span class="product__lab-title">Analyse indépendante</span>
@@ -196,8 +196,8 @@
                       <span>{{ t('product.downloadCoa') }}</span>
                     </button>
                   </div>
-                </div>
-              </div>
+                </ContentBlock>
+              </ContentBlock>
             </div>
 
             <!-- Colonne Infos -->
@@ -268,7 +268,7 @@
               </div>
 
               <!-- Bloc Prix -->
-              <div class="product__pricing">
+              <ContentBlock variant="card" size="lg" class="product__pricing">
                 <div class="product__price-container">
                   <template v-if="product.is_on_sale && product.sale_price">
                     <div class="product__price-old">
@@ -333,29 +333,33 @@
                 </div>
 
                 <!-- Alerte stock -->
-                <div
+                <ContentBlock
                   v-if="(product.stock ?? 0) > 0 && (product.stock ?? 0) < 10"
+                  variant="warning"
+                  size="sm"
                   class="product__stock-alert"
                 >
                   <BasicIconNext name="AlertTriangle" :size="16" />
                   <span>
                     {{ t('product.lowStockWarning', { count: product.stock }) }}
                   </span>
-                </div>
+                </ContentBlock>
 
                 <!-- Message urgence expédition -->
-                <div
+                <ContentBlock
                   v-if="(product.stock ?? 0) > 0 && canShipToday"
+                  variant="success"
+                  size="sm"
                   class="product__urgency"
                 >
                   <BasicIconNext name="Clock" :size="16" />
                   <span>{{ t('product.urgency.shipToday') }}</span>
-                </div>
-              </div>
+                </ContentBlock>
+              </ContentBlock>
 
               <!-- Garanties -->
               <div class="product__guarantees">
-                <div class="product__guarantee">
+                <ContentBlock variant="card" size="sm" :interactive="true" class="product__guarantee">
                   <div class="product__guarantee-icon">
                     <BasicIconNext name="ShieldCheck" :size="24" />
                   </div>
@@ -363,8 +367,8 @@
                     <strong>{{ t('product.guarantees.purity') }}</strong>
                     <span>{{ t('product.guarantees.purityDesc') }}</span>
                   </div>
-                </div>
-                <div class="product__guarantee">
+                </ContentBlock>
+                <ContentBlock variant="card" size="sm" :interactive="true" class="product__guarantee">
                   <div class="product__guarantee-icon">
                     <BasicIconNext name="Truck" :size="24" />
                   </div>
@@ -372,8 +376,8 @@
                     <strong>{{ t('product.guarantees.secureShipping') }}</strong>
                     <span>{{ t('product.guarantees.secureShippingDesc') }}</span>
                   </div>
-                </div>
-                <div class="product__guarantee">
+                </ContentBlock>
+                <ContentBlock variant="card" size="sm" :interactive="true" class="product__guarantee">
                   <div class="product__guarantee-icon">
                     <BasicIconNext name="Shield" :size="24" />
                   </div>
@@ -381,13 +385,13 @@
                     <strong>{{ t('product.guarantees.securePayment') }}</strong>
                     <span>{{ t('product.guarantees.securePaymentDesc') }}</span>
                   </div>
-                </div>
+                </ContentBlock>
               </div>
             </div>
           </div>
 
           <!-- ============ SECTION DESCRIPTION ============ -->
-          <div class="product__details">
+          <ContentBlock variant="card" size="lg" :no-padding="true" class="product__details">
             <div class="product__details-tabs">
               <PremiumButton
                 :type="activeTab === 'description' ? 'primary' : 'secondary'"
@@ -470,10 +474,10 @@
                 </div>
               </div>
             </div>
-          </div>
+          </ContentBlock>
 
           <!-- Disclaimer RUO renforcé -->
-          <div class="product__disclaimer">
+          <ContentBlock variant="danger" size="md" class="product__disclaimer">
             <div class="product__disclaimer-icon">
               <BasicIconNext name="AlertTriangle" :size="24" />
             </div>
@@ -487,7 +491,7 @@
                 Manipulation par personnel qualifié uniquement.
               </p>
             </div>
-          </div>
+          </ContentBlock>
 
           <!-- Section Avis Clients -->
           <ProductReviews
@@ -999,13 +1003,7 @@
 
     &__image-card {
       position: relative;
-      background: white;
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.06);
-      border: 1px solid @neutral-100;
+      // Styles de base gérés par ContentBlock
     }
 
     &__badge {
@@ -1234,10 +1232,7 @@
     // ============ LAB VERIFICATION (Analyse indépendante) ============
     &__lab-verification {
       margin-top: 16px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(16, 185, 129, 0.08) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 12px;
+      // Styles de base gérés par ContentBlock
     }
 
     &__lab-header {
@@ -1487,10 +1482,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      padding: 24px;
-      background: linear-gradient(135deg, white 0%, @neutral-50 100%);
-      border: 1px solid @neutral-200;
-      border-radius: 20px;
+      // Styles de base gérés par ContentBlock
     }
 
     &__price-container {
@@ -1607,13 +1599,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 16px;
-      background: @warning-100;
-      border: 1px solid @warning-300;
-      border-radius: 10px;
       font-family: @font-body;
       font-size: 13px;
       color: @warning-800;
+      // Styles de base gérés par ContentBlock
 
       svg {
         color: @warning-500;
@@ -1629,14 +1618,11 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, @success-50 0%, color-mix(in srgb, @success-100 50%, white) 100%);
-      border: 1px solid @success-200;
-      border-radius: 10px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
       color: @success-700;
+      // Styles de base gérés par ContentBlock
 
       svg {
         color: @success-500;
@@ -1661,16 +1647,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 14px 18px;
-      background: white;
-      border: 1px solid @neutral-100;
-      border-radius: 12px;
-      transition: all 0.2s @ease;
-
-      &:hover {
-        border-color: var(--primary-200);
-        background: rgba(var(--primary-500-rgb), 0.02);
-      }
+      // Styles de base gérés par ContentBlock
     }
 
     &__guarantee-icon {
@@ -1710,14 +1687,9 @@
 
     // ============ DETAILS SECTION ============
     &__details {
-      background: white;
-      border-radius: 24px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.06);
-      border: 1px solid @neutral-100;
       overflow: hidden;
       margin-bottom: 32px;
+      // Styles de base gérés par ContentBlock
     }
 
     &__details-tabs {
@@ -1856,11 +1828,8 @@
       display: flex;
       align-items: flex-start;
       gap: 16px;
-      padding: 24px;
       margin-bottom: 40px;
-      background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 60%, white) 100%);
-      border: 2px solid @danger-200;
-      border-radius: 16px;
+      // Styles de base gérés par ContentBlock
     }
 
     &__disclaimer-icon {

@@ -88,9 +88,13 @@ const { t } = useI18n()
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
       .checkout-progress__number {
-        background: var(--primary-500);
+        background: var(--primary-600);
         color: white;
-        box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-500) 40%, transparent);
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-600) 40%, transparent);
+
+        span {
+          color: inherit;
+        }
       }
 
       .checkout-progress__label {
@@ -101,7 +105,8 @@ const { t } = useI18n()
 
     &--done {
       .checkout-progress__number {
-        background: var(--color-success-500);
+        background: @success-500;
+        color: white;
         box-shadow: 0 4px 12px color-mix(in srgb, @success-500 40%, transparent);
       }
     }
@@ -137,7 +142,7 @@ const { t } = useI18n()
     transition: all 0.3s ease;
 
     &--active {
-      background: linear-gradient(90deg, var(--color-success-500) 0%, var(--primary-500) 100%);
+      background: linear-gradient(90deg, @success-500 0%, var(--primary-500) 100%);
     }
   }
 }

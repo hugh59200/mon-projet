@@ -571,17 +571,6 @@
     }
   }
 
-  // Style premium pour les inputs
-  :deep(.wrapper-input) {
-    .input-wrapper {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-      &:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      }
-    }
-  }
-
   // Section traductions (i18n)
   .translations-section {
     margin-top: 8px;

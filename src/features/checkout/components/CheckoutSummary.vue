@@ -1,6 +1,6 @@
 <template>
   <aside class="checkout-summary">
-    <div class="checkout-summary__card">
+    <ContentBlock variant="card" size="lg" class="checkout-summary__card">
       <h3 class="checkout-summary__title">{{ t('checkout.summary.title') }}</h3>
 
       <div class="checkout-summary__rows">
@@ -26,8 +26,10 @@
         </div>
 
         <!-- Barre de progression livraison gratuite -->
-        <div
+        <ContentBlock
           v-if="deliveryMode === 'home' && subtotal < freeShippingThreshold"
+          variant="info"
+          size="sm"
           class="checkout-summary__shipping-progress"
         >
           <div class="checkout-summary__shipping-bar">
@@ -41,7 +43,7 @@
             <strong>{{ formatPrice(freeShippingThreshold - subtotal) }}</strong>
             pour la livraison offerte
           </p>
-        </div>
+        </ContentBlock>
 
         <!-- Code Promo -->
         <div class="checkout-summary__promo">
@@ -92,7 +94,9 @@
       </div>
 
       <!-- Disclaimer RUO - Bloc visible et obligatoire -->
-      <div
+      <ContentBlock
+        :variant="disclaimerAccepted ? 'success' : 'danger'"
+        size="md"
         class="checkout-summary__disclaimer"
         :class="{ 'checkout-summary__disclaimer--accepted': disclaimerAccepted }"
       >
@@ -123,11 +127,16 @@
             Je comprends et j'accepte ces conditions
           </span>
         </label>
-        <div v-if="!disclaimerAccepted" class="checkout-summary__disclaimer-warning">
+        <ContentBlock
+          v-if="!disclaimerAccepted"
+          variant="warning"
+          size="sm"
+          class="checkout-summary__disclaimer-warning"
+        >
           <BasicIconNext name="AlertCircle" :size="14" />
           <span>{{ t('checkout.disclaimer.required') }}</span>
-        </div>
-      </div>
+        </ContentBlock>
+      </ContentBlock>
 
       <div class="checkout-summary__submit">
         <PremiumButton
@@ -166,7 +175,7 @@
           <span>{{ t('checkout.payment.sslProtected') }}</span>
         </div>
       </div>
-    </div>
+    </ContentBlock>
   </aside>
 </template>
 
@@ -212,11 +221,7 @@ function formatPrice(value: number | null | undefined) {
   top: 24px;
 
   &__card {
-    background: white;
-    border-radius: 24px;
-    padding: 28px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    border: 1px solid @neutral-100;
+    // Styles de base gérés par ContentBlock
   }
 
   &__title {
@@ -276,14 +281,7 @@ function formatPrice(value: number | null | undefined) {
   }
 
   &__shipping-progress {
-    padding: 12px;
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--primary-500) 6%, white) 0%,
-      color-mix(in srgb, var(--primary-500) 3%, white) 100%
-    );
-    border-radius: 12px;
-    border: 1px solid color-mix(in srgb, var(--primary-500) 12%, transparent);
+    // Styles de base gérés par ContentBlock
   }
 
   &__shipping-bar {
@@ -409,16 +407,10 @@ function formatPrice(value: number | null | undefined) {
 
   &__disclaimer {
     margin: 20px 0;
-    padding: 20px;
-    background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 50%, white) 100%);
-    border: 2px solid @danger-200;
-    border-radius: 16px;
     transition: all 0.3s ease;
+    // Styles de base gérés par ContentBlock
 
     &--accepted {
-      background: linear-gradient(135deg, @success-50 0%, color-mix(in srgb, @success-100 50%, white) 100%);
-      border-color: @success-300;
-
       .checkout-summary__disclaimer-icon {
         background: @success-100;
         svg { color: @success-600; }
@@ -540,13 +532,10 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 8px;
     margin-top: 12px;
-    padding: 10px 14px;
-    background: @warning-100;
-    border: 1px solid @warning-300;
-    border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
     color: @warning-800;
+    // Styles de base gérés par ContentBlock
 
     svg {
       color: @warning-600;

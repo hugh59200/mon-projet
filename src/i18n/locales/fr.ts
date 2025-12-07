@@ -420,7 +420,7 @@ export default {
       emailLogin: 'Adresse email utilisée lors de l\'inscription',
       emailRegister: 'Privilégiez une adresse professionnelle',
       emailReset: 'Adresse email associée à votre compte',
-      password: 'Minimum 8 caractères',
+      password: 'Minimum 6 caractères',
       passwordNew: 'Choisissez un mot de passe sécurisé',
       confirmPassword: 'Saisissez à nouveau votre mot de passe',
     },
@@ -503,7 +503,6 @@ export default {
     storage: 'Conservation',
     research: 'Applications Recherche',
     coa: "Certificat d'analyse",
-    downloadCoa: 'Télécharger le COA',
     relatedProducts: 'Molécules similaires',
     reviews: 'Avis Vérifiés',
     addToCart: 'Ajouter au panier',
@@ -705,7 +704,7 @@ export default {
       trackOrders: 'Créez un compte pour le suivi',
       email: 'Email',
       password: 'Mot de passe',
-      minChars: 'Min. 8 car.',
+      minChars: 'Min. 6 car.',
       activate: 'Activer',
       track: 'Suivre',
       history: 'Historique',
@@ -765,6 +764,116 @@ export default {
       needHelp: 'Besoin d\'aide ?',
       copied: 'Copié !',
       paymentConfirmed: 'Merci ! Nous vérifierons votre paiement sous 24-48h.',
+      newToCrypto: 'Nouveau avec les cryptos ?',
+      viewGuide: 'Voir le guide',
+    },
+  },
+
+  // ============================================
+  // CRYPTO GUIDE
+  // ============================================
+  cryptoGuide: {
+    banner: {
+      title: 'Guide complet pour payer en crypto',
+      description: 'Découvrez comment acheter et envoyer des cryptomonnaies facilement, même si c\'est votre première fois.',
+    },
+    whyCrypto: {
+      title: 'Pourquoi payer en crypto ?',
+      subtitle: 'Les avantages du paiement en cryptomonnaie',
+      benefits: {
+        privacy: {
+          title: 'Confidentialité',
+          description: 'Transactions discrètes sans intermédiaire bancaire.',
+        },
+        fast: {
+          title: 'Rapidité',
+          description: 'Confirmation en quelques minutes, pas de délai bancaire.',
+        },
+        global: {
+          title: 'International',
+          description: 'Paiement depuis n\'importe quel pays sans restriction.',
+        },
+        fees: {
+          title: 'Frais réduits',
+          description: 'Pas de frais de change ni de commission bancaire.',
+        },
+      },
+    },
+    steps: {
+      title: 'Comment payer en crypto ?',
+      subtitle: 'Suivez ces 4 étapes simples',
+      step1: {
+        title: 'Créer un compte',
+        description: 'Inscrivez-vous sur une plateforme d\'échange comme Binance ou Coinbase.',
+      },
+      step2: {
+        title: 'Acheter des cryptos',
+        description: 'Achetez du Bitcoin (BTC) ou du Tether (USDT) par carte bancaire ou virement.',
+      },
+      step3: {
+        title: 'Envoyer le paiement',
+        description: 'Copiez notre adresse de réception et envoyez le montant exact depuis votre wallet.',
+      },
+      step4: {
+        title: 'Confirmation',
+        description: 'Votre paiement est confirmé automatiquement sous 10-30 minutes.',
+      },
+    },
+    platforms: {
+      title: 'Plateformes recommandées',
+      subtitle: 'Achetez vos cryptos en toute sécurité sur ces exchanges',
+      binance: {
+        desc: 'La plus grande plateforme mondiale, idéale pour débuter.',
+      },
+      coinbase: {
+        desc: 'Interface simple et intuitive, parfait pour les débutants.',
+      },
+      kraken: {
+        desc: 'Plateforme européenne sécurisée et régulée.',
+      },
+      bybit: {
+        desc: 'Achat rapide et P2P disponible.',
+      },
+      tags: {
+        beginner: 'Débutant',
+        lowFees: 'Frais bas',
+        simple: 'Simple',
+        secure: 'Sécurisé',
+        advanced: 'Avancé',
+        europe: 'Europe',
+        fast: 'Rapide',
+        p2p: 'P2P',
+      },
+    },
+    accepted: {
+      title: 'Cryptos acceptées',
+      subtitle: 'Nous acceptons les cryptomonnaies suivantes',
+      btc: {
+        description: 'La crypto-monnaie la plus populaire et sécurisée.',
+      },
+      usdt: {
+        description: 'Stablecoin indexé sur le dollar, pas de volatilité.',
+        network: 'Réseau TRC-20 (Tron)',
+      },
+      popular: 'Populaire',
+      stable: 'Stable',
+    },
+    warning: {
+      title: 'Points importants',
+      item1: 'Vérifiez toujours l\'adresse de destination avant d\'envoyer.',
+      item2: 'Envoyez le montant exact indiqué sur la page de confirmation.',
+      item3: 'Pour USDT, utilisez uniquement le réseau TRC-20 (Tron).',
+    },
+    cta: {
+      title: 'Prêt à commander ?',
+      description: 'Profitez d\'un paiement simple et sécurisé en crypto.',
+      button: 'Voir le catalogue',
+      support: 'Contacter le support',
+    },
+    footer: {
+      secure: 'Paiement sécurisé',
+      fast: 'Traitement rapide',
+      support: 'Support disponible',
     },
   },
 
@@ -912,7 +1021,7 @@ export default {
       postalCode: '5 chiffres',
       city: 'Ville de résidence',
       country: 'Pays de résidence',
-      newPassword: 'Minimum 8 caractères, majuscule et chiffre',
+      newPassword: 'Minimum 6 caractères',
       confirmPassword: 'Doit correspondre au nouveau mot de passe',
     },
     placeholders: {
@@ -1443,7 +1552,7 @@ export default {
     },
     password: {
       enterPassword: 'Mot de passe',
-      minLength: '8 caractères min.',
+      minLength: '6 caractères min.',
       lowercase: '1 minuscule min.',
       uppercase: '1 majuscule min.',
       number: '1 chiffre min.',
@@ -1621,6 +1730,11 @@ export default {
       heading: 'Calculateur',
       description: 'Outil de laboratoire.',
       badge: 'Utilitaire',
+    },
+    cryptoGuide: {
+      title: 'Guide Crypto',
+      heading: 'Paiement Crypto',
+      description: 'Comment payer en Bitcoin ou USDT.',
     },
     legal: {
       mentions: 'Mentions Légales',

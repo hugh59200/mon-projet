@@ -1,5 +1,5 @@
 <template>
-  <div class="track-status">
+  <ContentBlock variant="card" size="lg" class="track-status">
     <div class="track-status__header">
       <div class="track-status__info">
         <div
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -148,13 +148,7 @@ function formatDate(date: string | null | undefined) {
 @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .track-status {
-  background: white;
-  border-radius: 28px;
-  padding: 36px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 12px 48px rgba(0, 0, 0, 0.06);
-  border: 1px solid @neutral-100;
+  // Styles de base gérés par ContentBlock
 
   &__header {
     display: flex;
@@ -360,9 +354,6 @@ function formatDate(date: string | null | undefined) {
 // Responsive
 .respond-mobile({
   .track-status {
-    padding: 24px;
-    border-radius: 20px;
-
     &__header {
       flex-direction: column;
       gap: 20px;

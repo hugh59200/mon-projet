@@ -99,6 +99,15 @@
 
             <!-- Instructions Crypto -->
             <div v-else class="confirmation__crypto-details">
+              <!-- Guide Crypto Link -->
+              <div class="confirmation__crypto-guide-link">
+                <BasicIconNext name="BookOpen" :size="18" />
+                <span>{{ t('checkout.confirmation.newToCrypto') }}</span>
+                <router-link to="/guide-crypto" class="confirmation__crypto-guide-btn">
+                  {{ t('checkout.confirmation.viewGuide') }}
+                  <BasicIconNext name="ArrowRight" :size="14" />
+                </router-link>
+              </div>
               <div class="confirmation__crypto-tabs">
                 <button
                   class="confirmation__crypto-tab"
@@ -377,6 +386,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+@import '@designSystem/fondation/selection/selectable-mixins.less';
+
 @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
 @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
 @ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -677,6 +688,57 @@ onMounted(() => {
   // ============================================
   // CRYPTO
   // ============================================
+  &__crypto-guide-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.08) 0%, rgba(var(--primary-500-rgb), 0.04) 100%);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.2);
+    border-radius: 12px;
+    font-family: @font-body;
+    font-size: 14px;
+    color: @neutral-600;
+
+    > svg:first-child {
+      color: var(--primary-500);
+      flex-shrink: 0;
+    }
+
+    > span {
+      flex: 1;
+    }
+  }
+
+  &__crypto-guide-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--primary-500);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    transition: all 0.2s @ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: var(--primary-600);
+      transform: translateX(2px);
+    }
+
+    svg {
+      transition: transform 0.2s @ease;
+    }
+
+    &:hover svg {
+      transform: translateX(2px);
+    }
+  }
+
   &__crypto-tabs {
     display: flex;
     gap: 8px;
@@ -690,25 +752,19 @@ onMounted(() => {
     justify-content: center;
     gap: 8px;
     padding: 12px 16px;
-    background: @neutral-100;
-    border: 2px solid transparent;
-    border-radius: 10px;
     font-family: @font-body;
     font-size: 13px;
     font-weight: 600;
-    color: @neutral-600;
-    cursor: pointer;
-    transition: all 0.2s @ease;
 
-    &:hover {
-      background: @neutral-50;
-      border-color: @neutral-300;
-    }
+    // Utilise le mixin dark pour cohérence
+    .selectable-card();
+    border-width: 2px;
+    border-radius: 10px;
+    color: @neutral-300;
 
     &--active {
-      background: white;
-      border-color: var(--primary-500);
-      color: var(--primary-700);
+      .selectable-card--active();
+      color: @white;
     }
   }
 

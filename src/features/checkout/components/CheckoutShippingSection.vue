@@ -285,6 +285,8 @@ function formatPrice(value: number) {
 </script>
 
 <style scoped lang="less">
+@import '@designSystem/fondation/selection/selectable-mixins.less';
+
 .checkout-shipping {
   background: white;
   border-radius: 24px;
@@ -336,26 +338,15 @@ function formatPrice(value: number) {
     gap: 16px;
     width: 100%;
     padding: 18px 20px;
-    background: white;
-    border: 2px solid @neutral-200;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
     min-height: 60px;
 
-    &:hover {
-      border-color: var(--primary-300);
-      background: color-mix(in srgb, var(--primary-500) 2%, white);
-    }
+    // Utilise le mixin dark pour cohérence
+    .selectable-card();
+    border-width: 2px;
+    border-radius: 16px;
 
     &--active {
-      border-color: var(--primary-500);
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--primary-500) 4%, white) 0%,
-        color-mix(in srgb, var(--primary-500) 2%, white) 100%
-      );
-      box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-500) 15%, transparent);
+      .selectable-card--active();
 
       .checkout-shipping__radio-inner {
         transform: scale(1);
@@ -367,7 +358,7 @@ function formatPrice(value: number) {
   &__radio {
     width: 22px;
     height: 22px;
-    border: 2px solid @neutral-300;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -420,24 +411,24 @@ function formatPrice(value: number) {
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: @neutral-900;
+    color: @white;
     margin-bottom: 2px;
   }
 
   &__option-desc {
     display: block;
     font-size: 13px;
-    color: @neutral-500;
+    color: @neutral-400;
   }
 
   &__option-price {
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-600;
+    color: @neutral-300;
     flex-shrink: 0;
 
     &--free {
-      color: var(--color-success-600);
+      color: @success-400;
     }
   }
 

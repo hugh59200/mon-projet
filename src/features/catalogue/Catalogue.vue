@@ -91,6 +91,7 @@
               placeholder="Trier par"
               size="small"
               force-value
+              variant="dark"
               class="catalogue-toolbar__dropdown"
             />
 
@@ -179,7 +180,7 @@
           :message="t('common.loading')"
         >
           <template #empty>
-            <div class="catalogue-empty">
+            <ContentBlock variant="card" size="lg" class="catalogue-empty">
               <div class="catalogue-empty__icon">
                 <BasicIconNext name="Search" :size="48" />
               </div>
@@ -195,7 +196,7 @@
                 icon-left="RotateCcw"
                 @click="resetAll"
               />
-            </div>
+            </ContentBlock>
           </template>
 
           <div
@@ -615,55 +616,11 @@
 
       &__dropdown {
         min-width: 130px;
-
-        // Style "secondary outline" pour le dark mode
-        :deep(.dropdown) {
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 10px;
-
-          &:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-            background: rgba(255, 255, 255, 0.03);
-          }
-
-          input {
-            background: transparent;
-            color: @neutral-200;
-            font-family: @font-body;
-            font-size: 13px;
-
-            &::placeholder {
-              color: @neutral-500;
-            }
-          }
-
-          svg {
-            background: transparent;
-            fill: @neutral-400;
-          }
-        }
-
-        :deep(.dropdown__menu) {
-          background: rgba(var(--secondary-900-rgb), 0.95);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
       }
 
       &__view {
         display: flex;
         gap: 4px;
-
-        &-btn--active {
-          :deep(.premium-button) {
-            background: transparent;
-
-            &:hover {
-              background: transparent;
-            }
-          }
-        }
       }
 
       // Mobile (≤ 720px)
@@ -826,10 +783,10 @@
     // EMPTY STATE
     // =========================================
     &-empty {
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 80px 40px;
       text-align: center;
 
       &__icon {

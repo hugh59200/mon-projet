@@ -91,28 +91,8 @@ const criteria = computed(() => {
   return [
     {
       key: 'length',
-      label: te('validation.password.minLength') ? t('validation.password.minLength') : 'Au moins 8 caractères',
-      valid: pwd.length >= 8,
-    },
-    {
-      key: 'lowercase',
-      label: te('validation.password.lowercase') ? t('validation.password.lowercase') : 'Une lettre minuscule',
-      valid: /[a-z]/.test(pwd),
-    },
-    {
-      key: 'uppercase',
-      label: te('validation.password.uppercase') ? t('validation.password.uppercase') : 'Une lettre majuscule',
-      valid: /[A-Z]/.test(pwd),
-    },
-    {
-      key: 'number',
-      label: te('validation.password.number') ? t('validation.password.number') : 'Un chiffre',
-      valid: /\d/.test(pwd),
-    },
-    {
-      key: 'special',
-      label: te('validation.password.special') ? t('validation.password.special') : 'Un caractère spécial',
-      valid: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+      label: te('validation.password.minLength') ? t('validation.password.minLength') : 'Au moins 6 caractères',
+      valid: pwd.length >= 6,
     },
   ]
 })

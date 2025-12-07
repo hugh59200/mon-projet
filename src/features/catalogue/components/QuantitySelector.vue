@@ -156,6 +156,7 @@ function selectQuantity(qty: number) {
 
 <style scoped lang="less">
 @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+@import '@designSystem/fondation/selection/selectable-mixins.less';
 
 @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
 @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
@@ -177,7 +178,7 @@ function selectQuantity(qty: number) {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-200;
+    color: @neutral-700;
   }
 
   &__lot-badge {
@@ -185,8 +186,8 @@ function selectQuantity(qty: number) {
     align-items: center;
     gap: 5px;
     padding: 5px 10px;
-    background: rgba(var(--primary-500-rgb), 0.1);
-    border: 1px solid rgba(var(--primary-500-rgb), 0.2);
+    background: rgba(var(--primary-500-rgb), 0.15);
+    border: 1px solid rgba(var(--primary-500-rgb), 0.25);
     border-radius: 6px;
     font-family: @font-body;
     font-size: 11px;
@@ -229,21 +230,12 @@ function selectQuantity(qty: number) {
   align-items: center;
   gap: 8px;
   padding: 16px 12px;
-  background: rgba(var(--secondary-800-rgb), 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.25s @ease;
 
-  &:hover {
-    border-color: rgba(var(--primary-500-rgb), 0.3);
-    background: rgba(var(--secondary-800-rgb), 0.8);
-  }
+  // Utilise le mixin sélectionnable (thème dark pour mise en avant)
+  .selectable-card();
 
   &--active {
-    border-color: var(--primary-500);
-    background: rgba(var(--primary-500-rgb), 0.08);
-    box-shadow: 0 0 0 1px rgba(var(--primary-500-rgb), 0.3);
+    .selectable-card--active();
 
     .quantity-option__number {
       color: var(--primary-400);
@@ -251,10 +243,11 @@ function selectQuantity(qty: number) {
   }
 
   &--popular {
+    // Bordure verte subtile pour "populaire"
     border-color: rgba(var(--success-500-rgb), 0.4);
 
     &.quantity-option--active {
-      border-color: var(--primary-500);
+      .selectable-card--active();
     }
   }
 
@@ -285,7 +278,7 @@ function selectQuantity(qty: number) {
     font-family: @font-display;
     font-size: 28px;
     font-weight: 700;
-    color: @neutral-100;
+    color: @white;
     line-height: 1;
     transition: color 0.2s @ease;
   }
@@ -305,8 +298,8 @@ function selectQuantity(qty: number) {
   &__total {
     font-family: @font-display;
     font-size: 18px;
-    font-weight: 600;
-    color: @neutral-100;
+    font-weight: 700;
+    color: @white;
   }
 
   &__discount {
@@ -322,7 +315,7 @@ function selectQuantity(qty: number) {
   &__per-unit {
     font-family: @font-body;
     font-size: 11px;
-    color: @neutral-500;
+    color: @neutral-400;
   }
 
   &__savings {
@@ -330,12 +323,12 @@ function selectQuantity(qty: number) {
     align-items: center;
     gap: 4px;
     padding: 4px 8px;
-    background: rgba(var(--success-500-rgb), 0.1);
+    background: rgba(var(--success-500-rgb), 0.15);
     border-radius: 6px;
     font-family: @font-body;
     font-size: 11px;
     font-weight: 600;
-    color: @success-500;
+    color: @success-400;
   }
 
   &__lab-rate {

@@ -21,7 +21,7 @@ export const validationMessagesFR = {
     // Password
     password: {
       enterPassword: 'Entrez un mot de passe',
-      minLength: 'Au moins 8 caractères',
+      minLength: 'Au moins 6 caractères',
       lowercase: 'Une lettre minuscule',
       uppercase: 'Une lettre majuscule',
       number: 'Un chiffre',
@@ -116,7 +116,7 @@ export const validationMessagesEN = {
     // Password
     password: {
       enterPassword: 'Enter a password',
-      minLength: 'At least 8 characters',
+      minLength: 'At least 6 characters',
       lowercase: 'One lowercase letter',
       uppercase: 'One uppercase letter',
       number: 'One number',

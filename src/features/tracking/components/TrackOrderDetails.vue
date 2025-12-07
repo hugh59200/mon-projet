@@ -1,7 +1,7 @@
 <template>
   <div class="track-details">
     <!-- Shipping Address -->
-    <div class="track-details__card">
+    <ContentBlock variant="card" size="md" :interactive="true" class="track-details__card">
       <div class="track-details__header">
         <div class="track-details__icon">
           <BasicIconNext name="MapPin" :size="22" />
@@ -20,10 +20,10 @@
           {{ order.shipping_zip }} {{ order.shipping_city }}, {{ order.shipping_country }}
         </p>
       </div>
-    </div>
+    </ContentBlock>
 
     <!-- Shipping Method -->
-    <div class="track-details__card track-details__card--highlight">
+    <ContentBlock variant="info" size="md" :interactive="true" class="track-details__card track-details__card--highlight">
       <div class="track-details__header">
         <div class="track-details__icon">
           <BasicIconNext name="Truck" :size="22" />
@@ -56,10 +56,10 @@
           </button>
         </div>
       </div>
-    </div>
+    </ContentBlock>
 
     <!-- Payment Method -->
-    <div class="track-details__card">
+    <ContentBlock variant="card" size="md" :interactive="true" class="track-details__card">
       <div class="track-details__header">
         <div class="track-details__icon">
           <BasicIconNext name="CreditCard" :size="22" />
@@ -75,10 +75,10 @@
           Paiement confirmé
         </p>
       </div>
-    </div>
+    </ContentBlock>
 
     <!-- Contact -->
-    <div class="track-details__card">
+    <ContentBlock variant="card" size="md" :interactive="true" class="track-details__card">
       <div class="track-details__header">
         <div class="track-details__icon">
           <BasicIconNext name="Mail" :size="22" />
@@ -88,7 +88,7 @@
       <div class="track-details__body">
         <p class="track-details__info">{{ order.shipping_email }}</p>
       </div>
-    </div>
+    </ContentBlock>
   </div>
 </template>
 
@@ -116,26 +116,7 @@ defineEmits<{
   gap: 20px;
 
   &__card {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 4px 16px rgba(0, 0, 0, 0.03);
-    border: 1px solid @neutral-100;
-    transition: all 0.25s @ease;
-
-    &:hover {
-      border-color: rgba(var(--primary-500-rgb), 0.2);
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.06);
-    }
-
-    &--highlight {
-      background: linear-gradient(135deg, white 0%, rgba(var(--primary-500-rgb), 0.03) 100%);
-      border-color: rgba(var(--primary-500-rgb), 0.15);
-    }
+    // Styles de base gérés par ContentBlock
   }
 
   &__header {

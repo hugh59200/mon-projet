@@ -2,7 +2,7 @@
   <div class="track-search">
     <div class="track-search__layout">
       <!-- Main Search Card -->
-      <div class="track-search__card">
+      <ContentBlock variant="card" size="lg" class="track-search__card">
         <div class="track-search__header">
           <div class="track-search__icon">
             <BasicIconNext name="Search" :size="28" />
@@ -68,10 +68,10 @@
             <span>Connexion sécurisée SSL</span>
           </div>
         </div>
-      </div>
+      </ContentBlock>
 
       <!-- Help Sidebar -->
-      <aside class="track-search__help">
+      <ContentBlock as="aside" variant="card" size="md" class="track-search__help">
         <h3 class="track-search__help-title">
           <BasicIconNext name="HelpCircle" :size="18" />
           Besoin d'aide ?
@@ -108,7 +108,7 @@
             </div>
           </div>
         </div>
-      </aside>
+      </ContentBlock>
     </div>
   </div>
 </template>
@@ -150,13 +150,7 @@ const { t } = useI18n()
   }
 
   &__card {
-    background: white;
-    border-radius: 28px;
-    padding: 40px;
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 12px 48px rgba(0, 0, 0, 0.06);
-    border: 1px solid @neutral-100;
+    // Styles de base gérés par ContentBlock
   }
 
   &__header {
@@ -239,13 +233,7 @@ const { t } = useI18n()
 
   // Help sidebar
   &__help {
-    background: white;
-    border-radius: 24px;
-    padding: 32px;
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 8px 32px rgba(0, 0, 0, 0.04);
-    border: 1px solid @neutral-100;
+    // Styles de base gérés par ContentBlock
   }
 
   &__help-title {

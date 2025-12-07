@@ -28,6 +28,7 @@ declare module 'vue' {
     WrapperFormElements: (typeof import('@designSystem/components/wrapper/formElements/WrapperFormElements.vue'))['default']
     WrapperInput: (typeof import('@designSystem/components/wrapper/input/WrapperInput.vue'))['default']
     WrapperLabelHint: (typeof import('@designSystem/components/wrapper/labelHint/WrapperLabelHint.vue'))['default']
+    ContentBlock: (typeof import('@designSystem/components/layout/ContentBlock.vue'))['default']
   }
 }
 

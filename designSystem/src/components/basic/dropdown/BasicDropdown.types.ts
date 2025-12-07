@@ -3,6 +3,7 @@ import type { AlertInputProps } from '../alert'
 
 export type DropdownSize = 'small' | 'medium' | 'large'
 export type DropdownType = 'form' | 'table'
+export type DropdownVariant = 'light' | 'dark'
 
 export type DropdownId = number | string | boolean | undefined | null
 
@@ -27,6 +28,7 @@ export type DropdownProps<T = DropdownItem<DropdownId>> = {
   keyLabel?: keyof T
   keyIconName?: keyof T
   dropdownType?: DropdownType
+  variant?: DropdownVariant
 } & AlertInputProps
 
 export const dropdownSizes: DropdownSize[] = ['small', 'medium', 'large']

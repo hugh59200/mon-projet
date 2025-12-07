@@ -45,6 +45,31 @@
     }
   }
 
+  // Dark mode variant
+  &--dark {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    &:hover:not(.dropdown--disabled, .dropdown--readonly) {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    input {
+      background: transparent;
+      color: @neutral-200;
+
+      &::placeholder {
+        color: @neutral-500;
+      }
+    }
+
+    svg {
+      background: transparent;
+      fill: @neutral-400;
+    }
+  }
+
   &:not(.dropdown--disabled, .dropdown--readonly) {
     &:hover {
       border-color: var(--primary-600);
@@ -95,6 +120,23 @@
       backdrop-filter 0.3s ease;
 
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+
+    // Dark mode variant
+    &--dark {
+      background: rgba(var(--secondary-900-rgb), 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      scrollbar-color: @neutral-600 transparent;
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: @neutral-600;
+        border: 2px solid transparent;
+      }
+    }
 
     /* 🌿 Scroll personnalisé */
     scrollbar-width: thin;

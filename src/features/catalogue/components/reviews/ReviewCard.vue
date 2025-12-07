@@ -39,7 +39,7 @@
 
       <!-- Infos pro -->
       <div v-if="review.author_title || review.author_institution" class="review-item__pro">
-        <BasicIconNext name="Briefcase" :size="14" />
+        <BasicIconNext name="Briefcase" :size="14" color="neutral-400" />
         <span>{{ [review.author_title, review.author_institution].filter(Boolean).join(' - ') }}</span>
       </div>
 
@@ -66,11 +66,11 @@
       <!-- Badges -->
       <div v-if="review.is_verified_purchase || review.is_featured" class="review-item__tags">
         <span v-if="review.is_verified_purchase" class="review-item__tag review-item__tag--verified">
-          <BasicIconNext name="CheckCircle" :size="12" />
+          <BasicIconNext name="CheckCircle" :size="12" color="success-600" />
           Achat vérifié
         </span>
         <span v-if="review.is_featured" class="review-item__tag review-item__tag--featured">
-          <BasicIconNext name="Award" :size="12" />
+          <BasicIconNext name="Award" :size="12" color="primary-600" />
           Mis en avant
         </span>
       </div>
@@ -317,11 +317,6 @@ function formatDate(date: string): string {
     border-radius: 6px;
     font-size: 12px;
     color: @neutral-500;
-
-    :deep(svg) {
-      color: @neutral-400;
-      fill: @neutral-400;
-    }
   }
 
   &__details {
@@ -361,26 +356,14 @@ function formatDate(date: string): string {
     font-size: 11px;
     font-weight: 600;
 
-    :deep(svg) {
-      flex-shrink: 0;
-    }
-
     &--verified {
       background: color-mix(in srgb, @success-500 12%, transparent);
       color: @success-600;
-
-      :deep(svg) {
-        fill: @success-600;
-      }
     }
 
     &--featured {
       background: color-mix(in srgb, var(--primary-500) 12%, transparent);
       color: var(--primary-600);
-
-      :deep(svg) {
-        fill: var(--primary-600);
-      }
     }
   }
 }

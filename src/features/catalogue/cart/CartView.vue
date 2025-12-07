@@ -47,6 +47,9 @@
         </div>
       </header>
 
+      <!-- Progress Steps -->
+      <CheckoutProgress :current-step="1" />
+
       <!-- Empty State -->
       <div
         v-if="cart.items.length === 0"
@@ -307,8 +310,10 @@
               </div>
 
               <!-- Shipping Progress -->
-              <div
+              <ContentBlock
                 v-if="cartSubtotal < FREE_SHIPPING_THRESHOLD"
+                variant="info"
+                size="sm"
                 class="cart__shipping-progress"
               >
                 <div class="cart__shipping-bar">
@@ -321,15 +326,17 @@
                   <BasicIconNext name="Truck" :size="14" />
                   {{ t('cart.freeShippingProgress', { amount: formatPrice(FREE_SHIPPING_THRESHOLD - cartSubtotal) }) }}
                 </p>
-              </div>
+              </ContentBlock>
 
-              <div
+              <ContentBlock
                 v-else
+                variant="success"
+                size="sm"
                 class="cart__shipping-success"
               >
                 <BasicIconNext name="CheckCircle2" :size="18" />
                 <span>{{ t('cart.freeShippingUnlocked') }}</span>
-              </div>
+              </ContentBlock>
 
               <div class="cart__summary-divider"></div>
 
@@ -397,6 +404,7 @@
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+  import CheckoutProgress from '@/features/checkout/components/CheckoutProgress.vue'
 
   // Configuration SEO pour le panier (noindex car page privée)
   useHead({
@@ -974,14 +982,8 @@
     }
 
     &__shipping-progress {
-      padding: 16px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-500-rgb), 0.05) 0%,
-        rgba(var(--primary-500-rgb), 0.02) 100%
-      );
-      border-radius: 12px;
       margin-top: 8px;
+      // Styles de base gérés par ContentBlock
     }
 
     &__shipping-bar {
@@ -1024,17 +1026,11 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 12px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--success-500-rgb), 0.1) 0%,
-        rgba(var(--success-500-rgb), 0.05) 100%
-      );
-      border-radius: 10px;
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
       color: @success-600;
+      // Styles de base gérés par ContentBlock
 
       svg {
         color: @success-500;

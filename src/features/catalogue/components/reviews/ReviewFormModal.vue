@@ -72,7 +72,7 @@
 
         <!-- Notice -->
         <div class="review-form__notice">
-          <BasicIconNext name="Info" :size="14" />
+          <BasicIconNext name="Info" :size="14" color="neutral-400" />
           <BasicText size="body-s" color="neutral-500">Votre avis sera publié après modération</BasicText>
         </div>
       </form>
@@ -263,12 +263,6 @@ async function submitReview() {
     background: @neutral-50;
     border-radius: 8px;
     margin: 0;
-
-    :deep(svg) {
-      color: @neutral-400;
-      fill: @neutral-400;
-      flex-shrink: 0;
-    }
   }
 }
 </style>

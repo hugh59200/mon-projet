@@ -1,0 +1,105 @@
+// ============================================================
+// SELECTABLE CARD MIXINS
+// Style unifié pour tous les éléments sélectionnables de l'app
+// ============================================================
+
+@ease-selection: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ------------------------------------------------------------
+// MIXIN: Carte sélectionnable (thème sombre)
+// Usage: .selectable-card();
+// Variantes: .selectable-card--active pour l'état sélectionné
+// ------------------------------------------------------------
+.selectable-card() {
+  background: var(--secondary-600);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s @ease-selection;
+
+  &:hover {
+    background: var(--secondary-500);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.selectable-card--active() {
+  background: var(--secondary-600);
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 1px rgba(var(--primary-500-rgb), 0.3);
+}
+
+// ------------------------------------------------------------
+// MIXIN: Carte sélectionnable (thème clair pour fond clair)
+// Usage: .selectable-card-light();
+// ------------------------------------------------------------
+.selectable-card-light() {
+  background: @neutral-50;
+  border: 1.5px solid @neutral-200;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s @ease-selection;
+
+  &:hover {
+    background: @neutral-100;
+    border-color: @neutral-300;
+  }
+}
+
+.selectable-card-light--active() {
+  background: rgba(var(--primary-500-rgb), 0.04);
+  border-color: var(--primary-500);
+  box-shadow:
+    0 0 0 1px rgba(var(--primary-500-rgb), 0.1),
+    inset 0 0 0 1px rgba(var(--primary-500-rgb), 0.03);
+}
+
+// ------------------------------------------------------------
+// MIXIN: Indicateur de sélection (check ou dot)
+// Usage: .selection-indicator(); puis .selection-indicator--active()
+// ------------------------------------------------------------
+.selection-indicator() {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s @ease-selection;
+  }
+}
+
+.selection-indicator--active() {
+  &::after {
+    border-color: var(--primary-500);
+    background: var(--primary-500);
+    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.9);
+  }
+}
+
+// ------------------------------------------------------------
+// CLASSES UTILITAIRES (peuvent être utilisées directement)
+// ------------------------------------------------------------
+.selectable-card-base {
+  .selectable-card();
+
+  &.is-active,
+  &--active {
+    .selectable-card--active();
+  }
+}
+
+.selectable-card-light-base {
+  .selectable-card-light();
+
+  &.is-active,
+  &--active {
+    .selectable-card-light--active();
+  }
+}

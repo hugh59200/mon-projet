@@ -341,6 +341,17 @@ const routes: Array<RouteRecordRaw> = [
       headerIcon: 'FlaskRound',
     },
   },
+  {
+    path: '/guide-crypto',
+    name: 'crypto-guide',
+    component: () => import('@/features/crypto-guide/CryptoGuideView.vue'),
+    meta: {
+      titleKey: 'routes.cryptoGuide.title',
+      headingKey: 'routes.cryptoGuide.heading',
+      descriptionKey: 'routes.cryptoGuide.description',
+      headerIcon: 'Bitcoin',
+    },
+  },
   // Pages légales
   {
     path: '/mentions-legales',
