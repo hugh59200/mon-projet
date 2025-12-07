@@ -36,6 +36,18 @@
 
     <!-- Image -->
     <div class="product-card__image">
+      <!-- Category Badge -->
+      <div
+        class="product-card__category-badge"
+        :style="{ '--category-color': categoryColor }"
+      >
+        <span
+          class="product-card__category-dot"
+          :style="{ background: categoryColor }"
+        ></span>
+        <span>{{ productCategory }}</span>
+      </div>
+
       <div class="product-card__image-inner">
         <img
           :src="product.image || defaultImage"
@@ -54,15 +66,6 @@
 
     <!-- Content -->
     <div class="product-card__content">
-      <!-- Category -->
-      <div class="product-card__category">
-        <span
-          class="product-card__category-dot"
-          :style="{ background: categoryColor }"
-        ></span>
-        <span>{{ productCategory }}</span>
-      </div>
-
       <!-- Name -->
       <h3 class="product-card__name">{{ productName }}</h3>
 
@@ -247,7 +250,7 @@
     &__stock-badge {
       position: absolute;
       top: 12px;
-      right: 12px;
+      left: 12px;
       z-index: 10;
       padding: 5px 10px;
       border-radius: 6px;
@@ -280,9 +283,45 @@
       }
     }
 
+    // Si promo ET stock badge présents, décaler le stock
+    &__promo + &__stock-badge {
+      top: 44px;
+    }
+
     @keyframes pulse-stock {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.85; }
+    }
+
+    // ============ CATEGORY BADGE ============
+    &__category-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      background: rgba(var(--bg-surface-rgb), 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--category-color, var(--primary-500));
+      border-radius: 8px;
+      font-family: @font-body;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s @ease;
+
+      .product-card__category-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
     }
 
     // ============ IMAGE ============
@@ -340,25 +379,6 @@
       text-align: center;
       gap: 12px;
       padding: 0 20px 20px;
-    }
-
-    &__category {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-family: @font-body;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--content-block-text-muted, @neutral-400);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    &__category-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
     }
 
     &__name {
@@ -533,10 +553,6 @@
         justify-content: center;
         align-items: flex-start;
         text-align: left;
-      }
-
-      .product-card__category {
-        justify-content: flex-start;
       }
 
       .product-card__specs {

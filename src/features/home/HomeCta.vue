@@ -67,7 +67,6 @@ onMounted(() => {
 @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .cta-section {
-  padding: 60px 40px;
   display: flex;
   justify-content: center;
 }
@@ -75,9 +74,6 @@ onMounted(() => {
 .cta {
   position: relative;
   width: 100%;
-  max-width: 1200px;
-  border-radius: 32px;
-  overflow: hidden;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.8s @ease;
@@ -88,46 +84,20 @@ onMounted(() => {
   }
 
   &__bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--secondary-800) 0%, var(--secondary-900) 50%, var(--secondary-950) 100%);
+    display: none; // Géré par ContentBlock parent
   }
 
   &__glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-
-    &--1 {
-      width: 400px;
-      height: 400px;
-      background: rgba(var(--primary-600-rgb), 0.25);
-      top: -100px;
-      left: -100px;
-    }
-
-    &--2 {
-      width: 300px;
-      height: 300px;
-      background: rgba(var(--primary-400-rgb), 0.2);
-      bottom: -80px;
-      right: 20%;
-    }
+    display: none; // Géré par ContentBlock parent
   }
 
   &__grid {
-    position: absolute;
-    inset: 0;
-    background-image: linear-gradient(rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+    display: none; // Géré par ContentBlock parent
   }
 
   &__inner {
     position: relative;
     z-index: 1;
-    padding: 60px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 60px;
@@ -143,7 +113,7 @@ onMounted(() => {
       font-family: @font-display;
       font-size: clamp(32px, 4vw, 48px);
       font-weight: 600;
-      color: @neutral-50;
+      color: var(--content-block-text);
       margin: 0;
       line-height: 1.15;
       letter-spacing: -0.02em;
@@ -159,7 +129,7 @@ onMounted(() => {
       font-family: @font-body;
       font-size: 17px;
       line-height: 1.7;
-      color: @neutral-300;
+      color: var(--content-block-text-secondary);
       margin: 0;
       max-width: 520px;
     }
@@ -176,11 +146,10 @@ onMounted(() => {
     flex-direction: column;
     gap: 16px;
     padding: 24px;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--content-block-bg-subtle);
+    border: 1px solid var(--content-block-border);
     border-radius: 16px;
     max-width: 280px;
-    backdrop-filter: blur(8px);
   }
 
   &__disclaimer-badge {
@@ -217,7 +186,7 @@ onMounted(() => {
     font-family: @font-display;
     font-size: 14px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--content-block-text);
     margin: 0;
   }
 
@@ -225,7 +194,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 13px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 }
@@ -257,8 +226,7 @@ onMounted(() => {
 
 // Responsive - Mobile (≤ 720px)
 .respond-mobile({
-  .cta-section { padding: 40px 20px; }
-  .cta__inner { padding: 40px 24px; gap: 24px; }
+  .cta__inner { gap: 24px; }
   .cta__actions { flex-direction: column; width: 100%; }
   .cta__disclaimer {
     flex-direction: column;

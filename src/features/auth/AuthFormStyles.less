@@ -14,7 +14,7 @@
   &__title {
     font-size: 2rem; /* Plus grand (h2/h3) */
     font-weight: 800;
-    color: #1e293b; /* Slate 800 - Plus foncé, plus pro */
+    color: var(--text-primary); /* Adapté au thème light/dark */
     margin-bottom: 16px;
     letter-spacing: -0.5px;
   }
@@ -22,7 +22,7 @@
   /* SOUS-TITRE */
   &__subtitle {
     font-size: 1rem; /* Taille de corps standard */
-    color: #64748b; /* Slate 500 - Gris neutre professionnel */
+    color: var(--text-secondary); /* Adapté au thème light/dark */
     margin-bottom: 40px;
     line-height: 1.5;
     max-width: 90%; /* Évite que le texte soit trop large sur grand écran */
@@ -64,7 +64,7 @@
     justify-content: center;
     margin-top: -10px;
     margin-bottom: 14px;
-    color: #94a3b8; /* Slate 400 */
+    color: var(--text-muted); /* Adapté au thème light/dark */
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase; /* Plus moderne */
@@ -75,7 +75,7 @@
       content: "";
       flex: 1;
       height: 1px;
-      background: #e2e8f0; /* Slate 200 - Ligne subtile */
+      background: var(--border-default); /* Adapté au thème light/dark */
       margin: 0 12px;
     }
   }
@@ -103,7 +103,7 @@
     flex-direction: column;
     gap: 8px;
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary); /* Adapté au thème light/dark */
 
     a {
       color: var(--primary-600);

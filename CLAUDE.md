@@ -141,6 +141,59 @@ Requises dans `.env` :
 
 > **Note** : En mode `npm run dev`, le CAPTCHA et le MFA sont automatiquement désactivés. Pour forcer leur activation en dev, utilisez `VITE_DISABLE_CAPTCHA=false` et `VITE_DISABLE_MFA=false`.
 
+## Supabase Storage (Assets statiques)
+
+Les images statiques du site (personas, illustrations) sont stockées sur Supabase Storage pour de meilleures performances.
+
+### Buckets disponibles
+
+| Bucket | Usage | Public |
+|--------|-------|--------|
+| `site-assets` | Images statiques du site (personas, illustrations) | Oui |
+| `product-images` | Images des produits | Oui |
+| `news-images` | Images des actualités | Oui |
+| `topic-images` | Images des topics | Oui |
+| `email-assets` | Assets pour les emails transactionnels | Oui |
+
+### Scripts d'upload
+
+**Seed complet des assets** (recommandé) :
+```bash
+# Upload/vérifie tous les assets statiques du site
+SUPABASE_SERVICE_ROLE_KEY="..." node scripts/seed-supabase-assets.cjs
+```
+
+Ce script :
+1. Crée les buckets si nécessaire
+2. Compresse et uploade les images (personas, etc.)
+3. Génère les fichiers de config TypeScript avec les URLs
+4. Si les images locales sont absentes, régénère la config depuis Supabase
+
+**Assets email** :
+```bash
+# Upload les assets email (SVG → PNG)
+SUPABASE_SERVICE_ROLE_KEY="..." node scripts/upload-email-assets.cjs
+```
+
+**Images produits** (migration manuelle) :
+```bash
+# Upload des images depuis source_images/ vers le bucket products
+SUPABASE_SERVICE_ROLE_KEY="..." node scripts/upload-images.cjs
+```
+
+### Utilisation dans le code
+
+```typescript
+// Images persona (HomeScience)
+import { PERSONA_ASSETS, getPersonaImageUrl } from '@/config/personaAssets'
+
+// Accès direct
+const imageUrl = PERSONA_ASSETS.rd
+
+// Via helper
+const imageUrl = getPersonaImageUrl('lab')
+```
+
 ## Design System Tokens
 
 **Typographie** : Police 'mont'. Tailles : `font-size-body-s` (10px) à `font-size-h1` (48px).

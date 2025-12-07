@@ -67,18 +67,64 @@
             <span class="brand-peptides">Peptides</span>
           </div>
         </div>
+        <div class="mobile-header__actions">
+          <PremiumButton
+            v-if="isLoginPage"
+            type="secondary"
+            variant="outline"
+            size="sm"
+            :label="t('auth.login.createAccount')"
+            icon-left="UserPlus"
+            @click="$router.push('/auth/register')"
+          />
+          <PremiumButton
+            v-else-if="isRegisterPage"
+            type="secondary"
+            variant="outline"
+            size="sm"
+            :label="t('auth.register.login')"
+            icon-left="LogIn"
+            @click="$router.push('/auth/login')"
+          />
+          <PremiumButton
+            v-if="showSkip"
+            type="primary"
+            variant="outline"
+            size="sm"
+            label="Voir le catalogue"
+            icon-right="ArrowRight"
+            class="mobile-skip-btn"
+            @click="$router.push('/')"
+          />
+        </div>
+      </div>
+
+      <!-- Bouton Créer un compte / Se connecter (gauche) -->
+      <div
+        v-if="showSkip && isDesktop && (isLoginPage || isRegisterPage)"
+        class="auth-switch-container"
+      >
         <PremiumButton
-          v-if="showSkip"
-          type="primary"
+          v-if="isLoginPage"
+          type="secondary"
           variant="outline"
-          size="sm"
-          label="Voir le catalogue"
-          icon-right="ArrowRight"
-          class="mobile-skip-btn"
-          @click="$router.push('/')"
+          size="md"
+          :label="t('auth.login.createAccount')"
+          icon-left="UserPlus"
+          @click="$router.push('/auth/register')"
+        />
+        <PremiumButton
+          v-else-if="isRegisterPage"
+          type="secondary"
+          variant="outline"
+          size="md"
+          :label="t('auth.register.login')"
+          icon-left="LogIn"
+          @click="$router.push('/auth/login')"
         />
       </div>
 
+      <!-- Bouton Voir le catalogue (droite) -->
       <div
         v-if="showSkip && isDesktop"
         class="skip-container"
@@ -111,14 +157,19 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
 
+  const { t } = useI18n()
   const route = useRoute()
   const { isDesktop } = useDeviceBreakpoint()
 
   const showSkip = computed(() => {
     return !['auth-callback', 'email-sent'].includes(route.name as string)
   })
+
+  const isLoginPage = computed(() => route.name === 'auth-login')
+  const isRegisterPage = computed(() => route.name === 'auth-register')
 </script>
 
 <style scoped lang="less">
@@ -126,7 +177,7 @@
     display: flex;
     min-height: 100vh;
     width: 100%;
-    background: white;
+    background: var(--bg-page);
     overflow-x: hidden;
   }
 
@@ -288,8 +339,8 @@
     position: relative;
     padding: 40px 20px;
 
-    background-color: #ffffff;
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-color: var(--bg-page);
+    background-image: radial-gradient(var(--border-default) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
@@ -310,6 +361,12 @@
     justify-content: space-between;
     align-items: center;
     z-index: 10;
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 
   .mobile-skip-btn {
@@ -333,7 +390,20 @@
     }
 
     .brand-fast.text-dark {
-      color: #1e293b !important;
+      color: var(--text-primary) !important;
+    }
+  }
+
+  .auth-switch-container {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 10;
+
+    :deep(.pbtn) {
+      &:hover {
+        transform: none !important;
+      }
     }
   }
 
@@ -354,21 +424,21 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: @white;
-    border: 1px solid @neutral-300;
-    color: @neutral-700;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
     font-weight: 700;
     font-size: 0.9rem;
     padding: 10px 20px;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 
     &:hover {
       border-color: var(--primary-500);
       color: var(--primary-600);
-      background: @white;
+      background: var(--bg-surface);
       box-shadow: 0 6px 12px -2px rgba(var(--primary-500-rgb), 0.15);
     }
 
@@ -406,11 +476,11 @@
     .auth-form-container {
       padding: 60px 20px 20px;
 
-      background-color: #f8fafc;
+      background-color: var(--bg-page);
       background-image:
         linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.1) 0%, transparent 50%),
         linear-gradient(225deg, rgba(var(--primary-500-rgb), 0.06) 0%, transparent 50%),
-        radial-gradient(#cbd5e1 1px, transparent 1px);
+        radial-gradient(var(--border-default) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 24px 24px;
     }
   });

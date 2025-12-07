@@ -1,9 +1,13 @@
+/* ══════════════════════════════════════════════════════════════
+   BASIC DROPDOWN — Light/Dark Theme Support
+   ══════════════════════════════════════════════════════════════ */
+
 .dropdown {
   position: relative;
   display: flex;
   align-items: center;
-  background: @white;
-  border: 1px solid @neutral-200;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   container-type: inline-size;
 
   &--table {
@@ -21,35 +25,41 @@
 
   input {
     cursor: pointer;
+    background: transparent;
+    color: var(--input-text);
+
+    &::placeholder {
+      color: var(--input-placeholder);
+    }
   }
 
   svg {
-    fill: @neutral-500;
-    background: @white;
+    fill: var(--text-muted);
+    background: transparent;
     transform: scale(0.8);
   }
 
   &:not(.dropdown--disabled):hover {
-    border-color: var(--primary-600);
+    border-color: var(--input-border-hover);
   }
 
   &:focus-within {
-    box-shadow: @focus-global;
-    border-color: @success-600;
+    box-shadow: var(--focus-ring);
+    border-color: var(--input-border-focus);
   }
 
   &--disabled {
-    background-color: @neutral-100;
+    background-color: var(--input-bg-disabled);
     pointer-events: none;
     opacity: 0.6;
 
     input {
-      background-color: @neutral-100;
+      background-color: var(--input-bg-disabled);
     }
 
     svg {
-      fill: @neutral-500;
-      background: @neutral-100;
+      fill: var(--text-disabled);
+      background: var(--input-bg-disabled);
       transform: scale(0.8);
     }
   }

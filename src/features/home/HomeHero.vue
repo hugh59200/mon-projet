@@ -1,6 +1,5 @@
 <template>
-  <section class="hero-wrapper">
-    <div class="hero-section">
+  <section class="hero-section">
       <!-- Image de fond -->
       <div class="hero-section__bg-image">
         <img
@@ -63,7 +62,6 @@
           </div>
         </div>
       </div>
-    </div>
   </section>
 </template>
 
@@ -88,27 +86,12 @@
     sans-serif;
 
   // ============================================
-  // WRAPPER (pleine largeur)
-  // ============================================
-  .hero-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 0 24px;
-    background: #020202;
-  }
-
-  // ============================================
-  // SECTION (max 1200px, contient tout)
+  // SECTION (layout géré par ContentBlock parent)
   // ============================================
   .hero-section {
     position: relative;
-    width: 100%;
-    max-width: 1200px;
-    min-height: 500px;
     display: flex;
     align-items: center;
-    border-radius: 24px;
     overflow: hidden;
 
     // Image de fond
@@ -122,14 +105,6 @@
         height: 100%;
         object-fit: cover;
         object-position: center right;
-        mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
-        -webkit-mask-image: linear-gradient(
-          90deg,
-          transparent 0%,
-          black 10%,
-          black 90%,
-          transparent 100%
-        );
       }
     }
 
@@ -312,14 +287,7 @@
 
   // MOBILE (≤ 720px)
   .respond-mobile({
-    .hero-wrapper {
-      padding: 0 16px;
-    }
-
     .hero-section {
-      min-height: auto;
-      border-radius: 20px;
-
       &__bg-image img {
         object-position: center center;
       }

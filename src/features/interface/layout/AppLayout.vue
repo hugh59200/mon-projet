@@ -101,7 +101,7 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-     APP LAYOUT - Premium Background
+     APP LAYOUT - Premium Background with Theme Support
      ═══════════════════════════════════════════════════════════════ */
   .app-layout {
     display: flex;
@@ -110,26 +110,11 @@
     max-width: 100%;
     overflow-x: clip; /* plus strict que hidden */
     overflow-y: auto;
-    background: linear-gradient(180deg, #f8f9fc 0%, #f1f4f9 40%, #e8edf5 100%);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Overlay décoratif subtil (optionnel) */
-  .app-layout::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-
-    /* Mesh gradient très subtil pour ajouter de la profondeur */
-    background:
-      radial-gradient(
-        ellipse 60% 40% at 10% 0%,
-        rgba(var(--primary-500-rgb), 0.02) 0%,
-        transparent 50%
-      ),
-      radial-gradient(ellipse 50% 30% at 90% 100%, rgba(16, 185, 129, 0.015) 0%, transparent 50%);
-  }
 
   /* Header existant */
   .header {
@@ -181,8 +166,8 @@
     /* Fond transparent pour laisser voir le gradient de l'app-layout */
     background: transparent;
 
-    color: @neutral-900;
-    transition: padding 0.3s ease;
+    color: var(--text-primary);
+    transition: padding 0.3s ease, color 0.3s ease;
 
     /* Les pages doivent remplir tout l'espace */
     > * {
@@ -210,7 +195,7 @@
     min-height: 100vh;
     padding: 0 !important;
     margin: 0 !important;
-    background: white;
+    background: var(--bg-surface);
     display: flex;
     flex-direction: column;
 
@@ -245,11 +230,14 @@
   .app-layout::-webkit-scrollbar {
     width: 8px;
   }
+  .app-layout::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
   .app-layout::-webkit-scrollbar-thumb {
-    background: rgba(100, 116, 139, 0.25);
+    background: var(--scrollbar-thumb);
     border-radius: 8px;
   }
   .app-layout::-webkit-scrollbar-thumb:hover {
-    background: rgba(100, 116, 139, 0.4);
+    background: var(--scrollbar-thumb-hover);
   }
 </style>

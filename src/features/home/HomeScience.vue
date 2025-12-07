@@ -16,7 +16,6 @@
         <div class="hero-banner__top-text">
           <BasicText
             size="body-s"
-            color="primary-600"
             class="hero-banner__eyebrow"
           >
             {{ t('home.banner.eyebrow') }}
@@ -25,14 +24,12 @@
           <BasicText
             size="h3"
             weight="bold"
-            color="neutral-900"
           >
             {{ t('home.banner.title.line1') }} {{ t('home.banner.title.accent') }} {{ t('home.banner.title.line2') }}
           </BasicText>
 
           <BasicText
             size="body-m"
-            color="neutral-600"
             class="hero-banner__top-sub"
           >
             {{ t('home.banner.description') }}
@@ -45,7 +42,7 @@
                 :size="18"
                 color="success-600"
               />
-              <BasicText color="neutral-700">
+              <BasicText>
                 {{ t('home.banner.bullets.b1') }}
               </BasicText>
             </li>
@@ -55,7 +52,7 @@
                 :size="18"
                 color="primary-600"
               />
-              <BasicText color="neutral-700">
+              <BasicText>
                 {{ t('home.banner.bullets.b2') }}
               </BasicText>
             </li>
@@ -65,7 +62,7 @@
                 :size="18"
                 color="warning-600"
               />
-              <BasicText color="neutral-700">
+              <BasicText>
                 {{ t('home.banner.bullets.b3') }}
               </BasicText>
             </li>
@@ -84,7 +81,6 @@
             />
             <BasicText
               size="body-s"
-              color="neutral-500"
               class="hero-banner__disclaimer"
             >
               {{ t('home.banner.carousel.scientific') }}
@@ -105,10 +101,7 @@
               :alt="persona.alt"
               loading="lazy"
             />
-            <BasicText
-              class="persona-card__tag"
-              color="neutral-700"
-            >
+            <BasicText class="persona-card__tag">
               {{ persona.tag }}
             </BasicText>
           </div>
@@ -116,13 +109,12 @@
             <BasicText
               size="body-s"
               weight="bold"
-              color="neutral-900"
             >
               {{ persona.name }}
             </BasicText>
             <BasicText
               size="body-s"
-              color="neutral-500"
+              class="persona-card__role"
             >
               {{ persona.role }}
             </BasicText>
@@ -137,16 +129,13 @@
     >
       <div class="hero-banner__bottom-inner">
         <div class="hero-banner__bottom-header">
-          <BasicText
-            weight="bold"
-            color="neutral-800"
-          >
+          <BasicText weight="bold">
             {{ t('home.banner.carousel.protocols') }}
           </BasicText>
           <BasicText
             fontStyle="italic"
-            color="neutral-500"
             size="body-s"
+            class="hero-banner__bottom-subtitle"
           >
             {{ t('home.banner.carousel.guides') }}
           </BasicText>
@@ -171,10 +160,7 @@
                 :alt="p.name"
               />
             </div>
-            <BasicText
-              size="body-s"
-              color="neutral-700"
-            >
+            <BasicText size="body-s">
               {{ p.name }}
             </BasicText>
           </div>
@@ -185,10 +171,7 @@
 </template>
 
 <script setup lang="ts">
-  import personaLab from '@/assets/banners/hero/persona-lab.png'
-  import personaPhd from '@/assets/banners/hero/persona-phd.png'
-  import personaQuality from '@/assets/banners/hero/persona-quality.png'
-  import personaRd from '@/assets/banners/hero/persona-rd.png'
+  import { PERSONA_ASSETS } from '@/config/personaAssets'
   import { useProductsStore } from '@/features/catalogue/composables/useProducts'
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -215,6 +198,9 @@
   let scrollTimeline: gsap.core.Timeline | null = null
   let isPaused = false
 
+  // URLs des images persona depuis Supabase Storage
+  const personaImages = PERSONA_ASSETS
+
   type Persona = {
     id: string
     name: string
@@ -230,7 +216,7 @@
       name: 'Dr. L. Moreau',
       role: t('home.banner.personas.rd.subtitle'),
       tag: t('home.banner.personas.rd.title'),
-      image: personaRd,
+      image: personaImages.rd,
       alt: t('home.banner.personas.rd.title'),
     },
     {
@@ -238,7 +224,7 @@
       name: 'Pr. K. Almeida',
       role: t('home.banner.personas.lab.subtitle'),
       tag: t('home.banner.personas.lab.title'),
-      image: personaLab,
+      image: personaImages.lab,
       alt: t('home.banner.personas.lab.title'),
     },
     {
@@ -246,7 +232,7 @@
       name: 'Noah',
       role: t('home.banner.personas.phd.subtitle'),
       tag: t('home.banner.personas.phd.title'),
-      image: personaPhd,
+      image: personaImages.phd,
       alt: t('home.banner.personas.phd.title'),
     },
     {
@@ -254,7 +240,7 @@
       name: 'Dr. S. Meyer',
       role: t('home.banner.personas.quality.subtitle'),
       tag: t('home.banner.personas.quality.title'),
-      image: personaQuality,
+      image: personaImages.quality,
       alt: t('home.banner.personas.quality.title'),
     },
   ])
@@ -390,47 +376,27 @@
 </script>
 
 <style scoped lang="less">
+  /* ══════════════════════════════════════════════════════════════
+     HOME SCIENCE — Light/Dark Theme Support
+     ══════════════════════════════════════════════════════════════ */
+
   .hero-banner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
     position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 24px;
-    overflow: hidden;
-    background: linear-gradient(135deg, var(--secondary-600), var(--secondary-600));
 
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 24px;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      z-index: 10;
-    }
-
+    // Géré par ContentBlock parent
     &__glow {
       position: absolute;
       inset: -50%;
       z-index: 0;
       filter: blur(100px);
-      opacity: 0.3;
+      opacity: 0.2;
       pointer-events: none;
       background:
-        radial-gradient(circle at 30% 30%, rgba(var(--primary-200-rgb), 0.4), transparent 60%),
-        radial-gradient(circle at 70% 70%, rgba(var(--secondary-200-rgb), 0.4), transparent 60%);
+        radial-gradient(circle at 30% 30%, rgba(var(--primary-200-rgb), 0.3), transparent 60%),
+        radial-gradient(circle at 70% 70%, rgba(var(--secondary-200-rgb), 0.3), transparent 60%);
       background-size: 150% 150%;
     }
 
@@ -453,9 +419,9 @@
       padding: 28px;
       border-radius: 20px;
       position: relative;
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid @neutral-100;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+      background: var(--content-block-bg-subtle);
+      border: 1px solid var(--content-block-border);
+      box-shadow: var(--shadow-md);
 
       &::before {
         content: '';
@@ -473,13 +439,15 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      color: var(--content-block-text);
     }
 
     &__eyebrow {
       display: inline-block;
       padding: 4px 12px;
       border-radius: 20px;
-      background: var(--primary-50);
+      background: rgba(var(--primary-500-rgb), 0.1);
+      color: var(--primary-600);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -494,6 +462,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      color: var(--content-block-text-secondary);
 
       li {
         display: flex;
@@ -515,6 +484,7 @@
       font-size: 0.75rem;
       text-align: center;
       opacity: 0.7;
+      color: var(--content-block-text-muted);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -530,25 +500,26 @@
     .persona-card {
       max-width: 320px;
       max-height: 220px;
-      background: white;
+      background: var(--content-block-bg-subtle);
       border-radius: 14px;
       padding: 10px;
-      border: 1px solid @neutral-100;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--content-block-border);
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       gap: 8px;
+      transition: all 0.2s ease;
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        box-shadow: var(--shadow-md);
       }
 
       &__image-wrap {
         position: relative;
         border-radius: 10px;
         overflow: hidden;
-        background: @neutral-50;
+        background: var(--content-block-bg-subtle);
         aspect-ratio: 4 / 3;
 
         img {
@@ -562,7 +533,7 @@
         position: absolute;
         bottom: 6px;
         left: 6px;
-        background: rgba(255, 255, 255, 0.92);
+        background: var(--content-block-bg-subtle);
         backdrop-filter: blur(4px);
         padding: 3px 8px;
         border-radius: 8px;
@@ -570,12 +541,18 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.02em;
+        color: var(--content-block-text-secondary);
       }
 
       &__info {
         display: flex;
         flex-direction: column;
         gap: 2px;
+        color: var(--content-block-text);
+      }
+
+      &__role {
+        color: var(--content-block-text-muted);
       }
     }
 
@@ -585,8 +562,8 @@
     &__bottom {
       position: relative;
       z-index: 2;
-      background: rgba(255, 255, 255, 0.4);
-      border-top: 1px solid rgba(255, 255, 255, 0.8);
+      background: var(--content-block-bg-subtle);
+      border-top: 1px solid var(--content-block-border);
       padding: 20px 0;
       overflow: hidden;
     }
@@ -604,6 +581,15 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
+      color: var(--content-block-text);
+    }
+
+    &__bottom-subtitle {
+      color: var(--content-block-text-muted);
+    }
+
+    &__top-sub {
+      color: var(--content-block-text-secondary);
     }
 
     .scroll-track {
@@ -621,15 +607,16 @@
         cursor: pointer;
         width: 100px;
         flex-shrink: 0;
+        color: var(--content-block-text-secondary);
 
         &__img-wrapper {
           width: 72px;
           height: 72px;
           border-radius: 50%;
           overflow: hidden;
-          background: linear-gradient(135deg, @neutral-100, @neutral-50);
-          border: 3px solid white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          background: var(--content-block-bg-subtle);
+          border: 3px solid var(--content-block-border);
+          box-shadow: var(--shadow-sm);
           transition:
             transform 0.25s ease,
             box-shadow 0.25s ease;
@@ -643,7 +630,7 @@
 
         &:hover &__img-wrapper {
           border-color: var(--primary-300);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+          box-shadow: var(--shadow-md);
         }
       }
     }

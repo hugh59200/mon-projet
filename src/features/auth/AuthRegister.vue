@@ -194,7 +194,7 @@
     gap: 8px;
     padding: 12px 16px;
     background: var(--color-danger-50);
-    border: 1px solid var(--color-danger-200);
+    border: 1px solid var(--color-danger-400); // Renforcé pour meilleur contraste
     border-radius: 10px;
     color: var(--color-danger-700);
     font-size: 14px;

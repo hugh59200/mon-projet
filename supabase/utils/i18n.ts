@@ -561,28 +561,28 @@ export const translations = {
       en: 'What you can do with your account:',
     },
     benefit1Title: {
-      fr: 'Historique des commandes',
-      en: 'Order history',
+      fr: 'Historique complet',
+      en: 'Full history',
     },
     benefit1Desc: {
-      fr: 'Retrouvez toutes vos commandes passées et téléchargez vos factures en un clic.',
-      en: 'Access all your past orders and download invoices with one click.',
+      fr: 'Commandes et factures accessibles en un clic.',
+      en: 'Orders and invoices accessible in one click.',
     },
     benefit2Title: {
-      fr: 'Traçabilité des lots',
-      en: 'Batch traceability',
+      fr: 'Suivi des lots',
+      en: 'Batch tracking',
     },
     benefit2Desc: {
-      fr: 'Consultez les numéros de lot pour garantir la reproductibilité de vos expériences.',
-      en: 'View batch numbers to ensure reproducibility of your experiments.',
+      fr: 'Conservez vos numeros de lot pour la reproductibilite.',
+      en: 'Keep your batch numbers for reproducibility.',
     },
     benefit3Title: {
-      fr: 'Recommande facile',
-      en: 'Easy reorder',
+      fr: 'Recommande rapide',
+      en: 'Quick reorder',
     },
     benefit3Desc: {
-      fr: 'Recommandez vos produits favoris en un clic pour maintenir la continuité de vos recherches.',
-      en: 'Reorder your favorite products with one click to maintain research continuity.',
+      fr: 'Renouvelez vos produits en un clic.',
+      en: 'Renew your products with one click.',
     },
     benefit4Title: {
       fr: 'Support prioritaire',

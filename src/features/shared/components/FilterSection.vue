@@ -4,10 +4,7 @@
       class="filter-section__header"
       @click="toggle"
     >
-      <BasicText
-        weight="semibold"
-        color="neutral-700"
-      >
+      <BasicText weight="semibold">
         {{ title }}
       </BasicText>
       <BasicIconNext
@@ -56,21 +53,19 @@
 
 <style scoped lang="less">
   /* ==========================================================
-   🧊 FILTER SECTION — Neural Glass v3 (Dark Theme Support)
+   FILTER SECTION — Light/Dark Theme Support
    ========================================================== */
 
   .filter-section {
     position: relative;
     border-radius: 14px;
 
-    // Utilise les variables admin si définies, sinon fallback light
-    background: var(--admin-bg-card, color-mix(in srgb, @neutral-200 82%, transparent));
+    // Utilise les variables sémantiques pour light/dark
+    background: rgba(var(--bg-surface-rgb), 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--admin-border, color-mix(in srgb, @neutral-300 40%, transparent));
-    box-shadow:
-      0 4px 14px var(--admin-shadow, color-mix(in srgb, @neutral-900 6%, transparent)),
-      inset 0 1px 0 color-mix(in srgb, @neutral-500 10%, transparent);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-md);
 
     overflow: hidden;
     transition: all 0.25s ease;
@@ -88,14 +83,18 @@
       cursor: pointer;
       user-select: none;
 
-      color: var(--admin-text-primary, @neutral-800);
+      color: var(--text-primary);
       font-weight: 600;
 
       transition: all 0.25s ease;
 
+      &:hover {
+        background: var(--hover-overlay);
+      }
+
       /* Chevron */
       svg {
-        color: var(--admin-text-secondary, @neutral-600);
+        color: var(--text-secondary);
         transition:
           transform 0.28s cubic-bezier(0.25, 1, 0.5, 1),
           opacity 0.25s ease;
@@ -117,7 +116,7 @@
       flex-direction: column;
       gap: 16px;
 
-      border-top: 1px solid var(--admin-border-subtle, color-mix(in srgb, @neutral-200 40%, transparent));
+      border-top: 1px solid var(--border-subtle);
       backdrop-filter: blur(10px);
 
       animation: fadeInGlass 0.25s ease;

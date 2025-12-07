@@ -234,35 +234,35 @@
 
     &.pbtn--outline {
       background: transparent;
-      color: @neutral-600;
-      border: 2px solid @neutral-300;
+      color: var(--text-secondary); // Adapté au thème
+      border: 2px solid var(--border-strong); // Bordure renforcée
 
       &:hover:not(.pbtn--disabled):not(.pbtn--loading) {
-        background: @neutral-50;
-        border-color: @neutral-400;
-        color: @neutral-700;
+        background: var(--hover-overlay);
+        border-color: var(--text-muted);
+        color: var(--text-primary);
       }
     }
 
     &.pbtn--ghost {
       background: transparent;
-      color: @neutral-600;
+      color: var(--text-secondary); // Adapté au thème
 
       &:hover:not(.pbtn--disabled):not(.pbtn--loading) {
-        background: @neutral-100;
-        color: @neutral-800;
+        background: var(--hover-overlay);
+        color: var(--text-primary);
       }
     }
 
     &.pbtn--glass {
-      background: rgba(0, 0, 0, 0.05);
+      background: var(--hover-overlay);
       backdrop-filter: blur(12px);
-      color: @neutral-700;
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: var(--text-secondary); // Adapté au thème
+      border: 1px solid var(--border-default);
 
       &:hover:not(.pbtn--disabled):not(.pbtn--loading) {
-        background: rgba(0, 0, 0, 0.1);
-        border-color: rgba(0, 0, 0, 0.15);
+        background: var(--active-overlay);
+        border-color: var(--border-strong);
       }
     }
 
@@ -447,9 +447,10 @@
   // STATES
   // ============================================
   &--disabled {
-    opacity: 0.5;
+    opacity: 0.45; // Réduit légèrement pour indiquer l'état inactif
     cursor: not-allowed;
     pointer-events: none;
+    filter: grayscale(15%); // Léger effet gris pour renforcer l'état disabled
   }
 
   &--loading {

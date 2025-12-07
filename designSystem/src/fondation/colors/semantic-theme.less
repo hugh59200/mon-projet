@@ -1,0 +1,278 @@
+/* ══════════════════════════════════════════════════════════════
+   SEMANTIC THEME SYSTEM — Light/Dark Mode
+   ══════════════════════════════════════════════════════════════
+
+   Ce fichier définit les variables sémantiques qui s'adaptent
+   automatiquement au thème light/dark via l'attribut data-theme
+   sur l'élément <html>.
+
+   Usage:
+   - CSS:  color: var(--text-primary);
+   - CSS:  background: var(--bg-surface);
+   - CSS:  border-color: var(--border-default);
+
+   Structure:
+   - html[data-theme="light"] → Variables pour thème clair
+   - html[data-theme="dark"]  → Variables pour thème sombre
+   - :root (fallback)         → Thème clair par défaut
+
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
+   MIXIN — Theme Definition
+   ══════════════════════════════════════════════════════════════ */
+
+.theme-light-vars() {
+  /* ─────────────────────────────────────────────────────────────
+     TEXT COLORS
+     ───────────────────────────────────────────────────────────── */
+  --text-primary: @neutral-900;
+  --text-secondary: @neutral-700;
+  --text-tertiary: @neutral-600;
+  --text-muted: @neutral-600; // Renforcé pour meilleur contraste (ratio 4.5:1)
+  --text-disabled: @neutral-500; // Renforcé pour accessibilité WCAG AA (ratio 3.8:1)
+  --text-inverse: @white;
+  --text-primary-rgb: red(@neutral-900), green(@neutral-900), blue(@neutral-900);
+
+  /* ─────────────────────────────────────────────────────────────
+     BACKGROUND COLORS
+     ───────────────────────────────────────────────────────────── */
+  --bg-page: @neutral-50;
+  --bg-surface: @white;
+  --bg-surface-secondary: @neutral-50;
+  --bg-surface-tertiary: @neutral-100;
+  --bg-elevated: @white;
+  --bg-inverse: @neutral-900;
+  --bg-subtle: @neutral-50;
+  --bg-page-rgb: red(@neutral-50), green(@neutral-50), blue(@neutral-50);
+  --bg-surface-rgb: 255, 255, 255;
+
+  /* ─────────────────────────────────────────────────────────────
+     BORDER COLORS
+     ───────────────────────────────────────────────────────────── */
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-default: @neutral-200;
+  --border-strong: @neutral-300;
+  --border-inverse: rgba(255, 255, 255, 0.1);
+
+  /* ─────────────────────────────────────────────────────────────
+     SHADOW COLORS
+     ───────────────────────────────────────────────────────────── */
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* ─────────────────────────────────────────────────────────────
+     INTERACTIVE STATES
+     ───────────────────────────────────────────────────────────── */
+  --hover-overlay: rgba(0, 0, 0, 0.04);
+  --active-overlay: rgba(0, 0, 0, 0.08);
+  --focus-ring: rgba(var(--primary-500-rgb), 0.4);
+  --selection-bg: rgba(var(--primary-500-rgb), 0.15);
+
+  /* ─────────────────────────────────────────────────────────────
+     INPUT COLORS
+     ───────────────────────────────────────────────────────────── */
+  --input-bg: @white;
+  --input-bg-disabled: @neutral-100;
+  --input-border: @neutral-300;
+  --input-border-hover: @neutral-400;
+  --input-border-focus: var(--primary-500);
+  --input-text: @neutral-900;
+  --input-placeholder: @neutral-500; // Renforcé pour lisibilité (ratio 3.8:1)
+
+  /* ─────────────────────────────────────────────────────────────
+     DROPDOWN/MENU COLORS
+     ───────────────────────────────────────────────────────────── */
+  --dropdown-bg: @white;
+  --dropdown-border: @neutral-200;
+  --dropdown-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --dropdown-item-hover: @neutral-50;
+  --dropdown-item-active: rgba(var(--primary-500-rgb), 0.1);
+
+  /* ─────────────────────────────────────────────────────────────
+     MODAL COLORS
+     ───────────────────────────────────────────────────────────── */
+  --modal-backdrop: rgba(0, 0, 0, 0.5);
+  --modal-bg: @white;
+  --modal-header-bg: @neutral-50;
+  --modal-border: @neutral-200;
+
+  /* ─────────────────────────────────────────────────────────────
+     SCROLLBAR COLORS
+     ───────────────────────────────────────────────────────────── */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: @neutral-300;
+  --scrollbar-thumb-hover: @neutral-400;
+
+  /* ─────────────────────────────────────────────────────────────
+     SKELETON/LOADING
+     ───────────────────────────────────────────────────────────── */
+  --skeleton-base: @neutral-200;
+  --skeleton-shine: @neutral-100;
+
+  /* ─────────────────────────────────────────────────────────────
+     CHROME (Header/Footer) — Subtle Shift Approach
+     En light mode: légèrement plus clair mais reste sombre
+     ───────────────────────────────────────────────────────────── */
+  --chrome-bg: @secondary-800; // Plus clair que dark mode
+  --chrome-bg-secondary: @secondary-700;
+  --chrome-bg-gradient-start: @secondary-800;
+  --chrome-bg-gradient-end: @secondary-900;
+  --chrome-text: @neutral-100;
+  --chrome-text-muted: rgba(255, 255, 255, 0.55);
+  --chrome-text-subtle: rgba(255, 255, 255, 0.4);
+  --chrome-border: rgba(255, 255, 255, 0.08);
+  --chrome-border-subtle: rgba(255, 255, 255, 0.05);
+  --chrome-hover: rgba(255, 255, 255, 0.06);
+  --chrome-active: rgba(255, 255, 255, 0.1);
+  --chrome-glow: rgba(var(--primary-500-rgb), 0.15);
+
+  // Footer spécifique - légèrement plus sombre que header
+  --footer-bg-start: @secondary-900;
+  --footer-bg-end: @secondary-950;
+}
+
+.theme-dark-vars() {
+  /* ─────────────────────────────────────────────────────────────
+     TEXT COLORS
+     ───────────────────────────────────────────────────────────── */
+  --text-primary: @neutral-50;
+  --text-secondary: @neutral-200;
+  --text-tertiary: @neutral-300;
+  --text-muted: @neutral-300; // Renforcé pour meilleur contraste en dark (ratio 8:1)
+  --text-disabled: @neutral-400; // Renforcé pour accessibilité WCAG AA (ratio 4.2:1)
+  --text-inverse: @neutral-900;
+  --text-primary-rgb: red(@neutral-50), green(@neutral-50), blue(@neutral-50);
+
+  /* ─────────────────────────────────────────────────────────────
+     BACKGROUND COLORS
+     ───────────────────────────────────────────────────────────── */
+  --bg-page: var(--secondary-950);
+  --bg-surface: var(--secondary-800);
+  --bg-surface-secondary: var(--secondary-700);
+  --bg-surface-tertiary: var(--secondary-600);
+  --bg-elevated: var(--secondary-700);
+  --bg-inverse: @white;
+  --bg-subtle: rgba(255, 255, 255, 0.03);
+  --bg-page-rgb: 10, 13, 20;
+  --bg-surface-rgb: 29, 36, 56;
+
+  /* ─────────────────────────────────────────────────────────────
+     BORDER COLORS
+     ───────────────────────────────────────────────────────────── */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-inverse: rgba(0, 0, 0, 0.1);
+
+  /* ─────────────────────────────────────────────────────────────
+     SHADOW COLORS
+     ───────────────────────────────────────────────────────────── */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  /* ─────────────────────────────────────────────────────────────
+     INTERACTIVE STATES
+     ───────────────────────────────────────────────────────────── */
+  --hover-overlay: rgba(255, 255, 255, 0.04);
+  --active-overlay: rgba(255, 255, 255, 0.08);
+  --focus-ring: rgba(var(--primary-500-rgb), 0.5);
+  --selection-bg: rgba(var(--primary-500-rgb), 0.25);
+
+  /* ─────────────────────────────────────────────────────────────
+     INPUT COLORS
+     ───────────────────────────────────────────────────────────── */
+  --input-bg: var(--secondary-800);
+  --input-bg-disabled: var(--secondary-900);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-border-hover: rgba(255, 255, 255, 0.15);
+  --input-border-focus: var(--primary-500);
+  --input-text: @neutral-50;
+  --input-placeholder: @neutral-400; // Renforcé pour lisibilité dark mode (ratio 4.2:1)
+
+  /* ─────────────────────────────────────────────────────────────
+     DROPDOWN/MENU COLORS
+     ───────────────────────────────────────────────────────────── */
+  --dropdown-bg: var(--secondary-800);
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --dropdown-item-hover: rgba(255, 255, 255, 0.05);
+  --dropdown-item-active: rgba(var(--primary-500-rgb), 0.2);
+
+  /* ─────────────────────────────────────────────────────────────
+     MODAL COLORS
+     ───────────────────────────────────────────────────────────── */
+  --modal-backdrop: rgba(0, 0, 0, 0.7);
+  --modal-bg: var(--secondary-800);
+  --modal-header-bg: var(--secondary-900);
+  --modal-border: rgba(255, 255, 255, 0.1);
+
+  /* ─────────────────────────────────────────────────────────────
+     SCROLLBAR COLORS
+     ───────────────────────────────────────────────────────────── */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+
+  /* ─────────────────────────────────────────────────────────────
+     SKELETON/LOADING
+     ───────────────────────────────────────────────────────────── */
+  --skeleton-base: var(--secondary-700);
+  --skeleton-shine: var(--secondary-600);
+
+  /* ─────────────────────────────────────────────────────────────
+     CHROME (Header/Footer) — Subtle Shift Approach
+     En dark mode: plus profond et contrasté
+     ───────────────────────────────────────────────────────────── */
+  --chrome-bg: var(--secondary-950); // Plus sombre qu'en light
+  --chrome-bg-secondary: var(--secondary-900);
+  --chrome-bg-gradient-start: var(--secondary-900);
+  --chrome-bg-gradient-end: var(--secondary-950);
+  --chrome-text: @neutral-50;
+  --chrome-text-muted: rgba(255, 255, 255, 0.5);
+  --chrome-text-subtle: rgba(255, 255, 255, 0.35);
+  --chrome-border: rgba(255, 255, 255, 0.1);
+  --chrome-border-subtle: rgba(255, 255, 255, 0.06);
+  --chrome-hover: rgba(255, 255, 255, 0.08);
+  --chrome-active: rgba(255, 255, 255, 0.12);
+  --chrome-glow: rgba(var(--primary-500-rgb), 0.2);
+
+  // Footer spécifique - encore plus profond
+  --footer-bg-start: #08080c;
+  --footer-bg-end: #040406;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ROOT — Default Theme (Light)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  .theme-light-vars();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME SELECTORS
+   ══════════════════════════════════════════════════════════════ */
+html[data-theme="light"],
+.theme-mode-light {
+  .theme-light-vars();
+}
+
+html[data-theme="dark"],
+.theme-mode-dark {
+  .theme-dark-vars();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SYSTEM PREFERENCE — Auto detect
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    .theme-dark-vars();
+  }
+}

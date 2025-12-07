@@ -4,20 +4,25 @@
     class="content-block"
     :class="[
       `content-block--${variant}`,
-      `content-block--${theme}`,
-      `content-block--${size}`,
+      `content-block--${resolvedTheme}`,
+      `content-block--bg-${bg}`,
+      !padding && `content-block--${size}`,
       {
-        'content-block--no-padding': noPadding,
         'content-block--no-border': noBorder,
         'content-block--interactive': interactive,
+        'content-block--centered': centered,
       },
     ]"
+    :style="containerStyle"
   >
     <slot />
   </component>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
 /**
  * ContentBlock - Composant de conteneur unifié
  *
@@ -30,34 +35,124 @@
  * - danger: Bloc d'alerte/erreur
  *
  * Thèmes:
- * - light: Fond clair (défaut)
- * - dark: Fond foncé pour mise en avant (décisions)
+ * - auto: Utilise le thème global (défaut)
+ * - light: Force le fond clair
+ * - dark: Force le fond foncé
  *
- * Tailles:
+ * Background (bg):
+ * - default: Fond standard selon variante (défaut)
+ * - elevated: Fond légèrement surélevé (plus clair en light, plus foncé en dark)
+ * - muted: Fond atténué/subtil
+ * - transparent: Fond transparent
+ * - surface: Fond surface (neutre, pour imbrication)
+ *
+ * Tailles (padding prédéfini, ignoré si padding est défini):
  * - sm: Padding réduit (12px)
  * - md: Padding moyen (20px) - défaut
  * - lg: Padding large (28px)
+ *
+ * Layout:
+ * - maxWidth: Largeur maximale (ex: '1200px')
+ * - minHeight: Hauteur minimale (ex: '400px')
+ * - padding: Padding personnalisé (ex: '20px', '16px 24px')
+ * - margin: Margin personnalisé (ex: '20px auto', '0 0 24px')
+ * - gap: Gap pour le contenu flex/grid (ex: '16px')
+ * - borderRadius: Border radius personnalisé (ex: '24px')
+ * - centered: Centre le bloc horizontalement (défaut: true)
  */
-withDefaults(
+const props = withDefaults(
   defineProps<{
     variant?: 'card' | 'flat' | 'info' | 'success' | 'warning' | 'danger'
-    theme?: 'light' | 'dark'
+    theme?: 'light' | 'dark' | 'auto'
+    /** Niveau de fond - contrôle l'intensité/type du background */
+    bg?: 'default' | 'elevated' | 'muted' | 'transparent' | 'surface'
     size?: 'sm' | 'md' | 'lg'
     as?: string
-    noPadding?: boolean
     noBorder?: boolean
     interactive?: boolean
+    /** Largeur du bloc (ex: '100%', '500px') */
+    width?: string
+    /** Largeur maximale du bloc (ex: '1200px', '800px') */
+    maxWidth?: string
+    /** Hauteur minimale du bloc (ex: '400px') */
+    minHeight?: string
+    /** Padding personnalisé (ex: '20px', '16px 24px', '0') - remplace size */
+    padding?: string
+    /** Margin personnalisé (ex: '20px auto', '0 0 24px') */
+    margin?: string
+    /** Gap pour le contenu (ex: '16px') */
+    gap?: string
+    /** Border radius personnalisé (ex: '24px', '0') */
+    borderRadius?: string
+    /** Centre le bloc horizontalement (défaut: true) */
+    centered?: boolean
   }>(),
   {
     variant: 'card',
-    theme: 'light',
+    theme: 'auto',
+    bg: 'default',
     size: 'md',
     as: 'div',
-    noPadding: false,
     noBorder: false,
     interactive: false,
+    width: undefined,
+    maxWidth: undefined,
+    minHeight: undefined,
+    padding: undefined,
+    margin: undefined,
+    gap: undefined,
+    borderRadius: undefined,
+    centered: true,
   },
 )
+
+const { theme: globalTheme } = useTheme()
+
+// Si theme="auto", utilise le thème global, sinon utilise la valeur forcée
+const resolvedTheme = computed(() => {
+  if (props.theme === 'auto') {
+    return globalTheme.value
+  }
+  return props.theme
+})
+
+// Style inline pour les props de layout
+const containerStyle = computed(() => {
+  const style: Record<string, string> = {}
+
+  if (props.width) {
+    style.width = props.width
+  }
+
+  if (props.maxWidth) {
+    style.maxWidth = props.maxWidth
+    if (!props.width) {
+      style.width = '100%'
+    }
+  }
+
+  if (props.minHeight) {
+    style.minHeight = props.minHeight
+  }
+
+  if (props.padding !== undefined) {
+    style.padding = props.padding
+  }
+
+  if (props.margin) {
+    style.margin = props.margin
+  }
+
+  if (props.gap) {
+    style.gap = props.gap
+  }
+
+  if (props.borderRadius) {
+    style.borderRadius = props.borderRadius
+  }
+
+  return Object.keys(style).length > 0 ? style : undefined
+})
 </script>
 
 <style scoped lang="less">
@@ -89,12 +184,13 @@ withDefaults(
     border-radius: 24px;
   }
 
-  &--no-padding {
-    padding: 0;
-  }
-
   &--no-border {
     border: none !important;
+  }
+
+  &--centered {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   // ============ LIGHT THEME ============
@@ -106,43 +202,93 @@ withDefaults(
     --content-block-border: @neutral-200;
     --content-block-bg-subtle: @neutral-50;
 
-    // Card - Standard
+    // Card - Standard avec gradient subtil
     &.content-block--card {
-      background: @white;
-      border: 1px solid @neutral-100;
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
+        linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.015) 0%, transparent 40%),
+        @white;
+      border: 1px solid rgba(var(--primary-500-rgb), 0.08);
       box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 4px 16px rgba(0, 0, 0, 0.04);
+        0 1px 3px rgba(0, 0, 0, 0.03),
+        0 4px 20px rgba(var(--primary-500-rgb), 0.04);
+
+      // Background levels
+      &.content-block--bg-elevated {
+        background:
+          linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.03) 0%, transparent 60%),
+          linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.02) 0%, transparent 50%),
+          @white;
+        border-color: rgba(var(--primary-500-rgb), 0.12);
+        box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.04),
+          0 12px 32px rgba(var(--primary-500-rgb), 0.08);
+      }
+      &.content-block--bg-muted {
+        background:
+          linear-gradient(180deg, @neutral-50 0%, @neutral-100 100%);
+        border-color: @neutral-200;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+      }
+      &.content-block--bg-surface {
+        background: @neutral-50;
+        border-color: @neutral-200;
+      }
+      &.content-block--bg-transparent {
+        background: transparent;
+        box-shadow: none;
+      }
     }
 
-    // Flat - Sans ombre
+    // Flat - Sans ombre avec touche de couleur
     &.content-block--flat {
-      background: @neutral-50;
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.015) 0%, transparent 40%),
+        @neutral-50;
       border: 1px solid @neutral-200;
+
+      &.content-block--bg-elevated {
+        background:
+          linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
+          @white;
+      }
+      &.content-block--bg-muted {
+        background: @neutral-100;
+      }
+      &.content-block--bg-surface {
+        background: @neutral-50;
+      }
+      &.content-block--bg-transparent {
+        background: transparent;
+      }
     }
 
     // Info - Neutre/Primaire
     &.content-block--info {
-      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.04) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.06) 0%, rgba(var(--primary-500-rgb), 0.02) 100%);
       border: 1px solid rgba(var(--primary-500-rgb), 0.15);
     }
 
     // Success
     &.content-block--success {
-      background: linear-gradient(135deg, @success-50 0%, color-mix(in srgb, @success-100 50%, white) 100%);
-      border: 1px solid @success-200;
+      background:
+        linear-gradient(135deg, rgba(@success-500, 0.08) 0%, rgba(@success-400, 0.03) 100%);
+      border: 1px solid rgba(@success-500, 0.2);
     }
 
     // Warning
     &.content-block--warning {
-      background: @warning-100;
-      border: 1px solid @warning-300;
+      background:
+        linear-gradient(135deg, rgba(@warning-500, 0.1) 0%, rgba(@warning-400, 0.04) 100%);
+      border: 1px solid rgba(@warning-500, 0.25);
     }
 
     // Danger
     &.content-block--danger {
-      background: linear-gradient(135deg, @danger-50 0%, color-mix(in srgb, @danger-100 60%, white) 100%);
-      border: 2px solid @danger-200;
+      background:
+        linear-gradient(135deg, rgba(@danger-500, 0.08) 0%, rgba(@danger-400, 0.03) 100%);
+      border: 1px solid rgba(@danger-500, 0.2);
     }
   }
 
@@ -155,41 +301,98 @@ withDefaults(
     --content-block-border: rgba(255, 255, 255, 0.1);
     --content-block-bg-subtle: rgba(255, 255, 255, 0.03);
 
-    // Card - Standard dark
+    // Card - Standard dark avec glow subtil
     &.content-block--card {
-      background: var(--secondary-600);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.06) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.03) 0%, transparent 30%),
+        var(--secondary-600);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+
+      // Background levels
+      &.content-block--bg-elevated {
+        background:
+          linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.1) 0%, transparent 50%),
+          linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.05) 0%, transparent 40%),
+          var(--secondary-500);
+        border-color: rgba(var(--primary-500-rgb), 0.2);
+        box-shadow:
+          0 8px 40px rgba(0, 0, 0, 0.35),
+          0 0 60px rgba(var(--primary-500-rgb), 0.08),
+          0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      }
+      &.content-block--bg-muted {
+        background:
+          linear-gradient(180deg, var(--secondary-700) 0%, var(--secondary-800) 100%);
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      &.content-block--bg-surface {
+        background: var(--secondary-800);
+        border-color: rgba(255, 255, 255, 0.05);
+      }
+      &.content-block--bg-transparent {
+        background: transparent;
+        box-shadow: none;
+      }
     }
 
     // Flat - Sans ombre dark
     &.content-block--flat {
-      background: var(--secondary-700);
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.03) 0%, transparent 30%),
+        var(--secondary-700);
       border: 1px solid rgba(255, 255, 255, 0.08);
+
+      &.content-block--bg-elevated {
+        background:
+          linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.05) 0%, transparent 40%),
+          var(--secondary-600);
+      }
+      &.content-block--bg-muted {
+        background: var(--secondary-800);
+      }
+      &.content-block--bg-surface {
+        background: var(--secondary-700);
+      }
+      &.content-block--bg-transparent {
+        background: transparent;
+      }
     }
 
     // Info - Dark
     &.content-block--info {
-      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.15) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.3);
+      background:
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.18) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.35);
+      box-shadow: 0 0 30px rgba(var(--primary-500-rgb), 0.1);
     }
 
     // Success - Dark
     &.content-block--success {
-      background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.15) 0%, rgba(var(--success-500-rgb), 0.08) 100%);
-      border: 1px solid rgba(var(--success-500-rgb), 0.3);
+      background:
+        linear-gradient(135deg, rgba(@success-500, 0.18) 0%, rgba(@success-500, 0.06) 100%);
+      border: 1px solid rgba(@success-500, 0.35);
+      box-shadow: 0 0 30px rgba(@success-500, 0.08);
     }
 
     // Warning - Dark
     &.content-block--warning {
-      background: linear-gradient(135deg, rgba(var(--warning-500-rgb), 0.15) 0%, rgba(var(--warning-500-rgb), 0.08) 100%);
-      border: 1px solid rgba(var(--warning-500-rgb), 0.3);
+      background:
+        linear-gradient(135deg, rgba(@warning-500, 0.18) 0%, rgba(@warning-500, 0.06) 100%);
+      border: 1px solid rgba(@warning-500, 0.35);
+      box-shadow: 0 0 30px rgba(@warning-500, 0.08);
     }
 
     // Danger - Dark
     &.content-block--danger {
-      background: linear-gradient(135deg, rgba(var(--danger-500-rgb), 0.15) 0%, rgba(var(--danger-500-rgb), 0.08) 100%);
-      border: 1px solid rgba(var(--danger-500-rgb), 0.3);
+      background:
+        linear-gradient(135deg, rgba(@danger-500, 0.18) 0%, rgba(@danger-500, 0.06) 100%);
+      border: 1px solid rgba(@danger-500, 0.35);
+      box-shadow: 0 0 30px rgba(@danger-500, 0.08);
     }
   }
 

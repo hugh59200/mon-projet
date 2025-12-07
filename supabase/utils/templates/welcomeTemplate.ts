@@ -13,98 +13,64 @@ export function welcomeTemplate({
   const t = translations.welcome
 
   const bodyHTML = `
-    <p>${t.greeting[locale](full_name || '')}</p>
+    <p style="font-size: 16px; color: #334155; margin-bottom: 24px;">
+      ${t.greeting[locale](full_name || '')}
+    </p>
 
-    <p>${t.accountActive[locale]}</p>
+    <p style="font-size: 15px; color: #475569; margin-bottom: 32px;">
+      ${t.accountActive[locale]}
+    </p>
 
-    <div style="margin: 24px 0; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 24px; text-align: center;">
-      <p style="margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #166534;">
-        ${t.welcomeTitle[locale]}
-      </p>
-      <p style="margin: 0; font-size: 14px; color: #15803d;">
-        ${t.welcomeSubtitle[locale]}
-      </p>
-    </div>
+    <!-- Features Grid - 3 colonnes -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+      <tr>
+        <!-- Feature 1: Historique -->
+        <td width="33%" style="text-align: center; vertical-align: top; padding: 0 8px;">
+          <img src="${EMAIL_ASSETS['welcome-history']}" width="64" height="64" alt="" style="display: block; margin: 0 auto 12px;" />
+          <p style="margin: 0 0 6px; font-size: 14px; font-weight: 600; color: #0f172a;">
+            ${t.benefit1Title[locale]}
+          </p>
+          <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.4;">
+            ${t.benefit1Desc[locale]}
+          </p>
+        </td>
 
-    <p style="font-weight: 600; margin-bottom: 16px; color: #1e293b;">${t.benefitsTitle[locale]}</p>
+        <!-- Feature 2: Lots -->
+        <td width="33%" style="text-align: center; vertical-align: top; padding: 0 8px;">
+          <img src="${EMAIL_ASSETS['welcome-batch']}" width="64" height="64" alt="" style="display: block; margin: 0 auto 12px;" />
+          <p style="margin: 0 0 6px; font-size: 14px; font-weight: 600; color: #0f172a;">
+            ${t.benefit2Title[locale]}
+          </p>
+          <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.4;">
+            ${t.benefit2Desc[locale]}
+          </p>
+        </td>
 
-    <div style="margin: 0 0 24px;">
-      <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
-        <div style="width: 32px; height: 32px; background: #e0f2fe; border-radius: 8px; display: inline-block; text-align: center; line-height: 32px; margin-right: 12px; flex-shrink: 0;">
-          📦
-        </div>
-        <div>
-          <p style="margin: 0 0 4px; font-weight: 600; color: #0f172a;">${t.benefit1Title[locale]}</p>
-          <p style="margin: 0; font-size: 14px; color: #64748b;">${t.benefit1Desc[locale]}</p>
-        </div>
-      </div>
+        <!-- Feature 3: Recommande -->
+        <td width="33%" style="text-align: center; vertical-align: top; padding: 0 8px;">
+          <img src="${EMAIL_ASSETS['welcome-reorder']}" width="64" height="64" alt="" style="display: block; margin: 0 auto 12px;" />
+          <p style="margin: 0 0 6px; font-size: 14px; font-weight: 600; color: #0f172a;">
+            ${t.benefit3Title[locale]}
+          </p>
+          <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.4;">
+            ${t.benefit3Desc[locale]}
+          </p>
+        </td>
+      </tr>
+    </table>
 
-      <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
-        <div style="width: 32px; height: 32px; background: #fef3c7; border-radius: 8px; display: inline-block; text-align: center; line-height: 32px; margin-right: 12px; flex-shrink: 0;">
-          🔬
-        </div>
-        <div>
-          <p style="margin: 0 0 4px; font-weight: 600; color: #0f172a;">${t.benefit2Title[locale]}</p>
-          <p style="margin: 0; font-size: 14px; color: #64748b;">${t.benefit2Desc[locale]}</p>
-        </div>
-      </div>
+    <!-- Separator -->
+    <div style="border-top: 1px solid #e2e8f0; margin: 32px 0;"></div>
 
-      <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
-        <div style="width: 32px; height: 32px; background: #f0fdf4; border-radius: 8px; display: inline-block; text-align: center; line-height: 32px; margin-right: 12px; flex-shrink: 0;">
-          🔄
-        </div>
-        <div>
-          <p style="margin: 0 0 4px; font-weight: 600; color: #0f172a;">${t.benefit3Title[locale]}</p>
-          <p style="margin: 0; font-size: 14px; color: #64748b;">${t.benefit3Desc[locale]}</p>
-        </div>
-      </div>
-
-      <div style="display: flex; align-items: flex-start;">
-        <div style="width: 32px; height: 32px; background: #fce7f3; border-radius: 8px; display: inline-block; text-align: center; line-height: 32px; margin-right: 12px; flex-shrink: 0;">
-          💬
-        </div>
-        <div>
-          <p style="margin: 0 0 4px; font-weight: 600; color: #0f172a;">${t.benefit4Title[locale]}</p>
-          <p style="margin: 0; font-size: 14px; color: #64748b;">${t.benefit4Desc[locale]}</p>
-        </div>
-      </div>
-    </div>
-
-    <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 24px 0;">
-      <p style="margin: 0 0 12px; font-weight: 600; color: #334155;">${t.quickLinksTitle[locale]}</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="padding: 8px 0;">
-            <a href="${APP_BASE_URL}/catalogue" style="color: #00796B; text-decoration: none; font-weight: 500;">
-              → ${t.linkCatalogue[locale]}
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 8px 0;">
-            <a href="${APP_BASE_URL}/profil" style="color: #00796B; text-decoration: none; font-weight: 500;">
-              → ${t.linkProfile[locale]}
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 8px 0;">
-            <a href="${APP_BASE_URL}/faq" style="color: #00796B; text-decoration: none; font-weight: 500;">
-              → ${t.linkFaq[locale]}
-            </a>
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <div style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border: 1px solid #fde047; border-radius: 12px; padding: 16px; margin: 24px 0;">
-      <p style="margin: 0; font-size: 13px; color: #854d0e;">
-        <strong>⚗️ ${t.ruoTitle[locale]}</strong><br/>
+    <!-- RUO Notice -->
+    <div style="background: #fefce8; border-left: 4px solid #eab308; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;">
+      <p style="margin: 0; font-size: 13px; color: #854d0e; line-height: 1.5;">
+        <strong>${t.ruoTitle[locale]}</strong><br/>
         ${t.ruoMessage[locale]}
       </p>
     </div>
 
-    <p style="margin-top: 24px;">
+    <p style="font-size: 15px; color: #475569; margin-top: 24px;">
       ${t.closing[locale]}
     </p>
   `

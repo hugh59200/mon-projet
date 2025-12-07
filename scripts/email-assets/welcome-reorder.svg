@@ -1,0 +1,24 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="#F0FDF4" stroke="#22C55E" stroke-width="2"/>
+
+  <!-- Circular arrow - main arc -->
+  <path d="M85 45C85 45 78 32 60 32C42 32 30 47 30 60C30 73 42 88 60 88C73 88 83 80 87 70" stroke="#22C55E" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Arrow head top -->
+  <path d="M78 45L88 45L88 35" stroke="#22C55E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Small arrow bottom -->
+  <path d="M35 75C35 75 42 88 60 88" stroke="#16A34A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M42 82L35 75L42 68" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Center cart icon -->
+  <circle cx="60" cy="60" r="16" fill="#22C55E"/>
+  <path d="M52 58H54L56 66H66L68 58" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="57" cy="69" r="2" fill="white"/>
+  <circle cx="65" cy="69" r="2" fill="white"/>
+
+  <!-- Plus sign -->
+  <circle cx="82" cy="78" r="10" fill="#15803D"/>
+  <path d="M82 73V83M77 78H87" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

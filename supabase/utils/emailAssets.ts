@@ -9,6 +9,9 @@ export const EMAIL_ASSETS = {
   'password-reset': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/password-reset.png',
   'payment-success': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/payment-success.png',
   'shipping': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/shipping.png',
+  'welcome-batch': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/welcome-batch.png',
+  'welcome-history': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/welcome-history.png',
+  'welcome-reorder': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/welcome-reorder.png',
   'welcome': 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/email-assets/welcome.png'
 } as const
 

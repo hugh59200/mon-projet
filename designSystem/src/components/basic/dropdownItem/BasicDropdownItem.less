@@ -1,11 +1,15 @@
+/* ══════════════════════════════════════════════════════════════
+   DROPDOWN ITEM — Light/Dark Theme Support
+   ══════════════════════════════════════════════════════════════ */
+
 .dropdown-item {
-  background-color: @white;
+  background-color: var(--dropdown-bg);
   display: flex;
   align-items: center;
   padding: @spacing-10 @spacing-10;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: var(--secondary-100);
+  color: var(--text-primary);
 
   &--small {
     font-size: @font-size-body-s;
@@ -29,27 +33,27 @@
   }
 
   &--active {
-    background-color: var(--secondary-800);
-    color: @white;
+    background-color: var(--dropdown-item-active);
+    color: var(--text-inverse);
 
     .dropdown-item__label {
-      color: white;
+      color: var(--text-inverse);
     }
     .icon {
-      fill: @white;
+      fill: var(--text-inverse);
     }
   }
 
   &--highlighted {
-    background-color: var(--secondary-200);
+    background-color: var(--dropdown-item-hover);
   }
 
   &--active&--highlighted {
-    background-color: var(--secondary-600);
+    background-color: var(--dropdown-item-active);
   }
 
   &:not(.dropdown-item--active):hover {
-    background-color: var(--secondary-0);
+    background-color: var(--dropdown-item-hover);
   }
 
   &__label {
@@ -57,7 +61,7 @@
   }
 
   .icon {
-    fill: var(--secondary-100);
+    fill: var(--text-secondary);
     width: 25px;
   }
 }

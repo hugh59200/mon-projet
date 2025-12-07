@@ -40,36 +40,40 @@
       </div>
 
       <div class="quality__visual">
-        <div class="coa-card">
-          <div class="coa-card__header">
-            <span class="coa-card__badge">COA</span>
-            <span class="coa-card__title">{{ t('home.quality.coa.title') }}</span>
-          </div>
-          <div class="coa-card__body">
-            <div class="coa-card__row">
-              <span>{{ t('home.quality.coa.hplc') }}</span>
-              <span>BPC-157-5mg</span>
+        <div class="quality__coa-scroll">
+          <div class="quality__coa-track">
+            <div
+              v-for="coa in coaList"
+              :key="coa.id"
+              class="coa-card"
+            >
+              <div class="coa-card__header">
+                <span class="coa-card__badge">COA</span>
+                <span class="coa-card__title">{{ coa.name }}</span>
+              </div>
+              <div class="coa-card__body">
+                <div class="coa-card__row">
+                  <span>{{ t('home.quality.coa.hplc') }}</span>
+                  <span>{{ coa.ref }}</span>
+                </div>
+                <div class="coa-card__row">
+                  <span>{{ t('home.quality.coa.batch') }}</span>
+                  <span>{{ coa.batch }}</span>
+                </div>
+                <div class="coa-card__row coa-card__row--highlight">
+                  <span>{{ t('home.quality.coa.purity') }}</span>
+                  <span>{{ coa.purity }}</span>
+                </div>
+                <div class="coa-card__row">
+                  <span>{{ t('home.quality.coa.lcms') }}</span>
+                  <span>{{ coa.mass }}</span>
+                </div>
+              </div>
+              <div class="coa-card__footer">
+                <BasicIconNext name="CheckCircle2" :size="18" />
+                <span>{{ t('home.quality.coa.download') }}</span>
+              </div>
             </div>
-            <div class="coa-card__row">
-              <span>{{ t('home.quality.coa.batch') }}</span>
-              <span>BP2024-0847</span>
-            </div>
-            <div class="coa-card__row coa-card__row--highlight">
-              <span>{{ t('home.quality.coa.purity') }}</span>
-              <span>99.4%</span>
-            </div>
-            <div class="coa-card__row">
-              <span>{{ t('home.quality.coa.lcms') }}</span>
-              <span>1419.53 Da</span>
-            </div>
-            <div class="coa-card__row">
-              <span>{{ t('home.quality.coa.subtitle') }}</span>
-              <span>✓</span>
-            </div>
-          </div>
-          <div class="coa-card__footer">
-            <BasicIconNext name="CheckCircle2" :size="20" />
-            <span>{{ t('home.quality.coa.download') }}</span>
           </div>
         </div>
       </div>
@@ -83,6 +87,42 @@
 
   const { t } = useI18n()
   const sectionRef = ref<HTMLElement | null>(null)
+
+  // Liste des COA à afficher
+  const coaList = [
+    {
+      id: 'bpc157',
+      name: 'BPC-157 5mg',
+      ref: 'BPC-157-5mg',
+      batch: 'BP2024-0847',
+      purity: '99.4%',
+      mass: '1419.53 Da',
+    },
+    {
+      id: 'semaglutide',
+      name: 'Semaglutide 10mg',
+      ref: 'SEMA-10mg',
+      batch: 'SM2024-1203',
+      purity: '98.7%',
+      mass: '4113.58 Da',
+    },
+    {
+      id: 'tb500',
+      name: 'TB-500 5mg',
+      ref: 'TB500-5mg',
+      batch: 'TB2024-0562',
+      purity: '99.1%',
+      mass: '4963.50 Da',
+    },
+    {
+      id: 'ipamorelin',
+      name: 'Ipamorelin 5mg',
+      ref: 'IPA-5mg',
+      batch: 'IP2024-0891',
+      purity: '99.6%',
+      mass: '711.85 Da',
+    },
+  ]
 
   const icon = (d: string) => () =>
     h(
@@ -160,54 +200,14 @@
   .layout-section {
     position: relative;
     width: 100%;
-    padding: 80px 32px;
-    background: linear-gradient(
-      180deg,
-      var(--secondary-950) 0%,
-      var(--secondary-900) 50%,
-      var(--secondary-950) 100%
-    );
 
     &__bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    &__pattern {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(var(--primary-400-rgb), 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    &__glow {
-      position: absolute;
-      border-radius: 50%;
-      &--quality-1 {
-        width: 200px;
-        height: 200px;
-        background: rgba(@success-500, 0.15);
-        top: -50px;
-        right: -50px;
-        filter: blur(60px);
-      }
-      &--quality-2 {
-        width: 150px;
-        height: 150px;
-        background: rgba(var(--primary-500-rgb), 0.15);
-        bottom: -30px;
-        left: 0;
-        filter: blur(60px);
-      }
+      display: none; // Géré par ContentBlock parent
     }
 
     &__inner {
       position: relative;
       z-index: 1;
-      max-width: 1200px;
-      margin: 0 auto;
       &--two-cols {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -217,7 +217,6 @@
     }
 
     &--quality {
-      margin-top: 40px;
       opacity: 0;
       transform: translateY(30px);
       transition: all 0.8s @ease;
@@ -253,7 +252,7 @@
       font-family: @font-display;
       font-size: clamp(36px, 4vw, 52px);
       font-weight: 600;
-      color: @neutral-50;
+      color: var(--content-block-text);
       margin: 0;
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -268,7 +267,7 @@
       font-family: @font-body;
       font-size: 17px;
       line-height: 1.7;
-      color: @neutral-300;
+      color: var(--content-block-text-secondary);
       margin: 0;
     }
     &__features {
@@ -318,13 +317,13 @@
           font-family: @font-display;
           font-size: 16px;
           font-weight: 600;
-          color: @neutral-50;
+          color: var(--content-block-text);
           margin: 0 0 4px;
         }
         p {
           font-family: @font-body;
           font-size: 14px;
-          color: @neutral-400;
+          color: var(--content-block-text-muted);
           margin: 0;
           line-height: 1.5;
         }
@@ -334,33 +333,104 @@
     &__visual {
       display: flex;
       justify-content: center;
+      align-items: center;
+    }
+
+    &__coa-scroll {
+      position: relative;
+      width: 320px;
+      height: 450px;
+      border-radius: 20px;
+      overflow: hidden;
+
+      // Masques de fondu en haut et en bas
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 50px;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      &::before {
+        top: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(var(--secondary-900-rgb), 1) 0%,
+          transparent 100%
+        );
+      }
+
+      &::after {
+        bottom: 0;
+        background: linear-gradient(
+          to top,
+          rgba(var(--secondary-900-rgb), 1) 0%,
+          transparent 100%
+        );
+      }
+    }
+
+    &__coa-track {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px 0;
+      animation: scrollCoaVertical 25s ease-in-out infinite;
+
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+
+    @keyframes scrollCoaVertical {
+      0%, 10% {
+        transform: translateY(0);
+      }
+      45%, 55% {
+        transform: translateY(calc(-50% + 225px));
+      }
+      90%, 100% {
+        transform: translateY(0);
+      }
     }
   }
 
   .coa-card {
-    width: 340px;
+    flex-shrink: 0;
+    width: 300px;
+    margin: 0 auto;
     background: rgba(var(--secondary-800-rgb), 0.6);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(var(--neutral-300-rgb), 0.1);
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s @ease, box-shadow 0.3s @ease;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+    }
 
     &__header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 20px;
+      gap: 10px;
+      padding: 14px 16px;
       background: rgba(var(--secondary-700-rgb), 0.4);
       border-bottom: 1px solid rgba(var(--neutral-300-rgb), 0.08);
     }
 
     &__badge {
-      padding: 4px 10px;
+      padding: 3px 8px;
       background: rgba(@success-500, 0.2);
-      border-radius: 6px;
+      border-radius: 5px;
       font-family: @font-body;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -369,39 +439,43 @@
 
     &__title {
       font-family: @font-body;
-      font-size: 14px;
-      font-weight: 500;
-      color: @neutral-100;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--content-block-text);
     }
+
     &__body {
-      padding: 20px;
+      padding: 14px 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     &__row {
       display: flex;
       justify-content: space-between;
       font-family: @font-body;
-      font-size: 13px;
+      font-size: 12px;
+
       span:first-child {
-        color: @neutral-400;
+        color: var(--content-block-text-muted);
       }
+
       span:last-child {
-        color: @neutral-100;
+        color: var(--content-block-text);
         font-weight: 500;
       }
 
       &--highlight {
-        padding: 12px;
-        margin: 4px -12px;
+        padding: 10px;
+        margin: 2px -8px;
         background: rgba(@success-500, 0.1);
-        border-radius: 8px;
+        border-radius: 6px;
+
         span:last-child {
           color: @success-500;
           font-weight: 700;
-          font-size: 15px;
+          font-size: 14px;
         }
       }
     }
@@ -410,18 +484,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 16px 20px;
+      gap: 6px;
+      padding: 12px 16px;
       background: rgba(@success-500, 0.08);
       border-top: 1px solid rgba(var(--neutral-300-rgb), 0.08);
       font-family: @font-body;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: @success-500;
-      svg {
-        width: 18px;
-        height: 18px;
-      }
     }
   }
 
@@ -438,18 +508,21 @@
     .quality__visual {
       order: -1;
     }
+    .quality__coa-scroll {
+      width: 100%;
+      max-width: 400px;
+      height: 380px;
+    }
   });
 
   // Responsive - Mobile (≤ 720px)
   .respond-mobile({
-    .layout-section {
-      padding: 60px 20px;
-    }
-    .quality__visual {
-      display: none;
+    .quality__coa-scroll {
+      width: 100%;
+      height: 320px;
     }
     .coa-card {
-      width: 100%;
+      width: 280px;
     }
   });
 </style>

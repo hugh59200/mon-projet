@@ -1,3 +1,13 @@
+/* ══════════════════════════════════════════════════════════════
+   MODAL COMPONENT — Light/Dark Theme Support
+   ══════════════════════════════════════════════════════════════
+
+   Utilise les variables CSS sémantiques de semantic-theme.less:
+   - --modal-backdrop, --modal-bg, --modal-header-bg, --modal-border
+   - --scrollbar-thumb, --scrollbar-track
+
+   ══════════════════════════════════════════════════════════════ */
+
 .modal {
   position: fixed;
   inset: 0;
@@ -6,7 +16,7 @@
   justify-content: center;
   z-index: @z-modal;
   backdrop-filter: blur(8px) saturate(150%);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--modal-backdrop);
   padding: 100px 16px;
   box-sizing: border-box;
   animation: fadeInBackdrop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -26,12 +36,10 @@
     max-height: calc(100vh - 200px);
     width: 100%;
     max-width: 700px;
-    background: linear-gradient(135deg, @white 0%, @neutral-50 100%);
+    background: var(--modal-bg);
     border-radius: 20px;
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
-      0 10px 20px -8px rgba(0, 0, 0, 0.1),
-      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    border: 1px solid var(--modal-border);
+    box-shadow: var(--shadow-xl);
     overflow: hidden;
     position: relative;
 
@@ -46,7 +54,7 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.3) 50%,
         transparent 100%
       );
       z-index: 2;
@@ -76,26 +84,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 28px 32px;
-    background: linear-gradient(135deg, var(--secondary-900) 0%, var(--secondary-800) 100%);
-    color: white;
+    background: var(--modal-header-bg);
+    color: var(--text-primary);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     position: relative;
     z-index: 1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-    // Effet de brillance sur le header
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 50%
-      );
-      pointer-events: none;
-    }
+    border-bottom: 1px solid var(--modal-border);
 
     // Barre de couleur accent
     &::after {
@@ -114,7 +109,7 @@
     span,
     div {
       margin: 0;
-      color: white;
+      color: var(--text-primary);
       font-size: 1.125rem;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -126,7 +121,7 @@
     svg {
       flex-shrink: 0;
       cursor: pointer;
-      fill: @white;
+      fill: var(--text-secondary);
       width: 24px;
       height: 24px;
       padding: 8px;
@@ -134,10 +129,11 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       z-index: 1;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--hover-overlay);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--active-overlay);
+        fill: var(--text-primary);
         transform: rotate(90deg);
       }
 
@@ -150,10 +146,11 @@
   &__content {
     flex: 1 1 auto;
     overflow-y: auto;
-    overflow-x: hidden; /* 🔥 FIX: Empêche le scroll horizontal */
+    overflow-x: hidden;
     padding: 12px;
     position: relative;
     z-index: 1;
+    color: var(--text-primary);
 
     // Scrollbar premium custom
     &::-webkit-scrollbar {
@@ -161,31 +158,31 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: @neutral-100;
+      background: var(--scrollbar-track);
       border-radius: 10px;
       margin: 8px 0;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--primary-400), var(--primary-600));
+      background: var(--scrollbar-thumb);
       border-radius: 10px;
-      border: 2px solid @neutral-100;
+      border: 2px solid transparent;
 
       &:hover {
-        background: linear-gradient(180deg, var(--primary-500), var(--primary-700));
+        background: var(--scrollbar-thumb-hover);
       }
     }
 
     svg {
-      fill: @neutral-500;
+      fill: var(--text-muted);
     }
   }
 
   &__actions {
     flex-shrink: 0;
     padding: 20px 32px 28px 32px;
-    border-top: 2px solid @neutral-100;
-    background: linear-gradient(180deg, @white 0%, @neutral-50 100%);
+    border-top: 1px solid var(--modal-border);
+    background: var(--modal-bg);
     z-index: 1;
     position: relative;
 
@@ -197,7 +194,7 @@
       left: 0;
       right: 0;
       height: 12px;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.02), transparent);
+      background: linear-gradient(to top, var(--shadow-color), transparent);
       pointer-events: none;
     }
   }

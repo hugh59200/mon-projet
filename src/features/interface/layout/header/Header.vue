@@ -43,6 +43,23 @@
         ref="rightRef"
         class="navbar__right"
       >
+        <!-- Theme Toggle (DEV) -->
+        <BasicTooltip
+          :label="theme === 'light' ? 'Dark mode' : 'Light mode'"
+          position="bottom"
+        >
+          <button
+            class="navbar__icon-btn navbar__theme-toggle"
+            @click="toggleTheme"
+          >
+            <BasicIconNext
+              :name="theme === 'light' ? 'Moon' : 'Sun'"
+              :size="18"
+              :color="theme === 'light' ? 'warning-500' : 'warning-400'"
+            />
+          </button>
+        </BasicTooltip>
+
         <BasicTooltip
           :label="t('nav.tracking')"
           position="bottom"
@@ -69,6 +86,7 @@
 
 <script setup lang="ts">
   import { useNavOverflow } from '@/composables/useNavOverflow'
+  import { useTheme } from '@/composables/useTheme'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import WishlistIcon from '@/features/catalogue/components/WishlistIcon.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
@@ -85,6 +103,7 @@
   const router = useRouter()
   const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
+  const { theme, toggleTheme } = useTheme()
 
   const containerRef = ref<HTMLElement | null>(null)
   const leftRef = ref<HTMLElement | null>(null)
@@ -141,10 +160,11 @@
       inset: 0;
       background: linear-gradient(
         90deg,
-        var(--secondary-900) 0%,
-        color-mix(in srgb, var(--secondary-800), black 8%) 50%,
-        var(--secondary-900) 100%
+        var(--chrome-bg-gradient-end) 0%,
+        var(--chrome-bg) 50%,
+        var(--chrome-bg-gradient-end) 100%
       );
+      transition: background 0.3s ease;
     }
 
     &__bg-shine {
@@ -156,9 +176,9 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.06) 20%,
-        rgba(255, 255, 255, 0.1) 50%,
-        rgba(255, 255, 255, 0.06) 80%,
+        var(--chrome-border-subtle) 20%,
+        var(--chrome-border) 50%,
+        var(--chrome-border-subtle) 80%,
         transparent 100%
       );
     }
@@ -204,15 +224,15 @@
       width: 36px;
       height: 36px;
       padding: 0;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--chrome-hover);
+      border: 1px solid var(--chrome-border);
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.12);
+        background: var(--chrome-active);
+        border-color: var(--chrome-border);
       }
 
       &:active {
@@ -225,9 +245,18 @@
         border-color: transparent;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.06);
+          background: var(--chrome-hover);
           border-color: transparent;
         }
+      }
+    }
+
+    &__theme-toggle {
+      background: rgba(var(--warning-500-rgb), 0.15) !important;
+      border-color: rgba(var(--warning-500-rgb), 0.3) !important;
+
+      &:hover {
+        background: rgba(var(--warning-500-rgb), 0.25) !important;
       }
     }
 
@@ -239,15 +268,15 @@
       width: 36px;
       height: 36px;
       padding: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--chrome-hover);
+      border: 1px solid var(--chrome-border);
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.12);
+        background: var(--chrome-active);
+        border-color: var(--chrome-border);
       }
 
       &:active {
@@ -257,7 +286,7 @@
       &-line {
         width: 100%;
         height: 2px;
-        background: @neutral-200;
+        background: var(--chrome-text);
         border-radius: 1px;
         transition: all 0.3s @ease;
         transform-origin: center;

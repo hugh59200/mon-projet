@@ -1,34 +1,67 @@
 <template>
   <div class="home">
-    <HomeHero />
-    <HomeTrustBar />
-    <section class="home__section home__section--left">
+    <ContentBlock
+      variant="flat"
+      width="100%"
+      padding="0"
+      min-height="500px"
+      border-radius="0"
+      :centered="false"
+      :no-border="true"
+    >
+      <HomeHero />
+    </ContentBlock>
+    <ContentBlock
+      size="lg"
+      max-width="1200px"
+      theme="dark"
+    >
       <HomeQuality />
-    </section>
-    <section class="home__section home__section--full">
+    </ContentBlock>
+    <ContentBlock
+      variant="card"
+      max-width="1200px"
+      padding="0"
+      theme="dark"
+    >
       <CategoryHeroBanner />
-    </section>
-    <section class="home__section home__section--right">
+    </ContentBlock>
+    <ContentBlock
+      variant="card"
+      max-width="1200px"
+      padding="60px 50px"
+      theme="dark"
+    >
       <NewsletterSection />
-    </section>
-    <section class="home__section home__section--left">
+    </ContentBlock>
+    <ContentBlock
+      variant="card"
+      max-width="1200px"
+      padding="0"
+      theme="dark"
+    >
       <HomeScience />
-    </section>
-    <section class="home__section home__section--right">
+    </ContentBlock>
+    <ContentBlock
+      variant="card"
+      size="lg"
+      theme="dark"
+      max-width="1200px"
+    >
       <HomeCta />
-    </section>
+    </ContentBlock>
   </div>
 </template>
 
 <script setup lang="ts">
   import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
+  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { useHead } from '@vueuse/head'
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
   import HomeCta from './HomeCta.vue'
   import HomeHero from './HomeHero.vue'
   import HomeQuality from './HomeQuality.vue'
   import HomeScience from './HomeScience.vue'
-  import HomeTrustBar from './HomeTrustBar.vue'
 
   // Configuration SEO pour la page d'accueil
   useHead({
@@ -66,63 +99,24 @@
   .home {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 60px;
     overflow-x: hidden;
-    padding: 50px 0;
-
-    &__section {
-      // Full-width (mais contenu limité à 1200px)
-      &--full {
-        width: 100%;
-        margin: 60px 0;
-      }
-
-      // Décalé gauche
-      &--left {
-        max-width: 1200px;
-        width: 100%;
-        margin: 60px auto;
-        padding: 0 80px 0 40px; // Plus de padding à droite = décalé gauche
-      }
-
-      // Décalé droite
-      &--right {
-        max-width: 1200px;
-        width: 100%;
-        margin: 60px auto;
-        padding: 0 40px 0 80px; // Plus de padding à gauche = décalé droite
-      }
-    }
+    padding-bottom: 50px;
   }
 
   // Responsive - Tablet
   .respond-tablet({
-    .home__section {
-      &--full {
-        margin: 40px 0;
-      }
-      &--left {
-        margin: 40px auto;
-        padding: 0 60px 0 24px;
-      }
-      &--right {
-        margin: 40px auto;
-        padding: 0 24px 0 60px;
-      }
+    .home {
+      gap: 40px;
+      padding-bottom: 40px;
     }
   });
 
-  // Responsive - Mobile (tout centré sur mobile)
+  // Responsive - Mobile
   .respond-mobile({
-    .home__section {
-      &--full {
-        margin: 32px 0;
-      }
-      &--left,
-      &--right {
-        margin: 32px auto;
-        padding: 0 16px;
-      }
+    .home {
+      gap: 32px;
+      padding-bottom: 32px;
     }
   });
 </style>

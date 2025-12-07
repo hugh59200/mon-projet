@@ -1,3 +1,12 @@
+/* ══════════════════════════════════════════════════════════════
+   BASIC BADGE — Light/Dark Theme Support
+   ══════════════════════════════════════════════════════════════
+
+   Les badges utilisent des couleurs semi-transparentes basées sur
+   les variables RGB pour s'adapter automatiquement au thème.
+
+   ══════════════════════════════════════════════════════════════ */
+
 .badge {
   max-width: fit-content;
   display: flex;
@@ -23,56 +32,56 @@
   }
 
   &--default {
-    background-color: var(--secondary-0);
-    color: var(--secondary-600);
-    border-color: var(--secondary-600);
+    background-color: var(--bg-subtle);
+    color: var(--text-secondary);
+    border-color: var(--border-default);
     svg {
-      fill: var(--secondary-0);
+      fill: var(--text-secondary);
     }
   }
 
   &--pending {
-    background-color: @warning-50;
-    color: @warning-500;
-    border-color: @warning-500;
+    background-color: rgba(var(--warning-500-rgb), 0.12);
+    color: var(--warning-500);
+    border-color: rgba(var(--warning-500-rgb), 0.4);
     svg {
-      fill: @warning-500;
+      fill: var(--warning-500);
     }
   }
 
   &--error {
-    background-color: @danger-0;
-    color: @danger-500;
-    border-color: @danger-500;
+    background-color: rgba(var(--danger-500-rgb), 0.12);
+    color: var(--danger-500);
+    border-color: rgba(var(--danger-500-rgb), 0.4);
     svg {
-      fill: @danger-500;
+      fill: var(--danger-500);
     }
   }
 
   &--success {
-    background-color: @success-50;
-    color: @success-500;
-    border-color: @success-500;
+    background-color: rgba(var(--success-500-rgb), 0.12);
+    color: var(--success-500);
+    border-color: rgba(var(--success-500-rgb), 0.4);
     svg {
-      fill: @success-500;
+      fill: var(--success-500);
     }
   }
 
   &--info {
-    background-color: @info-50;
-    color: @info-500;
-    border-color: @info-500;
+    background-color: rgba(var(--info-500-rgb), 0.12);
+    color: var(--info-500);
+    border-color: rgba(var(--info-500-rgb), 0.4);
     svg {
-      fill: @info-500;
+      fill: var(--info-500);
     }
   }
 
   &--canceled {
-    background-color: @neutral-100;
-    color: @neutral-500;
-    border-color: @neutral-500;
+    background-color: var(--bg-subtle);
+    color: var(--text-secondary); // Renforcé pour meilleur contraste (ratio 6:1)
+    border-color: var(--border-strong);
     svg {
-      fill: @neutral-500;
+      fill: var(--text-secondary);
     }
   }
 

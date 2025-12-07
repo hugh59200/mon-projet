@@ -24,9 +24,9 @@ html body * {
 input {
   width: 100%;
   min-width: 0;
-  background: @white;
+  background: var(--input-bg);
+  color: var(--input-text);
   font-weight: @font-weight-regular;
-  border: 1px solid @neutral-200;
   caret-color: var(--primary-600);
   transition:
     border-color 0.2s,
@@ -38,7 +38,7 @@ input {
   text-overflow: ellipsis;
 
   &::placeholder {
-    color: @neutral-400;
+    color: var(--input-placeholder);
     font-size: @font-size-body-m;
   }
 
@@ -46,8 +46,8 @@ input {
   &[disabled] {
     caret-color: transparent;
     cursor: default !important;
-    background-color: @neutral-100;
-    color: @neutral-500;
+    background-color: var(--input-bg-disabled);
+    color: var(--text-disabled);
   }
 
   &[disabled] {
@@ -55,7 +55,7 @@ input {
   }
 
   &[readonly] {
-    background-color: @neutral-0;
+    background-color: var(--bg-surface);
   }
 }
 
@@ -66,8 +66,12 @@ input {
     height: 6px;
 
     &-thumb {
-      background-color: @neutral-200;
+      background-color: var(--scrollbar-thumb);
       border-radius: 6px;
+    }
+
+    &-track {
+      background-color: var(--scrollbar-track);
     }
   }
 }
@@ -76,7 +80,7 @@ input {
   /* Styles spécifiques Firefox */
   .scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: @neutral-100 transparent;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 }
 

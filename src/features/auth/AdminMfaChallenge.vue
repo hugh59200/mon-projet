@@ -243,7 +243,7 @@ function onPaste(event: ClipboardEvent) {
   gap: 8px;
   padding: 12px 16px;
   background: var(--color-danger-50);
-  border: 1px solid var(--color-danger-200);
+  border: 1px solid var(--color-danger-400); // Renforcé pour meilleur contraste
   border-radius: 10px;
   color: var(--color-danger-700);
   font-size: 14px;
@@ -259,7 +259,7 @@ function onPaste(event: ClipboardEvent) {
 .mfa-links {
   text-align: center;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-secondary); // Adapté au thème light/dark
 
   a {
     color: var(--primary-600);

@@ -4,7 +4,6 @@
       class="basic-hint"
       size="body-s"
       wrap
-      color="neutral-500"
     >
       <slot>{{ hint }}</slot>
     </BasicText>

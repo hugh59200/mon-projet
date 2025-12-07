@@ -6,12 +6,6 @@
       { 'newsletter-signup--success': isSuccess }
     ]"
   >
-    <!-- Glow effect -->
-    <div
-      v-if="variant === 'premium'"
-      class="newsletter-signup__glow"
-    ></div>
-
     <!-- Success State -->
     <Transition
       name="fade-scale"
@@ -343,22 +337,6 @@
       border: 1px solid rgba(var(--primary-500-rgb), 0.15);
       border-radius: 24px;
       overflow: hidden;
-
-      .newsletter-signup__glow {
-        position: absolute;
-        top: -50%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 200%;
-        height: 100%;
-        background: radial-gradient(
-          ellipse at center top,
-          rgba(var(--primary-400-rgb), 0.15) 0%,
-          transparent 60%
-        );
-        pointer-events: none;
-        animation: pulse-glow 4s ease-in-out infinite;
-      }
 
       .newsletter-signup__content {
         position: relative;
@@ -780,21 +758,6 @@
     }
   }
 
-  // ============================================
-  // ANIMATIONS
-  // ============================================
-
-  @keyframes pulse-glow {
-    0%,
-    100% {
-      opacity: 0.5;
-      transform: translateX(-50%);
-    }
-    50% {
-      opacity: 0.8;
-      transform: translateX(-50%);
-    }
-  }
 
   @keyframes success-pop {
     0% {

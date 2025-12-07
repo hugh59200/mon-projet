@@ -1,20 +1,23 @@
 /* ══════════════════════════════════════════════════════════════
    COLORS SYSTEM — FastPeptides Design Tokens
    ══════════════════════════════════════════════════════════════
-   
+
    Ce fichier définit toutes les couleurs du design system.
    Chaque couleur a une variable LESS (@color) et une variable CSS (--color).
    Les variantes RGB (--color-rgb) permettent l'utilisation avec rgba().
-   
+
    Usage:
    - LESS:  background: @danger-500;
    - CSS:   background: var(--danger-500);
    - RGBA:  background: rgba(var(--danger-500-rgb), 0.5);
-   
+
    ══════════════════════════════════════════════════════════════ */
 
-/* Thèmes CSS */
+/* Thèmes CSS (primary/secondary colors: blue/brown) */
 @import "./theme-variables.less";
+
+/* Thème sémantique (light/dark mode) */
+@import "./semantic-theme.less";
 
 /* ══════════════════════════════════════════════════════════════
    UTILITY MIXIN — Generate RGB variables

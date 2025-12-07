@@ -136,8 +136,10 @@
 
   .footer {
     position: relative;
-    background: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
+    background: linear-gradient(180deg, var(--footer-bg-start) 0%, var(--footer-bg-end) 100%);
     overflow: hidden;
+    transition: background 0.3s ease;
+    border-top: 1px solid var(--chrome-border);
 
     // ============================================
     // GLOW EFFECT
@@ -186,7 +188,7 @@
       grid-template-columns: 1.4fr 2fr 1fr;
       gap: 48px;
       padding-bottom: 32px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid var(--chrome-border-subtle);
     }
 
     // ============================================
@@ -205,7 +207,7 @@
     &__tagline {
       font-family: @font-body;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--chrome-text-muted);
       line-height: 1.6;
       margin: 0;
       max-width: 260px;
@@ -221,7 +223,7 @@
       gap: 8px;
       font-family: @font-body;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.4);
+      color: var(--chrome-text-subtle);
       text-decoration: none;
       transition: color 0.2s @ease;
 
@@ -258,7 +260,7 @@
       font-family: @font-display;
       font-size: 11px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--chrome-text-muted);
       text-transform: uppercase;
       letter-spacing: 0.8px;
       margin: 0 0 4px;
@@ -282,7 +284,7 @@
       span {
         font-family: @font-body;
         font-size: 13px;
-        color: rgba(255, 255, 255, 0.45);
+        color: var(--chrome-text-subtle);
         text-decoration: none;
         transition: all 0.2s @ease;
       }
@@ -292,7 +294,7 @@
       }
 
       svg {
-        color: rgba(255, 255, 255, 0.25);
+        color: var(--chrome-border);
         flex-shrink: 0;
       }
 
@@ -329,7 +331,7 @@
       gap: 32px;
       margin-top: 24px;
       padding: 20px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--chrome-border-subtle);
     }
 
     &__trust-payments {
@@ -342,7 +344,7 @@
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--chrome-text-subtle);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -364,15 +366,15 @@
       font-family: @font-body;
       font-size: 11px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--chrome-text-muted);
       padding: 3px 8px;
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--chrome-hover);
       border-radius: 4px;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.7);
+        background: var(--chrome-active);
+        color: var(--chrome-text);
       }
     }
 
@@ -387,7 +389,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.45);
+      color: var(--chrome-text-subtle);
 
       svg {
         color: #10b981;
@@ -408,7 +410,7 @@
     &__copyright {
       font-family: @font-body;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--chrome-text-subtle);
       margin: 0;
     }
 
@@ -419,7 +421,7 @@
       a {
         font-family: @font-body;
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--chrome-text-subtle);
         text-decoration: none;
         transition: color 0.2s @ease;
 
@@ -438,9 +440,9 @@
     &__version {
       font-family: @font-body;
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.25);
+      color: var(--chrome-border);
       padding: 3px 8px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--chrome-hover);
       border-radius: 4px;
     }
 
@@ -450,12 +452,12 @@
       gap: 5px;
       font-family: @font-body;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
+      color: var(--chrome-text-subtle);
       cursor: pointer;
       transition: color 0.2s @ease;
 
       &:hover {
-        color: white;
+        color: var(--chrome-text);
       }
     }
 
@@ -476,7 +478,7 @@
         align-items: center;
         gap: 24px;
         padding-bottom: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid var(--chrome-border-subtle);
       }
 
       &__tagline {
@@ -532,7 +534,7 @@
           align-items: center;
           text-align: center;
           padding-bottom: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid var(--chrome-border-subtle);
         }
       }
 
@@ -584,7 +586,7 @@
         gap: 16px;
         padding-top: 20px;
         margin-top: 4px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        border-top: 1px solid var(--chrome-border-subtle);
 
         @media (max-width: 480px) {
           grid-row: 3;
