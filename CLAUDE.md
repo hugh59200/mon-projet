@@ -2,9 +2,50 @@
 
 Ce fichier fournit des instructions à Claude Code (claude.ai/code) pour travailler avec ce dépôt.
 
+## Documentation complémentaire
+
+**IMPORTANT** : Lire le fichier `readme/README_2.md` pour le contexte complet du projet (fonctionnalités, roadmap, décisions techniques).
+
 ## Langue
 
 Toujours répondre en français.
+
+## Règles UI/UX strictes
+
+- **JAMAIS d'effet de grossissement (scale) au hover** - Pas de `transform: scale()` sur les interactions hover
+- **Pas de glow/halo décoratifs** - Éviter les `radial-gradient` décoratifs qui créent des halos visuels
+
+## Gestion Supabase
+
+### Modifications SQL
+
+Quand une modification de schéma SQL est nécessaire :
+1. **Mettre à jour le backup** : `supabase/script/back-up-tables-v6.sql`
+2. **Mettre à jour le seed** : `supabase/script/seed-v6.sql`
+3. **Exécuter** les scripts dans Supabase (backup d'abord, puis seed)
+
+### Edge Functions
+
+Quand une Edge Function est créée ou modifiée :
+- **Déployer automatiquement** avec `npm run deploy:functions`
+
+### Types Supabase - Récursivité JSON
+
+En cas d'erreur de récursivité liée aux types JSON générés par Supabase :
+```typescript
+// Surcharger le type problématique en `any`
+type MyTable = Database['public']['Tables']['my_table']['Row'] & {
+  json_column: any // Surcharge pour éviter la récursivité
+}
+```
+
+## Maintenance de la documentation
+
+**Mettre à jour régulièrement** les fichiers README quand :
+- Nouvelle feature ajoutée
+- Changement d'architecture
+- Nouvelles conventions établies
+- Scripts ou commandes ajoutés
 
 ## Commandes de Build & Développement
 
