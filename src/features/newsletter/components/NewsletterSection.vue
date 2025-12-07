@@ -1,5 +1,7 @@
 <template>
-  <section class="newsletter-section">
+  <div class="newsletter-section">
+    <!-- Conteneur centré max-width 1200px -->
+    <div class="newsletter-section__container">
       <!-- Left: Content -->
       <div class="newsletter-section__content">
         <div class="newsletter-section__badge">
@@ -38,23 +40,29 @@
         </ul>
       </div>
 
-      <!-- Right: Signup Form -->
-      <div class="newsletter-section__form-wrapper">
+      <!-- Right: Signup Form (theme dynamique via ContentBlock) -->
+      <ContentBlock
+        variant="card"
+        padding="24px"
+        class="newsletter-section__form-wrapper"
+      >
         <NewsletterSignup
           variant="premium"
           source="website"
           :show-features="false"
           :show-name-field="true"
         />
-      </div>
-  </section>
+      </ContentBlock>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
   import { useLanguage } from '@/composables/useLanguage'
-  import NewsletterSignup from './NewsletterSignup.vue'
   import type { IconNameNext } from '@designSystem/components/basic/icon/BasicIconNext.types'
+  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
+  import { computed } from 'vue'
+  import NewsletterSignup from './NewsletterSignup.vue'
 
   const { t } = useLanguage()
 
@@ -90,11 +98,21 @@
 
 <style scoped lang="less">
   .newsletter-section {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
+    width: 100%;
+
+    // ============================================
+    // CONTAINER (centré, max-width 1200px)
+    // ============================================
+
+    &__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 50px;
+    }
 
     // ============================================
     // CONTENT (Left)
@@ -192,12 +210,13 @@
     }
 
     // ============================================
-    // FORM WRAPPER (Right)
+    // FORM WRAPPER (Right) - ContentBlock avec theme dynamique
     // ============================================
 
     &__form-wrapper {
-      display: flex;
-      justify-content: flex-end;
+      justify-self: end;
+      overflow: hidden;
+      min-width: 0; // Empêche le débordement dans le grid
     }
 
     // ============================================
@@ -205,8 +224,11 @@
     // ============================================
 
     .respond-tablet({
-      grid-template-columns: 1fr;
-      gap: 40px;
+      &__container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 0 24px;
+      }
 
       &__content {
         text-align: center;
@@ -234,12 +256,16 @@
       }
 
       &__form-wrapper {
-        justify-content: center;
+        justify-self: center;
+        max-width: 100%;
       }
     });
 
     .respond-mobile({
-      gap: 28px;
+      &__container {
+        gap: 28px;
+        padding: 0 16px;
+      }
 
       &__title {
         font-size: 26px;

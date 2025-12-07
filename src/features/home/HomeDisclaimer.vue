@@ -20,7 +20,6 @@
     'SF Pro Text',
     -apple-system,
     sans-serif;
-  @light-text-secondary: @neutral-600;
 
   .disclaimer {
     display: flex;
@@ -45,7 +44,7 @@
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: @light-text-secondary;
+      color: var(--content-block-text-secondary);
       margin: 0;
 
       strong {

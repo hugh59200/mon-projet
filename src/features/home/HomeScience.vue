@@ -12,7 +12,11 @@
       class="hero-banner__top"
       ref="topSection"
     >
-      <div class="hero-banner__panel">
+      <ContentBlock
+        variant="card"
+        size="sm"
+        class="hero-banner__panel"
+      >
         <div class="hero-banner__top-text">
           <BasicText
             size="body-s"
@@ -87,19 +91,23 @@
             </BasicText>
           </div>
         </div>
-      </div>
+      </ContentBlock>
 
       <div class="hero-banner__personas">
-        <article
+        <ContentBlock
           v-for="persona in personas"
           :key="persona.id"
+          variant="card"
+          size="sm"
+          padding="10px"
           class="persona-card"
         >
           <div class="persona-card__image-wrap">
             <img
               :src="persona.image"
               :alt="persona.alt"
-              loading="lazy"
+              @error="(e) => console.error('[IMG ERROR]', persona.id, e)"
+              @load="() => console.log('[IMG LOADED]', persona.id)"
             />
             <BasicText class="persona-card__tag">
               {{ persona.tag }}
@@ -119,11 +127,15 @@
               {{ persona.role }}
             </BasicText>
           </div>
-        </article>
+        </ContentBlock>
       </div>
     </div>
 
-    <div
+    <ContentBlock
+      variant="flat"
+      bg="surface"
+      padding="20px 0"
+      :no-border="true"
       class="hero-banner__bottom"
       ref="carouselContainer"
     >
@@ -166,13 +178,14 @@
           </div>
         </div>
       </div>
-    </div>
+    </ContentBlock>
   </section>
 </template>
 
 <script setup lang="ts">
   import { PERSONA_ASSETS } from '@/config/personaAssets'
   import { useProductsStore } from '@/features/catalogue/composables/useProducts'
+  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { storeToRefs } from 'pinia'
@@ -195,11 +208,15 @@
   const scrollTrack = ref<HTMLElement>()
   const carouselContainer = ref<HTMLElement>()
 
-  let scrollTimeline: gsap.core.Timeline | null = null
-  let isPaused = false
+  // TODO: Réactiver les animations plus tard
+  // let scrollTimeline: gsap.core.Timeline | null = null
+  // let isPaused = false
 
   // URLs des images persona depuis Supabase Storage
   const personaImages = PERSONA_ASSETS
+
+  // Debug: vérifier que les URLs sont correctes
+  console.log('[HomeScience] Persona images:', personaImages)
 
   type Persona = {
     id: string
@@ -249,60 +266,26 @@
     router.push(`/catalogue/${p.id}`)
   }
 
-  /**
-   * Crée l'animation ping-pong du carousel
-   * - Défile vers la gauche
-   * - Pause 3 secondes
-   * - Défile vers la droite (retour)
-   * - Pause 3 secondes
-   * - Répète
-   */
-  function createPingPongAnimation() {
-    const track = scrollTrack.value
-    const container = carouselContainer.value
-
-    if (!track || !container) return
-
-    // Kill l'ancienne animation si elle existe
-    if (scrollTimeline) {
-      scrollTimeline.kill()
-      gsap.set(track, { x: 0 })
-    }
-
-    // Calcul du déplacement nécessaire
-    const trackWidth = track.scrollWidth
-    const containerWidth = container.clientWidth
-    const maxScroll = trackWidth - containerWidth
-
-    // Si le contenu ne dépasse pas, pas besoin d'animation
-    if (maxScroll <= 0) return
-
-    // Durée basée sur la distance (~40px/seconde pour une vitesse confortable)
-    const scrollDuration = Math.max(12, maxScroll / 40)
-
-    // Création de la timeline ping-pong
-    scrollTimeline = gsap.timeline({ repeat: -1 })
-
-    // 1. Défilement vers la gauche (début -> fin)
-    scrollTimeline.to(track, {
-      x: -maxScroll,
-      duration: scrollDuration,
-      ease: 'none',
-    })
-
-    // 2. Pause de 3 secondes à la fin
-    scrollTimeline.to({}, { duration: 3 })
-
-    // 3. Défilement vers la droite (fin -> début)
-    scrollTimeline.to(track, {
-      x: 0,
-      duration: scrollDuration,
-      ease: 'none',
-    })
-
-    // 4. Pause de 3 secondes au début
-    scrollTimeline.to({}, { duration: 3 })
-  }
+  // TODO: Réactiver les animations plus tard
+  // function createPingPongAnimation() {
+  //   const track = scrollTrack.value
+  //   const container = carouselContainer.value
+  //   if (!track || !container) return
+  //   if (scrollTimeline) {
+  //     scrollTimeline.kill()
+  //     gsap.set(track, { x: 0 })
+  //   }
+  //   const trackWidth = track.scrollWidth
+  //   const containerWidth = container.clientWidth
+  //   const maxScroll = trackWidth - containerWidth
+  //   if (maxScroll <= 0) return
+  //   const scrollDuration = Math.max(12, maxScroll / 40)
+  //   scrollTimeline = gsap.timeline({ repeat: -1 })
+  //   scrollTimeline.to(track, { x: -maxScroll, duration: scrollDuration, ease: 'none' })
+  //   scrollTimeline.to({}, { duration: 3 })
+  //   scrollTimeline.to(track, { x: 0, duration: scrollDuration, ease: 'none' })
+  //   scrollTimeline.to({}, { duration: 3 })
+  // }
 
   // Recréer l'animation quand les produits changent
   // watch(
@@ -317,61 +300,45 @@
   onMounted(() => {
     load()
 
+    // TODO: Réactiver les animations plus tard (désactivées pour perf)
     // Animation d'entrée
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+    // const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+    //
+    // if (heroSection.value) {
+    //   tl.from(heroSection.value, { opacity: 0, duration: 0.5 })
+    // }
+    //
+    // if (topSection.value) {
+    //   const textBlock = topSection.value.querySelector('.hero-banner__top-text')
+    //   const cards = topSection.value.querySelectorAll('.persona-card')
+    //
+    //   if (textBlock) {
+    //     tl.from(textBlock, { y: 24, opacity: 0, duration: 0.5 }, '-=0.25')
+    //   }
+    //
+    //   if (cards.length) {
+    //     tl.from(cards, { y: 20, opacity: 0, stagger: 0.1, duration: 0.4 }, '-=0.2')
+    //   }
+    // }
 
-    if (heroSection.value) {
-      tl.from(heroSection.value, { opacity: 0, duration: 0.5 })
-    }
+    // Carousel ping-pong désactivé pour perf
+    // setTimeout(createPingPongAnimation, 500)
 
-    if (topSection.value) {
-      const textBlock = topSection.value.querySelector('.hero-banner__top-text')
-      const cards = topSection.value.querySelectorAll('.persona-card')
-
-      if (textBlock) {
-        tl.from(textBlock, { y: 24, opacity: 0, duration: 0.5 }, '-=0.25')
-      }
-
-      if (cards.length) {
-        tl.from(cards, { y: 28, opacity: 0, stagger: 0.12, duration: 0.45 }, '-=0.2')
-      }
-    }
-
-    // Initialiser l'animation du carousel (sera recréée quand les produits arrivent)
-    setTimeout(createPingPongAnimation, 500)
-
-    // Pause/Resume au hover
-    const container = carouselContainer.value
-    if (container) {
-      container.addEventListener('mouseenter', () => {
-        if (scrollTimeline && !isPaused) {
-          scrollTimeline.pause()
-          isPaused = true
-        }
-      })
-      container.addEventListener('mouseleave', () => {
-        if (scrollTimeline && isPaused) {
-          scrollTimeline.resume()
-          isPaused = false
-        }
-      })
-    }
-
-    // Glow animé
-    if (glowLayer.value) {
-      gsap.to(glowLayer.value, {
-        backgroundPosition: '200% 100%',
-        duration: 22,
-        ease: 'none',
-        repeat: -1,
-        yoyo: true,
-      })
-    }
+    // Glow animé désactivé pour perf
+    // if (glowLayer.value) {
+    //   gsap.to(glowLayer.value, {
+    //     backgroundPosition: '200% 100%',
+    //     duration: 22,
+    //     ease: 'none',
+    //     repeat: -1,
+    //     yoyo: true,
+    //   })
+    // }
   })
 
   onBeforeUnmount(() => {
-    scrollTimeline?.kill()
-    ScrollTrigger.getAll().forEach((t) => t.kill())
+    // scrollTimeline?.kill()
+    // ScrollTrigger.getAll().forEach((t) => t.kill())
   })
 </script>
 
@@ -385,6 +352,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 
     // Géré par ContentBlock parent
     &__glow {
@@ -412,16 +380,11 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // LEFT PANEL
+    // LEFT PANEL (ContentBlock gère bg/border/shadow)
     // ═══════════════════════════════════════════════════════════════
     &__panel {
       flex: 0 0 360px;
-      padding: 28px;
-      border-radius: 20px;
       position: relative;
-      background: var(--content-block-bg-subtle);
-      border: 1px solid var(--content-block-border);
-      box-shadow: var(--shadow-md);
 
       &::before {
         content: '';
@@ -432,6 +395,7 @@
         width: 4px;
         border-radius: 0 4px 4px 0;
         background: linear-gradient(to bottom, var(--primary-400), var(--primary-200));
+        z-index: 1;
       }
     }
 
@@ -497,23 +461,11 @@
       gap: 18px;
     }
 
+    // ContentBlock gère bg/border/shadow
     .persona-card {
-      max-width: 320px;
-      max-height: 220px;
-      background: var(--content-block-bg-subtle);
-      border-radius: 14px;
-      padding: 10px;
-      border: 1px solid var(--content-block-border);
-      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       gap: 8px;
-      transition: all 0.2s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-      }
 
       &__image-wrap {
         position: relative;
@@ -521,11 +473,14 @@
         overflow: hidden;
         background: var(--content-block-bg-subtle);
         aspect-ratio: 4 / 3;
+        min-height: 120px;
 
         img {
+          display: block;
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center top;
         }
       }
 
@@ -557,15 +512,13 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // BOTTOM CAROUSEL
+    // BOTTOM CAROUSEL (ContentBlock gère bg/border)
     // ═══════════════════════════════════════════════════════════════
     &__bottom {
       position: relative;
       z-index: 2;
-      background: var(--content-block-bg-subtle);
-      border-top: 1px solid var(--content-block-border);
-      padding: 20px 0;
       overflow: hidden;
+      border-radius: 0 !important;
     }
 
     &__bottom-inner {

@@ -2,7 +2,6 @@
   <div class="home">
     <ContentBlock
       variant="flat"
-      width="100%"
       padding="0"
       min-height="500px"
       border-radius="0"
@@ -12,27 +11,26 @@
       <HomeHero />
     </ContentBlock>
     <ContentBlock
-      size="lg"
-      max-width="1200px"
-      theme="dark"
-    >
-      <HomeQuality />
-    </ContentBlock>
-    <ContentBlock
-      variant="card"
+      variant="flat"
+      bg="transparent"
       max-width="1200px"
       padding="0"
+      :no-border="true"
       theme="dark"
     >
       <CategoryHeroBanner />
     </ContentBlock>
     <ContentBlock
-      variant="card"
-      max-width="1200px"
-      padding="60px 50px"
+      variant="flat"
+      width="100%"
+      padding="30px 0"
+      border-radius="0"
+      :no-border="true"
       theme="dark"
+      :bg-image="bgQualityImage"
+      :bg-opacity="0.35"
     >
-      <NewsletterSection />
+      <HomeQuality />
     </ContentBlock>
     <ContentBlock
       variant="card"
@@ -43,10 +41,23 @@
       <HomeScience />
     </ContentBlock>
     <ContentBlock
+      variant="flat"
+      width="100%"
+      padding="40px 0"
+      border-radius="0"
+      :no-border="true"
+      theme="dark"
+      :bg-image="bgNewsletterImage"
+    >
+      <NewsletterSection />
+    </ContentBlock>
+    <ContentBlock
       variant="card"
-      size="lg"
       theme="dark"
       max-width="1200px"
+      size="lg"
+      :no-border="true"
+      :bg-image="bgCtaImage"
     >
       <HomeCta />
     </ContentBlock>
@@ -54,6 +65,9 @@
 </template>
 
 <script setup lang="ts">
+  import bgCtaImage from '@/assets/bg-cta.png'
+  import bgNewsletterImage from '@/assets/bg-newsletter.png'
+  import bgQualityImage from '@/assets/bg-quality.png'
   import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
   import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { useHead } from '@vueuse/head'

@@ -1362,6 +1362,10 @@ export default {
       promotions: 'Promo codes and discounts',
       unsubscribe: 'Unsubscribe in 1 click',
     },
+    benefits: {
+      exclusive: 'Exclusive offers',
+      discounts: 'Subscriber discounts',
+    },
     success: {
       title: 'Subscription confirmed!',
       description: 'Welcome! You will soon receive our latest news.',

@@ -1,6 +1,7 @@
 <template>
   <section class="hero-section">
-      <!-- Image de fond -->
+    <!-- Image de fond (pleine largeur) -->
+    <div class="hero-section__bg">
       <div class="hero-section__bg-image">
         <img
           :src="peptidesHeroImage"
@@ -11,57 +12,70 @@
 
       <!-- Grille décorative -->
       <div class="hero-section__grid"></div>
+    </div>
 
+    <!-- Conteneur centré max-width 1200px -->
+    <div class="hero-section__container">
       <!-- Contenu -->
       <div class="hero-section__content">
-        <div class="hero__badge">
-          <span class="hero__badge-dot"></span>
-          <span>{{ t('home.hero.badge.certified') }}</span>
-          <span class="hero__badge-sep">•</span>
-          <span>{{ t('home.hero.badge.researchOnly') }}</span>
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        <span>{{ t('home.hero.badge.certified') }}</span>
+        <span class="hero__badge-sep">•</span>
+        <span>{{ t('home.hero.badge.researchOnly') }}</span>
+      </div>
+
+      <h1 class="hero__title">
+        <span>{{ t('home.hero.title.line1') }}</span>
+        <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
+        <span>{{ t('home.hero.title.line2') }}</span>
+      </h1>
+
+      <p class="hero__desc">
+        {{ t('home.hero.description') }}
+      </p>
+
+      <div class="hero__actions">
+        <BaseButton
+          variant="primary"
+          arrow
+          @click="$router.push('/catalogue')"
+        >
+          {{ t('home.hero.cta.explore') }}
+        </BaseButton>
+        <BaseButton
+          variant="ghost"
+          @click="$router.push('/a-propos')"
+        >
+          {{ t('home.hero.cta.learnMore') }}
+        </BaseButton>
+      </div>
+
+      <div class="hero__trust">
+        <div class="hero__trust-item">
+          <BasicIconNext
+            name="ShieldCheck"
+            :size="18"
+          />
+          <span>{{ t('home.hero.trust.purity') }}</span>
         </div>
-
-        <h1 class="hero__title">
-          <span>{{ t('home.hero.title.line1') }}</span>
-          <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
-          <span>{{ t('home.hero.title.line2') }}</span>
-        </h1>
-
-        <p class="hero__desc">
-          {{ t('home.hero.description') }}
-        </p>
-
-        <div class="hero__actions">
-          <BaseButton
-            variant="primary"
-            arrow
-            @click="$router.push('/catalogue')"
-          >
-            {{ t('home.hero.cta.explore') }}
-          </BaseButton>
-          <BaseButton
-            variant="ghost"
-            @click="$router.push('/a-propos')"
-          >
-            {{ t('home.hero.cta.learnMore') }}
-          </BaseButton>
+        <div class="hero__trust-item">
+          <BasicIconNext
+            name="FileText"
+            :size="18"
+          />
+          <span>{{ t('home.hero.trust.coa') }}</span>
         </div>
-
-        <div class="hero__trust">
-          <div class="hero__trust-item">
-            <BasicIconNext name="ShieldCheck" :size="18" />
-            <span>{{ t('home.hero.trust.purity') }}</span>
-          </div>
-          <div class="hero__trust-item">
-            <BasicIconNext name="FileText" :size="18" />
-            <span>{{ t('home.hero.trust.coa') }}</span>
-          </div>
-          <div class="hero__trust-item">
-            <BasicIconNext name="Zap" :size="18" />
-            <span>{{ t('home.hero.trust.delivery') }}</span>
-          </div>
+        <div class="hero__trust-item">
+          <BasicIconNext
+            name="Zap"
+            :size="18"
+          />
+          <span>{{ t('home.hero.trust.delivery') }}</span>
         </div>
       </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -92,13 +106,21 @@
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
+    min-height: 500px;
+
+    // Fond (pleine largeur)
+    &__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
 
     // Image de fond
     &__bg-image {
       position: absolute;
       inset: 0;
-      z-index: 0;
 
       img {
         width: 100%;
@@ -149,15 +171,23 @@
       pointer-events: none;
     }
 
-    // Contenu
-    &__content {
+    // Conteneur centré
+    &__container {
       position: relative;
       z-index: 2;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    // Contenu
+    &__content {
       display: flex;
       flex-direction: column;
       gap: 24px;
       max-width: 550px;
-      padding: 60px;
+      padding: 60px 0;
     }
   }
 
@@ -278,9 +308,13 @@
         );
       }
 
+      &__container {
+        padding: 0 20px;
+      }
+
       &__content {
         max-width: 500px;
-        padding: 40px;
+        padding: 40px 0;
       }
     }
   });
@@ -306,9 +340,13 @@
         }
       }
 
+      &__container {
+        padding: 0 16px;
+      }
+
       &__content {
         max-width: 100%;
-        padding: 32px 20px;
+        padding: 32px 0;
         text-align: center;
         align-items: center;
         gap: 20px;

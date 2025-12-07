@@ -88,18 +88,12 @@
       justify-content: center;
       align-items: stretch;
       gap: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(20, 20, 35, 0.95) 0%,
-        rgba(15, 15, 28, 0.98) 100%
-      );
+      background: var(--content-block-bg);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+      border: 1px solid var(--content-block-border);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      box-shadow: var(--shadow-lg);
     }
 
     &__item {
@@ -109,7 +103,7 @@
       justify-content: center;
       gap: 12px;
       padding: 22px 24px;
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid var(--content-block-border);
       transition: background 0.2s ease;
       text-decoration: none;
 
@@ -157,14 +151,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: @white;
+      color: var(--content-block-text);
       letter-spacing: -0.01em;
     }
 
     &__label {
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-400;
+      color: var(--content-block-text-muted);
     }
   }
 
@@ -181,7 +175,7 @@
       &__item {
         flex: 1 1 50%;
         padding: 16px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: 1px solid var(--content-block-border);
 
         &:nth-child(2) {
           border-right: none;

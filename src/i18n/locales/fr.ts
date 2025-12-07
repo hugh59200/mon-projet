@@ -1365,6 +1365,10 @@ export default {
       promotions: 'Codes promo et réductions',
       unsubscribe: 'Désinscription en 1 clic',
     },
+    benefits: {
+      exclusive: 'Offres exclusives',
+      discounts: 'Réductions abonnés',
+    },
     success: {
       title: 'Inscription confirmée !',
       description: 'Bienvenue ! Vous recevrez bientôt nos dernières actualités.',

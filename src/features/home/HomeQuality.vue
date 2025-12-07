@@ -1,128 +1,265 @@
 <template>
-  <section
-    class="layout-section layout-section--quality"
-    ref="sectionRef"
-  >
-    <div class="layout-section__bg">
-      <div class="layout-section__pattern"></div>
-      <div class="layout-section__glow layout-section__glow--quality-1"></div>
-      <div class="layout-section__glow layout-section__glow--quality-2"></div>
-    </div>
+  <div class="layout-section">
+    <!-- Conteneur centré max-width 1200px -->
+    <div class="layout-section__container">
+      <div class="layout-section__inner layout-section__inner--two-cols">
+        <div class="quality__content">
+          <span class="quality__badge">{{ t('home.quality.badge') }}</span>
+          <h2 class="quality__title">
+            {{ t('home.quality.title.line1') }}
+            <br />
+            <span>{{ t('home.quality.title.accent') }}</span>
+          </h2>
+          <p class="quality__desc">
+            {{ t('home.quality.description') }}
+          </p>
 
-    <div class="layout-section__inner layout-section__inner--two-cols">
-      <div class="quality__content">
-        <span class="quality__badge">{{ t('home.quality.badge') }}</span>
-        <h2 class="quality__title">
-          {{ t('home.quality.title.line1') }}
-          <br />
-          <span>{{ t('home.quality.title.accent') }}</span>
-        </h2>
-        <p class="quality__desc">
-          {{ t('home.quality.description') }}
-        </p>
-
-        <div class="quality__features">
-          <div
-            v-for="f in features"
-            :key="f.title"
-            class="quality__feature"
-            :class="`quality__feature--${f.variant}`"
-          >
-            <div class="quality__feature-icon">
-              <component :is="f.icon" />
-            </div>
-            <div class="quality__feature-text">
-              <h4>{{ f.title }}</h4>
-              <p>{{ f.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="quality__visual">
-        <div class="quality__coa-scroll">
-          <div class="quality__coa-track">
+          <div class="quality__features">
             <div
-              v-for="coa in coaList"
-              :key="coa.id"
-              class="coa-card"
+              v-for="f in features"
+              :key="f.title"
+              class="quality__feature"
+              :class="`quality__feature--${f.variant}`"
             >
-              <div class="coa-card__header">
-                <span class="coa-card__badge">COA</span>
-                <span class="coa-card__title">{{ coa.name }}</span>
+              <div class="quality__feature-icon">
+                <component :is="f.icon" />
               </div>
-              <div class="coa-card__body">
-                <div class="coa-card__row">
-                  <span>{{ t('home.quality.coa.hplc') }}</span>
-                  <span>{{ coa.ref }}</span>
-                </div>
-                <div class="coa-card__row">
-                  <span>{{ t('home.quality.coa.batch') }}</span>
-                  <span>{{ coa.batch }}</span>
-                </div>
-                <div class="coa-card__row coa-card__row--highlight">
-                  <span>{{ t('home.quality.coa.purity') }}</span>
-                  <span>{{ coa.purity }}</span>
-                </div>
-                <div class="coa-card__row">
-                  <span>{{ t('home.quality.coa.lcms') }}</span>
-                  <span>{{ coa.mass }}</span>
-                </div>
+              <div class="quality__feature-text">
+                <h4>{{ f.title }}</h4>
+                <p>{{ f.description }}</p>
               </div>
-              <div class="coa-card__footer">
-                <BasicIconNext name="CheckCircle2" :size="18" />
-                <span>{{ t('home.quality.coa.download') }}</span>
-              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quality__visual">
+          <div
+            class="quality__coa-scroll"
+            ref="scrollContainer"
+          >
+            <div class="quality__coa-track">
+              <ContentBlock
+                v-for="(coa, index) in infiniteCoaList"
+                :key="`${coa.id}-${index}`"
+                variant="card"
+                size="sm"
+                class="coa-card"
+              >
+                <div class="coa-card__header">
+                  <span class="coa-card__badge">COA</span>
+                  <span class="coa-card__title">{{ coa.name }}</span>
+                </div>
+                <div class="coa-card__body">
+                  <div class="coa-card__row">
+                    <span>{{ t('home.quality.coa.hplc') }}</span>
+                    <span>{{ coa.ref }}</span>
+                  </div>
+                  <div class="coa-card__row">
+                    <span>{{ t('home.quality.coa.batch') }}</span>
+                    <span>{{ coa.batch }}</span>
+                  </div>
+                  <div class="coa-card__row coa-card__row--highlight">
+                    <span>{{ t('home.quality.coa.purity') }}</span>
+                    <span>{{ coa.purity }}</span>
+                  </div>
+                  <div class="coa-card__row">
+                    <span>{{ t('home.quality.coa.lcms') }}</span>
+                    <span>{{ coa.mass }}</span>
+                  </div>
+                </div>
+                <button
+                  class="coa-card__footer"
+                  @click="downloadCoa(coa)"
+                >
+                  <BasicIconNext
+                    name="CheckCircle2"
+                    :size="18"
+                  />
+                  <span>{{ t('home.quality.coa.download') }}</span>
+                </button>
+              </ContentBlock>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, h, onMounted, ref } from 'vue'
+  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
+  import { computed, h, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
-  const sectionRef = ref<HTMLElement | null>(null)
+  const scrollContainer = ref<HTMLElement | null>(null)
 
-  // Liste des COA à afficher
-  const coaList = [
+  interface CoaItem {
+    id: string
+    name: string
+    ref: string
+    batch: string
+    purity: string
+    mass: string
+    coaUrl: string
+  }
+
+  // Liste statique des COA avec les vraies URLs
+  const coaList: CoaItem[] = [
     {
-      id: 'bpc157',
-      name: 'BPC-157 5mg',
-      ref: 'BPC-157-5mg',
-      batch: 'BP2024-0847',
-      purity: '99.4%',
-      mass: '1419.53 Da',
+      id: '1',
+      name: 'TB-500',
+      ref: 'TB500-5MG',
+      batch: '2025-1847',
+      purity: '99.2%',
+      mass: '5mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tb-500-10mg.jpg',
     },
     {
-      id: 'semaglutide',
-      name: 'Semaglutide 10mg',
-      ref: 'SEMA-10mg',
-      batch: 'SM2024-1203',
+      id: '2',
+      name: 'Tirzepatide',
+      ref: 'TIRZ-10MG',
+      batch: '2025-2341',
       purity: '98.7%',
-      mass: '4113.58 Da',
+      mass: '10mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tirzepatide-60mg.jpg',
     },
     {
-      id: 'tb500',
-      name: 'TB-500 5mg',
-      ref: 'TB500-5mg',
-      batch: 'TB2024-0562',
+      id: '3',
+      name: 'Retatrutide',
+      ref: 'RETA-10MG',
+      batch: '2025-3892',
       purity: '99.1%',
-      mass: '4963.50 Da',
+      mass: '10mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/retatrutide-60mg.jpg',
     },
     {
-      id: 'ipamorelin',
-      name: 'Ipamorelin 5mg',
-      ref: 'IPA-5mg',
-      batch: 'IP2024-0891',
-      purity: '99.6%',
-      mass: '711.85 Da',
+      id: '4',
+      name: 'CJC-1295 DAC',
+      ref: 'CJC-5MG',
+      batch: '2025-4521',
+      purity: '98.9%',
+      mass: '5mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/cjc-1295-5mg.jpg',
+    },
+    {
+      id: '5',
+      name: 'PT-141',
+      ref: 'PT141-10MG',
+      batch: '2025-5673',
+      purity: '99.4%',
+      mass: '10mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/pt-141-10mg.jpg',
+    },
+    {
+      id: '6',
+      name: 'Selank',
+      ref: 'SEL-5MG',
+      batch: '2025-6124',
+      purity: '99.0%',
+      mass: '5mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/selank-10mg.jpg',
+    },
+    {
+      id: '7',
+      name: 'Semax',
+      ref: 'SMX-5MG',
+      batch: '2025-7289',
+      purity: '98.8%',
+      mass: '5mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/semax-10mg.jpg',
+    },
+    {
+      id: '8',
+      name: 'GHK-Cu',
+      ref: 'GHKCU-100MG',
+      batch: '2025-8156',
+      purity: '99.3%',
+      mass: '100mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ghk-cu-100mg.jpg',
+    },
+    {
+      id: '9',
+      name: 'NAD+',
+      ref: 'NAD-500MG',
+      batch: '2025-9034',
+      purity: '99.5%',
+      mass: '500mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/nad-500mg.jpg',
+    },
+    {
+      id: '10',
+      name: 'DSIP',
+      ref: 'DSIP-5MG',
+      batch: '2025-1023',
+      purity: '98.6%',
+      mass: '5mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/dsip-5mg.jpg',
+    },
+    {
+      id: '11',
+      name: 'BPC-157',
+      ref: 'BPC-10MG',
+      batch: '2025-1198',
+      purity: '99.1%',
+      mass: '10mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/bpc-157-5mg.jpg',
+    },
+    {
+      id: '12',
+      name: 'SS-31',
+      ref: 'SS31-10MG',
+      batch: '2025-1267',
+      purity: '98.9%',
+      mass: '10mg',
+      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ss-31-50mg.jpg',
     },
   ]
+
+  // Télécharger le COA (comme dans ProductDetails)
+  async function downloadCoa(coa: CoaItem) {
+    try {
+      const response = await fetch(coa.coaUrl)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      // Déterminer l'extension depuis l'URL
+      const ext = coa.coaUrl.match(/\.(pdf|png|jpg|jpeg|webp)$/i)?.[1]?.toLowerCase() || 'jpg'
+      link.download = `${coa.name}_FreedomDiagnostics_Lot-${coa.batch}.${ext}`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Erreur téléchargement COA:', error)
+      // Fallback: ouvrir dans un nouvel onglet
+      window.open(coa.coaUrl, '_blank')
+    }
+  }
+
+  // Liste dupliquée pour l'effet infini
+  const infiniteCoaList = computed(() => [...coaList, ...coaList, ...coaList])
+
+  // TODO: Réactiver les animations plus tard
+  // const setupInfiniteScroll = () => {
+  //   const container = scrollContainer.value
+  //   if (!container) return
+  //   const handleScroll = () => {
+  //     const { scrollTop, scrollHeight } = container
+  //     const singleSetHeight = scrollHeight / 3
+  //     if (scrollTop >= singleSetHeight * 2) {
+  //       container.scrollTop = scrollTop - singleSetHeight
+  //     } else if (scrollTop <= 0) {
+  //       container.scrollTop = scrollTop + singleSetHeight
+  //     }
+  //   }
+  //   container.addEventListener('scroll', handleScroll)
+  //   requestAnimationFrame(() => {
+  //     const singleSetHeight = container.scrollHeight / 3
+  //     container.scrollTop = singleSetHeight
+  //   })
+  // }
 
   const icon = (d: string) => () =>
     h(
@@ -169,19 +306,10 @@
     },
   ])
 
-  onMounted(() => {
-    if ('IntersectionObserver' in window && sectionRef.value) {
-      const obs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) e.target.classList.add('is-visible')
-          })
-        },
-        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' },
-      )
-      obs.observe(sectionRef.value)
-    }
-  })
+  // TODO: Réactiver les animations plus tard (désactivées pour perf)
+  // onMounted(() => {
+  //   setupInfiniteScroll()
+  // })
 </script>
 
 <style scoped lang="less">
@@ -198,16 +326,16 @@
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   .layout-section {
-    position: relative;
     width: 100%;
 
-    &__bg {
-      display: none; // Géré par ContentBlock parent
+    // Conteneur centré
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 50px;
     }
 
     &__inner {
-      position: relative;
-      z-index: 1;
       &--two-cols {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -216,15 +344,16 @@
       }
     }
 
-    &--quality {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.8s @ease;
-      &.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    // TODO: Réactiver les animations plus tard
+    // &--quality {
+    //   opacity: 0;
+    //   transform: translateY(30px);
+    //   transition: all 0.8s @ease;
+    //   &.is-visible {
+    //     opacity: 1;
+    //     transform: translateY(0);
+    //   }
+    // }
   }
 
   .quality {
@@ -338,99 +467,66 @@
 
     &__coa-scroll {
       position: relative;
-      width: 320px;
-      height: 450px;
+      width: 280px;
+      height: 500px;
       border-radius: 20px;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      // Scrollbar invisible
+      scrollbar-width: none; // Firefox
+      -ms-overflow-style: none; // IE/Edge
+      &::-webkit-scrollbar {
+        display: none; // Chrome/Safari
+      }
 
       // Masques de fondu en haut et en bas
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 50px;
-        z-index: 2;
-        pointer-events: none;
-      }
-
-      &::before {
-        top: 0;
-        background: linear-gradient(
-          to bottom,
-          rgba(var(--secondary-900-rgb), 1) 0%,
-          transparent 100%
-        );
-      }
-
-      &::after {
-        bottom: 0;
-        background: linear-gradient(
-          to top,
-          rgba(var(--secondary-900-rgb), 1) 0%,
-          transparent 100%
-        );
-      }
+      mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 12%,
+        black 88%,
+        transparent 100%
+      );
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 12%,
+        black 88%,
+        transparent 100%
+      );
     }
 
     &__coa-track {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      padding: 20px 0;
-      animation: scrollCoaVertical 25s ease-in-out infinite;
-
-      &:hover {
-        animation-play-state: paused;
-      }
-    }
-
-    @keyframes scrollCoaVertical {
-      0%, 10% {
-        transform: translateY(0);
-      }
-      45%, 55% {
-        transform: translateY(calc(-50% + 225px));
-      }
-      90%, 100% {
-        transform: translateY(0);
-      }
+      gap: 12px;
+      padding: 16px 8px;
     }
   }
 
   .coa-card {
     flex-shrink: 0;
-    width: 300px;
+    width: 260px;
     margin: 0 auto;
-    background: rgba(var(--secondary-800-rgb), 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(var(--neutral-300-rgb), 0.1);
-    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-    transition: transform 0.3s @ease, box-shadow 0.3s @ease;
-
-    &:hover {
-      transform: scale(1.02);
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
-    }
+    padding: 0 !important; // Override ContentBlock padding
 
     &__header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      background: rgba(var(--secondary-700-rgb), 0.4);
-      border-bottom: 1px solid rgba(var(--neutral-300-rgb), 0.08);
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--content-block-bg-subtle);
+      border-bottom: 1px solid var(--content-block-border);
     }
 
     &__badge {
-      padding: 3px 8px;
+      padding: 2px 6px;
       background: rgba(@success-500, 0.2);
-      border-radius: 5px;
+      border-radius: 4px;
       font-family: @font-body;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -439,23 +535,23 @@
 
     &__title {
       font-family: @font-body;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--content-block-text);
     }
 
     &__body {
-      padding: 14px 16px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     &__row {
       display: flex;
       justify-content: space-between;
       font-family: @font-body;
-      font-size: 12px;
+      font-size: 11px;
 
       span:first-child {
         color: var(--content-block-text-muted);
@@ -467,15 +563,15 @@
       }
 
       &--highlight {
-        padding: 10px;
-        margin: 2px -8px;
+        padding: 8px;
+        margin: 2px -6px;
         background: rgba(@success-500, 0.1);
         border-radius: 6px;
 
         span:last-child {
           color: @success-500;
           font-weight: 700;
-          font-size: 14px;
+          font-size: 12px;
         }
       }
     }
@@ -484,14 +580,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 12px 16px;
+      gap: 5px;
+      width: 100%;
+      padding: 8px 12px;
       background: rgba(@success-500, 0.08);
-      border-top: 1px solid rgba(var(--neutral-300-rgb), 0.08);
+      border: none;
+      border-top: 1px solid var(--content-block-border);
       font-family: @font-body;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       color: @success-500;
+      cursor: pointer;
+      transition: background 0.2s @ease;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover {
+        background: rgba(@success-500, 0.15);
+      }
     }
   }
 

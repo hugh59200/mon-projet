@@ -3,7 +3,7 @@
     :class="[
       'newsletter-signup',
       `newsletter-signup--${variant}`,
-      { 'newsletter-signup--success': isSuccess }
+      { 'newsletter-signup--success': isSuccess },
     ]"
   >
     <!-- Success State -->
@@ -32,179 +32,246 @@
         key="form"
         class="newsletter-signup__content"
       >
-        <!-- Header -->
-        <div class="newsletter-signup__header">
-          <div
-            v-if="variant === 'premium'"
-            class="newsletter-signup__badge"
-          >
-            <BasicIconNext
-              name="Sparkles"
-              :size="14"
-            />
-            <span>{{ t('newsletter.badge') }}</span>
+        <!-- Premium Layout -->
+        <template v-if="variant === 'premium'">
+          <!-- Custom Icon -->
+          <div class="newsletter-signup__hero-icon">
+            <div class="newsletter-signup__hero-icon-inner">
+              <BasicIconNext
+                name="Mail"
+                :size="28"
+              />
+            </div>
+            <div class="newsletter-signup__hero-icon-ring"></div>
           </div>
 
-          <div class="newsletter-signup__icon-wrapper">
-            <BasicIconNext
-              :name="variant === 'premium' ? 'Mail' : 'Send'"
-              :size="variant === 'premium' ? 24 : 20"
-              class="newsletter-signup__icon"
-            />
-          </div>
-
-          <div class="newsletter-signup__text">
+          <!-- Title & Description -->
+          <div class="newsletter-signup__header-premium">
             <h4 class="newsletter-signup__title">{{ title || t('newsletter.title') }}</h4>
             <p class="newsletter-signup__desc">{{ description || t('newsletter.description') }}</p>
           </div>
-        </div>
 
-        <!-- Features (Premium only) -->
-        <ul
-          v-if="variant === 'premium' && showFeatures"
-          class="newsletter-signup__features"
-        >
-          <li
-            v-for="feature in features"
-            :key="feature"
-          >
-            <BasicIconNext
-              name="Check"
-              :size="16"
-            />
-            <span>{{ feature }}</span>
-          </li>
-        </ul>
-
-        <!-- Form -->
-        <form
-          class="newsletter-signup__form"
-          @submit.prevent="handleSubmit"
-        >
-          <!-- Compact title -->
-          <span
-            v-if="variant === 'compact'"
-            class="newsletter-signup__compact-title"
-          >
-            {{ t('newsletter.compactTitle') }}
-          </span>
-
-          <div class="newsletter-signup__input-wrapper">
-            <!-- Compact: input avec bouton intégré à droite -->
-            <div
-              v-if="variant === 'compact'"
-              class="newsletter-signup__input-inline"
-            >
+          <!-- Inline benefits -->
+          <div class="newsletter-signup__benefits">
+            <div class="newsletter-signup__benefit">
               <BasicIconNext
-                name="Mail"
+                name="Gift"
                 :size="16"
-                class="newsletter-signup__input-icon"
               />
-              <input
+              <span>{{ t('newsletter.benefits.exclusive') }}</span>
+            </div>
+            <div class="newsletter-signup__benefit">
+              <BasicIconNext
+                name="Percent"
+                :size="16"
+              />
+              <span>{{ t('newsletter.benefits.discounts') }}</span>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form
+            class="newsletter-signup__form"
+            @submit.prevent="handleSubmit"
+          >
+            <div class="newsletter-signup__input-wrapper">
+              <BasicInput
                 v-model="email"
                 type="email"
                 :placeholder="t('newsletter.placeholder')"
+                icon-name="Mail"
+                icon-state="iconLeft"
                 autocomplete="email"
+                size="large"
                 :disabled="isLoading"
-                class="newsletter-signup__input-field"
+                class="newsletter-signup__input"
                 @keydown.enter="handleSubmit"
               />
-              <button
-                type="submit"
-                class="newsletter-signup__input-btn"
+
+              <BasicInput
+                v-if="showNameField"
+                v-model="firstName"
+                type="text"
+                :placeholder="t('newsletter.namePlaceholder')"
+                icon-name="User"
+                icon-state="iconLeft"
+                autocomplete="given-name"
+                size="large"
                 :disabled="isLoading"
-              >
-                <BasicIconNext
-                  v-if="!isLoading"
-                  name="ArrowRight"
-                  :size="16"
-                />
-                <BasicIconNext
-                  v-else
-                  name="Loader2"
-                  :size="16"
-                  class="newsletter-signup__input-btn-loading"
-                />
-              </button>
+                class="newsletter-signup__input"
+              />
             </div>
 
-            <!-- Premium/Default: use BasicInput -->
-            <BasicInput
-              v-else
-              v-model="email"
-              type="email"
-              :placeholder="t('newsletter.placeholder')"
-              icon-name="Mail"
-              icon-state="iconLeft"
-              autocomplete="email"
-              :size="variant === 'premium' ? 'large' : 'medium'"
-              :disabled="isLoading"
-              class="newsletter-signup__input"
-              @keydown.enter="handleSubmit"
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="lg"
+              icon-right="ArrowRight"
+              :label="t('newsletter.cta')"
+              :loading="isLoading"
+              html-type="submit"
+              class="newsletter-signup__btn"
             />
+          </form>
 
-            <!-- Name field for premium variant -->
-            <BasicInput
-              v-if="variant === 'premium' && showNameField"
-              v-model="firstName"
-              type="text"
-              :placeholder="t('newsletter.namePlaceholder')"
-              icon-name="User"
-              icon-state="iconLeft"
-              autocomplete="given-name"
-              size="large"
-              :disabled="isLoading"
-              class="newsletter-signup__input"
+          <!-- Error message -->
+          <Transition name="fade">
+            <p
+              v-if="errorMessage"
+              class="newsletter-signup__error"
+            >
+              <BasicIconNext
+                name="AlertCircle"
+                :size="14"
+              />
+              {{ errorMessage }}
+            </p>
+          </Transition>
+
+          <!-- Privacy note -->
+          <p class="newsletter-signup__privacy">
+            <BasicIconNext
+              name="Lock"
+              :size="12"
             />
+            {{ t('newsletter.privacy') }}
+          </p>
+        </template>
+
+        <!-- Other variants (compact, inline) -->
+        <template v-else>
+          <!-- Header -->
+          <div class="newsletter-signup__header">
+            <div class="newsletter-signup__icon-wrapper">
+              <BasicIconNext
+                name="Send"
+                :size="20"
+                class="newsletter-signup__icon"
+              />
+            </div>
+
+            <div class="newsletter-signup__text">
+              <h4 class="newsletter-signup__title">{{ title || t('newsletter.title') }}</h4>
+              <p class="newsletter-signup__desc">
+                {{ description || t('newsletter.description') }}
+              </p>
+            </div>
           </div>
 
-          <PremiumButton
-            v-if="variant !== 'compact'"
-            type="primary"
-            variant="solid"
-            :size="variant === 'premium' ? 'lg' : 'sm'"
-            :icon-left="variant === 'premium' ? 'ArrowRight' : undefined"
-            :icon-right="variant === 'inline' ? 'ArrowRight' : undefined"
-            :label="variant === 'premium' ? t('newsletter.cta') : ''"
-            :loading="isLoading"
-            :glow="variant === 'premium'"
-            html-type="submit"
-            class="newsletter-signup__btn"
-          />
-        </form>
-
-        <!-- Error message -->
-        <Transition name="fade">
-          <p
-            v-if="errorMessage"
-            class="newsletter-signup__error"
+          <!-- Form -->
+          <form
+            class="newsletter-signup__form"
+            @submit.prevent="handleSubmit"
           >
-            <BasicIconNext
-              name="AlertCircle"
-              :size="14"
-            />
-            {{ errorMessage }}
-          </p>
-        </Transition>
+            <!-- Compact title -->
+            <span
+              v-if="variant === 'compact'"
+              class="newsletter-signup__compact-title"
+            >
+              {{ t('newsletter.compactTitle') }}
+            </span>
 
-        <!-- Privacy note -->
-        <p class="newsletter-signup__privacy">
-          <BasicIconNext
-            name="Lock"
-            :size="12"
-          />
-          {{ t('newsletter.privacy') }}
-        </p>
+            <div class="newsletter-signup__input-wrapper">
+              <!-- Compact: input avec bouton intégré à droite -->
+              <div
+                v-if="variant === 'compact'"
+                class="newsletter-signup__input-inline"
+              >
+                <BasicIconNext
+                  name="Mail"
+                  :size="16"
+                  class="newsletter-signup__input-icon"
+                />
+                <input
+                  v-model="email"
+                  type="email"
+                  :placeholder="t('newsletter.placeholder')"
+                  autocomplete="email"
+                  :disabled="isLoading"
+                  class="newsletter-signup__input-field"
+                  @keydown.enter="handleSubmit"
+                />
+                <button
+                  type="submit"
+                  class="newsletter-signup__input-btn"
+                  :disabled="isLoading"
+                >
+                  <BasicIconNext
+                    v-if="!isLoading"
+                    name="ArrowRight"
+                    :size="16"
+                  />
+                  <BasicIconNext
+                    v-else
+                    name="Loader2"
+                    :size="16"
+                    class="newsletter-signup__input-btn-loading"
+                  />
+                </button>
+              </div>
+
+              <!-- Inline variant -->
+              <BasicInput
+                v-else
+                v-model="email"
+                type="email"
+                :placeholder="t('newsletter.placeholder')"
+                icon-name="Mail"
+                icon-state="iconLeft"
+                autocomplete="email"
+                size="medium"
+                :disabled="isLoading"
+                class="newsletter-signup__input"
+                @keydown.enter="handleSubmit"
+              />
+            </div>
+
+            <PremiumButton
+              v-if="variant !== 'compact'"
+              type="primary"
+              variant="solid"
+              size="sm"
+              icon-right="ArrowRight"
+              :label="''"
+              :loading="isLoading"
+              html-type="submit"
+              class="newsletter-signup__btn"
+            />
+          </form>
+
+          <!-- Error message -->
+          <Transition name="fade">
+            <p
+              v-if="errorMessage"
+              class="newsletter-signup__error"
+            >
+              <BasicIconNext
+                name="AlertCircle"
+                :size="14"
+              />
+              {{ errorMessage }}
+            </p>
+          </Transition>
+
+          <!-- Privacy note -->
+          <p class="newsletter-signup__privacy">
+            <BasicIconNext
+              name="Lock"
+              :size="12"
+            />
+            {{ t('newsletter.privacy') }}
+          </p>
+        </template>
       </div>
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import type { NewsletterSource } from '@/api/supabase/newsletter'
   import { subscribeToNewsletter } from '@/api/supabase/newsletter'
   import { useLanguage } from '@/composables/useLanguage'
-  import type { NewsletterSource } from '@/api/supabase/newsletter'
+  import { ref } from 'vue'
 
   // ============================================
   // PROPS
@@ -243,17 +310,6 @@
   const isLoading = ref(false)
   const isSuccess = ref(false)
   const errorMessage = ref('')
-
-  // ============================================
-  // COMPUTED
-  // ============================================
-
-  const features = computed(() => [
-    t('newsletter.features.exclusive'),
-    t('newsletter.features.research'),
-    t('newsletter.features.promotions'),
-    t('newsletter.features.unsubscribe'),
-  ])
 
   // ============================================
   // METHODS
@@ -319,132 +375,115 @@
   // ============================================
 
   .newsletter-signup {
-    position: relative;
-    width: 100%;
-
     // ============================================
-    // PREMIUM VARIANT
+    // PREMIUM VARIANT - Design épuré et aligné
     // ============================================
 
+    // ContentBlock gère le padding
     &--premium {
-      padding: 40px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--primary-500-rgb), 0.08) 0%,
-        rgba(var(--primary-700-rgb), 0.04) 50%,
-        rgba(var(--secondary-900-rgb), 0.95) 100%
-      );
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
-      border-radius: 24px;
+      background: transparent;
       overflow: hidden;
 
       .newsletter-signup__content {
-        position: relative;
-        z-index: 1;
-      }
-
-      .newsletter-signup__header {
+        display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 16px;
-        margin-bottom: 24px;
+        gap: 20px;
       }
 
-      .newsletter-signup__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
-        background: linear-gradient(
-          135deg,
-          rgba(var(--primary-500-rgb), 0.2) 0%,
-          rgba(var(--primary-600-rgb), 0.1) 100%
-        );
-        border: 1px solid rgba(var(--primary-400-rgb), 0.3);
-        border-radius: 100px;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--primary-300);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        svg {
-          color: var(--primary-400);
-        }
+      // Custom Icon avec ring animé
+      .newsletter-signup__hero-icon {
+        position: relative;
+        width: 72px;
+        height: 72px;
       }
 
-      .newsletter-signup__icon-wrapper {
-        width: 64px;
-        height: 64px;
+      .newsletter-signup__hero-icon-inner {
+        position: relative;
+        z-index: 2;
+        // width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(
           135deg,
           rgba(var(--primary-500-rgb), 0.15) 0%,
-          rgba(var(--primary-700-rgb), 0.05) 100%
+          rgba(var(--primary-600-rgb), 0.08) 100%
         );
-        border: 1px solid rgba(var(--primary-400-rgb), 0.2);
+        border: 1px solid rgba(var(--primary-500-rgb), 0.25);
         border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(var(--primary-500-rgb), 0.15);
-      }
 
-      .newsletter-signup__icon {
-        color: var(--primary-400);
-      }
-
-      .newsletter-signup__title {
-        font-size: 28px;
-        font-weight: 700;
-        background: linear-gradient(135deg, @white 0%, rgba(255, 255, 255, 0.8) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin: 0;
-      }
-
-      .newsletter-signup__desc {
-        font-size: 15px;
-        color: rgba(255, 255, 255, 0.6);
-        max-width: 400px;
-        margin: 4px auto 0;
-        line-height: 1.5;
-      }
-
-      .newsletter-signup__features {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        list-style: none;
-        padding: 0;
-        margin: 0 0 28px;
-
-        li {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 12px;
-          font-size: 13px;
-          color: rgba(255, 255, 255, 0.7);
-          transition: all 0.2s @ease;
-
-          &:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(var(--primary-500-rgb), 0.2);
-          }
-
-          svg {
-            color: var(--success-500);
-            flex-shrink: 0;
-          }
+        svg {
+          color: var(--primary-400);
         }
       }
 
+      .newsletter-signup__hero-icon-ring {
+        position: absolute;
+        inset: -6px;
+        border: 1px dashed rgba(var(--primary-500-rgb), 0.2);
+        border-radius: 24px;
+        animation: ring-rotate 20s linear infinite;
+      }
+
+      @keyframes ring-rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      // Header
+      .newsletter-signup__header-premium {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .newsletter-signup__title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--content-block-text);
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .newsletter-signup__desc {
+        font-size: 14px;
+        color: var(--content-block-text-secondary);
+        max-width: 320px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      // Benefits inline
+      .newsletter-signup__benefits {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px 0;
+      }
+
+      .newsletter-signup__benefit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--content-block-text-muted);
+
+        svg {
+          color: var(--primary-400);
+        }
+      }
+
+      // Form
       .newsletter-signup__form {
+        display: flex;
         flex-direction: column;
         gap: 12px;
       }
@@ -452,7 +491,7 @@
       .newsletter-signup__input-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
         width: 100%;
       }
 
@@ -465,21 +504,51 @@
         margin-top: 4px;
       }
 
+      .newsletter-signup__error {
+        margin: 8px 0 0;
+      }
+
       .newsletter-signup__privacy {
         text-align: center;
-        margin-top: 16px;
+        margin-top: 8px;
       }
 
       // Responsive
       .respond-mobile({
-        padding: 28px 20px;
-
-        .newsletter-signup__title {
-          font-size: 22px;
+        .newsletter-signup__hero-icon {
+          width: 60px;
+          height: 60px;
         }
 
-        .newsletter-signup__features {
-          grid-template-columns: 1fr;
+        .newsletter-signup__hero-icon-inner {
+          border-radius: 16px;
+
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        .newsletter-signup__hero-icon-ring {
+          inset: -5px;
+          border-radius: 20px;
+        }
+
+        .newsletter-signup__title {
+          font-size: 20px;
+        }
+
+        .newsletter-signup__desc {
+          font-size: 13px;
+        }
+
+        .newsletter-signup__benefits {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .newsletter-signup__benefit {
+          font-size: 12px;
         }
       });
     }
@@ -606,8 +675,12 @@
       }
 
       @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       .newsletter-signup__btn {
@@ -678,13 +751,13 @@
       .newsletter-signup__success-title {
         font-size: 20px;
         font-weight: 600;
-        color: @white;
+        color: var(--content-block-text);
         margin: 8px 0 0;
       }
 
       .newsletter-signup__success-desc {
         font-size: 14px;
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--content-block-text-secondary);
         max-width: 280px;
         margin: 0;
       }
@@ -749,15 +822,15 @@
       justify-content: center;
       gap: 6px;
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--content-block-text-muted);
       margin: 0;
 
       svg {
-        color: rgba(255, 255, 255, 0.25);
+        color: var(--content-block-text-muted);
+        opacity: 0.7;
       }
     }
   }
-
 
   @keyframes success-pop {
     0% {
