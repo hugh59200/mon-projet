@@ -15,7 +15,9 @@
     />
 
     <template v-if="hasLoaded && order">
-      <div
+      <ContentBlock
+        variant="card"
+        size="lg"
         class="order-detail__header"
         v-motion="{
           initial: { opacity: 0, y: -20 },
@@ -43,10 +45,12 @@
             :type="getTypeBadge(order.status)"
           />
         </div>
-      </div>
+      </ContentBlock>
 
-      <div
+      <ContentBlock
         v-if="order.status"
+        variant="card"
+        size="md"
         class="order-detail__section order-detail__section--tracking"
       >
         <BasicText
@@ -123,10 +127,10 @@
             @click="contactSupport"
           />
         </div>
-      </div>
+      </ContentBlock>
 
       <div class="order-detail__grid">
-        <div class="order-detail__section order-detail__section--items">
+        <ContentBlock variant="card" size="md" class="order-detail__section order-detail__section--items">
           <BasicText
             size="h5"
             weight="semibold"
@@ -190,10 +194,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </ContentBlock>
 
         <div class="order-detail__col-right">
-          <div class="order-detail__section">
+          <ContentBlock variant="card" size="md" class="order-detail__section">
             <BasicText
               size="h5"
               weight="semibold"
@@ -233,9 +237,9 @@
                 <strong>{{ order.carrier ?? 'Standard' }}</strong>
               </BasicText>
             </div>
-          </div>
+          </ContentBlock>
 
-          <div class="order-detail__section order-detail__section--summary">
+          <ContentBlock variant="info" size="md" class="order-detail__section order-detail__section--summary">
             <BasicText
               size="h5"
               weight="semibold"
@@ -290,20 +294,22 @@
                 />
               </div>
             </div>
-          </div>
+          </ContentBlock>
         </div>
       </div>
     </template>
 
-    <div
+    <ContentBlock
       v-else-if="hasLoaded && !order"
+      variant="card"
+      size="lg"
       class="order-detail__empty-state"
     >
       <BasicText
         size="body-m"
         color="neutral-600"
       >
-        Cette commande est introuvable ou n’existe plus.
+        Cette commande est introuvable ou n'existe plus.
       </BasicText>
       <PremiumButton
         label="Retour à mes commandes"
@@ -312,7 +318,7 @@
         size="sm"
         @click="$router.push('/profil/commandes')"
       />
-    </div>
+    </ContentBlock>
   </div>
 </template>
 
@@ -460,15 +466,11 @@
 
     /* HEADER */
     &__header {
-      background: @white;
-      border: 1px solid @neutral-100;
-      border-radius: 16px;
-      padding: 30px;
+      // Styles de base gérés par ContentBlock
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      box-shadow: @shadow-medium;
 
       &-left {
         display: flex;
@@ -496,11 +498,7 @@
 
     /* SECTIONS */
     &__section {
-      background: @white;
-      border: 1px solid @neutral-100;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: @shadow-light;
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -510,11 +508,6 @@
         border-bottom: 1px solid @neutral-100;
         padding-bottom: 10px;
         margin-bottom: 4px;
-      }
-
-      &--summary {
-        background: color-mix(in srgb, var(--primary-50) 80%, @white);
-        border-color: var(--primary-100);
       }
     }
 
@@ -690,8 +683,8 @@
     }
 
     &__empty-state {
+      // Styles de base gérés par ContentBlock
       text-align: center;
-      padding: 60px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -711,11 +704,6 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
-        padding: 20px;
-      }
-
-      &__section {
-        padding: 16px;
       }
 
       &__item {

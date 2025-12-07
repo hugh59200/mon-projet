@@ -4,8 +4,10 @@
 
     <WrapperLoader :loading="!hasLoaded" />
 
-    <div
+    <ContentBlock
       v-if="hasLoaded && orders.length === 0"
+      variant="card"
+      size="lg"
       class="user-orders__empty"
       v-motion="{
         initial: { opacity: 0, scale: 0.95 },
@@ -16,7 +18,7 @@
         size="body-l"
         color="neutral-700"
       >
-        Vous n’avez encore passé aucune commande.
+        Vous n'avez encore passé aucune commande.
       </BasicText>
 
       <PremiumButton
@@ -26,7 +28,7 @@
         size="md"
         @click="$router.push('/catalogue')"
       />
-    </div>
+    </ContentBlock>
 
     <div
       v-else
@@ -48,9 +50,11 @@
         />
       </div>
 
-      <div
+      <ContentBlock
         v-for="(order, index) in orders"
         :key="safeId(order)"
+        variant="card"
+        size="md"
         class="user-orders__card"
         v-motion="{
           initial: { opacity: 0, y: 40, scale: 0.97 },
@@ -348,7 +352,7 @@
             @click="trackPackage(order.tracking_number)"
           />
         </div>
-      </div>
+      </ContentBlock>
     </div>
   </div>
 </template>
@@ -450,8 +454,8 @@
     flex-direction: column;
 
     &__empty {
+      // Styles de base gérés par ContentBlock
       text-align: center;
-      padding: 70px 20px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -471,20 +475,10 @@
     }
 
     &__card {
-      background: @white;
-      border: 1px solid @neutral-200;
-      border-radius: 16px;
-      padding: 26px;
-      box-shadow: 0 3px 8px color-mix(in srgb, @neutral-400 8%, transparent);
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       gap: 20px;
-      transition: all 0.25s ease;
-
-      &:hover {
-        box-shadow: 0 6px 14px color-mix(in srgb, @neutral-400 15%, transparent);
-        transform: translateY(-2px);
-      }
 
       &-header {
         display: flex;
@@ -644,10 +638,6 @@
     .respond-mobile({
       padding: 0 16px;
 
-      &__empty {
-        padding: 48px 16px;
-      }
-
       &__list {
         gap: 20px;
       }
@@ -657,8 +647,6 @@
       }
 
       &__card {
-        padding: 16px;
-        border-radius: 14px;
         gap: 16px;
 
         &-header {

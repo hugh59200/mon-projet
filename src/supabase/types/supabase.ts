@@ -1,4 +1,3 @@
-// Type simplifié pour éviter "Type instantiation is excessively deep"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Json = any
 

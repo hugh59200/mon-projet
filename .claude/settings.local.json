@@ -26,7 +26,8 @@
       "Bash(find:*)",
       "Bash(git stash:*)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b21zYmF3dGhsa3RhcG10bXF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDUyMjY0NSwiZXhwIjoyMDc2MDk4NjQ1fQ.L-wn7W2MLZM9mFIVLZendBYhWsCw3WWt3adXfWZkwvc\" node -e \"\nconst { createClient } = require(''@supabase/supabase-js'');\n\nconst supabase = createClient(\n  ''https://dwomsbawthlktapmtmqu.supabase.co'',\n  process.env.SUPABASE_SERVICE_ROLE_KEY,\n  { db: { schema: ''public'' } }\n);\n\nasync function run() {\n  // Test simple query first\n  const { data, error } = await supabase.rpc(''version'');\n  if (error) {\n    console.log(''RPC error:'', error.message);\n  } else {\n    console.log(''PostgreSQL version:'', data);\n  }\n}\n\nrun();\n\")"
     ],
     "deny": [],
     "ask": []

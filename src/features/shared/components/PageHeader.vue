@@ -36,31 +36,8 @@
         @click="handleBack"
       />
 
-      <!-- Actions slot (en haut à droite) -->
-      <div
-        v-if="$slots.actions"
-        class="page-header__actions"
-      >
-        <slot name="actions"></slot>
-      </div>
-
       <!-- Header content -->
       <div class="page-header__content">
-        <!-- Badge -->
-        <div
-          v-if="displayBadge || displayIcon || $slots.badge"
-          class="page-header__badge"
-        >
-          <slot name="badge">
-            <BasicIconNext
-              v-if="displayIcon"
-              :name="displayIcon"
-              :size="16"
-            />
-            <span v-if="displayBadge">{{ displayBadge }}</span>
-          </slot>
-        </div>
-
         <!-- Title -->
         <h1 class="page-header__title">
           {{ splitTitle.start }}
@@ -79,31 +56,12 @@
         >
           {{ displayDescription }}
         </p>
-
-        <!-- Stats slot -->
-        <div
-          v-if="$slots.stats"
-          class="page-header__stats"
-        >
-          <slot name="stats"></slot>
-        </div>
-      </div>
-
-      <!-- Default slot (contenu additionnel sous le header) -->
-      <div
-        v-if="$slots.default"
-        class="page-header__extra"
-      >
-        <slot></slot>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-  import BasicIconNext, {
-    type IconNameNext,
-  } from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import { computed } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
@@ -119,8 +77,6 @@
       theme?: PageHeaderTheme
       title?: string
       description?: string
-      badge?: string
-      icon?: string
       compact?: boolean
       showBack?: boolean
       backLabel?: string
@@ -150,18 +106,6 @@
     if (route.meta.titleKey) return t(route.meta.titleKey as string).replace(' – Fast Peptides', '')
     if (route.meta.title) return (route.meta.title as string).replace(' – Fast Peptides', '')
     return ''
-  })
-
-  const displayBadge = computed(() => {
-    if (props.badge) return props.badge
-    if (route.meta.badgeKey) return t(route.meta.badgeKey as string)
-    if (route.meta.badge) return route.meta.badge as string
-    return ''
-  })
-
-  const displayIcon = computed<IconNameNext | undefined>(() => {
-    const icon = props.icon || route.meta.headerIcon
-    return icon as IconNameNext | undefined
   })
 
   const displayDescription = computed(() => {
@@ -267,16 +211,6 @@
         color: @neutral-400;
       }
 
-      .page-header__badge {
-        background: rgba(var(--primary-500-rgb), 0.12);
-        border: 1px solid rgba(var(--primary-400-rgb), 0.2);
-        color: var(--primary-400);
-
-        svg {
-          color: var(--primary-400);
-        }
-      }
-
       .page-header__back {
         background: rgba(var(--secondary-800-rgb), 0.6);
         border: 1px solid rgba(var(--neutral-700-rgb), 0.3);
@@ -331,23 +265,6 @@
 
       .page-header__subtitle {
         color: @neutral-500;
-      }
-
-      .page-header__badge {
-        background: linear-gradient(
-          135deg,
-          rgba(var(--primary-500-rgb), 0.1) 0%,
-          rgba(var(--primary-500-rgb), 0.05) 100%
-        );
-        border: 1px solid rgba(var(--primary-500-rgb), 0.15);
-
-        svg {
-          color: var(--primary-600);
-        }
-
-        span {
-          color: var(--primary-700);
-        }
       }
 
       .page-header__back {
@@ -476,22 +393,6 @@
     }
 
     // ========================================
-    // BADGE
-    // ========================================
-    &__badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      margin-bottom: 8px;
-      backdrop-filter: blur(8px);
-    }
-
-    // ========================================
     // TITLE
     // ========================================
     &__title {
@@ -538,30 +439,6 @@
     }
 
     // ========================================
-    // STATS
-    // ========================================
-    &__stats {
-      display: inline-flex;
-      align-items: center;
-      gap: 24px;
-      margin-top: 20px;
-      padding: 16px 32px;
-      background: rgba(var(--secondary-800-rgb), 0.5);
-      border: 1px solid rgba(var(--neutral-700-rgb), 0.3);
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-    }
-
-    // Stats light theme
-    &--light .page-header__stats {
-      background: white;
-      border: 1px solid @neutral-100;
-      box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.04),
-        0 8px 24px rgba(0, 0, 0, 0.04);
-    }
-
-    // ========================================
     // BACK BUTTON
     // ========================================
     &__back {
@@ -594,25 +471,6 @@
     }
 
     // ========================================
-    // ACTIONS
-    // ========================================
-    &__actions {
-      position: absolute;
-      top: 0;
-      right: 0;
-      display: flex;
-      gap: 12px;
-      z-index: 3;
-    }
-
-    // ========================================
-    // EXTRA (slot default)
-    // ========================================
-    &__extra {
-      margin-top: 24px;
-    }
-
-    // ========================================
     // RESPONSIVE
     // ========================================
     .respond-mobile({
@@ -632,18 +490,6 @@
         span {
           display: none;
         }
-      }
-
-      &__actions {
-        position: relative;
-        justify-content: center;
-        margin-bottom: 16px;
-      }
-
-      &__stats {
-        flex-wrap: wrap;
-        gap: 16px;
-        padding: 12px 16px;
       }
     });
   }

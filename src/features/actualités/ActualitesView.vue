@@ -5,10 +5,10 @@
 
     <PageContent size="xl">
       <!-- Loading State -->
-      <div v-if="isLoading" class="actualites__loading">
+      <ContentBlock v-if="isLoading" variant="card" size="lg" class="actualites__loading">
         <BasicLoader size="medium" />
         <p class="actualites__loading-text">Chargement des articles...</p>
-      </div>
+      </ContentBlock>
 
       <template v-else>
       <!-- Topics Carousel -->
@@ -241,8 +241,10 @@
         </div>
 
         <!-- Empty State -->
-        <div
+        <ContentBlock
           v-if="!nonFeaturedArticles.length && !isLoading"
+          variant="card"
+          size="lg"
           class="actualites__empty"
         >
           <div class="actualites__empty-icon">
@@ -278,7 +280,7 @@
             icon-left="ArrowLeft"
             @click="$router.push('/actualites')"
           />
-        </div>
+        </ContentBlock>
 
         <!-- Articles Grid -->
         <div
@@ -581,11 +583,11 @@
     // LOADING STATE
     // ===========================
     &__loading {
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 120px 24px;
       gap: 20px;
     }
 
@@ -1004,14 +1006,11 @@
     // EMPTY STATE
     // ===========================
     &__empty {
+      // Styles de base gérés par ContentBlock
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 80px 24px;
-      background: white;
-      border-radius: 24px;
-      border: 2px dashed @neutral-200;
       text-align: center;
     }
 
@@ -1359,9 +1358,6 @@
         }
       }
 
-      &__empty {
-        padding: 48px 20px;
-      }
 
       &__trust {
         flex-direction: column;

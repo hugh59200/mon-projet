@@ -18,6 +18,7 @@ import { shippingTemplate } from './shippingTemplate.ts'
 import { signupConfirmationTemplate } from './signupConfirmationTemplate.ts'
 import { paymentValidatedTemplate } from './paymentValidatedTemplate.ts'
 import { statusUpdateTemplate } from './statusUpdateTemplate.ts'
+import { welcomeTemplate } from './welcomeTemplate.ts'
 
 // Type générique pour les données d'email
 // deno-lint-ignore no-explicit-any
@@ -141,6 +142,13 @@ export function renderEmailTemplate(type: string, data: EmailData): string {
         total_amount: Number(data.total_amount) || 0,
         payment_method: data.payment_method,
         ctaUrl: data.ctaUrl,
+        locale,
+      })
+    }
+
+    case 'welcome': {
+      return welcomeTemplate({
+        full_name: data.full_name,
         locale,
       })
     }

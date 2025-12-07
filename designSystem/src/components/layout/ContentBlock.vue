@@ -99,6 +99,13 @@ withDefaults(
 
   // ============ LIGHT THEME ============
   &--light {
+    // CSS Variables pour le contenu enfant
+    --content-block-text: @neutral-900;
+    --content-block-text-secondary: @neutral-600;
+    --content-block-text-muted: @neutral-500;
+    --content-block-border: @neutral-200;
+    --content-block-bg-subtle: @neutral-50;
+
     // Card - Standard
     &.content-block--card {
       background: @white;
@@ -141,6 +148,13 @@ withDefaults(
 
   // ============ DARK THEME ============
   &--dark {
+    // CSS Variables pour le contenu enfant
+    --content-block-text: @neutral-100;
+    --content-block-text-secondary: @neutral-300;
+    --content-block-text-muted: @neutral-400;
+    --content-block-border: rgba(255, 255, 255, 0.1);
+    --content-block-bg-subtle: rgba(255, 255, 255, 0.03);
+
     // Card - Standard dark
     &.content-block--card {
       background: var(--secondary-600);

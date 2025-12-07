@@ -1,6 +1,9 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V6.0 — REVIEWS + NEWSLETTER
+-- SUPABASE CLEAN BACKUP V6.1 — WELCOME EMAIL
 -- ============================================================
+-- V6.1 : Email de bienvenue automatique
+--        - Trigger on_email_confirmed sur auth.users
+--        - Fonction trigger_welcome_email appelant Edge Function
 -- V6.0 : Système d'avis produits (reviews) + Newsletter
 --        - Table reviews avec types (standard, premium, pro, verified)
 --        - Vue product_reviews_summary pour SEO aggregateRating
@@ -63,6 +66,7 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'tr_messages_sync_conversation_admin') THEN DROP TRIGGER tr_messages_sync_conversation_admin ON public.messages; END IF;
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'tr_conversations_touch_updated_at') THEN DROP TRIGGER tr_conversations_touch_updated_at ON public.conversations; END IF;
   IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_order_number') THEN DROP TRIGGER set_order_number ON public.orders; END IF;
+  IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_email_confirmed') THEN DROP TRIGGER on_email_confirmed ON auth.users; END IF;
 END $$;
 
 DROP FUNCTION IF EXISTS
@@ -101,7 +105,9 @@ DROP FUNCTION IF EXISTS
   public.update_newsletter_subscribers_updated_at,
   public.subscribe_to_newsletter,
   public.unsubscribe_from_newsletter,
-  public.confirm_newsletter_subscription
+  public.confirm_newsletter_subscription,
+  -- Welcome email function
+  public.trigger_welcome_email
 CASCADE;
 
 -- ============================================================
@@ -2498,8 +2504,52 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION public.confirm_newsletter_subscription TO anon, authenticated;
 
 -- ============================================================
--- FIN DU BACKUP V6.0 — REVIEWS + NEWSLETTER
+-- BLOC 12 — WELCOME EMAIL TRIGGER
 -- ============================================================
--- V6.0 : Système d'avis produits + Newsletter complète
+-- Déclenché automatiquement quand un utilisateur confirme son email
+
+CREATE OR REPLACE FUNCTION public.trigger_welcome_email()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public, extensions, pg_net
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Vérifie que email_confirmed_at vient d'être défini (première confirmation)
+  IF OLD.email_confirmed_at IS NULL AND NEW.email_confirmed_at IS NOT NULL THEN
+    -- Appel asynchrone à l'Edge Function welcome-email via pg_net
+    PERFORM net.http_post(
+      url := 'https://dwomsbawthlktapmtmqu.supabase.co/functions/v1/welcome-email',
+      headers := '{"Content-Type": "application/json"}'::jsonb,
+      body := jsonb_build_object(
+        'user_id', NEW.id::text,
+        'email', NEW.email,
+        'full_name', COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+        'locale', COALESCE(NEW.raw_user_meta_data->>'locale', 'fr')
+      )
+    );
+
+    RAISE LOG 'Welcome email triggered for user: %', NEW.email;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+-- Trigger sur auth.users pour détecter la confirmation d'email
+DROP TRIGGER IF EXISTS on_email_confirmed ON auth.users;
+
+CREATE TRIGGER on_email_confirmed
+  AFTER UPDATE OF email_confirmed_at ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trigger_welcome_email();
+
+COMMENT ON FUNCTION public.trigger_welcome_email() IS
+'Envoie un email de bienvenue lorsque l''utilisateur confirme son adresse email pour la première fois.';
+
+-- ============================================================
+-- FIN DU BACKUP V6.1 — WELCOME EMAIL
+-- ============================================================
+-- V6.1 : Email de bienvenue automatique après confirmation
 -- Inclut toutes les tables, vues, fonctions, RLS et triggers
 -- ============================================================

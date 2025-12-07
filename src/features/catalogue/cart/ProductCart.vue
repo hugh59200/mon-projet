@@ -1,5 +1,8 @@
 <template>
-  <article
+  <ContentBlock
+    as="article"
+    variant="card"
+    :interactive="true"
     class="product-card"
     :class="{ 'product-card--list': viewMode === 'list' }"
     @click="$emit('view', product.id)"
@@ -136,7 +139,7 @@
         />
       </div>
     </div>
-  </article>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -216,24 +219,11 @@
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   .product-card {
+    // Styles de base gérés par ContentBlock
     position: relative;
     display: flex;
     flex-direction: column;
-    background: rgba(var(--secondary-900-rgb), 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
     overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s @ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
-    &:hover {
-      border-color: rgba(var(--primary-500-rgb), 0.4);
-      box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(var(--primary-500-rgb), 0.15);
-      background: rgba(var(--secondary-900-rgb), 1);
-    }
 
     // ============ BADGES ============
     &__promo {
@@ -299,7 +289,7 @@
     &__image {
       position: relative;
       padding: 16px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+      background: var(--content-block-bg-subtle, @neutral-50);
     }
 
     &__image-inner {
@@ -308,7 +298,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.02);
+      background: transparent;
       border-radius: 12px;
       overflow: hidden;
 
@@ -346,6 +336,8 @@
     &__content {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      text-align: center;
       gap: 12px;
       padding: 0 20px 20px;
     }
@@ -353,11 +345,12 @@
     &__category {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;
-      color: @neutral-400;
+      color: var(--content-block-text-muted, @neutral-400);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -372,7 +365,7 @@
       font-family: @font-display;
       font-size: 17px;
       font-weight: 600;
-      color: @neutral-100;
+      color: var(--content-block-text, @neutral-900);
       line-height: 1.3;
       margin: 0;
       display: -webkit-box;
@@ -383,7 +376,9 @@
 
     &__specs {
       display: flex;
-      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     &__spec {
@@ -392,10 +387,10 @@
       gap: 4px;
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-400;
+      color: var(--content-block-text-muted, @neutral-400);
 
       svg {
-        color: @neutral-500;
+        color: var(--content-block-text-muted, @neutral-500);
       }
 
       // Pureté mise en évidence
@@ -416,11 +411,11 @@
         background: rgba(var(--primary-500-rgb), 0.1);
         padding: 4px 8px;
         border-radius: 6px;
-        color: var(--primary-400);
+        color: var(--primary-500);
         font-weight: 500;
 
         svg {
-          color: var(--primary-400);
+          color: var(--primary-500);
         }
       }
     }
@@ -429,21 +424,24 @@
     &__pricing {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      justify-content: center;
+      width: 100%;
+      padding-top: 12px;
+      margin-top: 4px;
+      border-top: 1px solid var(--content-block-border, rgba(0, 0, 0, 0.08));
     }
 
     &__price {
       display: flex;
       align-items: baseline;
+      justify-content: center;
       gap: 8px;
     }
 
     &__price-old {
       font-family: @font-body;
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted, @neutral-500);
       text-decoration: line-through;
     }
 
@@ -451,7 +449,7 @@
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: @neutral-100;
+      color: var(--content-block-text, @neutral-900);
 
       &--sale {
         color: @danger-500;
@@ -461,7 +459,8 @@
     // ============ ACTIONS ============
     &__actions {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      width: 100%;
       gap: 8px;
       margin-top: 4px;
     }
@@ -532,6 +531,24 @@
         flex: 1;
         padding: 0;
         justify-content: center;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .product-card__category {
+        justify-content: flex-start;
+      }
+
+      .product-card__specs {
+        justify-content: flex-start;
+      }
+
+      .product-card__pricing {
+        justify-content: flex-start;
+      }
+
+      .product-card__price {
+        justify-content: flex-start;
       }
 
       .product-card__name {
@@ -541,6 +558,7 @@
 
       .product-card__actions {
         flex-direction: row;
+        justify-content: flex-start;
         max-width: 300px;
       }
     }

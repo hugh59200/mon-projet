@@ -41,26 +41,31 @@
       direction="row"
       class="catalogue-body"
     >
-      <FilterPanel
+      <ContentBlock
         v-if="!isMobile"
+        variant="card"
+        size="md"
         class="catalogue-sidebar"
-        :all-open="allOpen"
-        v-model:filterOpen="filterOpen"
-        v-model:priceRange="priceRange"
-        v-model:selectedCategories="selectedCategories"
-        v-model:inStockOnly="inStockOnly"
-        v-model:selectedTags="selectedTags"
-        :categoryItems="categoryItemsWithCounts"
-        :stockCount="stockCount"
-        :tagItems="tagItemsWithCounts"
-        :tags="allTags"
-        @toggleAll="toggleAll"
-        @resetAll="resetAll"
-        @toggleTag="toggleTag"
-      />
+      >
+        <FilterPanel
+          :all-open="allOpen"
+          v-model:filterOpen="filterOpen"
+          v-model:priceRange="priceRange"
+          v-model:selectedCategories="selectedCategories"
+          v-model:inStockOnly="inStockOnly"
+          v-model:selectedTags="selectedTags"
+          :categoryItems="categoryItemsWithCounts"
+          :stockCount="stockCount"
+          :tagItems="tagItemsWithCounts"
+          :tags="allTags"
+          @toggleAll="toggleAll"
+          @resetAll="resetAll"
+          @toggleTag="toggleTag"
+        />
+      </ContentBlock>
       <main class="catalogue-main">
         <!-- Toolbar -->
-        <div class="catalogue-toolbar">
+        <ContentBlock variant="card" size="sm" class="catalogue-toolbar">
           <!-- Search Desktop -->
           <BasicInput
             v-if="!isMobile"
@@ -115,11 +120,13 @@
               />
             </div>
           </div>
-        </div>
+        </ContentBlock>
 
         <!-- Active Filters Pills -->
-        <div
+        <ContentBlock
           v-if="hasActiveFilters"
+          variant="card"
+          size="sm"
           class="catalogue-active-filters"
         >
           <div class="catalogue-active-filters__list">
@@ -170,7 +177,7 @@
             class="catalogue-active-filters__clear"
             @click="resetAll"
           />
-        </div>
+        </ContentBlock>
 
         <!-- Products Grid -->
         <WrapperLoader
@@ -544,17 +551,13 @@
     // SIDEBAR
     // =========================================
     &-sidebar {
+      // Styles de base gérés par ContentBlock
       width: 280px;
       flex-shrink: 0;
       position: sticky;
       height: fit-content;
       max-height: calc(100vh - 48px);
       overflow-y: auto;
-      padding: 20px;
-      background: rgba(var(--secondary-900-rgb), 0.8);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
 
       // Masquer sur mobile (la barre mobile est affichée via v-if="isMobile")
       .respond-mobile({
@@ -574,13 +577,10 @@
     // TOOLBAR
     // =========================================
     &-toolbar {
+      // Styles de base gérés par ContentBlock
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 14px 20px;
-      background: rgba(var(--secondary-900-rgb), 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
       margin-bottom: 16px;
 
       &__results {
@@ -626,7 +626,6 @@
       // Mobile (≤ 720px)
       .respond-mobile({
         flex-wrap: wrap;
-        padding: 12px 14px;
         gap: 12px;
 
         &__results {
@@ -680,15 +679,11 @@
     // ACTIVE FILTERS
     // =========================================
     &-active-filters {
+      // Styles de base gérés par ContentBlock
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 16px;
-      background: rgba(var(--secondary-900-rgb), 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
       margin-bottom: 16px;
 
       &__list {
@@ -706,23 +701,7 @@
       }
 
       &__clear {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        font-family: @font-body;
-        font-size: 12px;
-        color: @neutral-400;
-        cursor: pointer;
         white-space: nowrap;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: @neutral-200;
-        }
       }
     }
 

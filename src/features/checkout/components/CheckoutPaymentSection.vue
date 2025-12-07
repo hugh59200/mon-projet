@@ -1,5 +1,5 @@
 <template>
-  <section class="checkout-payment">
+  <ContentBlock as="section" variant="card" size="lg" class="checkout-payment">
     <div class="checkout-payment__header">
       <div class="checkout-payment__icon">
         <BasicIconNext name="CreditCard" :size="20" />
@@ -50,10 +50,10 @@
               <li>{{ t('checkout.payment.cryptoHelp.step3') }}</li>
               <li>{{ t('checkout.payment.cryptoHelp.step4') }}</li>
             </ol>
-            <a href="/faq#crypto" class="crypto-help__link">
-              <BasicIconNext name="HelpCircle" :size="14" />
+            <router-link to="/guide-crypto" class="crypto-help__link">
+              <BasicIconNext name="BookOpen" :size="14" />
               {{ t('checkout.payment.cryptoHelp.guide') }}
-            </a>
+            </router-link>
           </div>
         </Transition>
       </div>
@@ -97,7 +97,7 @@
         </Transition>
       </div>
     </div>
-  </section>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -122,11 +122,7 @@ const showComingSoon = ref(false)
 @import '@designSystem/fondation/selection/selectable-mixins.less';
 
 .checkout-payment {
-  background: white;
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  border: 1px solid @neutral-100;
+  // Styles de base gérés par ContentBlock
 
   &__header {
     display: flex;
@@ -420,11 +416,6 @@ const showComingSoon = ref(false)
 
 // Tablet
 .respond-tablet({
-  .checkout-payment {
-    padding: 20px;
-    border-radius: 20px;
-  }
-
   .payment-card {
     padding: 16px;
     gap: 12px;
@@ -439,9 +430,6 @@ const showComingSoon = ref(false)
 // Mobile
 .respond-mobile({
   .checkout-payment {
-    padding: 16px;
-    border-radius: 16px;
-
     &__header {
       gap: 12px;
       margin-bottom: 16px;

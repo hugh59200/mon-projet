@@ -530,6 +530,102 @@ export const translations = {
     },
   },
 
+  // ========== WELCOME EMAIL ==========
+  welcome: {
+    title: {
+      fr: 'Bienvenue dans votre espace chercheur',
+      en: 'Welcome to your researcher space',
+    },
+    subject: {
+      fr: 'Bienvenue chez FP Store – Votre espace est prêt',
+      en: 'Welcome to FP Store – Your space is ready',
+    },
+    greeting: {
+      fr: (name: string) => `Bonjour <strong>${name || 'cher chercheur'}</strong>,`,
+      en: (name: string) => `Hello <strong>${name || 'dear researcher'}</strong>,`,
+    },
+    accountActive: {
+      fr: 'Votre compte est maintenant actif et prêt à vous accompagner dans vos recherches.',
+      en: 'Your account is now active and ready to support your research.',
+    },
+    welcomeTitle: {
+      fr: 'Bienvenue dans la communauté FP Store',
+      en: 'Welcome to the FP Store community',
+    },
+    welcomeSubtitle: {
+      fr: 'Votre partenaire de confiance pour la recherche',
+      en: 'Your trusted partner for research',
+    },
+    benefitsTitle: {
+      fr: 'Ce que vous pouvez faire avec votre compte :',
+      en: 'What you can do with your account:',
+    },
+    benefit1Title: {
+      fr: 'Historique des commandes',
+      en: 'Order history',
+    },
+    benefit1Desc: {
+      fr: 'Retrouvez toutes vos commandes passées et téléchargez vos factures en un clic.',
+      en: 'Access all your past orders and download invoices with one click.',
+    },
+    benefit2Title: {
+      fr: 'Traçabilité des lots',
+      en: 'Batch traceability',
+    },
+    benefit2Desc: {
+      fr: 'Consultez les numéros de lot pour garantir la reproductibilité de vos expériences.',
+      en: 'View batch numbers to ensure reproducibility of your experiments.',
+    },
+    benefit3Title: {
+      fr: 'Recommande facile',
+      en: 'Easy reorder',
+    },
+    benefit3Desc: {
+      fr: 'Recommandez vos produits favoris en un clic pour maintenir la continuité de vos recherches.',
+      en: 'Reorder your favorite products with one click to maintain research continuity.',
+    },
+    benefit4Title: {
+      fr: 'Support prioritaire',
+      en: 'Priority support',
+    },
+    benefit4Desc: {
+      fr: 'Accédez à notre équipe technique pour toute question sur vos commandes.',
+      en: 'Access our technical team for any questions about your orders.',
+    },
+    quickLinksTitle: {
+      fr: 'Accès rapides',
+      en: 'Quick links',
+    },
+    linkCatalogue: {
+      fr: 'Explorer le catalogue',
+      en: 'Browse the catalogue',
+    },
+    linkProfile: {
+      fr: 'Mon espace personnel',
+      en: 'My personal space',
+    },
+    linkFaq: {
+      fr: 'Questions fréquentes',
+      en: 'FAQ',
+    },
+    ruoTitle: {
+      fr: 'Recherche uniquement',
+      en: 'Research use only',
+    },
+    ruoMessage: {
+      fr: 'Tous nos produits sont destinés exclusivement à la recherche scientifique in vitro. Consultez les fiches produits pour les conditions de stockage.',
+      en: 'All our products are intended exclusively for in vitro scientific research. Check product sheets for storage conditions.',
+    },
+    closing: {
+      fr: 'À bientôt sur FP Store !',
+      en: 'See you soon on FP Store!',
+    },
+    ctaLabel: {
+      fr: 'Découvrir le catalogue',
+      en: 'Explore the catalogue',
+    },
+  },
+
   // ========== STATUS MESSAGES ==========
   status: {
     pending: {

@@ -2,20 +2,13 @@
   <div class="track">
     <PageHeader
       :title="order ? `Commande #${order.order_number}` : t('tracking.title')"
-      :breadcrumbs="[
-        { label: t('nav.home'), to: '/' },
-        { label: t('nav.tracking'), to: '/suivi-commande' }
-      ]"
-    >
-      <template #description>
-        <span>{{ t('tracking.description') }}</span>
-      </template>
-    </PageHeader>
+      :description="t('tracking.description')"
+    />
 
     <PageContent background="neutral">
       <!-- Error Message -->
       <Transition name="slide-down">
-        <div v-if="errorMessage" class="track__error">
+        <ContentBlock v-if="errorMessage" variant="danger" size="md" class="track__error">
           <div class="track__error-icon">
             <BasicIconNext name="AlertCircle" :size="24" />
           </div>
@@ -26,7 +19,7 @@
           <button class="track__error-close" @click="errorMessage = ''">
             <BasicIconNext name="X" :size="20" />
           </button>
-        </div>
+        </ContentBlock>
       </Transition>
 
       <!-- Search Form -->
@@ -273,14 +266,10 @@ onMounted(async () => {
 
   // Error toast
   &__error {
+    // Styles de base gérés par ContentBlock
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px 24px;
-    background: white;
-    border-radius: 16px;
-    border-left: 4px solid @danger-500;
-    box-shadow: 0 4px 24px rgba(var(--danger-500-rgb), 0.15), 0 12px 48px rgba(var(--black-rgb), 0.08);
     margin-bottom: 32px;
     max-width: 600px;
     margin-left: auto;

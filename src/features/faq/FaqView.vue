@@ -1,15 +1,7 @@
 <template>
   <div class="faq">
     <!-- Header via PageHeader -->
-    <PageHeader>
-      <template #stats>
-        <PageHeaderStat :value="faqs.length" :label="t('faq.title')" />
-        <PageHeaderStatDivider />
-        <PageHeaderStat :value="categories.length" :label="t('faq.categories.all')" />
-        <PageHeaderStatDivider />
-        <PageHeaderStat value="24h" label="Support" />
-      </template>
-    </PageHeader>
+    <PageHeader />
 
     <PageContent size="lg">
       <!-- Main Layout -->
@@ -259,8 +251,6 @@
   import { useHead } from '@vueuse/head'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
-  import PageHeaderStat from '@/features/shared/components/PageHeaderStat.vue'
-  import PageHeaderStatDivider from '@/features/shared/components/PageHeaderStatDivider.vue'
   import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
 

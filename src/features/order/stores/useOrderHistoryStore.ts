@@ -28,11 +28,13 @@ export const useOrderHistoryStore = defineStore('orderHistory', () => {
   const previousLots = computed<LotHistory[]>(() => {
     const lotsMap = new Map<string, LotHistory>()
 
-    for (const order of orders.value) {
-      const items = (order.detailed_items as unknown as OrderItemDetailed[]) || []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const order of orders.value as any[]) {
+      const items = (order.detailed_items || []) as OrderItemDetailed[]
 
       for (const item of items) {
         // Utilise le batch_number du produit si disponible
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const batchNumber = (item as any).batch_number || (item as any).product_batch_number
         if (!batchNumber) continue
 
@@ -45,6 +47,7 @@ export const useOrderHistoryStore = defineStore('orderHistory', () => {
             productId: item.product_id,
             productName: item.product_name || 'Produit',
             productImage: item.product_image || null,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             productSlug: (item as any).product_slug || null,
             batchNumber,
             orderDate: order.created_at || '',
@@ -108,10 +111,12 @@ export const useOrderHistoryStore = defineStore('orderHistory', () => {
   function getLastOrderedLot(productId: string | undefined): string | null {
     if (!productId) return null
 
-    for (const order of orders.value) {
-      const items = (order.detailed_items as unknown as OrderItemDetailed[]) || []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const order of orders.value as any[]) {
+      const items = (order.detailed_items || []) as OrderItemDetailed[]
       for (const item of items) {
         if (item.product_id === productId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return (item as any).batch_number || (item as any).product_batch_number || null
         }
       }

@@ -51,20 +51,40 @@
 
     <footer class="cart__footer">
       <!-- Barre livraison gratuite -->
-      <div v-if="cart.totalPrice < FREE_SHIPPING_THRESHOLD" class="cart__shipping-progress">
+      <div
+        v-if="cart.totalPrice < FREE_SHIPPING_THRESHOLD"
+        class="cart__shipping-progress"
+      >
         <div class="cart__shipping-bar">
           <div
             class="cart__shipping-fill"
-            :style="{ width: `${Math.min((cart.totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }"
+            :style="{
+              width: `${Math.min((cart.totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%`,
+            }"
           />
         </div>
         <p class="cart__shipping-text">
-          <BasicIconNext name="Truck" :size="14" />
-          <span>{{ t('aov.freeShipping.progress', { amount: formatPrice(FREE_SHIPPING_THRESHOLD - cart.totalPrice) }) }}</span>
+          <BasicIconNext
+            name="Truck"
+            :size="14"
+          />
+          <span>
+            {{
+              t('aov.freeShipping.progress', {
+                amount: formatPrice(FREE_SHIPPING_THRESHOLD - cart.totalPrice),
+              })
+            }}
+          </span>
         </p>
       </div>
-      <div v-else class="cart__shipping-unlocked">
-        <BasicIconNext name="Check" :size="14" />
+      <div
+        v-else
+        class="cart__shipping-unlocked"
+      >
+        <BasicIconNext
+          name="Check"
+          :size="14"
+        />
         <span>{{ t('aov.freeShipping.unlocked') }}</span>
       </div>
 
@@ -76,11 +96,17 @@
       <!-- Mini trust badges -->
       <div class="cart__trust">
         <div class="cart__trust-item">
-          <BasicIconNext name="ShieldCheck" :size="14" />
+          <BasicIconNext
+            name="ShieldCheck"
+            :size="14"
+          />
           <span>{{ t('aov.quality.purityCertified') }}</span>
         </div>
         <div class="cart__trust-item">
-          <BasicIconNext name="FileCheck" :size="14" />
+          <BasicIconNext
+            name="FileCheck"
+            :size="14"
+          />
           <span>{{ t('aov.quality.coaIncluded') }}</span>
         </div>
       </div>
@@ -184,7 +210,6 @@
     border-radius: 12px;
     transition: background 0.2s;
     position: relative;
-    width: 100%;
 
     &:hover {
       background: rgba(var(--neutral-100-rgb), 0.03);
