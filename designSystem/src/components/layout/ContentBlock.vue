@@ -11,11 +11,30 @@
         'content-block--no-border': noBorder,
         'content-block--interactive': interactive,
         'content-block--centered': centered,
+        'content-block--has-bg-image': bgImage,
       },
     ]"
     :style="containerStyle"
   >
-    <slot />
+    <!-- Background image -->
+    <div
+      v-if="bgImage"
+      class="content-block__bg-image"
+    >
+      <img
+        :src="bgImage"
+        alt=""
+        aria-hidden="true"
+      />
+    </div>
+    <!-- Content -->
+    <div
+      v-if="bgImage"
+      class="content-block__content"
+    >
+      <slot />
+    </div>
+    <slot v-else />
   </component>
 </template>
 
@@ -59,6 +78,8 @@ import { useTheme } from '@/composables/useTheme'
  * - gap: Gap pour le contenu flex/grid (ex: '16px')
  * - borderRadius: Border radius personnalisé (ex: '24px')
  * - centered: Centre le bloc horizontalement (défaut: true)
+ * - bgImage: Image de fond (URL ou import)
+ * - bgOpacity: Opacité de l'image de fond (défaut: 0.4)
  */
 const props = withDefaults(
   defineProps<{
@@ -86,6 +107,10 @@ const props = withDefaults(
     borderRadius?: string
     /** Centre le bloc horizontalement (défaut: true) */
     centered?: boolean
+    /** Image de fond (URL ou import) */
+    bgImage?: string
+    /** Opacité de l'image de fond (défaut: 0.4) */
+    bgOpacity?: number
   }>(),
   {
     variant: 'card',
@@ -103,6 +128,8 @@ const props = withDefaults(
     gap: undefined,
     borderRadius: undefined,
     centered: true,
+    bgImage: undefined,
+    bgOpacity: 0.4,
   },
 )
 
@@ -167,6 +194,39 @@ const containerStyle = computed(() => {
 .content-block {
   border-radius: 16px;
   transition: all 0.2s @ease;
+
+  // ============ BACKGROUND IMAGE ============
+  &--has-bg-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__bg-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: v-bind('props.bgOpacity');
+    }
+
+    // Overlay pour assurer la lisibilité
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%);
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+  }
 
   // ============ SIZES ============
   &--sm {
