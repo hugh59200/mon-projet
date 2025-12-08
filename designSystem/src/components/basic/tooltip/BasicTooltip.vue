@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
   import { useWebComponentNode } from '@/features/interface/composables/useWebComponentNode'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
   import BasicText from '@designSystem/components/basic/text/BasicText.vue'
   import { computed, nextTick, ref, watch, watchEffect, type CSSProperties } from 'vue'
   import type { TooltipPosition, TooltipProps } from './BasicTooltip.types'
@@ -40,6 +41,9 @@
     maxLength: undefined,
     maxWidth: 200,
   })
+
+  /* 📱 Détection mobile - désactive les tooltips sur tactile */
+  const { isMobile } = useDeviceBreakpoint()
 
   /* 🧩 Refs & état */
   const trigger = ref<HTMLElement | null>(null)
@@ -72,7 +76,7 @@
 
   /* 🧠 Gestion affichage */
   const startShow = (e: MouseEvent) => {
-    if (!props.visible) return // ✅ bloque l'affichage si visible = false
+    if (!props.visible || isMobile.value) return // ✅ bloque l'affichage si visible = false ou sur mobile
     trigger.value = e.currentTarget as HTMLElement
     timer = setTimeout(() => (show.value = true), 600)
   }

@@ -192,8 +192,8 @@
   /* --- CARTE --- */
   .cart-card {
     display: flex;
-    background: @white;
-    border: 1px solid @neutral-200;
+    background: var(--chrome-bg);
+    border: 1px solid var(--chrome-border);
     border-radius: 16px;
     padding: 16px;
     gap: 26px;
@@ -214,9 +214,9 @@
       .img-container {
         width: 100%;
         height: 100%;
-        background: @neutral-50;
+        background: var(--chrome-bg-secondary);
         border-radius: 12px;
-        border: 1px solid @neutral-100;
+        border: 1px solid var(--chrome-border-subtle);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -265,7 +265,7 @@
       align-items: center;
       gap: 6px;
       .separator {
-        color: @neutral-300;
+        color: var(--chrome-fg-muted);
         font-size: 10px;
       }
     }
@@ -273,13 +273,13 @@
     .btn-remove {
       background: transparent;
       border: none;
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
       padding: 6px;
       margin: -6px -6px 0 0;
       border-radius: 8px;
       cursor: pointer;
       &:hover {
-        background: @danger-50;
+        background: rgba(var(--danger-500-rgb), 0.1);
         color: @danger-600;
       }
     }
@@ -308,13 +308,13 @@
       .old-price {
         font-size: 13px;
         text-decoration: line-through;
-        color: @neutral-400;
+        color: var(--chrome-fg-muted);
         font-weight: 400;
       }
 
       .unit-label {
         font-size: 11px;
-        color: @neutral-400;
+        color: var(--chrome-fg-muted);
         margin-top: 2px;
       }
     }
@@ -329,8 +329,8 @@
     .stepper-pill {
       display: flex;
       align-items: center;
-      background: @neutral-50;
-      border: 1px solid @neutral-200;
+      background: var(--chrome-bg-secondary);
+      border: 1px solid var(--chrome-border);
       border-radius: 50px;
       height: 32px;
       padding: 0 2px;
@@ -346,15 +346,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: @neutral-600;
+        color: var(--chrome-fg-secondary);
 
         &:hover:not(:disabled) {
-          background: @white;
+          background: var(--chrome-bg);
           color: var(--primary-600);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         &:disabled {
-          color: @neutral-300;
+          color: var(--chrome-fg-muted);
         }
       }
 
@@ -363,7 +363,7 @@
         text-align: center;
         font-weight: 600;
         font-size: 13px;
-        color: @neutral-900;
+        color: var(--chrome-fg);
       }
     }
 
@@ -385,7 +385,7 @@
         justify-content: space-between;
         margin-left: 0;
         padding-top: 10px;
-        border-top: 1px solid @neutral-100;
+        border-top: 1px solid var(--chrome-border-subtle);
       }
       .price-unit-block {
         flex-direction: row;

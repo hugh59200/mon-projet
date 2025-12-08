@@ -626,6 +626,131 @@ export const translations = {
     },
   },
 
+  // ========== NEWSLETTER CONFIRMATION ==========
+  newsletterConfirmation: {
+    title: {
+      fr: 'Confirmez votre inscription',
+      en: 'Confirm your subscription',
+    },
+    subject: {
+      fr: 'Confirmez votre inscription et recevez -10%',
+      en: 'Confirm your subscription and get 10% off',
+    },
+    greeting: {
+      fr: (name: string) => `Bonjour <strong>${name}</strong>,`,
+      en: (name: string) => `Hello <strong>${name}</strong>,`,
+    },
+    greetingDefault: {
+      fr: 'Bonjour,',
+      en: 'Hello,',
+    },
+    thankYou: {
+      fr: 'Merci de votre inscription à notre newsletter ! Pour finaliser votre abonnement et recevoir votre code promo, veuillez confirmer votre adresse email.',
+      en: 'Thank you for subscribing to our newsletter! To complete your subscription and receive your promo code, please confirm your email address.',
+    },
+    yourPromoCode: {
+      fr: 'Votre code promo exclusif',
+      en: 'Your exclusive promo code',
+    },
+    promoDescription: {
+      fr: '-10% sur votre première commande',
+      en: '10% off your first order',
+    },
+    confirmPrompt: {
+      fr: 'Cliquez sur le bouton ci-dessous pour activer votre abonnement :',
+      en: 'Click the button below to activate your subscription:',
+    },
+    ctaConfirm: {
+      fr: 'Confirmer mon inscription',
+      en: 'Confirm my subscription',
+    },
+    whatYouGet: {
+      fr: 'Ce que vous recevrez :',
+      en: 'What you will receive:',
+    },
+    benefit1: {
+      fr: 'Offres exclusives réservées aux abonnés',
+      en: 'Exclusive offers for subscribers only',
+    },
+    benefit2: {
+      fr: 'Actualités et études scientifiques',
+      en: 'Scientific news and studies',
+    },
+    benefit3: {
+      fr: 'Nouveaux produits en avant-première',
+      en: 'Early access to new products',
+    },
+    benefit4: {
+      fr: 'Désinscription en 1 clic à tout moment',
+      en: 'Unsubscribe in 1 click anytime',
+    },
+    ignoreIfNotYou: {
+      fr: "Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement cet email.",
+      en: "If you didn't sign up for this, simply ignore this email.",
+    },
+    // Page de confirmation
+    confirmationSuccess: {
+      fr: 'Inscription confirmée !',
+      en: 'Subscription confirmed!',
+    },
+    confirmationSuccessMessage: {
+      fr: 'Votre abonnement à la newsletter est maintenant actif. Utilisez le code ci-dessous pour bénéficier de -10% sur votre première commande.',
+      en: 'Your newsletter subscription is now active. Use the code below to get 10% off your first order.',
+    },
+    confirmationError: {
+      fr: 'Lien invalide ou expiré',
+      en: 'Invalid or expired link',
+    },
+    confirmationErrorMessage: {
+      fr: 'Ce lien de confirmation est invalide ou a déjà été utilisé. Si vous pensez qu\'il s\'agit d\'une erreur, veuillez vous réinscrire.',
+      en: 'This confirmation link is invalid or has already been used. If you think this is an error, please subscribe again.',
+    },
+  },
+
+  // ========== NEWSLETTER UNSUBSCRIBE ==========
+  newsletterUnsubscribe: {
+    title: {
+      fr: 'Désinscription de la newsletter',
+      en: 'Newsletter unsubscription',
+    },
+    confirmTitle: {
+      fr: 'Vous souhaitez vous désinscrire ?',
+      en: 'Do you want to unsubscribe?',
+    },
+    confirmMessage: {
+      fr: 'Vous ne recevrez plus nos emails concernant les offres exclusives, les nouveaux produits et les actualités scientifiques.',
+      en: 'You will no longer receive our emails about exclusive offers, new products and scientific news.',
+    },
+    reasonLabel: {
+      fr: 'Raison (optionnel) :',
+      en: 'Reason (optional):',
+    },
+    reasonPlaceholder: {
+      fr: 'Dites-nous pourquoi vous partez...',
+      en: 'Tell us why you are leaving...',
+    },
+    ctaUnsubscribe: {
+      fr: 'Confirmer la désinscription',
+      en: 'Confirm unsubscription',
+    },
+    successTitle: {
+      fr: 'Désinscription confirmée',
+      en: 'Unsubscription confirmed',
+    },
+    successMessage: {
+      fr: 'Vous avez été désinscrit avec succès. Vous ne recevrez plus d\'emails de notre part.',
+      en: 'You have been successfully unsubscribed. You will no longer receive emails from us.',
+    },
+    resubscribePrompt: {
+      fr: 'Vous avez changé d\'avis ?',
+      en: 'Changed your mind?',
+    },
+    ctaResubscribe: {
+      fr: 'Se réinscrire',
+      en: 'Resubscribe',
+    },
+  },
+
   // ========== STATUS MESSAGES ==========
   status: {
     pending: {

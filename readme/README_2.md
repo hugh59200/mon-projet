@@ -113,7 +113,7 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 
 ## 📝 Roadmap & Statut Actuel
 
-_Mise à jour : 04/12/2025_
+_Mise à jour : 08/12/2025_
 
 | Brique                |  Statut   | Notes                                                      |
 | :-------------------- | :-------: | :--------------------------------------------------------- |
@@ -125,7 +125,55 @@ _Mise à jour : 04/12/2025_
 | **Paiement Crypto**   |  🟢 Fait  | Wallet Exodus configuré, Adresses injectées.               |
 | **Qualité (QA)**      |  🟢 Fait  | Tests E2E Cypress validés.                                 |
 | **Email Pro (OpSec)** |  🟢 Fait  | Proton (Admin) + Resend (Auto) + DNS Cloudflare Sécurisés. |
+| **Newsletter**        |  🟢 Fait  | Double opt-in + Code promo -10% automatique.               |
 | **Compte Banque**     | 🔴 Bloqué | Attente EIN (Délai IRS important).                         |
+
+---
+
+## 📧 Système Newsletter (Double Opt-in)
+
+### Flux d'inscription
+
+```
+1. Utilisateur s'inscrit (homepage ou footer)
+   ↓
+2. Email de confirmation envoyé automatiquement
+   (via Edge Function newsletter-confirmation)
+   ↓
+3. Email contient : Code WELCOME10 + Lien de confirmation
+   ↓
+4. Clic sur le lien → /newsletter/confirm?token=xxx
+   ↓
+5. Status passe de 'pending' à 'active'
+   ↓
+6. Affichage du code promo avec bouton copier
+```
+
+### Composants Frontend
+
+| Route | Fichier | Description |
+|-------|---------|-------------|
+| Homepage/Footer | `NewsletterSignup.vue` | Formulaire d'inscription (3 variantes) |
+| `/newsletter/confirm` | `NewsletterConfirmView.vue` | Page de confirmation avec code promo |
+| `/newsletter/unsubscribe` | `NewsletterUnsubscribeView.vue` | Page de désinscription |
+
+### Edge Functions
+
+| Fonction | Description |
+|----------|-------------|
+| `newsletter-confirmation` | Envoie l'email de confirmation avec code -10% |
+| `send-newsletter` | Envoi de campagnes en masse (admin) |
+
+### Tables Supabase
+
+- `newsletter_subscribers` : Liste des abonnés avec préférences
+- `newsletter_campaigns` : Campagnes d'envoi
+- `newsletter_sends` : Tracking des envois individuels
+- `newsletter_stats` (vue) : Statistiques en temps réel
+
+### Code Promo
+
+Le code `WELCOME10` est automatiquement affiché dans l'email de confirmation et sur la page de confirmation. Il offre -10% sur la première commande (usage unique par utilisateur).
 
 ---
 

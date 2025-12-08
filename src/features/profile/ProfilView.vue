@@ -345,11 +345,7 @@
                 {{ t('profile.themeDesc') }}
               </BasicText>
 
-              <PremiumThemeSelector
-                v-model="isBrownTheme"
-                label-color="neutral-800"
-                description-color="neutral-600"
-              />
+              <CustomThemeSelector />
             </ContentBlock>
 
             <ContentBlock variant="card" size="lg" class="profil__pref-card profil__pref-card--secondary">
@@ -492,10 +488,10 @@
   import type { Orders, Profiles } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
-  import { computed, onMounted, ref, watch, type Ref } from 'vue'
+  import { computed, onMounted, ref, type Ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
-  import PremiumThemeSelector from '@designSystem/components/basic/theme/PremiumThemeSelector.vue'
+  import CustomThemeSelector from '@designSystem/components/basic/theme/CustomThemeSelector.vue'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useChatWidgetStore } from '@/features/chat/user/useChatWidgetStore'
   import { useProfileSectionsStore } from './useProfileSectionsStore'
@@ -518,7 +514,6 @@
     useProfileActions()
   const { deleteOwnAccount } = useUserActions()
 
-  const isBrownTheme = ref(false)
   const profile = ref<Profiles | null>(null)
   const lastOrders = ref([]) as Ref<Partial<Orders>[]>
 
@@ -572,11 +567,7 @@
   })
 
   const hasPreferenceChanges = computed(() => {
-    return (
-      newsletter.value !== originalNewsletter.value ||
-      isBrownTheme.value.toString() !==
-        (localStorage.getItem('theme-preference') === 'brown').toString()
-    )
+    return newsletter.value !== originalNewsletter.value
   })
 
   // Lots précédents depuis l'historique des commandes
@@ -593,24 +584,6 @@
     } else {
       toast.show(t('profile.reorderError'), 'danger')
     }
-  }
-
-  const THEME_STORAGE_KEY = 'theme-preference'
-
-  watch(isBrownTheme, (isBrown) => {
-    const html = document.documentElement
-    html.classList.toggle('theme-brown', isBrown)
-    html.classList.toggle('theme-blue', !isBrown)
-    localStorage.setItem(THEME_STORAGE_KEY, isBrown ? 'brown' : 'blue')
-  })
-
-  function loadThemePreference() {
-    const preference = localStorage.getItem(THEME_STORAGE_KEY)
-    const isBrown = preference === 'brown'
-    isBrownTheme.value = isBrown
-
-    const html = document.documentElement
-    html.classList.add(isBrown ? 'theme-brown' : 'theme-blue')
   }
 
   function formatOrderDate(date: string) {
@@ -768,7 +741,6 @@
   }
 
   onMounted(async () => {
-    loadThemePreference()
     await sections.loadFromSupabase()
     await fetchProfileData()
     // Charger l'historique des commandes pour les lots précédents
@@ -794,7 +766,7 @@
       background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.15),
+        var(--chrome-border),
         transparent
       );
       margin: 28px 0 20px;
@@ -807,7 +779,7 @@
       font-weight: 700;
       margin-bottom: 16px;
       display: block;
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
     }
 
     &__actions {
@@ -827,7 +799,7 @@
       &-bar {
         flex: 1;
         height: 6px;
-        background: @neutral-700;
+        background: var(--chrome-border);
         border-radius: 3px;
         overflow: hidden;
       }
@@ -848,7 +820,7 @@
 
     &__danger {
       margin-top: 30px;
-      border-top: 1px dashed @neutral-800;
+      border-top: 1px dashed var(--chrome-border);
       padding-top: 20px;
 
       .PremiumButton {
@@ -877,14 +849,14 @@
       margin: -100px auto 70px;
       padding: 40px;
 
-      background: rgba(var(--secondary-800-rgb), 0.9);
+      background: var(--chrome-bg);
 
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
 
-      border: 1px solid fade(@neutral-300, 15%);
+      border: 1px solid var(--chrome-border);
 
-      box-shadow: 0 25px 60px fade(#000, 50%);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
 
       position: relative;
       z-index: 10;
@@ -896,7 +868,7 @@
       gap: 30px;
       margin-bottom: 40px;
       padding-bottom: 20px;
-      border-bottom: 1px solid @neutral-800;
+      border-bottom: 1px solid var(--chrome-border);
     }
 
     &__avatar {
@@ -906,11 +878,11 @@
       border-radius: 50%;
       flex-shrink: 0;
 
-      background: var(--secondary-700);
-      border: 4px solid var(--secondary-900);
+      background: var(--chrome-bg-secondary);
+      border: 4px solid var(--chrome-bg);
 
       box-shadow:
-        0 6px 20px fade(@neutral-900, 50%),
+        0 6px 20px rgba(0, 0, 0, 0.25),
         0 0 0 4px var(--primary-500);
 
       overflow: hidden;
@@ -919,7 +891,7 @@
 
       &:hover {
         box-shadow:
-          0 8px 25px fade(@neutral-900, 60%),
+          0 8px 25px rgba(0, 0, 0, 0.35),
           0 0 0 4px var(--primary-400);
       }
 
@@ -927,7 +899,7 @@
         position: absolute;
         inset: 0;
         background: rgba(0, 0, 0, 0.4);
-        color: @neutral-50;
+        color: var(--chrome-fg);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -950,8 +922,8 @@
       }
 
       .profil__avatar-placeholder {
-        color: @neutral-300;
-        background: var(--secondary-700);
+        color: var(--chrome-fg-muted);
+        background: var(--chrome-bg-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -981,7 +953,7 @@
 
       h3,
       [size='h3'] {
-        color: @neutral-50;
+        color: var(--chrome-fg);
       }
     }
 
@@ -998,7 +970,7 @@
       }
 
       .BasicText {
-        color: @neutral-400;
+        color: var(--chrome-fg-muted);
       }
 
       .profil__role {
@@ -1016,15 +988,15 @@
       margin-top: 16px;
 
       :deep(.FilterSection) {
-        border: 1px solid fade(@neutral-500, 12%);
-        background: rgba(var(--secondary-900-rgb), 0.55);
+        border: 1px solid var(--chrome-border);
+        background: var(--chrome-bg-secondary);
         border-radius: 20px;
         padding: 28px 32px;
         transition: all 0.3s ease;
 
         &:hover {
-          border-color: fade(@neutral-400, 15%);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          border-color: var(--chrome-border-hover);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         }
       }
 
@@ -1037,7 +1009,7 @@
       }
 
       :deep(.FilterSection__head .BasicText) {
-        color: @neutral-50;
+        color: var(--chrome-fg);
         font-size: 18px;
         letter-spacing: -0.3px;
       }
@@ -1069,7 +1041,7 @@
         height: 56px;
         border-radius: 10px;
         object-fit: cover;
-        border: 1px solid @neutral-200;
+        border: 1px solid var(--content-block-border);
         flex-shrink: 0;
       }
 
@@ -1091,7 +1063,7 @@
       // Styles de base gérés par ContentBlock
 
       .BasicText {
-        color: @neutral-900;
+        color: var(--content-block-text);
       }
     }
 
@@ -1128,7 +1100,7 @@
         margin-bottom: 14px;
 
         .BasicText {
-          color: @neutral-900;
+          color: var(--content-block-text);
           font-size: 16px;
         }
       }
@@ -1139,7 +1111,7 @@
         gap: 6px;
 
         .BasicText {
-          color: @neutral-600;
+          color: var(--content-block-text-secondary);
         }
       }
 
@@ -1194,11 +1166,7 @@
       }
 
       &--premium {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.98) 0%,
-          rgba(250, 250, 255, 0.95) 100%
-        );
+        // ContentBlock gère le fond, on ajoute juste la bordure premium
         border: 2px solid rgba(102, 126, 234, 0.15);
 
         &::before {
@@ -1219,11 +1187,7 @@
       }
 
       &--secondary {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.95) 0%,
-          rgba(248, 250, 252, 0.92) 100%
-        );
+        // ContentBlock gère le fond
       }
 
       &-header {
@@ -1231,7 +1195,7 @@
         align-items: center;
         gap: 12px;
         padding-bottom: 16px;
-        border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+        border-bottom: 2px solid var(--content-block-border);
       }
 
       &-icon {
@@ -1247,7 +1211,7 @@
       }
 
       &-title {
-        color: @neutral-800;
+        color: var(--content-block-text);
         margin: 0;
         letter-spacing: -0.3px;
       }
@@ -1270,7 +1234,7 @@
         gap: 6px;
 
         .BasicText[color='neutral-100'] {
-          color: @neutral-900 !important;
+          color: var(--content-block-text) !important;
         }
       }
 
@@ -1290,20 +1254,20 @@
           }
 
           .BasicText {
-            color: @neutral-800;
+            color: var(--content-block-text);
             font-weight: 500;
           }
         }
       }
 
-      :deep(.premium-theme-selector) {
-        .premium-theme-selector__option {
-          background: rgba(0, 0, 0, 0.05);
-          border-color: rgba(0, 0, 0, 0.15);
+      :deep(.custom-theme-selector) {
+        .custom-theme-selector__preset {
+          background: var(--content-block-bg-subtle);
+          border-color: var(--content-block-border);
 
-          &:hover:not(.premium-theme-selector__option--active) {
-            background: rgba(0, 0, 0, 0.08);
-            border-color: rgba(0, 0, 0, 0.2);
+          &:hover:not(.custom-theme-selector__preset--active) {
+            background: rgba(var(--primary-500-rgb), 0.05);
+            border-color: var(--content-block-border);
           }
 
           &--active {
@@ -1312,21 +1276,33 @@
           }
         }
 
-        .premium-theme-selector__description {
-          background: rgba(0, 0, 0, 0.03);
-          border-color: rgba(0, 0, 0, 0.1);
+        .custom-theme-selector__color-picker,
+        .custom-theme-selector__preview,
+        .custom-theme-selector__description {
+          background: var(--content-block-bg-subtle);
+          border-color: var(--content-block-border);
         }
 
-        .premium-theme-selector__sparkle {
+        .custom-theme-selector__hex-input {
+          background: var(--content-block-bg-subtle);
+          border-color: var(--content-block-border);
+          color: var(--content-block-text);
+        }
+
+        .custom-theme-selector__sparkle {
           color: var(--primary-500);
+        }
+
+        .custom-theme-selector__section-title {
+          color: var(--content-block-text-secondary);
         }
       }
     }
 
     :deep(.WrapperInput) {
       .BasicInput {
-        border-color: @neutral-300;
-        background: @neutral-50;
+        border-color: var(--chrome-border);
+        background: var(--chrome-bg);
       }
     }
 

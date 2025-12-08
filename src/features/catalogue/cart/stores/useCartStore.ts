@@ -1,7 +1,7 @@
 // ============================================================
 // 🛒 useCartStore — V4.0 (Guest Checkout + Pinia Persist - Simplified)
 // ============================================================
-import defaultImage from '@/assets/products/default/default-product-image.png'
+import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { trackAddToCart } from '@/features/tracking/services/sessionTracker'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'

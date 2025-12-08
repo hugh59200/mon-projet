@@ -348,7 +348,7 @@ onMounted(async () => {
     justify-content: space-between;
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--chrome-border-subtle);
   }
 
   &__nav-back {
@@ -356,13 +356,13 @@ onMounted(async () => {
     align-items: center;
     gap: 10px;
     padding: 12px 20px;
-    background: white;
-    border: 1px solid @neutral-200;
+    background: var(--chrome-bg);
+    border: 1px solid var(--chrome-border);
     border-radius: 12px;
     font-family: @font-body;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-600;
+    color: var(--chrome-fg-secondary);
     cursor: pointer;
     transition: all 0.25s @ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -372,9 +372,9 @@ onMounted(async () => {
     }
 
     &:hover {
-      background: @neutral-50;
+      background: var(--chrome-bg-secondary);
       border-color: var(--primary-300);
-      color: var(--primary-700);
+      color: var(--primary-500);
       transform: translateX(-4px);
 
       svg {
@@ -393,16 +393,16 @@ onMounted(async () => {
     font-family: @font-body;
     font-size: 13px;
     font-weight: 500;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
   }
 
   &__nav-number {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--chrome-fg);
     padding: 8px 16px;
-    background: @neutral-50;
+    background: var(--chrome-bg-secondary);
     border-radius: 10px;
   }
 

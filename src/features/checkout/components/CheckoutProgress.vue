@@ -67,11 +67,11 @@ const { t } = useI18n()
   padding: 24px;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--primary-500) 4%, white) 0%,
-    color-mix(in srgb, var(--primary-500) 2%, white) 100%
+    rgba(var(--primary-500-rgb), 0.08) 0%,
+    rgba(var(--primary-500-rgb), 0.04) 100%
   );
   border-radius: 20px;
-  border: 1px solid color-mix(in srgb, var(--primary-500) 10%, transparent);
+  border: 1px solid rgba(var(--primary-500-rgb), 0.12);
   margin-bottom: 32px;
 
   &__step {
@@ -84,13 +84,13 @@ const { t } = useI18n()
     background: transparent;
 
     &--active {
-      background: white;
+      background: var(--chrome-bg);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
       .checkout-progress__number {
         background: var(--primary-600);
         color: white;
-        box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-600) 40%, transparent);
+        box-shadow: 0 4px 12px rgba(var(--primary-600-rgb), 0.4);
 
         span {
           color: inherit;
@@ -98,7 +98,7 @@ const { t } = useI18n()
       }
 
       .checkout-progress__label {
-        color: @neutral-900;
+        color: var(--chrome-fg);
         font-weight: 600;
       }
     }
@@ -107,7 +107,7 @@ const { t } = useI18n()
       .checkout-progress__number {
         background: @success-500;
         color: white;
-        box-shadow: 0 4px 12px color-mix(in srgb, @success-500 40%, transparent);
+        box-shadow: 0 4px 12px rgba(var(--success-500-rgb), 0.4);
       }
     }
   }
@@ -118,8 +118,8 @@ const { t } = useI18n()
     display: flex;
     align-items: center;
     justify-content: center;
-    background: @neutral-200;
-    color: @neutral-500;
+    background: var(--chrome-border);
+    color: var(--chrome-fg-muted);
     border-radius: 50%;
     font-size: 13px;
     font-weight: 700;
@@ -129,7 +129,7 @@ const { t } = useI18n()
   &__label {
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
     transition: all 0.3s ease;
     white-space: nowrap;
   }
@@ -137,7 +137,7 @@ const { t } = useI18n()
   &__line {
     width: 40px;
     height: 2px;
-    background: @neutral-200;
+    background: var(--chrome-border);
     border-radius: 1px;
     transition: all 0.3s ease;
 

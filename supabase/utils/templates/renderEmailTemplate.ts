@@ -19,6 +19,7 @@ import { signupConfirmationTemplate } from './signupConfirmationTemplate.ts'
 import { paymentValidatedTemplate } from './paymentValidatedTemplate.ts'
 import { statusUpdateTemplate } from './statusUpdateTemplate.ts'
 import { welcomeTemplate } from './welcomeTemplate.ts'
+import { newsletterConfirmationTemplate } from './newsletterConfirmationTemplate.ts'
 
 // Type générique pour les données d'email
 // deno-lint-ignore no-explicit-any
@@ -149,6 +150,15 @@ export function renderEmailTemplate(type: string, data: EmailData): string {
     case 'welcome': {
       return welcomeTemplate({
         full_name: data.full_name,
+        locale,
+      })
+    }
+
+    case 'newsletter_confirmation': {
+      return newsletterConfirmationTemplate({
+        first_name: data.first_name,
+        confirmation_url: data.confirmation_url,
+        promo_code: data.promo_code,
         locale,
       })
     }

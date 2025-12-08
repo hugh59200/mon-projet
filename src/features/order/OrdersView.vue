@@ -358,7 +358,7 @@
 </template>
 
 <script setup lang="ts">
-  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import FilterSection from '@/features/shared/components/FilterSection.vue'
   import { fetchUserOrders } from '@/api/supabase/orders'

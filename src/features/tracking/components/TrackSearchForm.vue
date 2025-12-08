@@ -158,7 +158,7 @@ const { t } = useI18n()
     gap: 20px;
     margin-bottom: 36px;
     padding-bottom: 28px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--content-block-border);
   }
 
   &__icon {
@@ -181,14 +181,14 @@ const { t } = useI18n()
     font-family: @font-display;
     font-size: 22px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 6px;
   }
 
   &__subtitle {
     font-family: @font-body;
     font-size: 15px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 
@@ -215,7 +215,7 @@ const { t } = useI18n()
     justify-content: center;
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--content-block-border);
   }
 
   &__secure {
@@ -224,10 +224,10 @@ const { t } = useI18n()
     gap: 8px;
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
 
     svg {
-      color: @success-500;
+      color: var(--success-500);
     }
   }
 
@@ -243,10 +243,10 @@ const { t } = useI18n()
     font-family: @font-display;
     font-size: 18px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 24px;
     padding-bottom: 20px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--content-block-border);
 
     svg {
       color: var(--primary-500);
@@ -289,13 +289,13 @@ const { t } = useI18n()
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
     }
 
     span {
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       line-height: 1.5;
     }
   }

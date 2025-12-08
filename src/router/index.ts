@@ -365,6 +365,23 @@ const routes: Array<RouteRecordRaw> = [
       headerIcon: 'Bitcoin',
     },
   },
+  // Newsletter
+  {
+    path: '/newsletter/confirm',
+    name: 'newsletter-confirm',
+    component: () => import('@/features/newsletter/pages/NewsletterConfirmView.vue'),
+    meta: {
+      titleKey: 'routes.newsletter.confirm',
+    },
+  },
+  {
+    path: '/newsletter/unsubscribe',
+    name: 'newsletter-unsubscribe',
+    component: () => import('@/features/newsletter/pages/NewsletterUnsubscribeView.vue'),
+    meta: {
+      titleKey: 'routes.newsletter.unsubscribe',
+    },
+  },
   // Pages légales
   {
     path: '/mentions-legales',

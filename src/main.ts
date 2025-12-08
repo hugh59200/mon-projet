@@ -1,3 +1,4 @@
+import { initCustomTheme } from '@/composables/useCustomTheme'
 import directives from '@/directives'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
@@ -13,6 +14,9 @@ import { createApp } from 'vue'
 import Vue3GoogleOauth from 'vue3-google-signin'
 import App from './App.vue'
 import router from './router'
+
+// Initialiser le thème custom le plus tôt possible (avant le rendu)
+initCustomTheme()
 
 const app = createApp(App)
 const pinia = createPinia()

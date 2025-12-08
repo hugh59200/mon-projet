@@ -125,7 +125,7 @@ defineEmits<{
     gap: 14px;
     margin-bottom: 16px;
     padding-bottom: 14px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--content-block-border);
   }
 
   &__icon {
@@ -148,7 +148,7 @@ defineEmits<{
     font-family: @font-body;
     font-size: 13px;
     font-weight: 600;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -163,14 +163,14 @@ defineEmits<{
     font-family: @font-display;
     font-size: 17px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0;
   }
 
   &__address {
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
     line-height: 1.6;
     margin: 0;
   }
@@ -178,7 +178,7 @@ defineEmits<{
   &__info {
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 
@@ -191,7 +191,7 @@ defineEmits<{
     margin: 0;
 
     &--success {
-      color: @success-600;
+      color: var(--success-500);
     }
   }
 
@@ -201,7 +201,7 @@ defineEmits<{
     gap: 8px;
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 4px 0 0;
     font-style: italic;
   }
@@ -216,7 +216,7 @@ defineEmits<{
   &__tracking-label {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
   }
 
   &__tracking-btn {
@@ -224,18 +224,18 @@ defineEmits<{
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
+    background: var(--chrome-bg-secondary);
+    border: 1px solid var(--chrome-border);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.25s @ease;
 
     &:hover {
-      background: @neutral-100;
+      background: var(--chrome-bg-tertiary);
       border-color: var(--primary-300);
 
       .track-details__tracking-copy {
-        color: var(--primary-600);
+        color: var(--primary-500);
       }
     }
   }
@@ -244,12 +244,12 @@ defineEmits<{
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-800;
+    color: var(--content-block-text);
     flex: 1;
   }
 
   &__tracking-copy {
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
     transition: color 0.25s @ease;
   }
 }

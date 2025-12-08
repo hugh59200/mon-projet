@@ -323,7 +323,7 @@
 </template>
 
 <script setup lang="ts">
-  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
   import { fetchOrderById } from '@/api/supabase/orders'
   import type { OrderItemDetailed, OrdersFullView } from '@/supabase/types/supabase.types'
   import { getLabelBadge, getTypeBadge } from '@/utils'

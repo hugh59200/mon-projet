@@ -841,6 +841,22 @@
       }
     }
 
+    &--second &__btn {
+      background: linear-gradient(135deg, @silver 0%, @silver-dark 100%);
+
+      &:hover {
+        background: linear-gradient(135deg, lighten(@silver, 5%) 0%, @silver 100%);
+      }
+    }
+
+    &--third &__btn {
+      background: linear-gradient(135deg, @bronze 0%, @bronze-dark 100%);
+
+      &:hover {
+        background: linear-gradient(135deg, lighten(@bronze, 5%) 0%, @bronze 100%);
+      }
+    }
+
     // ============ PEDESTAL ============
     &__pedestal {
       display: flex;

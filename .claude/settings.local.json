@@ -5,7 +5,9 @@
       "Bash(npm install:*)",
       "Bash(DATABASE_PASSWORD=\"162497\" node scripts/exec-sql.cjs:*)",
       "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node scripts/exec-sql.cjs:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(npm run deploy:functions:*)"
     ],
     "deny": [],
     "ask": []

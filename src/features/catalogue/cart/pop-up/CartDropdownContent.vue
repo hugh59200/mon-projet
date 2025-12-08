@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useI18n } from 'vue-i18n'
 
@@ -171,12 +171,12 @@
     border-bottom: 1px solid rgba(var(--neutral-100-rgb), 0.06);
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-200;
+    color: var(--chrome-fg);
 
     &-count {
       font-size: 12px;
       font-weight: 500;
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
       padding: 4px 10px;
       background: rgba(var(--neutral-100-rgb), 0.04);
       border-radius: 100px;
@@ -246,7 +246,7 @@
     &-name {
       font-size: 14px;
       font-weight: 500;
-      color: @neutral-100;
+      color: var(--chrome-fg);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -260,7 +260,7 @@
 
     &-qty {
       font-size: 12px;
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
     }
 
     &-price {
@@ -269,12 +269,12 @@
       gap: 8px;
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-100;
+      color: var(--chrome-fg);
 
       &--old {
         font-size: 12px;
         font-weight: 400;
-        color: @neutral-500;
+        color: var(--chrome-fg-muted);
         text-decoration: line-through;
       }
 
@@ -292,7 +292,7 @@
       border-radius: 6px;
       background: rgba(var(--neutral-100-rgb), 0.04);
       border: none;
-      color: @neutral-500;
+      color: var(--chrome-fg-muted);
       cursor: pointer;
       opacity: 0;
       transition: all 0.2s;
@@ -301,7 +301,7 @@
       justify-content: center;
 
       &:hover {
-        background: rgba(@danger-500, 0.15);
+        background: rgba(var(--danger-500-rgb), 0.15);
         color: @danger-400;
       }
     }
@@ -382,7 +382,7 @@
     align-items: center;
     gap: 4px;
     font-size: 10px;
-    color: @neutral-400;
+    color: var(--chrome-fg-muted);
 
     svg {
       color: @success-500;
@@ -397,7 +397,7 @@
 
     span {
       font-size: 14px;
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
     }
 
     strong {

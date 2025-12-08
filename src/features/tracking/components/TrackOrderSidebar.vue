@@ -149,7 +149,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { OrdersFullView } from '@/supabase/types/supabase.types'
-import defaultImage from '@/assets/products/default/default-product-image.png'
+import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
 
 const props = defineProps<{
   order: OrdersFullView
@@ -194,13 +194,13 @@ function formatPrice(value: number | null | undefined) {
 
   // Summary
   &__summary {
-    background: white;
+    background: var(--chrome-bg);
     border-radius: 24px;
     padding: 28px;
     box-shadow:
       0 1px 3px rgba(0, 0, 0, 0.04),
       0 12px 48px rgba(0, 0, 0, 0.06);
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--chrome-border-subtle);
   }
 
   &__summary-header {
@@ -209,7 +209,7 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     margin-bottom: 24px;
     padding-bottom: 20px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--chrome-border-subtle);
   }
 
   &__summary-title {
@@ -219,7 +219,7 @@ function formatPrice(value: number | null | undefined) {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--chrome-fg);
     margin: 0;
 
     svg {
@@ -231,9 +231,9 @@ function formatPrice(value: number | null | undefined) {
     font-family: @font-body;
     font-size: 13px;
     font-weight: 500;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
     padding: 6px 14px;
-    background: @neutral-100;
+    background: var(--chrome-bg-secondary);
     border-radius: 20px;
   }
 
@@ -252,12 +252,12 @@ function formatPrice(value: number | null | undefined) {
     }
 
     &::-webkit-scrollbar-track {
-      background: @neutral-100;
+      background: var(--chrome-bg-secondary);
       border-radius: 2px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: @neutral-300;
+      background: var(--chrome-border);
       border-radius: 2px;
     }
   }
@@ -267,7 +267,7 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 14px;
     padding-bottom: 16px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--chrome-border-subtle);
 
     &:last-child {
       border-bottom: none;
@@ -285,7 +285,7 @@ function formatPrice(value: number | null | undefined) {
       height: 100%;
       object-fit: cover;
       border-radius: 12px;
-      border: 1px solid @neutral-100;
+      border: 1px solid var(--chrome-border-subtle);
     }
   }
 
@@ -301,7 +301,7 @@ function formatPrice(value: number | null | undefined) {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--chrome-fg);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -316,14 +316,14 @@ function formatPrice(value: number | null | undefined) {
   &__item-qty {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
   }
 
   &__item-dosage {
     font-family: @font-body;
     font-size: 11px;
     font-weight: 500;
-    color: var(--primary-700);
+    color: var(--primary-500);
     background: rgba(var(--primary-500-rgb), 0.08);
     padding: 3px 8px;
     border-radius: 6px;
@@ -333,7 +333,7 @@ function formatPrice(value: number | null | undefined) {
     font-family: @font-display;
     font-size: 15px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--chrome-fg);
     flex-shrink: 0;
   }
 
@@ -343,7 +343,7 @@ function formatPrice(value: number | null | undefined) {
     flex-direction: column;
     gap: 12px;
     padding-top: 20px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--chrome-border-subtle);
   }
 
   &__totals-row {
@@ -351,10 +351,10 @@ function formatPrice(value: number | null | undefined) {
     justify-content: space-between;
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--chrome-fg-secondary);
 
     &--discount {
-      color: @success-500;
+      color: var(--success-500);
 
       span:first-child {
         display: flex;
@@ -366,27 +366,27 @@ function formatPrice(value: number | null | undefined) {
     &--total {
       padding-top: 16px;
       margin-top: 8px;
-      border-top: 2px dashed @neutral-200;
+      border-top: 2px dashed var(--chrome-border);
       font-size: 16px;
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--chrome-fg);
 
       span:last-child {
         font-family: @font-display;
         font-size: 22px;
-        color: var(--primary-700);
+        color: var(--primary-500);
       }
     }
   }
 
   &__totals-free {
-    color: @success-500;
+    color: var(--success-500);
     font-weight: 600;
   }
 
   // Register CTA
   &__register {
-    background: linear-gradient(135deg, white 0%, rgba(var(--primary-500-rgb), 0.04) 100%);
+    background: linear-gradient(135deg, var(--chrome-bg) 0%, rgba(var(--primary-500-rgb), 0.04) 100%);
     border: 1px solid rgba(var(--primary-500-rgb), 0.2);
     border-radius: 24px;
     padding: 28px;
@@ -404,9 +404,9 @@ function formatPrice(value: number | null | undefined) {
     justify-content: center;
     width: 52px;
     height: 52px;
-    background: white;
+    background: var(--chrome-bg);
     border-radius: 16px;
-    color: var(--primary-600);
+    color: var(--primary-500);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
   }
@@ -420,13 +420,13 @@ function formatPrice(value: number | null | undefined) {
       font-family: @font-display;
       font-size: 17px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--chrome-fg);
     }
 
     span {
       font-family: @font-body;
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--chrome-fg-muted);
     }
   }
 
@@ -442,12 +442,12 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid @neutral-200;
+    background: var(--chrome-bg-secondary);
+    border: 1px solid var(--chrome-border);
     border-radius: 14px;
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 13px;
-    color: @neutral-600;
+    color: var(--chrome-fg-secondary);
 
     span {
       flex: 1;
@@ -457,13 +457,13 @@ function formatPrice(value: number | null | undefined) {
     }
 
     svg:first-child {
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
       flex-shrink: 0;
     }
   }
 
   &__register-verified {
-    color: @success-500;
+    color: var(--success-500);
     flex-shrink: 0;
   }
 
@@ -472,8 +472,8 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
-    background: white;
-    border: 2px solid @neutral-200;
+    background: var(--chrome-bg);
+    border: 2px solid var(--chrome-border);
     border-radius: 14px;
     transition: all 0.25s @ease;
 
@@ -483,7 +483,7 @@ function formatPrice(value: number | null | undefined) {
     }
 
     svg {
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
       flex-shrink: 0;
     }
   }
@@ -494,11 +494,11 @@ function formatPrice(value: number | null | undefined) {
     background: transparent;
     font-family: @font-body;
     font-size: 15px;
-    color: @neutral-900;
+    color: var(--chrome-fg);
     outline: none;
 
     &::placeholder {
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
     }
   }
 
@@ -558,10 +558,10 @@ function formatPrice(value: number | null | undefined) {
     gap: 10px;
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-600;
+    color: var(--chrome-fg-secondary);
 
     svg {
-      color: @success-500;
+      color: var(--success-500);
       flex-shrink: 0;
     }
   }
@@ -573,8 +573,8 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 16px;
     padding: 40px 28px;
-    background: linear-gradient(135deg, @success-50 0%, @success-100 100%);
-    border: 1px solid @success-200;
+    background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.1) 0%, rgba(var(--success-500-rgb), 0.05) 100%);
+    border: 1px solid rgba(var(--success-500-rgb), 0.2);
     border-radius: 24px;
     text-align: center;
   }
@@ -585,9 +585,9 @@ function formatPrice(value: number | null | undefined) {
     justify-content: center;
     width: 72px;
     height: 72px;
-    background: white;
+    background: var(--chrome-bg);
     border-radius: 50%;
-    color: @success-500;
+    color: var(--success-500);
     box-shadow: 0 4px 20px rgba(var(--success-500-rgb), 0.2);
   }
 
@@ -595,19 +595,19 @@ function formatPrice(value: number | null | undefined) {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 600;
-    color: @success-800;
+    color: var(--success-500);
   }
 
   &__success-text {
     font-family: @font-body;
     font-size: 14px;
-    color: @success-700;
+    color: var(--chrome-fg-secondary);
     margin: 0;
     line-height: 1.6;
 
     span {
       font-weight: 600;
-      color: @success-800;
+      color: var(--chrome-fg);
     }
   }
 
@@ -617,9 +617,9 @@ function formatPrice(value: number | null | undefined) {
     justify-content: center;
     gap: 28px;
     padding: 20px;
-    background: white;
+    background: var(--chrome-bg);
     border-radius: 16px;
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--chrome-border-subtle);
   }
 
   &__trust-item {
@@ -628,10 +628,10 @@ function formatPrice(value: number | null | undefined) {
     gap: 10px;
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
 
     svg {
-      color: @success-500;
+      color: var(--success-500);
     }
   }
 }

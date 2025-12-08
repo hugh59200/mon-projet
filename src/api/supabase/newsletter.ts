@@ -73,6 +73,7 @@ export interface SubscribeResult {
 
 /**
  * S'abonner à la newsletter
+ * Envoie automatiquement l'email de confirmation avec le code promo -10%
  */
 export async function subscribeToNewsletter(params: SubscribeParams): Promise<SubscribeResult> {
   try {
@@ -92,13 +93,48 @@ export async function subscribeToNewsletter(params: SubscribeParams): Promise<Su
 
     if (error) throw error
 
-    return data as SubscribeResult
+    const result = data as SubscribeResult
+
+    // Envoyer l'email de confirmation si nouvelle inscription ou réabonnement
+    if (result.success && (result.message === 'subscribed' || result.message === 'resubscribed')) {
+      // Appel asynchrone à l'Edge Function (fire and forget)
+      sendNewsletterConfirmationEmail({
+        subscriber_id: result.subscriber_id,
+        email: params.email,
+        first_name: params.firstName,
+        confirmation_token: result.confirmation_token,
+        locale: params.locale || 'fr',
+      }).catch((err) => {
+        console.error('Erreur envoi email confirmation newsletter:', err)
+      })
+    }
+
+    return result
   } catch (error) {
     console.error('Erreur lors de l\'abonnement à la newsletter:', error)
     return {
       success: false,
       message: 'error',
     }
+  }
+}
+
+/**
+ * Envoyer l'email de confirmation de newsletter via Edge Function
+ */
+async function sendNewsletterConfirmationEmail(params: {
+  subscriber_id?: string
+  email: string
+  first_name?: string
+  confirmation_token?: string
+  locale: string
+}): Promise<void> {
+  const response = await supabase.functions.invoke('newsletter-confirmation', {
+    body: params,
+  })
+
+  if (response.error) {
+    throw new Error(response.error.message)
   }
 }
 

@@ -221,7 +221,7 @@ function formatDate(date: string | null | undefined) {
   &__message {
     font-family: @font-body;
     font-size: 15px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
     margin: 0;
     max-width: 400px;
     line-height: 1.5;
@@ -233,13 +233,13 @@ function formatDate(date: string | null | undefined) {
     gap: 8px;
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
     padding: 10px 16px;
-    background: @neutral-50;
+    background: var(--chrome-bg-secondary);
     border-radius: 10px;
 
     svg {
-      color: @neutral-400;
+      color: var(--chrome-fg-muted);
     }
   }
 
@@ -247,7 +247,7 @@ function formatDate(date: string | null | undefined) {
   &__timeline {
     position: relative;
     padding: 32px;
-    background: @neutral-50;
+    background: var(--chrome-bg-secondary);
     border-radius: 20px;
   }
 
@@ -257,7 +257,7 @@ function formatDate(date: string | null | undefined) {
     left: 80px;
     right: 80px;
     height: 4px;
-    background: @neutral-200;
+    background: var(--chrome-border);
     border-radius: 2px;
     overflow: hidden;
   }
@@ -293,7 +293,7 @@ function formatDate(date: string | null | undefined) {
       }
 
       .track-status__timeline-label {
-        color: @neutral-900;
+        color: var(--chrome-fg);
         font-weight: 600;
       }
     }
@@ -316,10 +316,10 @@ function formatDate(date: string | null | undefined) {
     justify-content: center;
     width: 52px;
     height: 52px;
-    background: white;
-    border: 2px solid @neutral-200;
+    background: var(--chrome-bg);
+    border: 2px solid var(--chrome-border);
     border-radius: 50%;
-    color: @neutral-400;
+    color: var(--chrome-fg-muted);
     transition: all 0.4s @ease;
     font-family: @font-display;
     font-size: 16px;
@@ -340,14 +340,14 @@ function formatDate(date: string | null | undefined) {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-400;
+    color: var(--chrome-fg-muted);
     transition: all 0.3s @ease;
   }
 
   &__timeline-date {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--chrome-fg-muted);
   }
 }
 

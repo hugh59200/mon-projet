@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { CartView } from '@/supabase/types/supabase.types'
-import defaultImage from '@/assets/products/default/default-product-image.png'
+import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
 
 defineProps<{
   items: CartView[]

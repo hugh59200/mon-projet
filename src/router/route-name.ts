@@ -31,6 +31,8 @@ export type RouteName =
   'mentions-legales' |
   'mfa-challenge' |
   'mfa-setup' |
+  'newsletter-confirm' |
+  'newsletter-unsubscribe' |
   'order-detail' |
   'orders' |
   'politique-confidentialite' |

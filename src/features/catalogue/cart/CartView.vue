@@ -6,9 +6,9 @@
       <div class="cart__bg-pattern"></div>
     </div>
 
-    <div class="cart__container">
-      <!-- Header -->
-      <header class="cart__header">
+    <!-- Header - Full width -->
+    <header class="cart__header">
+      <div class="cart__header-inner">
         <div class="cart__header-left">
           <PremiumButton
             type="secondary"
@@ -45,14 +45,18 @@
             @click="confirmClearCart"
           />
         </div>
-      </header>
+      </div>
+    </header>
 
+    <div class="cart__container">
       <!-- Progress Steps -->
       <CheckoutProgress :current-step="1" />
 
       <!-- Empty State -->
-      <div
+      <ContentBlock
         v-if="cart.items.length === 0"
+        variant="card"
+        size="lg"
         class="cart__empty"
       >
         <div class="cart__empty-visual">
@@ -108,7 +112,7 @@
             />
           </div>
         </div>
-      </div>
+      </ContentBlock>
 
       <!-- Cart Content -->
       <div
@@ -116,7 +120,7 @@
         class="cart__content"
       >
         <!-- Items List -->
-        <div class="cart__main">
+        <ContentBlock variant="card" padding="0" class="cart__main">
           <!-- Table Header -->
           <div class="cart__table-header">
             <span class="cart__col cart__col--product">{{ t('cart.item') }}</span>
@@ -275,11 +279,11 @@
               </div>
             </div>
           </div>
-        </div>
+        </ContentBlock>
 
         <!-- Summary Sidebar -->
         <aside class="cart__sidebar">
-          <div class="cart__summary">
+          <ContentBlock variant="card" size="lg" class="cart__summary">
             <h3 class="cart__summary-title">
               <BasicIconNext name="ClipboardList" :size="20" />
               {{ t('checkout.summary.title') }}
@@ -388,7 +392,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </ContentBlock>
         </aside>
       </div>
     </div>
@@ -397,7 +401,7 @@
 
 <script setup lang="ts">
   import { useHead } from '@vueuse/head'
-  import defaultImage from '@/assets/products/default/default-product-image.png'
+  import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import type { CartView } from '@/supabase/types/supabase.types'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -553,7 +557,7 @@
   .cart {
     position: relative;
     min-height: 100vh;
-    background: @neutral-50;
+    background: var(--chrome-bg-secondary);
 
     // ============================================
     // BACKGROUND
@@ -601,12 +605,20 @@
     // HEADER
     // ============================================
     &__header {
+      position: relative;
+      z-index: 1;
+      padding: 24px 32px;
+      margin-bottom: 0;
+      border-bottom: 1px solid var(--chrome-border);
+      background: var(--chrome-bg);
+    }
+
+    &__header-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 40px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid @neutral-200;
+      max-width: 1280px;
+      margin: 0 auto;
     }
 
     &__header-left,
@@ -624,18 +636,18 @@
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: white;
-      border: 1px solid @neutral-200;
+      background: var(--chrome-bg);
+      border: 1px solid var(--chrome-border);
       border-radius: 10px;
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: @neutral-700;
+      color: var(--chrome-fg-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: @neutral-50;
+        background: var(--chrome-bg-secondary);
         border-color: var(--primary-300);
         color: var(--primary-700);
         transform: translateX(-4px);
@@ -658,7 +670,7 @@
       font-family: @font-display;
       font-size: 28px;
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--chrome-fg);
       margin: 0;
 
       svg {
@@ -686,17 +698,17 @@
       gap: 6px;
       padding: 8px 14px;
       background: transparent;
-      border: 1px solid @neutral-200;
+      border: 1px solid var(--chrome-border);
       border-radius: 8px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: @neutral-500;
+      color: var(--chrome-fg-muted);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: @danger-50;
+        background: rgba(var(--danger-500-rgb), 0.1);
         border-color: @danger-200;
         color: @danger-500;
       }
@@ -709,13 +721,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 80px 32px;
-      background: white;
-      border-radius: 24px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
       text-align: center;
     }
 
@@ -730,9 +735,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, @neutral-100 0%, @neutral-50 100%);
+      background: var(--content-block-bg-subtle);
       border-radius: 50%;
-      color: @neutral-400;
+      color: var(--content-block-text-muted);
     }
 
     &__empty-circles {
@@ -741,7 +746,7 @@
 
       span {
         position: absolute;
-        border: 2px dashed @neutral-200;
+        border: 2px dashed var(--content-block-border);
         border-radius: 50%;
 
         &:nth-child(1) {
@@ -765,14 +770,14 @@
       font-family: @font-display;
       font-size: 24px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
       margin: 0 0 12px;
     }
 
     &__empty-text {
       font-family: @font-body;
       font-size: 16px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       margin: 0 0 32px;
       max-width: 400px;
     }
@@ -802,14 +807,14 @@
     &__suggestions {
       margin-top: 48px;
       padding-top: 32px;
-      border-top: 1px solid @neutral-100;
+      border-top: 1px solid var(--content-block-border);
     }
 
     &__suggestions-title {
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       margin: 0 0 16px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -820,25 +825,6 @@
       gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
-
-      button {
-        padding: 10px 20px;
-        background: @neutral-50;
-        border: 1px solid @neutral-200;
-        border-radius: 20px;
-        font-family: @font-body;
-        font-size: 14px;
-        font-weight: 500;
-        color: @neutral-700;
-        cursor: pointer;
-        transition: all 0.2s @ease;
-
-        &:hover {
-          background: white;
-          border-color: var(--primary-300);
-          color: var(--primary-700);
-        }
-      }
     }
 
     // ============================================
@@ -852,12 +838,6 @@
     }
 
     &__main {
-      background: white;
-      border-radius: 20px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
       overflow: hidden;
     }
 
@@ -869,12 +849,12 @@
       grid-template-columns: 2fr 1fr 1fr 1fr 60px;
       gap: 16px;
       padding: 16px 24px;
-      background: @neutral-50;
-      border-bottom: 1px solid @neutral-100;
+      background: var(--content-block-bg-subtle);
+      border-bottom: 1px solid var(--content-block-border);
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -908,13 +888,7 @@
     }
 
     &__summary {
-      background: white;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 8px 32px rgba(0, 0, 0, 0.04);
-      border: 1px solid @neutral-100;
+      // Styles gérés par ContentBlock
     }
 
     &__summary-title {
@@ -924,10 +898,10 @@
       font-family: @font-display;
       font-size: 18px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
       margin: 0 0 24px;
       padding-bottom: 16px;
-      border-bottom: 1px solid @neutral-100;
+      border-bottom: 1px solid var(--content-block-border);
 
       svg {
         color: var(--primary-500);
@@ -945,7 +919,7 @@
       justify-content: space-between;
       font-family: @font-body;
       font-size: 14px;
-      color: @neutral-600;
+      color: var(--content-block-text-secondary);
 
       &--discount {
         color: @success-500;
@@ -961,7 +935,7 @@
         padding-top: 16px;
         font-size: 18px;
         font-weight: 700;
-        color: @neutral-900;
+        color: var(--content-block-text);
 
         span:last-child {
           color: var(--primary-700);
@@ -977,7 +951,7 @@
 
     &__summary-divider {
       height: 1px;
-      background: @neutral-100;
+      background: var(--content-block-border);
       margin: 8px 0;
     }
 
@@ -988,7 +962,7 @@
 
     &__shipping-bar {
       height: 6px;
-      background: @neutral-200;
+      background: var(--content-block-border);
       border-radius: 3px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -1008,7 +982,7 @@
       gap: 8px;
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-600;
+      color: var(--content-block-text-secondary);
       margin: 0;
 
       svg {
@@ -1068,7 +1042,7 @@
       gap: 12px;
       margin-top: 24px;
       padding-top: 24px;
-      border-top: 1px solid @neutral-100;
+      border-top: 1px solid var(--content-block-border);
     }
 
     &__trust-item {
@@ -1077,7 +1051,7 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
 
       svg {
         color: @success-500;
@@ -1087,13 +1061,13 @@
     &__payment-methods {
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid @neutral-100;
+      border-top: 1px solid var(--content-block-border);
       text-align: center;
 
       > span {
         font-family: @font-body;
         font-size: 12px;
-        color: @neutral-400;
+        color: var(--content-block-text-muted);
       }
     }
 
@@ -1126,7 +1100,7 @@
     gap: 16px;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--content-block-border);
     transition: background 0.2s @ease;
 
     &:last-child {
@@ -1134,7 +1108,7 @@
     }
 
     &:hover {
-      background: @neutral-50;
+      background: var(--content-block-bg-subtle);
     }
 
     &__product {
@@ -1155,8 +1129,8 @@
         height: 100%;
         object-fit: cover;
         border-radius: 12px;
-        background: @neutral-50;
-        border: 1px solid @neutral-100;
+        background: var(--content-block-bg-subtle);
+        border: 1px solid var(--content-block-border);
         transition: transform 0.2s @ease;
       }
 
@@ -1189,7 +1163,7 @@
       font-family: @font-display;
       font-size: 15px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
       margin: 0;
       cursor: pointer;
       transition: color 0.2s @ease;
@@ -1202,7 +1176,7 @@
     &__dosage {
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       margin: 0;
     }
 
@@ -1234,7 +1208,7 @@
     &__price-old {
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-400;
+      color: var(--content-block-text-muted);
       text-decoration: line-through;
     }
 
@@ -1242,7 +1216,7 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
 
       &--sale {
         color: @danger-500;
@@ -1258,8 +1232,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      background: @neutral-50;
-      border: 1px solid @neutral-200;
+      background: var(--content-block-bg-subtle);
+      border: 1px solid var(--content-block-border);
       border-radius: 10px;
       padding: 4px;
 
@@ -1274,20 +1248,20 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: white;
+      background: transparent;
       border: none;
       border-radius: 8px;
-      color: @neutral-600;
+      color: var(--content-block-text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover:not(:disabled) {
-        background: @neutral-100;
-        color: @neutral-900;
+        background: var(--content-block-border);
+        color: var(--content-block-text);
       }
 
       &:disabled {
-        color: @neutral-300;
+        color: var(--content-block-text-muted);
         cursor: not-allowed;
         background: transparent;
       }
@@ -1299,7 +1273,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
       border: none;
       background: transparent;
       -moz-appearance: textfield;
@@ -1321,7 +1295,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--content-block-text);
     }
 
     &__total {
@@ -1332,7 +1306,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--content-block-text);
     }
 
     &__actions {
@@ -1345,12 +1319,12 @@
       background: transparent;
       border: none;
       border-radius: 8px;
-      color: @neutral-400;
+      color: var(--content-block-text-muted);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: @danger-50;
+        background: rgba(var(--danger-500-rgb), 0.1);
         color: @danger-500;
       }
     }
@@ -1430,18 +1404,20 @@
       }
 
       &__header {
+        padding: 16px;
+      }
+
+      &__header-inner {
         flex-direction: column;
         gap: 12px;
         text-align: center;
-        margin-bottom: 24px;
-        padding-bottom: 16px;
+      }
 
-        &-left,
-        &-right {
-          flex: none;
-          width: 100%;
-          justify-content: center;
-        }
+      &__header-left,
+      &__header-right {
+        flex: none;
+        width: 100%;
+        justify-content: center;
       }
 
       &__title {
@@ -1573,12 +1549,12 @@
         align-items: center;
         width: 100%;
         padding-top: 12px;
-        border-top: 1px dashed @neutral-200;
+        border-top: 1px dashed var(--content-block-border);
       }
 
       &__qty-control--mobile {
         display: flex;
-        background: @neutral-100;
+        background: var(--content-block-bg-subtle);
         border-radius: 8px;
         padding: 2px;
       }

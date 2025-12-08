@@ -81,11 +81,6 @@
         </div>
       </div>
 
-      <!-- Indicateur de scroll -->
-      <div v-if="isMobile" class="hero__scroll-indicator">
-        <BasicIconNext name="ChevronDown" :size="20" />
-      </div>
-
       <div v-if="!isMobile" class="hero__trust">
         <div class="hero__trust-item">
           <BasicIconNext
@@ -212,9 +207,10 @@
     &__container {
       position: relative;
       z-index: 2;
+      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 50px;
     }
 
     // Contenu
@@ -386,35 +382,6 @@
       }
     }
 
-    // Indicateur de scroll
-    &__scroll-indicator {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: @neutral-400;
-      animation: bounce 2s infinite;
-
-      svg {
-        opacity: 0.6;
-      }
-    }
-  }
-
-  // Animation bounce pour l'indicateur de scroll
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-      transform: translateX(-50%) translateY(0);
-    }
-    40% {
-      transform: translateX(-50%) translateY(-6px);
-    }
-    60% {
-      transform: translateX(-50%) translateY(-3px);
-    }
   }
 
   // Animation fade-in pour le titre mobile

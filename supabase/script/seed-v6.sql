@@ -1252,6 +1252,8 @@ ON CONFLICT (setting_key) DO UPDATE SET
 -- Codes promo de test
 INSERT INTO public.promo_codes (id, code, description, discount_type, discount_value, min_order_amount, max_discount_amount, max_uses, max_uses_per_user, valid_from, valid_until, active)
 VALUES
+  -- Code newsletter -10% (WELCOME10)
+  ('00000000-0000-0000-0000-000000000010', 'WELCOME10', 'Code newsletter -10% première commande', 'percentage', 10, 0, NULL, NULL, 1, now(), NULL, true),
   -- Code pourcentage sans limite
   ('11111111-1111-1111-1111-111111111111', 'TEST10', 'Code de test -10%', 'percentage', 10, 0, NULL, NULL, NULL, now(), NULL, true),
   -- Code pourcentage avec plafond
