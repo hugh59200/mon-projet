@@ -16,16 +16,29 @@
 
     <!-- Conteneur centré max-width 1200px -->
     <div class="hero-section__container">
+      <!-- Badge mobile en haut à droite -->
+      <div v-if="isMobile" class="hero__badge hero__badge--mobile">
+        <span class="hero__badge-dot"></span>
+        <span>{{ t('home.hero.badge.certified') }}</span>
+      </div>
+
+      <!-- Titre mobile en haut -->
+      <h1 v-if="isMobile" class="hero__title hero__title--mobile">
+        <span>{{ t('home.hero.title.line1') }}</span>
+        <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
+        <span>{{ t('home.hero.title.line2') }}</span>
+      </h1>
+
       <!-- Contenu -->
       <div class="hero-section__content">
-      <div class="hero__badge">
+      <div v-if="!isMobile" class="hero__badge">
         <span class="hero__badge-dot"></span>
         <span>{{ t('home.hero.badge.certified') }}</span>
         <span class="hero__badge-sep">•</span>
         <span>{{ t('home.hero.badge.researchOnly') }}</span>
       </div>
 
-      <h1 class="hero__title">
+      <h1 v-if="!isMobile" class="hero__title">
         <span>{{ t('home.hero.title.line1') }}</span>
         <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
         <span>{{ t('home.hero.title.line2') }}</span>
@@ -51,7 +64,7 @@
         </BaseButton>
       </div>
 
-      <div class="hero__trust">
+      <div v-if="!isMobile" class="hero__trust">
         <div class="hero__trust-item">
           <BasicIconNext
             name="ShieldCheck"
@@ -81,10 +94,12 @@
 
 <script setup lang="ts">
   import peptidesHeroImage from '@/assets/peptides-hero.png'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
   import { useI18n } from 'vue-i18n'
   import BaseButton from './shared/BaseButton.vue'
 
   const { t } = useI18n()
+  const { isMobile } = useDeviceBreakpoint()
 </script>
 
 <style scoped lang="less">
@@ -175,7 +190,6 @@
     &__container {
       position: relative;
       z-index: 2;
-      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 24px;
@@ -218,6 +232,49 @@
 
       &-sep {
         color: @neutral-500;
+      }
+
+      &--mobile {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        z-index: 10;
+        padding: 6px 12px;
+        font-size: 11px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(12px);
+      }
+    }
+
+    &__title--mobile {
+      position: absolute;
+      top: 25%;
+      left: 20px;
+      right: 20px;
+      transform: translateY(-50%);
+      font-family: @font-display;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: @neutral-50;
+      margin: 0;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+
+      span {
+        display: block;
+      }
+
+      .hero__title-accent {
+        background: linear-gradient(
+          135deg,
+          var(--primary-400) 0%,
+          var(--primary-300) 50%,
+          var(--primary-500) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
 
@@ -322,74 +379,69 @@
   // MOBILE (≤ 720px)
   .respond-mobile({
     .hero-section {
+      min-height: 480px;
+      align-items: stretch;
+
       &__bg-image img {
         object-position: center center;
       }
 
+      // Overlay léger pour voir l'image
       &__bg-overlay {
-        background: rgba(2, 2, 2, 0.85);
+        background: linear-gradient(
+          180deg,
+          rgba(2, 2, 2, 0.85) 0%,
+          rgba(2, 2, 2, 0.3) 25%,
+          rgba(2, 2, 2, 0.2) 50%,
+          rgba(2, 2, 2, 0.5) 75%,
+          rgba(2, 2, 2, 0.95) 100%
+        );
 
         &::after {
-          background: linear-gradient(
-            180deg,
-            rgba(2, 2, 2, 0.2) 0%,
-            transparent 20%,
-            transparent 80%,
-            rgba(2, 2, 2, 0.2) 100%
-          );
+          display: none;
         }
       }
 
       &__container {
-        padding: 0 16px;
+        padding: 0 20px;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
       }
 
       &__content {
-        max-width: 100%;
-        padding: 32px 0;
-        text-align: center;
-        align-items: center;
-        gap: 20px;
+        padding: 0 0 32px;
+        text-align: left;
+        align-items: flex-start;
+        gap: 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
       }
     }
 
     .hero {
-      &__badge {
-        &-sep,
-        & > span:last-of-type {
-          display: none;
-        }
-      }
-
       &__title {
-        font-size: 32px;
+        font-size: 28px;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
       }
 
       &__desc {
         font-size: 14px;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       &__actions {
-        width: 100%;
+        margin-top: 4px;
 
-        :deep(button) {
-          width: 100%;
-          justify-content: center;
-        }
-
-        // Masquer le CTA secondaire sur mobile pour simplifier
         :deep(button:nth-child(2)) {
           display: none;
-        }
-      }
-
-      &__trust {
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-
-        &-item {
-          font-size: 12px;
         }
       }
     }

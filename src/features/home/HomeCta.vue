@@ -26,10 +26,7 @@
       </div>
     </div>
 
-    <ContentBlock
-      variant="card"
-      class="cta__disclaimer"
-    >
+    <div class="cta__disclaimer">
       <div class="cta__disclaimer-badge">
         <BasicIconNext
           name="Shield"
@@ -41,12 +38,11 @@
         <p class="cta__disclaimer-title">{{ t('home.disclaimer.title') }}</p>
         <p class="cta__disclaimer-text">{{ t('home.disclaimer.text') }}</p>
       </div>
-    </ContentBlock>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { useI18n } from 'vue-i18n'
   import BaseButton from './shared/BaseButton.vue'
 
@@ -67,9 +63,12 @@
 
   .cta {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 60px;
+    grid-template-columns: 60% 40%;
+    gap: 32px;
     align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 
     &__content {
       display: flex;
@@ -113,6 +112,11 @@
       flex-direction: column;
       gap: 16px;
       max-width: 280px;
+      padding: 20px;
+      background: rgba(var(--warning-500-rgb), 0.08);
+      border: 1px solid rgba(var(--warning-500-rgb), 0.2);
+      border-radius: 16px;
+      align-self: center;
     }
 
     &__disclaimer-badge {
@@ -120,20 +124,19 @@
       align-items: center;
       gap: 8px;
       padding: 8px 14px;
-      background: rgba(var(--primary-500-rgb), 0.15);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.25);
+      background: rgba(var(--warning-500-rgb), 0.15);
       border-radius: 8px;
       width: fit-content;
 
       svg {
-        color: var(--primary-400);
+        color: var(--warning-400);
       }
 
       span {
         font-family: @font-display;
         font-size: 11px;
         font-weight: 600;
-        color: var(--primary-300);
+        color: var(--warning-400);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -172,16 +175,8 @@
     .cta__content { align-items: center; }
     .cta__actions { justify-content: center; }
     .cta__disclaimer {
-      max-width: 400px;
+      max-width: 480px;
       margin: 0 auto;
-      flex-direction: row;
-      align-items: center;
-      gap: 20px;
-    }
-    .cta__disclaimer-badge {
-      flex-shrink: 0;
-    }
-    .cta__disclaimer-content {
       text-align: left;
     }
   });
@@ -189,19 +184,22 @@
   // Responsive - Mobile (≤ 720px)
   .respond-mobile({
     .cta {
-      gap: 24px;
+      gap: 20px;
     }
-    .cta__actions { flex-direction: column; width: 100%; }
-    .cta__disclaimer {
-      flex-direction: column;
-      max-width: none;
+    .cta__content {
       gap: 12px;
+
+      p {
+        display: none;
+      }
     }
-    .cta__disclaimer-content {
-      text-align: center;
+    .cta__actions {
+      button:nth-child(2) {
+        display: none;
+      }
     }
-    .cta__disclaimer-badge {
-      margin: 0 auto;
+    .cta__disclaimer {
+      display: none;
     }
   });
 </style>

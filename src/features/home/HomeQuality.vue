@@ -39,7 +39,7 @@
           >
             <div class="quality__coa-track">
               <ContentBlock
-                v-for="(coa, index) in infiniteCoaList"
+                v-for="(coa, index) in displayedCoaList"
                 :key="`${coa.id}-${index}`"
                 variant="card"
                 size="sm"
@@ -87,11 +87,67 @@
 </template>
 
 <script setup lang="ts">
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
   import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
-  import { computed, h } from 'vue'
+  import { computed, h, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
+  const { isMobile } = useDeviceBreakpoint()
+
+  // Ref pour le scroll container
+  const scrollContainer = ref<HTMLElement | null>(null)
+  let autoScrollInterval: number | null = null
+  let scrollDirection: 'right' | 'left' = 'right'
+  const isDev = import.meta.env.DEV
+
+  // Auto-scroll horizontal pour mobile
+  const startAutoScroll = () => {
+    if (isDev || !isMobile.value || !scrollContainer.value) return
+
+    autoScrollInterval = window.setInterval(() => {
+      const container = scrollContainer.value
+      if (!container) return
+
+      const maxScroll = container.scrollWidth - container.clientWidth
+      const currentScroll = container.scrollLeft
+
+      if (scrollDirection === 'right') {
+        if (currentScroll >= maxScroll - 5) {
+          scrollDirection = 'left'
+        } else {
+          container.scrollTo({
+            left: currentScroll + 232, // largeur carte + gap
+            behavior: 'smooth',
+          })
+        }
+      } else {
+        if (currentScroll <= 5) {
+          scrollDirection = 'right'
+        } else {
+          container.scrollTo({
+            left: currentScroll - 232,
+            behavior: 'smooth',
+          })
+        }
+      }
+    }, 5000)
+  }
+
+  const stopAutoScroll = () => {
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval)
+      autoScrollInterval = null
+    }
+  }
+
+  onMounted(() => {
+    startAutoScroll()
+  })
+
+  onBeforeUnmount(() => {
+    stopAutoScroll()
+  })
 
   interface CoaItem {
     id: string
@@ -237,8 +293,9 @@
     }
   }
 
-  // Liste dupliquée pour l'effet infini
+  // Liste dupliquée pour l'effet infini (desktop) ou simple (mobile)
   const infiniteCoaList = computed(() => [...coaList, ...coaList, ...coaList])
+  const displayedCoaList = computed(() => (isMobile.value ? coaList : infiniteCoaList.value))
 
   // TODO: Réactiver les animations plus tard
   // const setupInfiniteScroll = () => {
@@ -625,12 +682,56 @@
 
   // Responsive - Mobile (≤ 720px)
   .respond-mobile({
+    .layout-section__container {
+      padding: 0 16px;
+    }
+    .layout-section__inner--two-cols {
+      gap: 24px;
+    }
+    .quality__desc {
+      font-size: 14px;
+    }
+    .quality__features {
+      display: none;
+    }
+    .quality__visual {
+      order: 1; // COA en bas
+      width: 100vw;
+      margin-left: -16px;
+      margin-right: -16px;
+    }
     .quality__coa-scroll {
       width: 100%;
-      height: 320px;
+      height: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-radius: 0;
+      padding: 0 16px;
+      // Masque horizontal
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 5%,
+        black 95%,
+        transparent 100%
+      );
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 5%,
+        black 95%,
+        transparent 100%
+      );
+    }
+    .quality__coa-track {
+      flex-direction: row;
+      padding: 8px 0;
+      gap: 12px;
+      width: max-content;
     }
     .coa-card {
-      width: 280px;
+      width: 220px;
+      flex-shrink: 0;
     }
   });
 </style>

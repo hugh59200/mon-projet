@@ -177,7 +177,7 @@
       position: relative;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 48px 40px 24px;
+      padding: 40px 24px;
     }
 
     // ============================================
@@ -329,8 +329,8 @@
       justify-content: space-between;
       align-items: center;
       gap: 32px;
-      margin-top: 24px;
       padding: 20px 0;
+      border-top: 1px solid var(--chrome-border-subtle);
       border-bottom: 1px solid var(--chrome-border-subtle);
     }
 
@@ -469,78 +469,64 @@
     .respond-tablet({
       &__main {
         grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
         gap: 32px;
+        text-align: center;
       }
 
+      // Brand et Newsletter côte à côte, space-around
       &__brand {
-        grid-column: 1 / -1;
-        flex-direction: row;
+        grid-row: 1;
+        grid-column: 1;
+        flex-direction: column;
         align-items: center;
-        gap: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--chrome-border-subtle);
+        justify-self: center;
+        gap: 16px;
       }
 
       &__tagline {
-        max-width: 300px;
+        max-width: 280px;
       }
 
       &__contact-inline {
         margin-top: 0;
-        margin-left: auto;
-      }
-
-      &__nav {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
+        margin-left: 0;
       }
 
       &__newsletter-col {
-        justify-self: end;
-        max-width: 240px;
+        grid-row: 1;
+        grid-column: 2;
+        justify-self: center;
+        align-self: center;
+        max-width: 280px;
+      }
+
+      // Nav en dessous, pleine largeur
+      &__nav {
+        grid-row: 2;
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        justify-items: center;
+        padding-top: 24px;
+        border-top: 1px solid var(--chrome-border-subtle);
+      }
+
+      &__nav-col {
+        align-items: center;
       }
     });
 
     // Mobile (≤ 720px)
     .respond-mobile({
       &__container {
-        padding: 32px 20px 20px;
-      }
-
-      &__main {
-        grid-template-columns: 1fr auto;
-        grid-template-rows: auto auto;
-        gap: 20px;
-
-        // Micro résolution : stack vertical
-        @media (max-width: 480px) {
-          grid-template-columns: 1fr;
-          grid-template-rows: auto auto auto;
-          gap: 24px;
-        }
-      }
-
-      // Brand à gauche, row 1
-      &__brand {
-        grid-row: 1;
-        grid-column: 1;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding-bottom: 0;
-        border-bottom: none;
-
-        @media (max-width: 480px) {
-          align-items: center;
-          text-align: center;
-          padding-bottom: 20px;
-          border-bottom: 1px solid var(--chrome-border-subtle);
-        }
+        padding: 24px 20px 20px;
       }
 
       &__tagline {
         font-size: 11px;
         line-height: 1.5;
+        max-width: 240px;
       }
 
       &__contact-inline {
@@ -552,47 +538,21 @@
         font-size: 11px;
       }
 
-      // Newsletter à droite, row 1
       &__newsletter-col {
-        grid-row: 1;
-        grid-column: 2;
-        justify-self: end;
-        align-self: start;
-        max-width: 160px;
+        max-width: 240px;
 
         .footer__nav-title {
           font-size: 9px;
           margin-bottom: 10px;
         }
-
-        @media (max-width: 480px) {
-          grid-row: 2;
-          grid-column: 1;
-          justify-self: stretch;
-          max-width: none;
-          text-align: center;
-
-          .footer__nav-title {
-            text-align: center;
-          }
-        }
       }
 
-      // Nav en dessous, row 2, pleine largeur
+      // Nav
       &__nav {
-        grid-row: 2;
-        grid-column: 1 / -1;
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
         padding-top: 20px;
-        margin-top: 4px;
         border-top: 1px solid var(--chrome-border-subtle);
-
-        @media (max-width: 480px) {
-          grid-row: 3;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px 16px;
-        }
       }
 
       &__nav-col {
@@ -666,6 +626,33 @@
         margin-bottom: 2px;
       }
     });
+
+    // Très petit mobile (≤ 480px) - Brand et Newsletter en colonne
+    @media (max-width: 480px) {
+      &__main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 24px;
+      }
+
+      &__brand {
+        grid-row: 1;
+        grid-column: 1;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--chrome-border-subtle);
+      }
+
+      &__newsletter-col {
+        grid-row: 2;
+        grid-column: 1;
+        max-width: 320px;
+      }
+
+      &__nav {
+        grid-row: 3;
+        grid-column: 1;
+      }
+    }
 
   }
 </style>

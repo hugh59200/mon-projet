@@ -164,9 +164,6 @@ const containerStyle = computed(() => {
 
   if (props.maxWidth) {
     style.maxWidth = props.maxWidth
-    if (!props.width) {
-      style.width = '100%'
-    }
   }
 
   if (props.minHeight) {
@@ -259,10 +256,6 @@ const containerStyle = computed(() => {
     border: none !important;
   }
 
-  &--centered {
-    margin-left: auto;
-    margin-right: auto;
-  }
 
   // ============ LIGHT THEME ============
   &--light {

@@ -4,14 +4,6 @@
     <div class="newsletter-section__container">
       <!-- Left: Content -->
       <div class="newsletter-section__content">
-        <div class="newsletter-section__badge">
-          <BasicIconNext
-            name="Sparkles"
-            :size="14"
-          />
-          <span>{{ t('newsletter.badge') }}</span>
-        </div>
-
         <h2 class="newsletter-section__title">
           <span class="newsletter-section__title-line">{{ t('newsletter.title') }}</span>
         </h2>
@@ -276,7 +268,7 @@
       }
 
       &__features {
-        grid-template-columns: 1fr;
+        display: none;
       }
     });
   }

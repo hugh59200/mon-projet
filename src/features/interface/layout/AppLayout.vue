@@ -176,9 +176,8 @@
       flex-direction: column;
     }
 
-    /* Mobile: padding pour la bottom nav */
+    /* Mobile */
     .respond-mobile({
-      padding-bottom: 72px;
       min-height: calc(100vh - 60px - 150px); /* header mobile + footer mobile */
     });
   }

@@ -37,9 +37,43 @@
         </div>
       </div>
 
-      <!-- Podium Section -->
+      <!-- VERSION MOBILE : Liste simple -->
       <div
-        v-else
+        v-if="!loading"
+        class="best-sellers__mobile-list"
+      >
+        <div
+          v-for="(product, index) in topProducts"
+          :key="product.id"
+          class="mobile-item"
+          @click="goToProduct(product.id)"
+        >
+          <span class="mobile-item__rank">#{{ index + 1 }}</span>
+          <div class="mobile-item__image">
+            <img
+              :src="product.image || defaultImage"
+              :alt="getProductName(product)"
+            />
+          </div>
+          <div class="mobile-item__content">
+            <span class="mobile-item__name">{{ getProductName(product) }}</span>
+            <span class="mobile-item__price">{{ getPrice(product).toFixed(2) }}€</span>
+          </div>
+          <button
+            class="mobile-item__btn"
+            @click.stop="addToCart(product)"
+          >
+            <BasicIconNext
+              name="Plus"
+              :size="18"
+            />
+          </button>
+        </div>
+      </div>
+
+      <!-- VERSION DESKTOP : Podium Section -->
+      <div
+        v-if="!loading"
         class="best-sellers__podium-section"
       >
         <div class="best-sellers__podium">
@@ -476,12 +510,23 @@
       }
     }
 
+    // ============ VERSION MOBILE ============
+    &__mobile-list {
+      display: none;
+
+      .respond-mobile({
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      });
+    }
+
     // ============ PODIUM SECTION ============
     &__podium-section {
       margin-bottom: 32px;
 
       .respond-mobile({
-        margin-bottom: 24px;
+        display: none;
       });
     }
 
@@ -495,19 +540,16 @@
       .respond-tablet({
         gap: 16px;
       });
-
-      .respond-mobile({
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        padding-top: 16px;
-      });
     }
 
     // ============ HONORABLE SECTION ============
     &__honorable {
       border-top: 1px solid var(--content-block-border);
       padding-top: 24px;
+
+      .respond-mobile({
+        display: none;
+      });
     }
 
     &__honorable-header {
@@ -579,11 +621,6 @@
       width: 240px;
     });
 
-    .respond-mobile({
-      width: 100%;
-      max-width: 320px;
-    });
-
     // ============ VARIATIONS ============
     &--first {
       border-color: rgba(@gold, 0.3);
@@ -593,22 +630,6 @@
         border-color: rgba(@gold, 0.5);
         box-shadow: 0 16px 48px rgba(@gold, 0.25);
       }
-
-      .respond-mobile({
-        order: -1; // Premier sur mobile
-      });
-    }
-
-    &--second {
-      .respond-mobile({
-        order: 0;
-      });
-    }
-
-    &--third {
-      .respond-mobile({
-        order: 1;
-      });
     }
 
     // ============ CROWN ============
@@ -975,6 +996,86 @@
         width: 32px;
         height: 32px;
       });
+    }
+  }
+
+  // ============ MOBILE ITEM (liste simple) ============
+  .mobile-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(var(--secondary-900-rgb), 0.8);
+    border: 1px solid rgba(var(--secondary-600-rgb), 0.4);
+    border-radius: 12px;
+    cursor: pointer;
+
+    &__rank {
+      font-family: @font-display;
+      font-size: 14px;
+      font-weight: 700;
+      color: @gold;
+      min-width: 28px;
+    }
+
+    &__image {
+      width: 50px;
+      height: 50px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--content-block-bg-subtle);
+      border-radius: 8px;
+
+      img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+      }
+    }
+
+    &__content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &__name {
+      font-family: @font-display;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--content-block-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__price {
+      font-family: @font-body;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-400);
+    }
+
+    &__btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-500);
+      border: none;
+      border-radius: 10px;
+      color: @white;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:active {
+        background: var(--primary-600);
+      }
     }
   }
 </style>

@@ -1,5 +1,96 @@
 <template>
+  <!-- VERSION MOBILE : Design immersif plein écran -->
+  <div
+    v-if="isMobile"
+    class="category-mobile"
+    :class="`category-mobile--${slides[activeIndex].variant}`"
+  >
+    <!-- Image de fond plein écran -->
+    <div
+      class="category-mobile__bg"
+      :style="{ backgroundImage: `url(${slides[activeIndex].bgImage})` }"
+    ></div>
+    <div class="category-mobile__overlay"></div>
+
+    <!-- Contenu -->
+    <div class="category-mobile__content">
+      <!-- Header avec titre (en haut) -->
+      <div class="category-mobile__header">
+        <span class="category-mobile__eyebrow">{{ slides[activeIndex].eyebrow }}</span>
+        <h2 class="category-mobile__title">{{ slides[activeIndex].titleAccent }}</h2>
+        <p class="category-mobile__desc">{{ slides[activeIndex].description }}</p>
+      </div>
+
+      <!-- Partie basse -->
+      <div class="category-mobile__bottom">
+        <!-- Navigation catégories -->
+        <div class="category-mobile__nav-scroll">
+          <div class="category-mobile__nav">
+            <button
+              v-for="(slide, i) in slides"
+              :key="slide.id"
+              class="category-mobile__nav-item"
+              :class="[
+                `category-mobile__nav-item--${slide.variant}`,
+                { active: i === activeIndex }
+              ]"
+              @click="goToSlide(i)"
+            >
+              <span class="category-mobile__nav-icon">
+                <component :is="slide.icon" />
+              </span>
+              <span class="category-mobile__nav-label">{{ slide.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions (tout en bas) -->
+        <div class="category-mobile__actions">
+          <button
+            class="category-mobile__cta"
+            @click="goToCategory(slides[activeIndex])"
+          >
+            <span>{{ t('home.categories.common.explore') }}</span>
+            <BasicIconNext name="ArrowRight" :size="18" />
+          </button>
+          <button
+            class="category-mobile__video-btn"
+            @click="openVideo(slides[activeIndex])"
+          >
+            <BasicIconNext name="Play" :size="18" />
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal vidéo -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div
+          v-if="activeVideo"
+          class="video-modal"
+          @click="closeModal"
+        >
+          <div class="video-modal__content" @click.stop>
+            <iframe
+              :src="`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`"
+              frameborder="0"
+              allow="autoplay; fullscreen"
+              allowfullscreen
+            ></iframe>
+            <button class="video-modal__close-btn" @click="closeModal">
+              <BasicIconNext name="X" :size="20" />
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+  </div>
+
+  <!-- VERSION DESKTOP : Carousel complet -->
   <section
+    v-else
     class="category-hero"
     ref="heroSection"
     @mouseenter="pauseAutoplay"
@@ -186,9 +277,13 @@
 </template>
 
 <script setup lang="ts">
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
+  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { computed, h, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+
+  const { isMobile } = useDeviceBreakpoint()
 
   const { t } = useI18n()
 
@@ -683,35 +778,11 @@
   @ease: cubic-bezier(0.16, 1, 0.3, 1);
 
   .category-hero {
-    --radius: 24px;
     position: relative;
     min-height: 520px;
-    border-radius: var(--radius);
+    border-radius: inherit;
     overflow: hidden;
     background: linear-gradient(135deg, var(--secondary-600), var(--secondary-600));
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: var(--radius);
-      padding: 1px;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--neutral-100-rgb), 0.1),
-        rgba(var(--neutral-100-rgb), 0.05)
-      );
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      z-index: 10;
-    }
 
     // Backgrounds
     &__backgrounds {
@@ -1478,10 +1549,9 @@
     }
   });
 
-  // Responsive - Mobile
+  // Responsive - Mobile (styles pour desktop carousel si jamais affiché)
   .respond-mobile({
     .category-hero {
-      --radius: 16px;
       &__container {
         padding: 20px 16px;
       }
@@ -1528,4 +1598,283 @@
       }
     }
   });
+
+  // ═══════════════════════════════════════════════════════════════
+  // VERSION MOBILE - Design immersif plein écran
+  // ═══════════════════════════════════════════════════════════════
+
+  .category-mobile {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+
+    // Variants de couleur
+    &--success { --accent-color: @success-500; --accent-color-rgb: var(--success-500-rgb); }
+    &--primary { --accent-color: var(--primary-500); --accent-color-rgb: var(--primary-500-rgb); }
+    &--warning { --accent-color: @warning-500; --accent-color-rgb: var(--warning-500-rgb); }
+    &--info { --accent-color: #3b82f6; --accent-color-rgb: 59, 130, 246; }
+    &--purple { --accent-color: #8b5cf6; --accent-color-rgb: 139, 92, 246; }
+    &--pink { --accent-color: #ec4899; --accent-color-rgb: 236, 72, 153; }
+    &--teal { --accent-color: #14b8a6; --accent-color-rgb: 20, 184, 166; }
+    &--orange { --accent-color: @warning-500; --accent-color-rgb: var(--warning-500-rgb); }
+    &--indigo { --accent-color: #6366f1; --accent-color-rgb: 99, 102, 241; }
+    &--emerald { --accent-color: #10b981; --accent-color-rgb: 16, 185, 129; }
+
+    // ─────────────────────────────────────────────────────────────
+    // Background image plein écran
+    // ─────────────────────────────────────────────────────────────
+    &__bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.5s @ease;
+    }
+
+    &__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(var(--secondary-950-rgb), 0.8) 0%,
+        rgba(var(--secondary-950-rgb), 0.4) 40%,
+        rgba(var(--secondary-950-rgb), 0.7) 70%,
+        rgba(var(--secondary-950-rgb), 0.95) 100%
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Contenu
+    // ─────────────────────────────────────────────────────────────
+    &__content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+      gap: 20px;
+    }
+
+    &__header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    &__eyebrow {
+      font-family: @font-body;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-color);
+    }
+
+    &__title {
+      font-family: @font-display;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: @neutral-50;
+      margin: 0;
+      background: linear-gradient(135deg, @neutral-50, var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    &__desc {
+      font-family: @font-body;
+      font-size: 14px;
+      line-height: 1.6;
+      color: @neutral-300;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Actions (CTA + Video)
+    // ─────────────────────────────────────────────────────────────
+    &__actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    &__cta {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--accent-color);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+
+      span {
+        font-family: @font-body;
+        font-size: 15px;
+        font-weight: 600;
+        color: @neutral-50;
+      }
+
+      svg {
+        color: @neutral-50;
+        transition: transform 0.2s @ease;
+      }
+
+      &:active {
+        transform: scale(0.98);
+        svg { transform: translateX(4px); }
+      }
+    }
+
+    &__video-btn {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(var(--neutral-100-rgb), 0.1);
+      border: 1px solid rgba(var(--neutral-100-rgb), 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+
+      svg {
+        color: @neutral-50;
+      }
+
+      &:active {
+        transform: scale(0.95);
+        background: rgba(var(--accent-color-rgb), 0.2);
+        border-color: var(--accent-color);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Navigation catégories (scroll horizontal en bas)
+    // ─────────────────────────────────────────────────────────────
+    &__nav-scroll {
+      margin: 0 -20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar { display: none; }
+    }
+
+    &__nav {
+      display: inline-flex;
+      gap: 8px;
+      padding: 0 20px;
+    }
+
+    &__nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: rgba(var(--secondary-800-rgb), 0.6);
+      border: 1px solid rgba(var(--neutral-100-rgb), 0.08);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s @ease;
+      min-width: 72px;
+
+      // Variants
+      &--success { --item-color: @success-500; --item-color-rgb: var(--success-500-rgb); }
+      &--primary { --item-color: var(--primary-500); --item-color-rgb: var(--primary-500-rgb); }
+      &--warning { --item-color: @warning-500; --item-color-rgb: var(--warning-500-rgb); }
+      &--info { --item-color: #3b82f6; --item-color-rgb: 59, 130, 246; }
+      &--purple { --item-color: #8b5cf6; --item-color-rgb: 139, 92, 246; }
+      &--pink { --item-color: #ec4899; --item-color-rgb: 236, 72, 153; }
+      &--teal { --item-color: #14b8a6; --item-color-rgb: 20, 184, 166; }
+      &--orange { --item-color: @warning-500; --item-color-rgb: var(--warning-500-rgb); }
+      &--indigo { --item-color: #6366f1; --item-color-rgb: 99, 102, 241; }
+      &--emerald { --item-color: #10b981; --item-color-rgb: 16, 185, 129; }
+
+      &.active {
+        background: rgba(var(--item-color-rgb), 0.15);
+        border-color: rgba(var(--item-color-rgb), 0.4);
+
+        .category-mobile__nav-icon {
+          background: var(--item-color);
+          svg { color: @neutral-50; }
+        }
+        .category-mobile__nav-label {
+          color: @neutral-50;
+        }
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+    }
+
+    &__nav-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(var(--item-color-rgb), 0.2);
+      border-radius: 8px;
+      transition: all 0.2s @ease;
+
+      svg {
+        width: 18px;
+        height: 18px;
+        color: var(--item-color);
+      }
+    }
+
+    &__nav-label {
+      font-family: @font-body;
+      font-size: 10px;
+      font-weight: 500;
+      color: @neutral-400;
+      white-space: nowrap;
+      transition: color 0.2s @ease;
+    }
+
+  }
+
+  // Video modal close button for mobile
+  .video-modal__close-btn {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(var(--neutral-100-rgb), 0.1);
+    border: 1px solid rgba(var(--neutral-100-rgb), 0.2);
+    color: @neutral-50;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(var(--neutral-100-rgb), 0.2);
+    }
+  }
 </style>

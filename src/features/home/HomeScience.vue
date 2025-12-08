@@ -600,8 +600,8 @@
         padding: 24px;
       }
       &__personas {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
       }
       .persona-card {
         padding: 8px;
