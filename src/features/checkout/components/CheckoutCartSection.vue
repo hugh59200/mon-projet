@@ -1,5 +1,5 @@
 <template>
-  <section class="checkout-cart">
+  <ContentBlock variant="card" class="checkout-cart">
     <div class="checkout-cart__header">
       <div class="checkout-cart__icon">
         <BasicIconNext name="ShoppingCart" :size="20" />
@@ -109,7 +109,7 @@
         />
       </div>
     </div>
-  </section>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -144,11 +144,7 @@ function getLineTotal(item: CartView) {
 
 <style scoped lang="less">
 .checkout-cart {
-  background: white;
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  border: 1px solid @neutral-100;
+  // Styles de base gérés par ContentBlock
 
   &__header {
     display: flex;
@@ -163,21 +159,21 @@ function getLineTotal(item: CartView) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.15) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
     border-radius: 14px;
-    color: var(--primary-600);
+    color: var(--primary-500);
   }
 
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 
@@ -194,13 +190,13 @@ function getLineTotal(item: CartView) {
     h3 {
       font-size: 18px;
       font-weight: 600;
-      color: @neutral-700;
+      color: var(--content-block-text-secondary);
       margin: 16px 0 8px;
     }
 
     p {
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--content-block-text-muted);
       margin: 0 0 24px;
     }
   }
@@ -211,10 +207,10 @@ function getLineTotal(item: CartView) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: @neutral-100;
+    background: var(--content-block-bg-subtle);
     border-radius: 50%;
     margin: 0 auto;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 }
 
@@ -222,12 +218,12 @@ function getLineTotal(item: CartView) {
   display: flex;
   gap: 16px;
   padding: 16px;
-  background: @neutral-50;
+  background: var(--content-block-bg-subtle);
   border-radius: 16px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: @neutral-100;
+    background: rgba(var(--primary-500-rgb), 0.05);
   }
 
   &__image {
@@ -241,7 +237,7 @@ function getLineTotal(item: CartView) {
       height: 100%;
       object-fit: cover;
       border-radius: 12px;
-      border: 1px solid @neutral-200;
+      border: 1px solid var(--content-block-border);
     }
   }
 
@@ -276,14 +272,14 @@ function getLineTotal(item: CartView) {
   &__name {
     font-size: 15px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0;
     line-height: 1.3;
   }
 
   &__dosage {
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 4px 0 0;
   }
 
@@ -322,10 +318,10 @@ function getLineTotal(item: CartView) {
     display: flex;
     align-items: center;
     gap: 4px;
-    background: white;
+    background: var(--content-block-bg-subtle);
     padding: 4px;
     border-radius: 10px;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--content-block-border);
   }
 
   &__qty-btn {
@@ -339,7 +335,7 @@ function getLineTotal(item: CartView) {
     text-align: center;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--content-block-text);
   }
 
   &__price {
@@ -351,14 +347,14 @@ function getLineTotal(item: CartView) {
 
   &__price-old {
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
     text-decoration: line-through;
   }
 
   &__price-current {
     font-size: 16px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
 
     &--sale {
       color: @red-600;

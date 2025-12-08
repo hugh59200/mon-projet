@@ -137,21 +137,21 @@ const showComingSoon = ref(false)
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.15) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
     border-radius: 14px;
-    color: var(--primary-600);
+    color: var(--primary-500);
   }
 
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 
@@ -162,7 +162,7 @@ const showComingSoon = ref(false)
   }
 
   &__coming-soon {
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--content-block-border);
     border-radius: 16px;
     overflow: hidden;
   }
@@ -173,13 +173,13 @@ const showComingSoon = ref(false)
     align-items: center;
     justify-content: space-between;
     padding: 14px 18px;
-    background: @neutral-50;
+    background: var(--content-block-bg-subtle);
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: @neutral-100;
+      background: rgba(var(--primary-500-rgb), 0.05);
     }
   }
 
@@ -188,20 +188,20 @@ const showComingSoon = ref(false)
     align-items: center;
     gap: 10px;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
   }
 
   &__coming-badge {
     font-size: 11px;
     font-weight: 600;
-    color: @warning-700;
-    background: @warning-100;
+    color: @warning-600;
+    background: rgba(@warning-500, 0.15);
     padding: 3px 8px;
     border-radius: 6px;
   }
 
   &__coming-chevron {
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
     transition: transform 0.3s ease;
 
     &--open {
@@ -211,14 +211,14 @@ const showComingSoon = ref(false)
 
   &__coming-content {
     padding: 16px;
-    border-top: 1px solid @neutral-200;
+    border-top: 1px solid var(--content-block-border);
   }
 
   &__crypto-help {
     margin-top: 16px;
     padding: 20px;
-    background: linear-gradient(135deg, @orange-50 0%, @neutral-50 100%);
-    border: 1px solid @orange-200;
+    background: linear-gradient(135deg, rgba(@orange-500, 0.1) 0%, var(--content-block-bg-subtle) 100%);
+    border: 1px solid rgba(@orange-500, 0.2);
     border-radius: 14px;
   }
 }
@@ -230,7 +230,7 @@ const showComingSoon = ref(false)
     gap: 10px;
     font-size: 15px;
     font-weight: 600;
-    color: @orange-700;
+    color: @orange-600;
     margin-bottom: 14px;
   }
 
@@ -238,7 +238,7 @@ const showComingSoon = ref(false)
     margin: 0 0 14px 0;
     padding-left: 20px;
     font-size: 13px;
-    color: @neutral-700;
+    color: var(--content-block-text-secondary);
     line-height: 1.8;
 
     li {
@@ -276,9 +276,7 @@ const showComingSoon = ref(false)
   padding: 20px;
   min-height: 44px;
 
-  // Utilise le mixin dark pour cohérence avec QuantitySelector
   .selectable-card();
-  border-width: 2px;
   border-radius: 16px;
 
   &--active {
@@ -299,7 +297,7 @@ const showComingSoon = ref(false)
   &__radio {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--content-block-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -352,14 +350,14 @@ const showComingSoon = ref(false)
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: @white;
+    color: var(--content-block-text);
     margin-bottom: 2px;
   }
 
   &__desc {
     display: block;
     font-size: 13px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 
   &__crypto-icons {
@@ -371,8 +369,8 @@ const showComingSoon = ref(false)
   &__crypto-badge {
     font-size: 11px;
     font-weight: 700;
-    color: @orange-700;
-    background: @orange-100;
+    color: @orange-600;
+    background: rgba(@orange-500, 0.15);
     padding: 4px 8px;
     border-radius: 6px;
   }
@@ -380,8 +378,8 @@ const showComingSoon = ref(false)
   &__badge-coming {
     font-size: 11px;
     font-weight: 600;
-    color: @neutral-500;
-    background: @neutral-200;
+    color: var(--content-block-text-muted);
+    background: var(--content-block-bg-subtle);
     padding: 4px 10px;
     border-radius: 8px;
     flex-shrink: 0;

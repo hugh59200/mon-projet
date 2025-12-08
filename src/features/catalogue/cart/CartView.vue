@@ -557,7 +557,7 @@
   .cart {
     position: relative;
     min-height: 100vh;
-    background: var(--chrome-bg-secondary);
+    background: var(--bg-page);
 
     // ============================================
     // BACKGROUND
@@ -609,8 +609,8 @@
       z-index: 1;
       padding: 24px 32px;
       margin-bottom: 0;
-      border-bottom: 1px solid var(--chrome-border);
-      background: var(--chrome-bg);
+      border-bottom: 1px solid var(--border-default);
+      background: var(--bg-surface);
     }
 
     &__header-inner {
@@ -636,20 +636,20 @@
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: var(--chrome-bg);
-      border: 1px solid var(--chrome-border);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: 10px;
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: var(--chrome-fg-secondary);
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: var(--chrome-bg-secondary);
+        background: var(--bg-surface-secondary);
         border-color: var(--primary-300);
-        color: var(--primary-700);
+        color: var(--primary-500);
         transform: translateX(-4px);
 
         svg {
@@ -670,7 +670,7 @@
       font-family: @font-display;
       font-size: 28px;
       font-weight: 700;
-      color: var(--chrome-fg);
+      color: var(--text-primary);
       margin: 0;
 
       svg {
@@ -698,18 +698,18 @@
       gap: 6px;
       padding: 8px 14px;
       background: transparent;
-      border: 1px solid var(--chrome-border);
+      border: 1px solid var(--border-default);
       border-radius: 8px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: var(--chrome-fg-muted);
+      color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
         background: rgba(var(--danger-500-rgb), 0.1);
-        border-color: @danger-200;
+        border-color: @danger-300;
         color: @danger-500;
       }
     }

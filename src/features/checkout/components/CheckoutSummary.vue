@@ -227,10 +227,10 @@ function formatPrice(value: number | null | undefined) {
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--content-block-border);
   }
 
   &__rows {
@@ -244,13 +244,13 @@ function formatPrice(value: number | null | undefined) {
     justify-content: space-between;
     align-items: center;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
 
     &--total {
       padding-top: 16px;
       font-size: 18px;
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--content-block-text);
     }
   }
 
@@ -264,10 +264,10 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: @neutral-50;
+    background: var(--content-block-bg-subtle);
     border-radius: 10px;
     font-size: 13px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
 
     svg {
       color: var(--primary-500);
@@ -286,7 +286,7 @@ function formatPrice(value: number | null | undefined) {
 
   &__shipping-bar {
     height: 6px;
-    background: @neutral-200;
+    background: var(--content-block-border);
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -301,12 +301,12 @@ function formatPrice(value: number | null | undefined) {
 
   &__shipping-text {
     font-size: 12px;
-    color: @neutral-600;
+    color: var(--content-block-text-secondary);
     margin: 0;
     text-align: center;
 
     strong {
-      color: var(--primary-600);
+      color: var(--primary-500);
     }
   }
 
@@ -324,9 +324,11 @@ function formatPrice(value: number | null | undefined) {
   &__promo-field {
     flex: 1;
     padding: 10px 14px;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--content-block-border);
     border-radius: 10px;
     font-size: 14px;
+    background: var(--content-block-bg-subtle);
+    color: var(--content-block-text);
     transition: all 0.2s ease;
 
     &:focus {
@@ -336,7 +338,7 @@ function formatPrice(value: number | null | undefined) {
     }
 
     &::placeholder {
-      color: @neutral-400;
+      color: var(--content-block-text-muted);
     }
   }
 
@@ -401,7 +403,7 @@ function formatPrice(value: number | null | undefined) {
 
   &__divider {
     height: 1px;
-    background: @neutral-200;
+    background: var(--content-block-border);
     margin: 8px 0;
   }
 
@@ -453,11 +455,11 @@ function formatPrice(value: number | null | undefined) {
   &__disclaimer-content {
     font-size: 13px;
     line-height: 1.6;
-    color: @neutral-700;
+    color: var(--content-block-text-secondary);
     margin: 0 0 16px;
 
     strong {
-      color: @neutral-900;
+      color: var(--content-block-text);
     }
   }
 
@@ -476,14 +478,13 @@ function formatPrice(value: number | null | undefined) {
     gap: 12px;
     cursor: pointer;
     padding: 12px 16px;
-    background: white;
+    background: var(--content-block-bg-subtle);
     border-radius: 10px;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--content-block-border);
     transition: all 0.2s ease;
 
     &:hover {
       border-color: var(--primary-300);
-      background: @neutral-50;
     }
   }
 
@@ -508,9 +509,9 @@ function formatPrice(value: number | null | undefined) {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid @neutral-300;
+    border: 2px solid var(--content-block-border);
     border-radius: 6px;
-    background: white;
+    background: var(--content-block-bg-subtle);
     transition: all 0.2s ease;
 
     svg {
@@ -524,7 +525,7 @@ function formatPrice(value: number | null | undefined) {
   &__disclaimer-label {
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-700;
+    color: var(--content-block-text-secondary);
   }
 
   &__disclaimer-warning {
@@ -552,7 +553,7 @@ function formatPrice(value: number | null | undefined) {
     flex-direction: column;
     gap: 10px;
     padding-top: 16px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--content-block-border);
   }
 
   &__trust-item {
@@ -560,7 +561,7 @@ function formatPrice(value: number | null | undefined) {
     align-items: center;
     gap: 10px;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
 
     svg {
       color: var(--color-success-500);

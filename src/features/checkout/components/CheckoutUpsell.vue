@@ -222,13 +222,13 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-100;
+    color: var(--content-block-text);
   }
 
   &__shipping-subtitle {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 
   &__suggestions {
@@ -249,7 +249,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 15px;
     font-weight: 600;
-    color: @neutral-800;
+    color: var(--content-block-text);
 
     svg {
       color: var(--primary-500);
@@ -268,13 +268,13 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: rgba(var(--secondary-800-rgb), 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--content-block-bg-subtle);
+  border: 1px solid var(--content-block-border);
   border-radius: 10px;
   transition: all 0.2s @ease;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--primary-300);
   }
 
   &__image {
@@ -282,7 +282,7 @@ onMounted(() => {
     height: 40px;
     object-fit: contain;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--content-block-bg-subtle);
   }
 
   &__info {
@@ -297,7 +297,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 13px;
     font-weight: 500;
-    color: @neutral-200;
+    color: var(--content-block-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -340,8 +340,8 @@ onMounted(() => {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: @neutral-50;
-  border: 1px solid @neutral-100;
+  background: var(--content-block-bg-subtle);
+  border: 1px solid var(--content-block-border);
   border-radius: 10px;
 
   &__info {
@@ -354,7 +354,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-800;
+    color: var(--content-block-text);
     line-height: 1.3;
   }
 
@@ -364,7 +364,7 @@ onMounted(() => {
     gap: 6px;
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
 
     svg {
       color: var(--primary-500);
@@ -378,7 +378,7 @@ onMounted(() => {
     justify-content: space-between;
     gap: 12px;
     padding-top: 12px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--content-block-border);
   }
 
   &__price {

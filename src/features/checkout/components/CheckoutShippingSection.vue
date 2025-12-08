@@ -1,5 +1,5 @@
 <template>
-  <section class="checkout-shipping">
+  <ContentBlock variant="card" class="checkout-shipping">
     <div class="checkout-shipping__header">
       <div class="checkout-shipping__icon">
         <BasicIconNext name="Truck" :size="20" />
@@ -219,7 +219,7 @@
         />
       </div>
     </div>
-  </section>
+  </ContentBlock>
 </template>
 
 <script setup lang="ts">
@@ -288,11 +288,7 @@ function formatPrice(value: number) {
 @import '@designSystem/fondation/selection/selectable-mixins.less';
 
 .checkout-shipping {
-  background: white;
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  border: 1px solid @neutral-100;
+  // Styles de base gérés par ContentBlock
 
   &__header {
     display: flex;
@@ -307,21 +303,21 @@ function formatPrice(value: number) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+    background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.15) 0%, rgba(var(--primary-500-rgb), 0.08) 100%);
     border-radius: 14px;
-    color: var(--primary-600);
+    color: var(--primary-500);
   }
 
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--content-block-text);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--content-block-text-muted);
     margin: 0;
   }
 
@@ -340,9 +336,7 @@ function formatPrice(value: number) {
     padding: 18px 20px;
     min-height: 60px;
 
-    // Utilise le mixin dark pour cohérence
     .selectable-card();
-    border-width: 2px;
     border-radius: 16px;
 
     &--active {
@@ -358,7 +352,7 @@ function formatPrice(value: number) {
   &__radio {
     width: 22px;
     height: 22px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--content-block-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -411,31 +405,31 @@ function formatPrice(value: number) {
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: @white;
+    color: var(--content-block-text);
     margin-bottom: 2px;
   }
 
   &__option-desc {
     display: block;
     font-size: 13px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 
   &__option-price {
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-300;
+    color: var(--content-block-text-secondary);
     flex-shrink: 0;
 
     &--free {
-      color: @success-400;
+      color: @success-500;
     }
   }
 
   &__relay {
     margin-bottom: 24px;
     padding: 20px;
-    background: @neutral-50;
+    background: var(--content-block-bg-subtle);
     border-radius: 16px;
   }
 

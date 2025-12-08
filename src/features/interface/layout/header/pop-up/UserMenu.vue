@@ -36,125 +36,68 @@
 
         <!-- Navigation -->
         <nav class="user-menu__nav">
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.profile')"
-            icon-left="UserCog"
-            class="user-menu__link"
-            @click="goTo('/profil')"
-          />
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.favorites')"
-            icon-left="Heart"
-            :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
-            class="user-menu__link"
-            @click="goTo('/favoris')"
-          />
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('profile.support')"
-            icon-left="MessageSquare"
-            :badge="totalUnread > 0 ? totalUnread.toString() : undefined"
-            class="user-menu__link"
-            @click="goTo('/admin/messagerie')"
-          />
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('admin.stats')"
-            icon-left="BarChart3"
-            class="user-menu__link"
-            @click="goTo('/admin/statistiques')"
-          />
-          <PremiumButton
+          <button class="user-menu__link" @click="goTo('/profil')">
+            <BasicIconNext name="UserCog" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.profile') }}</span>
+          </button>
+          <button class="user-menu__link" @click="goTo('/favoris')">
+            <BasicIconNext name="Heart" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.favorites') }}</span>
+            <span v-if="wishlistCount > 0" class="user-menu__badge">{{ wishlistCount }}</span>
+          </button>
+          <button class="user-menu__link" @click="goTo('/admin/messagerie')">
+            <BasicIconNext name="MessageSquare" :size="18" class="user-menu__icon" />
+            <span>{{ t('profile.support') }}</span>
+            <span v-if="totalUnread > 0" class="user-menu__badge">{{ totalUnread }}</span>
+          </button>
+          <button class="user-menu__link" @click="goTo('/admin/statistiques')">
+            <BasicIconNext name="BarChart3" :size="18" class="user-menu__icon" />
+            <span>{{ t('admin.stats') }}</span>
+          </button>
+          <button
             v-if="isAdmin"
-            type="primary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.admin')"
-            icon-left="Settings"
             class="user-menu__link user-menu__link--accent"
             @click="goToAdmin"
-          />
+          >
+            <BasicIconNext name="Settings" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.admin') }}</span>
+          </button>
         </nav>
 
         <div class="user-menu__divider"></div>
 
         <!-- Logout -->
-        <PremiumButton
-          type="danger"
-          variant="ghost"
-          size="md"
-          width="full"
-          :label="t('nav.logout')"
-          icon-left="LogOut"
-          class="user-menu__logout"
-          @click="handleLogout"
-        />
+        <button class="user-menu__link user-menu__link--danger" @click="handleLogout">
+          <BasicIconNext name="LogOut" :size="18" class="user-menu__icon" />
+          <span>{{ t('nav.logout') }}</span>
+        </button>
       </template>
 
       <!-- Guest -->
       <template v-else>
         <nav class="user-menu__nav">
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('tracking.title')"
-            icon-left="PackageSearch"
-            class="user-menu__link"
-            @click="goTo('/suivi-commande')"
-          />
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.favorites')"
-            icon-left="Heart"
-            :badge="wishlistCount > 0 ? wishlistCount.toString() : undefined"
-            class="user-menu__link"
-            @click="goTo('/favoris')"
-          />
+          <button class="user-menu__link" @click="goTo('/suivi-commande')">
+            <BasicIconNext name="PackageSearch" :size="18" class="user-menu__icon" />
+            <span>{{ t('tracking.title') }}</span>
+          </button>
+          <button class="user-menu__link" @click="goTo('/favoris')">
+            <BasicIconNext name="Heart" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.favorites') }}</span>
+            <span v-if="wishlistCount > 0" class="user-menu__badge">{{ wishlistCount }}</span>
+          </button>
         </nav>
 
         <div class="user-menu__divider user-menu__divider--subtle"></div>
 
         <nav class="user-menu__nav">
-          <PremiumButton
-            type="primary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.login')"
-            icon-left="LogIn"
-            class="user-menu__link user-menu__link--accent"
-            @click="goTo('/auth/login')"
-          />
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="md"
-            width="full"
-            :label="t('nav.register')"
-            icon-left="UserPlus"
-            class="user-menu__link"
-            @click="goTo('/auth/register')"
-          />
+          <button class="user-menu__link user-menu__link--accent" @click="goTo('/auth/login')">
+            <BasicIconNext name="LogIn" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.login') }}</span>
+          </button>
+          <button class="user-menu__link" @click="goTo('/auth/register')">
+            <BasicIconNext name="UserPlus" :size="18" class="user-menu__icon" />
+            <span>{{ t('nav.register') }}</span>
+          </button>
         </nav>
       </template>
     </div>
@@ -202,6 +145,14 @@
 
 <style scoped lang="less">
   @ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  // Le dropdown a toujours un fond sombre (via FloatingDropdownWrapper)
+  // On utilise donc des couleurs fixes pour le texte
+  @dropdown-text: @neutral-100;
+  @dropdown-text-muted: @neutral-300;
+  @dropdown-text-subtle: @neutral-500;
+  @dropdown-border: rgba(255, 255, 255, 0.08);
+  @dropdown-hover: rgba(255, 255, 255, 0.04);
 
   // Trigger
   .user-trigger {
@@ -266,11 +217,11 @@
 
     &__divider {
       height: 1px;
-      background: rgba(var(--neutral-100-rgb), 0.08);
+      background: @dropdown-border;
       margin: 4px 0;
 
       &--subtle {
-        background: rgba(var(--neutral-100-rgb), 0.04);
+        background: rgba(255, 255, 255, 0.04);
       }
     }
 
@@ -283,94 +234,81 @@
     &__link {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
       gap: 12px;
       width: 100%;
       padding: 10px 12px;
       border: none;
       border-radius: 10px;
       background: transparent;
-      color: @neutral-300;
+      color: @dropdown-text-muted;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s @ease;
       text-align: left;
 
-      :deep(.pbtn__content) {
-        justify-content: flex-start;
-      }
-
       &:hover {
-        background: rgba(var(--neutral-100-rgb), 0.04);
-        color: @neutral-100;
+        background: rgba(255, 255, 255, 0.08);
+        color: @dropdown-text;
 
-        .user-menu__link-icon {
+        .user-menu__icon {
           color: var(--primary-400);
         }
-      }
-
-      &-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: @neutral-500;
-        transition: color 0.2s;
-      }
-
-      &-badge {
-        margin-left: auto;
-        min-width: 20px;
-        height: 20px;
-        padding: 0 6px;
-        background: rgba(var(--primary-500-rgb), 0.15);
-        color: var(--primary-400);
-        border-radius: 100px;
-        font-size: 11px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       &--accent {
         color: var(--primary-400);
 
-        .user-menu__link-icon {
+        .user-menu__icon {
           color: var(--primary-400);
         }
 
         &:hover {
-          background: rgba(var(--primary-500-rgb), 0.1);
+          background: rgba(var(--primary-500-rgb), 0.15);
           color: var(--primary-300);
+        }
+      }
+
+      &--danger {
+        color: @danger-400;
+
+        .user-menu__icon {
+          color: @danger-400;
+        }
+
+        &:hover {
+          background: rgba(@danger-500, 0.15);
+          color: @danger-300;
+
+          .user-menu__icon {
+            color: @danger-300;
+          }
         }
       }
     }
 
-    &__logout {
+    &__icon {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
-      width: 100%;
-      padding: 10px 12px;
-      border: none;
-      border-radius: 10px;
-      background: transparent;
-      color: @danger-400;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s @ease;
+      justify-content: center;
+      color: @dropdown-text-subtle;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
 
-      :deep(.pbtn__content) {
-        justify-content: flex-start;
-      }
-
-      &:hover {
-        background: rgba(@danger-500, 0.1);
-        color: @danger-300;
-      }
+    &__badge {
+      margin-left: auto;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: rgba(var(--primary-500-rgb), 0.15);
+      color: var(--primary-400);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 

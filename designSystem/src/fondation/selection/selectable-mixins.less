@@ -6,27 +6,26 @@
 @ease-selection: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ------------------------------------------------------------
-// MIXIN: Carte sélectionnable (thème sombre)
+// MIXIN: Carte sélectionnable (adaptatif au thème)
 // Usage: .selectable-card();
 // Variantes: .selectable-card--active pour l'état sélectionné
 // ------------------------------------------------------------
 .selectable-card() {
-  background: var(--secondary-600);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s @ease-selection;
 
   &:hover {
-    background: var(--secondary-500);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--bg-surface-tertiary);
+    border-color: var(--border-default);
   }
 }
 
 .selectable-card--active() {
-  background: var(--secondary-600);
+  background: var(--bg-surface-secondary);
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 1px rgba(var(--primary-500-rgb), 0.3);
 }
 
 // ------------------------------------------------------------
@@ -68,7 +67,7 @@
     right: 8px;
     width: 16px;
     height: 16px;
-    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border: 1.5px solid var(--border-default);
     border-radius: 50%;
     background: transparent;
     transition: all 0.2s @ease-selection;

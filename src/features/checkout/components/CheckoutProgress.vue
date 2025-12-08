@@ -84,8 +84,8 @@ const { t } = useI18n()
     background: transparent;
 
     &--active {
-      background: var(--chrome-bg);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
 
       .checkout-progress__number {
         background: var(--primary-600);
@@ -98,7 +98,7 @@ const { t } = useI18n()
       }
 
       .checkout-progress__label {
-        color: var(--chrome-fg);
+        color: var(--text-primary);
         font-weight: 600;
       }
     }
@@ -118,8 +118,8 @@ const { t } = useI18n()
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--chrome-border);
-    color: var(--chrome-fg-muted);
+    background: var(--border-default);
+    color: var(--text-muted);
     border-radius: 50%;
     font-size: 13px;
     font-weight: 700;
@@ -129,7 +129,7 @@ const { t } = useI18n()
   &__label {
     font-size: 14px;
     font-weight: 500;
-    color: var(--chrome-fg-muted);
+    color: var(--text-muted);
     transition: all 0.3s ease;
     white-space: nowrap;
   }
@@ -137,7 +137,7 @@ const { t } = useI18n()
   &__line {
     width: 40px;
     height: 2px;
-    background: var(--chrome-border);
+    background: var(--border-default);
     border-radius: 1px;
     transition: all 0.3s ease;
 

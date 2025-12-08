@@ -156,6 +156,13 @@
 <style scoped lang="less">
   @ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+  // Le dropdown a toujours un fond sombre (via FloatingDropdownWrapper)
+  // On utilise donc des couleurs fixes pour le texte
+  @dropdown-text: @neutral-50;
+  @dropdown-text-muted: @neutral-400;
+  @dropdown-border: rgba(255, 255, 255, 0.08);
+  @dropdown-bg-subtle: rgba(255, 255, 255, 0.04);
+
   // Dropdown
   .cart__dropdown {
     display: flex;
@@ -168,17 +175,17 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 16px;
-    border-bottom: 1px solid rgba(var(--neutral-100-rgb), 0.06);
+    border-bottom: 1px solid @dropdown-border;
     font-size: 14px;
     font-weight: 600;
-    color: var(--chrome-fg);
+    color: @dropdown-text;
 
     &-count {
       font-size: 12px;
       font-weight: 500;
-      color: var(--chrome-fg-muted);
+      color: @dropdown-text-muted;
       padding: 4px 10px;
-      background: rgba(var(--neutral-100-rgb), 0.04);
+      background: @dropdown-bg-subtle;
       border-radius: 100px;
     }
   }
@@ -197,7 +204,7 @@
       background: transparent;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(var(--neutral-100-rgb), 0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
     }
   }
@@ -212,7 +219,7 @@
     position: relative;
 
     &:hover {
-      background: rgba(var(--neutral-100-rgb), 0.03);
+      background: @dropdown-bg-subtle;
       .cart__item-remove {
         opacity: 1;
       }
@@ -223,8 +230,8 @@
       height: 56px;
       border-radius: 10px;
       overflow: hidden;
-      border: 1px solid rgba(var(--neutral-100-rgb), 0.08);
-      background: var(--secondary-950);
+      border: 1px solid @dropdown-border;
+      background: rgba(0, 0, 0, 0.2);
       flex-shrink: 0;
 
       img {
@@ -246,7 +253,7 @@
     &-name {
       font-size: 14px;
       font-weight: 500;
-      color: var(--chrome-fg);
+      color: @dropdown-text;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -260,7 +267,7 @@
 
     &-qty {
       font-size: 12px;
-      color: var(--chrome-fg-muted);
+      color: @dropdown-text-muted;
     }
 
     &-price {
@@ -269,12 +276,12 @@
       gap: 8px;
       font-size: 14px;
       font-weight: 600;
-      color: var(--chrome-fg);
+      color: @dropdown-text;
 
       &--old {
         font-size: 12px;
         font-weight: 400;
-        color: var(--chrome-fg-muted);
+        color: @dropdown-text-muted;
         text-decoration: line-through;
       }
 
@@ -290,9 +297,9 @@
       width: 24px;
       height: 24px;
       border-radius: 6px;
-      background: rgba(var(--neutral-100-rgb), 0.04);
+      background: @dropdown-bg-subtle;
       border: none;
-      color: var(--chrome-fg-muted);
+      color: @dropdown-text-muted;
       cursor: pointer;
       opacity: 0;
       transition: all 0.2s;
@@ -310,7 +317,7 @@
   // Footer
   .cart__footer {
     padding-top: 16px;
-    border-top: 1px solid rgba(var(--neutral-100-rgb), 0.06);
+    border-top: 1px solid @dropdown-border;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -326,7 +333,7 @@
 
   .cart__shipping-bar {
     height: 4px;
-    background: rgba(var(--neutral-100-rgb), 0.1);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -382,7 +389,7 @@
     align-items: center;
     gap: 4px;
     font-size: 10px;
-    color: var(--chrome-fg-muted);
+    color: @dropdown-text-muted;
 
     svg {
       color: @success-500;
@@ -397,7 +404,7 @@
 
     span {
       font-size: 14px;
-      color: var(--chrome-fg-muted);
+      color: @dropdown-text-muted;
     }
 
     strong {

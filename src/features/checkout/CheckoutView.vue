@@ -581,7 +581,7 @@ async function submitOrder() {
 .checkout {
   position: relative;
   min-height: 100vh;
-  background: @neutral-50;
+  background: var(--bg-page);
 
   // Background
   &__bg {
@@ -634,19 +634,19 @@ async function submitOrder() {
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: white;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-700;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s @ease;
 
     &:hover {
-      background: @neutral-50;
+      background: var(--bg-surface-secondary);
       border-color: var(--primary-300);
-      color: var(--primary-700);
+      color: var(--primary-500);
       transform: translateX(-4px);
     }
   }
