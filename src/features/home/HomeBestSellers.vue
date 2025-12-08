@@ -3,14 +3,14 @@
     <div class="best-sellers__container">
       <!-- Header -->
       <div class="best-sellers__header">
+        <span class="best-sellers__badge">
+          <BasicIconNext
+            name="TrendingUp"
+            :size="14"
+          />
+          {{ t('home.bestSellers.badge') }}
+        </span>
         <div class="best-sellers__title-group">
-          <span class="best-sellers__badge">
-            <BasicIconNext
-              name="TrendingUp"
-              :size="14"
-            />
-            {{ t('home.bestSellers.badge') }}
-          </span>
           <h2 class="best-sellers__title">{{ t('home.bestSellers.title') }}</h2>
           <p class="best-sellers__subtitle">{{ t('home.bestSellers.subtitle') }}</p>
         </div>
@@ -391,6 +391,7 @@
 
     // ============ HEADER ============
     &__header {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -412,6 +413,9 @@
     }
 
     &__badge {
+      position: absolute;
+      top: 0;
+      right: 0;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -423,11 +427,17 @@
       font-size: 12px;
       font-weight: 600;
       color: @gold;
-      width: fit-content;
 
       svg {
         color: @gold;
       }
+
+      .respond-mobile({
+        position: absolute;
+        top: -16px;
+        right: 0;
+        margin-bottom: 0;
+      });
     }
 
     &__title {

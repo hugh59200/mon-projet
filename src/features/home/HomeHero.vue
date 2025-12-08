@@ -18,7 +18,10 @@
     <div class="hero-section__container">
       <!-- Badge mobile en haut à droite -->
       <div v-if="isMobile" class="hero__badge hero__badge--mobile">
-        <span class="hero__badge-dot"></span>
+        <BasicIconNext
+          name="ShieldCheck"
+          :size="14"
+        />
         <span>{{ t('home.hero.badge.certified') }}</span>
       </div>
 
@@ -44,7 +47,7 @@
         <span>{{ t('home.hero.title.line2') }}</span>
       </h1>
 
-      <p class="hero__desc">
+      <p v-if="!isMobile" class="hero__desc">
         {{ t('home.hero.description') }}
       </p>
 
@@ -57,11 +60,30 @@
           {{ t('home.hero.cta.explore') }}
         </BaseButton>
         <BaseButton
+          v-if="!isMobile"
           variant="ghost"
           @click="$router.push('/a-propos')"
         >
           {{ t('home.hero.cta.learnMore') }}
         </BaseButton>
+      </div>
+
+      <!-- Trust badges mobile (icônes compactes) -->
+      <div v-if="isMobile" class="hero__trust-mobile">
+        <div class="hero__trust-mobile-item">
+          <BasicIconNext name="ShieldCheck" :size="16" />
+        </div>
+        <div class="hero__trust-mobile-item">
+          <BasicIconNext name="FileText" :size="16" />
+        </div>
+        <div class="hero__trust-mobile-item">
+          <BasicIconNext name="Zap" :size="16" />
+        </div>
+      </div>
+
+      <!-- Indicateur de scroll -->
+      <div v-if="isMobile" class="hero__scroll-indicator">
+        <BasicIconNext name="ChevronDown" :size="20" />
       </div>
 
       <div v-if="!isMobile" class="hero__trust">
@@ -260,6 +282,7 @@
       color: @neutral-50;
       margin: 0;
       text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+      animation: fadeInUp 0.8s ease-out;
 
       span {
         display: block;
@@ -339,6 +362,70 @@
           color: @success-500;
         }
       }
+    }
+
+    // Trust badges mobile (icônes seules)
+    &__trust-mobile {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+
+      &-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: rgba(var(--success-500-rgb), 0.15);
+        border: 1px solid rgba(var(--success-500-rgb), 0.3);
+        border-radius: 8px;
+
+        svg {
+          color: @success-400;
+        }
+      }
+    }
+
+    // Indicateur de scroll
+    &__scroll-indicator {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: @neutral-400;
+      animation: bounce 2s infinite;
+
+      svg {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  // Animation bounce pour l'indicateur de scroll
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-6px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-3px);
+    }
+  }
+
+  // Animation fade-in pour le titre mobile
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(-40%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%);
     }
   }
 
@@ -423,26 +510,8 @@
     }
 
     .hero {
-      &__title {
-        font-size: 28px;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-      }
-
-      &__desc {
-        font-size: 14px;
-        line-height: 1.6;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
       &__actions {
         margin-top: 4px;
-
-        :deep(button:nth-child(2)) {
-          display: none;
-        }
       }
     }
   });
