@@ -16,9 +16,11 @@
     <ContentBlock
       variant="flat"
       max-width="1200px"
-      padding="50px 0"
+      padding="40px 0"
       theme="dark"
       :no-border="true"
+      :bg-image="bgPodiumImage"
+      bg-opacity-var="var(--bg-image-opacity-podium)"
     >
       <HomeBestSellers />
     </ContentBlock>
@@ -44,7 +46,7 @@
       :no-border="true"
       theme="dark"
       :bg-image="bgQualityImage"
-      :bg-opacity="0.35"
+      bg-opacity-var="var(--bg-image-opacity-quality)"
     >
       <HomeQuality />
     </ContentBlock>
@@ -58,6 +60,7 @@
       :no-border="true"
       theme="dark"
       :bg-image="bgNewsletterImage"
+      bg-opacity-var="var(--bg-image-opacity-newsletter)"
     >
       <NewsletterSection />
     </ContentBlock>
@@ -70,6 +73,7 @@
       size="lg"
       :no-border="true"
       :bg-image="bgCtaImage"
+      bg-opacity-var="var(--bg-image-opacity-cta)"
     >
       <HomeCta />
     </ContentBlock>
@@ -77,9 +81,12 @@
 </template>
 
 <script setup lang="ts">
-  import bgCtaImage from '@/assets/bg-cta.png'
-  import bgNewsletterImage from '@/assets/bg-newsletter.png'
-  import bgQualityImage from '@/assets/bg-quality.png'
+  import {
+    bgCtaImage,
+    bgNewsletterImage,
+    bgPodiumImage,
+    bgQualityImage,
+  } from '@/config/backgrounds'
   import { getCanonicalUrl, SEO_CONFIG } from '@/config/seo'
   import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
   import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'

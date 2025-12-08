@@ -111,6 +111,8 @@ const props = withDefaults(
     bgImage?: string
     /** Opacité de l'image de fond (défaut: 0.4) */
     bgOpacity?: number
+    /** Variable CSS pour l'opacité (ex: 'var(--bg-image-opacity-podium)') - prioritaire sur bgOpacity */
+    bgOpacityVar?: string
   }>(),
   {
     variant: 'card',
@@ -130,6 +132,7 @@ const props = withDefaults(
     centered: true,
     bgImage: undefined,
     bgOpacity: 0.4,
+    bgOpacityVar: undefined,
   },
 )
 
@@ -141,6 +144,14 @@ const resolvedTheme = computed(() => {
     return globalTheme.value
   }
   return props.theme
+})
+
+// Opacité de l'image de fond (variable CSS ou valeur numérique)
+const bgImageOpacity = computed(() => {
+  if (props.bgOpacityVar) {
+    return props.bgOpacityVar
+  }
+  return props.bgOpacity
 })
 
 // Style inline pour les props de layout
@@ -211,7 +222,7 @@ const containerStyle = computed(() => {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: v-bind('props.bgOpacity');
+      opacity: v-bind('bgImageOpacity');
     }
 
     // Overlay pour assurer la lisibilité

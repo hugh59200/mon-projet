@@ -137,11 +137,12 @@ export default {
       },
     },
     bestSellers: {
-      badge: 'Populaires',
-      title: 'Nos best-sellers',
-      subtitle: 'Les peptides les plus commandés par nos clients.',
+      badge: 'Tendances 2025',
+      title: 'Top Peptides Recherche',
+      subtitle: 'Les peptides les plus étudiés par la communauté scientifique mondiale.',
       viewAll: 'Voir tout le catalogue',
-      addToCart: 'Ajouter',
+      addToCart: 'Ajouter au panier',
+      honorable: 'Également populaires',
     },
     faq: {
       badge: 'Support',
