@@ -136,6 +136,13 @@ export default {
         },
       },
     },
+    bestSellers: {
+      badge: 'Popular',
+      title: 'Our best-sellers',
+      subtitle: 'The most ordered peptides by our customers.',
+      viewAll: 'View all products',
+      addToCart: 'Add to cart',
+    },
     faq: {
       badge: 'Support',
       title: 'Frequently Asked Questions',
@@ -465,10 +472,12 @@ export default {
       outOfStock: 'Unavailable',
       inStock: 'In stock',
       lowStock: 'Low stock',
+      remaining: 'left',
       viewDetails: 'Details',
       viewProduct: 'View product',
       quantity: 'Qty',
-      purity: 'Purity',
+      purity: '≥98%',
+      coaIncluded: 'COA included',
       format: 'Format',
     },
     results: {
@@ -1348,27 +1357,28 @@ export default {
   // NEWSLETTER
   // ============================================
   newsletter: {
-    badge: 'Exclusive newsletter',
-    title: 'Alerts & news',
+    badge: '10% off',
+    title: 'Get your promo code',
     compactTitle: 'Research updates',
-    description: 'New peptides, recent studies and exclusive offers directly in your inbox.',
+    description: 'Subscribe now and instantly receive your 10% discount code for your first order.',
+    promoBanner: 'on your first order',
     placeholder: 'Professional email',
     namePlaceholder: 'Your first name (optional)',
-    cta: 'Subscribe for free',
+    cta: 'Get my 10% off',
     privacy: 'Your data stays confidential. Unsubscribe in 1 click.',
     features: {
-      exclusive: 'Exclusive offers for subscribers only',
+      exclusive: '10% off your first order',
       research: 'Scientific news and studies',
-      promotions: 'Promo codes and discounts',
+      promotions: 'Exclusive offers for subscribers',
       unsubscribe: 'Unsubscribe in 1 click',
     },
     benefits: {
-      exclusive: 'Exclusive offers',
+      exclusive: '10% off now',
       discounts: 'Subscriber discounts',
     },
     success: {
-      title: 'Subscription confirmed!',
-      description: 'Welcome! You will soon receive our latest news.',
+      title: 'Your code is on its way!',
+      description: 'Check your inbox, your 10% off code is waiting for you.',
     },
     errors: {
       required: 'Please enter your email address',

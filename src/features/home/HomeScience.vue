@@ -106,8 +106,6 @@
             <img
               :src="persona.image"
               :alt="persona.alt"
-              @error="(e) => console.error('[IMG ERROR]', persona.id, e)"
-              @load="() => console.log('[IMG LOADED]', persona.id)"
             />
             <BasicText class="persona-card__tag">
               {{ persona.tag }}
@@ -215,8 +213,6 @@
   // URLs des images persona depuis Supabase Storage
   const personaImages = PERSONA_ASSETS
 
-  // Debug: vérifier que les URLs sont correctes
-  console.log('[HomeScience] Persona images:', personaImages)
 
   type Persona = {
     id: string

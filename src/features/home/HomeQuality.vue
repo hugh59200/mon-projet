@@ -88,11 +88,10 @@
 
 <script setup lang="ts">
   import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
-  import { computed, h, ref } from 'vue'
+  import { computed, h } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
-  const scrollContainer = ref<HTMLElement | null>(null)
 
   interface CoaItem {
     id: string

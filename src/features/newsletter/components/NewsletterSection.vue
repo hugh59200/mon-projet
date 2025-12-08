@@ -43,7 +43,7 @@
       <!-- Right: Signup Form (theme dynamique via ContentBlock) -->
       <ContentBlock
         variant="card"
-        padding="24px"
+        padding="0"
         class="newsletter-section__form-wrapper"
       >
         <NewsletterSignup
@@ -74,18 +74,18 @@
 
   const features = computed<Feature[]>(() => [
     {
-      icon: 'Gift',
+      icon: 'Percent',
       title: t('newsletter.features.exclusive'),
+      description: '',
+    },
+    {
+      icon: 'Gift',
+      title: t('newsletter.features.promotions'),
       description: '',
     },
     {
       icon: 'FlaskConical',
       title: t('newsletter.features.research'),
-      description: '',
-    },
-    {
-      icon: 'Percent',
-      title: t('newsletter.features.promotions'),
       description: '',
     },
     {

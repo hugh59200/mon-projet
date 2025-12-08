@@ -34,39 +34,16 @@
       >
         <!-- Premium Layout -->
         <template v-if="variant === 'premium'">
-          <!-- Custom Icon -->
-          <div class="newsletter-signup__hero-icon">
-            <div class="newsletter-signup__hero-icon-inner">
-              <BasicIconNext
-                name="Mail"
-                :size="28"
-              />
-            </div>
-            <div class="newsletter-signup__hero-icon-ring"></div>
+          <!-- Promo Banner -->
+          <div class="newsletter-signup__promo-banner">
+            <span class="newsletter-signup__promo-badge">-10%</span>
+            <span class="newsletter-signup__promo-text">{{ t('newsletter.promoBanner') }}</span>
           </div>
 
           <!-- Title & Description -->
           <div class="newsletter-signup__header-premium">
             <h4 class="newsletter-signup__title">{{ title || t('newsletter.title') }}</h4>
             <p class="newsletter-signup__desc">{{ description || t('newsletter.description') }}</p>
-          </div>
-
-          <!-- Inline benefits -->
-          <div class="newsletter-signup__benefits">
-            <div class="newsletter-signup__benefit">
-              <BasicIconNext
-                name="Gift"
-                :size="16"
-              />
-              <span>{{ t('newsletter.benefits.exclusive') }}</span>
-            </div>
-            <div class="newsletter-signup__benefit">
-              <BasicIconNext
-                name="Percent"
-                :size="16"
-              />
-              <span>{{ t('newsletter.benefits.discounts') }}</span>
-            </div>
           </div>
 
           <!-- Form -->
@@ -389,52 +366,72 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 20px;
+        gap: 0;
       }
 
-      // Custom Icon avec ring animé
-      .newsletter-signup__hero-icon {
-        position: relative;
-        width: 72px;
-        height: 72px;
-      }
-
-      .newsletter-signup__hero-icon-inner {
-        position: relative;
-        z-index: 2;
-        // width: 100%;
-        height: 100%;
+      // Promo Banner (bandeau rouge)
+      .newsletter-signup__promo-banner {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(
-          135deg,
-          rgba(var(--primary-500-rgb), 0.15) 0%,
-          rgba(var(--primary-600-rgb), 0.08) 100%
-        );
-        border: 1px solid rgba(var(--primary-500-rgb), 0.25);
-        border-radius: 20px;
+        gap: 12px;
+        width: 100%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px 12px 0 0;
 
-        svg {
-          color: var(--primary-400);
+        // Effet brillant subtil
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.15) 50%,
+            transparent 100%
+          );
+          animation: shine 3s ease-in-out infinite;
         }
       }
 
-      .newsletter-signup__hero-icon-ring {
-        position: absolute;
-        inset: -6px;
-        border: 1px dashed rgba(var(--primary-500-rgb), 0.2);
-        border-radius: 24px;
-        animation: ring-rotate 20s linear infinite;
+      @keyframes shine {
+        0% {
+          left: -100%;
+        }
+        50%,
+        100% {
+          left: 100%;
+        }
       }
 
-      @keyframes ring-rotate {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
+      .newsletter-signup__promo-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 14px;
+        background: @white;
+        color: #dc2626;
+        font-size: 18px;
+        font-weight: 800;
+        border-radius: 6px;
+        letter-spacing: -0.02em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .newsletter-signup__promo-text {
+        color: @white;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        position: relative;
+        z-index: 1;
       }
 
       // Header
@@ -442,6 +439,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        padding: 24px 24px 0;
       }
 
       .newsletter-signup__title {
@@ -486,6 +484,8 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+        padding: 20px 24px 0;
+        box-sizing: border-box;
       }
 
       .newsletter-signup__input-wrapper {
@@ -505,33 +505,34 @@
       }
 
       .newsletter-signup__error {
-        margin: 8px 0 0;
+        margin: 8px 24px 0;
       }
 
       .newsletter-signup__privacy {
         text-align: center;
         margin-top: 8px;
+        padding: 0 24px 24px;
       }
 
       // Responsive
       .respond-mobile({
-        .newsletter-signup__hero-icon {
-          width: 60px;
-          height: 60px;
+        .newsletter-signup__promo-banner {
+          flex-direction: column;
+          gap: 6px;
+          padding: 12px 16px;
         }
 
-        .newsletter-signup__hero-icon-inner {
-          border-radius: 16px;
-
-          svg {
-            width: 24px;
-            height: 24px;
-          }
+        .newsletter-signup__promo-badge {
+          font-size: 16px;
+          padding: 5px 12px;
         }
 
-        .newsletter-signup__hero-icon-ring {
-          inset: -5px;
-          border-radius: 20px;
+        .newsletter-signup__promo-text {
+          font-size: 12px;
+        }
+
+        .newsletter-signup__header-premium {
+          padding: 20px 16px 0;
         }
 
         .newsletter-signup__title {
@@ -542,13 +543,12 @@
           font-size: 13px;
         }
 
-        .newsletter-signup__benefits {
-          flex-direction: column;
-          gap: 8px;
+        .newsletter-signup__form {
+          padding: 16px 16px 0;
         }
 
-        .newsletter-signup__benefit {
-          font-size: 12px;
+        .newsletter-signup__privacy {
+          padding: 0 16px 20px;
         }
       });
     }

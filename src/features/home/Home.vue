@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <!-- 1. Hero - Accroche principale -->
     <ContentBlock
       variant="flat"
       padding="0"
@@ -10,20 +11,35 @@
     >
       <HomeHero />
     </ContentBlock>
+
+    <!-- 2. Best-Sellers - Produits populaires (conversion rapide) -->
+    <ContentBlock
+      variant="flat"
+      max-width="1200px"
+      padding="50px 0"
+      theme="dark"
+      :no-border="true"
+    >
+      <HomeBestSellers />
+    </ContentBlock>
+
+    <!-- 3. Catégories - Navigation pour explorer -->
     <ContentBlock
       variant="flat"
       bg="transparent"
       max-width="1200px"
-      padding="0"
+      padding="0 0 50px"
       :no-border="true"
       theme="dark"
     >
       <CategoryHeroBanner />
     </ContentBlock>
+
+    <!-- 4. Qualité - Réassurance (COA, pureté) -->
     <ContentBlock
       variant="flat"
       width="100%"
-      padding="30px 0"
+      padding="50px 0"
       border-radius="0"
       :no-border="true"
       theme="dark"
@@ -32,18 +48,12 @@
     >
       <HomeQuality />
     </ContentBlock>
-    <ContentBlock
-      variant="card"
-      max-width="1200px"
-      padding="0"
-      theme="dark"
-    >
-      <HomeScience />
-    </ContentBlock>
+
+    <!-- 5. Newsletter - Capture email + promo -10% -->
     <ContentBlock
       variant="flat"
       width="100%"
-      padding="40px 0"
+      padding="50px 0"
       border-radius="0"
       :no-border="true"
       theme="dark"
@@ -51,6 +61,8 @@
     >
       <NewsletterSection />
     </ContentBlock>
+
+    <!-- 6. CTA Final - Dernier push -->
     <ContentBlock
       variant="card"
       theme="dark"
@@ -68,44 +80,41 @@
   import bgCtaImage from '@/assets/bg-cta.png'
   import bgNewsletterImage from '@/assets/bg-newsletter.png'
   import bgQualityImage from '@/assets/bg-quality.png'
+  import { getCanonicalUrl, SEO_CONFIG } from '@/config/seo'
   import NewsletterSection from '@/features/newsletter/components/NewsletterSection.vue'
   import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { useHead } from '@vueuse/head'
   import CategoryHeroBanner from './CategoryHeroBanner.vue'
+  import HomeBestSellers from './HomeBestSellers.vue'
   import HomeCta from './HomeCta.vue'
   import HomeHero from './HomeHero.vue'
   import HomeQuality from './HomeQuality.vue'
-  import HomeScience from './HomeScience.vue'
 
   // Configuration SEO pour la page d'accueil
   useHead({
-    title: 'Atlas Lab Solutions - Peptides de Recherche de Haute Pureté',
+    title: `${SEO_CONFIG.SITE_NAME} - Peptides de Recherche de Haute Pureté`,
     meta: [
       {
         name: 'description',
         content:
           'Découvrez notre gamme complète de peptides et réactifs chimiques pour la recherche scientifique. Qualité laboratoire garantie, expédition rapide depuis la France et les États-Unis.',
       },
+      { name: 'author', content: SEO_CONFIG.AUTHOR },
+      { property: 'og:site_name', content: SEO_CONFIG.SITE_NAME },
       {
         property: 'og:title',
-        content: 'Atlas Lab Solutions - Peptides de Recherche',
+        content: `${SEO_CONFIG.SITE_NAME} - Peptides de Recherche`,
       },
       {
         property: 'og:description',
         content:
           'Fournisseur de peptides de haute pureté pour la recherche scientifique. Expédition rapide et service client professionnel.',
       },
-      {
-        property: 'og:type',
-        content: 'website',
-      },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: getCanonicalUrl('/') },
+      { property: 'og:image', content: SEO_CONFIG.DEFAULT_OG_IMAGE },
     ],
-    link: [
-      {
-        rel: 'canonical',
-        href: 'https://fast-peptides.com',
-      },
-    ],
+    link: [{ rel: 'canonical', href: getCanonicalUrl('/') }],
   })
 </script>
 

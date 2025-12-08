@@ -1,8 +1,5 @@
 <template>
-  <ContentBlock
-    as="article"
-    variant="card"
-    :interactive="true"
+  <article
     class="product-card"
     :class="{ 'product-card--list': viewMode === 'list' }"
     @click="$emit('view', product.id)"
@@ -12,10 +9,6 @@
       v-if="product.is_on_sale"
       class="product-card__promo"
     >
-      <BasicIconNext
-        name="Star"
-        :size="12"
-      />
       <span>-{{ discountPercent }}%</span>
     </div>
 
@@ -30,15 +23,14 @@
       v-else-if="(product.stock ?? 0) < 5"
       class="product-card__stock-badge product-card__stock-badge--low"
     >
-      <BasicIconNext name="AlertCircle" :size="12" />
-      <span>{{ product.stock }} restant{{ (product.stock ?? 0) > 1 ? 's' : '' }}</span>
+      {{ product.stock }} {{ t('catalogue.product.remaining') }}
     </div>
 
-    <!-- Image -->
+    <!-- Image Container -->
     <div class="product-card__image">
       <!-- Category Badge -->
       <div
-        class="product-card__category-badge"
+        class="product-card__category"
         :style="{ '--category-color': categoryColor }"
       >
         <span
@@ -48,7 +40,8 @@
         <span>{{ productCategory }}</span>
       </div>
 
-      <div class="product-card__image-inner">
+      <!-- Product Image -->
+      <div class="product-card__image-wrapper">
         <img
           :src="product.image || defaultImage"
           :alt="productName"
@@ -65,84 +58,66 @@
     </div>
 
     <!-- Content -->
-    <div class="product-card__content">
+    <div class="product-card__body">
       <!-- Name -->
       <h3 class="product-card__name">{{ productName }}</h3>
 
-      <!-- Specs -->
+      <!-- Specs Row -->
       <div class="product-card__specs">
-        <div class="product-card__spec product-card__spec--purity">
+        <span class="product-card__spec product-card__spec--highlight">
           <BasicIconNext
             name="FlaskConical"
-            :size="14"
+            :size="12"
           />
-          <span>{{ t('catalogue.product.purity') }}</span>
-        </div>
-        <div class="product-card__spec product-card__spec--coa">
+          {{ t('catalogue.product.purity') }}
+        </span>
+        <span class="product-card__spec">
           <BasicIconNext
             name="FileCheck"
-            :size="14"
+            :size="12"
           />
-          <span>{{ t('catalogue.product.coaIncluded') }}</span>
-        </div>
-        <div
+          COA
+        </span>
+        <span
           v-if="product.dosage"
           class="product-card__spec"
         >
-          <BasicIconNext
-            name="Shield"
-            :size="14"
-          />
-          <span>{{ product.dosage }}</span>
-        </div>
+          {{ product.dosage }}
+        </span>
       </div>
 
       <!-- Price -->
-      <div class="product-card__pricing">
-        <div class="product-card__price">
-          <span
-            v-if="product.is_on_sale && product.sale_price"
-            class="product-card__price-old"
-          >
-            {{ product.price.toFixed(2) }}€
-          </span>
-          <span
-            class="product-card__price-current"
-            :class="{ 'product-card__price-current--sale': product.is_on_sale }"
-          >
-            {{ currentPrice.toFixed(2) }}€
-          </span>
-        </div>
+      <div class="product-card__price">
+        <span
+          v-if="product.is_on_sale && product.sale_price"
+          class="product-card__price-old"
+        >
+          {{ product.price.toFixed(2) }}€
+        </span>
+        <span
+          class="product-card__price-current"
+          :class="{ 'product-card__price-current--sale': product.is_on_sale }"
+        >
+          {{ currentPrice.toFixed(2) }}€
+        </span>
       </div>
 
       <!-- Actions -->
       <div class="product-card__actions">
-        <PremiumButton
-          type="primary"
-          variant="solid"
-          size="sm"
-          :label="
-            (product.stock ?? 0) > 0
-              ? t('catalogue.product.add')
-              : t('catalogue.product.outOfStock')
-          "
-          icon-left="ShoppingCart"
+        <button
+          class="product-card__btn product-card__btn--primary"
           :disabled="(product.stock ?? 0) <= 0"
-          :shine="true"
           @click.stop="$emit('add', product)"
-        />
-
-        <PremiumButton
-          v-if="(product.stock ?? 0) > 0 && !isMobile"
-          type="secondary"
-          size="sm"
-          :label="t('catalogue.product.buyNow')"
-          icon-left="Zap"
-          @click.stop="$emit('buy', product)"
-        />
+        >
+          <BasicIconNext
+            name="ShoppingCart"
+            :size="16"
+          />
+          <span class="product-card__btn-label">{{ t('catalogue.product.add') }}</span>
+        </button>
       </div>
     </div>
-  </ContentBlock>
+  </article>
 </template>
 
 <script setup lang="ts">
@@ -152,21 +127,17 @@
   import { useI18n } from 'vue-i18n'
   import WishlistButton from '../components/WishlistButton.vue'
   import { useWishlistStore } from '../stores/useWishlistStore'
-  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
 
   const { t } = useI18n()
   const wishlistStore = useWishlistStore()
-  const { isMobile } = useDeviceBreakpoint()
 
   const props = defineProps<{
     product: Products
     viewMode?: 'grid' | 'list'
   }>()
 
-  // Vérifier si le produit est dans les favoris
   const isInWishlist = computed(() => wishlistStore.isInWishlist(props.product.id))
 
-  // Traductions automatiques du produit
   const { name: productName, category: productCategory } = useTranslatedProduct(
     toRef(props, 'product'),
   )
@@ -175,7 +146,6 @@
 
   const defaultImage = '/images/default-product.png'
 
-  // Couleurs des catégories utilisant les variables du design system
   const categoryColors: Record<string, string> = {
     Récupération: 'var(--success-500)',
     'Perte de poids': 'var(--warning-500)',
@@ -209,44 +179,52 @@
 </script>
 
 <style scoped lang="less">
-  @font-display:
-    'Instrument Sans',
-    'SF Pro Display',
-    -apple-system,
-    sans-serif;
-  @font-body:
-    'Inter',
-    'SF Pro Text',
-    -apple-system,
-    sans-serif;
-  @ease: cubic-bezier(0.4, 0, 0.2, 1);
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
 
+  // ============ VARIABLES ============
+  @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
+  @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
+  @ease: cubic-bezier(0.4, 0, 0.2, 1);
+  @radius-card: 16px;
+  @radius-sm: 8px;
+
+  // ============ CARD BASE ============
   .product-card {
-    // Styles de base gérés par ContentBlock
     position: relative;
     display: flex;
     flex-direction: column;
+    background: var(--content-block-bg);
+    border: 1px solid var(--content-block-border);
+    border-radius: @radius-card;
     overflow: hidden;
+    cursor: pointer;
+    transition:
+      border-color 0.2s @ease,
+      box-shadow 0.2s @ease;
 
-    // ============ BADGES ============
+    // Hover state
+    &:hover {
+      border-color: rgba(var(--primary-500-rgb), 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    // ============ PROMO BADGE ============
     &__promo {
       position: absolute;
       top: 12px;
       left: 12px;
       z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 10px;
-      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
-      border-radius: 8px;
+      padding: 5px 10px;
+      background: @danger-500;
+      border-radius: 6px;
       font-family: @font-body;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       color: @white;
-      box-shadow: 0 4px 12px rgba(var(--danger-500-rgb), 0.4);
+      box-shadow: 0 2px 8px rgba(var(--danger-500-rgb), 0.4);
     }
 
+    // ============ STOCK BADGE ============
     &__stock-badge {
       position: absolute;
       top: 12px;
@@ -258,166 +236,188 @@
       font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
 
       &--out {
-        background: rgba(var(--danger-500-rgb), 0.15);
+        background: rgba(var(--danger-500-rgb), 0.12);
         color: @danger-500;
-        border: 1px solid rgba(var(--danger-500-rgb), 0.3);
       }
 
       &--low {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        padding: 6px 10px;
-        background: linear-gradient(135deg, @warning-500 0%, @warning-600 100%);
-        color: white;
-        border: none;
-        box-shadow: 0 2px 8px rgba(var(--warning-500-rgb), 0.4);
-        animation: pulse-stock 2s infinite;
-
-        svg {
-          color: white;
-        }
+        background: @warning-500;
+        color: @white;
       }
     }
 
-    // Si promo ET stock badge présents, décaler le stock
+    // Si promo présente, décaler le stock badge
     &__promo + &__stock-badge {
-      top: 44px;
+      top: 46px;
     }
 
-    @keyframes pulse-stock {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.85; }
+    // ============ IMAGE SECTION ============
+    &__image {
+      position: relative;
+      background: var(--content-block-bg-subtle);
+      padding: 20px;
+
+      .respond-tablet({
+        padding: 16px;
+      });
+
+      .respond-mobile({
+        padding: 12px;
+      });
+    }
+
+    &__image-wrapper {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        max-width: 80%;
+        max-height: 80%;
+        object-fit: contain;
+        transition: transform 0.3s @ease;
+
+        .respond-mobile({
+          max-width: 85%;
+          max-height: 85%;
+        });
+      }
     }
 
     // ============ CATEGORY BADGE ============
-    &__category-badge {
+    &__category {
       position: absolute;
       top: 12px;
       right: 12px;
       z-index: 10;
       display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 6px 10px;
-      background: rgba(var(--bg-surface-rgb), 0.85);
+      gap: 6px;
+      padding: 5px 10px;
+      background: rgba(var(--bg-surface-rgb), 0.9);
       backdrop-filter: blur(8px);
       border: 1px solid var(--category-color, var(--primary-500));
-      border-radius: 8px;
+      border-radius: 6px;
       font-family: @font-body;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
       color: var(--text-primary);
       text-transform: uppercase;
-      letter-spacing: 0.3px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s @ease;
+      letter-spacing: 0.4px;
 
-      .product-card__category-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
+      .respond-mobile({
+        padding: 4px 8px;
+        font-size: 8px;
+      });
     }
 
-    // ============ IMAGE ============
-    &__image {
-      position: relative;
-      padding: 16px;
-      background: var(--content-block-bg-subtle, @neutral-50);
+    &__category-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+
+      .respond-mobile({
+        width: 5px;
+        height: 5px;
+      });
     }
 
-    &__image-inner {
-      position: relative;
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border-radius: 12px;
-      overflow: hidden;
-
-      img {
-        max-width: 85%;
-        max-height: 85%;
-        object-fit: contain;
-        transition: transform 0.4s @ease;
-      }
-    }
-
+    // ============ WISHLIST ============
     &__wishlist {
       position: absolute;
       bottom: 12px;
       right: 12px;
       z-index: 10;
       opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.2s @ease;
+      transform: translateY(4px);
+      transition:
+        opacity 0.2s @ease,
+        transform 0.2s @ease;
     }
 
     &:hover &__wishlist,
-    &__wishlist:focus-within {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    // Toujours visible si actif (favori sélectionné)
+    &__wishlist:focus-within,
     &__wishlist--active {
       opacity: 1;
-      transform: scale(1);
+      transform: translateY(0);
     }
 
-    // ============ CONTENT ============
-    &__content {
+    // Mobile: toujours visible
+    .respond-mobile({
+      &__wishlist {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    });
+
+    // ============ BODY SECTION ============
+    &__body {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
       gap: 12px;
-      padding: 0 20px 20px;
+      padding: 16px 20px 20px;
+
+      .respond-tablet({
+        padding: 14px 16px 16px;
+        gap: 10px;
+      });
+
+      .respond-mobile({
+        padding: 12px;
+        gap: 8px;
+      });
     }
 
+    // ============ NAME ============
     &__name {
       font-family: @font-display;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
-      color: var(--content-block-text, @neutral-900);
-      line-height: 1.3;
+      color: var(--content-block-text);
+      line-height: 1.35;
       margin: 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      min-height: 2.7em; // 2 lignes minimum pour alignement
+
+      .respond-mobile({
+        font-size: 14px;
+        min-height: 2.7em;
+      });
     }
 
+    // ============ SPECS ============
     &__specs {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
     &__spec {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 4px;
+      padding: 4px 8px;
+      background: rgba(var(--secondary-700-rgb), 0.5);
+      border-radius: 4px;
       font-family: @font-body;
-      font-size: 12px;
-      color: var(--content-block-text-muted, @neutral-400);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--content-block-text-muted);
 
       svg {
-        color: var(--content-block-text-muted, @neutral-500);
+        flex-shrink: 0;
       }
 
-      // Pureté mise en évidence
-      &--purity {
+      &--highlight {
         background: rgba(var(--success-500-rgb), 0.12);
-        padding: 4px 8px;
-        border-radius: 6px;
         color: @success-500;
         font-weight: 600;
 
@@ -426,63 +426,69 @@
         }
       }
 
-      // Badge COA
-      &--coa {
-        background: rgba(var(--primary-500-rgb), 0.1);
-        padding: 4px 8px;
-        border-radius: 6px;
-        color: var(--primary-500);
-        font-weight: 500;
+      .respond-mobile({
+        padding: 3px 6px;
+        font-size: 10px;
+        gap: 3px;
 
         svg {
-          color: var(--primary-500);
+          width: 10px;
+          height: 10px;
         }
-      }
+      });
     }
 
-    // ============ PRICING ============
-    &__pricing {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding-top: 12px;
-      margin-top: 4px;
-      border-top: 1px solid var(--content-block-border, rgba(0, 0, 0, 0.08));
-    }
-
+    // ============ PRICE ============
     &__price {
       display: flex;
       align-items: baseline;
-      justify-content: center;
       gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--content-block-border);
+
+      .respond-mobile({
+        padding-top: 10px;
+        gap: 6px;
+      });
     }
 
     &__price-old {
       font-family: @font-body;
-      font-size: 14px;
-      color: var(--content-block-text-muted, @neutral-500);
+      font-size: 13px;
+      color: var(--content-block-text-muted);
       text-decoration: line-through;
+
+      .respond-mobile({
+        font-size: 12px;
+      });
     }
 
     &__price-current {
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--content-block-text, @neutral-900);
+      color: var(--content-block-text);
+      letter-spacing: -0.02em;
 
       &--sale {
         color: @danger-500;
       }
+
+      .respond-mobile({
+        font-size: 18px;
+      });
     }
 
     // ============ ACTIONS ============
     &__actions {
       display: flex;
-      justify-content: center;
-      width: 100%;
       gap: 8px;
       margin-top: 4px;
+
+      .respond-mobile({
+        margin-top: 2px;
+      });
     }
 
     &__btn {
@@ -490,144 +496,107 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       padding: 12px 16px;
-      border-radius: 12px;
+      border: none;
+      border-radius: @radius-sm;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s @ease;
-      border: none;
+      transition: all 0.15s @ease;
+
+      svg {
+        flex-shrink: 0;
+      }
 
       &--primary {
-        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(var(--primary-500-rgb), 0.25);
+        background: var(--primary-500);
+        color: @white;
 
         &:hover:not(:disabled) {
-          box-shadow: 0 6px 16px rgba(var(--primary-500-rgb), 0.35);
-          background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+          background: var(--primary-400);
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.98);
         }
 
         &:disabled {
-          background: @neutral-700;
-          box-shadow: none;
+          background: var(--secondary-600);
+          color: var(--secondary-400);
           cursor: not-allowed;
-          opacity: 0.6;
         }
       }
 
-      &--secondary {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: @neutral-300;
+      .respond-mobile({
+        padding: 10px 12px;
+        font-size: 12px;
+        gap: 6px;
+      });
+    }
 
-        &:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.15);
-          color: white;
-        }
-      }
+    &__btn-label {
+      .respond-mobile({
+        // Masquer le texte sur très petit écran si besoin
+        // display: none;
+      });
     }
 
     // ============ LIST MODE ============
     &--list {
       flex-direction: row;
-      padding: 16px;
-      gap: 20px;
+      gap: 0;
 
       .product-card__image {
-        width: 180px;
+        width: 200px;
         flex-shrink: 0;
-        padding: 0;
+
+        .respond-tablet({
+          width: 160px;
+        });
+
+        .respond-mobile({
+          width: 120px;
+        });
       }
 
-      .product-card__image-inner {
-        aspect-ratio: 1;
-      }
-
-      .product-card__content {
+      .product-card__body {
         flex: 1;
-        padding: 0;
         justify-content: center;
-        align-items: flex-start;
-        text-align: left;
-      }
+        padding: 20px;
 
-      .product-card__specs {
-        justify-content: flex-start;
-      }
-
-      .product-card__pricing {
-        justify-content: flex-start;
-      }
-
-      .product-card__price {
-        justify-content: flex-start;
+        .respond-mobile({
+          padding: 12px;
+        });
       }
 
       .product-card__name {
-        font-size: 20px;
+        font-size: 18px;
         -webkit-line-clamp: 1;
+        min-height: auto;
+
+        .respond-mobile({
+          font-size: 14px;
+        });
       }
 
       .product-card__actions {
-        flex-direction: row;
-        justify-content: flex-start;
-        max-width: 300px;
+        max-width: 280px;
+
+        .respond-mobile({
+          max-width: 100%;
+        });
       }
     }
 
-    // ============ RESPONSIVE ============
-    // Mobile (≤ 720px) - Breakpoint harmonisé
+    // ============ TOUCH FEEDBACK ============
     .respond-mobile({
-      // Feedback tactile optimisé
       -webkit-tap-highlight-color: transparent;
 
-      // Active state pour retour tactile
       &:active {
         transform: scale(0.98);
         transition: transform 0.1s ease;
-      }
-
-      &__content {
-        padding: 0 14px 14px;
-        gap: 10px;
-      }
-
-      &__name {
-        font-size: 15px;
-      }
-
-      &__price-current {
-        font-size: 18px;
-      }
-
-      &__actions {
-        flex-direction: row;
-        gap: 6px;
-      }
-
-      &__btn {
-        padding: 10px 12px;
-        font-size: 12px;
-      }
-
-      // Wishlist toujours visible sur mobile
-      &__wishlist {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      // Image légèrement plus grande sur mobile
-      &__image {
-        padding: 12px;
-      }
-
-      &__image-inner img {
-        max-width: 90%;
-        max-height: 90%;
       }
     });
   }
