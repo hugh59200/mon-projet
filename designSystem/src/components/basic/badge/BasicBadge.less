@@ -1,9 +1,10 @@
 /* ══════════════════════════════════════════════════════════════
-   BASIC BADGE — Light/Dark Theme Support
+   BASIC BADGE — Couleurs fixes (non affectées par ContentBlock)
    ══════════════════════════════════════════════════════════════
 
-   Les badges utilisent des couleurs semi-transparentes basées sur
-   les variables RGB pour s'adapter automatiquement au thème.
+   Les badges utilisent des couleurs FIXES basées sur les variables
+   de couleur globales pour garantir un rendu cohérent peu importe
+   le contexte (ContentBlock dark/light, etc.)
 
    ══════════════════════════════════════════════════════════════ */
 
@@ -31,57 +32,338 @@
     }
   }
 
+  // ══════════════════════════════════════════════════════════════
+  // BADGE TYPES — Couleurs fixes avec fallback LESS
+  // ══════════════════════════════════════════════════════════════
+
   &--default {
-    background-color: var(--bg-subtle);
-    color: var(--text-secondary);
-    border-color: var(--border-default);
+    background-color: @neutral-100;
+    color: @neutral-600;
+    border-color: @neutral-300;
     svg {
-      fill: var(--text-secondary);
+      fill: @neutral-600;
     }
   }
 
   &--pending {
-    background-color: rgba(var(--warning-500-rgb), 0.12);
-    color: var(--warning-500);
-    border-color: rgba(var(--warning-500-rgb), 0.4);
+    background-color: fade(@warning-500, 15%);
+    color: @warning-600;
+    border-color: fade(@warning-500, 50%);
     svg {
-      fill: var(--warning-500);
+      fill: @warning-600;
     }
   }
 
   &--error {
-    background-color: rgba(var(--danger-500-rgb), 0.12);
-    color: var(--danger-500);
-    border-color: rgba(var(--danger-500-rgb), 0.4);
+    background-color: fade(@danger-500, 15%);
+    color: @danger-500;
+    border-color: fade(@danger-500, 50%);
     svg {
-      fill: var(--danger-500);
+      fill: @danger-500;
     }
   }
 
   &--success {
-    background-color: rgba(var(--success-500-rgb), 0.12);
-    color: var(--success-500);
-    border-color: rgba(var(--success-500-rgb), 0.4);
+    background-color: fade(@success-500, 15%);
+    color: @success-600;
+    border-color: fade(@success-500, 50%);
     svg {
-      fill: var(--success-500);
+      fill: @success-600;
     }
   }
 
   &--info {
-    background-color: rgba(var(--info-500-rgb), 0.12);
-    color: var(--info-500);
-    border-color: rgba(var(--info-500-rgb), 0.4);
+    background-color: fade(@info-500, 15%);
+    color: @info-600;
+    border-color: fade(@info-500, 50%);
     svg {
-      fill: var(--info-500);
+      fill: @info-600;
     }
   }
 
   &--canceled {
-    background-color: var(--bg-subtle);
-    color: var(--text-secondary); // Renforcé pour meilleur contraste (ratio 6:1)
-    border-color: var(--border-strong);
+    background-color: @neutral-200;
+    color: @neutral-500;
+    border-color: @neutral-400;
     svg {
-      fill: var(--text-secondary);
+      fill: @neutral-500;
+    }
+  }
+
+  &--warning {
+    background-color: fade(@warning-500, 15%);
+    color: @warning-600;
+    border-color: fade(@warning-500, 50%);
+    svg {
+      fill: @warning-600;
+    }
+  }
+
+  &--secondary {
+    background-color: @neutral-100;
+    color: @neutral-500;
+    border-color: @neutral-200;
+    svg {
+      fill: @neutral-500;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // BADGE COLORS — Pour les tags avec couleurs personnalisées
+  // État normal : couleur légère / État selected : couleur intense
+  // !important pour garantir que ces couleurs ne sont pas override
+  // ══════════════════════════════════════════════════════════════
+
+  &--color-primary {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    color: #4f46e5 !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #4f46e5 !important; }
+    .badge__label { color: #4f46e5 !important; }
+
+    &:hover {
+      background-color: rgba(99, 102, 241, 0.20) !important;
+      border-color: rgba(99, 102, 241, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #6366f1 !important;
+      color: @white !important;
+      border-color: #4f46e5 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+
+      &:hover {
+        background-color: #4f46e5 !important;
+      }
+    }
+  }
+
+  &--color-blue {
+    background-color: fade(@info-500, 12%) !important;
+    color: @info-700 !important;
+    border-color: fade(@info-500, 35%) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: @info-700 !important; }
+    .badge__label { color: @info-700 !important; }
+
+    &:hover {
+      background-color: fade(@info-500, 20%) !important;
+      border-color: fade(@info-500, 50%) !important;
+    }
+
+    &.badge--selected {
+      background-color: @info-500 !important;
+      color: @white !important;
+      border-color: @info-700 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: @info-700 !important; }
+    }
+  }
+
+  &--color-purple {
+    background-color: rgba(139, 92, 246, 0.12) !important;
+    color: #7c3aed !important;
+    border-color: rgba(139, 92, 246, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #7c3aed !important; }
+    .badge__label { color: #7c3aed !important; }
+
+    &:hover {
+      background-color: rgba(139, 92, 246, 0.20) !important;
+      border-color: rgba(139, 92, 246, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #8b5cf6 !important;
+      color: @white !important;
+      border-color: #7c3aed !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: #7c3aed !important; }
+    }
+  }
+
+  &--color-pink {
+    background-color: rgba(236, 72, 153, 0.12) !important;
+    color: #db2777 !important;
+    border-color: rgba(236, 72, 153, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #db2777 !important; }
+    .badge__label { color: #db2777 !important; }
+
+    &:hover {
+      background-color: rgba(236, 72, 153, 0.20) !important;
+      border-color: rgba(236, 72, 153, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #ec4899 !important;
+      color: @white !important;
+      border-color: #db2777 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: #db2777 !important; }
+    }
+  }
+
+  &--color-red {
+    background-color: fade(@danger-500, 12%) !important;
+    color: @danger-700 !important;
+    border-color: fade(@danger-500, 35%) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: @danger-700 !important; }
+    .badge__label { color: @danger-700 !important; }
+
+    &:hover {
+      background-color: fade(@danger-500, 20%) !important;
+      border-color: fade(@danger-500, 50%) !important;
+    }
+
+    &.badge--selected {
+      background-color: @danger-500 !important;
+      color: @white !important;
+      border-color: @danger-700 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: @danger-700 !important; }
+    }
+  }
+
+  &--color-orange {
+    background-color: fade(@warning-500, 12%) !important;
+    color: @warning-700 !important;
+    border-color: fade(@warning-500, 35%) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: @warning-700 !important; }
+    .badge__label { color: @warning-700 !important; }
+
+    &:hover {
+      background-color: fade(@warning-500, 20%) !important;
+      border-color: fade(@warning-500, 50%) !important;
+    }
+
+    &.badge--selected {
+      background-color: @warning-500 !important;
+      color: @white !important;
+      border-color: @warning-700 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: @warning-700 !important; }
+    }
+  }
+
+  &--color-yellow {
+    background-color: rgba(234, 179, 8, 0.12) !important;
+    color: #a16207 !important;
+    border-color: rgba(234, 179, 8, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #a16207 !important; }
+    .badge__label { color: #a16207 !important; }
+
+    &:hover {
+      background-color: rgba(234, 179, 8, 0.20) !important;
+      border-color: rgba(234, 179, 8, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #eab308 !important;
+      color: #422006 !important; // Texte foncé pour le jaune
+      border-color: #a16207 !important;
+      svg { fill: #422006 !important; }
+      .badge__label { color: #422006 !important; }
+      &:hover { background-color: #ca8a04 !important; }
+    }
+  }
+
+  &--color-green {
+    background-color: fade(@success-500, 12%) !important;
+    color: @success-700 !important;
+    border-color: fade(@success-500, 35%) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: @success-700 !important; }
+    .badge__label { color: @success-700 !important; }
+
+    &:hover {
+      background-color: fade(@success-500, 20%) !important;
+      border-color: fade(@success-500, 50%) !important;
+    }
+
+    &.badge--selected {
+      background-color: @success-500 !important;
+      color: @white !important;
+      border-color: @success-700 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: @success-700 !important; }
+    }
+  }
+
+  &--color-teal {
+    background-color: rgba(20, 184, 166, 0.12) !important;
+    color: #0f766e !important;
+    border-color: rgba(20, 184, 166, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #0f766e !important; }
+    .badge__label { color: #0f766e !important; }
+
+    &:hover {
+      background-color: rgba(20, 184, 166, 0.20) !important;
+      border-color: rgba(20, 184, 166, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #14b8a6 !important;
+      color: @white !important;
+      border-color: #0f766e !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: #0f766e !important; }
+    }
+  }
+
+  &--color-cyan {
+    background-color: rgba(6, 182, 212, 0.12) !important;
+    color: #0e7490 !important;
+    border-color: rgba(6, 182, 212, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg { fill: #0e7490 !important; }
+    .badge__label { color: #0e7490 !important; }
+
+    &:hover {
+      background-color: rgba(6, 182, 212, 0.20) !important;
+      border-color: rgba(6, 182, 212, 0.50) !important;
+    }
+
+    &.badge--selected {
+      background-color: #06b6d4 !important;
+      color: @white !important;
+      border-color: #0e7490 !important;
+      svg { fill: @white !important; }
+      .badge__label { color: @white !important; }
+      &:hover { background-color: #0e7490 !important; }
     }
   }
 

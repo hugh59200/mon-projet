@@ -5,6 +5,7 @@ export type RouteName =
   'AdminOrders' |
   'AdminProducts' |
   'AdminPromoCodes' |
+  'AdminSessions' |
   'AdminStats' |
   'AdminTopics' |
   'AdminUsers' |

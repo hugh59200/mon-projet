@@ -65,7 +65,11 @@
       </ContentBlock>
       <main class="catalogue-main">
         <!-- Toolbar -->
-        <ContentBlock variant="card" size="sm" class="catalogue-toolbar">
+        <ContentBlock
+          variant="card"
+          size="sm"
+          class="catalogue-toolbar"
+        >
           <!-- Search Desktop -->
           <BasicInput
             v-if="!isMobile"
@@ -107,7 +111,10 @@
                 :variant="viewMode === 'grid' ? 'outline' : 'ghost'"
                 size="sm"
                 icon-left="LayoutGrid"
-                :class="['catalogue-toolbar__view-btn', { 'catalogue-toolbar__view-btn--active': viewMode === 'grid' }]"
+                :class="[
+                  'catalogue-toolbar__view-btn',
+                  { 'catalogue-toolbar__view-btn--active': viewMode === 'grid' },
+                ]"
                 @click="viewMode = 'grid'"
               />
               <PremiumButton
@@ -115,7 +122,10 @@
                 :variant="viewMode === 'list' ? 'outline' : 'ghost'"
                 size="sm"
                 icon-left="List"
-                :class="['catalogue-toolbar__view-btn', { 'catalogue-toolbar__view-btn--active': viewMode === 'list' }]"
+                :class="[
+                  'catalogue-toolbar__view-btn',
+                  { 'catalogue-toolbar__view-btn--active': viewMode === 'list' },
+                ]"
                 @click="viewMode = 'list'"
               />
             </div>
@@ -187,9 +197,16 @@
           :message="t('common.loading')"
         >
           <template #empty>
-            <ContentBlock variant="card" size="lg" class="catalogue-empty">
+            <ContentBlock
+              variant="card"
+              size="lg"
+              class="catalogue-empty"
+            >
               <div class="catalogue-empty__icon">
-                <BasicIconNext name="Search" :size="48" />
+                <BasicIconNext
+                  name="Search"
+                  :size="48"
+                />
               </div>
               <h3 class="catalogue-empty__title">{{ t('catalogue.results.noResults') }}</h3>
               <p class="catalogue-empty__text">
@@ -299,7 +316,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useHead } from '@vueuse/head'
   import ProductCart from '@/features/catalogue/cart/ProductCart.vue'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useFilters } from '@/features/catalogue/composables/useFilters'
@@ -311,14 +327,15 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import type { Products } from '@/supabase/types/supabase.types'
   import { useSmartToast } from '@designSystem/components/basic/toast/useSmartToast'
+  import { useHead } from '@vueuse/head'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
-
-  const { t } = useI18n()
   import { useProductsStore } from './composables/useProducts'
   import FilterPanel from './FilterPanel.vue'
+
+  const { t } = useI18n()
 
   // Configuration SEO pour la page catalogue
   useHead({
@@ -382,9 +399,7 @@
 
   // UI State
   const showFilters = ref(false)
-  const viewMode = ref<'grid' | 'list'>(
-    (route.query.view as 'grid' | 'list') || 'grid',
-  )
+  const viewMode = ref<'grid' | 'list'>((route.query.view as 'grid' | 'list') || 'grid')
 
   // Active filters
   const hasActiveFilters = computed(() => {
@@ -468,7 +483,16 @@
 
   // ⚠️ PAS de scrollToProductList() ici - c'est ça qui causait le scroll brutal
   watch(
-    [selectedCategories, inStockOnly, selectedTags, priceRange, sortBy, searchTerm, pageSize, viewMode],
+    [
+      selectedCategories,
+      inStockOnly,
+      selectedTags,
+      priceRange,
+      sortBy,
+      searchTerm,
+      pageSize,
+      viewMode,
+    ],
     () => {
       page.value = 1
       updateUrl()

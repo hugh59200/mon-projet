@@ -1,6 +1,7 @@
 import directives from '@/directives'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+import { initSessionTracking, trackPageView } from '@/features/tracking/services/sessionTracker'
 import i18n from '@/i18n'
 import { deviceBreakpointPlugin } from '@/plugin/device-breakpoint'
 import { RegistrationDSComponents } from '@/plugin/registration'
@@ -38,5 +39,13 @@ const cart = useCartStore()
 
 await auth.initAuth()
 await cart.loadCart()
+
+// Initialisation du tracking de session
+initSessionTracking(auth.user?.id ?? null)
+
+// Tracker les changements de page
+router.afterEach((to) => {
+  trackPageView(to.path)
+})
 
 app.mount('#app')

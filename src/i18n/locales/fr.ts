@@ -1421,6 +1421,7 @@ export default {
     news: 'Blog',
     categories: 'Catégories',
     messaging: 'Messagerie',
+    sessions: 'Connexions',
     // Commun admin
     common: {
       actions: 'Actions',

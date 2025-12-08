@@ -1,15 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b21zYmF3dGhsa3RhcG10bXF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDUyMjY0NSwiZXhwIjoyMDc2MDk4NjQ1fQ.L-wn7W2MLZM9mFIVLZendBYhWsCw3WWt3adXfWZkwvc\" node scripts/upload-email-assets.cjs:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm run deploy:functions:*)",
-      "Bash(dir \"C:\\Users\\hugo.bogrand-ext\\sources\\Projet\\mon-projet\\src\\assets\\banners\")",
-      "Bash(dir:*)",
-      "Bash(git ls-tree:*)",
-      "Bash(SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b21zYmF3dGhsa3RhcG10bXF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDUyMjY0NSwiZXhwIjoyMDc2MDk4NjQ1fQ.L-wn7W2MLZM9mFIVLZendBYhWsCw3WWt3adXfWZkwvc\" node:*)",
-      "Bash(curl:*)",
-      "WebSearch"
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(DATABASE_PASSWORD=\"162497\" node scripts/exec-sql.cjs:*)",
+      "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node scripts/exec-sql.cjs:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

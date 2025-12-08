@@ -69,8 +69,8 @@
           :key="tag.id"
           :label="`${tag.label} (${tag.count})`"
           size="small"
-          :type="selectedTags.includes(tag.id) ? 'success' : 'default'"
-          deletable
+          :color="getTagColor(tag.label)"
+          :selected="selectedTags.includes(tag.id)"
           @click="emit('toggleTag', tag.id)"
           class="filter-tag"
         />
@@ -96,10 +96,41 @@
 
 <script setup lang="ts">
   import FilterSection from '@/features/shared/components/FilterSection.vue'
+  import type { BadgeColor } from '@designSystem/components/basic/badge/BasicBadge.types'
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
+
+  // Couleurs disponibles pour les tags
+  const TAG_COLORS: BadgeColor[] = [
+    'blue',
+    'purple',
+    'teal',
+    'cyan',
+    'green',
+    'orange',
+    'pink',
+    'red',
+    'yellow',
+    'primary',
+  ]
+
+  // Hash simple pour obtenir une couleur déterministe par tag
+  function hashString(str: string): number {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash // Convert to 32bit integer
+    }
+    return Math.abs(hash)
+  }
+
+  function getTagColor(tag: string): BadgeColor {
+    const index = hashString(tag) % TAG_COLORS.length
+    return TAG_COLORS[index] ?? 'blue'
+  }
 
   // Models
   const filterOpen = defineModel<Record<string, boolean>>('filterOpen', { default: () => ({}) })

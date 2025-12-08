@@ -3,6 +3,7 @@
 // ============================================================
 import defaultImage from '@/assets/products/default/default-product-image.png'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import { trackAddToCart } from '@/features/tracking/services/sessionTracker'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
 import type { CartItems, Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
@@ -147,6 +148,9 @@ export const useCartStore = defineStore(
         }
         // Pas besoin de synchro, items est un computed de guestCart
       }
+
+      // Tracker l'ajout au panier pour les analytics
+      trackAddToCart()
     }
 
     async function updateQuantity(productId: string, quantity: number) {

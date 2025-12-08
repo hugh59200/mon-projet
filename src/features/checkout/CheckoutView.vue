@@ -101,6 +101,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+import { trackCheckoutStart, trackOrderComplete } from '@/features/tracking/services/sessionTracker'
 import { createOrder, invokeOrderConfirmation } from '@/api/supabase/orders'
 import type { CartView } from '@/supabase/types/supabase.types'
 import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
@@ -405,6 +406,9 @@ watch(useProfileAddress, (isUsing) => {
 
 // Lifecycle
 onMounted(() => {
+  // Tracker le début du checkout
+  trackCheckoutStart()
+
   const saved = sessionStorage.getItem('fp-checkout-form')
   if (saved) {
     try {
@@ -550,6 +554,9 @@ async function submitOrder() {
 
     sessionStorage.removeItem('fp-checkout-form')
     cart.clearCart()
+
+    // Tracker la commande complétée
+    trackOrderComplete()
 
     router.push({
       path: '/checkout/confirmation',

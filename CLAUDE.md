@@ -21,8 +21,33 @@ Toujours répondre en français.
 
 Quand une modification de schéma SQL est nécessaire :
 1. **Mettre à jour le backup** : `supabase/script/back-up-tables-v6.sql`
-2. **Mettre à jour le seed** : `supabase/script/seed-v6.sql`
-3. **Exécuter** les scripts dans Supabase (backup d'abord, puis seed)
+   - Ajouter les DROP dans le bloc 1 (vues, tables, fonctions)
+   - Ajouter les CREATE TABLE/VIEW/FUNCTION dans le corps du fichier
+   - Incrémenter le numéro de version dans le header (ex: V6.2 → V6.3)
+   - **NE PAS créer de fichier de migration séparé** - tout doit être dans le backup principal
+2. **Mettre à jour le seed** : `supabase/script/seed-v6.sql` (si données de test nécessaires)
+3. **Créer un script de migration incrémentale** : `supabase/script/migrate-vX.X-*.sql`
+   - Ce script utilise `IF NOT EXISTS` et `DROP ... IF EXISTS` pour être idempotent
+   - Il peut être exécuté sur une base existante sans tout recréer
+
+### Exécution des scripts SQL
+
+**Méthode recommandée** - Via connexion PostgreSQL directe :
+```bash
+# Le mot de passe est dans .env.local (DATABASE_PASSWORD)
+DATABASE_PASSWORD="..." node scripts/exec-sql.cjs supabase/script/migrate-vX.X-xxx.sql
+```
+
+Le script `scripts/exec-sql.cjs` :
+- Se connecte directement à PostgreSQL via le package `pg`
+- Utilise l'host `db.<project-ref>.supabase.co` sur le port 5432
+- Affiche le nombre de commandes exécutées
+- Gère les erreurs avec indication de la ligne approximative
+
+**Alternative** - Via Supabase Dashboard :
+1. Aller sur https://supabase.com/dashboard/project/dwomsbawthlktapmtmqu/sql
+2. Copier-coller le contenu du fichier SQL
+3. Cliquer sur "Run"
 
 ### Edge Functions
 

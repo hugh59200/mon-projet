@@ -1419,6 +1419,7 @@ export default {
     news: 'Blog',
     categories: 'Categories',
     messaging: 'Messaging',
+    sessions: 'Sessions',
     // Common admin
     common: {
       actions: 'Actions',

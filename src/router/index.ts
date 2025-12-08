@@ -2,6 +2,7 @@ import AdminNewsTable from '@/features/admin/news/AdminNewsView.vue'
 import AdminOrdersView from '@/features/admin/orders/AdminOrdersView.vue'
 import AdminProductsTable from '@/features/admin/products/AdminProductsView.vue'
 import AdminPromoCodesView from '@/features/admin/promo/AdminPromoCodesView.vue'
+import AdminSessionsView from '@/features/admin/sessions/AdminSessionsView.vue'
 import AdminTopicsTable from '@/features/admin/topics/AdminTopicsView.vue'
 import AdminUsersView from '@/features/admin/users/AdminUsersView.vue'
 import AuthLayout from '@/features/auth/AuthLayout.vue'
@@ -287,6 +288,18 @@ const routes: Array<RouteRecordRaw> = [
           labelKey: 'admin.stats',
           icon: 'BarChart3',
           color: '#10B981',
+          requiresAuth: true,
+          requiresAdmin: true,
+        },
+      },
+      {
+        path: 'connexions',
+        name: 'AdminSessions',
+        component: AdminSessionsView,
+        meta: {
+          labelKey: 'admin.sessions',
+          icon: 'Activity',
+          color: '#8B5CF6',
           requiresAuth: true,
           requiresAdmin: true,
         },

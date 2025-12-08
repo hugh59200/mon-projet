@@ -11,6 +11,7 @@ import {
   signUp as serviceSignUp,
   signInWithPassword,
 } from '@/api/external/auth'
+import { updateSessionUser, terminateSession } from '@/features/tracking/services/sessionTracker'
 
 export type Providers = 'google' | 'github' | 'facebook'
 
@@ -80,6 +81,9 @@ export const useAuthStore = defineStore('auth', () => {
       await fetchProfile()
       startAutoRefresh()
 
+      // Mettre à jour la session de tracking avec l'ID utilisateur
+      updateSessionUser(result.user.id)
+
       // Récupérer la redirection demandée et le rôle pour déterminer la destination
       const requestedRedirect = router.currentRoute.value.query.redirect as string | undefined
       const userRole = profile.value?.role || 'user'
@@ -139,6 +143,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut(redirect = true) {
+    // Terminer la session de tracking
+    await terminateSession()
+
     await supabase.auth.signOut()
     user.value = null
     profile.value = null

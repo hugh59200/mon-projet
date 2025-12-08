@@ -115,6 +115,17 @@
           />
           <span class="product-card__btn-label">{{ t('catalogue.product.add') }}</span>
         </button>
+        <button
+          v-if="(product.stock ?? 0) > 0"
+          class="product-card__btn product-card__btn--secondary"
+          @click.stop="$emit('buy', product)"
+        >
+          <BasicIconNext
+            name="Zap"
+            :size="16"
+          />
+          <span class="product-card__btn-label">{{ t('catalogue.product.buyNow') }}</span>
+        </button>
       </div>
     </div>
   </article>
@@ -146,21 +157,34 @@
 
   const defaultImage = '/images/default-product.png'
 
-  const categoryColors: Record<string, string> = {
-    Récupération: 'var(--success-500)',
-    'Perte de poids': 'var(--warning-500)',
-    Croissance: 'var(--blue-500)',
-    'Anti-âge': 'var(--purple-500)',
-    Performance: 'var(--danger-500)',
-    'Bien-être': 'var(--pink-500)',
-    Hormonal: 'var(--purple-600)',
-    Nootropique: 'var(--persian-500)',
-    Cosmétique: 'var(--pink-400)',
-    Santé: 'var(--success-500)',
+  // Couleurs disponibles pour les catégories
+  const CATEGORY_COLORS = [
+    'var(--success-500)',
+    'var(--warning-500)',
+    'var(--info-500)',
+    'var(--purple-500)',
+    'var(--danger-500)',
+    'var(--pink-500)',
+    'var(--teal-500)',
+    'var(--cyan-500)',
+  ]
+
+  // Hash simple pour obtenir une couleur déterministe par catégorie
+  function hashString(str: string): number {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash
+    }
+    return Math.abs(hash)
   }
 
   const categoryColor = computed(() => {
-    return categoryColors[props.product.category || ''] || 'var(--primary-500)'
+    const cat = props.product.category || ''
+    if (!cat) return 'var(--primary-500)'
+    const index = hashString(cat) % CATEGORY_COLORS.length
+    return CATEGORY_COLORS[index]
   })
 
   const currentPrice = computed(() => {
@@ -193,8 +217,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--content-block-bg);
-    border: 1px solid var(--content-block-border);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     border-radius: @radius-card;
     overflow: hidden;
     cursor: pointer;
@@ -202,10 +226,16 @@
       border-color 0.2s @ease,
       box-shadow 0.2s @ease;
 
+    // Variables sémantiques pour le contenu
+    --card-text: var(--text-primary);
+    --card-text-secondary: var(--text-secondary);
+    --card-text-muted: var(--text-muted);
+    --card-bg-subtle: var(--bg-subtle);
+
     // Hover state
     &:hover {
       border-color: rgba(var(--primary-500-rgb), 0.4);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--shadow-lg);
     }
 
     // ============ PROMO BADGE ============
@@ -257,7 +287,7 @@
     // ============ IMAGE SECTION ============
     &__image {
       position: relative;
-      background: var(--content-block-bg-subtle);
+      background: var(--card-bg-subtle);
       padding: 20px;
 
       .respond-tablet({
@@ -378,7 +408,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--card-text);
       line-height: 1.35;
       margin: 0;
       display: -webkit-box;
@@ -405,12 +435,12 @@
       align-items: center;
       gap: 4px;
       padding: 4px 8px;
-      background: rgba(var(--secondary-700-rgb), 0.5);
+      background: var(--bg-subtle);
       border-radius: 4px;
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;
-      color: var(--content-block-text-muted);
+      color: var(--card-text-muted);
 
       svg {
         flex-shrink: 0;
@@ -445,7 +475,7 @@
       gap: 8px;
       margin-top: auto;
       padding-top: 12px;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
 
       .respond-mobile({
         padding-top: 10px;
@@ -456,7 +486,7 @@
     &__price-old {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--card-text-muted);
       text-decoration: line-through;
 
       .respond-mobile({
@@ -468,7 +498,7 @@
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--card-text);
       letter-spacing: -0.02em;
 
       &--sale {
@@ -526,6 +556,22 @@
           background: var(--secondary-600);
           color: var(--secondary-400);
           cursor: not-allowed;
+        }
+      }
+
+      &--secondary {
+        background: var(--bg-subtle);
+        color: var(--text-primary);
+        border: 1px solid var(--border-default);
+
+        &:hover {
+          background: var(--bg-surface);
+          border-color: var(--primary-500);
+          color: var(--primary-500);
+        }
+
+        &:active {
+          transform: scale(0.98);
         }
       }
 
