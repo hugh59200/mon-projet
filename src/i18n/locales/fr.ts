@@ -2080,6 +2080,10 @@ export default {
       subtitle: 'Souvent commandés pour ce type de protocole',
       viewProduct: 'Voir le produit',
       addToOrder: 'Ajouter',
+      addAllToCart: 'Ajouter tout au panier',
+      addedAll: 'Tous ajoutés !',
+      bundleTotal: 'Total bundle',
+      products: 'produits',
     },
     // Sélecteur de quantité avec prix dégressif
     quantity: {
@@ -2093,6 +2097,11 @@ export default {
       savings: 'Économie',
       labRate: 'Tarif laboratoire',
       popular: 'Populaire',
+      packSummary: 'Pack de {qty} unités',
+      addPack: 'Ajouter le pack',
+      packAdded: 'Pack ajouté !',
+      totalPack: 'Total',
+      youSave: 'Vous économisez',
     },
     // Upsell au checkout
     checkout: {

@@ -1,3 +1,4 @@
+// Override: any pour éviter "Type instantiation is excessively deep and possibly infinite"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Json = any
 
@@ -863,6 +864,8 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
+          last_login_at: string | null
+          login_count: number | null
           phone: string | null
           role: string | null
           ui_preferences: Json | null
@@ -881,6 +884,8 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
+          last_login_at?: string | null
+          login_count?: number | null
           phone?: string | null
           role?: string | null
           ui_preferences?: Json | null
@@ -899,6 +904,8 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          last_login_at?: string | null
+          login_count?: number | null
           phone?: string | null
           role?: string | null
           ui_preferences?: Json | null
@@ -1138,6 +1145,7 @@ export type Database = {
       }
       user_cart_items: {
         Row: {
+          applied_discount_percent: number | null
           id: string
           product_id: string
           quantity: number
@@ -1145,6 +1153,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          applied_discount_percent?: number | null
           id?: string
           product_id: string
           quantity?: number
@@ -1152,6 +1161,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          applied_discount_percent?: number | null
           id?: string
           product_id?: string
           quantity?: number
@@ -1243,6 +1253,102 @@ export type Database = {
           },
           {
             foreignKeyName: "user_promo_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_sessions: {
+        Row: {
+          added_to_cart: boolean | null
+          browser: string | null
+          city: string | null
+          completed_order: boolean | null
+          country: string | null
+          country_code: string | null
+          device_type: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          ip_address: string | null
+          landing_page: string | null
+          last_activity_at: string | null
+          metadata: Json | null
+          os: string | null
+          pages_viewed: number | null
+          referrer: string | null
+          region: string | null
+          session_id: string
+          session_type: string
+          started_at: string | null
+          started_checkout: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          added_to_cart?: boolean | null
+          browser?: string | null
+          city?: string | null
+          completed_order?: boolean | null
+          country?: string | null
+          country_code?: string | null
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          landing_page?: string | null
+          last_activity_at?: string | null
+          metadata?: Json | null
+          os?: string | null
+          pages_viewed?: number | null
+          referrer?: string | null
+          region?: string | null
+          session_id: string
+          session_type: string
+          started_at?: string | null
+          started_checkout?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          added_to_cart?: boolean | null
+          browser?: string | null
+          city?: string | null
+          completed_order?: boolean | null
+          country?: string | null
+          country_code?: string | null
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          landing_page?: string | null
+          last_activity_at?: string | null
+          metadata?: Json | null
+          os?: string | null
+          pages_viewed?: number | null
+          referrer?: string | null
+          region?: string | null
+          session_id?: string
+          session_type?: string
+          started_at?: string | null
+          started_checkout?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1556,8 +1662,54 @@ export type Database = {
         }
         Relationships: []
       }
+      sessions_by_country: {
+        Row: {
+          country: string | null
+          country_code: string | null
+          orders: number | null
+          total_sessions: number | null
+          unique_users: number | null
+        }
+        Relationships: []
+      }
+      sessions_by_day: {
+        Row: {
+          anonymous_sessions: number | null
+          authenticated_users: number | null
+          conversions: number | null
+          day: string | null
+          total_sessions: number | null
+          unique_countries: number | null
+        }
+        Relationships: []
+      }
+      sessions_stats: {
+        Row: {
+          anonymous_sessions: number | null
+          authenticated_sessions: number | null
+          authenticated_users: number | null
+          avg_duration_seconds: number | null
+          avg_pages_viewed: number | null
+          desktop_sessions: number | null
+          mobile_sessions: number | null
+          sessions_24h: number | null
+          sessions_30d: number | null
+          sessions_7d: number | null
+          sessions_with_cart: number | null
+          sessions_with_checkout: number | null
+          sessions_with_order: number | null
+          tablet_sessions: number | null
+          total_sessions: number | null
+          unique_sessions: number | null
+          users_24h: number | null
+          users_30d: number | null
+          users_7d: number | null
+        }
+        Relationships: []
+      }
       user_cart_view: {
         Row: {
+          applied_discount_percent: number | null
           cart_item_id: string | null
           category_i18n: Json | null
           is_on_sale: boolean | null
@@ -1747,6 +1899,7 @@ export type Database = {
         Args: { p_user_email: string; p_user_id: string }
         Returns: Json
       }
+      end_session: { Args: { p_session_id: string }; Returns: Json }
       find_abandoned_carts: {
         Args: { p_cutoff_time: string; p_min_value?: number }
         Returns: {
@@ -1789,6 +1942,25 @@ export type Database = {
         }
         Returns: Json
       }
+      track_session: {
+        Args: {
+          p_browser?: string
+          p_city?: string
+          p_country?: string
+          p_country_code?: string
+          p_device_type?: string
+          p_ip_address?: string
+          p_landing_page?: string
+          p_os?: string
+          p_referrer?: string
+          p_region?: string
+          p_session_id: string
+          p_session_type?: string
+          p_user_agent?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       unsubscribe_from_newsletter: {
         Args: { p_email: string; p_reason?: string }
         Returns: Json
@@ -1802,6 +1974,16 @@ export type Database = {
           p_relay_id: string
           p_relay_name: string
           p_relay_zipcode: string
+        }
+        Returns: Json
+      }
+      update_session_activity: {
+        Args: {
+          p_added_to_cart?: boolean
+          p_completed_order?: boolean
+          p_pages_viewed?: number
+          p_session_id: string
+          p_started_checkout?: boolean
         }
         Returns: Json
       }

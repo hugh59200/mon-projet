@@ -104,28 +104,26 @@
 
       <!-- Actions -->
       <div class="product-card__actions">
-        <button
-          class="product-card__btn product-card__btn--primary"
+        <PremiumButton
+          type="primary"
+          variant="solid"
+          size="sm"
+          :label="t('catalogue.product.add')"
+          icon-left="ShoppingCart"
           :disabled="(product.stock ?? 0) <= 0"
+          class="product-card__btn"
           @click.stop="$emit('add', product)"
-        >
-          <BasicIconNext
-            name="ShoppingCart"
-            :size="16"
-          />
-          <span class="product-card__btn-label">{{ t('catalogue.product.add') }}</span>
-        </button>
-        <button
+        />
+        <PremiumButton
           v-if="(product.stock ?? 0) > 0"
-          class="product-card__btn product-card__btn--secondary"
+          type="secondary"
+          variant="outline"
+          size="sm"
+          :label="t('catalogue.product.buyNow')"
+          icon-left="Zap"
+          class="product-card__btn"
           @click.stop="$emit('buy', product)"
-        >
-          <BasicIconNext
-            name="Zap"
-            :size="16"
-          />
-          <span class="product-card__btn-label">{{ t('catalogue.product.buyNow') }}</span>
-        </button>
+        />
       </div>
     </div>
   </article>
@@ -523,70 +521,6 @@
 
     &__btn {
       flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border: none;
-      border-radius: @radius-sm;
-      font-family: @font-body;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s @ease;
-
-      svg {
-        flex-shrink: 0;
-      }
-
-      &--primary {
-        background: var(--primary-500);
-        color: @white;
-
-        &:hover:not(:disabled) {
-          background: var(--primary-400);
-        }
-
-        &:active:not(:disabled) {
-          transform: scale(0.98);
-        }
-
-        &:disabled {
-          background: var(--secondary-600);
-          color: var(--secondary-400);
-          cursor: not-allowed;
-        }
-      }
-
-      &--secondary {
-        background: var(--bg-subtle);
-        color: var(--text-primary);
-        border: 1px solid var(--border-default);
-
-        &:hover {
-          background: var(--bg-surface);
-          border-color: var(--primary-500);
-          color: var(--primary-500);
-        }
-
-        &:active {
-          transform: scale(0.98);
-        }
-      }
-
-      .respond-mobile({
-        padding: 10px 12px;
-        font-size: 12px;
-        gap: 6px;
-      });
-    }
-
-    &__btn-label {
-      .respond-mobile({
-        // Masquer le texte sur très petit écran si besoin
-        // display: none;
-      });
     }
 
     // ============ LIST MODE ============

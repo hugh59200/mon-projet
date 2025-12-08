@@ -93,17 +93,17 @@
         </div>
       </div>
 
-      <button
-        class="track-sidebar__register-btn"
+      <PremiumButton
+        type="primary"
+        variant="solid"
+        size="md"
+        label="Créer mon compte"
+        icon-left="UserPlus"
+        :loading="registerLoading"
         :disabled="registerLoading || password.length < 6"
+        class="track-sidebar__register-btn"
         @click="$emit('register', password)"
-      >
-        <span v-if="registerLoading" class="track-sidebar__register-loader"></span>
-        <template v-else>
-          <BasicIconNext name="UserPlus" :size="18" />
-          Créer mon compte
-        </template>
-      </button>
+      />
 
       <div class="track-sidebar__register-benefits">
         <div class="track-sidebar__register-benefit">

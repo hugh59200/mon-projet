@@ -229,6 +229,7 @@ CREATE TABLE public.user_cart_items (
   user_id uuid NOT NULL REFERENCES public.profiles (id) ON DELETE CASCADE,
   product_id uuid NOT NULL REFERENCES public.products (id) ON DELETE CASCADE,
   quantity integer NOT NULL DEFAULT 1 CHECK (quantity > 0),
+  applied_discount_percent numeric(5,2) DEFAULT 0 CHECK (applied_discount_percent >= 0 AND applied_discount_percent <= 100),
   updated_at timestamptz DEFAULT now()
 );
 CREATE UNIQUE INDEX uniq_cart_user_product ON public.user_cart_items (user_id, product_id);
@@ -1956,6 +1957,7 @@ SELECT
   c.user_id,
   c.product_id,
   COALESCE(c.quantity, 1) AS quantity,
+  COALESCE(c.applied_discount_percent, 0)::numeric(5,2) AS applied_discount_percent,
   c.updated_at,
   p.name AS product_name,
   p.dosage AS product_dosage,

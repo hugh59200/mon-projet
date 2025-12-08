@@ -67,16 +67,15 @@
                     <span>{{ coa.mass }}</span>
                   </div>
                 </div>
-                <button
+                <PremiumButton
+                  type="primary"
+                  variant="solid"
+                  size="sm"
+                  :label="t('home.quality.coa.download')"
+                  icon-left="CheckCircle2"
                   class="coa-card__footer"
                   @click="downloadCoa(coa)"
-                >
-                  <BasicIconNext
-                    name="CheckCircle2"
-                    :size="18"
-                  />
-                  <span>{{ t('home.quality.coa.download') }}</span>
-                </button>
+                />
               </ContentBlock>
             </div>
           </div>

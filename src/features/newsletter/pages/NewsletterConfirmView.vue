@@ -35,15 +35,14 @@
         <span class="newsletter-confirm__promo-label">{{ t('newsletter.confirm.yourCode') }}</span>
         <div class="newsletter-confirm__promo-code">
           {{ promoCode }}
-          <button
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="xs"
+            :icon-left="copied ? 'Check' : 'Copy'"
             class="newsletter-confirm__copy"
             @click="copyCode"
-          >
-            <BasicIconNext
-              :name="copied ? 'Check' : 'Copy'"
-              :size="18"
-            />
-          </button>
+          />
         </div>
         <span class="newsletter-confirm__promo-desc">{{ t('newsletter.confirm.codeDesc') }}</span>
       </div>

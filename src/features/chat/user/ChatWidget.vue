@@ -286,15 +286,15 @@
       bottom: 76px;
       right: 0;
       width: 380px;
-      background: white;
+      background: var(--bg-surface);
       border-radius: 20px;
       box-shadow:
-        0 12px 40px color-mix(in srgb, @neutral-900 25%, transparent),
-        0 4px 16px color-mix(in srgb, @neutral-900 10%, transparent);
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 16px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      border: 1px solid color-mix(in srgb, @neutral-200 50%, transparent);
+      border: 1px solid var(--border-subtle);
     }
 
     // ─────────────────────────────────────────

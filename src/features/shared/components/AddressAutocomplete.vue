@@ -273,11 +273,11 @@ watch(suggestions, (newSuggestions) => {
     gap: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: @neutral-600;
+    color: var(--text-secondary);
     margin-bottom: 6px;
 
     svg {
-      color: @neutral-400;
+      color: var(--text-muted);
     }
   }
 
@@ -293,14 +293,14 @@ watch(suggestions, (newSuggestions) => {
     padding-right: 44px;
     font-size: 15px;
     font-family: inherit;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--border-default);
     border-radius: 12px;
-    background: @white;
-    color: @neutral-900;
+    background: var(--bg-surface);
+    color: var(--text-primary);
     transition: all 0.2s ease;
 
     &::placeholder {
-      color: @neutral-400;
+      color: var(--text-muted);
     }
 
     &:focus {
@@ -357,8 +357,8 @@ watch(suggestions, (newSuggestions) => {
     top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: @white;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     border-radius: 16px;
     box-shadow:
       0 4px 24px rgba(0, 0, 0, 0.08),
@@ -377,7 +377,7 @@ watch(suggestions, (newSuggestions) => {
     padding: 14px 16px;
     background: transparent;
     border: none;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--border-subtle);
     cursor: pointer;
     transition: all 0.15s ease;
     text-align: left;
@@ -398,7 +398,7 @@ watch(suggestions, (newSuggestions) => {
     &--active {
       .address-autocomplete__item-icon {
         background: var(--primary-500);
-        color: @white;
+        color: white;
       }
     }
   }
@@ -409,9 +409,9 @@ watch(suggestions, (newSuggestions) => {
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: @neutral-100;
+    background: var(--bg-surface-secondary);
     border-radius: 10px;
-    color: @neutral-500;
+    color: var(--text-muted);
     flex-shrink: 0;
     transition: all 0.2s ease;
   }
@@ -427,7 +427,7 @@ watch(suggestions, (newSuggestions) => {
   &__item-main {
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-900;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -435,7 +435,7 @@ watch(suggestions, (newSuggestions) => {
 
   &__item-secondary {
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -457,13 +457,13 @@ watch(suggestions, (newSuggestions) => {
     justify-content: center;
     gap: 6px;
     padding: 10px;
-    background: @neutral-50;
-    border-top: 1px solid @neutral-100;
+    background: var(--bg-surface-secondary);
+    border-top: 1px solid var(--border-subtle);
     font-size: 11px;
-    color: @neutral-400;
+    color: var(--text-muted);
 
     svg {
-      color: @neutral-300;
+      color: var(--text-muted);
     }
   }
 }

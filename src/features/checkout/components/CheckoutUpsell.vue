@@ -35,13 +35,15 @@
             <span class="upsell-mini-card__name">{{ getProductName(product) }}</span>
             <span class="upsell-mini-card__price">{{ getPrice(product).toFixed(2) }}€</span>
           </div>
-          <button
-            class="upsell-mini-card__add"
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="xs"
+            :icon-left="addedProducts.has(product.id) ? 'Check' : 'Plus'"
             :disabled="addedProducts.has(product.id)"
+            class="upsell-mini-card__add"
             @click="addProduct(product)"
-          >
-            <BasicIconNext :name="addedProducts.has(product.id) ? 'Check' : 'Plus'" :size="14" />
-          </button>
+          />
         </div>
       </div>
     </ContentBlock>
@@ -73,13 +75,15 @@
           </div>
           <div class="upsell-item__action">
             <span class="upsell-item__price">+{{ getItemPrice(item).toFixed(2) }}€</span>
-            <button
-              class="upsell-item__btn"
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              :label="addedItems.has(item.product_id || '') ? t('aov.checkout.added') : t('aov.checkout.addSameVial')"
               :disabled="addedItems.has(item.product_id || '')"
+              class="upsell-item__btn"
               @click="addSameItem(item)"
-            >
-              {{ addedItems.has(item.product_id || '') ? t('aov.checkout.added') : t('aov.checkout.addSameVial') }}
-            </button>
+            />
           </div>
         </div>
       </div>
@@ -311,27 +315,7 @@ onMounted(() => {
   }
 
   &__add {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s @ease;
     flex-shrink: 0;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
-    }
-
-    &:disabled {
-      background: @success-500;
-      cursor: default;
-    }
   }
 }
 
@@ -389,26 +373,7 @@ onMounted(() => {
   }
 
   &__btn {
-    padding: 10px 16px;
-    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-    border: none;
-    border-radius: 8px;
-    font-family: @font-body;
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s @ease;
     white-space: nowrap;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
-    }
-
-    &:disabled {
-      background: @success-500;
-      cursor: default;
-    }
   }
 }
 </style>

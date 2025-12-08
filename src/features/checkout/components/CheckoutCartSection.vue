@@ -43,6 +43,13 @@
                   <BasicIconNext name="FileCheck" :size="12" />
                   {{ t('aov.quality.coaIncluded') }}
                 </span>
+                <span
+                  v-if="(item as any).applied_discount_percent > 0"
+                  class="checkout-item__pack-badge"
+                >
+                  <BasicIconNext name="Package" :size="12" />
+                  -{{ (item as any).applied_discount_percent }}%
+                </span>
               </div>
             </div>
             <PremiumButton
@@ -135,10 +142,15 @@ function formatPrice(value: number | null | undefined) {
 
 function getLineTotal(item: CartView) {
   const qty = item.quantity ?? 1
-  const price = item.is_on_sale
+  const basePrice = item.is_on_sale
     ? (item.product_sale_price ?? item.product_price ?? 0)
     : (item.product_price ?? 0)
-  return price * qty
+  // Appliquer la réduction de pack si présente
+  const discountPercent = Number((item as any).applied_discount_percent ?? 0)
+  const unitPrice = discountPercent > 0
+    ? basePrice * (1 - discountPercent / 100)
+    : basePrice
+  return unitPrice * qty
 }
 </script>
 
@@ -299,6 +311,18 @@ function getLineTotal(item: CartView) {
     font-size: 11px;
     font-weight: 500;
     color: var(--primary-500);
+  }
+
+  &__pack-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.15) 100%);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: @red-600;
   }
 
   &__remove {

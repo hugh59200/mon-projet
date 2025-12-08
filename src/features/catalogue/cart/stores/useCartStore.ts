@@ -5,7 +5,7 @@ import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { trackAddToCart } from '@/features/tracking/services/sessionTracker'
 import { supabaseSilent as supabase } from '@/supabase/supabaseClient'
-import type { CartItems, Products } from '@/supabase/types/supabase.types'
+import type { Products } from '@/supabase/types/supabase.types'
 import type { RealtimeChannel } from '@supabase/realtime-js'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -29,6 +29,7 @@ export interface SimpleCartItem {
   product_sale_price: number | null
   product_stock: number | null
   quantity: number | null
+  applied_discount_percent: number | null
   updated_at: string | null
   user_id: string | null
 }
@@ -103,17 +104,23 @@ export const useCartStore = defineStore(
     // ============================================================
     // 📤 Actions Panier (Unifiées)
     // ============================================================
-    async function addToCart(product: Products) {
+    async function addToCart(product: Products, quantity: number = 1, discountPercent: number = 0) {
       // 1. Mode Connecté (DB)
       if (auth.user?.id) {
         const existing = dbCart.value.find((i) => i.product_id === product.id)
         if (existing) {
-          await updateQuantity(product.id, (existing.quantity ?? 0) + 1)
+          // Si on ajoute avec une réduction différente, on met à jour la réduction
+          // Sinon on garde la réduction existante (la plus avantageuse)
+          const newDiscount = discountPercent > (existing.applied_discount_percent ?? 0)
+            ? discountPercent
+            : (existing.applied_discount_percent ?? 0)
+          await updateQuantityAndDiscount(product.id, (existing.quantity ?? 0) + quantity, newDiscount)
         } else {
-          const payload: Omit<CartItems, 'id' | 'updated_at'> = {
+          const payload = {
             user_id: auth.user.id,
             product_id: product.id,
-            quantity: 1,
+            quantity: quantity,
+            applied_discount_percent: discountPercent,
           }
           await supabase.from('user_cart_items').insert(payload)
           await loadCartFromSupabase()
@@ -124,7 +131,12 @@ export const useCartStore = defineStore(
         const existingIndex = guestCart.value.findIndex((i) => i.product_id === product.id)
 
         if (existingIndex >= 0) {
-          guestCart.value[existingIndex]!.quantity = (guestCart.value[existingIndex]!.quantity ?? 0) + 1
+          const existing = guestCart.value[existingIndex]!
+          existing.quantity = (existing.quantity ?? 0) + quantity
+          // Garder la réduction la plus avantageuse
+          if (discountPercent > (existing.applied_discount_percent ?? 0)) {
+            existing.applied_discount_percent = discountPercent
+          }
         } else {
           // Création d'un objet CartView factice pour le front
           guestCart.value.push({
@@ -140,7 +152,8 @@ export const useCartStore = defineStore(
             is_on_sale: product.is_on_sale,
             product_image: safeImage(product.image),
             product_stock: product.stock,
-            quantity: 1,
+            quantity: quantity,
+            applied_discount_percent: discountPercent,
             updated_at: new Date().toISOString(),
             name_i18n: product.name_i18n,
             category_i18n: product.category_i18n,
@@ -167,6 +180,29 @@ export const useCartStore = defineStore(
         const index = guestCart.value.findIndex((i) => i.product_id === productId)
         if (index >= 0) {
           guestCart.value[index]!.quantity = quantity
+        }
+      }
+    }
+
+    async function updateQuantityAndDiscount(productId: string, quantity: number, discountPercent: number) {
+      if (quantity <= 0) return removeFromCart(productId)
+
+      if (auth.user?.id) {
+        await supabase
+          .from('user_cart_items')
+          .update({
+            quantity,
+            applied_discount_percent: discountPercent,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', auth.user.id)
+          .eq('product_id', productId)
+        await loadCartFromSupabase()
+      } else {
+        const index = guestCart.value.findIndex((i) => i.product_id === productId)
+        if (index >= 0) {
+          guestCart.value[index]!.quantity = quantity
+          guestCart.value[index]!.applied_discount_percent = discountPercent
         }
       }
     }
@@ -202,27 +238,35 @@ export const useCartStore = defineStore(
       // Pour chaque item invité, on l'ajoute au compte
       for (const item of guestCart.value) {
         if (!item.product_id) continue
-        
+
         // Vérif existence pour éviter doublons/erreurs
         const { data: existing } = await supabase
            .from('user_cart_items')
-           .select('quantity')
+           .select('quantity, applied_discount_percent')
            .eq('user_id', auth.user.id)
            .eq('product_id', item.product_id)
            .maybeSingle()
 
         if (existing) {
-           // On additionne
+           // On additionne les quantités et garde la meilleure réduction
+           const bestDiscount = Math.max(
+             existing.applied_discount_percent ?? 0,
+             item.applied_discount_percent ?? 0
+           )
            await supabase.from('user_cart_items')
-             .update({ quantity: existing.quantity + (item.quantity ?? 1) })
+             .update({
+               quantity: existing.quantity + (item.quantity ?? 1),
+               applied_discount_percent: bestDiscount
+             })
              .eq('user_id', auth.user.id)
              .eq('product_id', item.product_id)
         } else {
-           // On insère
+           // On insère avec la réduction
            await supabase.from('user_cart_items').insert({
               user_id: auth.user.id,
               product_id: item.product_id,
-              quantity: item.quantity ?? 1
+              quantity: item.quantity ?? 1,
+              applied_discount_percent: item.applied_discount_percent ?? 0
            })
         }
       }
@@ -285,9 +329,14 @@ export const useCartStore = defineStore(
     const totalPrice = computed((): number =>
       items.value.reduce((sum, item) => {
         const qty = Number(item.quantity ?? 0)
-        const unitPrice = item.is_on_sale
+        const basePrice = item.is_on_sale
           ? Number(item.product_sale_price ?? item.product_price ?? 0)
           : Number(item.product_price ?? 0)
+        // Appliquer la réduction stockée
+        const discountPercent = Number(item.applied_discount_percent ?? 0)
+        const unitPrice = discountPercent > 0
+          ? basePrice * (1 - discountPercent / 100)
+          : basePrice
         return sum + unitPrice * qty
       }, 0),
     )

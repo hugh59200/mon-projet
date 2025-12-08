@@ -62,16 +62,16 @@
     <div v-if="reviews.length > 0" class="reviews-list">
       <ReviewCard v-for="review in displayedReviews" :key="review.id" :review="review" />
 
-      <button
+      <PremiumButton
         v-if="reviews.length > displayLimit"
-        @click="showAll = !showAll"
+        type="secondary"
+        variant="ghost"
+        size="sm"
+        :label="showAll ? 'Voir moins' : `Voir tous les avis (${reviews.length})`"
+        :icon-right="showAll ? 'ChevronUp' : 'ChevronDown'"
         class="show-more-btn"
-      >
-        {{ showAll ? 'Voir moins' : `Voir tous les avis (${reviews.length})` }}
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :class="{ rotated: showAll }">
-          <path d="M6 9l6 6 6-6"/>
-        </svg>
-      </button>
+        @click="showAll = !showAll"
+      />
     </div>
 
     <ReviewFormModal

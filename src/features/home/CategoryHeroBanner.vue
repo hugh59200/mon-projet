@@ -46,19 +46,23 @@
 
         <!-- Actions (tout en bas) -->
         <div class="category-mobile__actions">
-          <button
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="md"
+            :label="t('home.categories.common.explore')"
+            icon-right="ArrowRight"
             class="category-mobile__cta"
             @click="goToCategory(activeSlide)"
-          >
-            <span>{{ t('home.categories.common.explore') }}</span>
-            <BasicIconNext name="ArrowRight" :size="18" />
-          </button>
-          <button
+          />
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="md"
+            icon-left="Play"
             class="category-mobile__video-btn"
             @click="openVideo(activeSlide)"
-          >
-            <BasicIconNext name="Play" :size="18" />
-          </button>
+          />
         </div>
 
       </div>

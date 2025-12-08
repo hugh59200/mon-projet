@@ -59,15 +59,14 @@
             <span class="mobile-item__name">{{ getProductName(product) }}</span>
             <span class="mobile-item__price">{{ getPrice(product).toFixed(2) }}€</span>
           </div>
-          <button
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="xs"
+            icon-left="Plus"
             class="mobile-item__btn"
             @click.stop="addToCart(product)"
-          >
-            <BasicIconNext
-              name="Plus"
-              :size="18"
-            />
-          </button>
+          />
         </div>
       </div>
 
@@ -107,16 +106,15 @@
                 >{{ getPrice(topProducts[1]).toFixed(2) }}€</span>
               </div>
             </div>
-            <button
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              :label="t('home.bestSellers.addToCart')"
+              icon-left="ShoppingCart"
               class="podium-card__btn"
               @click.stop="addToCart(topProducts[1])"
-            >
-              <BasicIconNext
-                name="ShoppingCart"
-                :size="16"
-              />
-              <span>{{ t('home.bestSellers.addToCart') }}</span>
-            </button>
+            />
             <div class="podium-card__pedestal podium-card__pedestal--second">
               <span class="podium-card__pedestal-number">2</span>
             </div>
@@ -158,16 +156,15 @@
                 >{{ getPrice(topProducts[0]).toFixed(2) }}€</span>
               </div>
             </div>
-            <button
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              :label="t('home.bestSellers.addToCart')"
+              icon-left="ShoppingCart"
               class="podium-card__btn"
               @click.stop="addToCart(topProducts[0])"
-            >
-              <BasicIconNext
-                name="ShoppingCart"
-                :size="16"
-              />
-              <span>{{ t('home.bestSellers.addToCart') }}</span>
-            </button>
+            />
             <div class="podium-card__pedestal podium-card__pedestal--first">
               <span class="podium-card__pedestal-number">1</span>
             </div>
@@ -203,16 +200,15 @@
                 >{{ getPrice(topProducts[2]).toFixed(2) }}€</span>
               </div>
             </div>
-            <button
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="sm"
+              :label="t('home.bestSellers.addToCart')"
+              icon-left="ShoppingCart"
               class="podium-card__btn"
               @click.stop="addToCart(topProducts[2])"
-            >
-              <BasicIconNext
-                name="ShoppingCart"
-                :size="16"
-              />
-              <span>{{ t('home.bestSellers.addToCart') }}</span>
-            </button>
+            />
             <div class="podium-card__pedestal podium-card__pedestal--third">
               <span class="podium-card__pedestal-number">3</span>
             </div>
@@ -251,15 +247,14 @@
               <h4 class="honorable-card__name">{{ getProductName(product) }}</h4>
               <span class="honorable-card__price">{{ getPrice(product).toFixed(2) }}€</span>
             </div>
-            <button
+            <PremiumButton
+              type="primary"
+              variant="solid"
+              size="xs"
+              icon-left="Plus"
               class="honorable-card__btn"
               @click.stop="addToCart(product)"
-            >
-              <BasicIconNext
-                name="Plus"
-                :size="16"
-              />
-            </button>
+            />
           </div>
         </div>
       </div>

@@ -493,13 +493,23 @@ async function submitOrder() {
   try {
     currentStep.value = 3
 
-    const orderItemsPayload = cart.items.map((item) => ({
-      product_id: item.product_id!,
-      quantity: item.quantity ?? 1,
-      product_price: item.is_on_sale
-        ? (item.product_sale_price ?? 0)
-        : (item.product_price ?? 0),
-    }))
+    const orderItemsPayload = cart.items.map((item) => {
+      const basePrice = item.is_on_sale
+        ? (item.product_sale_price ?? item.product_price ?? 0)
+        : (item.product_price ?? 0)
+      // Appliquer la réduction de pack si présente
+      const discountPercent = Number((item as any).applied_discount_percent ?? 0)
+      const finalPrice = discountPercent > 0
+        ? basePrice * (1 - discountPercent / 100)
+        : basePrice
+
+      return {
+        product_id: item.product_id!,
+        quantity: item.quantity ?? 1,
+        product_price: finalPrice,
+        applied_discount_percent: discountPercent,
+      }
+    })
 
     const orderPayload: any = {
       userId: auth.user?.id ?? null,

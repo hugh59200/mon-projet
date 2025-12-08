@@ -151,14 +151,14 @@ function formatDate(date: string): string {
 .review-item {
   position: relative;
   border-radius: 12px;
-  background: color-mix(in srgb, @neutral-100 60%, transparent);
-  border: 1px solid color-mix(in srgb, @neutral-200 50%, transparent);
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-subtle);
   overflow: hidden;
   transition: all 0.2s ease;
 
   &.expanded {
-    background: white;
-    border-color: @neutral-200;
+    background: var(--bg-surface);
+    border-color: var(--border-default);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
@@ -186,7 +186,7 @@ function formatDate(date: string): string {
     transition: background 0.15s ease;
 
     &:hover {
-      background: color-mix(in srgb, @neutral-200 30%, transparent);
+      background: rgba(var(--primary-500-rgb), 0.05);
     }
   }
 
@@ -232,7 +232,7 @@ function formatDate(date: string): string {
   &__name {
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-800;
+    color: var(--text-primary);
   }
 
   &__badge {
@@ -268,12 +268,12 @@ function formatDate(date: string): string {
 
   &__date {
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--text-muted);
   }
 
   &__chevron {
     flex-shrink: 0;
-    color: @neutral-400;
+    color: var(--text-muted);
     transition: transform 0.2s ease;
 
     .expanded & {
@@ -284,7 +284,7 @@ function formatDate(date: string): string {
   // Contenu
   &__content {
     padding: 0 14px 14px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--border-subtle);
     margin-top: 0;
     transform-origin: top;
   }
@@ -297,14 +297,14 @@ function formatDate(date: string): string {
     margin: 0 0 6px;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-800;
+    color: var(--text-primary);
   }
 
   &__text {
     margin: 0;
     font-size: 13px;
     line-height: 1.6;
-    color: @neutral-600;
+    color: var(--text-secondary);
   }
 
   &__pro {
@@ -313,10 +313,10 @@ function formatDate(date: string): string {
     gap: 6px;
     margin-top: 10px;
     padding: 8px 10px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 6px;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--text-muted);
   }
 
   &__details {
@@ -331,12 +331,12 @@ function formatDate(date: string): string {
     align-items: center;
     gap: 6px;
     padding: 4px 8px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 6px;
 
     span {
       font-size: 11px;
-      color: @neutral-500;
+      color: var(--text-muted);
     }
   }
 

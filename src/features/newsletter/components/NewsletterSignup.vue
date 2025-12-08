@@ -168,23 +168,16 @@
                   class="newsletter-signup__input-field"
                   @keydown.enter="handleSubmit"
                 />
-                <button
-                  type="submit"
-                  class="newsletter-signup__input-btn"
+                <PremiumButton
+                  type="primary"
+                  variant="solid"
+                  size="sm"
+                  icon-left="ArrowRight"
+                  :loading="isLoading"
                   :disabled="isLoading"
-                >
-                  <BasicIconNext
-                    v-if="!isLoading"
-                    name="ArrowRight"
-                    :size="16"
-                  />
-                  <BasicIconNext
-                    v-else
-                    name="Loader2"
-                    :size="16"
-                    class="newsletter-signup__input-btn-loading"
-                  />
-                </button>
+                  class="newsletter-signup__input-btn"
+                  @click="handleSubmit"
+                />
               </div>
 
               <!-- Inline variant -->

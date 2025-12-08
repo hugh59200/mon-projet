@@ -16,9 +16,14 @@
             <strong>Commande introuvable</strong>
             <span>{{ errorMessage }}</span>
           </div>
-          <button class="track__error-close" @click="errorMessage = ''">
-            <BasicIconNext name="X" :size="20" />
-          </button>
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="xs"
+            icon-left="X"
+            class="track__error-close"
+            @click="errorMessage = ''"
+          />
         </ContentBlock>
       </Transition>
 
@@ -40,10 +45,15 @@
       <div v-if="order && !loading" class="track__results">
         <!-- Navigation -->
         <nav class="track__nav">
-          <button class="track__nav-back" @click="resetSearch">
-            <BasicIconNext name="ArrowLeft" :size="18" />
-            Nouvelle recherche
-          </button>
+          <PremiumButton
+            type="secondary"
+            variant="outline"
+            size="sm"
+            label="Nouvelle recherche"
+            icon-left="ArrowLeft"
+            class="track__nav-back"
+            @click="resetSearch"
+          />
           <div class="track__nav-order">
             <span class="track__nav-label">Commande</span>
             <span class="track__nav-number">#{{ order.order_number }}</span>

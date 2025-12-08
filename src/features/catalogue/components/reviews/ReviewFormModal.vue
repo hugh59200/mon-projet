@@ -196,9 +196,9 @@ async function submitReview() {
   &__rating {
     text-align: center;
     padding: 20px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 12px;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--border-default);
   }
 
   &__stars {
@@ -212,19 +212,19 @@ async function submitReview() {
   &__textarea {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid @neutral-200;
+    border: 1px solid var(--border-default);
     border-radius: 10px;
     font-family: inherit;
     font-size: 14px;
-    color: @neutral-800;
-    background: white;
+    color: var(--text-primary);
+    background: var(--bg-surface);
     resize: vertical;
     min-height: 80px;
     transition: border-color 0.2s ease;
     box-sizing: border-box;
 
     &::placeholder {
-      color: @neutral-400;
+      color: var(--text-muted);
     }
 
     &:focus {
@@ -244,13 +244,13 @@ async function submitReview() {
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    background: white;
+    background: var(--bg-surface);
     border-radius: 8px;
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--border-subtle);
 
     span {
       font-size: 13px;
-      color: @neutral-600;
+      color: var(--text-secondary);
     }
   }
 
@@ -260,7 +260,7 @@ async function submitReview() {
     justify-content: center;
     gap: 8px;
     padding: 10px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 8px;
     margin: 0;
   }

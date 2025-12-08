@@ -304,7 +304,7 @@ const qualityPoints = computed(() => [
 
 .about-page {
   min-height: 100vh;
-  background: @neutral-50;
+  background: var(--bg-base);
 }
 
 // ============================================
@@ -415,7 +415,7 @@ const qualityPoints = computed(() => [
 // ============================================
 .about-dna {
   padding: 100px 24px;
-  background: @white;
+  background: var(--bg-surface);
 
   &__container {
     max-width: 1200px;
@@ -432,14 +432,14 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 36px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 16px;
   }
 
   &__desc {
     font-family: @font-body;
     font-size: 18px;
-    color: @neutral-600;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin: 0;
   }
@@ -461,8 +461,8 @@ const qualityPoints = computed(() => [
   position: relative;
   padding: 40px;
   border-radius: 24px;
-  border: 1px solid @neutral-200;
-  background: @white;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
   transition: all 0.3s @ease;
 
   &:hover {
@@ -501,14 +501,14 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 24px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 12px;
   }
 
   &__text {
     font-family: @font-body;
     font-size: 15px;
-    color: @neutral-600;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin: 0 0 24px;
   }
@@ -527,7 +527,7 @@ const qualityPoints = computed(() => [
       gap: 10px;
       font-family: @font-body;
       font-size: 14px;
-      color: @neutral-700;
+      color: var(--text-secondary);
 
       svg {
         color: @success-500;
@@ -542,7 +542,7 @@ const qualityPoints = computed(() => [
 // ============================================
 .about-advantages {
   padding: 100px 24px;
-  background: @neutral-50;
+  background: var(--bg-base);
 
   &__container {
     max-width: 1200px;
@@ -574,7 +574,7 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 36px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0;
   }
 
@@ -598,9 +598,9 @@ const qualityPoints = computed(() => [
 
 .advantage-card {
   padding: 32px;
-  background: @white;
+  background: var(--bg-surface);
   border-radius: 20px;
-  border: 1px solid @neutral-200;
+  border: 1px solid var(--border-default);
   text-align: center;
   transition: all 0.3s @ease;
 
@@ -643,14 +643,14 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 18px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 8px;
   }
 
   &__text {
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
   }
@@ -661,7 +661,7 @@ const qualityPoints = computed(() => [
 // ============================================
 .about-quality {
   padding: 100px 24px;
-  background: @white;
+  background: var(--bg-surface);
 
   &__container {
     max-width: 1200px;
@@ -698,14 +698,14 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 36px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 16px;
   }
 
   &__desc {
     font-family: @font-body;
     font-size: 16px;
-    color: @neutral-600;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin: 0 0 40px;
   }
@@ -733,7 +733,7 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 18px;
     font-weight: 700;
-    color: @white;
+    color: white;
     flex-shrink: 0;
   }
 
@@ -742,14 +742,14 @@ const qualityPoints = computed(() => [
       font-family: @font-display;
       font-size: 18px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--text-primary);
       margin: 0 0 4px;
     }
 
     p {
       font-family: @font-body;
       font-size: 14px;
-      color: @neutral-600;
+      color: var(--text-secondary);
       line-height: 1.5;
       margin: 0;
     }

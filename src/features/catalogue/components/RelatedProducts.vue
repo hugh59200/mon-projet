@@ -35,6 +35,28 @@
         @buy="buyNow"
       />
     </div>
+
+    <!-- Bundle Add All Button -->
+    <div class="related-products__bundle">
+      <div class="related-products__bundle-info">
+        <span class="related-products__bundle-count">
+          {{ relatedProducts.length }} {{ t('aov.relatedProducts.products') }}
+        </span>
+        <span class="related-products__bundle-total">
+          {{ t('aov.relatedProducts.bundleTotal') }}: {{ formatPrice(bundleTotal) }}
+        </span>
+      </div>
+      <PremiumButton
+        type="primary"
+        variant="solid"
+        size="md"
+        :icon-left="isAddedAll ? 'Check' : 'ShoppingCart'"
+        :label="isAddedAll ? t('aov.relatedProducts.addedAll') : t('aov.relatedProducts.addAllToCart')"
+        class="related-products__bundle-btn"
+        :class="{ 'related-products__bundle-btn--success': isAddedAll }"
+        @click="addAllToCart"
+      />
+    </div>
   </ContentBlock>
 </template>
 
@@ -58,12 +80,26 @@
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allProducts = ref<any[]>([])
+  const isAddedAll = ref(false)
 
   const relatedProducts = computed(() => {
     return (allProducts.value as Products[])
       .filter((p) => p.id !== props.currentProductId && p.category === props.category)
       .slice(0, 4)
   })
+
+  const bundleTotal = computed(() => {
+    return relatedProducts.value.reduce((sum, product) => {
+      const price = product.is_on_sale && product.sale_price
+        ? product.sale_price
+        : product.price
+      return sum + price
+    }, 0)
+  })
+
+  function formatPrice(value: number) {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
+  }
 
   async function loadProducts() {
     if (!props.category) {
@@ -92,6 +128,19 @@
   function buyNow(product: Products) {
     cartStore.addToCart(product)
     router.push('/checkout')
+  }
+
+  function addAllToCart() {
+    if (isAddedAll.value) return
+
+    relatedProducts.value.forEach((product) => {
+      cartStore.addToCart(product)
+    })
+
+    isAddedAll.value = true
+    setTimeout(() => {
+      isAddedAll.value = false
+    }, 2000)
   }
 
   watch(() => props.category, loadProducts, { immediate: false })
@@ -174,6 +223,69 @@
 
       .respond-mobile({
         grid-template-columns: 1fr;
+      });
+    }
+
+    &__bundle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.08) 0%, rgba(var(--primary-500-rgb), 0.04) 100%);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.2);
+      border-radius: 12px;
+
+      .respond-mobile({
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px 16px;
+      });
+    }
+
+    &__bundle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .respond-mobile({
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      });
+    }
+
+    &__bundle-count {
+      font-family: @font-body;
+      font-size: 13px;
+      color: var(--content-block-text-muted);
+    }
+
+    &__bundle-total {
+      font-family: @font-display;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--content-block-text);
+
+      .respond-mobile({
+        font-size: 16px;
+      });
+    }
+
+    &__bundle-btn {
+      flex-shrink: 0;
+      min-width: 200px;
+      transition: all 0.3s ease;
+
+      &--success {
+        background: @success-500 !important;
+        border-color: @success-500 !important;
+      }
+
+      .respond-mobile({
+        min-width: 100%;
       });
     }
   }

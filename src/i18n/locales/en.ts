@@ -1891,6 +1891,10 @@ export default {
       subtitle: 'Often ordered for this type of protocol',
       viewProduct: 'View product',
       addToOrder: 'Add',
+      addAllToCart: 'Add all to cart',
+      addedAll: 'All added!',
+      bundleTotal: 'Bundle total',
+      products: 'products',
     },
     // Quantity selector with bulk pricing
     quantity: {
@@ -1904,6 +1908,11 @@ export default {
       savings: 'Savings',
       labRate: 'Lab rate',
       popular: 'Popular',
+      packSummary: 'Pack of {qty} units',
+      addPack: 'Add pack',
+      packAdded: 'Pack added!',
+      totalPack: 'Total',
+      youSave: 'You save',
     },
     // Checkout upsell
     checkout: {

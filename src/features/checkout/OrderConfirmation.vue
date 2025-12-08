@@ -396,7 +396,7 @@ onMounted(() => {
 .confirmation {
   position: relative;
   min-height: 100vh;
-  background: @neutral-50;
+  background: var(--bg-base);
 
   // ============================================
   // BACKGROUND
@@ -446,10 +446,10 @@ onMounted(() => {
   &__header {
     margin-bottom: 32px;
     padding: 24px 28px;
-    background: white;
+    background: var(--bg-surface);
     border-radius: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.04);
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--border-subtle);
   }
 
   &__header-content {
@@ -489,14 +489,14 @@ onMounted(() => {
     font-family: @font-display;
     font-size: 26px;
     font-weight: 700;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-family: @font-body;
     font-size: 15px;
-    color: @neutral-500;
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -520,11 +520,11 @@ onMounted(() => {
   // SECTIONS
   // ============================================
   &__section {
-    background: white;
+    background: var(--bg-surface);
     border-radius: 20px;
     padding: 28px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.04);
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--border-subtle);
   }
 
   &__section-header {
@@ -533,7 +533,7 @@ onMounted(() => {
     gap: 16px;
     margin-bottom: 24px;
     padding-bottom: 20px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   &__section-icon {
@@ -562,14 +562,14 @@ onMounted(() => {
     font-family: @font-display;
     font-size: 20px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0;
   }
 
   &__section-subtitle {
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-500;
+    color: var(--text-muted);
     margin: 4px 0 0;
   }
 
@@ -577,8 +577,8 @@ onMounted(() => {
   // DETAIL CARD
   // ============================================
   &__detail-card {
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-default);
     border-radius: 14px;
     overflow: hidden;
 
@@ -592,7 +592,7 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid @neutral-200;
+    border-bottom: 1px solid var(--border-default);
 
     &:last-child {
       border-bottom: none;
@@ -607,7 +607,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 13px;
     font-weight: 500;
-    color: @neutral-500;
+    color: var(--text-muted);
   }
 
   &__detail-value-wrapper {
@@ -620,7 +620,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--text-primary);
 
     &--mono {
       font-family: 'SF Mono', 'Fira Code', monospace;
@@ -640,10 +640,10 @@ onMounted(() => {
 
   &__copy-btn {
     padding: 6px;
-    background: white;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     border-radius: 6px;
-    color: @neutral-500;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s @ease;
 
@@ -699,7 +699,7 @@ onMounted(() => {
     border-radius: 12px;
     font-family: @font-body;
     font-size: 14px;
-    color: @neutral-600;
+    color: var(--text-secondary);
 
     > svg:first-child {
       color: var(--primary-500);
@@ -760,11 +760,11 @@ onMounted(() => {
     .selectable-card();
     border-width: 2px;
     border-radius: 10px;
-    color: @neutral-300;
+    color: var(--text-muted);
 
     &--active {
       .selectable-card--active();
-      color: @white;
+      color: var(--text-primary);
     }
   }
 
@@ -789,15 +789,15 @@ onMounted(() => {
     align-items: center;
     gap: 8px;
     padding: 24px 32px;
-    background: white;
-    border: 2px dashed @neutral-300;
+    background: var(--bg-surface);
+    border: 2px dashed var(--border-default);
     border-radius: 14px;
-    color: @neutral-400;
+    color: var(--text-muted);
 
     span {
       font-family: @font-body;
       font-size: 11px;
-      color: @neutral-500;
+      color: var(--text-muted);
     }
   }
 
@@ -816,13 +816,13 @@ onMounted(() => {
     align-items: center;
     text-align: center;
     padding: 20px 16px;
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-default);
     border-radius: 14px;
     transition: all 0.2s @ease;
 
     &:hover {
-      background: white;
+      background: var(--bg-surface);
       border-color: var(--primary-200);
     }
   }
@@ -852,13 +852,13 @@ onMounted(() => {
     font-family: @font-display;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--text-primary);
   }
 
   &__step-desc {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--text-muted);
     line-height: 1.4;
   }
 
@@ -874,21 +874,21 @@ onMounted(() => {
   }
 
   &__summary {
-    background: white;
+    background: var(--bg-surface);
     border-radius: 20px;
     padding: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.04);
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--border-subtle);
   }
 
   &__summary-title {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--text-primary);
     margin: 0 0 20px;
     padding-bottom: 16px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   &__order-ref {
@@ -901,7 +901,7 @@ onMounted(() => {
   &__order-label {
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--text-muted);
   }
 
   &__order-id-wrapper {
@@ -920,7 +920,7 @@ onMounted(() => {
 
   &__summary-divider {
     height: 1px;
-    background: @neutral-100;
+    background: var(--border-subtle);
     margin: 16px 0;
   }
 
@@ -939,7 +939,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-600;
+    color: var(--text-secondary);
   }
 
   &__amount-value {
@@ -954,12 +954,12 @@ onMounted(() => {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 10px;
     font-family: @font-body;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-700;
+    color: var(--text-secondary);
   }
 
   &__payment-icon {
@@ -992,7 +992,7 @@ onMounted(() => {
     gap: 10px;
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--border-subtle);
   }
 
   &__trust-item {
@@ -1001,7 +1001,7 @@ onMounted(() => {
     gap: 10px;
     font-family: @font-body;
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--text-muted);
 
     svg {
       color: @success-500;
@@ -1012,11 +1012,11 @@ onMounted(() => {
   // SUPPORT CARD
   // ============================================
   &__support-card {
-    background: white;
+    background: var(--bg-surface);
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    border: 1px solid @neutral-100;
+    border: 1px solid var(--border-subtle);
   }
 
   &__support-header {
@@ -1027,10 +1027,10 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-700;
+    color: var(--text-secondary);
 
     svg {
-      color: @neutral-400;
+      color: var(--text-muted);
     }
   }
 
@@ -1039,7 +1039,7 @@ onMounted(() => {
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background: @neutral-50;
+    background: var(--bg-surface-secondary);
     border-radius: 10px;
     font-family: @font-body;
     font-size: 14px;

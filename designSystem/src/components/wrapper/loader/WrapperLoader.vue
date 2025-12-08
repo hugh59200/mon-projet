@@ -88,6 +88,7 @@
     align-items: center;
     z-index: 10;
     border-radius: inherit;
+    pointer-events: none; // Permet les clics à travers l'overlay
   }
 
   /* ✨ Transition fade douce */

@@ -300,8 +300,53 @@
                   class="product__quantity-selector"
                 />
 
-                <!-- Boutons d'action -->
-                <div class="product__actions">
+                <!-- Récapitulatif du pack sélectionné -->
+                <Transition name="pack-summary">
+                  <div
+                    v-if="packInfo && (product.stock ?? 0) > 0"
+                    class="product__pack-summary"
+                  >
+                    <div class="product__pack-header">
+                      <div class="product__pack-badge">
+                        <BasicIconNext name="Package" :size="16" />
+                        <span>{{ t('aov.quantity.packSummary', { qty: packInfo.qty }) }}</span>
+                      </div>
+                      <div v-if="packInfo.discount > 0" class="product__pack-discount">
+                        -{{ packInfo.discount }}%
+                      </div>
+                    </div>
+
+                    <div class="product__pack-details">
+                      <div class="product__pack-row">
+                        <span class="product__pack-label">{{ t('aov.quantity.totalPack') }}</span>
+                        <span class="product__pack-price">{{ packInfo.totalPrice.toFixed(2) }}€</span>
+                      </div>
+                      <div v-if="packInfo.savings > 0" class="product__pack-row product__pack-row--savings">
+                        <span class="product__pack-label">
+                          <BasicIconNext name="TrendingDown" :size="14" />
+                          {{ t('aov.quantity.youSave') }}
+                        </span>
+                        <span class="product__pack-savings">{{ packInfo.savings.toFixed(2) }}€</span>
+                      </div>
+                    </div>
+
+                    <PremiumButton
+                      type="primary"
+                      variant="solid"
+                      size="lg"
+                      :icon-left="isPackAdded ? 'Check' : 'ShoppingCart'"
+                      :label="isPackAdded ? t('aov.quantity.packAdded') : t('aov.quantity.addPack')"
+                      :shine="!isPackAdded"
+                      :glow="!isPackAdded"
+                      class="product__pack-btn"
+                      :class="{ 'product__pack-btn--success': isPackAdded }"
+                      @click="addPackToCart(product as any)"
+                    />
+                  </div>
+                </Transition>
+
+                <!-- Boutons d'action (affichés seulement si quantité = 1) -->
+                <div v-if="selectedQuantity === 1" class="product__actions">
                   <PremiumButton
                     type="primary"
                     variant="solid"
@@ -584,16 +629,51 @@
 
   // AOV - Quantité sélectionnée
   const selectedQuantity = ref(1)
+  const isPackAdded = ref(false)
 
   // Prix dégressifs du produit (vient de la DB)
   const bulkPricing = computed<BulkPricingItem[] | null>(() => {
     if (!product.value) return null
-    // Le champ bulk_pricing est un JSONB en DB
-    const pricing = (product.value as Products & { bulk_pricing?: BulkPricingItem[] | null }).bulk_pricing
+    // Le champ bulk_pricing est un JSONB en DB (cast any pour éviter récursion types)
+    const pricing = (product.value as any).bulk_pricing as BulkPricingItem[] | null | undefined
     return pricing || null
   })
 
-  
+  // Configuration par défaut si pas de bulk_pricing en DB
+  const defaultPackConfigs: BulkPricingItem[] = [
+    { quantity: 3, discount_percent: 5 },
+    { quantity: 5, discount_percent: 10 },
+  ]
+
+  // Calcul du pack sélectionné
+  const packInfo = computed(() => {
+    if (!product.value || selectedQuantity.value <= 1) return null
+
+    const basePrice = product.value.is_on_sale && product.value.sale_price
+      ? product.value.sale_price
+      : product.value.price
+
+    const configs = bulkPricing.value && bulkPricing.value.length > 0
+      ? bulkPricing.value
+      : defaultPackConfigs
+
+    const packConfig = configs.find(c => c.quantity === selectedQuantity.value)
+    const discount = packConfig?.discount_percent || 0
+    const discountMultiplier = 1 - discount / 100
+    const unitPrice = basePrice * discountMultiplier
+    const totalPrice = unitPrice * selectedQuantity.value
+    const totalWithoutDiscount = basePrice * selectedQuantity.value
+    const savings = totalWithoutDiscount - totalPrice
+
+    return {
+      qty: selectedQuantity.value,
+      discount,
+      unitPrice,
+      totalPrice,
+      savings,
+    }
+  })
+
   // Vérifie si on peut expédier aujourd'hui (avant 14h, jours ouvrés)
   const canShipToday = computed(() => {
     const now = new Date()
@@ -828,23 +908,42 @@
     }
   })
 
-  const addToCart = (p: Products) => {
+  const addToCart = async (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    // Ajouter la quantité sélectionnée
-    for (let i = 0; i < selectedQuantity.value; i++) {
-      cart.addToCart(p)
-    }
+    // Calculer la réduction applicable
+    const discountPercent = packInfo.value?.discount ?? 0
+    // Ajouter la quantité sélectionnée en une seule fois avec la réduction
+    await cart.addToCart(p, selectedQuantity.value, discountPercent)
     showAddToCartToast(p)
     // Reset la quantité après ajout
     selectedQuantity.value = 1
   }
 
+  const addPackToCart = async (p: Products) => {
+    if ((p.stock ?? 0) <= 0 || selectedQuantity.value <= 1) return
+    if (isPackAdded.value) return
+
+    // Calculer la réduction applicable
+    const discountPercent = packInfo.value?.discount ?? 0
+    // Ajouter la quantité sélectionnée en une seule fois avec la réduction
+    await cart.addToCart(p, selectedQuantity.value, discountPercent)
+    showAddToCartToast(p)
+
+    // Feedback visuel
+    isPackAdded.value = true
+    setTimeout(() => {
+      isPackAdded.value = false
+      // Reset la quantité après ajout
+      selectedQuantity.value = 1
+    }, 2000)
+  }
+
   const buyNow = async (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    // Ajouter la quantité sélectionnée
-    for (let i = 0; i < selectedQuantity.value; i++) {
-      await cart.addToCart(p)
-    }
+    // Calculer la réduction applicable
+    const discountPercent = packInfo.value?.discount ?? 0
+    // Ajouter la quantité sélectionnée en une seule fois avec la réduction
+    await cart.addToCart(p, selectedQuantity.value, discountPercent)
     router.push('/checkout')
   }
 </script>
@@ -872,7 +971,7 @@
   .product-page {
     position: relative;
     min-height: 100vh;
-    background: linear-gradient(180deg, @neutral-50 0%, @neutral-100 100%);
+    background: var(--bg-page);
 
     &__bg {
       position: fixed;
@@ -925,18 +1024,18 @@
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: white;
-      border: 1px solid @neutral-200;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: 10px;
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: @neutral-700;
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: @neutral-50;
+        background: var(--bg-surface-secondary);
         border-color: var(--primary-300);
         color: var(--primary-700);
         transform: translateX(-4px);
@@ -957,7 +1056,7 @@
       gap: 8px;
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--text-muted);
 
       span {
         cursor: pointer;
@@ -968,14 +1067,14 @@
         }
 
         &.active {
-          color: @neutral-800;
+          color: var(--text-primary);
           font-weight: 500;
           cursor: default;
         }
       }
 
       svg {
-        color: @neutral-300;
+        color: var(--text-muted);
         flex-shrink: 0;
       }
     }
@@ -1031,7 +1130,7 @@
       &--ruo {
         top: 16px;
         right: 16px;
-        background: linear-gradient(135deg, @neutral-800 0%, @neutral-900 100%);
+        background: linear-gradient(135deg, var(--secondary-800) 0%, var(--secondary-900) 100%);
         color: white;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
@@ -1048,7 +1147,7 @@
     &__image-wrapper {
       position: relative;
       border-radius: 16px;
-      background: linear-gradient(135deg, @neutral-50 0%, white 100%);
+      background: var(--bg-subtle);
       height: 450px;
       display: flex;
       align-items: center;
@@ -1133,7 +1232,7 @@
     }
 
     &__image--coa {
-      background: white;
+      background: var(--bg-surface);
     }
 
     &__trust-strip {
@@ -1142,7 +1241,7 @@
       gap: 24px;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid @neutral-100;
+      border-top: 1px solid var(--border-subtle);
     }
 
     &__trust-item {
@@ -1151,7 +1250,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-600;
+      color: var(--text-secondary);
 
       svg {
         color: var(--primary-500);
@@ -1179,8 +1278,8 @@
       border-radius: 8px;
       overflow: hidden;
       flex-shrink: 0;
-      border: 1px solid @neutral-200;
-      background: white;
+      border: 1px solid var(--border-default);
+      background: var(--bg-surface);
 
       img {
         width: 100%;
@@ -1219,14 +1318,14 @@
       }
 
       &--product {
-        background: @neutral-700;
+        background: var(--secondary-700);
       }
     }
 
     &__coa-label {
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-600;
+      color: var(--text-secondary);
     }
 
     // ============ LAB VERIFICATION (Analyse indépendante) ============
@@ -1250,18 +1349,18 @@
       font-family: @font-display;
       font-size: 15px;
       font-weight: 700;
-      color: @neutral-800;
+      color: var(--text-primary);
     }
 
     &__lab-description {
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: @neutral-600;
+      color: var(--text-secondary);
       margin: 0 0 16px;
 
       strong {
-        color: @neutral-800;
+        color: var(--text-primary);
         font-weight: 600;
       }
     }
@@ -1272,9 +1371,9 @@
       gap: 16px;
       margin-bottom: 16px;
       padding: 12px 16px;
-      background: white;
+      background: var(--bg-surface);
       border-radius: 8px;
-      border: 1px solid @neutral-100;
+      border: 1px solid var(--border-subtle);
     }
 
     &__lab-detail {
@@ -1291,14 +1390,14 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: @neutral-500;
+      color: var(--text-muted);
     }
 
     &__lab-detail-value {
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-800;
+      color: var(--text-primary);
 
       &--success {
         color: @success-600;
@@ -1328,7 +1427,7 @@
     }
 
     &__lab-link {
-      background: white;
+      background: var(--bg-surface);
       color: var(--primary-700);
       border: 1px solid var(--primary-200);
 
@@ -1370,12 +1469,12 @@
       gap: 8px;
       width: fit-content;
       padding: 6px 14px;
-      background: @neutral-100;
+      background: var(--bg-surface-secondary);
       border-radius: 20px;
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: @neutral-700;
+      color: var(--text-secondary);
     }
 
     &__category-dot {
@@ -1388,7 +1487,7 @@
       font-family: @font-display;
       font-size: clamp(32px, 4vw, 48px);
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--text-primary);
       line-height: 1.1;
       letter-spacing: -0.02em;
       margin: 0;
@@ -1397,7 +1496,7 @@
     &__subtitle {
       font-family: @font-body;
       font-size: 18px;
-      color: @neutral-500;
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -1413,8 +1512,8 @@
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      background: white;
-      border: 1px solid @neutral-200;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: 12px;
       flex: 1;
       min-width: 160px;
@@ -1457,14 +1556,14 @@
     &__spec-label {
       font-family: @font-body;
       font-size: 12px;
-      color: @neutral-500;
+      color: var(--text-muted);
     }
 
     &__spec-value {
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-800;
+      color: var(--text-primary);
 
       &--success {
         color: @success-500;
@@ -1497,7 +1596,7 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 18px;
-      color: @neutral-400;
+      color: var(--text-muted);
       text-decoration: line-through;
     }
 
@@ -1520,7 +1619,7 @@
 
       span {
         font-size: 24px;
-        color: @neutral-500;
+        color: var(--text-muted);
       }
 
       &--sale {
@@ -1531,7 +1630,101 @@
     &__price-info {
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--text-muted);
+    }
+
+    // ─────────────────────────────────────────
+    // Pack Summary
+    // ─────────────────────────────────────────
+    &__pack-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.12) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.3);
+      border-radius: 16px;
+    }
+
+    &__pack-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    &__pack-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: @font-display;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-400);
+    }
+
+    &__pack-discount {
+      padding: 4px 10px;
+      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
+      border-radius: 6px;
+      font-family: @font-body;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    &__pack-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    &__pack-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+
+      &--savings {
+        padding-top: 8px;
+        border-top: 1px solid rgba(var(--primary-500-rgb), 0.2);
+      }
+    }
+
+    &__pack-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: @font-body;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    &__pack-price {
+      font-family: @font-display;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    &__pack-savings {
+      font-family: @font-display;
+      font-size: 16px;
+      font-weight: 700;
+      color: @success-400;
+    }
+
+    &__pack-btn {
+      width: 100%;
+      transition: all 0.3s ease;
+
+      &--success {
+        background: @success-500 !important;
+        border-color: @success-500 !important;
+      }
     }
 
     &__actions {
@@ -1576,16 +1769,16 @@
         }
 
         &:disabled {
-          background: @neutral-300;
+          background: var(--secondary-300);
           box-shadow: none;
           cursor: not-allowed;
         }
       }
 
       &--secondary {
-        background: white;
-        color: @neutral-800;
-        border: 2px solid @neutral-200;
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        border: 2px solid var(--border-default);
 
         &:hover {
           border-color: var(--primary-400);
@@ -1675,13 +1868,13 @@
         font-family: @font-body;
         font-size: 14px;
         font-weight: 600;
-        color: @neutral-800;
+        color: var(--text-primary);
       }
 
       span {
         font-family: @font-body;
         font-size: 13px;
-        color: @neutral-500;
+        color: var(--text-muted);
       }
     }
 
@@ -1696,8 +1889,8 @@
       display: flex;
       gap: 4px;
       padding: 8px;
-      background: @neutral-50;
-      border-bottom: 1px solid @neutral-100;
+      background: var(--bg-surface-secondary);
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     &__tab {
@@ -1713,7 +1906,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: @neutral-600;
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
@@ -1722,12 +1915,12 @@
       }
 
       &:hover:not(&--active) {
-        background: white;
-        color: @neutral-800;
+        background: var(--bg-surface);
+        color: var(--text-primary);
       }
 
       &--active {
-        background: white;
+        background: var(--bg-surface);
         color: var(--primary-700);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
@@ -1750,7 +1943,7 @@
       font-family: @font-body;
       font-size: 16px;
       line-height: 1.8;
-      color: @neutral-700;
+      color: var(--text-secondary);
 
       :deep(p) {
         margin-bottom: 16px;
@@ -1758,7 +1951,7 @@
 
       :deep(strong) {
         font-weight: 700;
-        color: @neutral-900;
+        color: var(--text-primary);
       }
 
       :deep(ul) {
@@ -1779,7 +1972,7 @@
       :deep(h4) {
         font-family: @font-display;
         font-weight: 600;
-        color: @neutral-900;
+        color: var(--text-primary);
         margin: 24px 0 12px;
       }
     }
@@ -1795,12 +1988,12 @@
       align-items: center;
       gap: 16px;
       padding: 20px;
-      background: @neutral-50;
+      background: var(--bg-surface-secondary);
       border-radius: 16px;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: @neutral-100;
+        background: var(--bg-surface-tertiary);
       }
     }
 
@@ -1812,14 +2005,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: @neutral-800;
+      color: var(--text-primary);
       margin: 0 0 4px;
     }
 
     &__shipping-card p {
       font-family: @font-body;
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -1866,11 +2059,11 @@
       font-family: @font-body;
       font-size: 14px;
       line-height: 1.6;
-      color: @neutral-700;
+      color: var(--text-secondary);
       margin: 0;
 
       strong {
-        color: @neutral-900;
+        color: var(--text-primary);
       }
     }
 
@@ -1906,6 +2099,27 @@
     to {
       opacity: 1;
     }
+  }
+
+  // ─────────────────────────────────────────
+  // Pack Summary Transition
+  // ─────────────────────────────────────────
+  .pack-summary-enter-active {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pack-summary-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .pack-summary-enter-from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+
+  .pack-summary-leave-to {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
   }
 
   // ============================================================
@@ -2147,14 +2361,14 @@
 
   &__price-old {
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--text-muted);
     text-decoration: line-through;
   }
 
   &__price-current {
     font-size: 22px;
     font-weight: 700;
-    color: @white;
+    color: var(--text-primary);
 
     &--sale {
       color: @danger-500;
