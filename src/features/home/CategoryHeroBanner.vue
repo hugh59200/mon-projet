@@ -1,14 +1,14 @@
 <template>
   <!-- VERSION MOBILE : Design immersif plein écran -->
   <div
-    v-if="isMobile"
+    v-if="isMobile && activeSlide"
     class="category-mobile"
-    :class="`category-mobile--${slides[activeIndex].variant}`"
+    :class="`category-mobile--${activeSlide.variant}`"
   >
     <!-- Image de fond plein écran -->
     <div
       class="category-mobile__bg"
-      :style="{ backgroundImage: `url(${slides[activeIndex].bgImage})` }"
+      :style="{ backgroundImage: `url(${activeSlide.bgImage})` }"
     ></div>
     <div class="category-mobile__overlay"></div>
 
@@ -16,9 +16,9 @@
     <div class="category-mobile__content">
       <!-- Header avec titre (en haut) -->
       <div class="category-mobile__header">
-        <span class="category-mobile__eyebrow">{{ slides[activeIndex].eyebrow }}</span>
-        <h2 class="category-mobile__title">{{ slides[activeIndex].titleAccent }}</h2>
-        <p class="category-mobile__desc">{{ slides[activeIndex].description }}</p>
+        <span class="category-mobile__eyebrow">{{ activeSlide.eyebrow }}</span>
+        <h2 class="category-mobile__title">{{ activeSlide.titleAccent }}</h2>
+        <p class="category-mobile__desc">{{ activeSlide.description }}</p>
       </div>
 
       <!-- Partie basse -->
@@ -48,14 +48,14 @@
         <div class="category-mobile__actions">
           <button
             class="category-mobile__cta"
-            @click="goToCategory(slides[activeIndex])"
+            @click="goToCategory(activeSlide)"
           >
             <span>{{ t('home.categories.common.explore') }}</span>
             <BasicIconNext name="ArrowRight" :size="18" />
           </button>
           <button
             class="category-mobile__video-btn"
-            @click="openVideo(slides[activeIndex])"
+            @click="openVideo(activeSlide)"
           >
             <BasicIconNext name="Play" :size="18" />
           </button>
@@ -278,7 +278,6 @@
 
 <script setup lang="ts">
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
-  import ContentBlock from '@designSystem/components/layout/ContentBlock.vue'
   import { computed, h, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
@@ -664,6 +663,9 @@
   const activeVideo = ref<string | null>(null)
   const heroSection = ref<HTMLElement | null>(null)
   const isHeroVisible = ref(true)
+
+  // Computed pour le slide actif (avec vérification undefined)
+  const activeSlide = computed(() => slides.value[activeIndex.value])
   let autoplayTimer: number | null = null
   let observer: IntersectionObserver | null = null
 
