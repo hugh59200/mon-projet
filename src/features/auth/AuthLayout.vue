@@ -339,7 +339,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 0 10vh; // Padding vertical + remonte le contenu
+    padding: 40px 0 20vh; // Remonte le contenu pour aligner avec le panneau gauche
   }
 
   /* ===========================================
@@ -401,8 +401,8 @@
     .form-wrapper {
       flex: 1;
       min-height: 0;
-      justify-content: flex-start;
-      padding: clamp(8px, 2vh, 16px) 16px clamp(8px, 2vh, 16px);
+      justify-content: center;
+      padding: 0 16px;
       width: 100%;
       box-sizing: border-box;
       overflow-y: auto;
