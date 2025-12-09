@@ -75,11 +75,42 @@
       },
       {
         name: 'robots',
-        content: 'index, follow',
+        content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
       },
       {
         name: 'author',
         content: SEO_CONFIG.AUTHOR,
+      },
+      {
+        name: 'keywords',
+        content:
+          'peptides synthèse France, research chemicals Europe, fourniture laboratoire peptides, pureté HPLC, réactifs recherche scientifique, RUO peptides, laboratoire peptides synthétiques, fournisseur réactifs chimiques',
+      },
+      // Geo targeting pour la France
+      {
+        name: 'geo.region',
+        content: 'FR',
+      },
+      {
+        name: 'geo.placename',
+        content: 'France',
+      },
+      {
+        name: 'content-language',
+        content: 'fr',
+      },
+      // Signal B2B / Audience scientifique
+      {
+        name: 'audience',
+        content: 'Researcher, Laboratory Professional, Scientific Institution',
+      },
+      {
+        name: 'classification',
+        content: 'Laboratory Supplies, Research Chemicals, Scientific Equipment',
+      },
+      {
+        name: 'category',
+        content: 'B2B, Research Use Only, Laboratory Reagents',
       },
       // Open Graph
       {
@@ -106,6 +137,10 @@
         property: 'og:image:height',
         content: '630',
       },
+      {
+        property: 'og:image:alt',
+        content: 'Atlas Lab Solutions - Peptides de Recherche Haute Pureté',
+      },
       // Twitter Cards
       {
         name: 'twitter:card',
@@ -113,6 +148,10 @@
       },
       {
         name: 'twitter:site',
+        content: '@AtlasLabSol',
+      },
+      {
+        name: 'twitter:creator',
         content: '@AtlasLabSol',
       },
       {
@@ -133,6 +172,17 @@
       {
         rel: 'canonical',
         href: getCanonicalUrl('/'),
+      },
+      // Hreflang pour préparation multi-langue (actuellement français uniquement)
+      {
+        rel: 'alternate',
+        hreflang: 'fr',
+        href: SEO_CONFIG.APP_URL,
+      },
+      {
+        rel: 'alternate',
+        hreflang: 'x-default',
+        href: SEO_CONFIG.APP_URL,
       },
     ],
     script: [

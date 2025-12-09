@@ -13,9 +13,15 @@ export interface ProductSchemaProps {
   sku: string
   image: string
   inStock: boolean
+  // Propriétés scientifiques/cliniques
   purity?: string
   casNumber?: string
   sequence?: string
+  molecularWeight?: string // Poids moléculaire (ex: "1206.4 Da")
+  molecularFormula?: string // Formule moléculaire (ex: "C55H91N17O15S")
+  storageConditions?: string // Conditions de stockage (ex: "-20°C, lyophilisé")
+  form?: string // Forme physique (ex: "Poudre lyophilisée blanche")
+  solubility?: string // Solubilité (ex: "Eau bactériostatique, NaCl 0.9%")
   productUrl?: string
   brand?: string
   category?: string
@@ -39,6 +45,11 @@ const {
   purity,
   casNumber,
   sequence,
+  molecularWeight,
+  molecularFormula,
+  storageConditions,
+  form,
+  solubility,
   productUrl,
   brand,
   category,
@@ -63,17 +74,43 @@ const additionalProperties = computed(() => {
     name: string
     value: string
     unitText?: string
+    unitCode?: string
   }> = []
 
+  // === Données scientifiques/cliniques (froides et techniques) ===
+
+  // Pureté HPLC - donnée clé pour les chercheurs
   if (purity?.value) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'HPLC Purity',
       value: purity.value,
       unitText: 'Percent',
+      unitCode: 'P1',
     })
   }
 
+  // Poids moléculaire - donnée technique essentielle
+  if (molecularWeight?.value) {
+    properties.push({
+      '@type': 'PropertyValue',
+      name: 'Molecular Weight',
+      value: molecularWeight.value,
+      unitText: 'Dalton',
+      unitCode: 'D',
+    })
+  }
+
+  // Formule moléculaire
+  if (molecularFormula?.value) {
+    properties.push({
+      '@type': 'PropertyValue',
+      name: 'Molecular Formula',
+      value: molecularFormula.value,
+    })
+  }
+
+  // Séquence d'acides aminés
   if (sequence?.value) {
     properties.push({
       '@type': 'PropertyValue',
@@ -82,6 +119,34 @@ const additionalProperties = computed(() => {
     })
   }
 
+  // Forme physique
+  if (form?.value) {
+    properties.push({
+      '@type': 'PropertyValue',
+      name: 'Physical Form',
+      value: form.value,
+    })
+  }
+
+  // Conditions de stockage
+  if (storageConditions?.value) {
+    properties.push({
+      '@type': 'PropertyValue',
+      name: 'Storage Conditions',
+      value: storageConditions.value,
+    })
+  }
+
+  // Solubilité
+  if (solubility?.value) {
+    properties.push({
+      '@type': 'PropertyValue',
+      name: 'Solubility',
+      value: solubility.value,
+    })
+  }
+
+  // Catégorie produit
   if (category?.value) {
     properties.push({
       '@type': 'PropertyValue',
@@ -90,16 +155,30 @@ const additionalProperties = computed(() => {
     })
   }
 
+  // === Attributs fixes (positionnement laboratoire) ===
+
   properties.push({
     '@type': 'PropertyValue',
     name: 'Product Type',
-    value: 'Research Peptide',
+    value: 'Synthetic Research Peptide',
   })
 
   properties.push({
     '@type': 'PropertyValue',
     name: 'Intended Use',
-    value: 'Laboratory Research Only',
+    value: 'Laboratory Research Only - Not for human or veterinary use',
+  })
+
+  properties.push({
+    '@type': 'PropertyValue',
+    name: 'Quality Standard',
+    value: 'Research Grade - HPLC Verified',
+  })
+
+  properties.push({
+    '@type': 'PropertyValue',
+    name: 'Certificate',
+    value: 'Certificate of Analysis (COA) included',
   })
 
   return properties
@@ -132,13 +211,16 @@ const productIdentifiers = computed(() => {
 })
 
 const productSchema = computed(() => {
+  // Schema principal Product enrichi pour positionnement "fourniture laboratoire"
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
+    // Double type : Product + IndividualProduct pour e-commerce scientifique
+    '@type': ['Product', 'IndividualProduct'],
     name: name.value,
     description: enrichedDescription.value,
     image: image.value,
     sku: sku.value,
+    // Marque et fabricant orientés B2B scientifique
     brand: {
       '@type': 'Brand',
       name: brand?.value || SEO_CONFIG.SITE_NAME,
@@ -146,6 +228,8 @@ const productSchema = computed(() => {
     manufacturer: {
       '@type': 'Organization',
       name: SEO_CONFIG.AUTHOR,
+      description: 'Fournisseur de réactifs et peptides de synthèse pour la recherche scientifique',
+      url: SEO_CONFIG.APP_URL,
     },
     offers: {
       '@type': 'Offer',
@@ -156,14 +240,18 @@ const productSchema = computed(() => {
       availability: inStock.value
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
         name: SEO_CONFIG.SITE_NAME,
+        description: 'Fourniture laboratoire peptides Europe',
       },
       eligibleRegion: {
         '@type': 'Place',
         name: 'European Union',
       },
+      // Restriction explicite : B2B / Recherche uniquement
+      eligibleCustomerType: 'https://schema.org/Business',
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'FR',
@@ -198,16 +286,38 @@ const productSchema = computed(() => {
         },
       },
     },
+    // Audience explicitement scientifique/chercheurs (signal B2B fort)
     audience: {
-      '@type': 'PeopleAudience',
-      suggestedMinAge: 18,
-      audienceType: 'Researchers',
+      '@type': 'Audience',
+      audienceType: 'Researcher',
+      geographicArea: {
+        '@type': 'Place',
+        name: 'Europe',
+      },
     },
-    category: 'Research Chemicals > Peptides',
-    isAccessoryOrSparePartFor: {
-      '@type': 'Thing',
-      name: 'Laboratory Research Equipment',
-    },
+    // Catégorie orientée fourniture laboratoire
+    category: 'Laboratory Supplies > Research Chemicals > Synthetic Peptides',
+    // Signal fort : ce produit est pour équipement de laboratoire
+    isRelatedTo: [
+      {
+        '@type': 'Thing',
+        name: 'Laboratory Research Equipment',
+      },
+      {
+        '@type': 'Thing',
+        name: 'Scientific Research Supplies',
+      },
+      {
+        '@type': 'Thing',
+        name: 'HPLC Analysis Equipment',
+      },
+    ],
+    // Usage prévu : recherche uniquement
+    usageInfo: 'Research Use Only (RUO) - Not for human or veterinary use',
+    // Matériau / composition chimique
+    material: 'Synthetic Peptide',
+    // Avertissement légal
+    warning: 'For laboratory research purposes only. Not intended for human consumption.',
   }
 
   if (additionalProperties.value.length > 0) {

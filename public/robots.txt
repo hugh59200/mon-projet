@@ -8,18 +8,26 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /checkout
+Disallow: /checkout/*
 Disallow: /profile
+Disallow: /profile/*
 Disallow: /auth/
 Disallow: /api/
 
-# Pages techniques
+# Pages techniques non indexables
 Disallow: /order-success
 Disallow: /order-error
 Disallow: /access-denied
+Disallow: /track-order
 
 # Paramètres de recherche (évite le duplicate content)
 Disallow: /*?*sort=
 Disallow: /*?*page=
+Disallow: /*?*filter=
 
-# Sitemap
+# Crawl-delay (optionnel, pour éviter surcharge serveur)
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://fast-peptides.com/sitemap-index.xml
 Sitemap: https://fast-peptides.com/sitemap.xml

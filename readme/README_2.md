@@ -113,7 +113,7 @@ Nous adoptons une approche évolutive pour contourner les délais administratifs
 
 ## 📝 Roadmap & Statut Actuel
 
-_Mise à jour : 08/12/2025_
+_Mise à jour : 09/12/2025_
 
 | Brique                |  Statut   | Notes                                                      |
 | :-------------------- | :-------: | :--------------------------------------------------------- |
@@ -126,6 +126,7 @@ _Mise à jour : 08/12/2025_
 | **Qualité (QA)**      |  🟢 Fait  | Tests E2E Cypress validés.                                 |
 | **Email Pro (OpSec)** |  🟢 Fait  | Proton (Admin) + Resend (Auto) + DNS Cloudflare Sécurisés. |
 | **Newsletter**        |  🟢 Fait  | Double opt-in + Code promo -10% automatique.               |
+| **Lab Notes**         |  🟢 Fait  | 5 guides techniques + Calculateur dilution intégré.        |
 | **Compte Banque**     | 🔴 Bloqué | Attente EIN (Délai IRS important).                         |
 
 ---
@@ -174,6 +175,60 @@ _Mise à jour : 08/12/2025_
 ### Code Promo
 
 Le code `WELCOME10` est automatiquement affiché dans l'email de confirmation et sur la page de confirmation. Il offre -10% sur la première commande (usage unique par utilisateur).
+
+---
+
+## 📚 Lab Notes (Ressources Techniques)
+
+Section documentation scientifique avec style "manuel de laboratoire" pour renforcer la crédibilité et le SEO.
+
+### Architecture
+
+| Route | Composant | Description |
+|-------|-----------|-------------|
+| `/ressources` | `ResourcesListView.vue` | Liste des guides avec carte outil en vedette |
+| `/ressources/:slug` | `ResourceDetailView.vue` | Article avec TOC sidebar sticky |
+| `/guide-reconstitution` | `ReconstitutionView.vue` | Calculateur de dilution interactif |
+
+### Fonctionnalités
+
+- **TOC Sidebar** : Table des matières auto-générée depuis les h2/h3, sticky au scroll
+- **Callouts stylisés** : `.callout-success`, `.callout-warning`, `.callout-danger`
+- **Featured Tool** : Carte en vedette vers le calculateur de dilution
+- **Badges** : Difficulté (Débutant/Intermédiaire/Avancé) + Catégorie sur chaque article
+- **Équipements** : Liste du matériel requis dans la sidebar
+
+### Guides Techniques (5 articles)
+
+| Titre | Catégorie | Difficulté |
+|-------|-----------|------------|
+| Reconstitution des Peptides Lyophilisés | Protocoles Lab | Débutant |
+| Comprendre les Rapports HPLC | Analyse HPLC | Intermédiaire |
+| Stockage Optimal des Peptides | Stockage & Conservation | Débutant |
+| Structure Moléculaire des Peptides | Science Moléculaire | Avancé |
+| Standards de Qualité (COA) | Standards Qualité | Intermédiaire |
+
+### Calculateur de Dilution
+
+Outil interactif accessible via Lab Notes (retiré de la navigation principale) :
+- Calcul automatique des volumes de solvant
+- Visualisation seringue avec graduations
+- Lien depuis les articles pertinents via callout
+
+### Tables Supabase
+
+- `resources` : Articles avec contenu, images, métadonnées SEO
+- `resource_categories` : Catégories avec icône et couleur
+
+### Scripts
+
+```bash
+# Seed des articles Lab Notes
+DATABASE_PASSWORD="..." node scripts/exec-sql.cjs supabase/script/seed-lab-notes-resources.sql
+
+# Upload des images vers bucket news-images
+node scripts/upload-lab-notes-images.cjs
+```
 
 ---
 

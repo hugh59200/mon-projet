@@ -16,6 +16,7 @@
     "deploy:functions": "supabase functions deploy --no-verify-jwt",
     "gen:types": "mkdir -p src/supabase/types && npx supabase gen types typescript --project-id dwomsbawthlktapmtmqu --schema public > src/supabase/types/supabase.ts",
     "gen:sitemap": "node scripts/generate-sitemap.cjs",
+    "submit:sitemap": "node scripts/submit-sitemap.cjs",
     "claude": "set CLAUDE_CODE_GIT_BASH_PATH=C:\\Users\\hugo.bogrand-ext\\AppData\\Local\\Programs\\Git\\bin\\bash.exe && npx claude",
     "test:e2e": "cypress open"
   },

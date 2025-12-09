@@ -175,6 +175,29 @@ const routes: Array<RouteRecordRaw> = [
       headerIcon: 'Newspaper',
     },
   },
+  // Section "Lab Notes" - Ressources techniques (séparées des actualités)
+  {
+    path: '/ressources',
+    name: 'ressources',
+    component: () => import('@/features/resources/ResourcesListView.vue'),
+    meta: {
+      labelKey: 'nav.resources',
+      icon: 'FlaskConical',
+      order: 4,
+      headingKey: 'routes.resources.heading',
+      titleKey: 'routes.resources.title',
+      descriptionKey: 'routes.resources.description',
+      headerIcon: 'FlaskConical',
+    },
+  },
+  {
+    path: '/ressources/:slug',
+    name: 'ressource-detail',
+    component: () => import('@/features/resources/ResourceDetailView.vue'),
+    meta: {
+      descriptionKey: 'routes.resourceDetail.description',
+    },
+  },
   {
     path: '/actualites/:slug',
     name: 'actualite-detail',

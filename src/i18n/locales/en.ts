@@ -322,7 +322,8 @@ export default {
   nav: {
     home: 'Home',
     catalogue: 'Catalogue',
-    news: 'Resources',
+    news: 'News',
+    resources: 'Lab Notes',
     about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
@@ -1724,13 +1725,21 @@ export default {
       description: 'Find your saved favorite products.',
     },
     news: {
-      title: 'Resources',
-      heading: 'Scientific Watch',
-      description: 'Articles and publications.',
-      badge: 'Blog',
+      title: 'News',
+      heading: 'News',
+      description: 'Updates, promotions and announcements.',
+      badge: 'News',
     },
     newsDetail: {
       description: 'Detailed article.',
+    },
+    resources: {
+      title: 'Lab Notes',
+      heading: 'Lab Notes',
+      description: 'Technical documentation and laboratory protocols.',
+    },
+    resourceDetail: {
+      description: 'Detailed technical resource.',
     },
     cart: {
       title: 'Cart',

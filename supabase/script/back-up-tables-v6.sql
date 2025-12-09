@@ -1,6 +1,14 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V6.2 — USER SESSIONS TRACKING
+-- SUPABASE CLEAN BACKUP V6.4 — RESOURCES (Lab Notes)
 -- ============================================================
+-- V6.4 : Séparation Ressources techniques / Actualités
+--        - Table resource_categories pour catégories Lab Notes
+--        - Table resources pour contenu technique (guides, protocoles)
+--        - Vue resources_with_category, fonction get_resource_related_products
+-- V6.3 : Colonnes scientifiques pour SEO "façade laboratoire"
+--        - Colonnes molecular_weight, molecular_formula, storage_conditions, etc.
+--        - Topics scientifiques pour blog "Lab Notes"
+--        - Trigger updated_at sur products pour sitemap
 -- V6.2 : Système de tracking des sessions utilisateurs
 --        - Table user_sessions pour tracking connexions (auth + anonyme)
 --        - Colonnes last_login_at et login_count sur profiles
@@ -42,10 +50,13 @@ DROP VIEW IF EXISTS
   public.newsletter_stats,
   public.sessions_stats,
   public.sessions_by_day,
-  public.sessions_by_country
+  public.sessions_by_country,
+  public.resources_with_category
 CASCADE;
 
 DROP TABLE IF EXISTS
+  public.resources,
+  public.resource_categories,
   public.user_sessions,
   public.newsletter_sends,
   public.newsletter_campaigns,
@@ -120,7 +131,10 @@ DROP FUNCTION IF EXISTS
   -- Session tracking functions
   public.track_session,
   public.update_session_activity,
-  public.end_session
+  public.end_session,
+  -- Resources functions
+  public.update_resources_updated_at,
+  public.get_resource_related_products
 CASCADE;
 
 -- ============================================================
@@ -172,15 +186,21 @@ CREATE TABLE public.products (
   image text,
   tags text[] DEFAULT '{}'::text[],
   created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
   -- i18n : traductions multilingues (JSONB)
   name_i18n jsonb DEFAULT '{}'::jsonb,
   description_i18n jsonb DEFAULT '{}'::jsonb,
   category_i18n jsonb DEFAULT '{}'::jsonb,
   -- COA (Certificate of Analysis)
   coa_url text,
-  -- SEO/GEO : donnees scientifiques
+  -- SEO/GEO : donnees scientifiques (facade laboratoire)
   cas_number varchar(50),
   sequence text,
+  molecular_weight varchar(50),
+  molecular_formula varchar(100),
+  storage_conditions varchar(200) DEFAULT '-20°C (lyophilisé), +4°C après reconstitution',
+  physical_form varchar(100) DEFAULT 'Poudre lyophilisée blanche',
+  solubility varchar(200) DEFAULT 'Eau bactériostatique, NaCl 0.9%, acide acétique 0.1%',
   -- AOV : Prix degressifs par quantite
   bulk_pricing jsonb DEFAULT '[{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]'::jsonb
 );
@@ -192,6 +212,27 @@ COMMENT ON COLUMN public.products.coa_url IS 'URL du Certificate of Analysis (CO
 COMMENT ON COLUMN public.products.cas_number IS 'Numero CAS (Chemical Abstracts Service) - Identifiant unique international';
 COMMENT ON COLUMN public.products.sequence IS 'Sequence d''acides amines du peptide';
 COMMENT ON COLUMN public.products.bulk_pricing IS 'Prix degressifs: [{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]';
+-- V6.3 : Colonnes scientifiques SEO
+COMMENT ON COLUMN public.products.updated_at IS 'Date de derniere modification (SEO sitemap lastmod)';
+COMMENT ON COLUMN public.products.molecular_weight IS 'Poids moleculaire en Daltons (ex: 1206.4 Da)';
+COMMENT ON COLUMN public.products.molecular_formula IS 'Formule moleculaire chimique (ex: C55H91N17O15S)';
+COMMENT ON COLUMN public.products.storage_conditions IS 'Conditions de stockage recommandees';
+COMMENT ON COLUMN public.products.physical_form IS 'Forme physique du produit (ex: Poudre lyophilisee blanche)';
+COMMENT ON COLUMN public.products.solubility IS 'Solvants compatibles pour reconstitution';
+
+-- Trigger pour mettre a jour updated_at automatiquement
+CREATE OR REPLACE FUNCTION public.update_products_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_products_updated_at
+  BEFORE UPDATE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_products_updated_at();
 
 CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
 CREATE INDEX idx_products_category ON public.products (category);
@@ -2880,8 +2921,142 @@ $$;
 GRANT EXECUTE ON FUNCTION public.end_session TO anon, authenticated;
 
 -- ============================================================
--- FIN DU BACKUP V6.2 — USER SESSIONS TRACKING
+-- BLOC RESOURCES — RESSOURCES TECHNIQUES (Lab Notes)
 -- ============================================================
--- V6.2 : Système de tracking des sessions utilisateurs
+
+-- ============================
+-- RESOURCE_CATEGORIES
+-- ============================
+CREATE TABLE public.resource_categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug varchar(100) UNIQUE NOT NULL,
+  label varchar(100) NOT NULL,
+  description text,
+  icon varchar(50) DEFAULT 'FileText',
+  color varchar(20) DEFAULT 'primary',
+  sort_order integer DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+COMMENT ON TABLE public.resource_categories IS 'Catégories de ressources techniques (Lab Notes)';
+
+CREATE INDEX idx_resource_categories_sort ON public.resource_categories(sort_order);
+
+-- ============================
+-- RESOURCES
+-- ============================
+CREATE TABLE public.resources (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug varchar(255) UNIQUE NOT NULL,
+  title varchar(255) NOT NULL,
+  excerpt text,
+  content text,
+  image varchar(500),
+  category_id uuid REFERENCES public.resource_categories(id) ON DELETE SET NULL,
+  difficulty_level varchar(20) DEFAULT 'intermediate' CHECK (difficulty_level IN ('beginner', 'intermediate', 'advanced')),
+  reading_time_minutes integer DEFAULT 5,
+  equipment_needed text[],
+  related_product_ids uuid[],
+  meta_title varchar(255),
+  meta_description varchar(320),
+  keywords text[],
+  status varchar(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+  published_at timestamptz,
+  featured boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+COMMENT ON TABLE public.resources IS 'Ressources techniques et guides scientifiques (Lab Notes)';
+COMMENT ON COLUMN public.resources.difficulty_level IS 'Niveau: beginner, intermediate, advanced';
+COMMENT ON COLUMN public.resources.equipment_needed IS 'Liste du matériel/équipement requis';
+COMMENT ON COLUMN public.resources.related_product_ids IS 'Produits liés à cette ressource';
+
+CREATE INDEX idx_resources_slug ON public.resources(slug);
+CREATE INDEX idx_resources_category ON public.resources(category_id);
+CREATE INDEX idx_resources_status ON public.resources(status);
+CREATE INDEX idx_resources_published ON public.resources(published_at DESC) WHERE status = 'published';
+CREATE INDEX idx_resources_featured ON public.resources(featured) WHERE featured = true;
+
+-- Trigger updated_at
+CREATE OR REPLACE FUNCTION public.update_resources_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_resources_updated_at
+  BEFORE UPDATE ON public.resources
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_resources_updated_at();
+
+-- ============================
+-- VUE resources_with_category
+-- ============================
+CREATE OR REPLACE VIEW public.resources_with_category AS
+SELECT
+  r.*,
+  rc.slug as category_slug,
+  rc.label as category_label,
+  rc.icon as category_icon,
+  rc.color as category_color
+FROM public.resources r
+LEFT JOIN public.resource_categories rc ON r.category_id = rc.id;
+
+-- ============================
+-- FONCTION get_resource_related_products
+-- ============================
+CREATE OR REPLACE FUNCTION public.get_resource_related_products(resource_id uuid)
+RETURNS SETOF public.products AS $$
+BEGIN
+  RETURN QUERY
+  SELECT p.*
+  FROM public.products p
+  WHERE p.id = ANY(
+    SELECT UNNEST(related_product_ids)
+    FROM public.resources
+    WHERE id = resource_id
+  );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- ============================
+-- RLS POLICIES — RESOURCES
+-- ============================
+ALTER TABLE public.resource_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resources ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read access to resource_categories"
+  ON public.resource_categories FOR SELECT
+  USING (true);
+
+CREATE POLICY "Public read access to published resources"
+  ON public.resources FOR SELECT
+  USING (status = 'published');
+
+CREATE POLICY "Admin full access to resource_categories"
+  ON public.resource_categories FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admin full access to resources"
+  ON public.resources FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- ============================================================
+-- FIN DU BACKUP V6.4 — RESOURCES (Lab Notes)
+-- ============================================================
+-- V6.4 : Séparation Ressources techniques / Actualités
 -- Inclut toutes les tables, vues, fonctions, RLS et triggers
 -- ============================================================

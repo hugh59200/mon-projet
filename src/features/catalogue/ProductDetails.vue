@@ -799,12 +799,81 @@
     }
   })
 
+  // Meta keywords dynamiques pour le SEO produit - Positionnement "fourniture laboratoire"
+  const pageKeywords = computed(() => {
+    if (!product.value) return 'peptides synthèse, fourniture laboratoire, research chemicals'
+    const keywords = [
+      // Nom produit avec terme scientifique
+      `${productName.value || product.value.name} peptide synthèse`,
+      // Termes "safe" orientés recherche
+      'pureté HPLC',
+      'peptide synthétique',
+      'fourniture laboratoire',
+      'research chemicals Europe',
+      'réactif recherche scientifique',
+      'RUO peptide',
+      'Atlas Lab Solutions',
+    ]
+    // Ajouter le numéro CAS (très recherché par les chercheurs)
+    if (product.value.cas_number) {
+      keywords.push(`CAS ${product.value.cas_number}`)
+    }
+    // Ajouter le dosage avec terme scientifique
+    if (product.value.dosage) {
+      keywords.push(`${product.value.dosage} lyophilisé`)
+    }
+    // Catégorie orientée recherche (évite les termes "fitness")
+    if (productCategory.value) {
+      keywords.push(`${productCategory.value} recherche`)
+    }
+    return keywords.filter(Boolean).join(', ')
+  })
+
   useHead({
     title: pageTitle,
     meta: [
       {
         name: 'description',
         content: pageDescription,
+      },
+      {
+        name: 'keywords',
+        content: pageKeywords,
+      },
+      {
+        name: 'author',
+        content: 'Atlas Lab Solutions',
+      },
+      // Signal B2B / Audience scientifique
+      {
+        name: 'audience',
+        content: 'Researcher, Laboratory Professional',
+      },
+      {
+        name: 'classification',
+        content: 'Laboratory Supply, Research Chemical, Synthetic Peptide',
+      },
+      // Product-specific meta
+      {
+        property: 'product:price:amount',
+        content: computed(() =>
+          product.value
+            ? (product.value.is_on_sale && product.value.sale_price
+                ? product.value.sale_price
+                : product.value.price
+              ).toFixed(2)
+            : '',
+        ),
+      },
+      {
+        property: 'product:price:currency',
+        content: 'EUR',
+      },
+      {
+        property: 'product:availability',
+        content: computed(() =>
+          product.value && (product.value.stock ?? 0) > 0 ? 'in stock' : 'out of stock',
+        ),
       },
       {
         property: 'og:title',
@@ -838,6 +907,28 @@
       {
         name: 'twitter:image',
         content: computed(() => product.value?.image || 'https://fast-peptides.com/default-product.jpg'),
+      },
+      {
+        name: 'twitter:label1',
+        content: 'Prix',
+      },
+      {
+        name: 'twitter:data1',
+        content: computed(() =>
+          product.value
+            ? `${(product.value.is_on_sale && product.value.sale_price ? product.value.sale_price : product.value.price).toFixed(2)} €`
+            : '',
+        ),
+      },
+      {
+        name: 'twitter:label2',
+        content: 'Disponibilité',
+      },
+      {
+        name: 'twitter:data2',
+        content: computed(() =>
+          product.value && (product.value.stock ?? 0) > 0 ? 'En stock' : 'Rupture de stock',
+        ),
       },
     ],
     link: [

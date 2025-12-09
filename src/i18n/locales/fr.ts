@@ -322,7 +322,8 @@ export default {
   nav: {
     home: 'Accueil',
     catalogue: 'Catalogue',
-    news: 'Ressources',
+    news: 'Actualités',
+    resources: 'Lab Notes',
     about: 'À propos',
     faq: 'FAQ',
     contact: 'Contact',
@@ -1726,13 +1727,21 @@ export default {
       description: 'Retrouvez vos produits favoris sauvegardés.',
     },
     news: {
-      title: 'Ressources',
-      heading: 'Veille Scientifique',
-      description: 'Articles et publications.',
-      badge: 'Blog',
+      title: 'Actualités',
+      heading: 'Actualités',
+      description: 'Nouveautés, promotions et annonces.',
+      badge: 'News',
     },
     newsDetail: {
       description: 'Article détaillé.',
+    },
+    resources: {
+      title: 'Lab Notes',
+      heading: 'Lab Notes',
+      description: 'Documentation technique et protocoles de laboratoire.',
+    },
+    resourceDetail: {
+      description: 'Ressource technique détaillée.',
     },
     cart: {
       title: 'Panier',

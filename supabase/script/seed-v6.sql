@@ -1,5 +1,5 @@
 -- =========================================
--- 🚀 SEED DATA V6.3 - AVEC SUPPORT I18N + SEO/GEO + PROMO + REVIEWS + WELCOME EMAIL
+-- 🚀 SEED DATA V6.4 - AVEC RESOURCES (Lab Notes)
 -- =========================================
 -- Ce script inclut :
 -- 1. Migration pour les colonnes i18n (JSONB)
@@ -10,6 +10,7 @@
 -- 6. Système de reviews avec RLS policies (V6.2)
 -- 7. Profil admin "Paloma" avec avatar
 -- 8. Trigger email de bienvenue (V6.3)
+-- 9. Ressources techniques Lab Notes (V6.4)
 -- =========================================
 
 -- ============================
@@ -1440,6 +1441,112 @@ CREATE TRIGGER on_email_confirmed
 COMMENT ON FUNCTION public.trigger_welcome_email() IS
 'Envoie un email de bienvenue lorsque l''utilisateur confirme son adresse email pour la première fois.';
 
+-- ============================
+-- 📚 SEED — RESOURCE CATEGORIES
+-- ============================
+INSERT INTO public.resource_categories (slug, label, description, icon, color, sort_order)
+VALUES
+  ('lab-protocols', 'Protocoles Laboratoire', 'Guides techniques pour la manipulation aseptique, reconstitution et protocoles de laboratoire.', 'FlaskConical', 'primary', 1),
+  ('hplc-analysis', 'Analyse HPLC', 'Comprendre les rapports HPLC, la chromatographie et les certificats d''analyse.', 'LineChart', 'info', 2),
+  ('storage-handling', 'Stockage & Conservation', 'Bonnes pratiques de stockage des peptides lyophilisés et reconstitués.', 'Thermometer', 'warning', 3),
+  ('molecular-science', 'Science Moléculaire', 'Structure moléculaire, séquences d''acides aminés et chimie des peptides.', 'Atom', 'secondary', 4),
+  ('quality-standards', 'Standards Qualité', 'Normes de qualité, certifications et traçabilité en recherche peptidique.', 'ShieldCheck', 'success', 5)
+ON CONFLICT (slug) DO UPDATE SET
+  label = EXCLUDED.label,
+  description = EXCLUDED.description,
+  icon = EXCLUDED.icon,
+  color = EXCLUDED.color,
+  sort_order = EXCLUDED.sort_order;
+
+-- ============================
+-- 📚 SEED — LAB NOTES RESOURCES
+-- ============================
+
+-- Article 1: Protocoles de Reconstitution
+INSERT INTO public.resources (
+  slug, title, excerpt, content, image, category_id,
+  difficulty_level, reading_time_minutes, equipment_needed,
+  status, published_at, featured
+) VALUES (
+  'guide-reconstitution-peptides-lyophilises',
+  'Guide Complet : Reconstitution des Peptides Lyophilisés',
+  'Protocole détaillé pour la reconstitution aseptique des peptides lyophilisés en environnement de laboratoire.',
+  '<h2>Introduction</h2><p>La reconstitution des peptides lyophilisés est une étape critique qui détermine la stabilité et l''intégrité du composé pour la recherche.</p><h2>Matériel Requis</h2><ul><li>Hotte à flux laminaire</li><li>Eau bactériostatique</li><li>Seringues stériles</li><li>Tampons alcoolisés 70%</li></ul><h2>Protocole Standard</h2><p>Injecter le solvant lentement le long de la paroi du flacon, jamais directement sur la poudre.</p>',
+  'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/lab-reconstitution.jpg',
+  (SELECT id FROM public.resource_categories WHERE slug = 'lab-protocols'),
+  'beginner', 8,
+  ARRAY['Hotte à flux laminaire', 'Eau bactériostatique', 'Seringues stériles', 'Alcool 70%'],
+  'published', NOW(), true
+) ON CONFLICT (slug) DO NOTHING;
+
+-- Article 2: Analyse HPLC
+INSERT INTO public.resources (
+  slug, title, excerpt, content, image, category_id,
+  difficulty_level, reading_time_minutes, equipment_needed,
+  status, published_at, featured
+) VALUES (
+  'comprendre-rapports-hplc-peptides',
+  'Comprendre les Rapports HPLC : Guide d''Interprétation',
+  'Comment lire et interpréter un certificat d''analyse HPLC pour les peptides de recherche.',
+  '<h2>Qu''est-ce que l''HPLC ?</h2><p>La Chromatographie Liquide Haute Performance est la méthode de référence pour analyser la pureté des peptides.</p><h2>Lecture d''un Chromatogramme</h2><ul><li>Temps de rétention</li><li>Aire du pic</li><li>Pics secondaires</li></ul><h2>Calcul de la Pureté</h2><p>Pureté (%) = (Aire pic principal / Aire totale) × 100</p>',
+  'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/hplc-analysis.jpg',
+  (SELECT id FROM public.resource_categories WHERE slug = 'hplc-analysis'),
+  'intermediate', 10,
+  ARRAY['Rapport HPLC', 'Certificat d''analyse'],
+  'published', NOW() - INTERVAL '2 days', true
+) ON CONFLICT (slug) DO NOTHING;
+
+-- Article 3: Stockage et Conservation
+INSERT INTO public.resources (
+  slug, title, excerpt, content, image, category_id,
+  difficulty_level, reading_time_minutes, equipment_needed,
+  status, published_at, featured
+) VALUES (
+  'stockage-optimal-peptides-recherche',
+  'Stockage Optimal des Peptides : Températures et Durées',
+  'Guide complet sur les conditions de stockage des peptides lyophilisés et reconstitués.',
+  '<h2>Principes de Base</h2><p>Les peptides sont sensibles à l''hydrolyse, l''oxydation et l''agrégation.</p><h2>Peptides Lyophilisés</h2><ul><li>Température : -20°C</li><li>Humidité : < 30%</li><li>Durée : 2-3 ans</li></ul><h2>Peptides Reconstitués</h2><p>Stockage à +2-8°C, durée variable selon le peptide (7-30 jours).</p>',
+  'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/storage-peptides.jpg',
+  (SELECT id FROM public.resource_categories WHERE slug = 'storage-handling'),
+  'beginner', 7,
+  ARRAY['Congélateur -20°C', 'Réfrigérateur +4°C', 'Dessiccant'],
+  'published', NOW() - INTERVAL '5 days', false
+) ON CONFLICT (slug) DO NOTHING;
+
+-- Article 4: Science Moléculaire
+INSERT INTO public.resources (
+  slug, title, excerpt, content, image, category_id,
+  difficulty_level, reading_time_minutes, equipment_needed,
+  status, published_at, featured
+) VALUES (
+  'structure-moleculaire-peptides-synthese',
+  'Structure Moléculaire des Peptides : De la Séquence à la Fonction',
+  'Comprendre la relation entre séquence d''acides aminés et propriétés des peptides.',
+  '<h2>Niveaux de Structure</h2><ul><li>Structure primaire : séquence linéaire</li><li>Structure secondaire : hélice α, feuillet β</li><li>Structure tertiaire : repliement 3D</li></ul><h2>Propriétés Clés</h2><p>Poids moléculaire, point isoélectrique, hydrophobicité.</p>',
+  'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/molecular-structure.jpg',
+  (SELECT id FROM public.resource_categories WHERE slug = 'molecular-science'),
+  'advanced', 12,
+  ARRAY['Documentation produit', 'Base de données UniProt'],
+  'published', NOW() - INTERVAL '7 days', false
+) ON CONFLICT (slug) DO NOTHING;
+
+-- Article 5: Standards Qualité
+INSERT INTO public.resources (
+  slug, title, excerpt, content, image, category_id,
+  difficulty_level, reading_time_minutes, equipment_needed,
+  status, published_at, featured
+) VALUES (
+  'standards-qualite-peptides-recherche',
+  'Standards de Qualité : Certificats et Traçabilité',
+  'Guide sur les normes de qualité pour les peptides de recherche.',
+  '<h2>Le Certificat d''Analyse (COA)</h2><ul><li>Identité du produit</li><li>Pureté HPLC ≥ 98%</li><li>Confirmation MS</li><li>Contenu peptidique</li></ul><h2>Tests Analytiques</h2><p>HPLC, Spectrométrie de masse, Analyse des acides aminés.</p><h2>Traçabilité</h2><p>Chaque lot doit avoir un identifiant unique avec documentation complète.</p>',
+  'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/news-images/quality-standards.jpg',
+  (SELECT id FROM public.resource_categories WHERE slug = 'quality-standards'),
+  'intermediate', 9,
+  ARRAY['Certificat d''analyse (COA)', 'Documentation lot'],
+  'published', NOW() - INTERVAL '10 days', true
+) ON CONFLICT (slug) DO NOTHING;
+
 -- =========================================
--- ✅ FIN DU SEED V6.3
+-- ✅ FIN DU SEED V6.4
 -- =========================================

@@ -375,63 +375,6 @@
         </div>
       </section>
 
-      <!-- Footer Trust -->
-      <footer class="actualites__footer">
-        <div class="actualites__trust">
-          <div class="actualites__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            <span>Sources vérifiées</span>
-          </div>
-          <div class="actualites__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
-            <span>Contenu scientifique</span>
-          </div>
-          <div class="actualites__trust-item">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-              />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            <span>Mis à jour régulièrement</span>
-          </div>
-        </div>
-      </footer>
       </template>
     </PageContent>
   </div>
@@ -1223,34 +1166,6 @@
       color: var(--text-muted);
       transition: all 0.2s @ease;
       margin-top: auto;
-    }
-
-    // ===========================
-    // FOOTER TRUST
-    // ===========================
-    &__footer {
-      padding-top: 40px;
-      border-top: 1px solid var(--border-default);
-    }
-
-    &__trust {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 40px;
-    }
-
-    &__trust-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: @font-body;
-      font-size: 14px;
-      color: var(--text-muted);
-
-      svg {
-        color: @success-500;
-      }
     }
 
     // ===========================

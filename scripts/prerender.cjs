@@ -37,14 +37,15 @@ const staticRoutes = [
   '/',
   '/catalogue',
   '/actualites',
+  '/ressources', // Lab Notes - Contenu scientifique SEO
   '/faq',
-  '/about',
-  '/reconstitution',
+  '/a-propos',
+  '/guide-reconstitution',
   '/contact',
-  '/crypto-guide',
-  '/legal/cgv',
-  '/legal/privacy',
-  '/legal/mentions',
+  '/guide-crypto',
+  '/mentions-legales',
+  '/politique-confidentialite',
+  '/cookies',
 ]
 
 let supabase = null

@@ -1,6 +1,10 @@
-// Override: any pour éviter "Type instantiation is excessively deep and possibly infinite"
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Json = any
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -795,14 +799,20 @@ export type Database = {
           id: string
           image: string | null
           is_on_sale: boolean | null
+          molecular_formula: string | null
+          molecular_weight: string | null
           name: string
           name_i18n: Json | null
+          physical_form: string | null
           price: number
           purity: number | null
           sale_price: number | null
           sequence: string | null
+          solubility: string | null
           stock: number
+          storage_conditions: string | null
           tags: string[] | null
+          updated_at: string | null
         }
         Insert: {
           bulk_pricing?: Json | null
@@ -817,14 +827,20 @@ export type Database = {
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
+          molecular_formula?: string | null
+          molecular_weight?: string | null
           name: string
           name_i18n?: Json | null
+          physical_form?: string | null
           price: number
           purity?: number | null
           sale_price?: number | null
           sequence?: string | null
+          solubility?: string | null
           stock?: number
+          storage_conditions?: string | null
           tags?: string[] | null
+          updated_at?: string | null
         }
         Update: {
           bulk_pricing?: Json | null
@@ -839,14 +855,20 @@ export type Database = {
           id?: string
           image?: string | null
           is_on_sale?: boolean | null
+          molecular_formula?: string | null
+          molecular_weight?: string | null
           name?: string
           name_i18n?: Json | null
+          physical_form?: string | null
           price?: number
           purity?: number | null
           sale_price?: number | null
           sequence?: string | null
+          solubility?: string | null
           stock?: number
+          storage_conditions?: string | null
           tags?: string[] | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1061,6 +1083,113 @@ export type Database = {
           valid_until?: string | null
         }
         Relationships: []
+      }
+      resource_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          label: string
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          label: string
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          label?: string
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          category_id: string | null
+          content: string | null
+          created_at: string | null
+          difficulty_level: string | null
+          equipment_needed: string[] | null
+          excerpt: string | null
+          featured: boolean | null
+          id: string
+          image: string | null
+          keywords: string[] | null
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          reading_time_minutes: number | null
+          related_product_ids: string[] | null
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          equipment_needed?: string[] | null
+          excerpt?: string | null
+          featured?: boolean | null
+          id?: string
+          image?: string | null
+          keywords?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          related_product_ids?: string[] | null
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          equipment_needed?: string[] | null
+          excerpt?: string | null
+          featured?: boolean | null
+          id?: string
+          image?: string | null
+          keywords?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          related_product_ids?: string[] | null
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resources_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "resource_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -1662,6 +1791,42 @@ export type Database = {
         }
         Relationships: []
       }
+      resources_with_category: {
+        Row: {
+          category_color: string | null
+          category_icon: string | null
+          category_id: string | null
+          category_label: string | null
+          category_slug: string | null
+          content: string | null
+          created_at: string | null
+          difficulty_level: string | null
+          equipment_needed: string[] | null
+          excerpt: string | null
+          featured: boolean | null
+          id: string | null
+          image: string | null
+          keywords: string[] | null
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          reading_time_minutes: number | null
+          related_product_ids: string[] | null
+          slug: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resources_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "resource_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions_by_country: {
         Row: {
           country: string | null
@@ -1812,41 +1977,41 @@ export type Database = {
               _email: string
               _full_name: string
               _items: Json
+              _payment_method: string
+              _total_amount: number
+              _user_id: string
+              _zip: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _address: string
+              _city: string
+              _country: string
+              _email: string
+              _full_name: string
+              _items: Json
+              _payment_method: string
+              _status?: string
+              _total_amount: number
+              _user_id: string
+              _zip: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _address: string
+              _city: string
+              _country: string
+              _email: string
+              _full_name: string
+              _items: Json
               _payment_intent_id?: string
               _payment_method: string
               _status?: string
               _stripe_session_id?: string
-              _total_amount: number
-              _user_id: string
-              _zip: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              _address: string
-              _city: string
-              _country: string
-              _email: string
-              _full_name: string
-              _items: Json
-              _payment_method: string
-              _total_amount: number
-              _user_id: string
-              _zip: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              _address: string
-              _city: string
-              _country: string
-              _email: string
-              _full_name: string
-              _items: Json
-              _payment_method: string
-              _status?: string
               _total_amount: number
               _user_id: string
               _zip: string
@@ -1927,9 +2092,46 @@ export type Database = {
         Returns: Json
       }
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
+      get_resource_related_products: {
+        Args: { resource_id: string }
+        Returns: {
+          bulk_pricing: Json | null
+          cas_number: string | null
+          category: string
+          category_i18n: Json | null
+          coa_url: string | null
+          created_at: string | null
+          description: string | null
+          description_i18n: Json | null
+          dosage: string | null
+          id: string
+          image: string | null
+          is_on_sale: boolean | null
+          molecular_formula: string | null
+          molecular_weight: string | null
+          name: string
+          name_i18n: Json | null
+          physical_form: string | null
+          price: number
+          purity: number | null
+          sale_price: number | null
+          sequence: string | null
+          solubility: string | null
+          stock: number
+          storage_conditions: string | null
+          tags: string[] | null
+          updated_at: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "products"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       is_admin:
-        | { Args: { uid: string }; Returns: boolean }
         | { Args: never; Returns: boolean }
+        | { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
       remove_order_relay: { Args: { p_order_id: string }; Returns: Json }
       subscribe_to_newsletter: {

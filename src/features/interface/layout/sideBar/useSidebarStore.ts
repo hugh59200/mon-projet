@@ -13,7 +13,7 @@ export const useSidebarStore = defineStore(
     const toggle = () => (isReduced.value = !isReduced.value)
     const auth = useAuthStore()
 
-    const allowedSidebarNames = ['home', 'catalogue', 'reconstitution', 'actualites', 'faq']
+    const allowedSidebarNames = ['home', 'catalogue', 'actualites', 'ressources', 'faq']
 
     const sidebarItems = computed(() => {
       return router

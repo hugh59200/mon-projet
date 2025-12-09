@@ -35,6 +35,14 @@ export type NewsTopics = Tables<'news_topics'>
 export type NewsTopicsInsert = TablesInsert<'news_topics'>
 export type NewsTopicsUpdate = TablesUpdate<'news_topics'>
 
+export type Resources = Tables<'resources'>
+export type ResourcesInsert = TablesInsert<'resources'>
+export type ResourcesUpdate = TablesUpdate<'resources'>
+
+export type ResourceCategories = Tables<'resource_categories'>
+export type ResourceCategoriesInsert = TablesInsert<'resource_categories'>
+export type ResourceCategoriesUpdate = TablesUpdate<'resource_categories'>
+
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
