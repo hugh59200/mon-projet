@@ -183,7 +183,9 @@
      LAYOUT PRINCIPAL
      =========================================== */
   .auth-layout {
-    display: flex;
+    display: grid;
+    grid-template-columns: 45% 1fr;
+    align-items: center; // Aligne les contenus des deux panneaux sur le même axe horizontal
     width: 100%;
     height: 100vh;
     overflow: hidden;
@@ -194,8 +196,7 @@
      PANNEAU VISUEL (DESKTOP)
      =========================================== */
   .auth-visual {
-    width: 45%;
-    height: 100vh;
+    height: 100%;
     position: relative;
     background-color: var(--secondary-900);
     display: flex;
@@ -348,8 +349,7 @@
      PANNEAU FORMULAIRE
      =========================================== */
   .auth-main {
-    flex: 1;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -455,10 +455,13 @@
      =========================================== */
   .respond-tablet({
     .auth-layout {
+      display: flex; // Repasse en flex sur mobile
+      grid-template-columns: none;
       height: 100dvh;
     }
 
     .auth-main {
+      flex: 1;
       height: 100dvh;
       padding: 12px;
       padding-top: env(safe-area-inset-top, 0px);
