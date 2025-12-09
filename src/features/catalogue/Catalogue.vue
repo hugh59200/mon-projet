@@ -434,8 +434,8 @@
     updateUrl()
   }
 
-  function viewProduct(id: string) {
-    router.push(`/catalogue/${id}`)
+  function viewProduct(slug: string) {
+    router.push(`/catalogue/${slug}`)
   }
 
   function addToCart(p: Products) {

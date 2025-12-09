@@ -150,7 +150,7 @@
                     v-if="item.is_on_sale"
                     class="cart-item__badge"
                   >
-                    -{{ getDiscountPercent(item) }}%
+                    -{{ getDiscountInfo(item).productDiscount }}%
                   </span>
                 </div>
 
@@ -167,6 +167,32 @@
                   >
                     {{ item.product_dosage }}
                   </p>
+                  <!-- Badges de promo cumulée -->
+                  <div v-if="getDiscountInfo(item).totalDiscount > 0" class="cart-item__discount-badges">
+                    <span
+                      v-if="getDiscountInfo(item).hasCumulatedDiscounts"
+                      class="cart-item__discount-badge cart-item__discount-badge--cumulated"
+                    >
+                      <BasicIconNext name="Zap" :size="10" />
+                      -{{ getDiscountInfo(item).totalDiscount }}% (Promo + Pack)
+                    </span>
+                    <template v-else>
+                      <span
+                        v-if="getDiscountInfo(item).productDiscount > 0"
+                        class="cart-item__discount-badge cart-item__discount-badge--promo"
+                      >
+                        <BasicIconNext name="Tag" :size="10" />
+                        -{{ getDiscountInfo(item).productDiscount }}%
+                      </span>
+                      <span
+                        v-if="getDiscountInfo(item).packDiscount > 0"
+                        class="cart-item__discount-badge cart-item__discount-badge--pack"
+                      >
+                        <BasicIconNext name="Package" :size="10" />
+                        -{{ getDiscountInfo(item).packDiscount }}% pack
+                      </span>
+                    </template>
+                  </div>
                   <div class="cart-item__meta">
                     <span class="cart-item__stock cart-item__stock--in">
                       <BasicIconNext name="CheckCircle2" :size="12" />
@@ -402,8 +428,9 @@
 <script setup lang="ts">
   import { useHead } from '@vueuse/head'
   import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
-  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import type { CartView } from '@/supabase/types/supabase.types'
+  import { useCartStore, type SimpleCartItem } from '@/features/catalogue/cart/stores/useCartStore'
+  import { getCartItemDiscountInfo, type CartItemDiscountInfo } from '@/features/catalogue/cart/helpers/cartDiscountHelper'
+  import { useProductsStore } from '@/features/catalogue/composables/useProducts'
   import { useToastStore } from '@designSystem/components/basic/toast/useToastStore'
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -428,6 +455,7 @@
   const { t } = useI18n()
 
   const cart = useCartStore()
+  const productsStore = useProductsStore()
   const router = useRouter()
   const toast = useToastStore()
 
@@ -466,22 +494,17 @@
     )
   }
 
-  function getLineTotal(item: CartView) {
-    const qty = item.quantity ?? 1
-    const price = item.is_on_sale
-      ? (item.product_sale_price ?? item.product_price ?? 0)
-      : (item.product_price ?? 0)
-    return price * qty
+  function getLineTotal(item: SimpleCartItem) {
+    // Utilise le helper pour obtenir le prix final après toutes les réductions
+    const info = getCartItemDiscountInfo(item)
+    return info.finalUnitPrice * (item.quantity ?? 1)
   }
 
-  function getDiscountPercent(item: CartView) {
-    if (item.is_on_sale && item.product_price && item.product_sale_price) {
-      return Math.round((1 - item.product_sale_price / item.product_price) * 100)
-    }
-    return 0
+  function getDiscountInfo(item: SimpleCartItem): CartItemDiscountInfo {
+    return getCartItemDiscountInfo(item)
   }
 
-  async function updateQuantity(item: CartView, delta: number) {
+  async function updateQuantity(item: SimpleCartItem, delta: number) {
     const newQty = (item.quantity ?? 1) + delta
     if (newQty >= 1 && item.product_id) {
       updatingItems.value.add(item.product_id)
@@ -493,7 +516,7 @@
     }
   }
 
-  async function handleQuantityChange(item: CartView, event: Event) {
+  async function handleQuantityChange(item: SimpleCartItem, event: Event) {
     const input = event.target as HTMLInputElement
     const newQty = parseInt(input.value)
     if (newQty >= 1 && item.product_id) {
@@ -508,7 +531,7 @@
     }
   }
 
-  async function removeItem(item: CartView) {
+  async function removeItem(item: SimpleCartItem) {
     if (item.product_id) {
       updatingItems.value.add(item.product_id)
       try {
@@ -536,8 +559,12 @@
     return productId ? updatingItems.value.has(productId) : false
   }
 
-  function viewProduct(id: string) {
-    if (id) router.push(`/catalogue/${id}`)
+  function viewProduct(productId: string) {
+    if (!productId) return
+    // Chercher le slug dans le store des produits
+    const product = productsStore.products.find((p) => p.id === productId)
+    const slug = product?.slug || productId
+    router.push(`/catalogue/${slug}`)
   }
 </script>
 
@@ -1178,6 +1205,39 @@
       font-size: 13px;
       color: var(--content-block-text-muted);
       margin: 0;
+    }
+
+    &__discount-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    &__discount-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+
+      &--promo {
+        background: rgba(@danger-500, 0.12);
+        color: @danger-600;
+      }
+
+      &--pack {
+        background: rgba(@success-500, 0.12);
+        color: @success-600;
+      }
+
+      &--cumulated {
+        background: linear-gradient(135deg, rgba(@success-500, 0.12) 0%, rgba(@primary-500, 0.12) 100%);
+        color: @success-600;
+      }
     }
 
     &__meta {

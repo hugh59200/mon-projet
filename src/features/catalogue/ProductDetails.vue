@@ -50,13 +50,13 @@
             <!-- Colonne Image -->
             <div class="product__gallery">
               <ContentBlock variant="card" size="lg" class="product__image-card">
-                <!-- Badge Promo -->
+                <!-- Badge Promo avec pourcentage -->
                 <div
-                  v-if="product.is_on_sale && !showCoa"
+                  v-if="product.is_on_sale && product.sale_price && !showCoa"
                   class="product__badge product__badge--promo"
                 >
-                  <BasicIconNext name="Star" :size="14" />
-                  {{ t('product.promo') }}
+                  <BasicIconNext name="Tag" :size="14" />
+                  -{{ Math.round((1 - product.sale_price / product.price) * 100) }}%
                 </div>
 
                 <!-- Badge RUO -->
@@ -313,8 +313,24 @@
                         <BasicIconNext name="Package" :size="16" />
                         <span>{{ t('aov.quantity.packSummary', { qty: packInfo.qty }) }}</span>
                       </div>
-                      <div v-if="packInfo.discount > 0" class="product__pack-discount">
-                        -{{ packInfo.discount }}%
+                      <!-- Affichage du % total de réduction -->
+                      <div v-if="packInfo.totalDiscountPercent > 0" class="product__pack-discount">
+                        -{{ packInfo.totalDiscountPercent }}%
+                      </div>
+                    </div>
+
+                    <!-- Détail des promos cumulées -->
+                    <div v-if="packInfo.hasCumulatedDiscounts" class="product__pack-promos">
+                      <div class="product__pack-promo-item">
+                        <BasicIconNext name="Tag" :size="12" />
+                        <span>{{ t('aov.quantity.productPromo') }}</span>
+                        <strong>-{{ packInfo.productDiscount }}%</strong>
+                      </div>
+                      <span class="product__pack-promo-plus">+</span>
+                      <div class="product__pack-promo-item">
+                        <BasicIconNext name="Package" :size="12" />
+                        <span>{{ t('aov.quantity.packPromo') }}</span>
+                        <strong>-{{ packInfo.packDiscount }}%</strong>
                       </div>
                     </div>
 
@@ -647,32 +663,48 @@
     { quantity: 5, discount_percent: 10 },
   ]
 
-  // Calcul du pack sélectionné
+  // Calcul du pack sélectionné (avec cumul des promos)
   const packInfo = computed(() => {
     if (!product.value || selectedQuantity.value <= 1) return null
 
-    const basePrice = product.value.is_on_sale && product.value.sale_price
-      ? product.value.sale_price
-      : product.value.price
+    const originalPrice = product.value.price
+    const isOnSale = product.value.is_on_sale && product.value.sale_price
+    const salePrice = isOnSale ? product.value.sale_price! : originalPrice
+    const productDiscount = isOnSale
+      ? Math.round((1 - salePrice / originalPrice) * 100)
+      : 0
 
     const configs = bulkPricing.value && bulkPricing.value.length > 0
       ? bulkPricing.value
       : defaultPackConfigs
 
     const packConfig = configs.find(c => c.quantity === selectedQuantity.value)
-    const discount = packConfig?.discount_percent || 0
-    const discountMultiplier = 1 - discount / 100
-    const unitPrice = basePrice * discountMultiplier
+    const packDiscount = packConfig?.discount_percent || 0
+    const discountMultiplier = 1 - packDiscount / 100
+    const unitPrice = salePrice * discountMultiplier
     const totalPrice = unitPrice * selectedQuantity.value
-    const totalWithoutDiscount = basePrice * selectedQuantity.value
-    const savings = totalWithoutDiscount - totalPrice
+
+    // Économies par rapport au prix ORIGINAL (sans aucune promo)
+    const totalWithoutAnyDiscount = originalPrice * selectedQuantity.value
+    const totalSavings = totalWithoutAnyDiscount - totalPrice
+
+    // Calcul du pourcentage de réduction total
+    const totalDiscountPercent = Math.round((1 - unitPrice / originalPrice) * 100)
 
     return {
       qty: selectedQuantity.value,
-      discount,
+      // Remise produit (promo de base)
+      productDiscount,
+      // Remise pack (quantité)
+      packDiscount,
+      // Remise totale cumulée
+      totalDiscountPercent,
       unitPrice,
       totalPrice,
-      savings,
+      // Économie totale par rapport au prix original
+      savings: totalSavings,
+      // Flag pour savoir si on cumule 2 promos
+      hasCumulatedDiscounts: productDiscount > 0 && packDiscount > 0,
     }
   })
 
@@ -747,7 +779,7 @@
       image: p.image || '',
       inStock: (p.stock ?? 0) > 0,
       purity: '≥99%',
-      productUrl: getCanonicalUrl(`/catalogue/${(p as any).slug || p.id}`),
+      productUrl: getCanonicalUrl(`/catalogue/${p.slug || p.id}`),
       category: productCategory.value || p.category,
       casNumber: p.cas_number ?? undefined,
       sequence: p.sequence ?? undefined,
@@ -795,7 +827,7 @@
           '@type': 'ListItem',
           position: 3,
           name: productName.value || product.value.name,
-          item: `https://fast-peptides.com/catalogue/${(product.value as any).slug || route.params.slug}`,
+          item: `https://fast-peptides.com/catalogue/${product.value.slug || route.params.slug}`,
         },
       ],
     }
@@ -936,7 +968,7 @@
     link: [
       {
         rel: 'canonical',
-        href: computed(() => `https://fast-peptides.com/catalogue/${(product.value as any)?.slug || route.params.slug}`),
+        href: computed(() => `https://fast-peptides.com/catalogue/${product.value?.slug || route.params.slug}`),
       },
     ],
     script: [
@@ -1013,8 +1045,8 @@
 
   const addToCart = async (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    // Calculer la réduction applicable
-    const discountPercent = packInfo.value?.discount ?? 0
+    // Calculer la réduction pack applicable
+    const discountPercent = packInfo.value?.packDiscount ?? 0
     // Ajouter la quantité sélectionnée en une seule fois avec la réduction
     await cart.addToCart(p, selectedQuantity.value, discountPercent)
     showAddToCartToast(p)
@@ -1026,8 +1058,8 @@
     if ((p.stock ?? 0) <= 0 || selectedQuantity.value <= 1) return
     if (isPackAdded.value) return
 
-    // Calculer la réduction applicable
-    const discountPercent = packInfo.value?.discount ?? 0
+    // Calculer la réduction pack applicable
+    const discountPercent = packInfo.value?.packDiscount ?? 0
     // Ajouter la quantité sélectionnée en une seule fois avec la réduction
     await cart.addToCart(p, selectedQuantity.value, discountPercent)
     showAddToCartToast(p)
@@ -1043,8 +1075,8 @@
 
   const buyNow = async (p: Products) => {
     if ((p.stock ?? 0) <= 0) return
-    // Calculer la réduction applicable
-    const discountPercent = packInfo.value?.discount ?? 0
+    // Calculer la réduction pack applicable
+    const discountPercent = packInfo.value?.packDiscount ?? 0
     // Ajouter la quantité sélectionnée en une seule fois avec la réduction
     await cart.addToCart(p, selectedQuantity.value, discountPercent)
     router.push('/checkout')
@@ -1344,7 +1376,7 @@
       gap: 24px;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid var(--border-subtle);
+      border-top: 1px solid var(--content-block-border);
     }
 
     &__trust-item {
@@ -1353,7 +1385,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 12px;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
 
       svg {
         color: var(--primary-500);
@@ -1428,7 +1460,7 @@
     &__coa-label {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
     }
 
     // ============ LAB VERIFICATION (Analyse indépendante) ============
@@ -1452,18 +1484,18 @@
       font-family: @font-display;
       font-size: 15px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--content-block-text);
     }
 
     &__lab-description {
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
       margin: 0 0 16px;
 
       strong {
-        color: var(--text-primary);
+        color: var(--content-block-text);
         font-weight: 600;
       }
     }
@@ -1474,9 +1506,9 @@
       gap: 16px;
       margin-bottom: 16px;
       padding: 12px 16px;
-      background: var(--bg-surface);
+      background: var(--content-block-bg-subtle);
       border-radius: 8px;
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--content-block-border);
     }
 
     &__lab-detail {
@@ -1493,14 +1525,14 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-muted);
+      color: var(--content-block-text-muted);
     }
 
     &__lab-detail-value {
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: var(--content-block-text);
 
       &--success {
         color: @success-600;
@@ -1699,7 +1731,7 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 18px;
-      color: var(--text-muted);
+      color: var(--content-block-text-muted);
       text-decoration: line-through;
     }
 
@@ -1722,7 +1754,7 @@
 
       span {
         font-size: 24px;
-        color: var(--text-muted);
+        color: var(--content-block-text-muted);
       }
 
       &--sale {
@@ -1733,7 +1765,7 @@
     &__price-info {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--content-block-text-muted);
     }
 
     // ─────────────────────────────────────────
@@ -1760,7 +1792,11 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--primary-600);
+      color: var(--content-block-text);
+
+      svg {
+        color: var(--primary-500);
+      }
     }
 
     &__pack-discount {
@@ -1771,6 +1807,43 @@
       font-size: 12px;
       font-weight: 700;
       color: white;
+    }
+
+    // Affichage des promos cumulées
+    &__pack-promos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(var(--success-500-rgb), 0.1);
+      border: 1px solid rgba(var(--success-500-rgb), 0.2);
+      border-radius: 8px;
+    }
+
+    &__pack-promo-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: @font-body;
+      font-size: 12px;
+      color: var(--content-block-text-secondary);
+
+      svg {
+        color: @success-500;
+      }
+
+      strong {
+        color: @success-600;
+        font-weight: 700;
+      }
+    }
+
+    &__pack-promo-plus {
+      font-family: @font-display;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--content-block-text-muted);
     }
 
     &__pack-details {
@@ -1801,14 +1874,18 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 14px;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
+
+      svg {
+        color: @success-500;
+      }
     }
 
     &__pack-price {
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--content-block-text);
     }
 
     &__pack-savings {
@@ -1969,13 +2046,13 @@
         font-family: @font-body;
         font-size: 14px;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--content-block-text);
       }
 
       span {
         font-family: @font-body;
         font-size: 13px;
-        color: var(--text-muted);
+        color: var(--content-block-text-muted);
       }
     }
 
@@ -2007,7 +2084,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
@@ -2016,12 +2093,12 @@
       }
 
       &:hover:not(&--active) {
-        background: var(--bg-surface);
-        color: var(--text-primary);
+        background: var(--content-block-bg-subtle);
+        color: var(--content-block-text);
       }
 
       &--active {
-        background: var(--bg-surface);
+        background: var(--content-block-bg-subtle);
         color: var(--primary-700);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
@@ -2044,7 +2121,7 @@
       font-family: @font-body;
       font-size: 16px;
       line-height: 1.8;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
 
       :deep(p) {
         margin-bottom: 16px;
@@ -2052,7 +2129,7 @@
 
       :deep(strong) {
         font-weight: 700;
-        color: var(--text-primary);
+        color: var(--content-block-text);
       }
 
       :deep(ul) {
@@ -2073,7 +2150,7 @@
       :deep(h4) {
         font-family: @font-display;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--content-block-text);
         margin: 24px 0 12px;
       }
     }
@@ -2089,12 +2166,12 @@
       align-items: center;
       gap: 16px;
       padding: 20px;
-      background: var(--bg-surface-secondary);
+      background: var(--content-block-bg-subtle);
       border-radius: 16px;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: var(--bg-surface-tertiary);
+        background: var(--content-block-border);
       }
     }
 
@@ -2106,14 +2183,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: var(--content-block-text);
       margin: 0 0 4px;
     }
 
     &__shipping-card p {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--content-block-text-muted);
       margin: 0;
     }
 
@@ -2160,11 +2237,11 @@
       font-family: @font-body;
       font-size: 14px;
       line-height: 1.6;
-      color: var(--text-secondary);
+      color: var(--content-block-text-secondary);
       margin: 0;
 
       strong {
-        color: var(--text-primary);
+        color: var(--content-block-text);
       }
     }
 

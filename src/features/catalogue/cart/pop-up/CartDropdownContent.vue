@@ -22,6 +22,29 @@
           </div>
           <div class="cart__item-info">
             <span class="cart__item-name">{{ item.product_name }}</span>
+            <!-- Badges de promo -->
+            <div v-if="getDiscountInfo(item).totalDiscount > 0" class="cart__item-badges">
+              <span
+                v-if="getDiscountInfo(item).hasCumulatedDiscounts"
+                class="cart__item-badge cart__item-badge--cumulated"
+              >
+                -{{ getDiscountInfo(item).totalDiscount }}% (Promo + Pack)
+              </span>
+              <template v-else>
+                <span
+                  v-if="getDiscountInfo(item).productDiscount > 0"
+                  class="cart__item-badge cart__item-badge--promo"
+                >
+                  -{{ getDiscountInfo(item).productDiscount }}%
+                </span>
+                <span
+                  v-if="getDiscountInfo(item).packDiscount > 0"
+                  class="cart__item-badge cart__item-badge--pack"
+                >
+                  -{{ getDiscountInfo(item).packDiscount }}% pack
+                </span>
+              </template>
+            </div>
             <div class="cart__item-meta">
               <span class="cart__item-qty">{{ t('cart.quantity') }}: {{ item.quantity }}</span>
               <div class="cart__item-price">
@@ -135,12 +158,18 @@
 <script setup lang="ts">
   import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
+  import { getCartItemDiscountInfo, type CartItemDiscountInfo } from '@/features/catalogue/cart/helpers/cartDiscountHelper'
+  import type { SimpleCartItem } from '@/features/catalogue/cart/stores/useCartStore'
   import { useI18n } from 'vue-i18n'
 
   const FREE_SHIPPING_THRESHOLD = 150
 
   const { t } = useI18n()
   const cart = useCartStore()
+
+  function getDiscountInfo(item: SimpleCartItem): CartItemDiscountInfo {
+    return getCartItemDiscountInfo(item)
+  }
 
   const emit = defineEmits<{
     goToCart: []
@@ -257,6 +286,38 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    &-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    &-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+
+      &--promo {
+        background: rgba(@danger-500, 0.2);
+        color: @danger-400;
+      }
+
+      &--pack {
+        background: rgba(@success-500, 0.2);
+        color: @success-400;
+      }
+
+      &--cumulated {
+        background: linear-gradient(135deg, rgba(@success-500, 0.2) 0%, rgba(@primary-500, 0.2) 100%);
+        color: @success-400;
+      }
     }
 
     &-meta {

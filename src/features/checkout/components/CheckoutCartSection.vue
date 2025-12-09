@@ -23,11 +23,12 @@
             :src="item.product_image || defaultImage"
             :alt="item.product_name!"
           />
+          <!-- Badge promo produit sur l'image -->
           <span
             v-if="item.is_on_sale"
             class="checkout-item__badge"
           >
-            -{{ Math.round((1 - (item.product_sale_price ?? 0) / (item.product_price ?? 1)) * 100) }}%
+            -{{ getDiscountInfo(item).productDiscount }}%
           </span>
         </div>
 
@@ -43,13 +44,32 @@
                   <BasicIconNext name="FileCheck" :size="12" />
                   {{ t('aov.quality.coaIncluded') }}
                 </span>
-                <span
-                  v-if="(item as any).applied_discount_percent > 0"
-                  class="checkout-item__pack-badge"
-                >
-                  <BasicIconNext name="Package" :size="12" />
-                  -{{ (item as any).applied_discount_percent }}%
-                </span>
+                <!-- Badge promo cumulée ou individuelle -->
+                <template v-if="getDiscountInfo(item).totalDiscount > 0">
+                  <span
+                    v-if="getDiscountInfo(item).hasCumulatedDiscounts"
+                    class="checkout-item__cumulated-badge"
+                  >
+                    <BasicIconNext name="Zap" :size="12" />
+                    -{{ getDiscountInfo(item).totalDiscount }}% (Promo + Pack)
+                  </span>
+                  <template v-else>
+                    <span
+                      v-if="getDiscountInfo(item).productDiscount > 0"
+                      class="checkout-item__promo-badge"
+                    >
+                      <BasicIconNext name="Tag" :size="12" />
+                      -{{ getDiscountInfo(item).productDiscount }}%
+                    </span>
+                    <span
+                      v-if="getDiscountInfo(item).packDiscount > 0"
+                      class="checkout-item__pack-badge"
+                    >
+                      <BasicIconNext name="Package" :size="12" />
+                      -{{ getDiscountInfo(item).packDiscount }}% pack
+                    </span>
+                  </template>
+                </template>
               </div>
             </div>
             <PremiumButton
@@ -121,16 +141,17 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { CartView } from '@/supabase/types/supabase.types'
+import type { SimpleCartItem } from '@/features/catalogue/cart/stores/useCartStore'
+import { getCartItemDiscountInfo, type CartItemDiscountInfo } from '@/features/catalogue/cart/helpers/cartDiscountHelper'
 import { DEFAULT_PRODUCT_IMAGE as defaultImage } from '@/config/productAssets'
 
 defineProps<{
-  items: CartView[]
+  items: SimpleCartItem[]
 }>()
 
 defineEmits<{
   (e: 'remove', productId: string): void
-  (e: 'update-quantity', item: CartView, delta: number): void
+  (e: 'update-quantity', item: SimpleCartItem, delta: number): void
 }>()
 
 const { t } = useI18n()
@@ -140,17 +161,13 @@ function formatPrice(value: number | null | undefined) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(value))
 }
 
-function getLineTotal(item: CartView) {
-  const qty = item.quantity ?? 1
-  const basePrice = item.is_on_sale
-    ? (item.product_sale_price ?? item.product_price ?? 0)
-    : (item.product_price ?? 0)
-  // Appliquer la réduction de pack si présente
-  const discountPercent = Number((item as any).applied_discount_percent ?? 0)
-  const unitPrice = discountPercent > 0
-    ? basePrice * (1 - discountPercent / 100)
-    : basePrice
-  return unitPrice * qty
+function getDiscountInfo(item: SimpleCartItem): CartItemDiscountInfo {
+  return getCartItemDiscountInfo(item)
+}
+
+function getLineTotal(item: SimpleCartItem) {
+  const info = getCartItemDiscountInfo(item)
+  return info.finalUnitPrice * (item.quantity ?? 1)
 }
 </script>
 
@@ -313,16 +330,40 @@ function getLineTotal(item: CartView) {
     color: var(--primary-500);
   }
 
+  &__promo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(@danger-500, 0.1);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: @danger-600;
+  }
+
   &__pack-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 3px 8px;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.15) 100%);
+    background: rgba(@success-500, 0.1);
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
-    color: @red-600;
+    color: @success-600;
+  }
+
+  &__cumulated-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, rgba(@success-500, 0.12) 0%, rgba(@primary-500, 0.12) 100%);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: @success-600;
   }
 
   &__remove {

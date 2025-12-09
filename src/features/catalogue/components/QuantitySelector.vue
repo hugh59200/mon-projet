@@ -178,7 +178,7 @@ function selectQuantity(qty: number) {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: @neutral-700;
+    color: var(--content-block-text-secondary);
   }
 
   &__lot-badge {
@@ -192,7 +192,7 @@ function selectQuantity(qty: number) {
     font-family: @font-body;
     font-size: 11px;
     font-weight: 500;
-    color: var(--primary-400);
+    color: var(--primary-600);
   }
 
   &__options {
@@ -210,14 +210,14 @@ function selectQuantity(qty: number) {
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--content-block-bg-subtle);
     border-radius: 8px;
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
 
     svg {
-      color: var(--primary-400);
+      color: var(--primary-500);
       flex-shrink: 0;
     }
   }
@@ -278,7 +278,7 @@ function selectQuantity(qty: number) {
     font-family: @font-display;
     font-size: 28px;
     font-weight: 700;
-    color: @white;
+    color: var(--content-block-text);
     line-height: 1;
     transition: color 0.2s @ease;
   }
@@ -286,7 +286,7 @@ function selectQuantity(qty: number) {
   &__unit {
     font-family: @font-body;
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 
   &__pricing {
@@ -299,7 +299,7 @@ function selectQuantity(qty: number) {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 700;
-    color: @white;
+    color: var(--content-block-text);
   }
 
   &__discount {
@@ -315,7 +315,7 @@ function selectQuantity(qty: number) {
   &__per-unit {
     font-family: @font-body;
     font-size: 11px;
-    color: @neutral-400;
+    color: var(--content-block-text-muted);
   }
 
   &__savings {
@@ -328,14 +328,14 @@ function selectQuantity(qty: number) {
     font-family: @font-body;
     font-size: 11px;
     font-weight: 600;
-    color: @success-400;
+    color: @success-600;
   }
 
   &__lab-rate {
     font-family: @font-body;
     font-size: 10px;
     font-weight: 500;
-    color: var(--primary-400);
+    color: var(--primary-600);
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }

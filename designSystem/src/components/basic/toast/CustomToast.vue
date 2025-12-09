@@ -25,6 +25,13 @@
         >
           {{ message || 'Ajouté au panier' }}
         </BasicText>
+        <!-- Badge de réduction si présent -->
+        <div v-if="discountBadge" class="toast-discount">
+          <span class="toast-discount__badge">{{ discountBadge }}</span>
+          <span v-if="savings && savings > 0" class="toast-discount__savings">
+            Économie {{ savings.toFixed(2) }}€
+          </span>
+        </div>
       </div>
 
       <button
@@ -47,6 +54,8 @@
     message?: string
     image?: string
     duration?: number
+    discountBadge?: string
+    savings?: number
   }>()
 
   const visible = ref(false)
@@ -100,6 +109,28 @@
       transition: color 0.2s;
       &:hover {
         color: white;
+      }
+    }
+
+    .toast-discount {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+
+      &__badge {
+        padding: 2px 6px;
+        background: linear-gradient(135deg, @success-500 0%, @success-600 100%);
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        color: white;
+      }
+
+      &__savings {
+        font-size: 10px;
+        color: @success-400;
+        font-weight: 600;
       }
     }
   }

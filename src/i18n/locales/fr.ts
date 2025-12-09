@@ -2111,6 +2111,9 @@ export default {
       packAdded: 'Pack ajouté !',
       totalPack: 'Total',
       youSave: 'Vous économisez',
+      // Promos cumulées
+      productPromo: 'Promo produit',
+      packPromo: 'Remise pack',
     },
     // Upsell au checkout
     checkout: {

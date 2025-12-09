@@ -1922,6 +1922,9 @@ export default {
       packAdded: 'Pack added!',
       totalPack: 'Total',
       youSave: 'You save',
+      // Cumulated discounts
+      productPromo: 'Product promo',
+      packPromo: 'Pack discount',
     },
     // Checkout upsell
     checkout: {

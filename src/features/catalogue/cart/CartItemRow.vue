@@ -49,6 +49,21 @@
               {{ item.product_dosage }}
             </BasicText>
           </div>
+
+          <!-- Badges de promo -->
+          <div v-if="discountInfo.totalDiscount > 0" class="discount-badges">
+            <span v-if="discountInfo.hasCumulatedDiscounts" class="discount-badge discount-badge--cumulated">
+              -{{ discountInfo.totalDiscount }}% (Promo + Pack)
+            </span>
+            <template v-else>
+              <span v-if="discountInfo.productDiscount > 0" class="discount-badge discount-badge--promo">
+                -{{ discountInfo.productDiscount }}% promo
+              </span>
+              <span v-if="discountInfo.packDiscount > 0" class="discount-badge discount-badge--pack">
+                -{{ discountInfo.packDiscount }}% pack
+              </span>
+            </template>
+          </div>
         </div>
 
         <PremiumButton
@@ -137,28 +152,25 @@
 </template>
 
 <script setup lang="ts">
-  import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
-  import type { CartView } from '@/supabase/types/supabase.types'
+  import { useCartStore, type SimpleCartItem } from '@/features/catalogue/cart/stores/useCartStore'
+  import { getCartItemDiscountInfo } from '@/features/catalogue/cart/helpers/cartDiscountHelper'
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
 
-  type ExtendedCartView = CartView & {
-    product_dosage?: string | null
-  }
-
-  const props = defineProps<{ item: ExtendedCartView }>()
+  const props = defineProps<{ item: SimpleCartItem }>()
   const emit = defineEmits(['view'])
   const cartStore = useCartStore()
   const loading = ref(false)
 
-  const effectiveUnitPrice = computed(() => {
-    return props.item.is_on_sale && props.item.product_sale_price
-      ? props.item.product_sale_price
-      : props.item.product_price || 0
-  })
+  // Calcul des infos de promo
+  const discountInfo = computed(() => getCartItemDiscountInfo(props.item))
 
+  // Prix unitaire après toutes les remises
+  const effectiveUnitPrice = computed(() => discountInfo.value.finalUnitPrice)
+
+  // Total de la ligne
   const rowTotal = computed(() => effectiveUnitPrice.value * (props.item.quantity || 1))
 
   async function updateQty(delta: number) {
@@ -267,6 +279,38 @@
       .separator {
         color: var(--text-muted);
         font-size: 10px;
+      }
+    }
+
+    .discount-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .discount-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+
+      &--promo {
+        background: rgba(@danger-500, 0.15);
+        color: @danger-600;
+      }
+
+      &--pack {
+        background: rgba(@success-500, 0.15);
+        color: @success-600;
+      }
+
+      &--cumulated {
+        background: linear-gradient(135deg, rgba(@success-500, 0.15) 0%, rgba(@primary-500, 0.15) 100%);
+        color: @success-600;
       }
     }
 
