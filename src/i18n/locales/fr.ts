@@ -324,6 +324,7 @@ export default {
     catalogue: 'Catalogue',
     news: 'Actualités',
     resources: 'Lab Notes',
+    glossary: 'Glossaire',
     about: 'À propos',
     faq: 'FAQ',
     contact: 'Contact',
@@ -1233,6 +1234,21 @@ export default {
   },
 
   // ============================================
+  // GLOSSARY / GLOSSAIRE
+  // ============================================
+  glossary: {
+    title: 'Glossaire scientifique',
+    searchPlaceholder: 'Rechercher un terme...',
+    noResults: 'Aucun terme trouvé',
+    backToGlossary: 'Retour au glossaire',
+    definition: 'Définition',
+    relatedProducts: 'Produits associés',
+    relatedResources: 'Ressources associées',
+    seeProduct: 'Voir le produit',
+    readResource: 'Lire la ressource',
+  },
+
+  // ============================================
   // ABOUT / À PROPOS
   // ============================================
   about: {
@@ -1340,6 +1356,7 @@ export default {
     region: 'Europe',
     securePayments: 'Paiement Sécurisé',
     sslSecure: 'Chiffrement SSL',
+    status: 'Statut du site',
     disclaimer: {
       research: 'Usage Recherche',
       researchDesc: 'Produits chimiques pour laboratoire uniquement.',
@@ -1437,6 +1454,29 @@ export default {
   },
 
   // ============================================
+  // NURTURING (Séquence éducative)
+  // ============================================
+  nurturing: {
+    optout: {
+      confirmTitle: 'Se désinscrire de la série éducative ?',
+      confirmMessage:
+        'Vous ne recevrez plus nos emails éducatifs (guides HPLC, protocoles de reconstitution, informations livraison).',
+      infoMessage:
+        'Vous resterez inscrit à notre newsletter et continuerez à recevoir les offres promotionnelles.',
+      ctaConfirm: 'Confirmer',
+      ctaCancel: 'Annuler',
+      successTitle: 'Désinscription confirmée',
+      successMessage: 'Vous ne recevrez plus les emails de la série éducative.',
+      stillSubscribed: 'Vous restez inscrit à notre newsletter.',
+      ctaHome: "Retour à l'accueil",
+      errorTitle: 'Erreur',
+      errorGeneric: 'Une erreur est survenue. Veuillez réessayer.',
+      noEmail: 'Adresse email manquante',
+      notFound: "Cette adresse n'est pas inscrite à la série éducative.",
+    },
+  },
+
+  // ============================================
   // ADMIN
   // ============================================
   admin: {
@@ -1447,8 +1487,10 @@ export default {
     promo: 'Codes Promo',
     news: 'Blog',
     categories: 'Catégories',
+    glossary: 'Glossaire',
     messaging: 'Messagerie',
     sessions: 'Connexions',
+    cryptoMatching: 'Matching Crypto',
     // Commun admin
     common: {
       actions: 'Actions',
@@ -1743,6 +1785,14 @@ export default {
     resourceDetail: {
       description: 'Ressource technique détaillée.',
     },
+    glossary: {
+      title: 'Glossaire',
+      heading: 'Glossaire scientifique',
+      description: 'Définitions des termes techniques liés aux peptides de recherche.',
+    },
+    glossaryDetail: {
+      description: 'Définition scientifique détaillée.',
+    },
     cart: {
       title: 'Panier',
       description: 'Validation des réactifs.',
@@ -1794,6 +1844,42 @@ export default {
     newsletter: {
       confirm: 'Confirmation newsletter',
       unsubscribe: 'Désinscription newsletter',
+    },
+    nurturing: {
+      optout: 'Désinscription série éducative',
+    },
+    status: {
+      title: 'Statut du Site | Fast Peptides',
+      heading: 'Statut Système',
+      description: 'État des services en temps réel.',
+    },
+  },
+
+  // ============================================
+  // STATUS PAGE
+  // ============================================
+  status: {
+    global: {
+      operational: 'Tous les systèmes sont opérationnels',
+      degraded: 'Certains services sont dégradés',
+      down: 'Incident en cours',
+    },
+    indicators: {
+      orders: { label: 'Commandes' },
+      shipping: { label: 'Expéditions' },
+      support: { label: 'Support' },
+    },
+    statusLabels: {
+      operational: 'Opérationnel',
+      degraded: 'Dégradé',
+      down: 'Hors service',
+    },
+    lastChecked: 'Dernière vérification à {time}',
+    footer: 'Les statuts sont mis à jour en temps réel.',
+    contact: {
+      title: "Besoin d'aide ?",
+      description: 'Notre équipe support est disponible.',
+      cta: 'Contacter le support',
     },
   },
 

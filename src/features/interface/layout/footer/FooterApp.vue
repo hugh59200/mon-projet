@@ -30,8 +30,9 @@
               <li><RouterLink to="/">{{ t('nav.home') }}</RouterLink></li>
               <li><RouterLink to="/catalogue">{{ t('nav.catalogue') }}</RouterLink></li>
               <li><RouterLink to="/actualites">{{ t('nav.news') }}</RouterLink></li>
+              <li><RouterLink to="/ressources">{{ t('nav.resources') }}</RouterLink></li>
+              <li><RouterLink to="/glossaire">{{ t('nav.glossary') }}</RouterLink></li>
               <li><RouterLink to="/faq">{{ t('nav.faq') }}</RouterLink></li>
-              <li><RouterLink to="/a-propos">{{ t('nav.about') }}</RouterLink></li>
             </ul>
           </div>
 
@@ -52,6 +53,7 @@
               <li><RouterLink to="/suivi-commande">{{ t('tracking.title') }}</RouterLink></li>
               <li><RouterLink to="/cgu">{{ t('footer.terms') }}</RouterLink></li>
               <li><RouterLink to="/guide-reconstitution">{{ t('reconstitution.title') }}</RouterLink></li>
+              <li><RouterLink to="/status">{{ t('footer.status') }}</RouterLink></li>
             </ul>
           </div>
         </nav>

@@ -1894,5 +1894,381 @@ INSERT INTO public.resources (
   updated_at = NOW();
 
 -- =========================================
--- ✅ FIN DU SEED V6.4
+-- 📚 SEED — GLOSSARY TERMS (40 définitions)
+-- =========================================
+
+INSERT INTO public.glossary_terms (slug, term, definition, meta_description, status, term_i18n, definition_i18n, related_product_ids, related_resource_ids)
+VALUES
+
+-- 1. Peptide
+('peptide', 'Peptide',
+'Un peptide est une chaîne courte d''acides aminés liés par des liaisons peptidiques. Contrairement aux protéines qui contiennent généralement plus de 50 acides aminés, les peptides en comptent moins de 50. Ils jouent des rôles cruciaux dans la signalisation cellulaire, agissant comme hormones, neurotransmetteurs ou facteurs de croissance. En recherche, les peptides synthétiques permettent d''étudier des mécanismes biologiques spécifiques avec une grande précision.',
+'Définition d''un peptide : chaîne courte d''acides aminés, rôle en signalisation cellulaire et recherche scientifique.',
+'published',
+'{"en": "Peptide"}',
+'{"en": "A peptide is a short chain of amino acids linked by peptide bonds. Unlike proteins which typically contain more than 50 amino acids, peptides have fewer than 50. They play crucial roles in cell signaling, acting as hormones, neurotransmitters, or growth factors. In research, synthetic peptides allow studying specific biological mechanisms with great precision."}',
+'{}', '{}'),
+
+-- 2. Acide aminé
+('acide-amine', 'Acide aminé',
+'Les acides aminés sont les monomères constituant les peptides et protéines. Il existe 20 acides aminés standards codés génétiquement, chacun possédant un groupe amine (-NH2), un groupe carboxyle (-COOH) et une chaîne latérale spécifique. La séquence des acides aminés détermine la structure tridimensionnelle et la fonction biologique du peptide. Certains acides aminés sont essentiels et doivent être apportés par l''alimentation.',
+'Acide aminé : monomère des peptides et protéines, 20 types standards avec propriétés chimiques uniques.',
+'published',
+'{"en": "Amino Acid"}',
+'{"en": "Amino acids are the monomers that make up peptides and proteins. There are 20 standard genetically encoded amino acids, each having an amine group (-NH2), a carboxyl group (-COOH), and a specific side chain. The sequence of amino acids determines the three-dimensional structure and biological function of the peptide. Some amino acids are essential and must be obtained through diet."}',
+'{}', '{}'),
+
+-- 3. Lyophilisation
+('lyophilisation', 'Lyophilisation',
+'La lyophilisation (ou cryodessiccation) est un procédé de déshydratation à basse température utilisé pour préserver les peptides. Le produit est d''abord congelé puis placé sous vide, permettant à l''eau de passer directement de l''état solide à gazeux (sublimation). Cette technique préserve la structure moléculaire et l''activité biologique des peptides, offrant une stabilité de stockage optimale à long terme.',
+'Lyophilisation : procédé de séchage par sublimation préservant la structure et l''activité des peptides.',
+'published',
+'{"en": "Lyophilization"}',
+'{"en": "Lyophilization (or freeze-drying) is a low-temperature dehydration process used to preserve peptides. The product is first frozen then placed under vacuum, allowing water to pass directly from solid to gas state (sublimation). This technique preserves the molecular structure and biological activity of peptides, offering optimal long-term storage stability."}',
+'{}', '{}'),
+
+-- 4. Reconstitution
+('reconstitution', 'Reconstitution',
+'La reconstitution est le processus de dissolution d''un peptide lyophilisé dans un solvant approprié, généralement de l''eau bactériostatique ou une solution saline stérile. Cette étape critique doit être réalisée avec précaution : le solvant est ajouté lentement le long de la paroi du flacon, sans agiter vigoureusement pour éviter la dénaturation. Le peptide reconstitué doit être conservé au réfrigérateur et utilisé dans un délai défini.',
+'Reconstitution : dissolution d''un peptide lyophilisé dans un solvant stérile pour utilisation en recherche.',
+'published',
+'{"en": "Reconstitution"}',
+'{"en": "Reconstitution is the process of dissolving a lyophilized peptide in an appropriate solvent, typically bacteriostatic water or sterile saline solution. This critical step must be performed carefully: the solvent is added slowly along the vial wall, without vigorous shaking to avoid denaturation. The reconstituted peptide must be refrigerated and used within a defined timeframe."}',
+'{}', '{}'),
+
+-- 5. Eau bactériostatique
+('eau-bacteriostatique', 'Eau bactériostatique',
+'L''eau bactériostatique est de l''eau stérile contenant 0.9% d''alcool benzylique comme agent conservateur antimicrobien. Ce conservateur inhibe la croissance bactérienne, permettant des prélèvements multiples sur un même flacon sans risque de contamination. Elle est le solvant de choix pour reconstituer les peptides de recherche, offrant une stabilité supérieure à l''eau stérile simple.',
+'Eau bactériostatique : eau stérile avec conservateur pour reconstitution sécurisée des peptides.',
+'published',
+'{"en": "Bacteriostatic Water"}',
+'{"en": "Bacteriostatic water is sterile water containing 0.9% benzyl alcohol as an antimicrobial preservative. This preservative inhibits bacterial growth, allowing multiple draws from the same vial without risk of contamination. It is the solvent of choice for reconstituting research peptides, offering superior stability compared to plain sterile water."}',
+'{}', '{}'),
+
+-- 6. HPLC
+('hplc', 'HPLC',
+'La chromatographie liquide haute performance (HPLC) est une technique analytique de référence pour déterminer la pureté des peptides. L''échantillon est dissous et injecté dans une colonne où les composants sont séparés selon leurs propriétés physico-chimiques. Un détecteur UV mesure l''absorption à 220nm. La pureté est calculée en pourcentage de l''aire du pic principal par rapport à l''aire totale des pics.',
+'HPLC : technique analytique de référence pour mesurer la pureté des peptides avec précision.',
+'published',
+'{"en": "HPLC"}',
+'{"en": "High-Performance Liquid Chromatography (HPLC) is the reference analytical technique for determining peptide purity. The sample is dissolved and injected into a column where components are separated according to their physicochemical properties. A UV detector measures absorption at 220nm. Purity is calculated as the percentage of the main peak area relative to the total peak area."}',
+'{}', '{}'),
+
+-- 7. Spectrométrie de masse
+('spectrometrie-masse', 'Spectrométrie de masse',
+'La spectrométrie de masse (MS) est une technique analytique permettant d''identifier et quantifier les molécules selon leur rapport masse/charge. Pour les peptides, elle confirme l''identité moléculaire en mesurant la masse exacte. Les techniques ESI (Electrospray Ionization) et MALDI sont couramment utilisées. La masse mesurée doit correspondre à la masse théorique calculée à partir de la séquence d''acides aminés.',
+'Spectrométrie de masse : technique d''identification des peptides par mesure de la masse moléculaire.',
+'published',
+'{"en": "Mass Spectrometry"}',
+'{"en": "Mass spectrometry (MS) is an analytical technique for identifying and quantifying molecules according to their mass-to-charge ratio. For peptides, it confirms molecular identity by measuring exact mass. ESI (Electrospray Ionization) and MALDI techniques are commonly used. The measured mass must match the theoretical mass calculated from the amino acid sequence."}',
+'{}', '{}'),
+
+-- 8. Demi-vie
+('demi-vie', 'Demi-vie',
+'La demi-vie est le temps nécessaire pour que la concentration d''une substance diminue de moitié dans un système biologique. Pour les peptides, elle varie de quelques minutes à plusieurs heures selon leur structure, leur taille et leur résistance aux enzymes protéolytiques. Les modifications chimiques comme la PEGylation ou l''ajout de groupes protecteurs peuvent prolonger significativement la demi-vie.',
+'Demi-vie : temps de réduction de moitié de la concentration d''un peptide dans l''organisme.',
+'published',
+'{"en": "Half-life"}',
+'{"en": "Half-life is the time required for the concentration of a substance to decrease by half in a biological system. For peptides, it varies from a few minutes to several hours depending on their structure, size, and resistance to proteolytic enzymes. Chemical modifications such as PEGylation or addition of protective groups can significantly extend half-life."}',
+'{}', '{}'),
+
+-- 9. Biodisponibilité
+('biodisponibilite', 'Biodisponibilité',
+'La biodisponibilité représente la fraction d''une substance qui atteint la circulation systémique sous forme active. Pour les peptides, la biodisponibilité orale est généralement faible (<2%) en raison de la dégradation gastro-intestinale et du faible passage transmembranaire. Les voies d''administration alternatives (sous-cutanée, intranasale) offrent une meilleure biodisponibilité pour la recherche.',
+'Biodisponibilité : fraction active d''un peptide atteignant la circulation sanguine.',
+'published',
+'{"en": "Bioavailability"}',
+'{"en": "Bioavailability represents the fraction of a substance that reaches systemic circulation in active form. For peptides, oral bioavailability is generally low (<2%) due to gastrointestinal degradation and poor transmembrane passage. Alternative administration routes (subcutaneous, intranasal) offer better bioavailability for research purposes."}',
+'{}', '{}'),
+
+-- 10. Séquence peptidique
+('sequence-peptidique', 'Séquence peptidique',
+'La séquence peptidique est l''ordre linéaire des acides aminés constituant un peptide, écrite de l''extrémité N-terminale (amine) vers l''extrémité C-terminale (carboxyle). Elle est représentée par des codes à une ou trois lettres (ex: Gly-Ala-Val ou GAV). Cette séquence primaire détermine toutes les propriétés du peptide : structure 3D, solubilité, stabilité et activité biologique.',
+'Séquence peptidique : ordre des acides aminés déterminant la structure et fonction du peptide.',
+'published',
+'{"en": "Peptide Sequence"}',
+'{"en": "The peptide sequence is the linear order of amino acids making up a peptide, written from the N-terminal end (amine) to the C-terminal end (carboxyl). It is represented by one or three-letter codes (e.g., Gly-Ala-Val or GAV). This primary sequence determines all peptide properties: 3D structure, solubility, stability, and biological activity."}',
+'{}', '{}'),
+
+-- 11. Pureté
+('purete', 'Pureté',
+'La pureté d''un peptide indique le pourcentage de molécules correctes par rapport au total. Une pureté de 98% signifie que 98% des molécules correspondent à la séquence attendue. Les impuretés peuvent inclure des séquences tronquées, des produits de dégradation ou des résidus de synthèse. Pour la recherche, une pureté minimale de 95% est recommandée, idéalement >98% pour les applications sensibles.',
+'Pureté peptidique : pourcentage de molécules conformes à la séquence attendue.',
+'published',
+'{"en": "Purity"}',
+'{"en": "Peptide purity indicates the percentage of correct molecules relative to the total. A purity of 98% means that 98% of molecules match the expected sequence. Impurities may include truncated sequences, degradation products, or synthesis residues. For research, a minimum purity of 95% is recommended, ideally >98% for sensitive applications."}',
+'{}', '{}'),
+
+-- 12. COA (Certificat d''Analyse)
+('coa', 'COA (Certificat d''Analyse)',
+'Le Certificat d''Analyse (COA) est un document officiel accompagnant chaque lot de peptide, attestant de sa qualité. Il inclut : identification du produit (nom, numéro de lot), résultats des tests (pureté HPLC, masse MS, aspect), critères d''acceptation et date d''analyse. Un COA authentique doit comporter des données brutes (chromatogrammes) et être spécifique au lot acheté.',
+'COA : document certifiant la qualité et la pureté d''un lot de peptide avec données analytiques.',
+'published',
+'{"en": "COA (Certificate of Analysis)"}',
+'{"en": "The Certificate of Analysis (COA) is an official document accompanying each peptide batch, attesting to its quality. It includes: product identification (name, batch number), test results (HPLC purity, MS mass, appearance), acceptance criteria, and analysis date. An authentic COA must contain raw data (chromatograms) and be specific to the purchased batch."}',
+'{}', '{}'),
+
+-- 13. Sécrétagogue
+('secretagogue', 'Sécrétagogue',
+'Un sécrétagogue est une substance qui stimule la sécrétion d''une autre substance par une glande ou un organe. Dans le contexte de la recherche peptidique, ce terme désigne souvent les peptides stimulant la libération d''hormones endogènes, comme les sécrétagogues de l''hormone de croissance (GHS) qui activent les récepteurs de la ghréline pour stimuler la libération de GH par l''hypophyse.',
+'Sécrétagogue : substance stimulant la sécrétion hormonale, notamment de l''hormone de croissance.',
+'published',
+'{"en": "Secretagogue"}',
+'{"en": "A secretagogue is a substance that stimulates the secretion of another substance by a gland or organ. In peptide research context, this term often refers to peptides stimulating endogenous hormone release, such as growth hormone secretagogues (GHS) that activate ghrelin receptors to stimulate GH release from the pituitary gland."}',
+'{}', '{}'),
+
+-- 14. Liaison peptidique
+('liaison-peptidique', 'Liaison peptidique',
+'La liaison peptidique est une liaison covalente formée entre le groupe carboxyle (-COOH) d''un acide aminé et le groupe amine (-NH2) d''un autre, avec élimination d''une molécule d''eau (réaction de condensation). Cette liaison -CO-NH- est planaire et rigide, conférant aux peptides leur structure caractéristique. Sa stabilité chimique permet aux peptides de maintenir leur conformation dans diverses conditions.',
+'Liaison peptidique : liaison chimique unissant les acides aminés dans une chaîne peptidique.',
+'published',
+'{"en": "Peptide Bond"}',
+'{"en": "The peptide bond is a covalent bond formed between the carboxyl group (-COOH) of one amino acid and the amine group (-NH2) of another, with elimination of a water molecule (condensation reaction). This -CO-NH- bond is planar and rigid, giving peptides their characteristic structure. Its chemical stability allows peptides to maintain their conformation under various conditions."}',
+'{}', '{}'),
+
+-- 15. Synthèse peptidique
+('synthese-peptidique', 'Synthèse peptidique',
+'La synthèse peptidique est le processus de fabrication artificielle de peptides. La méthode la plus courante est la synthèse en phase solide (SPPS), développée par Merrifield. Le premier acide aminé est ancré sur une résine, puis les suivants sont ajoutés séquentiellement avec des groupes protecteurs. Après assemblage, le peptide est clivé de la résine et purifié par HPLC.',
+'Synthèse peptidique : fabrication de peptides en laboratoire par assemblage d''acides aminés.',
+'published',
+'{"en": "Peptide Synthesis"}',
+'{"en": "Peptide synthesis is the process of artificially manufacturing peptides. The most common method is solid-phase peptide synthesis (SPPS), developed by Merrifield. The first amino acid is anchored to a resin, then subsequent ones are added sequentially with protective groups. After assembly, the peptide is cleaved from the resin and purified by HPLC."}',
+'{}', '{}'),
+
+-- 16. Récepteur
+('recepteur', 'Récepteur',
+'Un récepteur est une protéine cellulaire capable de reconnaître et lier spécifiquement une molécule signal (ligand). Cette interaction déclenche une cascade de signalisation intracellulaire. Les peptides exercent leurs effets biologiques en se liant à des récepteurs membranaires ou nucléaires. La spécificité ligand-récepteur détermine la sélectivité d''action d''un peptide sur différents tissus.',
+'Récepteur : protéine cellulaire reconnaissant les peptides pour déclencher une réponse biologique.',
+'published',
+'{"en": "Receptor"}',
+'{"en": "A receptor is a cellular protein capable of specifically recognizing and binding a signal molecule (ligand). This interaction triggers an intracellular signaling cascade. Peptides exert their biological effects by binding to membrane or nuclear receptors. Ligand-receptor specificity determines the selectivity of peptide action on different tissues."}',
+'{}', '{}'),
+
+-- 17. Agoniste
+('agoniste', 'Agoniste',
+'Un agoniste est une molécule qui se lie à un récepteur et l''active, produisant une réponse biologique similaire à celle du ligand naturel. Les peptides agonistes peuvent avoir une efficacité égale (agoniste complet) ou partielle (agoniste partiel) par rapport au ligand endogène. En recherche, les agonistes peptidiques permettent d''étudier les voies de signalisation et leurs effets physiologiques.',
+'Agoniste : molécule activant un récepteur pour produire une réponse biologique.',
+'published',
+'{"en": "Agonist"}',
+'{"en": "An agonist is a molecule that binds to a receptor and activates it, producing a biological response similar to the natural ligand. Peptide agonists can have equal efficacy (full agonist) or partial efficacy (partial agonist) compared to the endogenous ligand. In research, peptide agonists allow studying signaling pathways and their physiological effects."}',
+'{}', '{}'),
+
+-- 18. Antagoniste
+('antagoniste', 'Antagoniste',
+'Un antagoniste est une molécule qui se lie à un récepteur sans l''activer, bloquant ainsi l''action du ligand naturel. Les antagonistes peptidiques sont des outils de recherche précieux pour comprendre le rôle physiologique d''une voie de signalisation. Ils peuvent être compétitifs (même site de liaison que l''agoniste) ou non-compétitifs (site allostérique différent).',
+'Antagoniste : molécule bloquant un récepteur sans l''activer, inhibant la réponse biologique.',
+'published',
+'{"en": "Antagonist"}',
+'{"en": "An antagonist is a molecule that binds to a receptor without activating it, thus blocking the action of the natural ligand. Peptide antagonists are valuable research tools for understanding the physiological role of a signaling pathway. They can be competitive (same binding site as agonist) or non-competitive (different allosteric site)."}',
+'{}', '{}'),
+
+-- 19. Structure primaire
+('structure-primaire', 'Structure primaire',
+'La structure primaire d''un peptide correspond à sa séquence linéaire d''acides aminés, du N-terminal au C-terminal. C''est le premier niveau d''organisation structurale, déterminé par la séquence génétique ou la synthèse chimique. Cette structure primaire encode toute l''information nécessaire au repliement correct du peptide et à son activité biologique.',
+'Structure primaire : séquence linéaire d''acides aminés constituant un peptide.',
+'published',
+'{"en": "Primary Structure"}',
+'{"en": "The primary structure of a peptide corresponds to its linear sequence of amino acids, from N-terminal to C-terminal. It is the first level of structural organization, determined by genetic sequence or chemical synthesis. This primary structure encodes all information necessary for correct peptide folding and biological activity."}',
+'{}', '{}'),
+
+-- 20. Structure secondaire
+('structure-secondaire', 'Structure secondaire',
+'La structure secondaire décrit les motifs de repliement local d''un peptide, stabilisés par des liaisons hydrogène entre les atomes du squelette peptidique. Les deux structures secondaires principales sont l''hélice alpha (enroulement en spirale) et le feuillet bêta (brins alignés). Ces motifs structuraux influencent la stabilité, la solubilité et l''interaction avec les récepteurs.',
+'Structure secondaire : motifs de repliement (hélice alpha, feuillet bêta) d''un peptide.',
+'published',
+'{"en": "Secondary Structure"}',
+'{"en": "Secondary structure describes local folding patterns of a peptide, stabilized by hydrogen bonds between backbone atoms. The two main secondary structures are alpha helix (spiral coiling) and beta sheet (aligned strands). These structural motifs influence stability, solubility, and receptor interaction."}',
+'{}', '{}'),
+
+-- 21. Hormone peptidique
+('hormone-peptidique', 'Hormone peptidique',
+'Une hormone peptidique est un messager chimique composé d''acides aminés, sécrété par des glandes endocrines et transporté par le sang vers des cellules cibles. Exemples : insuline, glucagon, hormone de croissance, ocytocine. Ces hormones régulent de nombreux processus physiologiques : métabolisme, croissance, reproduction. Leur nature hydrophile les empêche de traverser les membranes cellulaires.',
+'Hormone peptidique : messager chimique à base d''acides aminés régulant les fonctions biologiques.',
+'published',
+'{"en": "Peptide Hormone"}',
+'{"en": "A peptide hormone is a chemical messenger composed of amino acids, secreted by endocrine glands and transported by blood to target cells. Examples: insulin, glucagon, growth hormone, oxytocin. These hormones regulate many physiological processes: metabolism, growth, reproduction. Their hydrophilic nature prevents them from crossing cell membranes."}',
+'{}', '{}'),
+
+-- 22. Facteur de croissance
+('facteur-croissance', 'Facteur de croissance',
+'Un facteur de croissance est une protéine ou un peptide signalant qui stimule la prolifération, la différenciation ou la survie cellulaire. Exemples : IGF-1 (insulin-like growth factor), EGF (epidermal growth factor), VEGF (vascular endothelial growth factor). Ces molécules jouent des rôles essentiels dans le développement, la réparation tissulaire et l''homéostasie.',
+'Facteur de croissance : peptide stimulant la prolifération et la différenciation cellulaire.',
+'published',
+'{"en": "Growth Factor"}',
+'{"en": "A growth factor is a signaling protein or peptide that stimulates cell proliferation, differentiation, or survival. Examples: IGF-1 (insulin-like growth factor), EGF (epidermal growth factor), VEGF (vascular endothelial growth factor). These molecules play essential roles in development, tissue repair, and homeostasis."}',
+'{}', '{}'),
+
+-- 23. Neuropeptide
+('neuropeptide', 'Neuropeptide',
+'Un neuropeptide est un peptide produit et libéré par les neurones, agissant comme neurotransmetteur ou neuromodulateur. Exemples : endorphines, substance P, neuropeptide Y, orexine. Ces molécules régulent diverses fonctions : douleur, humeur, appétit, sommeil. Contrairement aux neurotransmetteurs classiques, les neuropeptides sont synthétisés dans le corps cellulaire puis transportés vers les terminaisons.',
+'Neuropeptide : peptide neuronal régulant la douleur, l''humeur, l''appétit et d''autres fonctions.',
+'published',
+'{"en": "Neuropeptide"}',
+'{"en": "A neuropeptide is a peptide produced and released by neurons, acting as a neurotransmitter or neuromodulator. Examples: endorphins, substance P, neuropeptide Y, orexin. These molecules regulate various functions: pain, mood, appetite, sleep. Unlike classical neurotransmitters, neuropeptides are synthesized in the cell body then transported to terminals."}',
+'{}', '{}'),
+
+-- 24. Peptide cyclique
+('peptide-cyclique', 'Peptide cyclique',
+'Un peptide cyclique est un peptide dont les extrémités N et C-terminales sont liées, formant une structure en anneau. Cette cyclisation peut également impliquer des chaînes latérales (ponts disulfure, lactames). Les peptides cycliques présentent généralement une meilleure stabilité métabolique, une plus grande affinité pour les récepteurs et une biodisponibilité améliorée par rapport à leurs analogues linéaires.',
+'Peptide cyclique : peptide en forme d''anneau offrant stabilité et biodisponibilité améliorées.',
+'published',
+'{"en": "Cyclic Peptide"}',
+'{"en": "A cyclic peptide is a peptide whose N and C-terminal ends are linked, forming a ring structure. This cyclization can also involve side chains (disulfide bridges, lactams). Cyclic peptides generally exhibit better metabolic stability, higher receptor affinity, and improved bioavailability compared to their linear analogs."}',
+'{}', '{}'),
+
+-- 25. Pont disulfure
+('pont-disulfure', 'Pont disulfure',
+'Un pont disulfure est une liaison covalente formée entre deux résidus cystéine par oxydation de leurs groupes thiol (-SH). Cette liaison -S-S- stabilise la structure tridimensionnelle des peptides et protéines. Les ponts disulfure peuvent être intramoléculaires (au sein d''une même chaîne) ou intermoléculaires (entre chaînes différentes). Leur réduction détruit la structure et l''activité du peptide.',
+'Pont disulfure : liaison cystéine-cystéine stabilisant la structure des peptides.',
+'published',
+'{"en": "Disulfide Bridge"}',
+'{"en": "A disulfide bridge is a covalent bond formed between two cysteine residues by oxidation of their thiol groups (-SH). This -S-S- bond stabilizes the three-dimensional structure of peptides and proteins. Disulfide bridges can be intramolecular (within the same chain) or intermolecular (between different chains). Their reduction destroys peptide structure and activity."}',
+'{}', '{}'),
+
+-- 26. Protéolyse
+('proteolyse', 'Protéolyse',
+'La protéolyse est la dégradation enzymatique des peptides et protéines par des protéases. Ces enzymes coupent les liaisons peptidiques selon des spécificités variées. In vivo, la protéolyse limite la demi-vie des peptides. En laboratoire, des inhibiteurs de protéases sont ajoutés aux échantillons pour préserver l''intégrité peptidique. Les modifications chimiques peuvent conférer une résistance à la protéolyse.',
+'Protéolyse : dégradation enzymatique des peptides, facteur limitant leur durée d''action.',
+'published',
+'{"en": "Proteolysis"}',
+'{"en": "Proteolysis is the enzymatic degradation of peptides and proteins by proteases. These enzymes cleave peptide bonds with varying specificities. In vivo, proteolysis limits peptide half-life. In the laboratory, protease inhibitors are added to samples to preserve peptide integrity. Chemical modifications can confer resistance to proteolysis."}',
+'{}', '{}'),
+
+-- 27. Solubilité
+('solubilite', 'Solubilité',
+'La solubilité d''un peptide détermine sa capacité à se dissoudre dans un solvant donné. Elle dépend de la composition en acides aminés : les résidus hydrophiles augmentent la solubilité aqueuse, les hydrophobes la diminuent. Pour les peptides peu solubles dans l''eau, des co-solvants (DMSO, acide acétique) peuvent être utilisés. La solubilité affecte directement la préparation des solutions de recherche.',
+'Solubilité : capacité d''un peptide à se dissoudre, dépendant de sa composition en acides aminés.',
+'published',
+'{"en": "Solubility"}',
+'{"en": "Peptide solubility determines its ability to dissolve in a given solvent. It depends on amino acid composition: hydrophilic residues increase aqueous solubility, hydrophobic ones decrease it. For peptides with poor water solubility, co-solvents (DMSO, acetic acid) can be used. Solubility directly affects the preparation of research solutions."}',
+'{}', '{}'),
+
+-- 28. Stabilité
+('stabilite', 'Stabilité',
+'La stabilité d''un peptide réfère à sa capacité à maintenir sa structure et son activité dans le temps et sous diverses conditions. Les facteurs de dégradation incluent : température, pH, oxydation, lumière, protéases. Les peptides lyophilisés sont généralement stables à -20°C pendant des années. Une fois reconstitués, ils doivent être conservés à 4°C et utilisés rapidement.',
+'Stabilité peptidique : conservation de la structure et de l''activité dans différentes conditions.',
+'published',
+'{"en": "Stability"}',
+'{"en": "Peptide stability refers to its ability to maintain structure and activity over time and under various conditions. Degradation factors include: temperature, pH, oxidation, light, proteases. Lyophilized peptides are generally stable at -20°C for years. Once reconstituted, they must be stored at 4°C and used quickly."}',
+'{}', '{}'),
+
+-- 29. Affinité
+('affinite', 'Affinité',
+'L''affinité mesure la force de liaison entre un peptide et son récepteur cible. Elle est quantifiée par la constante de dissociation (Kd) : plus le Kd est faible, plus l''affinité est élevée. Une haute affinité permet au peptide d''exercer ses effets à de faibles concentrations. L''optimisation de l''affinité est un objectif majeur dans le développement de peptides de recherche.',
+'Affinité : force de liaison entre un peptide et son récepteur, mesurée par le Kd.',
+'published',
+'{"en": "Affinity"}',
+'{"en": "Affinity measures the binding strength between a peptide and its target receptor. It is quantified by the dissociation constant (Kd): the lower the Kd, the higher the affinity. High affinity allows the peptide to exert its effects at low concentrations. Affinity optimization is a major goal in research peptide development."}',
+'{}', '{}'),
+
+-- 30. Sélectivité
+('selectivite', 'Sélectivité',
+'La sélectivité d''un peptide décrit sa capacité à interagir préférentiellement avec un récepteur ou une cible spécifique parmi plusieurs possibles. Un peptide hautement sélectif produit des effets ciblés avec moins d''effets hors-cible. La sélectivité est déterminée par la structure tridimensionnelle et les interactions spécifiques entre le peptide et les différents sous-types de récepteurs.',
+'Sélectivité : capacité d''un peptide à cibler préférentiellement un récepteur spécifique.',
+'published',
+'{"en": "Selectivity"}',
+'{"en": "Peptide selectivity describes its ability to preferentially interact with a specific receptor or target among several possible ones. A highly selective peptide produces targeted effects with fewer off-target effects. Selectivity is determined by three-dimensional structure and specific interactions between the peptide and different receptor subtypes."}',
+'{}', '{}'),
+
+-- 31. Dosage
+('dosage', 'Dosage',
+'Le dosage fait référence à la quantité de peptide utilisée dans un contexte de recherche, généralement exprimée en microgrammes (µg) ou milligrammes (mg). La détermination du dosage approprié dépend de nombreux facteurs : affinité du peptide, voie d''administration, modèle expérimental. Les études dose-réponse permettent d''établir les relations entre la quantité administrée et l''effet observé.',
+'Dosage : quantité de peptide utilisée en recherche, déterminée par études dose-réponse.',
+'published',
+'{"en": "Dosage"}',
+'{"en": "Dosage refers to the amount of peptide used in a research context, usually expressed in micrograms (µg) or milligrams (mg). Determining appropriate dosage depends on many factors: peptide affinity, administration route, experimental model. Dose-response studies establish relationships between administered quantity and observed effect."}',
+'{}', '{}'),
+
+-- 32. In vitro
+('in-vitro', 'In vitro',
+'In vitro (latin : « dans le verre ») désigne les expériences réalisées en dehors d''un organisme vivant, dans un environnement contrôlé comme des tubes à essai, boîtes de Pétri ou plaques de culture. Les études in vitro sur les peptides utilisent des cellules isolées, des tissus ou des préparations enzymatiques. Elles permettent d''étudier des mécanismes moléculaires avec un contrôle précis des variables.',
+'In vitro : expériences sur peptides réalisées en laboratoire, hors organisme vivant.',
+'published',
+'{"en": "In Vitro"}',
+'{"en": "In vitro (Latin: ''in glass'') refers to experiments conducted outside a living organism, in a controlled environment such as test tubes, Petri dishes, or culture plates. In vitro peptide studies use isolated cells, tissues, or enzymatic preparations. They allow studying molecular mechanisms with precise control of variables."}',
+'{}', '{}'),
+
+-- 33. In vivo
+('in-vivo', 'In vivo',
+'In vivo (latin : « dans le vivant ») désigne les études réalisées dans un organisme vivant complet, généralement des modèles animaux dans le contexte de la recherche peptidique. Les études in vivo évaluent les effets systémiques, la pharmacocinétique (absorption, distribution, métabolisme, élimination) et la toxicité potentielle. Elles complètent les données in vitro pour une compréhension globale.',
+'In vivo : études sur peptides dans des organismes vivants pour évaluer les effets systémiques.',
+'published',
+'{"en": "In Vivo"}',
+'{"en": "In vivo (Latin: ''in the living'') refers to studies conducted in a complete living organism, typically animal models in peptide research context. In vivo studies evaluate systemic effects, pharmacokinetics (absorption, distribution, metabolism, elimination), and potential toxicity. They complement in vitro data for comprehensive understanding."}',
+'{}', '{}'),
+
+-- 34. Peptide mimétique
+('peptide-mimetique', 'Peptide mimétique',
+'Un peptide mimétique (ou peptidomimétique) est une molécule conçue pour imiter la structure et la fonction d''un peptide naturel tout en présentant des propriétés pharmacologiques améliorées. Les modifications peuvent inclure : remplacement d''acides aminés, modification du squelette, introduction de groupes non naturels. Les mimétiques offrent souvent une meilleure stabilité et biodisponibilité.',
+'Peptide mimétique : molécule imitant un peptide avec des propriétés pharmacologiques améliorées.',
+'published',
+'{"en": "Peptide Mimetic"}',
+'{"en": "A peptide mimetic (or peptidomimetic) is a molecule designed to mimic the structure and function of a natural peptide while presenting improved pharmacological properties. Modifications may include: amino acid replacement, backbone modification, introduction of non-natural groups. Mimetics often offer better stability and bioavailability."}',
+'{}', '{}'),
+
+-- 35. Peptide signal
+('peptide-signal', 'Peptide signal',
+'Un peptide signal est une courte séquence d''acides aminés (généralement 15-30) située à l''extrémité N-terminale d''une protéine nouvellement synthétisée. Il dirige la protéine vers son compartiment cellulaire de destination (réticulum endoplasmique, mitochondries, noyau). Après translocation, le peptide signal est généralement clivé par des peptidases spécifiques.',
+'Peptide signal : séquence dirigeant les protéines vers leur destination cellulaire.',
+'published',
+'{"en": "Signal Peptide"}',
+'{"en": "A signal peptide is a short amino acid sequence (typically 15-30) located at the N-terminal end of a newly synthesized protein. It directs the protein to its cellular destination compartment (endoplasmic reticulum, mitochondria, nucleus). After translocation, the signal peptide is generally cleaved by specific peptidases."}',
+'{}', '{}'),
+
+-- 36. Modification post-traductionnelle
+('modification-post-traductionnelle', 'Modification post-traductionnelle',
+'Les modifications post-traductionnelles (PTM) sont des changements chimiques apportés aux peptides/protéines après leur synthèse ribosomale. Exemples : phosphorylation, glycosylation, acétylation, amidation. Ces modifications régulent l''activité, la localisation et la stabilité des peptides. La compréhension des PTM est essentielle pour reproduire l''activité des peptides naturels en synthèse.',
+'Modification post-traductionnelle : changements chimiques régulant l''activité des peptides.',
+'published',
+'{"en": "Post-translational Modification"}',
+'{"en": "Post-translational modifications (PTMs) are chemical changes made to peptides/proteins after their ribosomal synthesis. Examples: phosphorylation, glycosylation, acetylation, amidation. These modifications regulate peptide activity, localization, and stability. Understanding PTMs is essential for reproducing natural peptide activity in synthesis."}',
+'{}', '{}'),
+
+-- 37. Amidation
+('amidation', 'Amidation',
+'L''amidation est une modification de l''extrémité C-terminale d''un peptide, où le groupe carboxyle (-COOH) est converti en amide (-CONH2). Cette modification est fréquente dans les peptides bioactifs naturels (environ 50% des hormones peptidiques). L''amidation augmente la stabilité du peptide face aux carboxypeptidases et peut améliorer l''affinité pour les récepteurs.',
+'Amidation : modification C-terminale augmentant la stabilité et l''activité des peptides.',
+'published',
+'{"en": "Amidation"}',
+'{"en": "Amidation is a modification of the C-terminal end of a peptide, where the carboxyl group (-COOH) is converted to amide (-CONH2). This modification is common in natural bioactive peptides (about 50% of peptide hormones). Amidation increases peptide stability against carboxypeptidases and can improve receptor affinity."}',
+'{}', '{}'),
+
+-- 38. Acétylation
+('acetylation', 'Acétylation',
+'L''acétylation est l''ajout d''un groupe acétyle (CH3CO-) à l''extrémité N-terminale d''un peptide ou aux chaînes latérales de lysines. Cette modification protège contre les aminopeptidases, prolongeant la demi-vie. L''acétylation N-terminale neutralise également la charge positive, modifiant potentiellement les propriétés d''interaction du peptide avec ses cibles biologiques.',
+'Acétylation : protection N-terminale prolongeant la stabilité des peptides.',
+'published',
+'{"en": "Acetylation"}',
+'{"en": "Acetylation is the addition of an acetyl group (CH3CO-) to the N-terminal end of a peptide or to lysine side chains. This modification protects against aminopeptidases, extending half-life. N-terminal acetylation also neutralizes the positive charge, potentially modifying the peptide''s interaction properties with its biological targets."}',
+'{}', '{}'),
+
+-- 39. PEGylation
+('pegylation', 'PEGylation',
+'La PEGylation est la conjugaison d''un peptide avec du polyéthylène glycol (PEG). Cette modification augmente significativement la taille moléculaire, réduisant la clairance rénale et la reconnaissance immunitaire. Les peptides PEGylés présentent une demi-vie plasmatique considérablement prolongée (parfois de quelques heures à plusieurs jours), permettant des administrations moins fréquentes en contexte de recherche.',
+'PEGylation : conjugaison au PEG prolongeant drastiquement la demi-vie des peptides.',
+'published',
+'{"en": "PEGylation"}',
+'{"en": "PEGylation is the conjugation of a peptide with polyethylene glycol (PEG). This modification significantly increases molecular size, reducing renal clearance and immune recognition. PEGylated peptides exhibit considerably extended plasma half-life (sometimes from hours to several days), allowing less frequent administration in research settings."}',
+'{}', '{}'),
+
+-- 40. Numéro CAS
+('numero-cas', 'Numéro CAS',
+'Le numéro CAS (Chemical Abstracts Service) est un identifiant numérique unique attribué à chaque substance chimique. Format : XXXXXXX-XX-X. Ce numéro permet d''identifier sans ambiguïté un peptide spécifique dans la littérature scientifique et les bases de données. Chaque peptide avec une séquence et une modification distincte possède son propre numéro CAS, facilitant la traçabilité et la recherche documentaire.',
+'Numéro CAS : identifiant unique international pour chaque peptide et substance chimique.',
+'published',
+'{"en": "CAS Number"}',
+'{"en": "The CAS number (Chemical Abstracts Service) is a unique numerical identifier assigned to each chemical substance. Format: XXXXXXX-XX-X. This number unambiguously identifies a specific peptide in scientific literature and databases. Each peptide with a distinct sequence and modification has its own CAS number, facilitating traceability and literature research."}',
+'{}', '{}')
+
+ON CONFLICT (slug) DO UPDATE SET
+  term = EXCLUDED.term,
+  definition = EXCLUDED.definition,
+  meta_description = EXCLUDED.meta_description,
+  status = EXCLUDED.status,
+  term_i18n = EXCLUDED.term_i18n,
+  definition_i18n = EXCLUDED.definition_i18n,
+  updated_at = NOW();
+
+-- =========================================
+-- ✅ FIN DU SEED V6.5
 -- =========================================

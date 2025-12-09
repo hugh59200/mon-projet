@@ -164,6 +164,11 @@ _Mise à jour : 09/12/2025_
 | **Lab Notes**         |  🟢 Fait  | 5 guides techniques + Calculateur dilution intégré.        |
 | **Session Tracking**  |  🟢 Fait  | Analytics interne privacy-first + Dashboard admin.         |
 | **Kill Switch**       |  🟢 Fait  | Mode maintenance via env var Cloudflare.                   |
+| **Glossaire SEO**     |  🟢 Fait  | 40 termes scientifiques pour SEO longue traîne.            |
+| **Crypto Cockpit**    |  🟢 Fait  | Validation paiements crypto avec txid matching.            |
+| **Email Nurturing**   |  🟢 Fait  | Séquence 3 emails éducatifs post-inscription.              |
+| **Review Request**    |  🟢 Fait  | Demande d'avis automatique J+10 après expédition.          |
+| **Cart Reminder**     |  🟢 Fait  | Rappel panier abandonné avec code promo.                   |
 | **Compte Banque**     | 🔴 Bloqué | Attente EIN (Délai IRS important).                         |
 
 ---
@@ -488,6 +493,228 @@ updateSessionUser(user.id)
 // Event custom
 trackAddToCart()
 ```
+
+---
+
+## 📖 Glossaire SEO (Longue Traîne)
+
+Section glossaire scientifique avec définitions courtes (~100 mots) pour capturer les recherches SEO longue traîne.
+
+### Architecture
+
+| Route | Composant | Description |
+|-------|-----------|-------------|
+| `/glossaire` | `GlossaireView.vue` | Liste alphabétique avec recherche |
+| `/glossaire/:slug` | `GlossaireDetailView.vue` | Définition avec produits/ressources liés |
+| `/admin/glossaire` | `AdminGlossaryView.vue` | CRUD admin complet |
+
+### Fonctionnalités
+
+- **Navigation alphabétique** : A-Z avec ancres
+- **Recherche instantanée** : Filtrage en temps réel
+- **Liens croisés** : Vers produits du catalogue ET articles Lab Notes
+- **SEO complet** : Schema.org `DefinedTerm` + `DefinedTermSet`
+- **i18n** : Support FR/EN avec colonnes `term_i18n`, `definition_i18n`
+
+### Tables Supabase
+
+```sql
+glossary_terms (
+  id, slug, term, definition,
+  related_product_ids, related_resource_ids,
+  meta_description, term_i18n, definition_i18n,
+  status, created_at, updated_at
+)
+```
+
+### Placement UX
+
+- **Footer** : Lien dans la section "Liens rapides" (maillage interne SEO)
+- **Pas dans le Header** : Focus conversion maintenu
+
+---
+
+## 💰 Cockpit Crypto Matching
+
+Interface admin pour valider les paiements crypto avec vérification txid.
+
+### Fonctionnalités
+
+- **Liste des commandes crypto** : Filtrées par statut (pending, verified, failed)
+- **Vérification txid** : Saisie manuelle du hash de transaction
+- **Validation automatique** : Edge Function `verify-crypto-transaction`
+- **Historique** : Colonnes `crypto_txid`, `crypto_verified_at`, `crypto_verified_amount`
+
+### Architecture
+
+```
+src/features/admin/crypto-matching/
+├── AdminCryptoMatchingView.vue  # Vue principale
+└── components/
+    └── CryptoOrderCard.vue      # Carte commande
+```
+
+### Colonnes Orders
+
+```sql
+crypto_txid VARCHAR(255),
+crypto_type VARCHAR(20),     -- 'btc' | 'usdt'
+crypto_verified_at TIMESTAMPTZ,
+crypto_verified_amount DECIMAL
+```
+
+---
+
+## 📧 Séquence Email Nurturing
+
+Série de 3 emails éducatifs automatiques après inscription newsletter.
+
+### Flux
+
+```
+Inscription Newsletter
+   ↓ (J+2)
+Email 1 : "Bienvenue dans la recherche"
+   ↓ (J+5)
+Email 2 : "Guide reconstitution"
+   ↓ (J+9)
+Email 3 : "Certificats d'analyse"
+```
+
+### Edge Functions
+
+| Fonction | Description |
+|----------|-------------|
+| `send-nurturing-emails` | Envoi des emails de la séquence (cron quotidien) |
+
+### Tables Supabase
+
+```sql
+email_nurturing_sequence (
+  id, email, sequence_number,
+  scheduled_at, sent_at, status,
+  created_at
+)
+```
+
+### Opt-out
+
+- **Page dédiée** : `/newsletter/optout-nurturing?email=xxx`
+- **Granulaire** : Arrête la séquence sans désabonner de la newsletter
+
+---
+
+## ⭐ Système de Review Request
+
+Demande automatique d'avis J+10 après expédition.
+
+### Flux
+
+```
+Commande expédiée (shipped_at)
+   ↓ (J+10)
+Email avec lien unique
+   ↓
+Page avis (token dans URL)
+   ↓
+Soumission (même sans compte)
+```
+
+### Edge Functions
+
+| Fonction | Description |
+|----------|-------------|
+| `send-review-request` | Détecte les commandes J+10 et envoie les demandes |
+
+### Token System
+
+- **Génération** : Token unique par commande dans `reviews.review_token`
+- **Lien** : `/avis?token=xxx&order=yyy`
+- **Sécurité** : RLS policy permet soumission via token valide
+
+### Tables modifiées
+
+```sql
+-- Ajouts sur reviews
+order_id UUID REFERENCES orders(id),
+review_token VARCHAR(64) UNIQUE
+
+-- Ajouts sur emails_sent
+type 'review_request'
+```
+
+---
+
+## 🛒 Système Cart Reminder
+
+Rappel doux pour paniers abandonnés (2h sans achat, pas de code promo utilisé).
+
+### Conditions d'envoi
+
+1. Panier non-vide depuis > 2h
+2. Aucun code promo appliqué dans la session
+3. Pas de commande récente
+4. Max 1 reminder par utilisateur/48h
+
+### Flux
+
+```
+Panier abandonné (2h)
+   ↓
+Edge Function check-cart-reminders (cron)
+   ↓
+Génération code promo -5%
+   ↓
+send-cart-reminder-email
+```
+
+### Edge Functions
+
+| Fonction | Description |
+|----------|-------------|
+| `check-cart-reminders` | Détecte les paniers éligibles (cron) |
+| `send-cart-reminder-email` | Envoie l'email avec code promo |
+
+### Tables modifiées
+
+```sql
+-- Type ajouté dans user_promo_rewards
+reward_type 'cart_reminder'
+
+-- Config dans auto_promo_settings
+code_type = 'cart_reminder'
+discount_percent = 5
+validity_days = 7
+```
+
+---
+
+## 📊 Indicateurs de Statut (Footer)
+
+Widget affichant l'état opérationnel du site en temps réel.
+
+### Indicateurs
+
+| ID | Label | Source |
+|----|-------|--------|
+| `orders` | Commandes | Toujours "Ouvertes" |
+| `shipping` | Expéditions | Dernière commande expédiée |
+| `support` | Support | Activité admin (messages 48h) |
+
+### API
+
+```typescript
+import { fetchSystemStatus } from '@/api/supabase/status'
+
+const status = await fetchSystemStatus()
+// { orders, shipping, support, lastChecked }
+```
+
+### Niveaux de statut
+
+- `operational` : Vert - Fonctionnement normal
+- `degraded` : Orange - Retard possible (>5 jours sans expédition)
+- `down` : Rouge - Indisponible
 
 ---
 

@@ -111,6 +111,82 @@ export type Database = {
           },
         ]
       }
+      email_nurturing_sequence: {
+        Row: {
+          created_at: string | null
+          email: string
+          enrolled_at: string
+          id: string
+          locale: string | null
+          newsletter_subscriber_id: string | null
+          opted_out: boolean | null
+          opted_out_at: string | null
+          profile_id: string | null
+          sequence_step: number | null
+          source: string
+          step1_sent_at: string | null
+          step2_sent_at: string | null
+          step3_sent_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          enrolled_at?: string
+          id?: string
+          locale?: string | null
+          newsletter_subscriber_id?: string | null
+          opted_out?: boolean | null
+          opted_out_at?: string | null
+          profile_id?: string | null
+          sequence_step?: number | null
+          source: string
+          step1_sent_at?: string | null
+          step2_sent_at?: string | null
+          step3_sent_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          enrolled_at?: string
+          id?: string
+          locale?: string | null
+          newsletter_subscriber_id?: string | null
+          opted_out?: boolean | null
+          opted_out_at?: string | null
+          profile_id?: string | null
+          sequence_step?: number | null
+          source?: string
+          step1_sent_at?: string | null
+          step2_sent_at?: string | null
+          step3_sent_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_nurturing_sequence_newsletter_subscriber_id_fkey"
+            columns: ["newsletter_subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_subscribers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_nurturing_sequence_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_overview"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "email_nurturing_sequence_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emails_sent: {
         Row: {
           body_html: string
@@ -175,6 +251,51 @@ export type Database = {
             referencedColumns: ["order_id"]
           },
         ]
+      }
+      glossary_terms: {
+        Row: {
+          created_at: string | null
+          definition: string
+          definition_i18n: Json | null
+          id: string
+          meta_description: string | null
+          related_product_ids: string[] | null
+          related_resource_ids: string[] | null
+          slug: string
+          status: string | null
+          term: string
+          term_i18n: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          definition: string
+          definition_i18n?: Json | null
+          id?: string
+          meta_description?: string | null
+          related_product_ids?: string[] | null
+          related_resource_ids?: string[] | null
+          slug: string
+          status?: string | null
+          term: string
+          term_i18n?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          definition?: string
+          definition_i18n?: Json | null
+          id?: string
+          meta_description?: string | null
+          related_product_ids?: string[] | null
+          related_resource_ids?: string[] | null
+          slug?: string
+          status?: string | null
+          term?: string
+          term_i18n?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -605,6 +726,10 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          crypto_txid: string | null
+          crypto_type: string | null
+          crypto_verified_amount: number | null
+          crypto_verified_at: string | null
           discount_amount: number | null
           email: string
           full_name: string
@@ -639,6 +764,10 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          crypto_txid?: string | null
+          crypto_type?: string | null
+          crypto_verified_amount?: number | null
+          crypto_verified_at?: string | null
           discount_amount?: number | null
           email: string
           full_name: string
@@ -673,6 +802,10 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          crypto_txid?: string | null
+          crypto_type?: string | null
+          crypto_verified_amount?: number | null
+          crypto_verified_at?: string | null
           discount_amount?: number | null
           email?: string
           full_name?: string
@@ -1206,12 +1339,14 @@ export type Database = {
           is_approved: boolean | null
           is_featured: boolean | null
           is_verified_purchase: boolean | null
+          order_id: string | null
           product_id: string
           rating: number
           rating_purity: number | null
           rating_quality: number | null
           rating_shipping: number | null
           rating_value: number | null
+          review_token: string | null
           title: string | null
           updated_at: string | null
           user_id: string | null
@@ -1227,12 +1362,14 @@ export type Database = {
           is_approved?: boolean | null
           is_featured?: boolean | null
           is_verified_purchase?: boolean | null
+          order_id?: string | null
           product_id: string
           rating: number
           rating_purity?: number | null
           rating_quality?: number | null
           rating_shipping?: number | null
           rating_value?: number | null
+          review_token?: string | null
           title?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -1248,17 +1385,47 @@ export type Database = {
           is_approved?: boolean | null
           is_featured?: boolean | null
           is_verified_purchase?: boolean | null
+          order_id?: string | null
           product_id?: string
           rating?: number
           rating_purity?: number | null
           rating_quality?: number | null
           rating_shipping?: number | null
           rating_value?: number | null
+          review_token?: string | null
           title?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_detailed_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_full_view"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_overview_for_admin"
+            referencedColumns: ["order_id"]
+          },
           {
             foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
@@ -1712,6 +1879,10 @@ export type Database = {
       orders_overview_for_admin: {
         Row: {
           created_at: string | null
+          crypto_txid: string | null
+          crypto_type: string | null
+          crypto_verified_amount: number | null
+          crypto_verified_at: string | null
           customer_email: string | null
           customer_name: string | null
           delivery_city: string | null
@@ -1933,6 +2104,15 @@ export type Database = {
       }
     }
     Functions: {
+      admin_save_crypto_verification: {
+        Args: {
+          p_crypto_type: string
+          p_order_id: string
+          p_txid: string
+          p_verified_amount: number
+        }
+        Returns: Json
+      }
       admin_update_order_status: {
         Args: {
           p_new_status: string
@@ -2068,6 +2248,16 @@ export type Database = {
         Returns: Json
       }
       end_session: { Args: { p_session_id: string }; Returns: Json }
+      enroll_in_nurturing_sequence: {
+        Args: {
+          p_email: string
+          p_locale?: string
+          p_newsletter_subscriber_id?: string
+          p_profile_id?: string
+          p_source?: string
+        }
+        Returns: Json
+      }
       find_abandoned_carts: {
         Args: { p_cutoff_time: string; p_min_value?: number }
         Returns: {
@@ -2076,6 +2266,28 @@ export type Database = {
           items_count: number
           last_activity: string
           user_id: string
+        }[]
+      }
+      find_carts_for_reminder: {
+        Args: { p_cutoff_time: string; p_min_value?: number }
+        Returns: {
+          cart_total: number
+          email: string
+          first_name: string
+          items_count: number
+          last_activity: string
+          user_id: string
+        }[]
+      }
+      find_nurturing_emails_to_send: {
+        Args: never
+        Returns: {
+          email: string
+          enrolled_at: string
+          id: string
+          locale: string
+          next_step: number
+          profile_id: string
         }[]
       }
       generate_product_slug: {
@@ -2099,43 +2311,22 @@ export type Database = {
         Returns: Json
       }
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
-      get_product_by_slug: {
-        Args: { p_slug: string }
+      get_orders_for_review_request: {
+        Args: never
         Returns: {
-          bulk_pricing: Json | null
-          cas_number: string | null
-          category: string
-          category_i18n: Json | null
-          coa_url: string | null
-          created_at: string | null
-          description: string | null
-          description_i18n: Json | null
-          dosage: string | null
-          id: string
-          image: string | null
-          is_on_sale: boolean | null
-          molecular_formula: string | null
-          molecular_weight: string | null
-          name: string
-          name_i18n: Json | null
-          physical_form: string | null
-          price: number
-          purity: number | null
-          sale_price: number | null
-          sequence: string | null
-          slug: string
-          solubility: string | null
-          stock: number
-          storage_conditions: string | null
-          tags: string[] | null
-          updated_at: string | null
+          email: string
+          first_product_id: string
+          first_product_image: string
+          first_product_name: string
+          first_product_slug: string
+          full_name: string
+          is_guest: boolean
+          order_id: string
+          order_number: string
+          shipped_at: string
+          tracking_token: string
+          user_id: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "products"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_resource_related_products: {
         Args: { resource_id: string }
@@ -2179,6 +2370,20 @@ export type Database = {
         | { Args: never; Returns: boolean }
         | { Args: { uid: string }; Returns: boolean }
       jwt_custom_claims: { Args: never; Returns: Json }
+      mark_nurturing_email_sent: {
+        Args: { p_id: string; p_step: number }
+        Returns: boolean
+      }
+      optout_nurturing_sequence: { Args: { p_email: string }; Returns: Json }
+      record_cart_reminder: {
+        Args: {
+          p_cart_value?: number
+          p_items_count?: number
+          p_user_email: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       remove_order_relay: { Args: { p_order_id: string }; Returns: Json }
       subscribe_to_newsletter: {
         Args: {
@@ -2243,6 +2448,10 @@ export type Database = {
           p_user_email?: string
           p_user_id?: string
         }
+        Returns: Json
+      }
+      validate_review_token: {
+        Args: { p_order_id: string; p_product_id: string }
         Returns: Json
       }
     }

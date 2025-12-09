@@ -1,5 +1,7 @@
 // Auto-generated from router/index.ts
 export type RouteName =
+  'AdminCryptoMatching' |
+  'AdminGlossary' |
   'AdminMessagerie' |
   'AdminNews' |
   'AdminOrders' |
@@ -27,12 +29,15 @@ export type RouteName =
   'email-sent' |
   'faq' |
   'favorites' |
+  'glossaire' |
+  'glossaire-detail' |
   'home' |
   'mentions-legales' |
   'mfa-challenge' |
   'mfa-setup' |
   'newsletter-confirm' |
   'newsletter-unsubscribe' |
+  'nurturing-optout' |
   'order-detail' |
   'orders' |
   'politique-confidentialite' |
@@ -41,6 +46,7 @@ export type RouteName =
   'reconstitution' |
   'ressource-detail' |
   'ressources' |
+  'status' |
   'track-order' |
   'update-password' |
   'update-password-success'

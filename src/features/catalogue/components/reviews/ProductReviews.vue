@@ -78,6 +78,9 @@
       v-if="showReviewForm"
       :product-id="productId"
       :product-name="productName"
+      :review-token="reviewToken"
+      :order-id="orderId"
+      :guest-name="guestName"
       @close="showReviewForm = false"
       @submitted="onReviewSubmitted"
     />
@@ -85,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { fetchReviewsByProductId, fetchReviewSummary, hasUserReviewed } from '@/api'
 import type { Review, ReviewSummary } from '@/api/supabase/reviews'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
@@ -96,6 +99,10 @@ import ReviewFormModal from './ReviewFormModal.vue'
 const props = defineProps<{
   productId: string
   productName: string
+  // Props pour le mode invité (magic link)
+  reviewToken?: string
+  orderId?: string
+  guestName?: string
 }>()
 
 const authStore = useAuthStore()
@@ -106,11 +113,17 @@ const showAll = ref(false)
 const hasReviewed = ref(false)
 const displayLimit = 5
 
+// Mode invité (magic link)
+const isGuestMode = computed(() => Boolean(props.reviewToken && props.orderId))
+
 const displayedReviews = computed(() => {
   return showAll.value ? reviews.value : reviews.value.slice(0, displayLimit)
 })
 
 const canReview = computed(() => {
+  // Mode invité avec magic link
+  if (isGuestMode.value) return true
+  // Mode authentifié normal
   return authStore.isAuthenticated && !hasReviewed.value
 })
 
@@ -153,6 +166,13 @@ async function onReviewSubmitted() {
 onMounted(() => {
   loadReviews()
 })
+
+// Ouvrir automatiquement le formulaire si on arrive avec un magic link
+watch(isGuestMode, (isGuest) => {
+  if (isGuest) {
+    showReviewForm.value = true
+  }
+}, { immediate: true })
 </script>
 
 <style scoped lang="less">

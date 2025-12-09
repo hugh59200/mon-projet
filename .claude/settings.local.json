@@ -24,7 +24,15 @@
       "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node -e \"\nconst { Client } = require(''pg'');\nconst client = new Client({\n  connectionString: ''postgresql://postgres:Chipsau59126!3@db.dwomsbawthlktapmtmqu.supabase.co:5432/postgres'',\n  ssl: { rejectUnauthorized: false }\n});\nclient.connect().then(async () => {\n  const news = await client.query(''SELECT COUNT(*) as count FROM news'');\n  const topics = await client.query(''SELECT COUNT(*) as count FROM news_topics'');\n  const products = await client.query(''SELECT COUNT(*) as count FROM products'');\n  const resources = await client.query(''SELECT COUNT(*) as count FROM resources'');\n  const resCat = await client.query(''SELECT COUNT(*) as count FROM resource_categories'');\n  \n  console.log(''=== ÉTAT DES TABLES ==='');\n  console.log(''Products:'', products.rows[0].count);\n  console.log(''News Topics:'', topics.rows[0].count);\n  console.log(''News:'', news.rows[0].count);\n  console.log(''Resource Categories:'', resCat.rows[0].count);\n  console.log(''Resources:'', resources.rows[0].count);\n  \n  await client.end();\n}).catch(e => console.error(e.message));\")",
       "Bash(node scripts/upload-lab-notes-images.cjs:*)",
       "Bash(node scripts/exec-sql.cjs:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(xargs:*)",
+      "Bash(grep:*)",
+      "Bash(timeout 30 npm run dev:*)",
+      "Bash(npx supabase functions deploy:*)",
+      "Bash(curl:*)",
+      "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node -e \"\nconst { Client } = require(''pg'');\nconst client = new Client({\n  host: ''db.dwomsbawthlktapmtmqu.supabase.co'',\n  port: 5432,\n  database: ''postgres'',\n  user: ''postgres'',\n  password: ''Chipsau59126!3'',\n  ssl: { rejectUnauthorized: false }\n});\nclient.connect()\n  .then(() => client.query(''SELECT jobid, jobname, schedule, command FROM cron.job''))\n  .then(res => { console.log(''Jobs pg_cron:''); console.table(res.rows); })\n  .finally(() => client.end());\n\")",
+      "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node:*)"
     ],
     "deny": [],
     "ask": []

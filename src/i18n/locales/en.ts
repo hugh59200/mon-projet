@@ -324,6 +324,7 @@ export default {
     catalogue: 'Catalogue',
     news: 'News',
     resources: 'Lab Notes',
+    glossary: 'Glossary',
     about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
@@ -1231,6 +1232,21 @@ export default {
   },
 
   // ============================================
+  // GLOSSARY / GLOSSAIRE
+  // ============================================
+  glossary: {
+    title: 'Scientific Glossary',
+    searchPlaceholder: 'Search a term...',
+    noResults: 'No term found',
+    backToGlossary: 'Back to glossary',
+    definition: 'Definition',
+    relatedProducts: 'Related Products',
+    relatedResources: 'Related Resources',
+    seeProduct: 'View product',
+    readResource: 'Read resource',
+  },
+
+  // ============================================
   // ABOUT / À PROPOS
   // ============================================
   about: {
@@ -1435,6 +1451,29 @@ export default {
   },
 
   // ============================================
+  // NURTURING (Educational sequence)
+  // ============================================
+  nurturing: {
+    optout: {
+      confirmTitle: 'Unsubscribe from educational series?',
+      confirmMessage:
+        'You will no longer receive our educational emails (HPLC guides, reconstitution protocols, shipping information).',
+      infoMessage:
+        'You will remain subscribed to our newsletter and continue to receive promotional offers.',
+      ctaConfirm: 'Confirm',
+      ctaCancel: 'Cancel',
+      successTitle: 'Unsubscription confirmed',
+      successMessage: 'You will no longer receive emails from the educational series.',
+      stillSubscribed: 'You remain subscribed to our newsletter.',
+      ctaHome: 'Back to home',
+      errorTitle: 'Error',
+      errorGeneric: 'An error occurred. Please try again.',
+      noEmail: 'Email address missing',
+      notFound: 'This email is not subscribed to the educational series.',
+    },
+  },
+
+  // ============================================
   // ADMIN
   // ============================================
   admin: {
@@ -1444,9 +1483,11 @@ export default {
     products: 'Catalogue',
     promo: 'Promo Codes',
     news: 'Blog',
+    glossary: 'Glossary',
     categories: 'Categories',
     messaging: 'Messaging',
     sessions: 'Sessions',
+    cryptoMatching: 'Crypto Matching',
     // Common admin
     common: {
       actions: 'Actions',
@@ -1741,6 +1782,15 @@ export default {
     resourceDetail: {
       description: 'Detailed technical resource.',
     },
+    glossary: {
+      title: 'Glossary',
+      heading: 'Scientific Glossary',
+      description: 'Definitions of key scientific and laboratory terms.',
+      badge: 'Reference',
+    },
+    glossaryDetail: {
+      description: 'Detailed definition of the term.',
+    },
     cart: {
       title: 'Cart',
       description: 'Reagent validation.',
@@ -1787,6 +1837,9 @@ export default {
     newsletter: {
       confirm: 'Newsletter confirmation',
       unsubscribe: 'Newsletter unsubscription',
+    },
+    nurturing: {
+      optout: 'Educational series unsubscription',
     },
   },
 

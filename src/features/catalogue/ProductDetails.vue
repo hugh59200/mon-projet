@@ -561,6 +561,9 @@
             v-if="product"
             :product-id="product.id"
             :product-name="productName || product.name"
+            :review-token="reviewToken ?? undefined"
+            :order-id="reviewOrderId ?? undefined"
+            :guest-name="reviewMode?.full_name ?? undefined"
           />
 
           <!-- Section Produits Complémentaires (AOV) -->
@@ -608,8 +611,8 @@
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useTranslatedProduct } from '@/composables/useTranslated'
   import { fetchProductBySlug, fetchProductById } from '@/api/supabase/products'
-  import { fetchReviewSummary } from '@/api/supabase/reviews'
-  import type { ReviewSummary } from '@/api/supabase/reviews'
+  import { fetchReviewSummary, validateReviewToken } from '@/api/supabase/reviews'
+  import type { ReviewSummary, ValidateReviewTokenResult } from '@/api/supabase/reviews'
   import ProductReviews from './components/reviews/ProductReviews.vue'
   import RelatedProducts from './components/RelatedProducts.vue'
   import QuantitySelector from './components/QuantitySelector.vue'
@@ -644,6 +647,11 @@
   const activeTab = ref<'description' | 'protocol' | 'shipping'>('description')
   const reviewSummary = ref<ReviewSummary | null>(null)
   const showCoa = ref(false)
+
+  // Mode avis invité (magic link)
+  const reviewMode = ref<ValidateReviewTokenResult | null>(null)
+  const reviewToken = ref<string | null>(null)
+  const reviewOrderId = ref<string | null>(null)
 
   // AOV - Quantité sélectionnée
   const selectedQuantity = ref(1)
@@ -1035,6 +1043,22 @@
         product.value = productData
       }
       reviewSummary.value = reviewData
+
+      // Détecter le magic link pour avis invité
+      const queryReviewToken = route.query.review_token as string | undefined
+      const queryOrderId = route.query.order as string | undefined
+
+      if (queryReviewToken && queryOrderId && productData) {
+        // Valider le token
+        const validation = await validateReviewToken(queryOrderId, productData.id)
+        if (validation.valid) {
+          reviewToken.value = queryReviewToken
+          reviewOrderId.value = queryOrderId
+          reviewMode.value = validation
+        } else {
+          console.warn('Invalid review token:', validation.error)
+        }
+      }
     } catch (e) {
       console.error('Erreur loading product:', e)
       product.value = null

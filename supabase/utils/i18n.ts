@@ -802,6 +802,247 @@ export const translations = {
       en: 'Tracking number',
     },
   },
+
+  // ========== NURTURING SEQUENCE (Email Éducatif) ==========
+  nurturing: {
+    // Labels communs
+    seriesLabel: {
+      fr: 'Série Éducative',
+      en: 'Educational Series',
+    },
+    keyPointsTitle: {
+      fr: 'Ce que vous apprendrez :',
+      en: 'What you will learn:',
+    },
+    optoutText: {
+      fr: 'Vous ne souhaitez plus recevoir ces emails éducatifs ?',
+      en: 'You no longer want to receive these educational emails?',
+    },
+    optoutLink: {
+      fr: 'Se désinscrire de la série',
+      en: 'Unsubscribe from series',
+    },
+
+    // Step 1: Comment lire un rapport HPLC (J+2)
+    step1: {
+      subject: {
+        fr: 'Comment lire un rapport HPLC ?',
+        en: 'How to read an HPLC report?',
+      },
+      title: {
+        fr: 'Comment lire un rapport HPLC ?',
+        en: 'How to read an HPLC report?',
+      },
+      subtitle: {
+        fr: 'La science de la transparence',
+        en: 'The science of transparency',
+      },
+      intro: {
+        fr: 'Un certificat d\'analyse HPLC est votre meilleure garantie de pureté. Savoir le lire vous permet de vérifier la qualité de chaque lot que vous recevez.',
+        en: 'An HPLC analysis certificate is your best guarantee of purity. Knowing how to read it allows you to verify the quality of each batch you receive.',
+      },
+      point1: {
+        fr: 'Comprendre le % de pureté et ce qu\'il signifie réellement',
+        en: 'Understanding the % purity and what it really means',
+      },
+      point2: {
+        fr: 'Identifier les pics du chromatogramme',
+        en: 'Identifying chromatogram peaks',
+      },
+      point3: {
+        fr: 'Vérifier les impuretés et leur nature',
+        en: 'Checking impurities and their nature',
+      },
+      point4: {
+        fr: 'Nos standards qualité (≥98% pureté)',
+        en: 'Our quality standards (≥98% purity)',
+      },
+      ctaLabel: {
+        fr: 'Lire le guide complet',
+        en: 'Read the full guide',
+      },
+    },
+
+    // Step 2: Eau stérile vs Bactériostatique (J+5)
+    step2: {
+      subject: {
+        fr: 'Erreur classique : Eau stérile vs Bactériostatique',
+        en: 'Common mistake: Sterile Water vs Bacteriostatic',
+      },
+      title: {
+        fr: 'Eau stérile vs Bactériostatique',
+        en: 'Sterile Water vs Bacteriostatic',
+      },
+      subtitle: {
+        fr: 'L\'expertise technique',
+        en: 'Technical expertise',
+      },
+      intro: {
+        fr: 'Le choix du solvant de reconstitution est crucial. Une erreur peut compromettre la stabilité de vos peptides en quelques heures. Voici ce que vous devez savoir.',
+        en: 'The choice of reconstitution solvent is crucial. A mistake can compromise your peptides\' stability within hours. Here\'s what you need to know.',
+      },
+      point1: {
+        fr: 'Pourquoi l\'eau bactériostatique prolonge la conservation',
+        en: 'Why bacteriostatic water extends shelf life',
+      },
+      point2: {
+        fr: 'Quand utiliser l\'eau stérile (et quand l\'éviter)',
+        en: 'When to use sterile water (and when to avoid it)',
+      },
+      point3: {
+        fr: 'Les erreurs de reconstitution qui détruisent les peptides',
+        en: 'Reconstitution mistakes that destroy peptides',
+      },
+      point4: {
+        fr: 'Notre protocole de reconstitution recommandé',
+        en: 'Our recommended reconstitution protocol',
+      },
+      ctaLabel: {
+        fr: 'Voir le guide de reconstitution',
+        en: 'See the reconstitution guide',
+      },
+    },
+
+    // Step 3: Notre garantie livraison (J+9)
+    step3: {
+      subject: {
+        fr: 'Notre garantie livraison',
+        en: 'Our shipping guarantee',
+      },
+      title: {
+        fr: 'Livraison sécurisée et garantie',
+        en: 'Secure and guaranteed delivery',
+      },
+      subtitle: {
+        fr: 'Zéro risque pour vous',
+        en: 'Zero risk for you',
+      },
+      intro: {
+        fr: 'Nous comprenons vos préoccupations concernant la livraison. C\'est pourquoi nous avons mis en place des garanties solides pour votre tranquillité d\'esprit.',
+        en: 'We understand your concerns about delivery. That\'s why we\'ve implemented solid guarantees for your peace of mind.',
+      },
+      point1: {
+        fr: 'Renvoi gratuit en cas de perte ou saisie',
+        en: 'Free reshipment in case of loss or seizure',
+      },
+      point2: {
+        fr: 'Emballage discret et sécurisé',
+        en: 'Discreet and secure packaging',
+      },
+      point3: {
+        fr: 'Suivi de colis en temps réel',
+        en: 'Real-time package tracking',
+      },
+      point4: {
+        fr: 'Support réactif en cas de problème',
+        en: 'Responsive support if issues arise',
+      },
+      ctaLabel: {
+        fr: 'Découvrir nos garanties',
+        en: 'Discover our guarantees',
+      },
+    },
+  },
+
+  // ========== REVIEW REQUEST ==========
+  reviewRequest: {
+    title: {
+      fr: 'Votre avis compte',
+      en: 'Your feedback matters',
+    },
+    subject: {
+      fr: (orderNumber: string) => `Votre avis sur votre commande #${orderNumber}`,
+      en: (orderNumber: string) => `Share your feedback on order #${orderNumber}`,
+    },
+    greeting: {
+      fr: (name: string) => `Bonjour <strong>${name || 'cher client'}</strong>,`,
+      en: (name: string) => `Hello <strong>${name || 'dear customer'}</strong>,`,
+    },
+    intro: {
+      fr: (orderNumber: string) =>
+        `Nous espérons que vous êtes satisfait(e) de votre commande <strong>#${orderNumber}</strong>. Votre retour d'expérience nous aide à nous améliorer !`,
+      en: (orderNumber: string) =>
+        `We hope you're satisfied with your order <strong>#${orderNumber}</strong>. Your feedback helps us improve!`,
+    },
+    encouragement: {
+      fr: 'Partagez votre expérience en quelques clics',
+      en: 'Share your experience in just a few clicks',
+    },
+    whyReviewTitle: {
+      fr: 'Pourquoi donner votre avis ?',
+      en: 'Why share your feedback?',
+    },
+    whyReviewPoint1: {
+      fr: 'Aidez d\'autres chercheurs à faire le bon choix',
+      en: 'Help other researchers make the right choice',
+    },
+    whyReviewPoint2: {
+      fr: 'Contribuez à l\'amélioration de nos produits',
+      en: 'Contribute to improving our products',
+    },
+    whyReviewPoint3: {
+      fr: 'Faites partie de notre communauté scientifique',
+      en: 'Be part of our scientific community',
+    },
+    simpleNote: {
+      fr: 'Cela ne prend que 30 secondes !',
+      en: 'It only takes 30 seconds!',
+    },
+    ctaLabel: {
+      fr: 'Donner mon avis',
+      en: 'Leave a review',
+    },
+  },
+
+  // ========== CART REMINDER (rappel doux 2h) ==========
+  cartReminder: {
+    subject: {
+      fr: 'Vos recherches vous attendent...',
+      en: 'Your research is waiting...',
+    },
+    title: {
+      fr: 'Vos recherches vous attendent',
+      en: 'Your research is waiting',
+    },
+    greeting: {
+      fr: (name: string | null) => (name ? `Bonjour <strong>${name}</strong>,` : 'Bonjour,'),
+      en: (name: string | null) => (name ? `Hello <strong>${name}</strong>,` : 'Hello,'),
+    },
+    cartNotice: {
+      fr: (count: number, total: string) =>
+        `Nous avons remarqué que vous avez laissé <strong>${count} article${count > 1 ? 's' : ''}</strong> dans votre panier pour un total de <strong>${total} EUR</strong>.`,
+      en: (count: number, total: string) =>
+        `We noticed you left <strong>${count} item${count > 1 ? 's' : ''}</strong> in your cart for a total of <strong>${total} EUR</strong>.`,
+    },
+    waitingText: {
+      fr: 'Vos recherches sont en attente et nous voulons nous assurer que tout se passe bien de votre côté.',
+      en: 'Your research is waiting and we want to make sure everything is going well on your end.',
+    },
+    helpTitle: {
+      fr: "Besoin d'aide ?",
+      en: 'Need help?',
+    },
+    helpItems: {
+      fr: [
+        'Un problème technique lors du paiement crypto ?',
+        'Des questions sur un produit ?',
+        'Besoin de conseils sur le dosage ou le stockage ?',
+      ],
+      en: [
+        'Technical issue with crypto payment?',
+        'Questions about a product?',
+        'Need advice on dosage or storage?',
+      ],
+    },
+    supportText: {
+      fr: "Notre équipe est là pour vous accompagner. N'hésitez pas à nous contacter si vous avez la moindre question.",
+      en: "Our team is here to help. Don't hesitate to contact us if you have any questions.",
+    },
+    ctaLabel: {
+      fr: 'Reprendre mon panier',
+      en: 'Continue shopping',
+    },
+  },
 } as const
 
 /**

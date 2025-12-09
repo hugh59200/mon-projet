@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch } from 'vue'
-import { createReview } from '@/api'
+import { createReview, createGuestReview } from '@/api'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
 import FilterSection from '@/features/shared/components/FilterSection.vue'
@@ -107,7 +107,14 @@ import StarRating from './StarRating.vue'
 const props = defineProps<{
   productId: string
   productName: string
+  // Props pour le mode invité (magic link)
+  reviewToken?: string
+  orderId?: string
+  guestName?: string
 }>()
+
+// Mode invité si reviewToken et orderId sont fournis
+const isGuestMode = computed(() => Boolean(props.reviewToken && props.orderId))
 
 const emit = defineEmits<{
   close: []
@@ -160,10 +167,8 @@ async function submitReview() {
   isSubmitting.value = true
 
   try {
-    await createReview({
+    const baseReview = {
       product_id: props.productId,
-      user_id: authStore.user?.id,
-      author_name: authStore.user?.email?.split('@')[0] || 'Anonyme',
       rating: form.rating,
       title: form.title || undefined,
       content: form.content || undefined,
@@ -173,7 +178,24 @@ async function submitReview() {
       rating_value: form.rating_value || undefined,
       author_title: form.author_title || undefined,
       author_institution: form.author_institution || undefined,
-    })
+    }
+
+    if (isGuestMode.value) {
+      // Mode invité : utiliser createGuestReview avec le token
+      await createGuestReview({
+        ...baseReview,
+        order_id: props.orderId!,
+        review_token: props.reviewToken!,
+        author_name: props.guestName || 'Client vérifié',
+      })
+    } else {
+      // Mode authentifié : utiliser createReview classique
+      await createReview({
+        ...baseReview,
+        user_id: authStore.user?.id,
+        author_name: authStore.user?.email?.split('@')[0] || 'Anonyme',
+      })
+    }
 
     emit('submitted')
   } catch (error) {

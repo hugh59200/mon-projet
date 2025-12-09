@@ -1,6 +1,29 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V6.5 — SEO Slugs Produits
+-- SUPABASE CLEAN BACKUP V6.10 — Glossaire SEO
 -- ============================================================
+-- V6.10 : Glossaire scientifique (SEO longue traîne)
+--         - Table glossary_terms pour définitions (~100 mots)
+--         - Liens croisés vers produits et ressources
+--         - Trigger updated_at, RLS policies
+-- V6.9 : Cockpit Crypto Matching pour validation paiements
+--        - Champs crypto_txid, crypto_type, crypto_verified_at, crypto_verified_amount
+--        - Fonction admin_save_crypto_verification()
+--        - Index idx_orders_crypto_pending, idx_orders_crypto_txid
+-- V6.8 : Système de Rappel Doux Panier (2h sans code promo)
+--        - Type 'cart_reminder' dans user_promo_rewards
+--        - Config cart_reminder dans auto_promo_settings
+--        - Fonctions find_carts_for_reminder, record_cart_reminder
+--        - Edge Functions check-cart-reminders, send-cart-reminder-email
+-- V6.7 : Système de demande d'avis automatique (J+10 après expédition)
+--        - Type 'review_request' dans emails_sent
+--        - Colonnes order_id et review_token sur reviews (avis invités)
+--        - Fonction get_orders_for_review_request() pour cron
+--        - Politique RLS pour avis anonymes via token
+-- V6.6 : Séquence Email Nurturing (Éducative)
+--        - Table email_nurturing_sequence pour tracking
+--        - 3 emails automatiques après inscription (J+2, J+5, J+9)
+--        - Triggers sur auth.users et newsletter_subscribers
+--        - Opt-out granulaire (séquence seule)
 -- V6.5 : Slugs SEO-friendly pour URLs produits
 --        - Colonne slug sur products (ex: bpc-157-10mg)
 --        - Fonction generate_product_slug() + trigger auto-génération
@@ -59,6 +82,8 @@ DROP VIEW IF EXISTS
 CASCADE;
 
 DROP TABLE IF EXISTS
+  public.glossary_terms,
+  public.email_nurturing_sequence,
   public.resources,
   public.resource_categories,
   public.user_sessions,
@@ -121,6 +146,8 @@ DROP FUNCTION IF EXISTS
   public.check_loyalty_reward,
   public.create_cart_abandonment_promo,
   public.find_abandoned_carts,
+  public.find_carts_for_reminder,
+  public.record_cart_reminder,
   public.trigger_welcome_promo,
   public.trigger_check_loyalty,
   -- Reviews functions
@@ -138,7 +165,17 @@ DROP FUNCTION IF EXISTS
   public.end_session,
   -- Resources functions
   public.update_resources_updated_at,
-  public.get_resource_related_products
+  public.get_resource_related_products,
+  -- Glossary functions
+  public.update_glossary_updated_at,
+  -- Nurturing sequence functions
+  public.enroll_in_nurturing_sequence,
+  public.find_nurturing_emails_to_send,
+  public.mark_nurturing_email_sent,
+  public.optout_nurturing_sequence,
+  public.update_nurturing_updated_at,
+  public.trigger_nurturing_on_email_confirmed,
+  public.trigger_nurturing_on_newsletter_subscribe
 CASCADE;
 
 -- ============================================================
@@ -384,6 +421,12 @@ CREATE TABLE public.orders (
   -- Paiement (Virement bancaire / Crypto)
   payment_method text,
 
+  -- Crypto Matching (verification blockchain)
+  crypto_txid text,
+  crypto_type text CHECK (crypto_type IS NULL OR crypto_type IN ('BTC', 'USDT_TRC20', 'ETH', 'USDT_ERC20')),
+  crypto_verified_at timestamptz,
+  crypto_verified_amount numeric(18,8),
+
   -- Montants
   subtotal numeric(10,2) DEFAULT 0 CHECK (subtotal >= 0),
   tax_amount numeric(10,2) DEFAULT 0 CHECK (tax_amount >= 0),
@@ -425,9 +468,15 @@ CREATE INDEX idx_orders_created_at ON public.orders (created_at DESC);
 CREATE INDEX idx_orders_tracking_token ON public.orders (tracking_token);
 CREATE INDEX idx_orders_guest ON public.orders (is_guest_order) WHERE is_guest_order = true;
 CREATE INDEX idx_orders_relay_id ON public.orders (relay_id) WHERE relay_id IS NOT NULL;
+CREATE INDEX idx_orders_crypto_pending ON public.orders (status, payment_method) WHERE status = 'pending' AND payment_method = 'crypto';
+CREATE INDEX idx_orders_crypto_txid ON public.orders (crypto_txid) WHERE crypto_txid IS NOT NULL;
 
 COMMENT ON COLUMN public.orders.relay_id IS 'ID du point relais Mondial Relay. NULL = livraison domicile.';
 COMMENT ON COLUMN public.orders.relay_name IS 'Nom commercial du point relais';
+COMMENT ON COLUMN public.orders.crypto_txid IS 'Hash de la transaction blockchain verifiee';
+COMMENT ON COLUMN public.orders.crypto_type IS 'Type de crypto: BTC, USDT_TRC20, ETH, USDT_ERC20';
+COMMENT ON COLUMN public.orders.crypto_verified_at IS 'Timestamp de la verification blockchain';
+COMMENT ON COLUMN public.orders.crypto_verified_amount IS 'Montant verifie sur la blockchain (en crypto)';
 
 -- ============================
 -- ORDER ITEMS
@@ -469,7 +518,7 @@ CREATE TABLE public.user_promo_rewards (
   user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
   user_email text NOT NULL,
   promo_code_id uuid REFERENCES public.promo_codes(id) ON DELETE SET NULL,
-  reward_type text NOT NULL CHECK (reward_type IN ('welcome', 'loyalty', 'cart_abandonment', 'birthday')),
+  reward_type text NOT NULL CHECK (reward_type IN ('welcome', 'loyalty', 'cart_abandonment', 'cart_reminder', 'birthday')),
   generated_code text,
   is_used boolean DEFAULT false,
   expires_at timestamptz,
@@ -520,6 +569,11 @@ INSERT INTO public.auto_promo_settings (setting_key, setting_value, is_enabled) 
     "min_order_amount": 30,
     "expires_days": 7,
     "email_subject": "Vous avez oublié quelque chose..."
+  }'::jsonb, true),
+  ('cart_reminder', '{
+    "delay_hours": 2,
+    "min_order_amount": 20,
+    "cooldown_hours": 48
   }'::jsonb, true)
 ON CONFLICT (setting_key) DO NOTHING;
 
@@ -532,7 +586,7 @@ CREATE TABLE public.emails_sent (
   to_email text NOT NULL,
   subject text NOT NULL,
   body_html text NOT NULL,
-  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom','pending_payment','payment_validated','auth_signup','auth_recovery','auth_email_change')) NOT NULL DEFAULT 'custom',
+  type text CHECK (type IN ('confirmation','status_update','shipping','cancelation','payment','custom','pending_payment','payment_validated','auth_signup','auth_recovery','auth_email_change','review_request','cart_reminder')) NOT NULL DEFAULT 'custom',
   status text CHECK (status IN ('sent','error')) DEFAULT 'sent',
   provider_response jsonb,
   sent_at timestamptz DEFAULT now()
@@ -1182,6 +1236,55 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.admin_update_order_status TO authenticated;
 
+-- ============================
+-- FONCTION: admin_save_crypto_verification
+-- Sauvegarde la verification d'une transaction crypto
+-- ============================
+CREATE OR REPLACE FUNCTION public.admin_save_crypto_verification(
+  p_order_id uuid,
+  p_txid text,
+  p_crypto_type text,
+  p_verified_amount numeric
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER AS $$
+BEGIN
+  -- Verification admin
+  IF NOT public.is_admin(auth.uid()) THEN
+    RAISE EXCEPTION 'Acces refuse: admin requis';
+  END IF;
+
+  -- Validation crypto_type
+  IF p_crypto_type NOT IN ('BTC', 'USDT_TRC20', 'ETH', 'USDT_ERC20') THEN
+    RAISE EXCEPTION 'Type de crypto invalide: %', p_crypto_type;
+  END IF;
+
+  -- Mise a jour de la commande
+  UPDATE public.orders SET
+    crypto_txid = p_txid,
+    crypto_type = p_crypto_type,
+    crypto_verified_at = now(),
+    crypto_verified_amount = p_verified_amount,
+    updated_at = now()
+  WHERE id = p_order_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Commande non trouvee: %', p_order_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'order_id', p_order_id,
+    'txid', p_txid,
+    'crypto_type', p_crypto_type,
+    'verified_at', now()
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_save_crypto_verification TO authenticated;
+
 -- ============================================================
 -- BLOC 9.5 — PROMO CODE FUNCTIONS
 -- ============================================================
@@ -1819,6 +1922,139 @@ $$;
 GRANT EXECUTE ON FUNCTION public.find_abandoned_carts TO authenticated;
 
 -- ============================
+-- FONCTION: find_carts_for_reminder
+-- Trouve les paniers eligibles au rappel doux (2h-24h)
+-- ============================
+CREATE OR REPLACE FUNCTION public.find_carts_for_reminder(
+  p_cutoff_time timestamptz,
+  p_min_value numeric DEFAULT 20
+)
+RETURNS TABLE (
+  user_id uuid,
+  email text,
+  first_name text,
+  cart_total numeric,
+  last_activity timestamptz,
+  items_count bigint
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    p.id as user_id,
+    p.email,
+    p.first_name,
+    COALESCE(SUM(
+      CASE
+        WHEN pr.is_on_sale AND pr.sale_price IS NOT NULL
+        THEN pr.sale_price * ci.quantity
+        ELSE pr.price * ci.quantity
+      END
+    ), 0) as cart_total,
+    MAX(ci.updated_at) as last_activity,
+    COUNT(ci.id) as items_count
+  FROM profiles p
+  INNER JOIN user_cart_items ci ON ci.user_id = p.id
+  INNER JOIN products pr ON pr.id = ci.product_id
+  WHERE
+    -- Panier mis a jour avant le cutoff (>= 2h)
+    ci.updated_at < p_cutoff_time
+    -- Mais pas trop vieux (< 24h pour ne pas chevaucher le promo)
+    AND ci.updated_at > p_cutoff_time - interval '22 hours'
+    -- Pas de commande recente (24h)
+    AND NOT EXISTS (
+      SELECT 1 FROM orders o
+      WHERE o.user_id = p.id
+      AND o.created_at > p_cutoff_time - interval '24 hours'
+    )
+    -- Pas de rappel doux envoye recemment (48h)
+    AND NOT EXISTS (
+      SELECT 1 FROM user_promo_rewards upr
+      WHERE upr.user_id = p.id
+      AND upr.reward_type = 'cart_reminder'
+      AND upr.created_at > now() - interval '48 hours'
+    )
+    -- Pas de code abandon promo envoye recemment (7j)
+    AND NOT EXISTS (
+      SELECT 1 FROM user_promo_rewards upr
+      WHERE upr.user_id = p.id
+      AND upr.reward_type = 'cart_abandonment'
+      AND upr.created_at > now() - interval '7 days'
+    )
+  GROUP BY p.id, p.email, p.first_name
+  HAVING COALESCE(SUM(
+    CASE
+      WHEN pr.is_on_sale AND pr.sale_price IS NOT NULL
+      THEN pr.sale_price * ci.quantity
+      ELSE pr.price * ci.quantity
+    END
+  ), 0) >= p_min_value;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.find_carts_for_reminder TO authenticated;
+COMMENT ON FUNCTION public.find_carts_for_reminder IS 'Trouve les paniers eligibles au rappel doux (2h-24h)';
+
+-- ============================
+-- FONCTION: record_cart_reminder
+-- Enregistre l envoi d un rappel doux (sans code promo)
+-- ============================
+CREATE OR REPLACE FUNCTION public.record_cart_reminder(
+  p_user_id uuid,
+  p_user_email text,
+  p_cart_value numeric DEFAULT 0,
+  p_items_count integer DEFAULT 0
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_settings jsonb;
+  v_is_enabled boolean;
+BEGIN
+  -- Verifier si le systeme est active
+  SELECT setting_value, is_enabled INTO v_settings, v_is_enabled
+  FROM auto_promo_settings
+  WHERE setting_key = 'cart_reminder';
+
+  IF NOT COALESCE(v_is_enabled, false) THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'cart_reminder_disabled');
+  END IF;
+
+  -- Enregistrer l envoi du rappel (sans code promo)
+  INSERT INTO user_promo_rewards (
+    user_id,
+    user_email,
+    reward_type,
+    metadata
+  ) VALUES (
+    p_user_id,
+    p_user_email,
+    'cart_reminder',
+    jsonb_build_object(
+      'cart_value', p_cart_value,
+      'items_count', p_items_count,
+      'sent_at', now()
+    )
+  );
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'cart_value', p_cart_value,
+    'items_count', p_items_count
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.record_cart_reminder TO authenticated;
+COMMENT ON FUNCTION public.record_cart_reminder IS 'Enregistre l envoi d un rappel doux panier (sans code promo)';
+
+-- ============================
 -- TRIGGER: Creer code bienvenue a l'inscription
 -- ============================
 CREATE OR REPLACE FUNCTION public.trigger_welcome_promo()
@@ -2023,6 +2259,11 @@ SELECT
   o.status,
   o.total_amount,
   o.payment_method,  -- V5.1: Pour identifier Virement/Crypto et valider manuellement
+  -- V6.9: Champs crypto matching
+  o.crypto_txid,
+  o.crypto_type,
+  o.crypto_verified_at,
+  o.crypto_verified_amount,
   o.created_at,
   o.shipped_at,
   -- Info relay pour l'admin
@@ -2259,6 +2500,8 @@ CREATE TABLE public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+  review_token TEXT UNIQUE,
 
   -- Informations de l'auteur
   author_name VARCHAR(100) NOT NULL,
@@ -2290,6 +2533,8 @@ CREATE TABLE public.reviews (
 CREATE INDEX idx_reviews_product_id ON public.reviews(product_id);
 CREATE INDEX idx_reviews_approved ON public.reviews(is_approved) WHERE is_approved = true;
 CREATE INDEX idx_reviews_rating ON public.reviews(rating);
+CREATE INDEX idx_reviews_order_id ON public.reviews(order_id);
+CREATE INDEX idx_reviews_token ON public.reviews(review_token) WHERE review_token IS NOT NULL;
 
 COMMENT ON TABLE public.reviews IS 'Avis produits avec types (standard, premium, pro, verified) pour SEO aggregateRating';
 
@@ -2342,6 +2587,15 @@ CREATE POLICY "Admin full reviews"
   ON public.reviews FOR ALL
   TO authenticated
   USING (public.is_admin(auth.uid()));
+
+CREATE POLICY "Guests can create reviews via token"
+  ON public.reviews FOR INSERT
+  TO anon
+  WITH CHECK (
+    review_token IS NOT NULL
+    AND user_id IS NULL
+    AND order_id IS NOT NULL
+  );
 
 -- ============================
 -- REVIEWS TRIGGER
@@ -3106,8 +3360,466 @@ CREATE POLICY "Admin full access to resources"
   );
 
 -- ============================================================
--- FIN DU BACKUP V6.4 — RESOURCES (Lab Notes)
+-- BLOC GLOSSARY — Glossaire scientifique (V6.10)
 -- ============================================================
--- V6.4 : Séparation Ressources techniques / Actualités
+
+-- ============================
+-- TABLE glossary_terms
+-- ============================
+CREATE TABLE public.glossary_terms (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug varchar(255) UNIQUE NOT NULL,
+  term varchar(255) NOT NULL,
+  definition text NOT NULL,
+
+  -- Liens croisés
+  related_product_ids uuid[] DEFAULT '{}',
+  related_resource_ids uuid[] DEFAULT '{}',
+
+  -- SEO
+  meta_description varchar(320),
+
+  -- i18n (multilingue)
+  term_i18n jsonb DEFAULT '{}'::jsonb,
+  definition_i18n jsonb DEFAULT '{}'::jsonb,
+
+  -- Status et publication
+  status varchar(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+
+  -- Timestamps
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+COMMENT ON TABLE public.glossary_terms IS 'Glossaire de termes scientifiques pour SEO longue traîne';
+COMMENT ON COLUMN public.glossary_terms.term_i18n IS 'Traductions du terme: {"en": "...", "de": "..."}';
+COMMENT ON COLUMN public.glossary_terms.definition_i18n IS 'Traductions de la définition';
+COMMENT ON COLUMN public.glossary_terms.related_product_ids IS 'UUIDs des produits liés';
+COMMENT ON COLUMN public.glossary_terms.related_resource_ids IS 'UUIDs des ressources/articles liés';
+
+-- Index pour performances
+CREATE INDEX idx_glossary_slug ON public.glossary_terms(slug);
+CREATE INDEX idx_glossary_status ON public.glossary_terms(status) WHERE status = 'published';
+CREATE INDEX idx_glossary_term ON public.glossary_terms(lower(term));
+
+-- Trigger updated_at
+CREATE OR REPLACE FUNCTION public.update_glossary_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_glossary_updated_at
+  BEFORE UPDATE ON public.glossary_terms
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_glossary_updated_at();
+
+-- ============================
+-- RLS POLICIES — GLOSSARY
+-- ============================
+ALTER TABLE public.glossary_terms ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read access to published glossary"
+  ON public.glossary_terms FOR SELECT
+  USING (status = 'published');
+
+CREATE POLICY "Admin full access to glossary"
+  ON public.glossary_terms FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- ============================================================
+-- BLOC NURTURING — Email Nurturing Sequence (V6.6)
+-- ============================================================
+
+-- ============================
+-- TABLE email_nurturing_sequence
+-- ============================
+CREATE TABLE public.email_nurturing_sequence (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Identification de la cible
+  profile_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  newsletter_subscriber_id uuid REFERENCES public.newsletter_subscribers(id) ON DELETE CASCADE,
+  email text NOT NULL,
+
+  -- Progression dans la séquence (0=inscrit, 1-3=steps envoyés)
+  sequence_step integer DEFAULT 0 CHECK (sequence_step >= 0 AND sequence_step <= 3),
+
+  -- Dates d'envoi
+  enrolled_at timestamptz NOT NULL DEFAULT now(),
+  step1_sent_at timestamptz,
+  step2_sent_at timestamptz,
+  step3_sent_at timestamptz,
+
+  -- Opt-out spécifique
+  opted_out boolean DEFAULT false,
+  opted_out_at timestamptz,
+
+  -- Metadata
+  source text CHECK (source IN ('account_creation', 'newsletter_signup')) NOT NULL,
+  locale varchar(5) DEFAULT 'fr',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+
+  CONSTRAINT unique_nurturing_email UNIQUE (email)
+);
+
+COMMENT ON TABLE public.email_nurturing_sequence IS 'Séquence email éducative (3 emails après inscription)';
+COMMENT ON COLUMN public.email_nurturing_sequence.sequence_step IS '0=inscrit, 1=J+2 envoyé, 2=J+5 envoyé, 3=J+9 envoyé';
+COMMENT ON COLUMN public.email_nurturing_sequence.opted_out IS 'Opt-out de la séquence éducative (reste inscrit newsletter)';
+
+CREATE INDEX idx_nurturing_step ON public.email_nurturing_sequence (sequence_step)
+  WHERE sequence_step < 3 AND opted_out = false;
+CREATE INDEX idx_nurturing_enrolled ON public.email_nurturing_sequence (enrolled_at);
+CREATE INDEX idx_nurturing_email ON public.email_nurturing_sequence (email);
+
+-- ============================
+-- RLS POLICIES — NURTURING
+-- ============================
+ALTER TABLE public.email_nurturing_sequence ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admin full nurturing" ON public.email_nurturing_sequence
+  FOR ALL TO authenticated
+  USING (public.is_admin(auth.uid()));
+
+CREATE POLICY "Users view own nurturing" ON public.email_nurturing_sequence
+  FOR SELECT TO authenticated
+  USING (profile_id = auth.uid());
+
+-- ============================
+-- FONCTION : Inscription à la séquence
+-- ============================
+CREATE OR REPLACE FUNCTION public.enroll_in_nurturing_sequence(
+  p_email text,
+  p_profile_id uuid DEFAULT NULL,
+  p_newsletter_subscriber_id uuid DEFAULT NULL,
+  p_source text DEFAULT 'account_creation',
+  p_locale text DEFAULT 'fr'
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_existing_id uuid;
+  v_new_id uuid;
+BEGIN
+  SELECT id INTO v_existing_id
+  FROM public.email_nurturing_sequence
+  WHERE email = LOWER(TRIM(p_email));
+
+  IF v_existing_id IS NOT NULL THEN
+    RETURN jsonb_build_object('success', false, 'reason', 'already_enrolled', 'id', v_existing_id);
+  END IF;
+
+  INSERT INTO public.email_nurturing_sequence (email, profile_id, newsletter_subscriber_id, source, locale)
+  VALUES (LOWER(TRIM(p_email)), p_profile_id, p_newsletter_subscriber_id, p_source, COALESCE(p_locale, 'fr'))
+  RETURNING id INTO v_new_id;
+
+  RETURN jsonb_build_object('success', true, 'id', v_new_id, 'source', p_source);
+END;
+$$;
+
+-- ============================
+-- FONCTION : Trouver les emails à envoyer
+-- ============================
+CREATE OR REPLACE FUNCTION public.find_nurturing_emails_to_send()
+RETURNS TABLE (
+  id uuid,
+  email text,
+  locale varchar(5),
+  next_step integer,
+  profile_id uuid,
+  enrolled_at timestamptz
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_settings jsonb;
+  v_step1_delay integer;
+  v_step2_delay integer;
+  v_step3_delay integer;
+  v_batch_size integer;
+BEGIN
+  SELECT setting_value INTO v_settings
+  FROM public.auto_promo_settings
+  WHERE setting_key = 'email_nurturing' AND is_enabled = true;
+
+  IF v_settings IS NULL THEN RETURN; END IF;
+
+  v_step1_delay := (v_settings->>'step1_delay_days')::integer;
+  v_step2_delay := (v_settings->>'step2_delay_days')::integer;
+  v_step3_delay := (v_settings->>'step3_delay_days')::integer;
+  v_batch_size := COALESCE((v_settings->>'batch_size')::integer, 50);
+
+  RETURN QUERY
+  SELECT ens.id, ens.email, ens.locale, ens.sequence_step + 1 as next_step, ens.profile_id, ens.enrolled_at
+  FROM public.email_nurturing_sequence ens
+  WHERE ens.opted_out = false AND ens.sequence_step < 3
+    AND (
+      (ens.sequence_step = 0 AND ens.enrolled_at <= now() - (v_step1_delay || ' days')::interval AND ens.step1_sent_at IS NULL)
+      OR (ens.sequence_step = 1 AND ens.enrolled_at <= now() - (v_step2_delay || ' days')::interval AND ens.step2_sent_at IS NULL)
+      OR (ens.sequence_step = 2 AND ens.enrolled_at <= now() - (v_step3_delay || ' days')::interval AND ens.step3_sent_at IS NULL)
+    )
+  ORDER BY ens.enrolled_at ASC
+  LIMIT v_batch_size;
+END;
+$$;
+
+-- ============================
+-- FONCTION : Marquer un email comme envoyé
+-- ============================
+CREATE OR REPLACE FUNCTION public.mark_nurturing_email_sent(p_id uuid, p_step integer)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.email_nurturing_sequence
+  SET sequence_step = p_step, updated_at = now(),
+      step1_sent_at = CASE WHEN p_step = 1 THEN now() ELSE step1_sent_at END,
+      step2_sent_at = CASE WHEN p_step = 2 THEN now() ELSE step2_sent_at END,
+      step3_sent_at = CASE WHEN p_step = 3 THEN now() ELSE step3_sent_at END
+  WHERE id = p_id AND sequence_step = p_step - 1;
+  RETURN FOUND;
+END;
+$$;
+
+-- ============================
+-- FONCTION : Opt-out de la séquence
+-- ============================
+CREATE OR REPLACE FUNCTION public.optout_nurturing_sequence(p_email text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_id uuid;
+BEGIN
+  UPDATE public.email_nurturing_sequence
+  SET opted_out = true, opted_out_at = now(), updated_at = now()
+  WHERE email = LOWER(TRIM(p_email))
+  RETURNING id INTO v_id;
+
+  IF v_id IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'not_found');
+  END IF;
+  RETURN jsonb_build_object('success', true, 'id', v_id);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.optout_nurturing_sequence TO anon, authenticated;
+
+-- ============================
+-- TRIGGER : Inscription auto sur confirmation email (compte)
+-- ============================
+CREATE OR REPLACE FUNCTION public.trigger_nurturing_on_email_confirmed()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
+DECLARE v_result jsonb;
+BEGIN
+  IF OLD.email_confirmed_at IS NULL AND NEW.email_confirmed_at IS NOT NULL THEN
+    v_result := enroll_in_nurturing_sequence(
+      NEW.email, NEW.id, NULL, 'account_creation',
+      COALESCE(NEW.raw_user_meta_data->>'locale', 'fr')
+    );
+    RAISE LOG 'Nurturing enrollment for account %: %', NEW.email, v_result;
+  END IF;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'Nurturing enrollment error for %: %', NEW.email, SQLERRM;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_email_confirmed_nurturing ON auth.users;
+CREATE TRIGGER on_email_confirmed_nurturing
+  AFTER UPDATE OF email_confirmed_at ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trigger_nurturing_on_email_confirmed();
+
+-- ============================
+-- TRIGGER : Inscription auto sur newsletter active
+-- ============================
+CREATE OR REPLACE FUNCTION public.trigger_nurturing_on_newsletter_subscribe()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
+DECLARE v_result jsonb;
+BEGIN
+  IF NEW.status = 'active' AND (OLD IS NULL OR OLD.status != 'active') THEN
+    v_result := enroll_in_nurturing_sequence(
+      NEW.email, NEW.user_id, NEW.id, 'newsletter_signup',
+      COALESCE(NEW.locale, 'fr')
+    );
+    RAISE LOG 'Nurturing enrollment for newsletter %: %', NEW.email, v_result;
+  END IF;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'Nurturing enrollment error for newsletter %: %', NEW.email, SQLERRM;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_newsletter_active_nurturing ON public.newsletter_subscribers;
+CREATE TRIGGER on_newsletter_active_nurturing
+  AFTER INSERT OR UPDATE OF status ON public.newsletter_subscribers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trigger_nurturing_on_newsletter_subscribe();
+
+-- ============================
+-- TRIGGER : Updated_at automatique
+-- ============================
+CREATE OR REPLACE FUNCTION public.update_nurturing_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS nurturing_updated_at ON public.email_nurturing_sequence;
+CREATE TRIGGER nurturing_updated_at
+  BEFORE UPDATE ON public.email_nurturing_sequence
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_nurturing_updated_at();
+
+-- ============================
+-- REVIEW REQUEST FUNCTIONS
+-- ============================
+-- Fonction pour récupérer les commandes éligibles aux emails d'avis (J+10)
+CREATE OR REPLACE FUNCTION public.get_orders_for_review_request()
+RETURNS TABLE (
+  order_id uuid,
+  order_number text,
+  email text,
+  full_name text,
+  user_id uuid,
+  is_guest boolean,
+  tracking_token text,
+  shipped_at timestamptz,
+  first_product_id uuid,
+  first_product_name text,
+  first_product_slug text,
+  first_product_image text
+)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT DISTINCT ON (o.id)
+    o.id AS order_id,
+    o.order_number,
+    o.email,
+    o.full_name,
+    o.user_id,
+    o.is_guest_order AS is_guest,
+    o.tracking_token,
+    o.shipped_at,
+    p.id AS first_product_id,
+    COALESCE(oi.product_name_snapshot, p.name) AS first_product_name,
+    p.slug AS first_product_slug,
+    p.image AS first_product_image
+  FROM public.orders o
+  JOIN public.order_items oi ON oi.order_id = o.id
+  JOIN public.products p ON p.id = oi.product_id
+  WHERE
+    -- Expédié il y a 10 jours (±1 jour de marge)
+    o.shipped_at IS NOT NULL
+    AND o.shipped_at BETWEEN NOW() - INTERVAL '11 days' AND NOW() - INTERVAL '9 days'
+    -- Pas de demande d'avis déjà envoyée
+    AND NOT EXISTS (
+      SELECT 1 FROM public.emails_sent es
+      WHERE es.order_id = o.id
+      AND es.type = 'review_request'
+    )
+    -- Commande non annulée/remboursée
+    AND o.status NOT IN ('canceled', 'refunded', 'failed')
+  ORDER BY o.id, oi.created_at ASC;
+$$;
+
+COMMENT ON FUNCTION public.get_orders_for_review_request IS 'Retourne les commandes éligibles pour email de demande d''avis (J+10 après expédition)';
+
+-- Fonction pour valider un lien de demande d'avis
+CREATE OR REPLACE FUNCTION public.validate_review_token(
+  p_order_id uuid,
+  p_product_id uuid
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_order record;
+  v_has_product boolean;
+  v_already_reviewed boolean;
+BEGIN
+  -- Vérifier que la commande existe et a été expédiée
+  SELECT o.id, o.full_name, o.email, o.is_guest_order
+  INTO v_order
+  FROM public.orders o
+  WHERE o.id = p_order_id
+    AND o.shipped_at IS NOT NULL
+    AND o.status NOT IN ('canceled', 'refunded', 'failed');
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('valid', false, 'error', 'order_not_found');
+  END IF;
+
+  -- Vérifier que le produit fait partie de la commande
+  SELECT EXISTS (
+    SELECT 1 FROM public.order_items oi
+    WHERE oi.order_id = p_order_id AND oi.product_id = p_product_id
+  ) INTO v_has_product;
+
+  IF NOT v_has_product THEN
+    RETURN jsonb_build_object('valid', false, 'error', 'product_not_in_order');
+  END IF;
+
+  -- Vérifier qu'il n'y a pas déjà un avis pour ce produit/commande
+  SELECT EXISTS (
+    SELECT 1 FROM public.reviews r
+    WHERE r.order_id = p_order_id AND r.product_id = p_product_id
+  ) INTO v_already_reviewed;
+
+  IF v_already_reviewed THEN
+    RETURN jsonb_build_object('valid', false, 'error', 'already_reviewed');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'valid', true,
+    'full_name', v_order.full_name,
+    'email', v_order.email,
+    'is_guest', v_order.is_guest_order
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.validate_review_token TO anon, authenticated;
+
+COMMENT ON FUNCTION public.validate_review_token IS 'Valide un lien de demande d''avis et retourne les infos client';
+
+-- ============================================================
+-- FIN DU BACKUP V6.7 — REVIEW REQUEST EMAIL SYSTEM
+-- ============================================================
+-- V6.7 : Système de demande d'avis automatique (J+10 après expédition)
 -- Inclut toutes les tables, vues, fonctions, RLS et triggers
 -- ============================================================

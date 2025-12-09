@@ -20,6 +20,12 @@ import { paymentValidatedTemplate } from './paymentValidatedTemplate.ts'
 import { statusUpdateTemplate } from './statusUpdateTemplate.ts'
 import { welcomeTemplate } from './welcomeTemplate.ts'
 import { newsletterConfirmationTemplate } from './newsletterConfirmationTemplate.ts'
+import {
+  nurturingStep1Template,
+  nurturingStep2Template,
+  nurturingStep3Template,
+} from './nurturingTemplates.ts'
+import { reviewRequestTemplate } from './reviewRequestTemplate.ts'
 
 // Type générique pour les données d'email
 // deno-lint-ignore no-explicit-any
@@ -159,6 +165,42 @@ export function renderEmailTemplate(type: string, data: EmailData): string {
         first_name: data.first_name,
         confirmation_url: data.confirmation_url,
         promo_code: data.promo_code,
+        locale,
+      })
+    }
+
+    case 'nurturing_step1': {
+      return nurturingStep1Template({
+        locale,
+        optout_url: data.optout_url,
+        article_url: data.article_url,
+      })
+    }
+
+    case 'nurturing_step2': {
+      return nurturingStep2Template({
+        locale,
+        optout_url: data.optout_url,
+        article_url: data.article_url,
+      })
+    }
+
+    case 'nurturing_step3': {
+      return nurturingStep3Template({
+        locale,
+        optout_url: data.optout_url,
+        article_url: data.article_url,
+      })
+    }
+
+    case 'review_request': {
+      return reviewRequestTemplate({
+        order_number: data.order_number,
+        full_name: data.full_name,
+        product_name: data.product_name,
+        product_image: data.product_image,
+        product_slug: data.product_slug,
+        ctaUrl: data.ctaUrl,
         locale,
       })
     }

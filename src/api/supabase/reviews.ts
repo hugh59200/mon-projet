@@ -48,6 +48,8 @@ export interface ReviewSummary {
 export interface ReviewInsert {
   product_id: string
   user_id?: string
+  order_id?: string
+  review_token?: string
   author_name: string
   author_type?: 'standard' | 'premium' | 'pro' | 'verified'
   author_title?: string
@@ -59,6 +61,19 @@ export interface ReviewInsert {
   rating_purity?: number
   rating_shipping?: number
   rating_value?: number
+}
+
+export interface GuestReviewInsert extends Omit<ReviewInsert, 'user_id'> {
+  order_id: string
+  review_token: string
+}
+
+export interface ValidateReviewTokenResult {
+  valid: boolean
+  error?: 'order_not_found' | 'product_not_in_order' | 'already_reviewed'
+  full_name?: string
+  email?: string
+  is_guest?: boolean
 }
 
 // ============================================
@@ -174,6 +189,50 @@ export async function hasUserReviewed(productId: string, userId: string): Promis
   } catch {
     return false
   }
+}
+
+// ============================================
+// GUEST REVIEWS (via magic link)
+// ============================================
+
+/**
+ * Valide un lien de demande d'avis et retourne les infos client
+ */
+export async function validateReviewToken(
+  orderId: string,
+  productId: string
+): Promise<ValidateReviewTokenResult> {
+  try {
+    const { data, error } = await (supabase as any).rpc('validate_review_token', {
+      p_order_id: orderId,
+      p_product_id: productId,
+    })
+
+    if (error) {
+      console.error('Error validating review token:', error)
+      return { valid: false, error: 'order_not_found' }
+    }
+
+    return data as ValidateReviewTokenResult
+  } catch {
+    return { valid: false, error: 'order_not_found' }
+  }
+}
+
+/**
+ * Crée un avis invité (via magic link)
+ * Utilise un review_token unique pour identifier l'avis
+ */
+export async function createGuestReview(review: GuestReviewInsert): Promise<void> {
+  const { error } = await (supabase as any).from('reviews').insert({
+    ...review,
+    user_id: null,
+    is_approved: false,
+    is_featured: false,
+    is_verified_purchase: true, // Achat vérifié via order_id
+  })
+
+  if (error) throw error
 }
 
 // ============================================

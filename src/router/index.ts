@@ -206,6 +206,29 @@ const routes: Array<RouteRecordRaw> = [
       descriptionKey: 'routes.newsDetail.description',
     },
   },
+  // Glossaire scientifique (SEO longue traîne)
+  {
+    path: '/glossaire',
+    name: 'glossaire',
+    component: () => import('@/features/glossaire/GlossaireView.vue'),
+    meta: {
+      labelKey: 'nav.glossary',
+      icon: 'BookOpen',
+      order: 5,
+      headingKey: 'routes.glossary.heading',
+      titleKey: 'routes.glossary.title',
+      descriptionKey: 'routes.glossary.description',
+      headerIcon: 'BookOpen',
+    },
+  },
+  {
+    path: '/glossaire/:slug',
+    name: 'glossaire-detail',
+    component: () => import('@/features/glossaire/GlossaireDetailView.vue'),
+    meta: {
+      descriptionKey: 'routes.glossaryDetail.description',
+    },
+  },
   {
     path: '/panier',
     name: 'cart',
@@ -268,6 +291,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { labelKey: 'admin.orders', icon: 'ShoppingCart' },
       },
       {
+        path: 'crypto-matching',
+        name: 'AdminCryptoMatching',
+        component: () => import('@/features/admin/crypto-matching/AdminCryptoMatchingView.vue'),
+        meta: { labelKey: 'admin.cryptoMatching', icon: 'wallet' },
+      },
+      {
         path: 'produits',
         name: 'AdminProducts',
         component: AdminProductsTable,
@@ -290,6 +319,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AdminTopics',
         component: AdminTopicsTable,
         meta: { labelKey: 'admin.categories', icon: 'FolderTree' },
+      },
+      {
+        path: 'glossaire',
+        name: 'AdminGlossary',
+        component: () => import('@/features/admin/glossary/AdminGlossaryView.vue'),
+        meta: { labelKey: 'admin.glossary', icon: 'BookOpen' },
       },
       {
         path: 'messagerie',
@@ -405,6 +440,14 @@ const routes: Array<RouteRecordRaw> = [
       titleKey: 'routes.newsletter.unsubscribe',
     },
   },
+  {
+    path: '/emails/optout',
+    name: 'nurturing-optout',
+    component: () => import('@/features/newsletter/pages/NurturingOptoutView.vue'),
+    meta: {
+      titleKey: 'routes.nurturing.optout',
+    },
+  },
   // Pages légales
   {
     path: '/mentions-legales',
@@ -428,6 +471,17 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/legal/CookiesView.vue'),
     meta: {
       titleKey: 'routes.legal.cookies',
+    },
+  },
+  {
+    path: '/status',
+    name: 'status',
+    component: () => import('@/features/status/StatusView.vue'),
+    meta: {
+      titleKey: 'routes.status.title',
+      headingKey: 'routes.status.heading',
+      descriptionKey: 'routes.status.description',
+      headerIcon: 'Activity',
     },
   },
 ]

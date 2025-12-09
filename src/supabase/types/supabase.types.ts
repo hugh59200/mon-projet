@@ -43,6 +43,10 @@ export type ResourceCategories = Tables<'resource_categories'>
 export type ResourceCategoriesInsert = TablesInsert<'resource_categories'>
 export type ResourceCategoriesUpdate = TablesUpdate<'resource_categories'>
 
+export type GlossaryTerms = Tables<'glossary_terms'>
+export type GlossaryTermsInsert = TablesInsert<'glossary_terms'>
+export type GlossaryTermsUpdate = TablesUpdate<'glossary_terms'>
+
 export type Messages = Tables<'messages'>
 
 export type Conversations = Tables<'conversations'>
