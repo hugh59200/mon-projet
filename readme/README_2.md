@@ -39,6 +39,41 @@ Ce projet repose sur une stratégie de "cloisonnement total" pour protéger l'id
   - 🔴 **VPN OBLIGATOIRE (Mullvad)** pour toute connexion aux dashboards (Supabase, Cloudflare, Banque, Email).
   - **Cloisonnement :** L'email Admin (Proton) ne doit jamais interagir avec l'email Perso (Gmail). Pas de transfert automatique.
 
+### 5. Analytique "Fantôme" (Zero Tracking)
+
+- **Solution :** **Cloudflare Web Analytics** uniquement (Privacy-first, sans cookies, côté serveur).
+- 🔴 **INTERDIT :** Google Analytics (GA4), Facebook Pixel, Hotjar, ou tout tracker tiers.
+- _Raison :_ Ces services créent un lien direct entre votre site et votre identité Google/Meta. Un subpoena suffit.
+
+### 6. Kill Switch (Mode Urgence)
+
+Dispositif de coupure instantanée en cas de mise en demeure, intrusion suspectée ou raid.
+
+- **Déclencheur :** Variable `VITE_MAINTENANCE_MODE=true` sur Cloudflare Pages (Settings → Environment Variables).
+- **Effet :**
+  - Redirige 100% du trafic vers page statique "Maintenance technique"
+  - Coupe l'accès DB, panier, auth
+  - **SEO invisible** : `noindex, nofollow` automatique + suppression des schemas JSON-LD
+- **Délai :** < 30 secondes (le temps de modifier la variable et redéployer).
+- **Procédure :**
+  1. Cloudflare Dashboard → Pages → mon-projet → Settings → Environment Variables
+  2. Ajouter/Modifier `VITE_MAINTENANCE_MODE` = `true`
+  3. Cliquer "Save" → Redéploiement automatique
+  4. Vérifier que le site affiche la page maintenance
+
+**Comportement SEO en maintenance :**
+```html
+<!-- Mode Maintenance -->
+<title>Maintenance</title>
+<meta name="robots" content="noindex, nofollow">
+<!-- Pas de schema Organization/WebSite -->
+
+<!-- Mode Normal -->
+<title>Atlas Lab Solutions - Peptides de Recherche</title>
+<meta name="robots" content="index, follow, max-image-preview:large...">
+<script type="application/ld+json">...</script>
+```
+
 ---
 
 ## 🏗️ Architecture Technique (JAMstack)
@@ -127,6 +162,8 @@ _Mise à jour : 09/12/2025_
 | **Email Pro (OpSec)** |  🟢 Fait  | Proton (Admin) + Resend (Auto) + DNS Cloudflare Sécurisés. |
 | **Newsletter**        |  🟢 Fait  | Double opt-in + Code promo -10% automatique.               |
 | **Lab Notes**         |  🟢 Fait  | 5 guides techniques + Calculateur dilution intégré.        |
+| **Session Tracking**  |  🟢 Fait  | Analytics interne privacy-first + Dashboard admin.         |
+| **Kill Switch**       |  🟢 Fait  | Mode maintenance via env var Cloudflare.                   |
 | **Compte Banque**     | 🔴 Bloqué | Attente EIN (Délai IRS important).                         |
 
 ---
@@ -175,6 +212,99 @@ _Mise à jour : 09/12/2025_
 ### Code Promo
 
 Le code `WELCOME10` est automatiquement affiché dans l'email de confirmation et sur la page de confirmation. Il offre -10% sur la première commande (usage unique par utilisateur).
+
+---
+
+## 🔍 SEO & Indexation
+
+### Configuration Centralisée
+
+Fichier : `src/config/seo.ts`
+
+```typescript
+import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo'
+
+// SEO_CONFIG.APP_URL → 'https://fast-peptides.com'
+// SEO_CONFIG.SITE_NAME → 'Atlas Lab Solutions'
+// getCanonicalUrl('/produit/bpc-157') → 'https://fast-peptides.com/produit/bpc-157'
+```
+
+### useHead (@vueuse/head)
+
+Chaque page utilise `useHead` pour définir ses métadonnées :
+
+```typescript
+useHead({
+  title: 'Titre de la page | Atlas Lab Solutions',
+  meta: [
+    { name: 'description', content: 'Description...' },
+    { name: 'robots', content: 'index, follow' },
+    { property: 'og:title', content: 'Titre' },
+    { property: 'og:description', content: 'Description' },
+    { property: 'og:image', content: 'https://fast-peptides.com/og-image.jpg' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
+  link: [
+    { rel: 'canonical', href: getCanonicalUrl('/ma-page') }
+  ],
+  script: [
+    { type: 'application/ld+json', children: JSON.stringify(schemaOrg) }
+  ]
+})
+```
+
+### Schema.org (JSON-LD) — Hybridation "Research Chemical"
+
+Données structurées injectées par page avec **marquage scientifique** pour éviter les filtres médicaux Google :
+
+| Page | Schema Type | Particularité |
+|------|-------------|---------------|
+| Produit | `Product` + `ChemicalSubstance` + `IndividualProduct` | `audience: Researcher`, `usageInfo: "Research Use Only"` |
+| Article/Actualité | `BlogPosting` + `Article` | `author: Organization` |
+| Lab Notes | `TechArticle` + `HowTo` | `proficiencyLevel`, `tool` |
+| FAQ | `FAQPage` + `Question/Answer` | — |
+| Homepage | `Organization` + `WebSite` | `areaServed`, `knowsAbout: peptides` |
+
+⚠️ **Critique** : L'hybridation `ChemicalSubstance` + `audience: Researcher` signale aux crawlers que ce sont des produits de recherche, pas des médicaments ou compléments alimentaires. Sans cela, Google applique les filtres YMYL (Your Money Your Life).
+
+### Sitemap
+
+Génération automatique via `scripts/generate-sitemap.cjs` :
+
+```bash
+npm run build  # Génère sitemap.xml et sitemap-index.xml
+```
+
+Structure :
+- `sitemap-index.xml` → Index principal
+- `sitemap.xml` → Pages statiques + produits + articles
+
+### Robots.txt
+
+Fichier : `public/robots.txt`
+
+**Autorisé** : Toutes les pages publiques
+**Bloqué** : `/admin`, `/checkout`, `/profile`, `/auth`, `/api`, pages techniques
+
+### Prérendu (SSR-like)
+
+Script `scripts/prerender.cjs` pour pré-générer le HTML des pages critiques au build :
+- Homepage
+- Pages produits
+- Articles/Actualités
+- Lab Notes
+
+### Checklist SEO par Page
+
+- [ ] `title` unique (50-60 caractères)
+- [ ] `meta description` unique (150-160 caractères)
+- [ ] `canonical` URL absolue
+- [ ] `og:*` tags complets
+- [ ] `twitter:*` tags
+- [ ] Schema.org JSON-LD
+- [ ] `robots` meta (index/noindex)
+- [ ] Heading hierarchy (h1 unique, h2, h3...)
 
 ---
 
@@ -228,6 +358,114 @@ DATABASE_PASSWORD="..." node scripts/exec-sql.cjs supabase/script/seed-lab-notes
 
 # Upload des images vers bucket news-images
 node scripts/upload-lab-notes-images.cjs
+```
+
+---
+
+## 📊 Session Tracking (Analytics Interne)
+
+Système de tracking "privacy-first" entièrement interne, sans dépendance à des services tiers (GA4, Pixel, etc.).
+
+### Philosophie
+
+- **Zero tracking tiers** : Pas de GA4, Facebook Pixel, Hotjar (cf. section OPSEC)
+- **Données first-party** : Stockées dans Supabase, sous notre contrôle
+- **Privacy-first** : Pas de cookies persistants, session ID en `sessionStorage`
+- **Funnel complet** : Du landing à la commande
+
+### Architecture
+
+```
+src/features/tracking/
+├── services/
+│   └── sessionTracker.ts    # Service singleton de tracking
+└── components/              # (Composants TrackOrder - suivi colis)
+
+src/api/supabase/
+└── sessions.ts              # API Supabase pour les sessions
+
+src/features/admin/sessions/
+├── AdminSessionsView.vue    # Dashboard admin complet
+└── mobile/SessionCardMobile.vue
+```
+
+### Données Collectées
+
+| Catégorie | Champs | Source |
+|-----------|--------|--------|
+| **Session** | `session_id`, `session_type`, `duration_seconds` | Auto-généré |
+| **Utilisateur** | `user_id`, `profiles.*` | Supabase Auth |
+| **Géolocalisation** | `country`, `city`, `region`, `country_code` | ipapi.co (gratuit) |
+| **Device** | `device_type`, `browser`, `os`, `user_agent` | Navigator API |
+| **Navigation** | `landing_page`, `referrer`, `pages_viewed` | Router |
+| **Funnel** | `added_to_cart`, `started_checkout`, `completed_order` | Events manuels |
+
+### Points de Tracking (Intégration)
+
+| Event | Fichier | Moment |
+|-------|---------|--------|
+| **Session start** | `main.ts` | Au boot de l'app |
+| **Page view** | `main.ts` | `router.afterEach()` |
+| **Add to cart** | `useCartStore.ts` | `addItem()` |
+| **Checkout start** | `CheckoutView.vue` | `onMounted()` |
+| **Order complete** | `CheckoutView.vue` | Après création commande |
+| **Session end** | Auto | `beforeunload` + `sendBeacon` |
+
+### Dashboard Admin (`/admin` → Sessions)
+
+**Métriques temps réel :**
+- Sessions 24h / 7j / 30j
+- Utilisateurs actifs
+- En ligne maintenant (refresh 30s)
+- Conversions (sessions avec commande)
+
+**Visualisations :**
+- Graphique bar chart (7 derniers jours)
+- Liste des sessions avec filtres (Tous / Connectés / Anonymes)
+- Top pays (30 derniers jours)
+- Détail par session : user, device, localisation, durée, actions
+
+### Tables Supabase
+
+```sql
+-- Table principale
+user_sessions (
+  id, session_id, user_id, session_type,
+  device_type, browser, os, user_agent,
+  country, city, region, country_code,
+  landing_page, referrer, pages_viewed,
+  added_to_cart, started_checkout, completed_order,
+  started_at, last_activity_at, ended_at, duration_seconds
+)
+
+-- Vues agrégées
+sessions_stats        -- Métriques globales
+sessions_by_day       -- Agrégation par jour
+sessions_by_country   -- Agrégation par pays
+
+-- RPC Functions
+track_session()              -- Créer/mettre à jour session
+update_session_activity()    -- Mettre à jour activité
+end_session()                -- Terminer session
+```
+
+### Usage dans le code
+
+```typescript
+import {
+  initSessionTracking,
+  trackPageView,
+  trackAddToCart,
+  trackCheckoutStart,
+  trackOrderComplete,
+  updateSessionUser,
+} from '@/features/tracking/services/sessionTracker'
+
+// Au login
+updateSessionUser(user.id)
+
+// Event custom
+trackAddToCart()
 ```
 
 ---

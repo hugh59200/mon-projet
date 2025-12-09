@@ -214,8 +214,9 @@ const productSchema = computed(() => {
   // Schema principal Product enrichi pour positionnement "fourniture laboratoire"
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    // Double type : Product + IndividualProduct pour e-commerce scientifique
-    '@type': ['Product', 'IndividualProduct'],
+    // Triple type : Product + ChemicalSubstance + IndividualProduct pour e-commerce scientifique
+    // ChemicalSubstance signale aux crawlers que c'est un produit chimique de recherche, pas un médicament
+    '@type': ['Product', 'ChemicalSubstance', 'IndividualProduct'],
     name: name.value,
     description: enrichedDescription.value,
     image: image.value,

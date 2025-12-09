@@ -1,199 +1,142 @@
 <template>
-  <AppLayout />
-  <AgeGate />
-  <AppLoaderOverlay />
+  <MaintenanceMode v-if="isMaintenanceMode" />
+
+  <template v-else>
+    <AppLayout />
+    <AgeGate />
+    <AppLoaderOverlay />
+  </template>
 </template>
 
 <script setup lang="ts">
-  import { useHead } from '@vueuse/head'
-  import AppLayout from '@/features/interface/layout/AppLayout.vue'
-  import AgeGate from '@/features/interface/components/AgeGate.vue'
   import AppLoaderOverlay from '@/components/AppLoaderOverlay.vue'
+  import MaintenanceMode from '@/components/MaintenanceMode.vue'
   import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo'
+  import AgeGate from '@/features/interface/components/AgeGate.vue'
+  import AppLayout from '@/features/interface/layout/AppLayout.vue'
+  import { useHead } from '@vueuse/head'
 
-  // Schema JSON-LD pour Organization et WebSite (SEO + GEO)
-  const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: SEO_CONFIG.SITE_NAME,
-    legalName: 'Atlas Lab Solutions LLC',
-    url: SEO_CONFIG.APP_URL,
-    logo: `${SEO_CONFIG.APP_URL}/logo.png`,
-    description:
-      'Fournisseur de peptides et réactifs chimiques de haute pureté pour la recherche scientifique. Research Use Only.',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: '5850 Eubank Blvd NE, Suite B13',
-      addressLocality: 'Albuquerque',
-      addressRegion: 'NM',
-      postalCode: '87111',
-      addressCountry: 'US',
-    },
-    contactPoint: {
-      '@type': 'ContactPoint',
-      email: 'contact@fast-peptides.com',
-      contactType: 'customer service',
-      availableLanguage: ['French', 'English'],
-    },
-    sameAs: [],
+  // Kill Switch - Mode maintenance d'urgence
+  // Récupéré au build time. Nécessite un redéploiement pour changer (Sécurité max)
+  const isMaintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
+
+  // ============================================================
+  // 🔴 SEO Mode Maintenance : Silence Radio
+  // ============================================================
+  if (isMaintenanceMode) {
+    useHead({
+      title: 'Maintenance',
+      htmlAttrs: { lang: 'fr' },
+      meta: [
+        { name: 'robots', content: 'noindex, nofollow' }, // ⚠️ Invisible pour Google
+        { name: 'description', content: 'Site en maintenance.' },
+      ],
+    })
   }
 
-  const webSiteSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SEO_CONFIG.SITE_NAME,
-    url: SEO_CONFIG.APP_URL,
-    description:
-      'Peptides de recherche et réactifs chimiques de haute pureté pour laboratoires.',
-    inLanguage: 'fr-FR',
-    publisher: {
+  // ============================================================
+  // 🟢 SEO Mode Normal : Bouclier "Laboratoire" Actif
+  // ============================================================
+  else {
+    // Schema JSON-LD Organisation
+    const organizationSchema = {
+      '@context': 'https://schema.org',
       '@type': 'Organization',
       name: SEO_CONFIG.SITE_NAME,
-    },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${SEO_CONFIG.APP_URL}/catalogue?search={search_term_string}`,
+      legalName: 'Atlas Lab Solutions LLC',
+      url: SEO_CONFIG.APP_URL,
+      logo: `${SEO_CONFIG.APP_URL}/logo.png`,
+      description:
+        'Fournisseur de peptides et réactifs chimiques de haute pureté pour la recherche scientifique. Research Use Only.',
+      // 📍 Adresse Légale (US) - OpSec OK
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '5850 Eubank Blvd NE, Suite B13',
+        addressLocality: 'Albuquerque',
+        addressRegion: 'NM',
+        postalCode: '87111',
+        addressCountry: 'US',
       },
-      'query-input': 'required name=search_term_string',
-    },
-  }
+      // 🎯 Zone de Service (France) - SEO OK
+      areaServed: {
+        '@type': 'Country',
+        name: 'France',
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'contact@fast-peptides.com',
+        contactType: 'customer service',
+        availableLanguage: ['French', 'English'],
+      },
+    }
 
-  // Configuration SEO globale
-  useHead({
-    title: 'Atlas Lab Solutions - Peptides de Recherche',
-    htmlAttrs: {
-      lang: 'fr',
-    },
-    meta: [
-      // Primary Meta
-      {
-        name: 'description',
-        content:
-          'Fournisseur de peptides et réactifs chimiques de haute pureté pour la recherche scientifique. Qualité laboratoire garantie. Research Use Only.',
+    const webSiteSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SEO_CONFIG.SITE_NAME,
+      url: SEO_CONFIG.APP_URL,
+      inLanguage: 'fr-FR',
+      publisher: { '@type': 'Organization', name: SEO_CONFIG.SITE_NAME },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${SEO_CONFIG.APP_URL}/catalogue?search={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
       },
-      {
-        name: 'robots',
-        content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
-      },
-      {
-        name: 'author',
-        content: SEO_CONFIG.AUTHOR,
-      },
-      {
-        name: 'keywords',
-        content:
-          'peptides synthèse France, research chemicals Europe, fourniture laboratoire peptides, pureté HPLC, réactifs recherche scientifique, RUO peptides, laboratoire peptides synthétiques, fournisseur réactifs chimiques',
-      },
-      // Geo targeting pour la France
-      {
-        name: 'geo.region',
-        content: 'FR',
-      },
-      {
-        name: 'geo.placename',
-        content: 'France',
-      },
-      {
-        name: 'content-language',
-        content: 'fr',
-      },
-      // Signal B2B / Audience scientifique
-      {
-        name: 'audience',
-        content: 'Researcher, Laboratory Professional, Scientific Institution',
-      },
-      {
-        name: 'classification',
-        content: 'Laboratory Supplies, Research Chemicals, Scientific Equipment',
-      },
-      {
-        name: 'category',
-        content: 'B2B, Research Use Only, Laboratory Reagents',
-      },
-      // Open Graph
-      {
-        property: 'og:type',
-        content: 'website',
-      },
-      {
-        property: 'og:site_name',
-        content: SEO_CONFIG.SITE_NAME,
-      },
-      {
-        property: 'og:locale',
-        content: 'fr_FR',
-      },
-      {
-        property: 'og:image',
-        content: SEO_CONFIG.DEFAULT_OG_IMAGE,
-      },
-      {
-        property: 'og:image:width',
-        content: '1200',
-      },
-      {
-        property: 'og:image:height',
-        content: '630',
-      },
-      {
-        property: 'og:image:alt',
-        content: 'Atlas Lab Solutions - Peptides de Recherche Haute Pureté',
-      },
-      // Twitter Cards
-      {
-        name: 'twitter:card',
-        content: 'summary_large_image',
-      },
-      {
-        name: 'twitter:site',
-        content: '@AtlasLabSol',
-      },
-      {
-        name: 'twitter:creator',
-        content: '@AtlasLabSol',
-      },
-      {
-        name: 'twitter:title',
-        content: 'Atlas Lab Solutions - Peptides de Recherche',
-      },
-      {
-        name: 'twitter:description',
-        content:
-          'Peptides et réactifs chimiques de haute pureté pour la recherche scientifique.',
-      },
-      {
-        name: 'twitter:image',
-        content: SEO_CONFIG.DEFAULT_OG_IMAGE,
-      },
-    ],
-    link: [
-      {
-        rel: 'canonical',
-        href: getCanonicalUrl('/'),
-      },
-      // Hreflang pour préparation multi-langue (actuellement français uniquement)
-      {
-        rel: 'alternate',
-        hreflang: 'fr',
-        href: SEO_CONFIG.APP_URL,
-      },
-      {
-        rel: 'alternate',
-        hreflang: 'x-default',
-        href: SEO_CONFIG.APP_URL,
-      },
-    ],
-    script: [
-      {
-        type: 'application/ld+json',
-        innerHTML: JSON.stringify(organizationSchema),
-      },
-      {
-        type: 'application/ld+json',
-        innerHTML: JSON.stringify(webSiteSchema),
-      },
-    ],
-  })
+    }
+
+    useHead({
+      title: 'Atlas Lab Solutions - Peptides de Recherche',
+      htmlAttrs: { lang: 'fr' },
+      meta: [
+        {
+          name: 'description',
+          content:
+            'Fournisseur de peptides et réactifs chimiques de haute pureté pour la recherche scientifique. Qualité laboratoire garantie. Research Use Only.',
+        },
+        // ✅ Signal positif pour indexation
+        {
+          name: 'robots',
+          content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+        },
+        { name: 'author', content: SEO_CONFIG.AUTHOR },
+        // 🛡️ Mots-clés "Safe" B2B
+        {
+          name: 'keywords',
+          content:
+            'peptides synthèse France, research chemicals Europe, fourniture laboratoire peptides, pureté HPLC, réactifs recherche scientifique, RUO peptides',
+        },
+
+        // 🌍 Geo Targeting France
+        { name: 'geo.region', content: 'FR' },
+        { name: 'geo.placename', content: 'France' },
+
+        // 🛡️ Signaux d'Autorité B2B (Anti-YMYL)
+        {
+          name: 'audience',
+          content: 'Researcher, Laboratory Professional, Scientific Institution',
+        },
+        { name: 'classification', content: 'Laboratory Supplies, Research Chemicals' },
+        { name: 'category', content: 'B2B, Research Use Only, Laboratory Reagents' },
+
+        // Open Graph & Twitter (Classique)
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: SEO_CONFIG.SITE_NAME },
+        { property: 'og:locale', content: 'fr_FR' },
+        { property: 'og:image', content: SEO_CONFIG.DEFAULT_OG_IMAGE },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Atlas Lab Solutions - Peptides de Recherche' },
+      ],
+      link: [
+        { rel: 'canonical', href: getCanonicalUrl('/') },
+        { rel: 'alternate', hreflang: 'fr', href: SEO_CONFIG.APP_URL },
+      ],
+      script: [
+        { type: 'application/ld+json', innerHTML: JSON.stringify(organizationSchema) },
+        { type: 'application/ld+json', innerHTML: JSON.stringify(webSiteSchema) },
+      ],
+    })
+  }
 </script>
