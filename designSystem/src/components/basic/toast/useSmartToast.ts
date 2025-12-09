@@ -18,21 +18,43 @@ export function useSmartToast() {
   const { isMobile } = useDeviceBreakpoint()
 
   function showAddToCartToast(p: Products, packInfo?: PackDiscountInfo | null) {
+    // Calculer la promo produit si pas dans packInfo
+    const productDiscount = packInfo?.productDiscount ?? (
+      p.is_on_sale && p.sale_price && p.price
+        ? Math.round((1 - p.sale_price / p.price) * 100)
+        : 0
+    )
+
+    // Quantité ajoutée
+    const qty = packInfo?.qty ?? 1
+
     // Générer le message selon les promos
-    let message = 'Ajouté au panier'
+    let message: string
     let discountBadge: string | undefined
 
-    if (packInfo && packInfo.qty > 1) {
-      const qtyText = `Pack de ${packInfo.qty}`
+    if (qty > 1) {
+      // Pack de plusieurs produits
+      const qtyText = `× ${qty}`
 
-      if (packInfo.hasCumulatedDiscounts) {
-        message = `${qtyText} ajouté`
+      if (packInfo?.hasCumulatedDiscounts) {
+        message = `${qtyText} ajouté au panier`
         discountBadge = `-${packInfo.totalDiscountPercent}% (Promo + Pack)`
-      } else if (packInfo.packDiscount > 0) {
-        message = `${qtyText} ajouté`
+      } else if (packInfo && packInfo.packDiscount > 0) {
+        message = `${qtyText} ajouté au panier`
         discountBadge = `-${packInfo.packDiscount}% pack`
+      } else if (productDiscount > 0) {
+        message = `${qtyText} ajouté au panier`
+        discountBadge = `-${productDiscount}% promo`
       } else {
         message = `${qtyText} ajouté au panier`
+      }
+    } else {
+      // Produit unique
+      if (productDiscount > 0) {
+        message = 'Ajouté au panier'
+        discountBadge = `-${productDiscount}% promo`
+      } else {
+        message = 'Ajouté au panier'
       }
     }
 
@@ -42,7 +64,7 @@ export function useSmartToast() {
         title: p.name,
         message,
         image: p.image,
-        price: p.price,
+        price: p.is_on_sale && p.sale_price ? p.sale_price : p.price,
         discountBadge,
         savings: packInfo?.savings,
       },

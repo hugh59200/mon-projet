@@ -25,8 +25,8 @@
       :width="380"
       align="right"
       arrow-align="auto"
-      :close-delay="800"
-      trigger-mode="hover"
+      :close-delay="300"
+      trigger-mode="click"
     >
       <template #trigger>
         <button class="cart__trigger cart__trigger--ghost">

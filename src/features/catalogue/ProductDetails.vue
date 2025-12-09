@@ -1047,9 +1047,11 @@
     if ((p.stock ?? 0) <= 0) return
     // Calculer la réduction pack applicable
     const discountPercent = packInfo.value?.packDiscount ?? 0
+    // Sauvegarder packInfo avant reset
+    const currentPackInfo = packInfo.value
     // Ajouter la quantité sélectionnée en une seule fois avec la réduction
     await cart.addToCart(p, selectedQuantity.value, discountPercent)
-    showAddToCartToast(p)
+    showAddToCartToast(p, currentPackInfo)
     // Reset la quantité après ajout
     selectedQuantity.value = 1
   }
@@ -1060,9 +1062,11 @@
 
     // Calculer la réduction pack applicable
     const discountPercent = packInfo.value?.packDiscount ?? 0
+    // Sauvegarder packInfo avant reset
+    const currentPackInfo = packInfo.value
     // Ajouter la quantité sélectionnée en une seule fois avec la réduction
     await cart.addToCart(p, selectedQuantity.value, discountPercent)
-    showAddToCartToast(p)
+    showAddToCartToast(p, currentPackInfo)
 
     // Feedback visuel
     isPackAdded.value = true
