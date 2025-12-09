@@ -20,7 +20,7 @@
     align-items: center;
     width: 100%;
     max-width: 420px;
-    padding: 24px;
+    padding: 32px 24px;
     position: relative;
 
     // Fond glass premium - LIGHT MODE
@@ -112,18 +112,18 @@
   }
 
   /* ===========================================
-     HEADER (Logo + Titre)
+     HEADER (Logo + Titre) - Au-dessus de la carte
      =========================================== */
   &__header {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   &__header-logo {
-    display: none; // Caché sur desktop
+    display: none; // Caché sur desktop (logo dans le panneau gauche)
     color: var(--primary-500);
     flex-shrink: 0;
   }
@@ -148,12 +148,12 @@
   }
 
   /* ===========================================
-     SOUS-TITRE
+     SOUS-TITRE - Au-dessus de la carte
      =========================================== */
   &__subtitle {
     font-size: 1rem;
     color: var(--text-secondary);
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     line-height: 1.5;
     max-width: 90%;
   }
@@ -279,15 +279,15 @@
 .respond-tablet({
   .auth {
     &__card {
-      padding: clamp(12px, 2vh, 20px) 20px; // Padding horizontal fixe 20px
+      padding: clamp(20px, 4vh, 32px) 20px; // Plus de padding vertical sur mobile
       max-width: 100%;
       width: 100%;
-      // Retrait du style "carte" sur mobile
+      // Retrait du style "carte" sur mobile (garde le radius)
       background: transparent;
       backdrop-filter: none;
       box-shadow: none;
       border: none;
-      border-radius: 0;
+      // border-radius conservé (28px par défaut)
 
       &::before,
       &::after {

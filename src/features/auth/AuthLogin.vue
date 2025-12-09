@@ -1,20 +1,20 @@
 <template>
   <div class="auth">
+    <!-- Header avec logo + titre (au-dessus de la carte) -->
+    <div class="auth__header">
+      <BasicIconNext
+        name="fastPeptides"
+        :size="28"
+        class="auth__header-logo"
+      />
+      <h1 class="auth__title">{{ t('auth.login.title') }}</h1>
+    </div>
+    <p class="auth__subtitle">
+      {{ t('auth.login.subtitle') }}
+    </p>
+
     <!-- Card premium pour le formulaire -->
     <div ref="cardRef" class="auth__card">
-      <!-- Header avec logo (mobile) ou titre seul (desktop) -->
-      <div class="auth__header">
-        <BasicIconNext
-          name="fastPeptides"
-          :size="28"
-          class="auth__header-logo"
-        />
-        <h1 class="auth__title">{{ t('auth.login.title') }}</h1>
-      </div>
-      <p class="auth__subtitle">
-        {{ t('auth.login.subtitle') }}
-      </p>
-
       <form class="auth__form" @submit.prevent="submit">
       <div class="auth__field">
         <WrapperInput

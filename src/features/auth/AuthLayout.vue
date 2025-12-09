@@ -49,103 +49,48 @@
     </aside>
 
     <main class="auth-main">
-      <!-- Boutons en haut (tablette/mobile) -->
+      <!-- Header avec boutons de navigation -->
       <div
-        v-if="!isDesktop"
-        class="mobile-header"
+        v-if="showSkip"
+        class="auth-header"
       >
-        <PremiumButton
-          v-if="isLoginPage"
-          type="secondary"
-          variant="outline"
-          size="sm"
-          :label="t('auth.login.createAccount')"
-          icon-left="UserPlus"
-          @click="$router.push('/auth/register')"
-        />
-        <PremiumButton
-          v-else-if="isRegisterPage"
-          type="secondary"
-          variant="outline"
-          size="sm"
-          :label="t('auth.register.login')"
-          icon-left="LogIn"
-          @click="$router.push('/auth/login')"
-        />
-        <PremiumButton
-          v-if="showSkip"
-          type="primary"
-          variant="outline"
-          size="sm"
-          label="Catalogue"
-          icon-right="ArrowRight"
-          class="mobile-skip-btn"
-          @click="$router.push('/')"
-        />
-      </div>
+        <!-- Bouton gauche : Créer un compte / Se connecter -->
+        <div class="auth-header__left">
+          <PremiumButton
+            v-if="isLoginPage"
+            type="secondary"
+            variant="outline"
+            :size="isDesktop ? 'md' : 'sm'"
+            :label="t('auth.login.createAccount')"
+            icon-left="UserPlus"
+            @click="$router.push('/auth/register')"
+          />
+          <PremiumButton
+            v-else-if="isRegisterPage"
+            type="secondary"
+            variant="outline"
+            :size="isDesktop ? 'md' : 'sm'"
+            :label="t('auth.register.login')"
+            icon-left="LogIn"
+            @click="$router.push('/auth/login')"
+          />
+        </div>
 
-      <!-- Bouton Créer un compte / Se connecter (gauche) -->
-      <div
-        v-if="showSkip && isDesktop && (isLoginPage || isRegisterPage)"
-        class="auth-switch-container"
-      >
-        <PremiumButton
-          v-if="isLoginPage"
-          type="secondary"
-          variant="outline"
-          size="md"
-          :label="t('auth.login.createAccount')"
-          icon-left="UserPlus"
-          @click="$router.push('/auth/register')"
-        />
-        <PremiumButton
-          v-else-if="isRegisterPage"
-          type="secondary"
-          variant="outline"
-          size="md"
-          :label="t('auth.register.login')"
-          icon-left="LogIn"
-          @click="$router.push('/auth/login')"
-        />
-      </div>
-
-      <!-- Bouton Voir le catalogue (droite) -->
-      <div
-        v-if="showSkip && isDesktop"
-        class="skip-container"
-      >
-        <PremiumButton
-          type="primary"
-          variant="outline"
-          size="md"
-          label="Voir le catalogue"
-          icon-right="ArrowRight"
-          @click="$router.push('/')"
-        />
-      </div>
-
-      <!-- Conteneur principal : form (tablette/mobile) -->
-      <div
-        v-if="!isDesktop"
-        class="mobile-content"
-      >
-        <div class="form-wrapper">
-          <router-view v-slot="{ Component }">
-            <transition
-              name="fade-slide"
-              mode="out-in"
-            >
-              <component :is="Component" />
-            </transition>
-          </router-view>
+        <!-- Bouton droite : Voir le catalogue -->
+        <div class="auth-header__right">
+          <PremiumButton
+            type="primary"
+            variant="outline"
+            :size="isDesktop ? 'md' : 'sm'"
+            :label="isDesktop ? 'Voir le catalogue' : 'Catalogue'"
+            icon-right="ArrowRight"
+            @click="$router.push('/')"
+          />
         </div>
       </div>
 
-      <!-- Desktop form wrapper -->
-      <div
-        v-if="isDesktop"
-        class="form-wrapper"
-      >
+      <!-- Conteneur principal du formulaire -->
+      <div class="form-wrapper">
         <router-view v-slot="{ Component }">
           <transition
             name="fade-slide"
@@ -352,8 +297,6 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     position: relative;
     padding: 20px;
     overflow: hidden;
@@ -362,69 +305,41 @@
     background-size: 24px 24px;
   }
 
+  /* ===========================================
+     HEADER NAVIGATION (Bloc en haut)
+     =========================================== */
+  .auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px 10px 0;
+    flex-shrink: 0;
+
+    &__left,
+    &__right {
+      min-width: 0; // Pour éviter overflow
+    }
+
+    :deep(.pbtn:hover) {
+      transform: none !important;
+    }
+  }
+
+  /* ===========================================
+     FORM WRAPPER (Centré dans l'espace restant)
+     =========================================== */
   .form-wrapper {
+    flex: 1;
     width: 100%;
     max-width: 480px;
+    margin: 0 auto;
     z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-
-  /* ===========================================
-     BOUTONS NAVIGATION DESKTOP
-     =========================================== */
-  .auth-switch-container {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    z-index: 10;
-
-    :deep(.pbtn:hover) {
-      transform: none !important;
-    }
-  }
-
-  .skip-container {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    z-index: 10;
-
-    :deep(.pbtn:hover) {
-      transform: none !important;
-    }
-  }
-
-  /* ===========================================
-     MOBILE / TABLET
-     =========================================== */
-  .mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 16px 20px;
-    padding-top: calc(16px + env(safe-area-inset-top, 0px));
-    flex-shrink: 0;
-    z-index: 10;
-  }
-
-  .mobile-skip-btn {
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-
-  .mobile-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
-    overflow: hidden;
+    padding: 40px 0 10vh; // Padding vertical + remonte le contenu
   }
 
   /* ===========================================
@@ -469,39 +384,17 @@
       background-image: none; // Fond uni sur mobile
     }
 
-    .mobile-content {
-      justify-content: center;
+    .auth-header {
+      padding: 6px 4px 0;
     }
 
     .form-wrapper {
       flex: 1;
       min-height: 0;
       justify-content: center;
-      padding: 0 16px; // Espace latéral
+      padding: 24px 16px 5vh;
       width: 100%;
       box-sizing: border-box;
-    }
-
-    .mobile-header {
-      padding: 10px 16px;
-      padding-top: calc(10px + env(safe-area-inset-top, 0px));
-    }
-
-    .mobile-logo {
-      padding: clamp(12px, 3vh, 24px) 0;
-
-      &__icon {
-        width: clamp(32px, 6vh, 48px) !important;
-        height: clamp(32px, 6vh, 48px) !important;
-      }
-
-      &__text {
-        font-size: clamp(24px, 5vh, 32px);
-      }
-    }
-
-    .mobile-skip-btn :deep(.pbtn__label) {
-      font-size: 0.8rem;
     }
   });
 </style>
