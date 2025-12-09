@@ -378,23 +378,35 @@
     .auth-main {
       flex: 1;
       height: 100dvh;
-      padding: 12px;
-      padding-top: env(safe-area-inset-top, 0px);
+      padding: 0 12px 12px;
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      background-image: none; // Fond uni sur mobile
+      background-image: none;
     }
 
     .auth-header {
-      padding: 6px 4px 0;
+      padding: calc(8px + env(safe-area-inset-top, 0px)) 4px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+
+      // Micro résolution : masquer les libellés
+      @media (max-width: 320px) {
+        :deep(.pbtn__label) {
+          display: none;
+        }
+      }
     }
 
     .form-wrapper {
       flex: 1;
       min-height: 0;
-      justify-content: center;
-      padding: 24px 16px 5vh;
+      justify-content: flex-start;
+      padding: 16px 16px 5vh;
+      padding-top: clamp(16px, 5vh, 40px);
       width: 100%;
       box-sizing: border-box;
+      overflow-y: auto;
     }
   });
 </style>

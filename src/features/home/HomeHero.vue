@@ -153,9 +153,13 @@
     &__bg-image {
       position: absolute;
       inset: 0;
+      display: flex;
+      justify-content: center;
+      background: #020202;
 
       img {
         width: 100%;
+        max-width: 1500px;
         height: 100%;
         object-fit: cover;
         object-position: center right;
