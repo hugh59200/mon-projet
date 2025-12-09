@@ -2,7 +2,7 @@
   <article
     class="product-card"
     :class="{ 'product-card--list': viewMode === 'list' }"
-    @click="$emit('view', product.id)"
+    @click="$emit('view', product.slug || product.id)"
   >
     <!-- Badge Promo -->
     <div

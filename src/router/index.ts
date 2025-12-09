@@ -142,7 +142,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/catalogue/:id',
+    path: '/catalogue/:slug',
     name: 'product-detail',
     component: () => import('@/features/catalogue/ProductDetails.vue'),
     meta: {

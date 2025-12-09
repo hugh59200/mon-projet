@@ -1,6 +1,10 @@
 -- ============================================================
--- SUPABASE CLEAN BACKUP V6.4 — RESOURCES (Lab Notes)
+-- SUPABASE CLEAN BACKUP V6.5 — SEO Slugs Produits
 -- ============================================================
+-- V6.5 : Slugs SEO-friendly pour URLs produits
+--        - Colonne slug sur products (ex: bpc-157-10mg)
+--        - Fonction generate_product_slug() + trigger auto-génération
+--        - Route /catalogue/:slug au lieu de /catalogue/:uuid
 -- V6.4 : Séparation Ressources techniques / Actualités
 --        - Table resource_categories pour catégories Lab Notes
 --        - Table resources pour contenu technique (guides, protocoles)
@@ -202,7 +206,9 @@ CREATE TABLE public.products (
   physical_form varchar(100) DEFAULT 'Poudre lyophilisée blanche',
   solubility varchar(200) DEFAULT 'Eau bactériostatique, NaCl 0.9%, acide acétique 0.1%',
   -- AOV : Prix degressifs par quantite
-  bulk_pricing jsonb DEFAULT '[{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]'::jsonb
+  bulk_pricing jsonb DEFAULT '[{"quantity": 3, "discount_percent": 5}, {"quantity": 5, "discount_percent": 10}]'::jsonb,
+  -- V6.5 : Slug SEO-friendly pour URLs propres (trigger génère si vide)
+  slug varchar(255) UNIQUE NOT NULL DEFAULT ''
 );
 
 COMMENT ON COLUMN public.products.name_i18n IS 'Traductions du nom: {"en": "...", "de": "...", "es": "..."}';
@@ -237,6 +243,51 @@ CREATE TRIGGER tr_products_updated_at
 CREATE UNIQUE INDEX uniq_product_name_dosage ON public.products (name, dosage);
 CREATE INDEX idx_products_category ON public.products (category);
 CREATE INDEX idx_products_on_sale ON public.products (is_on_sale) WHERE is_on_sale = true;
+CREATE INDEX idx_products_slug ON public.products (slug);
+
+-- V6.5 : Fonction pour générer un slug SEO-friendly
+CREATE OR REPLACE FUNCTION generate_product_slug(p_name text, p_dosage text)
+RETURNS text AS $$
+DECLARE
+  base_slug text;
+BEGIN
+  base_slug := COALESCE(p_name, '') || CASE WHEN p_dosage IS NOT NULL THEN '-' || p_dosage ELSE '' END;
+  base_slug := lower(base_slug);
+  base_slug := translate(base_slug, 'àâäéèêëïîôùûüç', 'aaaeeeeiioouuc');
+  base_slug := regexp_replace(base_slug, '[^a-z0-9]+', '-', 'g');
+  base_slug := trim(both '-' from base_slug);
+  RETURN base_slug;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Trigger pour auto-générer le slug à l'insertion
+CREATE OR REPLACE FUNCTION set_product_slug()
+RETURNS TRIGGER AS $$
+DECLARE
+  base_slug text;
+  final_slug text;
+  counter int := 0;
+BEGIN
+  IF NEW.slug IS NOT NULL AND NEW.slug != '' THEN
+    RETURN NEW;
+  END IF;
+  base_slug := generate_product_slug(NEW.name, NEW.dosage);
+  final_slug := base_slug;
+  WHILE EXISTS (SELECT 1 FROM public.products WHERE slug = final_slug AND id != COALESCE(NEW.id, '00000000-0000-0000-0000-000000000000'::uuid)) LOOP
+    counter := counter + 1;
+    final_slug := base_slug || '-' || counter;
+  END LOOP;
+  NEW.slug := final_slug;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_set_product_slug
+  BEFORE INSERT OR UPDATE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION set_product_slug();
+
+COMMENT ON COLUMN public.products.slug IS 'Slug SEO-friendly pour URL (ex: bpc-157-10mg)';
 
 -- ============================
 -- MESSAGES & CONVERSATIONS

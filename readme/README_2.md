@@ -268,6 +268,27 @@ Données structurées injectées par page avec **marquage scientifique** pour é
 
 ⚠️ **Critique** : L'hybridation `ChemicalSubstance` + `audience: Researcher` signale aux crawlers que ce sont des produits de recherche, pas des médicaments ou compléments alimentaires. Sans cela, Google applique les filtres YMYL (Your Money Your Life).
 
+### URLs SEO-Friendly (Slugs)
+
+Les URLs des produits utilisent des slugs lisibles au lieu des UUIDs :
+
+```
+❌ Avant : /catalogue/30d23649-00f8-436f-9b99-f349ca8e411d
+✅ Après : /catalogue/bpc-157-10mg
+```
+
+**Implémentation :**
+- Colonne `slug` sur la table `products` (unique, auto-générée)
+- Fonction `generate_product_slug(name, dosage)` → génère le slug
+- Trigger `trigger_set_product_slug` → auto-génération à l'insertion
+- Route `/catalogue/:slug` au lieu de `/catalogue/:id`
+- Rétrocompatibilité : les anciens liens UUID fonctionnent toujours
+
+**Migration :**
+```bash
+DATABASE_PASSWORD="..." node scripts/exec-sql.cjs supabase/script/migrate-v6.5-product-slugs.sql
+```
+
 ### Sitemap
 
 Génération automatique via `scripts/generate-sitemap.cjs` :

@@ -808,6 +808,7 @@ export type Database = {
           purity: number | null
           sale_price: number | null
           sequence: string | null
+          slug: string
           solubility: string | null
           stock: number
           storage_conditions: string | null
@@ -836,6 +837,7 @@ export type Database = {
           purity?: number | null
           sale_price?: number | null
           sequence?: string | null
+          slug?: string
           solubility?: string | null
           stock?: number
           storage_conditions?: string | null
@@ -864,6 +866,7 @@ export type Database = {
           purity?: number | null
           sale_price?: number | null
           sequence?: string | null
+          slug?: string
           solubility?: string | null
           stock?: number
           storage_conditions?: string | null
@@ -2075,6 +2078,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      generate_product_slug: {
+        Args: { p_dosage: string; p_name: string }
+        Returns: string
+      }
       generate_unique_promo_code: {
         Args: { p_prefix?: string }
         Returns: string
@@ -2092,6 +2099,44 @@ export type Database = {
         Returns: Json
       }
       get_order_summary_public: { Args: { p_order_id: string }; Returns: Json }
+      get_product_by_slug: {
+        Args: { p_slug: string }
+        Returns: {
+          bulk_pricing: Json | null
+          cas_number: string | null
+          category: string
+          category_i18n: Json | null
+          coa_url: string | null
+          created_at: string | null
+          description: string | null
+          description_i18n: Json | null
+          dosage: string | null
+          id: string
+          image: string | null
+          is_on_sale: boolean | null
+          molecular_formula: string | null
+          molecular_weight: string | null
+          name: string
+          name_i18n: Json | null
+          physical_form: string | null
+          price: number
+          purity: number | null
+          sale_price: number | null
+          sequence: string | null
+          slug: string
+          solubility: string | null
+          stock: number
+          storage_conditions: string | null
+          tags: string[] | null
+          updated_at: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "products"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_resource_related_products: {
         Args: { resource_id: string }
         Returns: {
@@ -2116,6 +2161,7 @@ export type Database = {
           purity: number | null
           sale_price: number | null
           sequence: string | null
+          slug: string
           solubility: string | null
           stock: number
           storage_conditions: string | null

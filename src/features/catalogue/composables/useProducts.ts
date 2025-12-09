@@ -29,7 +29,7 @@ export const useProductsStore = defineStore(
       const { data, error } = await supabase
         .from('products')
         .select(
-          'id, name, price, sale_price, is_on_sale, purity, tags, category, stock, image, dosage, description',
+          'id, name, slug, price, sale_price, is_on_sale, purity, tags, category, stock, image, dosage, description',
         )
 
       if (!error && data) {

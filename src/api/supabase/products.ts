@@ -12,6 +12,15 @@ export async function fetchProductById(id: string): Promise<Products | null> {
   return handleApiMaybe(res)
 }
 
+/**
+ * Récupère un produit par son slug SEO-friendly
+ * @param slug - Le slug du produit (ex: "bpc-157-10mg")
+ */
+export async function fetchProductBySlug(slug: string): Promise<Products | null> {
+  const res = await supabase.from('products').select('*').eq('slug', slug).maybeSingle()
+  return handleApiMaybe(res)
+}
+
 export async function deleteProductById(id: string) {
   const { error } = await supabase.from('products').delete().eq('id', id)
   handleMutation(error)

@@ -258,8 +258,8 @@
     },
   ])
 
-  function goToProduct(p: { id: string }) {
-    router.push(`/catalogue/${p.id}`)
+  function goToProduct(p: { id: string; slug?: string }) {
+    router.push(`/catalogue/${p.slug || p.id}`)
   }
 
   // TODO: Réactiver les animations plus tard

@@ -302,8 +302,10 @@
 
                 <!-- Récapitulatif du pack sélectionné -->
                 <Transition name="pack-summary">
-                  <div
+                  <ContentBlock
                     v-if="packInfo && (product.stock ?? 0) > 0"
+                    variant="info"
+                    size="md"
                     class="product__pack-summary"
                   >
                     <div class="product__pack-header">
@@ -342,7 +344,7 @@
                       :class="{ 'product__pack-btn--success': isPackAdded }"
                       @click="addPackToCart(product as any)"
                     />
-                  </div>
+                  </ContentBlock>
                 </Transition>
 
                 <!-- Boutons d'action (affichés seulement si quantité = 1) -->
@@ -589,7 +591,7 @@
 <script setup lang="ts">
   import { useCartStore } from '@/features/catalogue/cart/stores/useCartStore'
   import { useTranslatedProduct } from '@/composables/useTranslated'
-  import { fetchProductById } from '@/api/supabase/products'
+  import { fetchProductBySlug, fetchProductById } from '@/api/supabase/products'
   import { fetchReviewSummary } from '@/api/supabase/reviews'
   import type { ReviewSummary } from '@/api/supabase/reviews'
   import ProductReviews from './components/reviews/ProductReviews.vue'
@@ -745,7 +747,7 @@
       image: p.image || '',
       inStock: (p.stock ?? 0) > 0,
       purity: '≥99%',
-      productUrl: getCanonicalUrl(`/catalogue/${p.id}`),
+      productUrl: getCanonicalUrl(`/catalogue/${(p as any).slug || p.id}`),
       category: productCategory.value || p.category,
       casNumber: p.cas_number ?? undefined,
       sequence: p.sequence ?? undefined,
@@ -793,7 +795,7 @@
           '@type': 'ListItem',
           position: 3,
           name: productName.value || product.value.name,
-          item: `https://fast-peptides.com/catalogue/${route.params.id}`,
+          item: `https://fast-peptides.com/catalogue/${(product.value as any).slug || route.params.slug}`,
         },
       ],
     }
@@ -934,7 +936,7 @@
     link: [
       {
         rel: 'canonical',
-        href: computed(() => `https://fast-peptides.com/catalogue/${route.params.id}`),
+        href: computed(() => `https://fast-peptides.com/catalogue/${(product.value as any)?.slug || route.params.slug}`),
       },
     ],
     script: [
@@ -970,9 +972,12 @@
     return orderHistory.hasOrderedProduct(product.value.id)
   })
 
+  // Regex pour détecter un UUID
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
   onMounted(async () => {
-    const { id } = route.params
-    if (typeof id !== 'string') return
+    const { slug } = route.params
+    if (typeof slug !== 'string') return
 
     loading.value = true
 
@@ -982,10 +987,17 @@
         orderHistory.loadOrders()
       }
 
-      const [productData, reviewData] = await Promise.all([
-        fetchProductById(id),
-        fetchReviewSummary(id),
-      ])
+      // Récupérer le produit : essaie le slug d'abord, puis UUID si c'est un format UUID
+      let productData = await fetchProductBySlug(slug)
+
+      // Si pas trouvé par slug et que ça ressemble à un UUID, essayer par ID
+      // (rétrocompatibilité pour les liens panier et anciens liens)
+      if (!productData && UUID_REGEX.test(slug)) {
+        productData = await fetchProductById(slug)
+      }
+
+      // Récupérer les avis par l'ID du produit (après avoir le produit)
+      const reviewData = productData ? await fetchReviewSummary(productData.id) : null
 
       if (productData) {
         product.value = productData
@@ -1725,16 +1737,13 @@
     }
 
     // ─────────────────────────────────────────
-    // Pack Summary
+    // Pack Summary (utilise ContentBlock variant="info")
     // ─────────────────────────────────────────
     &__pack-summary {
       display: flex;
       flex-direction: column;
       gap: 16px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.12) 0%, rgba(var(--primary-500-rgb), 0.06) 100%);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.3);
-      border-radius: 16px;
+      // Background et border gérés par ContentBlock
     }
 
     &__pack-header {
@@ -1751,7 +1760,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--primary-400);
+      color: var(--primary-600);
     }
 
     &__pack-discount {
@@ -1769,7 +1778,8 @@
       flex-direction: column;
       gap: 8px;
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--content-block-bg-subtle, rgba(var(--primary-500-rgb), 0.05));
+      border: 1px solid var(--content-block-border, rgba(var(--primary-500-rgb), 0.1));
       border-radius: 10px;
     }
 
@@ -1781,7 +1791,7 @@
 
       &--savings {
         padding-top: 8px;
-        border-top: 1px solid rgba(var(--primary-500-rgb), 0.2);
+        border-top: 1px solid var(--content-block-border, rgba(var(--primary-500-rgb), 0.15));
       }
     }
 
@@ -1805,7 +1815,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 700;
-      color: @success-400;
+      color: @success-600;
     }
 
     &__pack-btn {
