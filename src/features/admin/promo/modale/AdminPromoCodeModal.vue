@@ -365,8 +365,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-
   .promo-form {
     display: flex;
     flex-direction: column;
@@ -379,7 +377,7 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: 24px;
-    border-bottom: 1px solid @neutral-100;
+    border-bottom: 1px solid var(--admin-border-subtle);
 
     &:last-child {
       border-bottom: none;
@@ -387,7 +385,7 @@
     }
 
     &--stats {
-      background: @neutral-50;
+      background: var(--admin-bg-subtle);
       padding: 16px;
       border-radius: 12px;
       border-bottom: none;
@@ -427,33 +425,33 @@
     justify-content: center;
     gap: 8px;
     padding: 14px 16px;
-    background: @neutral-50;
+    background: var(--admin-bg-subtle);
     border: 2px solid transparent;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 14px;
     font-weight: 500;
-    color: @neutral-600;
+    color: var(--admin-text-secondary);
 
     &:hover {
-      background: @neutral-100;
+      background: var(--admin-bg-card);
     }
 
     &--active {
-      background: @primary-50;
-      border-color: @primary-500;
-      color: @primary-700;
+      background: var(--primary-50);
+      border-color: var(--primary-500);
+      color: var(--primary-700);
 
       svg {
-        color: @primary-500;
+        color: var(--primary-500);
       }
     }
   }
 
   .form-hint {
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--admin-text-muted);
     margin: 0;
     font-style: italic;
   }
@@ -473,11 +471,11 @@
   .stat-value {
     font-size: 18px;
     font-weight: 600;
-    color: @neutral-900;
+    color: var(--admin-text-primary);
   }
 
   .stat-label {
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
   }
 </style>

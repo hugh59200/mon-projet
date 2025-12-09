@@ -189,13 +189,14 @@
     flex-direction: column;
     align-items: center;
     margin: 2px 0;
+    width: 100%;
   }
 
   .cf-turnstile {
-    max-width: 280px;
-    transform: scale(0.85);
-    transform-origin: center;
-    margin: -4px 0;
+    max-width: 300px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 
     :deep(iframe) {
       border-radius: 10px !important;
@@ -206,7 +207,15 @@
   .error-text {
     color: @danger-500;
     font-size: 0.75rem;
-    margin: 0;
+    margin: 4px 0 0;
     text-align: center;
   }
+
+  .respond-mobile({
+    .cf-turnstile {
+      transform: scale(0.85);
+      transform-origin: center;
+      margin: -8px 0;
+    }
+  });
 </style>

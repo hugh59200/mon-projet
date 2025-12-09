@@ -344,8 +344,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-
   .admin-promo {
     display: flex;
     flex-direction: column;
@@ -353,7 +351,7 @@
   }
 
   .admin-promo__header {
-    background: @neutral-50;
+    background: var(--admin-bg-subtle);
     border-radius: 8px;
     padding: 12px 16px;
   }
@@ -368,15 +366,15 @@
   }
 
   .admin-promo__item {
-    background: @white;
-    border: 1px solid @neutral-100;
+    background: var(--admin-bg-surface);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 10px;
     padding: 16px;
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: @primary-200;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      border-color: var(--primary-200);
+      box-shadow: 0 4px 12px var(--admin-shadow);
     }
   }
 
@@ -395,15 +393,15 @@
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 14px;
     font-weight: 600;
-    color: @primary-700;
-    background: @primary-50;
+    color: var(--primary-700);
+    background: var(--primary-50);
     padding: 4px 8px;
     border-radius: 4px;
   }
 
   .admin-promo__description {
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -412,14 +410,14 @@
 
   .admin-promo__value {
     font-weight: 600;
-    color: @success-600;
+    color: var(--success-600);
     font-size: 14px;
   }
 
   .admin-promo__min {
     display: block;
     font-size: 11px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
     margin-top: 2px;
   }
 
@@ -428,15 +426,16 @@
     align-items: baseline;
     gap: 4px;
     font-size: 14px;
+    color: var(--admin-text-primary);
   }
 
   .admin-promo__usage-max {
-    color: @neutral-400;
+    color: var(--admin-text-muted);
     font-size: 12px;
   }
 
   .admin-promo__usage-unlimited {
-    color: @neutral-400;
+    color: var(--admin-text-muted);
     font-size: 11px;
     font-style: italic;
   }
@@ -449,12 +448,12 @@
 
   .admin-promo__date {
     font-size: 13px;
-    color: @neutral-600;
+    color: var(--admin-text-secondary);
   }
 
   .admin-promo__permanent {
     font-size: 12px;
-    color: @neutral-400;
+    color: var(--admin-text-muted);
     font-style: italic;
   }
 
@@ -466,15 +465,15 @@
 
   // Mobile styles
   .admin-promo__mobile-card {
-    background: @white;
-    border: 1px solid @neutral-100;
+    background: var(--admin-bg-surface);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 12px;
     cursor: pointer;
 
     &:active {
-      background: @neutral-50;
+      background: var(--admin-bg-card-hover);
     }
   }
 
@@ -489,7 +488,7 @@
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 16px;
     font-weight: 600;
-    color: @primary-700;
+    color: var(--primary-700);
   }
 
   .admin-promo__mobile-body {
@@ -507,12 +506,13 @@
 
   .admin-promo__mobile-label {
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
   }
 
   .admin-promo__mobile-value {
     font-size: 14px;
     font-weight: 500;
+    color: var(--admin-text-primary);
   }
 
   .admin-promo__mobile-actions {
@@ -520,6 +520,6 @@
     gap: 8px;
     justify-content: flex-end;
     padding-top: 12px;
-    border-top: 1px solid @neutral-100;
+    border-top: 1px solid var(--admin-border-subtle);
   }
 </style>

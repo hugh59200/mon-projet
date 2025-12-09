@@ -115,8 +115,8 @@
 
 <style scoped lang="less">
   .mobile-card {
-    background: @white;
-    border: 1px solid @neutral-200;
+    background: var(--admin-bg-surface);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -125,7 +125,7 @@
     transition: all 0.2s ease;
 
     &:active {
-      background: @neutral-50;
+      background: var(--admin-bg-card-hover);
     }
   }
 
@@ -150,9 +150,9 @@
 
   .dosage-tag {
     font-size: 11px;
-    color: @neutral-600;
+    color: var(--admin-text-secondary);
     font-weight: 500;
-    background: @neutral-100;
+    background: var(--admin-bg-card);
     padding: 1px 5px;
     border-radius: 4px;
   }
@@ -166,8 +166,8 @@
   .promo-tag {
     font-size: 9px;
     font-weight: 800;
-    color: @white;
-    background: @red-600;
+    color: var(--admin-text-inverse);
+    background: var(--danger-600);
     padding: 1px 4px;
     border-radius: 3px;
   }
@@ -181,7 +181,7 @@
 
   .bottom-row {
     align-items: center;
-    border-top: 1px dashed @neutral-200;
+    border-top: 1px dashed var(--admin-border-subtle);
     padding-top: 10px;
   }
 
@@ -193,7 +193,7 @@
 
   .purity-text {
     font-size: 12px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
   }
 
   // Zone tactile minimum 44px

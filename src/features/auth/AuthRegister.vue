@@ -1,11 +1,20 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">{{ t('auth.register.title') }}</h1>
-    <p class="auth__subtitle">
-      {{ t('auth.register.subtitle') }}
-    </p>
+    <div class="auth__card">
+      <!-- Header avec logo (mobile) ou titre seul (desktop) -->
+      <div class="auth__header">
+        <BasicIconNext
+          name="fastPeptides"
+          :size="28"
+          class="auth__header-logo"
+        />
+        <h1 class="auth__title">{{ t('auth.register.title') }}</h1>
+      </div>
+      <p class="auth__subtitle">
+        {{ t('auth.register.subtitle') }}
+      </p>
 
-    <form class="auth__form" @submit.prevent="submit">
+      <form class="auth__form" @submit.prevent="submit">
       <div class="auth__field">
         <WrapperInput
           v-model.trim="fields.email.value.value"
@@ -96,11 +105,12 @@
       </div>
     </form>
 
-    <div class="auth__links">
-      <span>
-        {{ t('auth.register.alreadyAccount') }}
-        <RouterLink to="/auth/login">{{ t('auth.register.login') }}</RouterLink>
-      </span>
+      <div class="auth__links">
+        <span>
+          {{ t('auth.register.alreadyAccount') }}
+          <RouterLink to="/auth/login">{{ t('auth.register.login') }}</RouterLink>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -108,6 +118,7 @@
 <script setup lang="ts">
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import ValidationIcon from '@designSystem/components/basic/validationIcon/ValidationIcon.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import type { FieldHelpers } from '@/composables/validation'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'

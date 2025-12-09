@@ -42,8 +42,8 @@
 
 <style scoped lang="less">
   .admin-toolbar {
-    background: @neutral-100;
-    border: 1px solid @neutral-200;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 16px;

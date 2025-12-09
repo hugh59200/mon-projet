@@ -138,8 +138,8 @@
     flex-direction: column;
     gap: 10px;
     padding: 16px 20px 20px;
-    background: linear-gradient(to top, white 0%, @neutral-50 100%);
-    border-top: 1px solid @neutral-100;
+    background: linear-gradient(to top, var(--admin-bg-surface, white) 0%, var(--admin-bg-subtle, @neutral-50) 100%);
+    border-top: 1px solid var(--admin-border-subtle, @neutral-100);
     position: relative;
 
     // Subtle top shadow
@@ -153,8 +153,8 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        @neutral-200 30%,
-        @neutral-200 70%,
+        var(--admin-border-subtle, @neutral-200) 30%,
+        var(--admin-border-subtle, @neutral-200) 70%,
         transparent 100%
       );
     }
@@ -166,13 +166,13 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: white;
+      background: var(--admin-bg-card, white);
       border-radius: 28px;
       padding: 8px 8px 8px 20px;
       box-shadow:
-        0 2px 8px color-mix(in srgb, @neutral-900 5%, transparent),
-        0 4px 16px color-mix(in srgb, @neutral-900 6%, transparent),
-        0 0 0 1px color-mix(in srgb, @neutral-200 40%, transparent);
+        0 2px 8px var(--admin-shadow, color-mix(in srgb, @neutral-900 5%, transparent)),
+        0 4px 16px var(--admin-shadow, color-mix(in srgb, @neutral-900 6%, transparent)),
+        0 0 0 1px var(--admin-border-subtle, color-mix(in srgb, @neutral-200 40%, transparent));
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
@@ -220,13 +220,13 @@
       background: transparent;
       font-size: 15px;
       line-height: 1.5;
-      color: @neutral-800;
+      color: var(--admin-text-primary, @neutral-800);
       outline: none;
       font-weight: 500;
       letter-spacing: -0.01em;
 
       &::placeholder {
-        color: @neutral-400;
+        color: var(--admin-text-muted, @neutral-400);
         font-weight: 400;
       }
     }
@@ -261,13 +261,13 @@
       padding: 10px 14px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, @danger-500 10%, white) 0%,
-        color-mix(in srgb, @danger-400 8%, white) 100%
+        color-mix(in srgb, @danger-500 10%, var(--admin-bg-surface, white)) 0%,
+        color-mix(in srgb, @danger-400 8%, var(--admin-bg-surface, white)) 100%
       );
       border: 1px solid color-mix(in srgb, @danger-400 30%, transparent);
       border-radius: 14px;
       font-size: 13px;
-      color: @danger-700;
+      color: var(--danger-700);
       box-shadow: 0 2px 8px color-mix(in srgb, @danger-500 15%, transparent);
       position: relative;
       overflow: hidden;
@@ -333,12 +333,12 @@
       padding: 8px 14px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, @warning-500 12%, white) 0%,
-        color-mix(in srgb, @warning-400 10%, white) 100%
+        color-mix(in srgb, @warning-500 12%, var(--admin-bg-surface, white)) 0%,
+        color-mix(in srgb, @warning-400 10%, var(--admin-bg-surface, white)) 100%
       );
       border-radius: 10px;
       font-size: 12px;
-      color: @warning-700;
+      color: var(--warning-700);
       font-weight: 600;
       box-shadow: 0 2px 8px color-mix(in srgb, @warning-500 15%, transparent);
     }

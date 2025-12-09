@@ -1,3 +1,52 @@
+/* ══════════════════════════════════════════════════════════════
+   DIALOG COMPONENT — Styles BEM
+   ══════════════════════════════════════════════════════════════ */
+.dialog {
+  &__title {
+    text-align: center;
+
+    &--success {
+      color: @green-success-500;
+    }
+
+    &--warning {
+      color: @red-600;
+    }
+  }
+
+  &__content {
+    color: var(--secondary-950);
+    text-align: left;
+    max-height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    margin-top: 24px;
+
+    > div {
+      min-height: 12px;
+    }
+
+    :deep(.basic-text) {
+      display: block;
+      white-space: break-spaces;
+      overflow-wrap: break-word;
+    }
+  }
+
+  &__image {
+    height: 20vh;
+  }
+}
+
+/* Override du modal parent */
+:deep(.modal__dialog) {
+  max-width: 500px;
+  border-radius: 16px;
+  margin: 18px;
+}
+
+/* Legacy aliases (rétro-compatibilité) */
 .title {
   text-align: center;
 
@@ -8,12 +57,6 @@
   &--warning {
     color: @red-600;
   }
-}
-
-:deep(.modal__dialog) {
-  max-width: 500px;
-  border-radius: 16px;
-  margin: 18px;
 }
 
 .content {
@@ -47,10 +90,12 @@
     margin: 0;
   }
 
+  .dialog__image,
   .image {
     height: 15vh;
   }
 
+  .dialog__content,
   .content {
     margin-top: 16px;
     max-height: 35vh;

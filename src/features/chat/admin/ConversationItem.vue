@@ -118,7 +118,8 @@
       left: 52px;
       right: 10px;
       height: 1px;
-      background: color-mix(in srgb, @neutral-300 30%, transparent);
+      background: var(--admin-border-subtle);
+      opacity: 0.5;
       transition: opacity 0.25s ease;
     }
 
@@ -162,8 +163,8 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: white;
-      border: 1px solid @neutral-200;
+      background: var(--admin-bg-surface);
+      border: 1px solid var(--admin-border-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -187,7 +188,7 @@
     &__header {
       font-size: 14px;
       font-weight: 600;
-      color: @neutral-900;
+      color: var(--admin-text-primary);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -226,7 +227,7 @@
 
     &__preview {
       font-size: 13px;
-      color: @neutral-600;
+      color: var(--admin-text-secondary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -240,7 +241,7 @@
     &__dot {
       width: 5px;
       height: 5px;
-      background: @neutral-500;
+      background: var(--admin-text-muted);
       border-radius: 50%;
       animation: typingDots 1.3s infinite ease-in-out;
 
@@ -262,13 +263,13 @@
 
     &__time {
       font-size: 12px;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
       white-space: nowrap;
     }
 
     &__badge {
       background: var(--primary-600);
-      color: white;
+      color: var(--admin-text-inverse);
       font-size: 12px;
       font-weight: 600;
       border-radius: 999px;

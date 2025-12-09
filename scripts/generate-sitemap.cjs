@@ -29,6 +29,7 @@ const staticPages = [
   { path: '/about', changefreq: 'monthly', priority: '0.7' },
   { path: '/reconstitution', changefreq: 'monthly', priority: '0.7' },
   { path: '/contact', changefreq: 'monthly', priority: '0.6' },
+  { path: '/crypto-guide', changefreq: 'monthly', priority: '0.6' },
   { path: '/legal/cgv', changefreq: 'yearly', priority: '0.3' },
   { path: '/legal/privacy', changefreq: 'yearly', priority: '0.3' },
   { path: '/legal/mentions', changefreq: 'yearly', priority: '0.3' },

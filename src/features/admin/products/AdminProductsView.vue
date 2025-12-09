@@ -257,7 +257,7 @@
       padding-bottom: 8px;
 
       &:hover {
-        background: var(--admin-bg-card-hover, var(--neutral-50));
+        background: var(--admin-bg-card-hover);
       }
     }
 
@@ -275,8 +275,8 @@
       height: 60px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--admin-border-subtle, @neutral-200);
-      background: var(--admin-bg-card, @white);
+      border: 1px solid var(--admin-border-subtle);
+      background: var(--admin-bg-surface);
       flex-shrink: 0;
     }
 
@@ -296,20 +296,20 @@
     &__name {
       font-size: 15px;
       font-weight: 600;
-      color: var(--admin-text-primary, @neutral-900);
+      color: var(--admin-text-primary);
     }
 
     &__dosage {
       font-size: 13px;
       font-weight: 400;
-      color: var(--admin-text-secondary, @neutral-500);
+      color: var(--admin-text-secondary);
     }
 
     &__badge-promo {
       margin-top: 8px;
       width: fit-content;
-      background-color: @red-600;
-      color: @white;
+      background-color: var(--danger-600);
+      color: var(--admin-text-inverse);
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
@@ -326,13 +326,13 @@
 
       .price-old {
         font-size: 12px;
-        color: var(--admin-text-muted, @neutral-400);
+        color: var(--admin-text-muted);
         text-decoration: line-through;
       }
 
       .price-sale {
         font-weight: 700;
-        color: @red-600;
+        color: var(--danger-600);
       }
     }
   }

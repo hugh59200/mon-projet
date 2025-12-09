@@ -11,7 +11,7 @@
       />
     </BasicTooltip>
     <template v-else>
-      <div class="icon--container">
+      <div class="alert__icon-container">
         <BasicIcon
           :name="iconNameMapping[alertType]"
           active

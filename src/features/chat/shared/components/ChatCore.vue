@@ -358,7 +358,7 @@
 </script>
 <style scoped lang="less">
   .chat-core {
-    background: white;
+    background: var(--admin-bg-surface, white);
     display: flex;
     flex-direction: column;
     border-radius: 0 0 16px 16px;
@@ -389,10 +389,10 @@
       gap: 10px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, @warning-500 15%, white) 0%,
-        color-mix(in srgb, @warning-400 10%, white) 100%
+        color-mix(in srgb, @warning-500 15%, var(--admin-bg-surface, white)) 0%,
+        color-mix(in srgb, @warning-400 10%, var(--admin-bg-surface, white)) 100%
       );
-      color: @warning-800;
+      color: var(--admin-text-warning, @warning-800);
       padding: 12px 20px;
       font-size: 13px;
       font-weight: 600;
@@ -436,7 +436,7 @@
       justify-content: center;
       gap: 24px;
       min-height: 400px;
-      background: linear-gradient(180deg, @neutral-50 0%, white 100%);
+      background: linear-gradient(180deg, var(--admin-bg-subtle, @neutral-50) 0%, var(--admin-bg-surface, white) 100%);
       position: relative;
       z-index: 1;
     }
@@ -446,11 +446,11 @@
       align-items: center;
       gap: 8px;
       padding: 16px 24px;
-      background: white;
+      background: var(--admin-bg-card, white);
       border-radius: 16px;
       box-shadow:
-        0 2px 8px color-mix(in srgb, @neutral-900 6%, transparent),
-        0 8px 24px color-mix(in srgb, @neutral-900 8%, transparent);
+        0 2px 8px var(--admin-shadow, color-mix(in srgb, @neutral-900 6%, transparent)),
+        0 8px 24px var(--admin-shadow, color-mix(in srgb, @neutral-900 8%, transparent));
     }
 
     &__loader-dot {
@@ -476,7 +476,7 @@
 
     &__loader-text {
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--admin-text-muted, @neutral-500);
       font-weight: 600;
       letter-spacing: -0.01em;
     }
@@ -504,7 +504,7 @@
       overflow-x: hidden;
       padding: 20px 24px;
       background:
-        linear-gradient(180deg, @neutral-100 0%, @neutral-50 30%, white 100%);
+        linear-gradient(180deg, var(--admin-bg-header, @neutral-100) 0%, var(--admin-bg-subtle, @neutral-50) 30%, var(--admin-bg-surface, white) 100%);
       scroll-behavior: smooth;
       min-height: 0;
       gap: 6px;
@@ -518,7 +518,7 @@
         inset: 0;
         background-image: radial-gradient(
           circle at 2px 2px,
-          color-mix(in srgb, @neutral-300 8%, transparent) 1px,
+          color-mix(in srgb, var(--admin-border-subtle, @neutral-300) 8%, transparent) 1px,
           transparent 0
         );
         background-size: 20px 20px;
@@ -539,8 +539,8 @@
     &__messages::-webkit-scrollbar-thumb {
       background: linear-gradient(
         180deg,
-        color-mix(in srgb, @neutral-400 60%, transparent) 0%,
-        color-mix(in srgb, @neutral-500 60%, transparent) 100%
+        color-mix(in srgb, var(--admin-text-muted, @neutral-400) 60%, transparent) 0%,
+        color-mix(in srgb, var(--admin-text-secondary, @neutral-500) 60%, transparent) 100%
       );
       border-radius: 8px;
       border: 2px solid transparent;
@@ -551,8 +551,8 @@
     &__messages::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(
         180deg,
-        @neutral-400 0%,
-        @neutral-500 100%
+        var(--admin-text-muted, @neutral-400) 0%,
+        var(--admin-text-secondary, @neutral-500) 100%
       );
       background-clip: padding-box;
     }
@@ -581,8 +581,8 @@
       height: 80px;
       background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--primary-500) 12%, white) 0%,
-        color-mix(in srgb, var(--primary-400) 8%, white) 100%
+        color-mix(in srgb, var(--primary-500) 12%, var(--admin-bg-surface, white)) 0%,
+        color-mix(in srgb, var(--primary-400) 8%, var(--admin-bg-surface, white)) 100%
       );
       border-radius: 24px;
       color: var(--primary-500);
@@ -607,14 +607,14 @@
       margin: 0;
       font-size: 18px;
       font-weight: 700;
-      color: @neutral-800;
+      color: var(--admin-text-primary, @neutral-800);
       letter-spacing: -0.02em;
     }
 
     &__empty-text {
       margin: 0;
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--admin-text-muted, @neutral-500);
       max-width: 260px;
       line-height: 1.5;
     }
@@ -640,7 +640,7 @@
       cursor: pointer;
       box-shadow:
         0 4px 16px color-mix(in srgb, var(--primary-600) 40%, transparent),
-        0 2px 4px color-mix(in srgb, @neutral-900 15%, transparent),
+        0 2px 4px var(--admin-shadow, color-mix(in srgb, @neutral-900 15%, transparent)),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 10;
@@ -666,7 +666,7 @@
         transform: translateX(-50%) translateY(-3px);
         box-shadow:
           0 8px 24px color-mix(in srgb, var(--primary-600) 50%, transparent),
-          0 4px 8px color-mix(in srgb, @neutral-900 15%, transparent),
+          0 4px 8px var(--admin-shadow, color-mix(in srgb, @neutral-900 15%, transparent)),
           inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
         &::before {

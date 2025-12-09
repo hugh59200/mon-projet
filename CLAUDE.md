@@ -268,6 +268,94 @@ const imageUrl = getPersonaImageUrl('lab')
 
 **Icônes** : Disponibles dans `designSystem/src/fondation/icons/` avec variantes bold et outline.
 
+## Système de Thème (Dark/Light)
+
+L'application utilise un **système de thème à deux couches** :
+
+### Couche 1 : Mode Light/Dark (global)
+
+**Fichiers clés** :
+- `src/composables/useTheme.ts` - Gestion du mode light/dark
+- `designSystem/src/fondation/colors/semantic-theme.less` - Variables CSS sémantiques
+
+**Fonctionnement** :
+- Stockage : `localStorage` → clé `theme-preference` (`'light'` | `'dark'` | `'system'`)
+- Application : Attribut `data-theme` sur `<html>`
+- Détection automatique de la préférence système via `prefers-color-scheme`
+
+```typescript
+import { useTheme } from '@/composables/useTheme'
+const { theme, preference, toggleTheme, setTheme } = useTheme()
+```
+
+### Couche 2 : Palette de couleurs (Blue/Brown/Custom)
+
+**Fichiers clés** :
+- `src/composables/useCustomTheme.ts` - Gestion des palettes
+- `designSystem/src/fondation/colors/themes/theme-blue.less`
+- `designSystem/src/fondation/colors/themes/theme-brown.less`
+
+**Modes** :
+- **Preset** : Classes `.theme-blue` / `.theme-brown`
+- **Custom** : Génération dynamique de palette depuis une couleur hex
+
+### Pattern ContentBlock : Propagation du thème aux enfants
+
+Le composant `ContentBlock` (`designSystem/src/components/layout/ContentBlock.vue`) propage le thème via **CSS Variable Scoping**.
+
+**Principe** : Le ContentBlock définit des variables CSS locales selon son thème résolu, héritées automatiquement par tous ses enfants.
+
+**Variables exposées** :
+```less
+// Définies par ContentBlock selon le thème (light ou dark)
+--content-block-text          // Couleur texte principale
+--content-block-text-secondary // Couleur texte secondaire
+--content-block-text-muted    // Couleur texte atténué
+--content-block-border        // Couleur bordures
+--content-block-bg-subtle     // Fond subtil (headers, etc.)
+```
+
+**Utilisation dans les composants enfants** :
+```less
+.my-child-component {
+  color: var(--content-block-text);
+  border: 1px solid var(--content-block-border);
+
+  .label {
+    color: var(--content-block-text-muted);
+  }
+
+  .header {
+    background: var(--content-block-bg-subtle);
+  }
+}
+```
+
+**Props du ContentBlock** :
+```vue
+<!-- Suit le thème global (défaut) -->
+<ContentBlock variant="card">
+  <MyComponent />
+</ContentBlock>
+
+<!-- Force un thème spécifique -->
+<ContentBlock variant="card" theme="dark">
+  <MyComponent /> <!-- Recevra les variables dark -->
+</ContentBlock>
+
+<ContentBlock variant="card" theme="light">
+  <MyComponent /> <!-- Recevra les variables light -->
+</ContentBlock>
+```
+
+**Avantages** :
+- Pas de props drilling (les enfants n'ont pas besoin de recevoir le thème)
+- Héritage CSS automatique à tous les niveaux de profondeur
+- Possibilité de forcer un thème localement (`theme="dark"`)
+- Compatible avec le thème global (`theme="auto"` par défaut)
+
+**Exemple concret** : Voir `src/features/home/HomeQuality.vue` qui utilise ce pattern pour les cartes COA.
+
 ## Responsive Design
 
 ### Breakpoints

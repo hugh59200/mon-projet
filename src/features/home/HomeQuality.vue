@@ -167,7 +167,8 @@
       batch: '2025-1847',
       purity: '99.2%',
       mass: '5mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tb-500-10mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tb-500-10mg.jpg',
     },
     {
       id: '2',
@@ -176,7 +177,8 @@
       batch: '2025-2341',
       purity: '98.7%',
       mass: '10mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tirzepatide-60mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/tirzepatide-60mg.jpg',
     },
     {
       id: '3',
@@ -185,7 +187,8 @@
       batch: '2025-3892',
       purity: '99.1%',
       mass: '10mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/retatrutide-60mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/retatrutide-60mg.jpg',
     },
     {
       id: '4',
@@ -194,7 +197,8 @@
       batch: '2025-4521',
       purity: '98.9%',
       mass: '5mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/cjc-1295-5mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/cjc-1295-5mg.jpg',
     },
     {
       id: '5',
@@ -203,7 +207,8 @@
       batch: '2025-5673',
       purity: '99.4%',
       mass: '10mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/pt-141-10mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/pt-141-10mg.jpg',
     },
     {
       id: '6',
@@ -212,7 +217,8 @@
       batch: '2025-6124',
       purity: '99.0%',
       mass: '5mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/selank-10mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/selank-10mg.jpg',
     },
     {
       id: '7',
@@ -221,7 +227,8 @@
       batch: '2025-7289',
       purity: '98.8%',
       mass: '5mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/semax-10mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/semax-10mg.jpg',
     },
     {
       id: '8',
@@ -230,7 +237,8 @@
       batch: '2025-8156',
       purity: '99.3%',
       mass: '100mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ghk-cu-100mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ghk-cu-100mg.jpg',
     },
     {
       id: '9',
@@ -257,7 +265,8 @@
       batch: '2025-1198',
       purity: '99.1%',
       mass: '10mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/bpc-157-5mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/bpc-157-5mg.jpg',
     },
     {
       id: '12',
@@ -266,7 +275,8 @@
       batch: '2025-1267',
       purity: '98.9%',
       mass: '10mg',
-      coaUrl: 'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ss-31-50mg.jpg',
+      coaUrl:
+        'https://dwomsbawthlktapmtmqu.supabase.co/storage/v1/object/public/coa/ss-31-50mg.jpg',
     },
   ]
 
@@ -381,8 +391,6 @@
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   .layout-section {
-    width: 100%;
-
     // Conteneur centré
     &__container {
       max-width: 1200px;
@@ -680,12 +688,12 @@
     }
     .quality__visual {
       order: 1;
-      width: calc(100% + 32px);
-      margin-left: -16px;
-      margin-right: -16px;
+      margin-left: -50px;
+      margin-right: -50px;
     }
+    
     .quality__coa-scroll {
-      width: 100%;
+     flex:1;
       max-width: 800px;
       margin: 0 auto;
       height: auto;

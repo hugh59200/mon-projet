@@ -1,11 +1,20 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">{{ t('auth.reset.title') }}</h1>
-    <p class="auth__subtitle">
-      {{ t('auth.reset.subtitle') }}
-    </p>
+    <div class="auth__card">
+      <!-- Header avec logo (mobile) ou titre seul (desktop) -->
+      <div class="auth__header">
+        <BasicIconNext
+          name="fastPeptides"
+          :size="28"
+          class="auth__header-logo"
+        />
+        <h1 class="auth__title">{{ t('auth.reset.title') }}</h1>
+      </div>
+      <p class="auth__subtitle">
+        {{ t('auth.reset.subtitle') }}
+      </p>
 
-    <div class="auth__form">
+      <div class="auth__form">
       <WrapperInput
         v-model.trim="email"
         :label="t('auth.reset.email')"
@@ -68,17 +77,18 @@
       </div>
     </div>
 
-    <div class="auth__links">
-      <RouterLink
-        to="/auth/login"
-        class="link-back"
-      >
-        <BasicIconNext
-          name="ArrowLeft"
-          :size="14"
-        />
-        {{ t('auth.reset.backToLogin') }}
-      </RouterLink>
+      <div class="auth__links">
+        <RouterLink
+          to="/auth/login"
+          class="link-back"
+        >
+          <BasicIconNext
+            name="ArrowLeft"
+            :size="14"
+          />
+          {{ t('auth.reset.backToLogin') }}
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

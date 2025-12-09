@@ -1,73 +1,204 @@
-/* =========================================
-   🎨 AuthFormStyles.less - Style global PRO
-   ========================================= */
+/* ===========================================
+   AUTH FORM STYLES - Premium & Clean
+   =========================================== */
 
 .auth {
-  align-self: stretch;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centré horizontalement */
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  width: 100%;
   animation: fadeIn 0.5s ease;
 
-  /* TITRE PRINCIPAL */
-  &__title {
-    font-size: 2rem; /* Plus grand (h2/h3) */
-    font-weight: 800;
-    color: var(--text-primary); /* Adapté au thème light/dark */
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-  }
-
-  /* SOUS-TITRE */
-  &__subtitle {
-    font-size: 1rem; /* Taille de corps standard */
-    color: var(--text-secondary); /* Adapté au thème light/dark */
-    margin-bottom: 40px;
-    line-height: 1.5;
-    max-width: 90%; /* Évite que le texte soit trop large sur grand écran */
-  }
-
-  /* CONTENEUR DU FORMULAIRE */
-  &__form {
-    width: 100%;
-    max-width: 400px; /* Largeur fixe pour le formulaire lui-même */
+  /* ===========================================
+     CARD PREMIUM
+     =========================================== */
+  &__card {
     display: flex;
     flex-direction: column;
-    gap: 24px; /* Espacement pour laisser place aux messages d'erreur absolus */
-    background: transparent; /* On laisse le fond du layout gérer */
+    align-items: center;
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    position: relative;
+
+    // Fond glass premium - LIGHT MODE
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.92) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1.5px solid transparent;
+    background-clip: padding-box;
+    border-radius: 28px;
+
+    // Relief et profondeur
+    box-shadow:
+      0 20px 50px -12px rgba(0, 0, 0, 0.12),
+      0 8px 20px -8px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(var(--primary-500-rgb), 0.08),
+      0 0 40px -10px rgba(var(--primary-500-rgb), 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 1),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.03);
+
+    // Bordure dégradée
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -1.5px;
+      border-radius: 29px;
+      padding: 1.5px;
+      background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(var(--primary-400-rgb), 0.3) 30%,
+        rgba(var(--primary-500-rgb), 0.2) 70%,
+        rgba(255, 255, 255, 0.6) 100%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    // Accent line en haut
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 3px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--primary-400),
+        var(--primary-500),
+        var(--primary-400),
+        transparent
+      );
+      border-radius: 0 0 4px 4px;
+      z-index: 1;
+    }
+
+    // DARK MODE
+    [data-theme="dark"] & {
+      background: linear-gradient(180deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%);
+      box-shadow:
+        0 20px 50px -12px rgba(0, 0, 0, 0.4),
+        0 8px 20px -8px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(var(--primary-500-rgb), 0.15),
+        0 0 50px -10px rgba(var(--primary-500-rgb), 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+
+      &::after {
+        background: linear-gradient(
+          160deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(var(--primary-400-rgb), 0.4) 30%,
+          rgba(var(--primary-500-rgb), 0.3) 70%,
+          rgba(255, 255, 255, 0.05) 100%
+        );
+      }
+    }
+  }
+
+  /* ===========================================
+     HEADER (Logo + Titre)
+     =========================================== */
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  &__header-logo {
+    display: none; // Caché sur desktop
+    color: var(--primary-500);
+    flex-shrink: 0;
+  }
+
+  /* ===========================================
+     TITRE
+     =========================================== */
+  &__title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(
+      135deg,
+      var(--text-primary) 0%,
+      var(--primary-600) 50%,
+      var(--primary-500) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(var(--primary-500-rgb), 0.15));
+  }
+
+  /* ===========================================
+     SOUS-TITRE
+     =========================================== */
+  &__subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.5;
+    max-width: 90%;
+  }
+
+  /* ===========================================
+     FORMULAIRE
+     =========================================== */
+  &__form {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     animation: fadeInUp 0.4s ease forwards;
   }
 
-  /* ZONE DE FEEDBACK (Erreurs/Succès) */
+  /* ===========================================
+     FEEDBACK
+     =========================================== */
   &__feedback {
-    min-height: 24px; /* Hauteur minimale pour éviter le saut de layout */
     display: flex;
     justify-content: center;
-    margin-top: -10px; /* Remonte légèrement pour être plus proche du bouton */
-    margin-bottom: 10px;
   }
 
   &__error {
     color: @danger-500;
-    font-size: 0.9rem;
-  }
-  &__message {
-    color: @success-600;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
   }
 
-  /* SÉPARATEUR "OU CONTINUER AVEC" */
+  &__message {
+    color: @success-600;
+    font-size: 0.875rem;
+  }
+
+  /* ===========================================
+     DIVIDER
+     =========================================== */
   &__divider {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -10px;
-    margin-bottom: 14px;
-    color: var(--text-muted); /* Adapté au thème light/dark */
+    color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 500;
-    text-transform: uppercase; /* Plus moderne */
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 
     &::before,
@@ -75,20 +206,25 @@
       content: "";
       flex: 1;
       height: 1px;
-      background: var(--border-default); /* Adapté au thème light/dark */
+      background: var(--border-default);
       margin: 0 12px;
     }
   }
 
-  /* BOUTONS SOCIAUX */
+  /* ===========================================
+     PROVIDERS
+     =========================================== */
   &__providers {
     display: flex;
     justify-content: center;
-    gap: 24px; /* Espacement généreux entre les providers */
-    margin-bottom: 8px; /* Espace après les providers */
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 12px 0;
   }
 
-  /* ICÔNE CENTRALE (pages confirmation) */
+  /* ===========================================
+     ICON WRAPPER
+     =========================================== */
   &__icon-wrapper {
     display: flex;
     align-items: center;
@@ -96,14 +232,32 @@
     margin-bottom: 16px;
   }
 
-  /* LIENS DE BAS DE PAGE */
+  /* ===========================================
+     BOTTOM SECTION
+     =========================================== */
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+
+    &--inline {
+      margin-top: 16px;
+    }
+  }
+
+  /* ===========================================
+     LINKS
+     =========================================== */
   &__links {
-    margin-top: 16px; /* Espace avant les liens */
+    margin-top: 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     font-size: 0.85rem;
-    color: var(--text-secondary); /* Adapté au thème light/dark */
+    color: var(--text-secondary);
 
     a {
       color: var(--primary-600);
@@ -119,44 +273,85 @@
   }
 }
 
-/* =========================================
-   📱 RESPONSIVE - Mobile (≤ 720px)
-   ========================================= */
-.respond-mobile({
+/* ===========================================
+   RESPONSIVE TABLET / MOBILE
+   =========================================== */
+.respond-tablet({
   .auth {
-    &__title {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-    }
-
-    &__subtitle {
-      font-size: 0.85rem;
-      margin-bottom: 32px;
+    &__card {
+      padding: clamp(12px, 2vh, 20px) 20px; // Padding horizontal fixe 20px
       max-width: 100%;
+      width: 100%;
+      // Retrait du style "carte" sur mobile
+      background: transparent;
+      backdrop-filter: none;
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+
+      &::before,
+      &::after {
+        display: none; // Pas de bordure décorative
+      }
     }
 
     &__form {
-      gap: 20px;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    &__header {
+      gap: clamp(8px, 2vw, 12px);
+      margin-bottom: clamp(8px, 2vh, 12px);
+    }
+
+    &__header-logo {
+      display: block; // Visible sur mobile/tablet
+      width: clamp(32px, 6vh, 38px) !important;
+      height: clamp(32px, 6vh, 38px) !important;
+    }
+
+    &__title {
+      font-size: clamp(1.3rem, 4vh, 1.6rem);
+    }
+
+    &__subtitle {
+      display: none;
+    }
+
+    &__form {
+      gap: clamp(16px, 3vh, 20px);
     }
 
     &__divider {
-      margin-top: -8px;
-      margin-bottom: 10px;
+      font-size: clamp(0.65rem, 1.5vh, 0.75rem);
     }
 
     &__providers {
-      gap: 16px;
-      margin-bottom: 6px;
+      gap: clamp(10px, 2vh, 16px);
+      margin: clamp(8px, 2vh, 12px) 0;
+    }
+
+    &__bottom {
+      margin-top: clamp(12px, 2vh, 20px);
     }
 
     &__links {
-      margin-top: 12px;
-      gap: 6px;
+      margin-top: clamp(10px, 2vh, 16px);
+      gap: clamp(4px, 1vh, 8px);
+      font-size: clamp(0.75rem, 2vh, 0.85rem);
     }
   }
 });
 
-/* ANIMATIONS */
+/* ===========================================
+   ANIMATIONS
+   =========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

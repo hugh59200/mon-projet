@@ -45,7 +45,7 @@
             <span>{{ t('nav.favorites') }}</span>
             <span v-if="wishlistCount > 0" class="user-menu__badge">{{ wishlistCount }}</span>
           </button>
-          <button class="user-menu__link" @click="goTo('/admin/messagerie')">
+          <button class="user-menu__link" @click="openSupport">
             <BasicIconNext name="MessageSquare" :size="18" class="user-menu__icon" />
             <span>{{ t('profile.support') }}</span>
             <span v-if="totalUnread > 0" class="user-menu__badge">{{ totalUnread }}</span>
@@ -109,18 +109,23 @@
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import { useWishlistStore } from '@/features/catalogue/stores/useWishlistStore'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
+  import { useChatWidgetStore } from '@/features/chat/user/useChatWidgetStore'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
+  import { storeToRefs } from 'pinia'
   import UserHeader from './UserHeader.vue'
 
   const { t } = useI18n()
   const router = useRouter()
-  const { user, isAdmin, signOut } = useAuthStore()
+  const authStore = useAuthStore()
+  const { user, isAdmin } = storeToRefs(authStore)
+  const { signOut } = authStore
   const notifStore = useChatNotifStore()
   const adminTabStore = useAdminTabStore()
   const wishlistStore = useWishlistStore()
+  const chatWidgetStore = useChatWidgetStore()
   const isOpen = ref(false)
 
   const totalUnread = computed(() =>
@@ -131,6 +136,14 @@
   const goTo = (path: string) => {
     isOpen.value = false
     router.push(path)
+  }
+  const openSupport = () => {
+    isOpen.value = false
+    if (isAdmin.value) {
+      router.push('/admin/messagerie')
+    } else {
+      chatWidgetStore.openChat()
+    }
   }
   const goToAdmin = () => {
     isOpen.value = false

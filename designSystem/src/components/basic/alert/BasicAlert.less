@@ -1,3 +1,6 @@
+/* ══════════════════════════════════════════════════════════════
+   BASIC ALERT — Composant d'alerte (BEM)
+   ══════════════════════════════════════════════════════════════ */
 .alert {
   flex: 1;
   display: flex;
@@ -12,18 +15,20 @@
     margin-top: -4px;
   }
 
-  .icon--container {
+  &__icon-container {
     height: 16px;
     width: 16px;
   }
 
   &--small {
     padding: @spacing-5;
+
     svg {
       margin-top: -6px;
       transform: scale(0.5);
     }
-    .icon--container {
+
+    .alert__icon-container {
       margin-right: 6px;
       margin-left: -4px;
     }
@@ -32,7 +37,7 @@
   &--medium {
     padding: @spacing-10;
 
-    .icon--container {
+    .alert__icon-container {
       margin-right: 10px;
     }
 

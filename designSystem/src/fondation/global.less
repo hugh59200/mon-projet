@@ -59,20 +59,23 @@ input {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   SCROLLBAR — Utilitaire BEM
+   ══════════════════════════════════════════════════════════════ */
 .scrollbar {
-  /* ========== Chrome, Safari, Edge Chromium ========== */
+  /* Chrome, Safari, Edge Chromium */
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;
+  }
 
-    &-thumb {
-      background-color: var(--scrollbar-thumb);
-      border-radius: 6px;
-    }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 6px;
+  }
 
-    &-track {
-      background-color: var(--scrollbar-track);
-    }
+  &::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track);
   }
 }
 
@@ -84,7 +87,22 @@ input {
   }
 }
 
-/* Style partagés aux éléments de grid — Dark Theme Support */
+/* ══════════════════════════════════════════════════════════════
+   ADMIN GRID — Styles partagés pour les listes admin (BEM)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Alternance de couleurs pour les lignes */
+.grid-elem__wrapper:nth-child(odd),
+.list-card-desktop__wrapper:nth-child(odd) {
+  background-color: var(--admin-bg-card, @light-blue);
+}
+
+.grid-elem__wrapper:nth-child(even),
+.list-card-desktop__wrapper:nth-child(even) {
+  background-color: var(--admin-bg-card-hover, @white);
+}
+
+/* Legacy aliases (rétro-compatibilité) */
 .gridElemWrapper:nth-child(odd),
 .listCardDesktopWrapper:nth-child(odd) {
   background-color: var(--admin-bg-card, @light-blue);
@@ -95,6 +113,55 @@ input {
   background-color: var(--admin-bg-card-hover, @white);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   CARD LAYOUT — Bloc principal pour les grilles admin (BEM)
+   ══════════════════════════════════════════════════════════════ */
+.card-layout {
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(36, 1fr);
+  padding: 12px;
+  border-bottom: 1px solid var(--admin-border-subtle, @neutral-200);
+  transition: background-color 0.15s ease;
+
+  &--selectionnable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--admin-bg-card-hover, @neutral-100);
+    }
+  }
+
+  &--no-pointer {
+    cursor: auto;
+  }
+
+  &--drawer {
+    background-color: var(--admin-bg-header, #eeeeee);
+  }
+
+  &--facture-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__drawer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &--header {
+    border-radius: 12px 12px 0px 0px;
+    background: var(--admin-bg-header, @indigo-900);
+    border-bottom: 1px solid var(--admin-border, transparent);
+  }
+}
+
+/* Legacy alias (rétro-compatibilité) */
 .cardLayoutWrapper {
   position: relative;
   display: grid;
@@ -106,6 +173,7 @@ input {
 
   &--selectionnable {
     cursor: pointer;
+
     &:hover {
       background-color: var(--admin-bg-card-hover, @neutral-100);
     }
@@ -161,13 +229,41 @@ input {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   COLOR CHIP — Indicateurs colorés (BEM)
+   ══════════════════════════════════════════════════════════════ */
 .color-chip {
   background-color: @neutral-400;
   min-width: 16px;
   height: 16px;
   border-radius: 50%;
+
+  &--demandes {
+    background-color: @red-600;
+  }
+
+  &--dossiers {
+    background-color: @yellow-500;
+  }
+
+  &--drf-demandes {
+    background-color: @pink-600;
+  }
+
+  &--drf-dossiers {
+    background-color: @persian-600;
+  }
+
+  &--virements {
+    background-color: var(--secondary-400);
+  }
+
+  &--factures {
+    background-color: @blue-600;
+  }
 }
 
+/* Legacy aliases (rétro-compatibilité) */
 .color-recherche-demandes {
   background-color: @red-600;
 }
@@ -192,6 +288,9 @@ input {
   background-color: @blue-600;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   UTILITAIRES — Classes utilitaires globales
+   ══════════════════════════════════════════════════════════════ */
 .link {
   color: @persian-600;
   cursor: pointer;
@@ -201,17 +300,22 @@ input {
   overflow: scroll;
 }
 
-.elem {
+/* ══════════════════════════════════════════════════════════════
+   GRID CELL — Cellule de grille admin (BEM)
+   ══════════════════════════════════════════════════════════════ */
+.grid-cell {
   display: flex;
   align-items: center;
   padding: 6px;
   color: var(--admin-text-primary, var(--primary-950));
   font-size: @font-size-body-m;
 
-  span {
+  &__text {
     font-weight: 600;
     font-size: 12px;
     color: var(--admin-text-primary, inherit);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   svg {
@@ -223,10 +327,90 @@ input {
     justify-content: center !important;
   }
 
-  &--bold {
-    span {
-      font-weight: 800;
+  &--bold &__text {
+    font-weight: 800;
+  }
+
+  &--column {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &--clickable {
+    color: @persian-600;
+    cursor: pointer;
+
+    svg {
+      fill: @persian-600;
     }
+  }
+
+  &--disabled {
+    color: #cccccc;
+
+    svg {
+      fill: #cccccc;
+    }
+  }
+
+  &--nowrap &__text {
+    white-space: nowrap;
+  }
+
+  &--danger svg {
+    fill: @red-600;
+  }
+
+  // Grid spans
+  &--span-1 { grid-column: span 1; }
+  &--span-2 { grid-column: span 2; }
+  &--span-3 { grid-column: span 3; }
+  &--span-4 { grid-column: span 4; }
+  &--span-5 { grid-column: span 5; }
+  &--span-6 { grid-column: span 6; }
+  &--span-7 { grid-column: span 7; }
+  &--span-8 { grid-column: span 8; }
+  &--span-9 { grid-column: span 9; }
+  &--span-10 { grid-column: span 10; }
+  &--span-12 { grid-column: span 12; }
+  &--span-13 { grid-column: span 13; }
+  &--span-14 { grid-column: span 14; }
+  &--span-16 { grid-column: span 16; }
+  &--span-18 { grid-column: span 18; }
+  &--span-20 { grid-column: span 20; }
+  &--span-32 { grid-column: span 32; }
+  &--span-36 { grid-column: span 36; }
+}
+
+/* Legacy alias (rétro-compatibilité) - À migrer progressivement */
+.elem {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  color: var(--admin-text-primary, var(--primary-950));
+  font-size: @font-size-body-m;
+
+  span {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--admin-text-primary, inherit);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  svg {
+    transform: scale(0.7);
+    overflow: visible;
+  }
+
+  &--center {
+    justify-content: center !important;
+  }
+
+  &--bold span {
+    font-weight: 800;
   }
 
   &--column {
@@ -244,7 +428,7 @@ input {
       fill: @persian-600;
     }
 
-    :hover {
+    &:hover {
       cursor: pointer;
     }
   }
@@ -255,106 +439,49 @@ input {
     svg {
       fill: #cccccc;
     }
-
-    :hover {
-      cursor: none;
-    }
   }
 
-  span {
-    text-overflow: ellipsis;
-    overflow: hidden;
+  &--nowrap span {
+    white-space: nowrap;
   }
 
-  &--nowrap {
-    span {
-      white-space: nowrap;
-    }
+  &--danger svg {
+    fill: @red-600;
   }
 
-  &--danger {
-    svg {
-      fill: @red-600;
-    }
-  }
+  &--span-1 { grid-column: span 1; }
+  &--span-2 { grid-column: span 2; }
+  &--span-3 { grid-column: span 3; }
+  &--span-4 { grid-column: span 4; }
+  &--span-5 { grid-column: span 5; }
+  &--span-6 { grid-column: span 6; }
+  &--span-7 { grid-column: span 7; }
+  &--span-8 { grid-column: span 8; }
+  &--span-9 { grid-column: span 9; }
+  &--span-10 { grid-column: span 10; }
+  &--span-12 { grid-column: span 12; }
+  &--span-13 { grid-column: span 13; }
+  &--span-14 { grid-column: span 14; }
+  &--span-16 { grid-column: span 16; }
+  &--span-18 { grid-column: span 18; }
+  &--span-20 { grid-column: span 20; }
+  &--span-32 { grid-column: span 32; }
+  &--span-36 { grid-column: span 36; }
+}
 
-  &--column {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &--span-1 {
-    grid-column: span 1;
-  }
-
-  &--span-2 {
-    grid-column: span 2;
-  }
-
-  &--span-3 {
-    grid-column: span 3;
-  }
-
-  &--span-4 {
-    grid-column: span 4;
-  }
-
-  &--span-5 {
-    grid-column: span 5;
-  }
-
-  &--span-6 {
-    grid-column: span 6;
-  }
-
-  &--span-7 {
-    grid-column: span 7;
-  }
-
-  &--span-8 {
-    grid-column: span 8;
-  }
-
-  &--span-9 {
-    grid-column: span 9;
-  }
-
-  &--span-10 {
-    grid-column: span 10;
-  }
-
-  &--span-12 {
-    grid-column: span 12;
-  }
-
-  &--span-13 {
-    grid-column: span 13;
-  }
-
-  &--span-14 {
-    grid-column: span 14;
-  }
-  &--span-16 {
-    grid-column: span 16;
-  }
-
-  &--span-18 {
-    grid-column: span 18;
-  }
-
-  &--span-20 {
-    grid-column: span 20;
-  }
-
-  &--span-32 {
-    grid-column: span 32;
-  }
-
-  &--span-36 {
-    grid-column: span 36;
+/* ══════════════════════════════════════════════════════════════
+   EMPTY LIST — Placeholder pour listes vides (BEM)
+   ══════════════════════════════════════════════════════════════ */
+.empty-list {
+  &__placeholder {
+    display: table;
+    margin: 0 auto;
+    margin-top: 24px;
+    color: @neutral-500;
   }
 }
 
+/* Legacy alias */
 .emptyListPlaceholder {
   display: table;
   margin: 0 auto;

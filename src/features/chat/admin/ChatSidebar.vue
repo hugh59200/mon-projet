@@ -115,8 +115,8 @@
 
 <style scoped lang="less">
   .chat-sidebar {
-    background: @neutral-0;
-    border-right: 1px solid @neutral-200;
+    background: var(--admin-bg-surface);
+    border-right: 1px solid var(--admin-border-subtle);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -132,8 +132,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px;
-      border-bottom: 1px solid @neutral-200;
+      border-bottom: 1px solid var(--admin-border-subtle);
       gap: 10px;
+      background: var(--admin-bg-surface);
     }
 
     &__status-left {
@@ -148,8 +149,8 @@
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      border: 1px solid @neutral-200;
-      background: @neutral-100;
+      border: 1px solid var(--admin-border-subtle);
+      background: var(--admin-bg-card);
 
       img {
         width: 100%;
@@ -164,7 +165,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
     }
 
     &__user-info {
@@ -178,17 +179,17 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: @success-500;
+      background: var(--success-500);
       display: inline-block;
       margin-right: 4px;
-      box-shadow: 0 0 5px color-mix(in srgb, @success-500 40%, transparent);
+      box-shadow: 0 0 5px rgba(var(--success-500-rgb), 0.4);
 
       &::after {
         content: '';
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        background: color-mix(in srgb, @success-500 35%, transparent);
+        background: rgba(var(--success-500-rgb), 0.35);
         animation: pulse-status 2s infinite ease-in-out;
       }
     }
@@ -200,34 +201,39 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: @neutral-50;
+      background: var(--admin-bg-subtle);
       padding: 8px 10px;
-      border-bottom: 1px solid @neutral-200;
+      border-bottom: 1px solid var(--admin-border-subtle);
 
       .search-icon {
-        color: @neutral-500;
+        color: var(--admin-text-muted);
         flex-shrink: 0;
       }
 
       input {
         flex: 1;
-        border: 1px solid @neutral-200;
+        border: 1px solid var(--admin-border-subtle);
         border-radius: 8px;
         padding: 6px 10px;
         font-size: 14px;
-        background: white;
+        background: var(--admin-bg-surface);
+        color: var(--admin-text-primary);
         transition: border-color 0.2s ease;
 
         &:focus {
           outline: none;
           border-color: var(--primary-500);
         }
+
+        &::placeholder {
+          color: var(--admin-text-muted);
+        }
       }
 
       .clear-btn {
         border: none;
         background: none;
-        color: @neutral-500;
+        color: var(--admin-text-muted);
         cursor: pointer;
         padding: 2px;
         display: flex;
@@ -236,7 +242,7 @@
         transition: color 0.2s;
 
         &:hover {
-          color: @neutral-700;
+          color: var(--admin-text-secondary);
         }
       }
     }
@@ -251,7 +257,7 @@
       background: rgba(var(--primary-200-rgb), 0.75);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid color-mix(in srgb, @neutral-300 25%, transparent);
+      border: 1px solid var(--admin-border-subtle);
     }
 
     &__empty-state {

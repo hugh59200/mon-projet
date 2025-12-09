@@ -44,6 +44,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://fast-peptides.com/crypto-guide</loc>
+    <lastmod>2025-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://fast-peptides.com/legal/cgv</loc>
     <lastmod>2025-12-05</lastmod>
     <changefreq>yearly</changefreq>

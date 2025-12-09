@@ -41,6 +41,7 @@ const staticRoutes = [
   '/about',
   '/reconstitution',
   '/contact',
+  '/crypto-guide',
   '/legal/cgv',
   '/legal/privacy',
   '/legal/mentions',

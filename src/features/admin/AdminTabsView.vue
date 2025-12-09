@@ -1,5 +1,8 @@
 <template>
-  <div class="admin-page">
+  <div
+    class="admin-page"
+    :class="`admin-page--${theme}`"
+  >
     <PageHeader />
 
     <div
@@ -39,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useTheme } from '@/composables/useTheme'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import type { RouteName } from '@/router/route-name'
@@ -46,6 +50,7 @@
   import { useRoute } from 'vue-router'
   import { useNavigationTabs } from './shared/composables/useNavigationTabs'
 
+  const { theme } = useTheme()
   const route = useRoute()
   const { tabs, goToTab } = useNavigationTabs()
   const contentRef = ref<HTMLElement | null>(null)
@@ -68,17 +73,74 @@
     flex: 1;
 
     // ═══════════════════════════════════════════════════════════════
-    // 🎨 CSS Variables - Contenu clair sur wrapper sombre
+    // 🎨 CSS Variables Admin - Light Theme
     // ═══════════════════════════════════════════════════════════════
-    --admin-bg-card: @neutral-100;
-    --admin-bg-card-hover: @neutral-200;
-    --admin-bg-header: @neutral-50;
-    --admin-border: @neutral-300;
-    --admin-border-subtle: @neutral-200;
-    --admin-text-primary: @neutral-800;
-    --admin-text-secondary: @neutral-600;
-    --admin-text-muted: @neutral-500;
-    --admin-shadow: rgba(0, 0, 0, 0.08);
+    &--light {
+      // Wrapper (reste sombre en light)
+      --admin-wrapper-bg: rgba(var(--secondary-900-rgb), 0.95);
+      --admin-wrapper-border: rgba(255, 255, 255, 0.06);
+
+      // Surfaces
+      --admin-bg-card: @neutral-100;
+      --admin-bg-card-hover: @neutral-50;
+      --admin-bg-header: @neutral-50;
+      --admin-bg-surface: @white;
+      --admin-bg-subtle: @neutral-50;
+      --admin-bg-input: @white;
+
+      // Texte
+      --admin-text-primary: @neutral-800;
+      --admin-text-secondary: @neutral-600;
+      --admin-text-muted: @neutral-500;
+      --admin-text-inverse: @white;
+
+      // Bordures
+      --admin-border: @neutral-300;
+      --admin-border-subtle: @neutral-200;
+
+      // Ombres
+      --admin-shadow: rgba(0, 0, 0, 0.08);
+      --admin-shadow-hover: rgba(0, 0, 0, 0.12);
+
+      // Nav tabs
+      --admin-nav-bg: @neutral-100;
+      --admin-nav-border: @neutral-200;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🌙 CSS Variables Admin - Dark Theme
+    // ═══════════════════════════════════════════════════════════════
+    &--dark {
+      // Wrapper (encore plus sombre en dark)
+      --admin-wrapper-bg: rgba(0, 0, 0, 0.6);
+      --admin-wrapper-border: rgba(255, 255, 255, 0.08);
+
+      // Surfaces
+      --admin-bg-card: var(--secondary-800);
+      --admin-bg-card-hover: var(--secondary-700);
+      --admin-bg-header: var(--secondary-900);
+      --admin-bg-surface: var(--secondary-800);
+      --admin-bg-subtle: var(--secondary-900);
+      --admin-bg-input: var(--secondary-900);
+
+      // Texte
+      --admin-text-primary: @neutral-100;
+      --admin-text-secondary: @neutral-300;
+      --admin-text-muted: @neutral-400;
+      --admin-text-inverse: @neutral-900;
+
+      // Bordures
+      --admin-border: rgba(255, 255, 255, 0.12);
+      --admin-border-subtle: rgba(255, 255, 255, 0.08);
+
+      // Ombres
+      --admin-shadow: rgba(0, 0, 0, 0.3);
+      --admin-shadow-hover: rgba(0, 0, 0, 0.4);
+
+      // Nav tabs
+      --admin-nav-bg: var(--secondary-800);
+      --admin-nav-border: rgba(255, 255, 255, 0.1);
+    }
   }
 
   .admin-scroll {
@@ -88,10 +150,10 @@
   }
 
   .admin-wrapper {
-    background: rgba(var(--secondary-900-rgb), 0.95);
+    background: var(--admin-wrapper-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--admin-wrapper-border);
     border-radius: 20px;
     padding: 24px;
     display: flex;
@@ -106,12 +168,12 @@
     });
 
     &__nav {
-      background: @neutral-100;
-      border: 1px solid @neutral-200;
+      background: var(--admin-nav-bg);
+      border: 1px solid var(--admin-nav-border);
       border-radius: 12px;
       padding: 6px;
       display: inline-flex;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px var(--admin-shadow);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
 

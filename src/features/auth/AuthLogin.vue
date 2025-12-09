@@ -1,11 +1,21 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">{{ t('auth.login.title') }}</h1>
-    <p class="auth__subtitle">
-      {{ t('auth.login.subtitle') }}
-    </p>
+    <!-- Card premium pour le formulaire -->
+    <div ref="cardRef" class="auth__card">
+      <!-- Header avec logo (mobile) ou titre seul (desktop) -->
+      <div class="auth__header">
+        <BasicIconNext
+          name="fastPeptides"
+          :size="28"
+          class="auth__header-logo"
+        />
+        <h1 class="auth__title">{{ t('auth.login.title') }}</h1>
+      </div>
+      <p class="auth__subtitle">
+        {{ t('auth.login.subtitle') }}
+      </p>
 
-    <form class="auth__form" @submit.prevent="submit">
+      <form class="auth__form" @submit.prevent="submit">
       <div class="auth__field">
         <WrapperInput
           v-model.trim="fields.email.value.value"
@@ -74,7 +84,28 @@
           </div>
         </Transition>
       </div>
+      </form>
 
+      <!-- Section bottom DANS le card quand trop proche -->
+      <div v-if="isTooClose" class="auth__bottom auth__bottom--inline">
+        <div class="auth__divider"><span>{{ t('common.or') }}</span></div>
+        <div class="auth__providers">
+          <BasicSocialButton provider="google" @click="provider('google')" />
+          <BasicSocialButton provider="github" @click="provider('github')" />
+          <BasicSocialButton provider="facebook" @click="provider('facebook')" />
+        </div>
+        <div class="auth__links">
+          <span>
+            {{ t('auth.login.noAccount') }}
+            <RouterLink to="/auth/register">{{ t('auth.login.createAccount') }}</RouterLink>
+          </span>
+          <RouterLink to="/auth/reset-password">{{ t('auth.login.forgotPassword') }}</RouterLink>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section bottom HORS du card quand assez d'espace -->
+    <div v-if="!isTooClose" class="auth__bottom">
       <div class="auth__divider"><span>{{ t('common.or') }}</span></div>
 
       <div class="auth__providers">
@@ -82,14 +113,14 @@
         <BasicSocialButton provider="github" @click="provider('github')" />
         <BasicSocialButton provider="facebook" @click="provider('facebook')" />
       </div>
-    </form>
 
-    <div class="auth__links">
-      <span>
-        {{ t('auth.login.noAccount') }}
-        <RouterLink to="/auth/register">{{ t('auth.login.createAccount') }}</RouterLink>
-      </span>
-      <RouterLink to="/auth/reset-password">{{ t('auth.login.forgotPassword') }}</RouterLink>
+      <div class="auth__links">
+        <span>
+          {{ t('auth.login.noAccount') }}
+          <RouterLink to="/auth/register">{{ t('auth.login.createAccount') }}</RouterLink>
+        </span>
+        <RouterLink to="/auth/reset-password">{{ t('auth.login.forgotPassword') }}</RouterLink>
+      </div>
     </div>
   </div>
 </template>
@@ -97,15 +128,21 @@
 <script setup lang="ts">
   import Turnstile from '@/features/auth/components/TurnstileWidget.vue'
   import ValidationIcon from '@designSystem/components/basic/validationIcon/ValidationIcon.vue'
+  import BasicIconNext from '@designSystem/components/basic/icon/BasicIconNext.vue'
   import type { FieldHelpers } from '@/composables/validation'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import BasicSocialButton from './BasicSocialButton.vue'
   import { useAuthForm } from './composables/useAuthForm'
   import { useAuthStore } from './stores/useAuthStore'
+  import { useAuthProximity } from './composables/useAuthProximity'
 
   const { t } = useI18n()
   const auth = useAuthStore()
+
+  // Ref pour la détection de proximité
+  const cardRef = ref<HTMLElement | null>(null)
+  const { isTooClose } = useAuthProximity(cardRef, { minGap: 40, bottomHeight: 150 })
 
   const { fields, canSubmit, validate } = useAuthForm({
     mode: 'login',

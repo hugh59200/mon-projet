@@ -597,11 +597,11 @@
     gap: 24px;
 
     .dashboard-card {
-      background: white;
-      border: 1px solid @neutral-200;
+      background: var(--admin-bg-surface);
+      border: 1px solid var(--admin-border-subtle);
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 2px 10px var(--admin-shadow);
     }
   }
 
@@ -616,27 +616,27 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: white;
-    border: 1px solid @neutral-200;
+    background: var(--admin-bg-surface);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 12px;
     padding: 20px;
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: @neutral-300;
+      border-color: var(--admin-border);
     }
 
     &--primary {
-      border-left: 4px solid @primary-500;
+      border-left: 4px solid var(--primary-500);
     }
     &--success {
-      border-left: 4px solid @success-500;
+      border-left: 4px solid var(--success-500);
     }
     &--info {
-      border-left: 4px solid @info-500;
+      border-left: 4px solid var(--info-500);
     }
     &--warning {
-      border-left: 4px solid @warning-500;
+      border-left: 4px solid var(--warning-500);
     }
 
     &__content {
@@ -647,12 +647,12 @@
     &__value {
       font-size: 28px;
       font-weight: 700;
-      color: @neutral-900;
+      color: var(--admin-text-primary);
     }
 
     &__label {
       font-size: 14px;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
     }
   }
 
@@ -669,7 +669,7 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      background: @success-500;
+      background: var(--success-500);
       border-radius: 50%;
       margin-right: 8px;
       animation: pulse 2s infinite;
@@ -687,19 +687,19 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: @neutral-50;
+    background: var(--admin-bg-subtle);
     border-radius: 8px;
     transition: background 0.15s ease;
 
     &:hover {
-      background: @neutral-100;
+      background: var(--admin-bg-card-hover);
     }
 
     &__avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: @neutral-200;
+      background: var(--admin-border-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -719,12 +719,12 @@
 
       .name {
         font-weight: 600;
-        color: @neutral-800;
+        color: var(--admin-text-primary);
       }
 
       .details {
         font-size: 13px;
-        color: @neutral-500;
+        color: var(--admin-text-muted);
       }
     }
   }
@@ -746,7 +746,7 @@
     transition: background 0.15s ease;
 
     &:hover {
-      background: @neutral-50;
+      background: var(--admin-bg-card-hover);
     }
   }
 
@@ -764,7 +764,7 @@
 
     .user-name {
       font-size: 14px;
-      color: @neutral-800;
+      color: var(--admin-text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -777,7 +777,7 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: @neutral-700;
+    color: var(--admin-text-secondary);
   }
 
   .actions-cell {
@@ -787,7 +787,7 @@
 
   .pages-viewed {
     font-size: 13px;
-    color: @neutral-500;
+    color: var(--admin-text-muted);
   }
 
   // Countries
@@ -805,7 +805,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px;
-    background: @neutral-50;
+    background: var(--admin-bg-subtle);
     border-radius: 8px;
 
     .country-flag {
@@ -815,12 +815,12 @@
     .country-name {
       flex: 1;
       font-weight: 500;
-      color: @neutral-800;
+      color: var(--admin-text-primary);
     }
 
     .country-sessions {
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
     }
   }
 

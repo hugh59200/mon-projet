@@ -260,7 +260,7 @@
       cursor: pointer;
 
       &:hover {
-        background: var(--primary-0);
+        background: var(--admin-bg-card-hover);
       }
     }
 
@@ -279,7 +279,8 @@
       height: 48px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid @neutral-200;
+      border: 1px solid var(--admin-border-subtle);
+      background: var(--admin-bg-surface);
     }
   }
 </style>

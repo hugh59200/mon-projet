@@ -55,14 +55,14 @@
     // Bubble
     // ─────────────────────────────────────────
     &__bubble {
-      background: white;
+      background: var(--admin-bg-card, white);
       border-radius: 18px;
       border-bottom-left-radius: 6px;
       padding: 12px 16px;
       box-shadow:
-        0 1px 2px color-mix(in srgb, @neutral-900 6%, transparent),
-        0 2px 8px color-mix(in srgb, @neutral-900 4%, transparent);
-      border: 1px solid color-mix(in srgb, @neutral-200 60%, transparent);
+        0 1px 2px var(--admin-shadow, color-mix(in srgb, @neutral-900 6%, transparent)),
+        0 2px 8px var(--admin-shadow, color-mix(in srgb, @neutral-900 4%, transparent));
+      border: 1px solid var(--admin-border-subtle, color-mix(in srgb, @neutral-200 60%, transparent));
     }
 
     // ─────────────────────────────────────────

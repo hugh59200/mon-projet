@@ -40,18 +40,18 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: @neutral-50;
-    border: 1px solid @neutral-200;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-subtle);
     border-radius: 10px;
     padding: 16px 18px;
-    box-shadow: 0 1px 3px color-mix(in srgb, @neutral-900 5%, transparent);
+    box-shadow: 0 1px 3px var(--admin-shadow);
     transition: all 0.2s ease-in-out;
     gap: 10px;
 
     &.hoverable:hover {
-      box-shadow: 0 2px 8px color-mix(in srgb, @neutral-900 12%, transparent);
+      box-shadow: 0 2px 8px var(--admin-shadow-hover);
       border-color: var(--primary-300);
-      background: @white;
+      background: var(--admin-bg-surface);
     }
 
     &__header {

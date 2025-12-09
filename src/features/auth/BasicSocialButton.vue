@@ -41,6 +41,10 @@
       background: @neutral-50;
     }
 
+    &:active {
+      transform: scale(0.96);
+    }
+
     /* GitHub : fond noir + logo blanc */
     &--github {
       background: @neutral-900;
@@ -72,4 +76,17 @@
       }
     }
   }
+
+  .respond-mobile({
+    .social-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+
+      :deep(svg) {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  });
 </style>

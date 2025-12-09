@@ -494,8 +494,6 @@
 </script>
 
 <style scoped lang="less">
-  @import '@designSystem/fondation/colors/colors.less';
-  @import '@designSystem/fondation/breakpoints/breakpoints.less';
   @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
 
   .admin-orders {
@@ -505,7 +503,7 @@
       flex-wrap: wrap;
       gap: 4px;
       margin-left: 16px;
-      background: rgba(0, 0, 0, 0.05);
+      background: var(--admin-bg-subtle);
       padding: 4px;
       border-radius: 8px;
     }
@@ -521,19 +519,19 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      color: @neutral-600;
+      color: var(--admin-text-secondary);
       transition: all 0.2s ease;
       white-space: nowrap;
 
       &:hover {
-        background: rgba(0, 0, 0, 0.05);
-        color: @neutral-800;
+        background: var(--admin-bg-card-hover);
+        color: var(--admin-text-primary);
       }
 
       &--active {
-        background: @white;
-        color: @neutral-900;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background: var(--admin-bg-surface);
+        color: var(--admin-text-primary);
+        box-shadow: 0 1px 3px var(--admin-shadow);
       }
 
       &--priority {
@@ -564,12 +562,12 @@
       font-size: 11px;
       font-weight: 600;
       border-radius: 10px;
-      background: @neutral-200;
-      color: @neutral-700;
+      background: var(--admin-border-subtle);
+      color: var(--admin-text-secondary);
 
       &--alert {
         background: var(--warning-500);
-        color: @white;
+        color: var(--admin-text-inverse);
         animation: pulse 2s infinite;
       }
     }
@@ -641,7 +639,7 @@
       transition: background-color 0.15s ease;
 
       &:hover {
-        background: var(--admin-bg-card-hover, var(--primary-0));
+        background: var(--admin-bg-card-hover);
       }
     }
 
@@ -649,15 +647,15 @@
       font-family: monospace;
       font-size: 12px;
       font-weight: 600;
-      color: @neutral-700;
-      background: @neutral-100;
+      color: var(--admin-text-secondary);
+      background: var(--admin-bg-card);
       padding: 4px 8px;
       border-radius: 4px;
     }
 
     &__date {
       font-size: 13px;
-      color: @neutral-600;
+      color: var(--admin-text-secondary);
     }
 
     &__client {
@@ -668,19 +666,19 @@
 
     &__client-name {
       font-weight: 500;
-      color: @neutral-900;
+      color: var(--admin-text-primary);
       font-size: 14px;
     }
 
     &__client-email {
       font-size: 12px;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
     }
 
     &__amount {
       font-weight: 600;
       font-size: 14px;
-      color: @neutral-900;
+      color: var(--admin-text-primary);
       font-variant-numeric: tabular-nums;
     }
 
@@ -745,14 +743,14 @@
 
       &:hover {
         background: var(--success-500);
-        color: @white;
+        color: var(--admin-text-inverse);
         box-shadow: 0 2px 8px rgba(var(--success-500-rgb), 0.3);
       }
     }
 
     &__details-btn {
-      background: @neutral-100;
-      color: @neutral-600;
+      background: var(--admin-bg-card);
+      color: var(--admin-text-secondary);
 
       &:hover {
         background: var(--primary-100);
@@ -762,7 +760,7 @@
 
     &__delete-btn {
       background: transparent;
-      color: @neutral-400;
+      color: var(--admin-text-muted);
 
       &:hover {
         background: var(--danger-100);
@@ -810,17 +808,18 @@
 
     &__question {
       font-size: 16px;
-      color: @neutral-800;
+      color: var(--admin-text-primary);
       margin-bottom: 24px;
       line-height: 1.5;
 
       strong {
-        color: @neutral-900;
+        color: var(--admin-text-primary);
+        font-weight: 700;
       }
     }
 
     &__details {
-      background: @neutral-50;
+      background: var(--admin-bg-subtle);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 20px;
@@ -831,7 +830,7 @@
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
-      border-bottom: 1px solid @neutral-200;
+      border-bottom: 1px solid var(--admin-border-subtle);
 
       &:last-child {
         border-bottom: none;
@@ -840,13 +839,13 @@
 
     &__detail-label {
       font-size: 13px;
-      color: @neutral-500;
+      color: var(--admin-text-muted);
     }
 
     &__detail-value {
       font-size: 13px;
       font-weight: 500;
-      color: @neutral-900;
+      color: var(--admin-text-primary);
     }
 
     &__warning {

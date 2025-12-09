@@ -220,12 +220,12 @@
       position: relative;
       padding: 12px 16px;
       border-radius: 20px;
-      background: white;
+      background: var(--admin-bg-card, white);
       box-shadow:
-        0 1px 3px color-mix(in srgb, @neutral-900 5%, transparent),
-        0 4px 12px color-mix(in srgb, @neutral-900 6%, transparent),
-        0 8px 24px color-mix(in srgb, @neutral-900 4%, transparent);
-      border: 1px solid color-mix(in srgb, @neutral-200 50%, transparent);
+        0 1px 3px var(--admin-shadow, color-mix(in srgb, @neutral-900 5%, transparent)),
+        0 4px 12px var(--admin-shadow, color-mix(in srgb, @neutral-900 6%, transparent)),
+        0 8px 24px var(--admin-shadow, color-mix(in srgb, @neutral-900 4%, transparent));
+      border: 1px solid var(--admin-border-subtle, color-mix(in srgb, @neutral-200 50%, transparent));
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
 
@@ -249,9 +249,9 @@
       &:hover {
         transform: translateY(-2px);
         box-shadow:
-          0 2px 4px color-mix(in srgb, @neutral-900 6%, transparent),
-          0 8px 20px color-mix(in srgb, @neutral-900 8%, transparent),
-          0 16px 32px color-mix(in srgb, @neutral-900 6%, transparent);
+          0 2px 4px var(--admin-shadow-hover, color-mix(in srgb, @neutral-900 6%, transparent)),
+          0 8px 20px var(--admin-shadow-hover, color-mix(in srgb, @neutral-900 8%, transparent)),
+          0 16px 32px var(--admin-shadow-hover, color-mix(in srgb, @neutral-900 6%, transparent));
       }
     }
 
@@ -306,7 +306,7 @@
       margin: 0;
       font-size: 14px;
       line-height: 1.5;
-      color: @neutral-800;
+      color: var(--admin-text-primary, @neutral-800);
       white-space: pre-wrap;
       word-break: break-word;
       position: relative;
@@ -334,7 +334,7 @@
 
     &__time {
       font-size: 11px;
-      color: @neutral-400;
+      color: var(--admin-text-muted, @neutral-400);
       font-weight: 600;
       letter-spacing: 0.02em;
     }
@@ -369,7 +369,7 @@
     // ─────────────────────────────────────────
     &__seen {
       font-size: 10px;
-      color: @neutral-400;
+      color: var(--admin-text-muted, @neutral-400);
       margin-top: 4px;
       padding-right: 4px;
       font-weight: 500;
@@ -381,7 +381,7 @@
         content: '';
         width: 4px;
         height: 4px;
-        background: @success-400;
+        background: var(--success-400);
         border-radius: 50%;
         animation: pulse-dot 2s ease-in-out infinite;
       }
