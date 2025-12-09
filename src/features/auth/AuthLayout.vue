@@ -402,8 +402,7 @@
       flex: 1;
       min-height: 0;
       justify-content: flex-start;
-      padding: 16px 16px 5vh;
-      padding-top: clamp(16px, 5vh, 40px);
+      padding: clamp(8px, 2vh, 16px) 16px clamp(8px, 2vh, 16px);
       width: 100%;
       box-sizing: border-box;
       overflow-y: auto;

@@ -279,19 +279,17 @@
 .respond-tablet({
   .auth {
     &__card {
-      padding: clamp(20px, 4vh, 32px) 20px; // Plus de padding vertical sur mobile
+      padding: clamp(12px, 3vh, 24px) 16px;
       max-width: 100%;
       width: 100%;
-      // Retrait du style "carte" sur mobile (garde le radius)
       background: transparent;
       backdrop-filter: none;
       box-shadow: none;
       border: none;
-      // border-radius conservé (28px par défaut)
 
       &::before,
       &::after {
-        display: none; // Pas de bordure décorative
+        display: none;
       }
     }
 
@@ -301,8 +299,8 @@
     }
 
     &__header {
-      gap: clamp(12px, 3vw, 16px);
-      margin-bottom: clamp(16px, 4vh, 32px);
+      gap: clamp(8px, 2vw, 12px);
+      margin-bottom: clamp(8px, 2vh, 16px);
       margin-top: 0;
     }
 
@@ -321,7 +319,7 @@
     }
 
     &__form {
-      gap: clamp(16px, 3vh, 20px);
+      gap: clamp(12px, 2vh, 16px);
     }
 
     &__divider {
