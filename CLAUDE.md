@@ -295,66 +295,100 @@ const { theme, preference, toggleTheme, setTheme } = useTheme()
 - `designSystem/src/fondation/colors/themes/theme-blue.less`
 - `designSystem/src/fondation/colors/themes/theme-brown.less`
 
+**Architecture Base Fixe + Accents** :
+
+| Palette | Rôle | Comportement |
+|---------|------|--------------|
+| **Secondary** | Surfaces, textes, bordures | **FIXE** - Toujours bleu-gris neutre |
+| **Primary** | Boutons, liens, focus, accents | Personnalisable par l'utilisateur |
+
 **Modes** :
-- **Preset** : Classes `.theme-blue` / `.theme-brown`
-- **Custom** : Génération dynamique de palette depuis une couleur hex
+- **Preset blue** : Primary bleu + Secondary bleu-gris (défaut)
+- **Preset brown** : Primary beige + Secondary brun
+- **Custom** : Primary custom + **Secondary blue fixe** (garantit accessibilité)
 
-### Pattern ContentBlock : Propagation du thème aux enfants
+```typescript
+import { useCustomTheme } from '@/composables/useCustomTheme'
 
-Le composant `ContentBlock` (`designSystem/src/components/layout/ContentBlock.vue`) propage le thème via **CSS Variable Scoping**.
+const { setPreset, setCustomColor } = useCustomTheme()
 
-**Principe** : Le ContentBlock définit des variables CSS locales selon son thème résolu, héritées automatiquement par tous ses enfants.
-
-**Variables exposées** :
-```less
-// Définies par ContentBlock selon le thème (light ou dark)
---content-block-text          // Couleur texte principale
---content-block-text-secondary // Couleur texte secondaire
---content-block-text-muted    // Couleur texte atténué
---content-block-border        // Couleur bordures
---content-block-bg-subtle     // Fond subtil (headers, etc.)
+setPreset('blue')           // Preset complet
+setCustomColor('#10b981')   // Custom: seuls les accents changent
 ```
 
-**Utilisation dans les composants enfants** :
+**Pourquoi la secondary reste fixe en mode custom ?**
+1. **Accessibilité** : L'utilisateur peut choisir des couleurs illisibles
+2. **Cohérence** : L'app reste reconnaissable (surfaces neutres)
+3. **Hiérarchie** : Les accents ressortent mieux sur base neutre
+
+### Surface Elevation System (Gestion du contraste)
+
+Le design system utilise un **système d'élévation par surfaces** pour gérer automatiquement le contraste entre conteneurs imbriqués.
+
+**Principe** : Chaque niveau de surface est plus visible que son parent (plus clair en dark mode).
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│ Level 0 (--surface-0) : Page background                       │
+│   └─ Level 1 (--surface-1) : Cards, ContentBlocks, Modals    │
+│        └─ Level 2 (--surface-2) : Éléments imbriqués, nested │
+│             └─ Level 3 (--surface-3) : Inputs, Dropdowns (↑) │
+└───────────────────────────────────────────────────────────────┘
+```
+
+**Variables de surface** :
 ```less
-.my-child-component {
-  color: var(--content-block-text);
-  border: 1px solid var(--content-block-border);
+// Dark mode (du plus foncé au plus clair)
+--surface-0: var(--secondary-950);  // Page (#0a0d14)
+--surface-1: var(--secondary-800);  // Cards (#1d2438)
+--surface-2: var(--secondary-600);  // Nested (#353e5a)
+--surface-3: var(--secondary-500);  // Floating (#454f6d)
 
-  .label {
-    color: var(--content-block-text-muted);
-  }
+// Light mode (moins de variation, bordures/ombres différencient)
+--surface-0: @neutral-50;   // Page
+--surface-1: @white;        // Cards
+--surface-2: @neutral-50;   // Nested
+--surface-3: @white;        // Floating
+```
 
-  .header {
-    background: var(--content-block-bg-subtle);
-  }
+**Mapping automatique** :
+```less
+--bg-page: var(--surface-0);
+--bg-surface: var(--surface-1);
+--input-bg: var(--surface-3);      // Inputs toujours au niveau le plus élevé
+--dropdown-bg: var(--surface-3);   // Menus flottants idem
+--modal-bg: var(--surface-1);      // Modals au niveau cards
+```
+
+**Règle d'or** : Les inputs et éléments interactifs utilisent `--surface-3` pour ressortir de n'importe quel conteneur parent.
+
+### ContentBlock : Layout et zones forcées
+
+Le composant `ContentBlock` gère le **layout** (padding, border-radius, variants) et permet de **forcer un thème** localement.
+
+**Variables globales à utiliser** (préférer aux `--content-block-*`) :
+```less
+.my-component {
+  color: var(--text-primary);         // Texte principal
+  color: var(--text-secondary);       // Texte secondaire
+  color: var(--text-muted);           // Texte atténué
+  border-color: var(--border-default); // Bordures
+  background: var(--bg-subtle);        // Fond subtil
 }
 ```
 
-**Props du ContentBlock** :
+**Forcer un thème localement** :
 ```vue
-<!-- Suit le thème global (défaut) -->
-<ContentBlock variant="card">
-  <MyComponent />
-</ContentBlock>
-
-<!-- Force un thème spécifique -->
+<!-- Zone toujours sombre (même en light mode global) -->
 <ContentBlock variant="card" theme="dark">
-  <MyComponent /> <!-- Recevra les variables dark -->
-</ContentBlock>
-
-<ContentBlock variant="card" theme="light">
-  <MyComponent /> <!-- Recevra les variables light -->
+  <CodePreview /> <!-- Hérite des variables dark -->
 </ContentBlock>
 ```
 
 **Avantages** :
-- Pas de props drilling (les enfants n'ont pas besoin de recevoir le thème)
-- Héritage CSS automatique à tous les niveaux de profondeur
+- Variables globales adaptées automatiquement au thème
+- Pas besoin de wrapper ContentBlock pour le theming
 - Possibilité de forcer un thème localement (`theme="dark"`)
-- Compatible avec le thème global (`theme="auto"` par défaut)
-
-**Exemple concret** : Voir `src/features/home/HomeQuality.vue` qui utilise ce pattern pour les cartes COA.
 
 ## Responsive Design
 

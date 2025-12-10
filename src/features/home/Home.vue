@@ -41,7 +41,7 @@
     <ContentBlock
       variant="flat"
       width="100%"
-      padding="50px 0"
+      padding="30px 0"
       border-radius="0"
       :no-border="true"
       theme="dark"
@@ -79,10 +79,22 @@
     </ContentBlock>
 
     <!-- Disclaimer mobile -->
-    <div v-if="isMobile" class="home__disclaimer">
+    <div
+      v-if="isMobile"
+      class="home__disclaimer"
+    >
       <div class="home__disclaimer-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 9v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M12 9v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
       <p class="home__disclaimer-text">{{ $t('home.disclaimer.text') }}</p>

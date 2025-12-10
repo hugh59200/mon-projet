@@ -1,5 +1,49 @@
 <template>
   <div class="admin-sessions">
+    <!-- Toolbar (uniformité avec les autres vues admin) -->
+    <BasicToolbar
+      v-model:search="search"
+      search-placeholder="Rechercher par email ou nom..."
+      :show-reset="true"
+      @reset="resetFilters"
+    >
+      <template #filters>
+        <div class="sessions-filters">
+          <PremiumButton
+            :label="`Toutes (${totalCount})`"
+            :type="sessionFilter === 'all' ? 'primary' : 'secondary'"
+            size="sm"
+            variant="ghost"
+            @click="sessionFilter = 'all'"
+          />
+          <PremiumButton
+            :label="`Connectés (${authenticatedCount})`"
+            :type="sessionFilter === 'authenticated' ? 'primary' : 'secondary'"
+            size="sm"
+            variant="ghost"
+            @click="sessionFilter = 'authenticated'"
+          />
+          <PremiumButton
+            :label="`Anonymes (${anonymousCount})`"
+            :type="sessionFilter === 'anonymous' ? 'primary' : 'secondary'"
+            size="sm"
+            variant="ghost"
+            @click="sessionFilter = 'anonymous'"
+          />
+        </div>
+      </template>
+      <template #pagination>
+        <BasicPagination
+          :current-page="page"
+          :nb-pages="nbPages"
+          :nb-results="filteredSessions.length"
+          :nb-pages-max="5"
+          size="small"
+          @change="page = $event"
+        />
+      </template>
+    </BasicToolbar>
+
     <!-- Stats Cards -->
     <section class="sessions-stats">
       <div
@@ -89,49 +133,6 @@
 
     <!-- Liste des sessions -->
     <section class="sessions-list dashboard-card">
-      <BasicToolbar
-        v-model:search="search"
-        search-placeholder="Rechercher par email ou nom..."
-        :show-reset="true"
-        @reset="resetFilters"
-      >
-        <template #filters>
-          <div class="sessions-filters">
-            <PremiumButton
-              :label="`Toutes (${totalCount})`"
-              :type="sessionFilter === 'all' ? 'primary' : 'secondary'"
-              size="sm"
-              variant="ghost"
-              @click="sessionFilter = 'all'"
-            />
-            <PremiumButton
-              :label="`Connectés (${authenticatedCount})`"
-              :type="sessionFilter === 'authenticated' ? 'primary' : 'secondary'"
-              size="sm"
-              variant="ghost"
-              @click="sessionFilter = 'authenticated'"
-            />
-            <PremiumButton
-              :label="`Anonymes (${anonymousCount})`"
-              :type="sessionFilter === 'anonymous' ? 'primary' : 'secondary'"
-              size="sm"
-              variant="ghost"
-              @click="sessionFilter = 'anonymous'"
-            />
-          </div>
-        </template>
-        <template #pagination>
-          <BasicPagination
-            :current-page="page"
-            :nb-pages="nbPages"
-            :nb-results="filteredSessions.length"
-            :nb-pages-max="5"
-            size="small"
-            @change="page = $event"
-          />
-        </template>
-      </BasicToolbar>
-
       <WrapperLoader
         :loading="loading"
         :has-loaded="hasLoaded"

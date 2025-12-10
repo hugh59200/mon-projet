@@ -465,7 +465,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, @success-500 0%, @success-600 100%);
+    background: linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%);
     border-radius: 50%;
     color: white;
     box-shadow: 0 8px 24px rgba(var(--success-500-rgb), 0.3);
@@ -633,7 +633,7 @@ onMounted(() => {
     }
 
     &--important {
-      color: @warning-700;
+      color: var(--warning-700);
       font-weight: 700;
     }
   }
@@ -667,12 +667,12 @@ onMounted(() => {
     gap: 12px;
     margin-top: 16px;
     padding: 14px 18px;
-    background: linear-gradient(135deg, @warning-50 0%, rgba(@warning-100, 0.5) 100%);
-    border: 1px solid @warning-200;
+    background: linear-gradient(135deg, var(--warning-50) 0%, rgba(var(--warning-100-rgb), 0.5) 100%);
+    border: 1px solid var(--warning-200);
     border-radius: 12px;
 
     svg {
-      color: @warning-500;
+      color: var(--warning-50)0;
       flex-shrink: 0;
       margin-top: 2px;
     }
@@ -681,7 +681,7 @@ onMounted(() => {
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.5;
-      color: @warning-700;
+      color: var(--warning-700);
     }
   }
 
@@ -1004,7 +1004,7 @@ onMounted(() => {
     color: var(--text-muted);
 
     svg {
-      color: @success-500;
+      color: var(--success-500);
     }
   }
 

@@ -530,7 +530,7 @@ const qualityPoints = computed(() => [
       color: var(--text-secondary);
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
         flex-shrink: 0;
       }
     }
@@ -624,18 +624,18 @@ const qualityPoints = computed(() => [
     }
 
     &--success {
-      background: linear-gradient(135deg, @success-100 0%, @success-50 100%);
-      color: @success-600;
+      background: linear-gradient(135deg, var(--success-100) 0%, var(--success-50) 100%);
+      color: var(--success-600);
     }
 
     &--warning {
-      background: linear-gradient(135deg, @warning-100 0%, @warning-50 100%);
-      color: @warning-600;
+      background: linear-gradient(135deg, var(--warning-100) 0%, var(--warning-50) 100%);
+      color: var(--warning-600);
     }
 
     &--info {
-      background: linear-gradient(135deg, @info-100 0%, @info-50 100%);
-      color: @info-600;
+      background: linear-gradient(135deg, var(--info-100) 0%, var(--info-50) 100%);
+      color: var(--info-600);
     }
   }
 
@@ -815,9 +815,9 @@ const qualityPoints = computed(() => [
 // ============================================
 .about-disclaimer {
   padding: 60px 24px;
-  background: @warning-50;
-  border-top: 1px solid @warning-200;
-  border-bottom: 1px solid @warning-200;
+  background: var(--warning-50);
+  border-top: 1px solid var(--warning-200);
+  border-bottom: 1px solid var(--warning-200);
 
   &__container {
     max-width: 900px;
@@ -841,9 +841,9 @@ const qualityPoints = computed(() => [
     display: flex;
     align-items: center;
     justify-content: center;
-    background: @warning-100;
+    background: var(--warning-100);
     border-radius: 16px;
-    color: @warning-600;
+    color: var(--warning-600);
     flex-shrink: 0;
   }
 
@@ -851,14 +851,14 @@ const qualityPoints = computed(() => [
     font-family: @font-display;
     font-size: 20px;
     font-weight: 700;
-    color: @warning-800;
+    color: var(--warning-800);
     margin: 0 0 8px;
   }
 
   &__text {
     font-family: @font-body;
     font-size: 15px;
-    color: @warning-700;
+    color: var(--warning-700);
     line-height: 1.6;
     margin: 0;
   }

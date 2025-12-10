@@ -84,7 +84,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow: hidden;
 
     .respond-mobile({
       gap: 16px;
@@ -95,17 +94,16 @@
       border: 1px solid var(--border-default);
       border-radius: 12px;
       padding: 6px;
-      display: inline-flex;
+      display: flex;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      max-width: 100%;
 
-      .respond-mobile({
-        width: 100%;
-        scrollbar-width: none;
-        &::-webkit-scrollbar {
-          display: none;
-        }
-      });
+      // Masquer la scrollbar horizontale (scroll tactile reste fonctionnel)
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

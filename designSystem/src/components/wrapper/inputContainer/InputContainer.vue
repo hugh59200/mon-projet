@@ -79,7 +79,7 @@
     wrap: false,
     hasLabel: true,
     alertMaxlength: undefined,
-    iconColor: 'neutral-600',
+    iconColor: undefined, // Pas de couleur par défaut → hérite de var(--text-muted) via CSS
     pointer: false,
   })
 

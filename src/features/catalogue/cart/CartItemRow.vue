@@ -299,18 +299,18 @@
       white-space: nowrap;
 
       &--promo {
-        background: rgba(@danger-500, 0.15);
-        color: @danger-600;
+        background: rgba(var(--danger-500-rgb), 0.15);
+        color: var(--danger-600);
       }
 
       &--pack {
-        background: rgba(@success-500, 0.15);
-        color: @success-600;
+        background: rgba(var(--success-500-rgb), 0.15);
+        color: var(--success-600);
       }
 
       &--cumulated {
-        background: linear-gradient(135deg, rgba(@success-500, 0.15) 0%, rgba(@primary-500, 0.15) 100%);
-        color: @success-600;
+        background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.15) 0%, rgba(var(--primary-500-rgb), 0.15) 100%);
+        color: var(--success-600);
       }
     }
 
@@ -324,7 +324,7 @@
       cursor: pointer;
       &:hover {
         background: rgba(var(--danger-500-rgb), 0.1);
-        color: @danger-600;
+        color: var(--danger-600);
       }
     }
 

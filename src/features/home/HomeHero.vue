@@ -1,122 +1,145 @@
 <template>
-  <section class="hero-section">
-    <!-- Image de fond (pleine largeur) -->
-    <div class="hero-section__bg">
-      <div class="hero-section__bg-image">
-        <img
-          :src="peptidesHeroImage"
-          alt="Fioles de peptides Fast Peptides"
-        />
-        <div class="hero-section__bg-overlay"></div>
-      </div>
-
-      <!-- Grille décorative -->
-      <div class="hero-section__grid"></div>
+  <!-- Niveau 1 : Wrapper pleine largeur -->
+  <section class="hero">
+    <!-- Fond absolu (pleine largeur) -->
+    <div class="hero__bg">
+      <div class="hero__bg-overlay"></div>
+      <div class="hero__bg-grid"></div>
     </div>
 
-    <!-- Conteneur centré max-width 1200px -->
-    <div class="hero-section__container">
-      <!-- Badge mobile en haut à droite -->
-      <div v-if="isMobile" class="hero__badge hero__badge--mobile">
-        <BasicIconNext
-          name="ShieldCheck"
-          :size="14"
-        />
-        <span>{{ t('home.hero.badge.certified') }}</span>
+    <!-- Niveau 2 : Wrapper image max-width 1200px -->
+    <div class="hero__image-wrapper">
+      <img
+        :src="heroImage"
+        alt="Fioles de peptides Fast Peptides"
+        class="hero__image"
+      />
+    </div>
+
+    <!-- Niveau 3 : Wrapper flex pour les éléments -->
+    <div class="hero__content">
+      <!-- Header : titre à gauche, badge à droite -->
+      <div class="hero__header">
+        <h1 class="hero__title">
+          <span>{{ t('home.hero.title.line1') }}</span>
+          <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
+          <span v-if="!isMobile">{{ t('home.hero.title.line2') }}</span>
+        </h1>
+
+        <div class="hero__badge">
+          <span class="hero__badge-dot"></span>
+          <span>{{ t('home.hero.badge.certified') }}</span>
+          <span
+            v-if="!isMobile"
+            class="hero__badge-sep"
+          >
+            •
+          </span>
+          <span v-if="!isMobile">{{ t('home.hero.badge.researchOnly') }}</span>
+        </div>
       </div>
 
-      <!-- Titre mobile en haut -->
-      <h1 v-if="isMobile" class="hero__title hero__title--mobile">
-        <span>{{ t('home.hero.title.line1') }}</span>
-        <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
-        <span>{{ t('home.hero.title.line2') }}</span>
-      </h1>
-
-      <!-- Contenu -->
-      <div class="hero-section__content">
-      <div v-if="!isMobile" class="hero__badge">
-        <span class="hero__badge-dot"></span>
-        <span>{{ t('home.hero.badge.certified') }}</span>
-        <span class="hero__badge-sep">•</span>
-        <span>{{ t('home.hero.badge.researchOnly') }}</span>
-      </div>
-
-      <h1 v-if="!isMobile" class="hero__title">
-        <span>{{ t('home.hero.title.line1') }}</span>
-        <span class="hero__title-accent">{{ t('home.hero.title.accent') }}</span>
-        <span>{{ t('home.hero.title.line2') }}</span>
-      </h1>
-
-      <p v-if="!isMobile" class="hero__desc">
-        {{ t('home.hero.description') }}
-      </p>
-
-      <div class="hero__actions">
-        <BaseButton
-          variant="primary"
-          arrow
-          @click="$router.push('/catalogue')"
+      <!-- Actions et trust -->
+      <div class="hero__footer">
+        <!-- Mobile : bouton + badges sur une ligne -->
+        <div
+          v-if="isMobile"
+          class="hero__bottom-row"
         >
-          {{ t('home.hero.cta.explore') }}
-        </BaseButton>
-        <BaseButton
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="md"
+            :label="t('home.hero.cta.explore')"
+            icon-right="ArrowRight"
+            @click="$router.push('/catalogue')"
+          />
+          <div class="hero__trust-mobile">
+            <div class="hero__trust-mobile-item">
+              <BasicIconNext
+                name="ShieldCheck"
+                :size="16"
+              />
+            </div>
+            <div class="hero__trust-mobile-item">
+              <BasicIconNext
+                name="FileText"
+                :size="16"
+              />
+            </div>
+            <div class="hero__trust-mobile-item">
+              <BasicIconNext
+                name="Zap"
+                :size="16"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop : actions séparées -->
+        <div
           v-if="!isMobile"
-          variant="ghost"
-          @click="$router.push('/a-propos')"
+          class="hero__actions"
         >
-          {{ t('home.hero.cta.learnMore') }}
-        </BaseButton>
-      </div>
+          <PremiumButton
+            type="primary"
+            variant="solid"
+            size="lg"
+            :label="t('home.hero.cta.explore')"
+            icon-right="ArrowRight"
+            @click="$router.push('/catalogue')"
+          />
+          <PremiumButton
+            type="secondary"
+            variant="ghost"
+            size="lg"
+            :label="t('home.hero.cta.learnMore')"
+            @click="$router.push('/a-propos')"
+          />
+        </div>
 
-      <!-- Trust badges mobile (icônes compactes) -->
-      <div v-if="isMobile" class="hero__trust-mobile">
-        <div class="hero__trust-mobile-item">
-          <BasicIconNext name="ShieldCheck" :size="16" />
+        <div
+          v-if="!isMobile"
+          class="hero__trust"
+        >
+          <div class="hero__trust-item">
+            <BasicIconNext
+              name="ShieldCheck"
+              :size="18"
+            />
+            <span>{{ t('home.hero.trust.purity') }}</span>
+          </div>
+          <div class="hero__trust-item">
+            <BasicIconNext
+              name="FileText"
+              :size="18"
+            />
+            <span>{{ t('home.hero.trust.coa') }}</span>
+          </div>
+          <div class="hero__trust-item">
+            <BasicIconNext
+              name="Zap"
+              :size="18"
+            />
+            <span>{{ t('home.hero.trust.delivery') }}</span>
+          </div>
         </div>
-        <div class="hero__trust-mobile-item">
-          <BasicIconNext name="FileText" :size="16" />
-        </div>
-        <div class="hero__trust-mobile-item">
-          <BasicIconNext name="Zap" :size="16" />
-        </div>
-      </div>
-
-      <div v-if="!isMobile" class="hero__trust">
-        <div class="hero__trust-item">
-          <BasicIconNext
-            name="ShieldCheck"
-            :size="18"
-          />
-          <span>{{ t('home.hero.trust.purity') }}</span>
-        </div>
-        <div class="hero__trust-item">
-          <BasicIconNext
-            name="FileText"
-            :size="18"
-          />
-          <span>{{ t('home.hero.trust.coa') }}</span>
-        </div>
-        <div class="hero__trust-item">
-          <BasicIconNext
-            name="Zap"
-            :size="18"
-          />
-          <span>{{ t('home.hero.trust.delivery') }}</span>
-        </div>
-      </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+  import peptidesHeroMobileImage from '@/assets/peptides-hero-mobile.png'
   import peptidesHeroImage from '@/assets/peptides-hero.png'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
+  import { computed } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import BaseButton from './shared/BaseButton.vue'
 
   const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
+
+  const heroImage = computed(() => (isMobile.value ? peptidesHeroMobileImage : peptidesHeroImage))
 </script>
 
 <style scoped lang="less">
@@ -132,52 +155,34 @@
     sans-serif;
 
   // ============================================
-  // SECTION (layout géré par ContentBlock parent)
+  // HERO - Structure à 3 niveaux
   // ============================================
-  .hero-section {
+  .hero {
+    // Niveau 1 : Wrapper pleine largeur
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    width: 100%;
     min-height: 500px;
+    overflow: hidden;
+    background: var(--secondary-950);
 
-    // Fond (pleine largeur)
+    // Fond absolu (pleine largeur)
     &__bg {
       position: absolute;
       inset: 0;
       z-index: 0;
     }
 
-    // Image de fond
-    &__bg-image {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      background: #020202;
-
-      img {
-        width: 100%;
-        max-width: 1500px;
-        height: 100%;
-        object-fit: cover;
-        object-position: center right;
-      }
-    }
-
-    // Overlay - DESKTOP (le plus clair)
     &__bg-overlay {
       position: absolute;
       inset: 0;
       background: linear-gradient(
         90deg,
-        rgba(2, 2, 2, 0.9) 0%,
-        rgba(2, 2, 2, 0.7) 25%,
-        rgba(2, 2, 2, 0.2) 50%,
-        rgba(2, 2, 2, 0.1) 70%,
-        rgba(2, 2, 2, 0.5) 95%,
-        rgba(2, 2, 2, 0.9) 100%
+        rgba(var(--secondary-950-rgb), 0.9) 0%,
+        rgba(var(--secondary-950-rgb), 0.7) 25%,
+        rgba(var(--secondary-950-rgb), 0.2) 50%,
+        rgba(var(--secondary-950-rgb), 0.1) 70%,
+        rgba(var(--secondary-950-rgb), 0.5) 95%,
+        rgba(var(--secondary-950-rgb), 0.9) 100%
       );
 
       &::after {
@@ -186,19 +191,17 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          rgba(2, 2, 2, 0.6) 0%,
+          rgba(var(--secondary-950-rgb), 0.6) 0%,
           transparent 15%,
           transparent 85%,
-          rgba(2, 2, 2, 0.6) 100%
+          rgba(var(--secondary-950-rgb), 0.6) 100%
         );
       }
     }
 
-    // Grille décorative
-    &__grid {
+    &__bg-grid {
       position: absolute;
       inset: 0;
-      z-index: 1;
       background-image:
         linear-gradient(rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(var(--primary-500-rgb), 0.04) 1px, transparent 1px);
@@ -207,31 +210,46 @@
       pointer-events: none;
     }
 
-    // Conteneur centré
-    &__container {
+    // Niveau 2 : Wrapper image (max-width 1200px, centré)
+    &__image-wrapper {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    &__image {
+      width: 100%;
+      max-width: 1300px;
+      height: 100%;
+      object-fit: cover;
+      object-position: center right;
+    }
+
+    // Niveau 3 : Wrapper flex pour les éléments
+    &__content {
       position: relative;
       z-index: 2;
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 50px;
-    }
-
-    // Contenu
-    &__content {
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      max-width: 550px;
-      padding: 60px 0;
+      max-width: 1200px;
+      min-height: 500px;
+      margin: 0 auto;
+      padding: 40px;
     }
-  }
 
-  // ============================================
-  // HERO ELEMENTS
-  // ============================================
-  .hero {
+    // Header : titre à gauche, badge en haut à droite
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    // Éléments
     &__badge {
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -242,7 +260,6 @@
       font-family: @font-body;
       font-size: 13px;
       color: var(--primary-300);
-      width: fit-content;
       backdrop-filter: blur(10px);
 
       &-dot {
@@ -253,51 +270,7 @@
       }
 
       &-sep {
-        color: @neutral-500;
-      }
-
-      &--mobile {
-        position: absolute;
-        top: 16px;
-        right: 20px;
-        z-index: 10;
-        padding: 6px 12px;
-        font-size: 11px;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(12px);
-      }
-    }
-
-    &__title--mobile {
-      position: absolute;
-      top: 25%;
-      left: 20px;
-      right: 20px;
-      transform: translateY(-50%);
-      font-family: @font-display;
-      font-size: 28px;
-      font-weight: 600;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      color: @neutral-50;
-      margin: 0;
-      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-      animation: fadeInUp 0.8s ease-out;
-
-      span {
-        display: block;
-      }
-
-      .hero__title-accent {
-        background: linear-gradient(
-          135deg,
-          var(--primary-400) 0%,
-          var(--primary-300) 50%,
-          var(--primary-500) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--text-muted);
       }
     }
 
@@ -307,7 +280,7 @@
       font-weight: 600;
       line-height: 1.1;
       letter-spacing: -0.03em;
-      color: @neutral-50;
+      color: @neutral-50; // Toujours clair (hero dark forcé)
       margin: 0;
 
       span {
@@ -327,12 +300,12 @@
       }
     }
 
-    &__desc {
-      font-family: @font-body;
-      font-size: 16px;
-      line-height: 1.7;
-      color: @neutral-300;
-      margin: 0;
+    &__footer {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 550px;
+      margin-top: auto; // Pousse le footer en bas
     }
 
     &__actions {
@@ -346,7 +319,7 @@
       gap: 24px;
       margin-top: 16px;
       padding-top: 24px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid var(--border-subtle);
 
       &-item {
         display: flex;
@@ -354,21 +327,29 @@
         gap: 8px;
         font-family: @font-body;
         font-size: 13px;
-        color: @neutral-400;
+        color: var(--text-secondary);
 
         svg {
           width: 18px;
           height: 18px;
-          color: @success-500;
+          color: var(--success-500);
         }
       }
+    }
+
+    // Mobile : bouton + badges sur une ligne
+    &__bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 16px;
     }
 
     // Trust badges mobile (icônes seules)
     &__trust-mobile {
       display: flex;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 8px;
 
       &-item {
         display: flex;
@@ -381,78 +362,60 @@
         border-radius: 8px;
 
         svg {
-          color: @success-400;
+          color: var(--success-400);
         }
       }
-    }
-
-  }
-
-  // Animation fade-in pour le titre mobile
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(-40%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(-50%);
     }
   }
 
   // ============================================
-  // RESPONSIVE - Breakpoints harmonisés
+  // RESPONSIVE
   // ============================================
 
   // TABLETTE (≤ 1160px)
   .respond-tablet({
-    .hero-section {
-      &__bg-image img {
+    .hero {
+      &__image {
         object-position: 70% center;
-        mask-image: none;
-        -webkit-mask-image: none;
       }
 
       &__bg-overlay {
         background: linear-gradient(
           90deg,
-          rgba(2, 2, 2, 0.97) 0%,
-          rgba(2, 2, 2, 0.85) 30%,
-          rgba(2, 2, 2, 0.5) 60%,
-          rgba(2, 2, 2, 0.7) 100%
+          rgba(var(--secondary-950-rgb), 0.97) 0%,
+          rgba(var(--secondary-950-rgb), 0.85) 30%,
+          rgba(var(--secondary-950-rgb), 0.5) 60%,
+          rgba(var(--secondary-950-rgb), 0.7) 100%
         );
       }
 
-      &__container {
-        padding: 0 20px;
+      &__content {
+        padding: 24px 20px;
       }
 
-      &__content {
+      &__footer {
         max-width: 500px;
-        padding: 40px 0;
       }
     }
   });
 
   // MOBILE (≤ 720px)
   .respond-mobile({
-    .hero-section {
+    .hero {
       min-height: 480px;
-      align-items: stretch;
 
-      &__bg-image img {
+      &__image {
         object-position: center center;
       }
 
-      // Overlay léger pour voir l'image
       &__bg-overlay {
         background: linear-gradient(
           180deg,
-          rgba(2, 2, 2, 0.85) 0%,
-          rgba(2, 2, 2, 0.3) 25%,
-          rgba(2, 2, 2, 0.2) 50%,
-          rgba(2, 2, 2, 0.5) 75%,
-          rgba(2, 2, 2, 0.95) 100%
+          rgba(var(--secondary-950-rgb), 0.85) 0%,
+          rgba(var(--secondary-950-rgb), 0.3) 25%,
+          rgba(var(--secondary-950-rgb), 0.2) 50%,
+          rgba(var(--secondary-950-rgb), 0.5) 75%,
+          rgba(var(--secondary-950-rgb), 0.95) 100%
         );
 
         &::after {
@@ -460,29 +423,24 @@
         }
       }
 
-      &__container {
-        padding: 0 20px;
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
       &__content {
-        padding: 0 0 32px;
-        text-align: left;
-        align-items: flex-start;
-        gap: 12px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
+        min-height: 480px;
+        padding: 20px;
       }
-    }
 
-    .hero {
-      &__actions {
-        margin-top: 4px;
+      &__footer {
+        gap: 12px;
+      }
+
+      &__title {
+        font-size: 28px;
+        text-shadow: 0 2px 20px rgba(var(--secondary-950-rgb), 0.5);
+      }
+
+      &__badge {
+        padding: 6px 12px;
+        font-size: 11px;
+        background: rgba(var(--secondary-950-rgb), 0.5);
       }
     }
   });

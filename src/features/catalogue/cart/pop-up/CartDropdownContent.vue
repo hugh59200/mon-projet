@@ -305,18 +305,18 @@
       white-space: nowrap;
 
       &--promo {
-        background: rgba(@danger-500, 0.2);
-        color: @danger-400;
+        background: rgba(var(--danger-500-rgb), 0.2);
+        color: var(--danger-400);
       }
 
       &--pack {
-        background: rgba(@success-500, 0.2);
-        color: @success-400;
+        background: rgba(var(--success-500-rgb), 0.2);
+        color: var(--success-400);
       }
 
       &--cumulated {
-        background: linear-gradient(135deg, rgba(@success-500, 0.2) 0%, rgba(@primary-500, 0.2) 100%);
-        color: @success-400;
+        background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.2) 0%, rgba(var(--primary-500-rgb), 0.2) 100%);
+        color: var(--success-400);
       }
     }
 
@@ -370,7 +370,7 @@
 
       &:hover {
         background: rgba(var(--danger-500-rgb), 0.15);
-        color: @danger-400;
+        color: var(--danger-400);
       }
     }
   }
@@ -431,10 +431,10 @@
     border-radius: 10px;
     font-size: 12px;
     font-weight: 600;
-    color: @success-400;
+    color: var(--success-400);
 
     svg {
-      color: @success-400;
+      color: var(--success-400);
     }
   }
 
@@ -453,7 +453,7 @@
     color: @dropdown-text-muted;
 
     svg {
-      color: @success-500;
+      color: var(--success-500);
       flex-shrink: 0;
     }
   }

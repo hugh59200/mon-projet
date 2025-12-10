@@ -34,7 +34,6 @@
         :max="to"
         icon-name="Euro"
         icon-state="iconLeft"
-        iconColor="neutral-700"
         text-align="right"
         size="small"
       />
@@ -45,7 +44,6 @@
         :min="from"
         icon-name="Euro"
         icon-state="iconLeft"
-        iconColor="neutral-700"
         :max="max"
         size="small"
       />

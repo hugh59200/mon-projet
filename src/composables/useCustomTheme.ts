@@ -157,76 +157,47 @@ function generatePalette(baseColor: string): ColorShade[] {
 }
 
 /**
- * Génère une palette secondaire (plus désaturée/neutre) pour accompagner la primary
- */
-function generateSecondaryPalette(baseColor: string): ColorShade[] {
-  const { h } = hexToHsl(baseColor)
-
-  // Secondary avec saturation très basse pour rester neutre
-  const shades: { shade: number; saturation: number; lightness: number }[] = [
-    { shade: 1000, saturation: 0, lightness: 0 },
-    { shade: 950, saturation: 15, lightness: 5 },
-    { shade: 900, saturation: 20, lightness: 9 },
-    { shade: 800, saturation: 18, lightness: 14 },
-    { shade: 700, saturation: 16, lightness: 20 },
-    { shade: 600, saturation: 14, lightness: 28 },
-    { shade: 500, saturation: 12, lightness: 38 },
-    { shade: 400, saturation: 10, lightness: 50 },
-    { shade: 300, saturation: 10, lightness: 62 },
-    { shade: 200, saturation: 12, lightness: 74 },
-    { shade: 100, saturation: 14, lightness: 84 },
-    { shade: 50, saturation: 16, lightness: 92 },
-    { shade: 0, saturation: 18, lightness: 96 },
-  ]
-
-  return shades.map(({ shade, saturation, lightness }) => {
-    const hex = hslToHex(h, saturation, lightness)
-    return {
-      shade,
-      hex,
-      rgb: hexToRgb(hex),
-    }
-  })
-}
-
-/**
  * Applique les variables CSS au document
+ *
+ * IMPORTANT: Seule la palette PRIMARY est personnalisable.
+ * La palette SECONDARY reste FIXE (base bleue-grise de l'app)
+ * pour garantir la cohérence des surfaces et l'accessibilité.
  */
-function applyCustomCssVariables(primaryPalette: ColorShade[], secondaryPalette: ColorShade[]) {
+function applyCustomCssVariables(primaryPalette: ColorShade[]) {
   const root = document.documentElement
 
-  // Appliquer les couleurs primary
+  // Appliquer UNIQUEMENT les couleurs primary (accent)
+  // Les couleurs secondary (surfaces, textes) restent fixes
   primaryPalette.forEach(({ shade, hex, rgb }) => {
     root.style.setProperty(`--primary-${shade}`, hex)
     root.style.setProperty(`--primary-${shade}-rgb`, rgb)
   })
-
-  // Appliquer les couleurs secondary
-  secondaryPalette.forEach(({ shade, hex, rgb }) => {
-    root.style.setProperty(`--secondary-${shade}`, hex)
-    root.style.setProperty(`--secondary-${shade}-rgb`, rgb)
-  })
 }
 
 /**
- * Supprime les variables CSS custom et remet les classes de thème preset
+ * Supprime les variables CSS custom (primary uniquement)
+ * et remet les classes de thème preset
  */
 function clearCustomCssVariables() {
   const root = document.documentElement
 
-  // Supprimer les styles inline pour primary et secondary
+  // Supprimer les styles inline pour primary uniquement
+  // (secondary n'est jamais modifiée en mode custom)
   const shadeNumbers = [0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000]
 
   shadeNumbers.forEach((shade) => {
     root.style.removeProperty(`--primary-${shade}`)
     root.style.removeProperty(`--primary-${shade}-rgb`)
-    root.style.removeProperty(`--secondary-${shade}`)
-    root.style.removeProperty(`--secondary-${shade}-rgb`)
   })
 }
 
 /**
  * Applique le thème selon la configuration
+ *
+ * ARCHITECTURE:
+ * - Les presets (blue/brown) changent BOTH primary ET secondary
+ * - Le mode custom change UNIQUEMENT primary (accents)
+ * - La secondary (surfaces) reste celle du preset blue par défaut
  */
 function applyTheme(config: CustomThemeConfig) {
   const html = document.documentElement
@@ -238,13 +209,14 @@ function applyTheme(config: CustomThemeConfig) {
     html.classList.toggle('theme-brown', config.preset === 'brown')
     html.classList.toggle('theme-blue', config.preset === 'blue')
   } else if (config.mode === 'custom' && config.customColor) {
-    // Mode custom : générer et appliquer la palette
-    html.classList.remove('theme-blue', 'theme-brown')
+    // Mode custom : générer UNIQUEMENT la palette primary (accents)
+    // La secondary reste fixe (base bleue-grise de l'app)
+    html.classList.remove('theme-brown')
+    html.classList.add('theme-blue') // Garder secondary blue comme base
     html.classList.add('theme-custom')
 
     const primaryPalette = generatePalette(config.customColor)
-    const secondaryPalette = generateSecondaryPalette(config.customColor)
-    applyCustomCssVariables(primaryPalette, secondaryPalette)
+    applyCustomCssVariables(primaryPalette)
   }
 }
 

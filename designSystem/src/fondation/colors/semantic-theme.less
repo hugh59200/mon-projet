@@ -23,6 +23,30 @@
    ══════════════════════════════════════════════════════════════ */
 
 .theme-light-vars() {
+  /* ═══════════════════════════════════════════════════════════════
+     SURFACE ELEVATION SYSTEM — Light Mode
+     ═══════════════════════════════════════════════════════════════
+
+     En light mode, la page est blanche et les cards sont légèrement
+     grisées pour créer du contraste visible.
+
+     Hiérarchie (de page vers floating) :
+     ┌─────────────────────────────────────────────────────────────┐
+     │ Level 0 : Page background (white)                          │
+     │   └─ Level 1 : Cards, ContentBlocks (neutral-50, grisé)    │
+     │        └─ Level 2 : Nested elements (neutral-100)          │
+     │             └─ Level 3 : Inputs, Dropdowns (white + focus) │
+     └─────────────────────────────────────────────────────────────┘
+
+     Règle : Cards grisées sur fond blanc = contraste visible.
+     ═══════════════════════════════════════════════════════════════ */
+
+  // Core elevation levels
+  --surface-0: @white;        // Page (blanc pur)
+  --surface-1: @neutral-100;  // Cards, modals (gris visible)
+  --surface-2: @neutral-200;  // Nested (plus foncé)
+  --surface-3: @white;        // Inputs (blanc pour ressortir)
+
   /* ─────────────────────────────────────────────────────────────
      BACKGROUND IMAGE OPACITY — Per Section
      Ces variables contrôlent l'opacité des images de fond
@@ -44,17 +68,17 @@
   --text-primary-rgb: red(@neutral-900), green(@neutral-900), blue(@neutral-900);
 
   /* ─────────────────────────────────────────────────────────────
-     BACKGROUND COLORS
+     BACKGROUND COLORS — Mapped to Surface System
      ───────────────────────────────────────────────────────────── */
-  --bg-page: @neutral-50;
-  --bg-surface: @white;
-  --bg-surface-secondary: @neutral-50;
-  --bg-surface-tertiary: @neutral-100;
-  --bg-elevated: @white;
+  --bg-page: var(--surface-0);
+  --bg-surface: var(--surface-1);
+  --bg-surface-secondary: @neutral-200;
+  --bg-surface-tertiary: @neutral-300;
+  --bg-elevated: var(--surface-1);
   --bg-inverse: @neutral-900;
-  --bg-subtle: @neutral-50;
-  --bg-page-rgb: red(@neutral-50), green(@neutral-50), blue(@neutral-50);
-  --bg-surface-rgb: 255, 255, 255;
+  --bg-subtle: @neutral-200;
+  --bg-page-rgb: 255, 255, 255;
+  --bg-surface-rgb: red(@neutral-100), green(@neutral-100), blue(@neutral-100);
 
   /* ─────────────────────────────────────────────────────────────
      BORDER COLORS
@@ -82,9 +106,9 @@
   --selection-bg: rgba(var(--primary-500-rgb), 0.15);
 
   /* ─────────────────────────────────────────────────────────────
-     INPUT COLORS
+     INPUT COLORS — Uses Surface Level 3 (floating)
      ───────────────────────────────────────────────────────────── */
-  --input-bg: @white;
+  --input-bg: var(--surface-3);
   --input-bg-disabled: @neutral-100;
   --input-border: @neutral-300;
   --input-border-hover: @neutral-400;
@@ -93,20 +117,20 @@
   --input-placeholder: @neutral-500; // Renforcé pour lisibilité (ratio 3.8:1)
 
   /* ─────────────────────────────────────────────────────────────
-     DROPDOWN/MENU COLORS
+     DROPDOWN/MENU COLORS — Uses Surface Level 3 (floating)
      ───────────────────────────────────────────────────────────── */
-  --dropdown-bg: @white;
+  --dropdown-bg: var(--surface-3);
   --dropdown-border: @neutral-200;
   --dropdown-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   --dropdown-item-hover: @neutral-50;
   --dropdown-item-active: rgba(var(--primary-500-rgb), 0.1);
 
   /* ─────────────────────────────────────────────────────────────
-     MODAL COLORS
+     MODAL COLORS — Uses Surface Levels
      ───────────────────────────────────────────────────────────── */
   --modal-backdrop: rgba(0, 0, 0, 0.5);
-  --modal-bg: @white;
-  --modal-header-bg: @neutral-50;
+  --modal-bg: var(--surface-1);        // Level 1 : modal body
+  --modal-header-bg: var(--surface-2); // Level 2 pour contraste
   --modal-border: @neutral-200;
 
   /* ─────────────────────────────────────────────────────────────
@@ -145,6 +169,30 @@
 }
 
 .theme-dark-vars() {
+  /* ═══════════════════════════════════════════════════════════════
+     SURFACE ELEVATION SYSTEM — Dark Mode
+     ═══════════════════════════════════════════════════════════════
+
+     Système de niveaux de surface pour gérer automatiquement
+     le contraste entre conteneurs imbriqués.
+
+     Hiérarchie (du plus foncé au plus clair) :
+     ┌─────────────────────────────────────────────────────────────┐
+     │ Level 0 : Page background (le plus foncé)                  │
+     │   └─ Level 1 : Cards, ContentBlocks, Modals                │
+     │        └─ Level 2 : Éléments imbriqués, nested cards       │
+     │             └─ Level 3 : Inputs, Dropdowns, Floating (↑)   │
+     └─────────────────────────────────────────────────────────────┘
+
+     Règle : Chaque niveau est PLUS CLAIR que son parent.
+     ═══════════════════════════════════════════════════════════════ */
+
+  // Core elevation levels
+  --surface-0: var(--secondary-950);  // Page
+  --surface-1: var(--secondary-800);  // Cards, modals
+  --surface-2: var(--secondary-600);  // Nested, overlay
+  --surface-3: var(--secondary-500);  // Inputs, dropdowns, floating
+
   /* ─────────────────────────────────────────────────────────────
      BACKGROUND IMAGE OPACITY — Per Section
      Ces variables contrôlent l'opacité des images de fond
@@ -166,13 +214,13 @@
   --text-primary-rgb: red(@neutral-50), green(@neutral-50), blue(@neutral-50);
 
   /* ─────────────────────────────────────────────────────────────
-     BACKGROUND COLORS
+     BACKGROUND COLORS — Mapped to Surface System
      ───────────────────────────────────────────────────────────── */
-  --bg-page: var(--secondary-950);
-  --bg-surface: var(--secondary-800);
-  --bg-surface-secondary: var(--secondary-700);
-  --bg-surface-tertiary: var(--secondary-600);
-  --bg-elevated: var(--secondary-700);
+  --bg-page: var(--surface-0);
+  --bg-surface: var(--surface-1);
+  --bg-surface-secondary: var(--secondary-700); // Entre level 1 et 2
+  --bg-surface-tertiary: var(--surface-2);
+  --bg-elevated: var(--surface-2);
   --bg-inverse: @white;
   --bg-subtle: rgba(255, 255, 255, 0.03);
   --bg-page-rgb: 10, 13, 20;
@@ -204,10 +252,10 @@
   --selection-bg: rgba(var(--primary-500-rgb), 0.25);
 
   /* ─────────────────────────────────────────────────────────────
-     INPUT COLORS
+     INPUT COLORS — Uses Surface Level 3 (floating)
      ───────────────────────────────────────────────────────────── */
-  --input-bg: var(--secondary-700); // Plus clair que surface pour ressortir
-  --input-bg-disabled: var(--secondary-800);
+  --input-bg: var(--surface-3); // Level 3 : toujours au-dessus du conteneur
+  --input-bg-disabled: var(--surface-1);
   --input-border: rgba(255, 255, 255, 0.1);
   --input-border-hover: rgba(255, 255, 255, 0.15);
   --input-border-focus: var(--primary-500);
@@ -215,20 +263,20 @@
   --input-placeholder: @neutral-400; // Renforcé pour lisibilité dark mode (ratio 4.2:1)
 
   /* ─────────────────────────────────────────────────────────────
-     DROPDOWN/MENU COLORS
+     DROPDOWN/MENU COLORS — Uses Surface Level 3 (floating)
      ───────────────────────────────────────────────────────────── */
-  --dropdown-bg: var(--secondary-700); // Plus clair que surface pour ressortir
+  --dropdown-bg: var(--surface-3); // Level 3 : menus flottants
   --dropdown-border: rgba(255, 255, 255, 0.12);
   --dropdown-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   --dropdown-item-hover: rgba(255, 255, 255, 0.08);
   --dropdown-item-active: rgba(var(--primary-500-rgb), 0.25);
 
   /* ─────────────────────────────────────────────────────────────
-     MODAL COLORS
+     MODAL COLORS — Uses Surface Levels
      ───────────────────────────────────────────────────────────── */
   --modal-backdrop: rgba(0, 0, 0, 0.7);
-  --modal-bg: var(--secondary-800);
-  --modal-header-bg: var(--secondary-900);
+  --modal-bg: var(--surface-1); // Level 1 : modal body
+  --modal-header-bg: var(--secondary-900); // Plus foncé que body pour hiérarchie
   --modal-border: rgba(255, 255, 255, 0.1);
 
   /* ─────────────────────────────────────────────────────────────

@@ -272,7 +272,7 @@ const containerStyle = computed(() => {
       background:
         linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
         linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.015) 0%, transparent 40%),
-        @white;
+        var(--surface-1);
       border: 1px solid rgba(var(--primary-500-rgb), 0.08);
       box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.03),
@@ -283,7 +283,7 @@ const containerStyle = computed(() => {
         background:
           linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.03) 0%, transparent 60%),
           linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.02) 0%, transparent 50%),
-          @white;
+          var(--surface-1);
         border-color: rgba(var(--primary-500-rgb), 0.12);
         box-shadow:
           0 2px 8px rgba(0, 0, 0, 0.04),
@@ -291,13 +291,13 @@ const containerStyle = computed(() => {
       }
       &.content-block--bg-muted {
         background:
-          linear-gradient(180deg, @neutral-50 0%, @neutral-100 100%);
-        border-color: @neutral-200;
+          linear-gradient(180deg, var(--surface-1) 0%, var(--surface-2) 100%);
+        border-color: var(--border-default);
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
       }
       &.content-block--bg-surface {
-        background: @neutral-50;
-        border-color: @neutral-200;
+        background: var(--surface-2);
+        border-color: var(--border-default);
       }
       &.content-block--bg-transparent {
         background: transparent;
@@ -309,19 +309,19 @@ const containerStyle = computed(() => {
     &.content-block--flat {
       background:
         linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.015) 0%, transparent 40%),
-        @neutral-50;
-      border: 1px solid @neutral-200;
+        var(--surface-1);
+      border: 1px solid var(--border-default);
 
       &.content-block--bg-elevated {
         background:
           linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
-          @white;
+          var(--surface-1);
       }
       &.content-block--bg-muted {
-        background: @neutral-100;
+        background: var(--surface-2);
       }
       &.content-block--bg-surface {
-        background: @neutral-50;
+        background: var(--surface-1);
       }
       &.content-block--bg-transparent {
         background: transparent;

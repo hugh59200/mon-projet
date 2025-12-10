@@ -791,7 +791,7 @@
       color: var(--text-primary);
 
       &--sale {
-        color: @danger-500;
+        color: var(--danger-500);
       }
     }
 

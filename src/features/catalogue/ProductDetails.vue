@@ -1285,7 +1285,7 @@
       &--promo {
         top: 16px;
         left: 16px;
-        background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
+        background: linear-gradient(135deg, var(--danger-500) 0%, var(--danger-600) 100%);
         color: @white;
         box-shadow: 0 4px 12px rgba(var(--danger-500-rgb), 0.3);
       }
@@ -1504,7 +1504,7 @@
       margin-bottom: 12px;
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
       }
     }
 
@@ -1563,7 +1563,7 @@
       color: var(--text-primary);
 
       &--success {
-        color: @success-600;
+        color: var(--success-600);
       }
     }
 
@@ -1602,7 +1602,7 @@
     }
 
     &__lab-download {
-      background: linear-gradient(135deg, @success-500 0%, @success-600 100%);
+      background: linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%);
       color: white;
       border: none;
       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
@@ -1693,12 +1693,12 @@
 
       &--purity {
         background: rgba(var(--success-500-rgb), 0.1);
-        color: @success-500;
+        color: var(--success-500);
       }
 
       &--stock {
         background: rgba(var(--info-500-rgb), 0.1);
-        color: @info-500;
+        color: var(--info-500);
       }
 
       &--origin {
@@ -1729,13 +1729,13 @@
       color: var(--text-primary);
 
       &--success {
-        color: @success-500;
+        color: var(--success-500);
       }
       &--warning {
-        color: @warning-500;
+        color: var(--warning-500);
       }
       &--danger {
-        color: @danger-500;
+        color: var(--danger-500);
       }
     }
 
@@ -1765,8 +1765,8 @@
 
     &__discount-badge {
       padding: 4px 8px;
-      background: @danger-50;
-      color: @danger-600;
+      background: var(--danger-50);
+      color: var(--danger-600);
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
@@ -1786,7 +1786,7 @@
       }
 
       &--sale {
-        color: @danger-600;
+        color: var(--danger-600);
       }
     }
 
@@ -1829,7 +1829,7 @@
 
     &__pack-discount {
       padding: 4px 10px;
-      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
+      background: linear-gradient(135deg, var(--danger-500) 0%, var(--danger-600) 100%);
       border-radius: 6px;
       font-family: @font-body;
       font-size: 12px;
@@ -1858,11 +1858,11 @@
       color: var(--text-secondary);
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
       }
 
       strong {
-        color: @success-600;
+        color: var(--success-600);
         font-weight: 700;
       }
     }
@@ -1905,7 +1905,7 @@
       color: var(--text-secondary);
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
       }
     }
 
@@ -1920,7 +1920,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 700;
-      color: @success-600;
+      color: var(--success-600);
     }
 
     &__pack-btn {
@@ -1928,8 +1928,8 @@
       transition: all 0.3s ease;
 
       &--success {
-        background: @success-500 !important;
-        border-color: @success-500 !important;
+        background: var(--success-500) !important;
+        border-color: var(--success-500) !important;
       }
     }
 
@@ -2000,11 +2000,11 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 13px;
-      color: @warning-800;
+      color: var(--warning-800);
       // Styles de base gérés par ContentBlock
 
       svg {
-        color: @warning-500;
+        color: var(--warning-500);
         flex-shrink: 0;
       }
 
@@ -2024,7 +2024,7 @@
       // Styles de base gérés par ContentBlock
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
         flex-shrink: 0;
         animation: pulse 2s ease-in-out infinite;
       }
@@ -2242,7 +2242,7 @@
       border-radius: 12px;
 
       svg {
-        color: @danger-600;
+        color: var(--danger-600);
       }
     }
 
@@ -2577,7 +2577,7 @@
     color: var(--text-primary);
 
     &--sale {
-      color: @danger-500;
+      color: var(--danger-500);
     }
   }
 

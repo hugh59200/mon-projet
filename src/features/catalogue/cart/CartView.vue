@@ -736,8 +736,8 @@
 
       &:hover {
         background: rgba(var(--danger-500-rgb), 0.1);
-        border-color: @danger-300;
-        color: @danger-500;
+        border-color: var(--danger-300);
+        color: var(--danger-500);
       }
     }
 
@@ -949,7 +949,7 @@
       color: var(--text-primary-secondary);
 
       &--discount {
-        color: @success-500;
+        color: var(--success-500);
 
         span:first-child {
           display: flex;
@@ -972,7 +972,7 @@
     }
 
     &__summary-free {
-      color: @success-500;
+      color: var(--success-500);
       font-weight: 600;
     }
 
@@ -1030,11 +1030,11 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: @success-600;
+      color: var(--success-600);
       // Styles de base gérés par ContentBlock
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
       }
     }
 
@@ -1081,7 +1081,7 @@
       color: var(--text-muted);
 
       svg {
-        color: @success-500;
+        color: var(--success-500);
       }
     }
 
@@ -1171,7 +1171,7 @@
       top: -6px;
       left: -6px;
       padding: 4px 8px;
-      background: linear-gradient(135deg, @danger-500 0%, @danger-600 100%);
+      background: linear-gradient(135deg, var(--danger-500) 0%, var(--danger-600) 100%);
       border-radius: 6px;
       font-family: @font-body;
       font-size: 10px;
@@ -1225,18 +1225,18 @@
       white-space: nowrap;
 
       &--promo {
-        background: rgba(@danger-500, 0.12);
-        color: @danger-600;
+        background: rgba(var(--danger-500-rgb), 0.12);
+        color: var(--danger-600);
       }
 
       &--pack {
-        background: rgba(@success-500, 0.12);
-        color: @success-600;
+        background: rgba(var(--success-500-rgb), 0.12);
+        color: var(--success-600);
       }
 
       &--cumulated {
-        background: linear-gradient(135deg, rgba(@success-500, 0.12) 0%, rgba(@primary-500, 0.12) 100%);
-        color: @success-600;
+        background: linear-gradient(135deg, rgba(var(--success-500-rgb), 0.12) 0%, rgba(var(--primary-500-rgb), 0.12) 100%);
+        color: var(--success-600);
       }
     }
 
@@ -1254,7 +1254,7 @@
       font-size: 12px;
 
       &--in {
-        color: @success-500;
+        color: var(--success-500);
       }
     }
 
@@ -1279,7 +1279,7 @@
       color: var(--text-primary);
 
       &--sale {
-        color: @danger-500;
+        color: var(--danger-500);
       }
     }
 
@@ -1385,7 +1385,7 @@
 
       &:hover {
         background: rgba(var(--danger-500-rgb), 0.1);
-        color: @danger-500;
+        color: var(--danger-500);
       }
     }
 

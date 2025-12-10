@@ -301,9 +301,9 @@ onMounted(async () => {
     justify-content: center;
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, @danger-50 0%, @danger-100 100%);
+    background: linear-gradient(135deg, var(--danger-50) 0%, var(--danger-100) 100%);
     border-radius: 12px;
-    color: @danger-500;
+    color: var(--danger-50)0;
     flex-shrink: 0;
   }
 
@@ -317,13 +317,13 @@ onMounted(async () => {
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: @danger-700;
+      color: var(--danger-700);
     }
 
     span {
       font-family: @font-body;
       font-size: 14px;
-      color: @danger-600;
+      color: var(--danger-600);
     }
   }
 
@@ -341,8 +341,8 @@ onMounted(async () => {
     transition: all 0.2s @ease;
 
     &:hover {
-      background: @danger-50;
-      color: @danger-500;
+      background: var(--danger-50);
+      color: var(--danger-50)0;
     }
   }
 

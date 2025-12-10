@@ -429,14 +429,14 @@
     &__badge {
       display: inline-block;
       padding: 6px 14px;
-      background: rgba(@success-500, 0.15);
+      background: rgba(var(--success-500-rgb), 0.15);
       border-radius: 100px;
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: @success-500;
+      color: var(--success-500);
       width: fit-content;
     }
 
@@ -449,7 +449,7 @@
       line-height: 1.1;
       letter-spacing: -0.02em;
       span {
-        background: linear-gradient(135deg, @success-500 0%, var(--primary-400) 100%);
+        background: linear-gradient(135deg, var(--success-500) 0%, var(--primary-400) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -474,20 +474,20 @@
       gap: 16px;
       align-items: flex-start;
       &--success .quality__feature-icon {
-        background: rgba(@success-500, 0.15);
-        color: @success-500;
+        background: rgba(var(--success-500-rgb), 0.15);
+        color: var(--success-500);
       }
       &--primary .quality__feature-icon {
         background: rgba(var(--primary-500-rgb), 0.15);
         color: var(--primary-400);
       }
       &--warning .quality__feature-icon {
-        background: rgba(@warning-500, 0.15);
-        color: @warning-500;
+        background: rgba(var(--warning-500-rgb), 0.15);
+        color: var(--warning-500);
       }
       &--info .quality__feature-icon {
-        background: rgba(@info-500, 0.15);
-        color: @info-500;
+        background: rgba(var(--info-500-rgb), 0.15);
+        color: var(--info-500);
       }
 
       &-icon {
@@ -586,14 +586,14 @@
 
     &__badge {
       padding: 2px 6px;
-      background: rgba(@success-500, 0.2);
+      background: rgba(var(--success-500-rgb), 0.2);
       border-radius: 4px;
       font-family: @font-body;
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: @success-500;
+      color: var(--success-500);
     }
 
     &__title {
@@ -628,11 +628,11 @@
       &--highlight {
         padding: 8px;
         margin: 2px -6px;
-        background: rgba(@success-500, 0.1);
+        background: rgba(var(--success-500-rgb), 0.1);
         border-radius: 6px;
 
         span:last-child {
-          color: @success-500;
+          color: var(--success-500);
           font-weight: 700;
           font-size: 12px;
         }
@@ -646,13 +646,13 @@
       gap: 5px;
       width: 100%;
       padding: 8px 12px;
-      background: rgba(@success-500, 0.08);
+      background: rgba(var(--success-500-rgb), 0.08);
       border: none;
       border-top: 1px solid var(--border-default);
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;
-      color: @success-500;
+      color: var(--success-500);
       cursor: pointer;
       transition: background 0.2s @ease;
 
@@ -662,7 +662,7 @@
       }
 
       &:hover {
-        background: rgba(@success-500, 0.15);
+        background: rgba(var(--success-500-rgb), 0.15);
       }
     }
   }

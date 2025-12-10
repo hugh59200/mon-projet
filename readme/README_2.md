@@ -718,6 +718,120 @@ const status = await fetchSystemStatus()
 
 ---
 
+## 🎨 Système de Theming
+
+Architecture à 2 couches indépendantes pour la personnalisation visuelle.
+
+### Couche 1 : Mode Light/Dark
+
+Gère l'apparence globale (clair/sombre).
+
+**Fichiers clés :**
+- `src/composables/useTheme.ts` — Composable principal
+- `designSystem/src/fondation/colors/semantic-theme.less` — Variables CSS sémantiques
+
+**Stockage :** `localStorage['theme-preference']` → `'light'` | `'dark'` | `'system'`
+
+**Application :** Attribut `data-theme` sur `<html>`
+
+```typescript
+import { useTheme } from '@/composables/useTheme'
+
+const { theme, toggleTheme, setTheme } = useTheme()
+setTheme('dark')     // Force dark
+setTheme('system')   // Suit la préférence OS
+toggleTheme()        // Bascule light ↔ dark
+```
+
+**Anti-flash :** Le thème est appliqué immédiatement au chargement du module (avant le rendu Vue) pour éviter le flash blanc.
+
+### Couche 2 : Palette de couleurs (Primary/Secondary)
+
+Gère les couleurs d'accent et de surface.
+
+**Fichiers clés :**
+- `src/composables/useCustomTheme.ts` — Gestion palettes
+- `designSystem/src/fondation/colors/themes/theme-blue.less` — Palette bleue (défaut)
+- `designSystem/src/fondation/colors/themes/theme-brown.less` — Palette marron
+- `designSystem/src/fondation/colors/theme-variables.less` — Application des palettes
+
+**Stockage :** `localStorage['custom-theme-config']` → `{ mode, preset?, customColor? }`
+
+**Modes disponibles :**
+
+| Mode | Primary (accents) | Secondary (surfaces) |
+|------|-------------------|----------------------|
+| Preset `blue` | Bleu (#2664ec) | Bleu-gris (#111727) |
+| Preset `brown` | Beige (#c9a97a) | Brun (#4b3424) |
+| Custom | Couleur choisie | **Fixe = blue** |
+
+⚠️ **Important** : En mode custom, seule la palette `primary` change. La `secondary` reste bleue pour garantir l'accessibilité et la cohérence des surfaces.
+
+```typescript
+import { useCustomTheme } from '@/composables/useCustomTheme'
+
+const { setPreset, setCustomColor } = useCustomTheme()
+setPreset('blue')           // Palette complète blue
+setPreset('brown')          // Palette complète brown
+setCustomColor('#10b981')   // Custom : primary uniquement
+```
+
+### Initialisation (main.ts)
+
+```typescript
+import { initCustomTheme } from '@/composables/useCustomTheme'
+
+// Appelé AVANT createApp() pour éviter le flash
+initCustomTheme()
+```
+
+### Génération de palette custom
+
+`generatePalette(baseColor)` dans `useCustomTheme.ts` :
+1. Convertit hex → HSL
+2. Garde la teinte (H) et saturation (S) fixes
+3. Varie la luminosité (L) pour générer 12 nuances (50 → 950)
+4. Injecte les variables `--primary-*` via style inline sur `<html>`
+
+### Surface Elevation System
+
+Système de niveaux pour gérer le contraste entre conteneurs imbriqués (dark mode).
+
+```
+Level 0 (--surface-0) : Page background    → secondary-950
+  └─ Level 1 (--surface-1) : Cards, Modals → secondary-800
+       └─ Level 2 (--surface-2) : Nested   → secondary-600
+            └─ Level 3 (--surface-3) : Inputs → secondary-500
+```
+
+**Règle :** Chaque niveau est plus clair que son parent. Les inputs utilisent toujours `--surface-3` pour ressortir de n'importe quel conteneur.
+
+### Composants UI
+
+| Composant | Rôle |
+|-----------|------|
+| `Header.vue` | Bouton toggle light/dark |
+| `CustomThemeSelector.vue` | Sélecteur preset/custom + color picker |
+| `ContentBlock.vue` | Peut forcer un thème local (`theme="dark"`) |
+
+### Variables sémantiques principales
+
+```less
+// Textes
+--text-primary, --text-secondary, --text-muted
+
+// Fonds
+--bg-page, --bg-surface, --bg-elevated
+
+// Inputs (toujours surface-3)
+--input-bg, --input-border, --input-border-focus
+
+// Chrome (header/footer - toujours sombre)
+--chrome-bg, --chrome-text
+```
+
+---
+
 ## ⚠️ Rappels Quotidiens pour l'Admin
 
 1.  **Active ton VPN (Mullvad)** avant de travailler.
