@@ -34,13 +34,13 @@
 
   &--active {
     background-color: var(--dropdown-item-active);
-    color: var(--text-inverse);
+    color: var(--dropdown-active-text, var(--text-inverse));
 
     .dropdown-item__label {
-      color: var(--text-inverse);
+      color: var(--dropdown-active-text, var(--text-inverse));
     }
     .icon {
-      fill: var(--text-inverse);
+      fill: var(--dropdown-active-text, var(--text-inverse));
     }
   }
 

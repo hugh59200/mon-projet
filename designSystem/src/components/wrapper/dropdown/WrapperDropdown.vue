@@ -16,6 +16,7 @@
       :readonly
       :deletable
       :force-value
+      :variant
       :key-id="'id' as keyof DropdownItem"
       :key-label="'label' as keyof DropdownItem"
       :key-icon-name="'iconName' as keyof DropdownItem"

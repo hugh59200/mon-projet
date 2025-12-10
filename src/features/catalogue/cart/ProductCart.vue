@@ -421,6 +421,11 @@
       transition:
         opacity 0.2s @ease,
         transform 0.2s @ease;
+
+      .respond-mobile({
+        opacity: 1;
+        transform: none;
+      });
     }
 
     &:hover &__wishlist,
@@ -429,16 +434,6 @@
       opacity: 1;
       transform: translateY(0);
     }
-
-    // Mobile: toujours visible, bord droit aligné avec la card
-    .respond-mobile({
-      &__wishlist {
-        opacity: 1;
-        transform: none;
-        bottom: -16px;
-        right: 0;
-      }
-    });
 
     // ============ BODY SECTION ============
     &__body {
@@ -631,7 +626,8 @@
         padding: 20px;
 
         .respond-mobile({
-          padding: 12px;
+          padding: 10px 12px;
+          gap: 6px;
         });
       }
 
@@ -642,6 +638,15 @@
 
         .respond-mobile({
           font-size: 14px;
+          padding-left: 0;
+          margin-bottom: 0;
+        });
+      }
+
+      .product-card__price {
+        .respond-mobile({
+          padding-top: 6px;
+          border-top: none;
         });
       }
 

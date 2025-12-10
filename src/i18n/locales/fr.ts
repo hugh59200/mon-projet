@@ -448,6 +448,9 @@ export default {
     title: 'Catalogue',
     subtitle: 'Peptides de recherche certifiés pour laboratoire',
     searchPlaceholder: 'Rechercher (ex: BPC-157, GHK-Cu...)',
+    toolbar: {
+      title: 'Recherche & Tri',
+    },
     filters: {
       title: 'Filtres',
       categories: 'Domaines',

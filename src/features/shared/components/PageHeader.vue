@@ -56,6 +56,9 @@
         >
           {{ displayDescription }}
         </p>
+
+        <!-- Slot for custom content -->
+        <slot />
       </div>
     </div>
   </header>
@@ -475,7 +478,7 @@
     // ========================================
     .respond-mobile({
       &--premium {
-        padding: 60px 16px 32px;
+        padding:  32px;
       }
 
       &--card {

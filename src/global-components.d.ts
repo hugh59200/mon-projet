@@ -26,6 +26,7 @@ declare module 'vue' {
     BasicText: typeof import('./../designSystem/src/components/basic/text/BasicText.vue')['default']
     BasicToast: typeof import('./../designSystem/src/components/basic/toast/BasicToast.vue')['default']
     BasicTooltip: typeof import('./../designSystem/src/components/basic/tooltip/BasicTooltip.vue')['default']
+    BottomSheet: typeof import('./../designSystem/src/components/wrapper/bottomSheet/BottomSheet.vue')['default']
     ClickOutside: typeof import('./../designSystem/src/components/basic/click-outside/ClickOutside.vue')['default']
     ContentBlock: typeof import('./../designSystem/src/components/layout/ContentBlock.vue')['default']
     CustomThemeSelector: typeof import('./../designSystem/src/components/basic/theme/CustomThemeSelector.vue')['default']

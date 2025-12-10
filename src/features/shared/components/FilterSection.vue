@@ -65,13 +65,17 @@
     border: 1px solid var(--border-default);
     box-shadow: var(--shadow-sm);
 
-    // Dark mode - même fond que les ProductCards
+    // Dark mode - surface-2 pour contraste avec les conteneurs parents
     html[data-theme='dark'] & {
-      background: var(--surface-1);
+      background: var(--surface-2);
     }
 
     overflow: hidden;
     transition: all 0.25s ease;
+
+    .respond-mobile({
+      border-radius: 10px;
+    });
 
     /* ----------------------------------------------------------
      HEADER
@@ -82,6 +86,10 @@
       justify-content: space-between;
 
       padding: 14px 18px;
+
+      .respond-mobile({
+        padding: 10px 14px;
+      });
 
       cursor: pointer;
       user-select: none;
@@ -118,6 +126,11 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+
+      .respond-mobile({
+        padding: 12px 14px 14px;
+        gap: 12px;
+      });
 
       border-top: 1px solid var(--border-subtle);
       backdrop-filter: blur(10px);

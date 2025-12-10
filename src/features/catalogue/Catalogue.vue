@@ -107,15 +107,11 @@
               placeholder="Trier par"
               size="small"
               force-value
-              variant="dark"
               class="catalogue-toolbar__dropdown"
             />
 
-            <!-- View Mode Toggle (desktop only) -->
-            <div
-              v-if="!isMobile"
-              class="catalogue-toolbar__view"
-            >
+            <!-- View Mode Toggle -->
+            <div class="catalogue-toolbar__view">
               <PremiumButton
                 type="secondary"
                 :variant="viewMode === 'grid' ? 'outline' : 'ghost'"
@@ -292,54 +288,51 @@
             icon-left="Plus"
             @click="page++"
           />
-          <span class="catalogue-load-more__info">
-            {{ page }} / {{ totalPages }}
-          </span>
+          <span class="catalogue-load-more__info">{{ page }} / {{ totalPages }}</span>
         </div>
       </main>
     </PageContent>
 
-    <!-- Mobile Filter Modal -->
-    <ModalComponent
-      id="mobile-filter-modal"
+    <!-- Mobile Filter Bottom Sheet -->
+    <BottomSheet
       v-model="showFilters"
-      closable
-      size="small"
       :title="t('catalogue.filters.title')"
     >
-      <template #content>
-        <FilterPanel
-          :all-open="allOpen"
-          v-model:filterOpen="filterOpen"
-          v-model:priceRange="priceRange"
-          v-model:selectedCategories="selectedCategories"
-          v-model:inStockOnly="inStockOnly"
-          v-model:selectedTags="selectedTags"
-          :categoryItems="categoryItemsWithCounts"
-          :stockCount="stockCount"
-          :tagItems="tagItemsWithCounts"
-          :tags="allTags"
-          @toggleAll="toggleAll"
-          @resetAll="resetAll"
-          @toggleTag="toggleTag"
-        />
-      </template>
+      <FilterPanel
+        :all-open="allOpen"
+        v-model:filterOpen="filterOpen"
+        v-model:priceRange="priceRange"
+        v-model:selectedCategories="selectedCategories"
+        v-model:inStockOnly="inStockOnly"
+        v-model:selectedTags="selectedTags"
+        :categoryItems="categoryItemsWithCounts"
+        :stockCount="stockCount"
+        :tagItems="tagItemsWithCounts"
+        :tags="allTags"
+        hide-header
+        @toggleAll="toggleAll"
+        @resetAll="resetAll"
+        @toggleTag="toggleTag"
+      />
+
       <template #actions>
-        <div class="catalogue-modal-actions">
+        <div class="catalogue-sheet-actions">
           <PremiumButton
             :label="t('catalogue.filters.resetAll')"
             type="secondary"
             variant="outline"
+            size="md"
             @click="resetAll"
           />
           <PremiumButton
-            :label="`${t('catalogue.results.showing')} ${finalProducts.length} ${t('catalogue.results.products')}`"
+            :label="`Voir ${finalProducts.length} produits`"
             type="primary"
+            size="md"
             @click="showFilters = false"
           />
         </div>
       </template>
-    </ModalComponent>
+    </BottomSheet>
   </div>
 </template>
 
@@ -349,7 +342,7 @@
   import { useFilters } from '@/features/catalogue/composables/useFilters'
   import { useFilterSections } from '@/features/catalogue/composables/useFilterSections'
   import { usePagination } from '@/features/catalogue/composables/usePagination'
-  import ModalComponent from '@/features/interface/modal/ModalComponent.vue'
+  import { BottomSheet } from '@designSystem/components/wrapper'
   import PageContent from '@/features/shared/components/PageContent.vue'
   import PageHeader from '@/features/shared/components/PageHeader.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
@@ -428,6 +421,11 @@
   // UI State
   const showFilters = ref(false)
   const viewMode = ref<'grid' | 'list'>((route.query.view as 'grid' | 'list') || 'grid')
+
+  // Fermer le BottomSheet quand on passe en desktop
+  watch(isMobile, (mobile) => {
+    if (!mobile) showFilters.value = false
+  })
 
   // Active filters
   const hasActiveFilters = computed(() => {
@@ -561,10 +559,13 @@
     // MOBILE BAR
     // =========================================
     &-mobile-bar {
+      position: absolute;
+      top: -18px;
+      right: 16px;
+      z-index: 10;
       display: flex;
       align-items: center;
       gap: 10px;
-      width: 100%;
 
       &__icon-btn {
         position: relative;
@@ -647,7 +648,6 @@
       flex-shrink: 0;
       position: sticky;
       height: fit-content;
-      max-height: calc(100vh - 48px);
       overflow-y: auto;
 
       // Masquer sur mobile (la barre mobile est affichée via v-if="isMobile")
@@ -713,7 +713,8 @@
       }
 
       &__dropdown {
-        min-width: 130px;
+        width: 180px;
+        // min-width: 130px;
       }
 
       &__view {
@@ -844,14 +845,17 @@
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 20px;
 
+      // Mode list : 1 produit par ligne
       &--list {
         grid-template-columns: 1fr;
         gap: 12px;
       }
 
-      // Mobile (≤ 720px)
+      // Mobile (≤ 720px) - mode grid uniquement
       .respond-mobile({
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        &:not(.catalogue-grid--list) {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
         gap: 12px;
       });
     }
@@ -952,7 +956,6 @@
         font-size: 14px;
         color: @neutral-500;
       }
-
     }
 
     // =========================================
@@ -974,13 +977,16 @@
     }
 
     // =========================================
-    // MODAL ACTIONS
+    // BOTTOM SHEET ACTIONS
     // =========================================
-    &-modal-actions {
+    &-sheet-actions {
       display: flex;
-      justify-content: center;
       gap: 12px;
       width: 100%;
+
+      > * {
+        flex: 1;
+      }
     }
   }
 </style>

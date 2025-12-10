@@ -4,6 +4,7 @@
     :items
     :selectedLabel
     :mode
+    :variant
     @on-key-down="onKeyDown"
   >
     <template #dropdown-items>

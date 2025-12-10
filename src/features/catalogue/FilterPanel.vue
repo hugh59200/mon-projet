@@ -1,6 +1,9 @@
 <template>
   <div class="catalogue-filters">
-    <div class="catalogue-filters__head">
+    <div
+      v-if="!hideHeader"
+      class="catalogue-filters__head"
+    >
       <BasicText
         size="h5"
         weight="bold"
@@ -33,6 +36,7 @@
     </FilterSection>
 
     <FilterSection
+      v-if="!hideHeader"
       v-model="filterOpen.category"
       :title="t('catalogue.filters.categories')"
     >
@@ -48,6 +52,7 @@
     </FilterSection>
 
     <FilterSection
+      v-if="!hideHeader"
       v-model="filterOpen.stock"
       :title="t('catalogue.filters.availability')"
     >
@@ -67,7 +72,7 @@
           v-for="tag in displayedTags"
           :key="tag.id"
           :label="`${tag.label} (${tag.count})`"
-          size="small"
+          size="medium"
           :color="getTagColor(tag.label)"
           :selected="selectedTags.includes(tag.id)"
           @click="emit('toggleTag', tag.id)"
@@ -78,16 +83,25 @@
       <div
         v-if="tagItems.length > VISIBLE_TAGS_COUNT"
         class="catalogue-filters__more"
+        @click="showAllTags = !showAllTags"
       >
+        <!-- Desktop: texte -->
         <BasicText
+          v-if="!hideHeader"
           size="body-s"
           weight="semibold"
           color="primary-500"
           class="toggle-link"
-          @click="showAllTags = !showAllTags"
         >
           {{ showAllTags ? `- ${t('common.seeLess')}` : `+ ${t('common.viewAll')} (${tagItems.length})` }}
         </BasicText>
+        <!-- Mobile: chevron centré -->
+        <BasicIconNext
+          v-else
+          :name="showAllTags ? 'ChevronUp' : 'ChevronDown'"
+          :size="20"
+          class="toggle-chevron"
+        />
       </div>
     </FilterSection>
   </div>
@@ -147,6 +161,7 @@
     tagItems: any[]
     tags: string[]
     stockCount: number
+    hideHeader?: boolean
   }>()
 
   const emit = defineEmits(['toggleAll', 'resetAll', 'toggleTag'])
@@ -198,11 +213,22 @@
     &__more {
       margin-top: 8px;
       cursor: pointer;
+      display: flex;
+      justify-content: center;
 
       .toggle-link {
         transition: color 0.2s;
         &:hover {
           color: var(--primary-400);
+        }
+      }
+
+      .toggle-chevron {
+        color: var(--text-muted);
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--text-primary);
         }
       }
     }

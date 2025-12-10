@@ -29,11 +29,11 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
     if (index === -1) {
       // Ajouter aux favoris
-      items.value.push(productId)
+      items.value = [...items.value, productId]
       toastStore.show(t('wishlist.added'), 'success')
     } else {
-      // Retirer des favoris
-      items.value.splice(index, 1)
+      // Retirer des favoris - nouvelle référence pour garantir réactivité
+      items.value = items.value.filter((id) => id !== productId)
       toastStore.show(t('wishlist.removed'), 'info')
     }
 
