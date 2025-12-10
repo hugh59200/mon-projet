@@ -4,7 +4,6 @@
       <BasicText
         size="h5"
         weight="bold"
-        color="neutral-300"
       >
         {{ t('catalogue.filters.title') }}
       </BasicText>

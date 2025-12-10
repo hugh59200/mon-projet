@@ -28,7 +28,7 @@
           <span class="navbar__burger-line"></span>
         </button>
 
-        <HeaderLogo />
+        <HeaderLogo :compact="useCompactLogo" />
       </div>
 
       <div
@@ -43,8 +43,9 @@
         ref="rightRef"
         class="navbar__right"
       >
-        <!-- Theme Toggle (DEV) -->
+        <!-- Theme Toggle (desktop + mobile si assez d'espace) -->
         <BasicTooltip
+          v-if="!isMobile || !hideThemeToggle"
           :label="theme === 'light' ? 'Dark mode' : 'Light mode'"
           position="bottom"
         >
@@ -60,7 +61,9 @@
           </button>
         </BasicTooltip>
 
+        <!-- Suivi commande (guests only - connectés ont accès via profil) -->
         <BasicTooltip
+          v-if="showTrackingButton"
           :label="t('nav.tracking')"
           position="bottom"
         >
@@ -75,7 +78,9 @@
             />
           </button>
         </BasicTooltip>
-        <LanguageSelector />
+
+        <!-- Language (desktop only) -->
+        <LanguageSelector v-if="!isMobile" />
         <WishlistIcon />
         <CartMenu />
         <HeaderActions />
@@ -87,11 +92,12 @@
 <script setup lang="ts">
   import { useNavOverflow } from '@/composables/useNavOverflow'
   import { useTheme } from '@/composables/useTheme'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import CartMenu from '@/features/catalogue/cart/pop-up/CartMenu.vue'
   import WishlistIcon from '@/features/catalogue/components/WishlistIcon.vue'
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint'
   import { BasicIconNext } from '@designSystem/components/basic/icon'
-  import { computed, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import HeaderActions from './HeaderActions.vue'
@@ -104,6 +110,10 @@
   const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
   const { theme, toggleTheme } = useTheme()
+  const auth = useAuthStore()
+
+  // Suivi commande visible uniquement pour guests (connectés ont accès via profil)
+  const showTrackingButton = computed(() => !auth.user)
 
   const containerRef = ref<HTMLElement | null>(null)
   const leftRef = ref<HTMLElement | null>(null)
@@ -117,6 +127,49 @@
     rightRef,
     { minGap: 20 }
   )
+
+  // Deux niveaux d'overflow sur mobile :
+  // 1. Theme toggle disparaît en premier (seuil large)
+  // 2. Logo passe aux initiales ensuite (seuil serré)
+  const hideThemeToggle = ref(false)
+  const useCompactLogo = ref(false)
+  const THEME_GAP = 80 // Seuil pour masquer le theme toggle
+  const LOGO_GAP = 16   // Seuil serré pour passer aux initiales
+
+  const checkHeaderOverflow = () => {
+    if (!isMobile.value) {
+      hideThemeToggle.value = false
+      useCompactLogo.value = false
+      return
+    }
+
+    if (!leftRef.value || !rightRef.value) return
+
+    const leftRect = leftRef.value.getBoundingClientRect()
+    const rightRect = rightRef.value.getBoundingClientRect()
+    const gap = rightRect.left - leftRect.right
+
+    // D'abord le theme toggle disparaît
+    hideThemeToggle.value = gap < THEME_GAP
+    // Ensuite le logo passe aux initiales
+    useCompactLogo.value = gap < LOGO_GAP
+  }
+
+  let headerObserver: ResizeObserver | null = null
+
+  watch(isMobile, checkHeaderOverflow)
+
+  onMounted(() => {
+    setTimeout(checkHeaderOverflow, 50)
+    headerObserver = new ResizeObserver(checkHeaderOverflow)
+    if (containerRef.value) headerObserver.observe(containerRef.value)
+    window.addEventListener('resize', checkHeaderOverflow)
+  })
+
+  onUnmounted(() => {
+    if (headerObserver) headerObserver.disconnect()
+    window.removeEventListener('resize', checkHeaderOverflow)
+  })
 
   // Sur mobile, on cache la nav (bottom nav la remplace) mais on garde le burger si overflow sur tablet
   const shouldShowMobileNav = computed(() => isOverflowing.value && !isMobile.value)

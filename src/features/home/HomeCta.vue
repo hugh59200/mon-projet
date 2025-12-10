@@ -79,7 +79,7 @@
         font-family: @font-display;
         font-size: clamp(32px, 4vw, 48px);
         font-weight: 600;
-        color: var(--text-primary);
+        color: @neutral-50;
         margin: 0;
         line-height: 1.15;
         letter-spacing: -0.02em;
@@ -95,7 +95,7 @@
         font-family: @font-body;
         font-size: 17px;
         line-height: 1.7;
-        color: var(--text-secondary);
+        color: @neutral-300;
         margin: 0;
         max-width: 520px;
       }
@@ -113,8 +113,8 @@
       gap: 16px;
       max-width: 280px;
       padding: 20px;
-      background: rgba(var(--warning-500-rgb), 0.08);
-      border: 1px solid rgba(var(--warning-500-rgb), 0.2);
+      background: rgba(@warning-500, 0.08);
+      border: 1px solid rgba(@warning-500, 0.2);
       border-radius: 16px;
       align-self: center;
     }
@@ -124,19 +124,19 @@
       align-items: center;
       gap: 8px;
       padding: 8px 14px;
-      background: rgba(var(--warning-500-rgb), 0.15);
+      background: rgba(@warning-500, 0.15);
       border-radius: 8px;
       width: fit-content;
 
       svg {
-        color: var(--warning-400);
+        color: @warning-400;
       }
 
       span {
         font-family: @font-display;
         font-size: 11px;
         font-weight: 600;
-        color: var(--warning-400);
+        color: @warning-400;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -152,7 +152,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       margin: 0;
     }
 
@@ -160,7 +160,7 @@
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: var(--text-muted);
+      color: @neutral-500;
       margin: 0;
     }
   }

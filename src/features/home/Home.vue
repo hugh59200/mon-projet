@@ -184,15 +184,15 @@
       gap: 12px;
       margin: 0 16px;
       padding: 16px;
-      background: rgba(var(--warning-500-rgb), 0.08);
-      border: 1px solid rgba(var(--warning-500-rgb), 0.2);
+      background: rgba(@warning-500, 0.08);
+      border: 1px solid rgba(@warning-500, 0.2);
       border-radius: 12px;
 
       &-icon {
         flex-shrink: 0;
         width: 20px;
         height: 20px;
-        color: var(--warning-500);
+        color: @warning-500;
 
         svg {
           width: 100%;
@@ -202,7 +202,7 @@
 
       &-text {
         font-size: 12px;
-        color: var(--warning-700);
+        color: @warning-700;
         margin: 0;
         line-height: 1.6;
       }

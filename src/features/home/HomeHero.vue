@@ -163,7 +163,7 @@
     width: 100%;
     min-height: 500px;
     overflow: hidden;
-    background: var(--secondary-950);
+    background: #020202;
 
     // Fond absolu (pleine largeur)
     &__bg {
@@ -177,12 +177,12 @@
       inset: 0;
       background: linear-gradient(
         90deg,
-        rgba(var(--secondary-950-rgb), 0.9) 0%,
-        rgba(var(--secondary-950-rgb), 0.7) 25%,
-        rgba(var(--secondary-950-rgb), 0.2) 50%,
-        rgba(var(--secondary-950-rgb), 0.1) 70%,
-        rgba(var(--secondary-950-rgb), 0.5) 95%,
-        rgba(var(--secondary-950-rgb), 0.9) 100%
+        rgba(2, 2, 2, 0.9) 0%,
+        rgba(2, 2, 2, 0.7) 25%,
+        rgba(2, 2, 2, 0.2) 50%,
+        rgba(2, 2, 2, 0.1) 70%,
+        rgba(2, 2, 2, 0.5) 95%,
+        rgba(2, 2, 2, 0.9) 100%
       );
 
       &::after {
@@ -191,10 +191,10 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          rgba(var(--secondary-950-rgb), 0.6) 0%,
+          rgba(2, 2, 2, 0.6) 0%,
           transparent 15%,
           transparent 85%,
-          rgba(var(--secondary-950-rgb), 0.6) 100%
+          rgba(2, 2, 2, 0.6) 100%
         );
       }
     }
@@ -270,7 +270,7 @@
       }
 
       &-sep {
-        color: var(--text-muted);
+        color: @neutral-500;
       }
     }
 
@@ -280,7 +280,7 @@
       font-weight: 600;
       line-height: 1.1;
       letter-spacing: -0.03em;
-      color: @neutral-50; // Toujours clair (hero dark forcé)
+      color: @neutral-50;
       margin: 0;
 
       span {
@@ -319,7 +319,7 @@
       gap: 24px;
       margin-top: 16px;
       padding-top: 24px;
-      border-top: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
 
       &-item {
         display: flex;
@@ -327,12 +327,12 @@
         gap: 8px;
         font-family: @font-body;
         font-size: 13px;
-        color: var(--text-secondary);
+        color: @neutral-400;
 
         svg {
           width: 18px;
           height: 18px;
-          color: var(--success-500);
+          color: @success-500;
         }
       }
     }
@@ -357,12 +357,12 @@
         justify-content: center;
         width: 32px;
         height: 32px;
-        background: rgba(var(--success-500-rgb), 0.15);
-        border: 1px solid rgba(var(--success-500-rgb), 0.3);
+        background: rgba(@success-500, 0.15);
+        border: 1px solid rgba(@success-500, 0.3);
         border-radius: 8px;
 
         svg {
-          color: var(--success-400);
+          color: @success-400;
         }
       }
     }
@@ -382,10 +382,10 @@
       &__bg-overlay {
         background: linear-gradient(
           90deg,
-          rgba(var(--secondary-950-rgb), 0.97) 0%,
-          rgba(var(--secondary-950-rgb), 0.85) 30%,
-          rgba(var(--secondary-950-rgb), 0.5) 60%,
-          rgba(var(--secondary-950-rgb), 0.7) 100%
+          rgba(2, 2, 2, 0.97) 0%,
+          rgba(2, 2, 2, 0.85) 30%,
+          rgba(2, 2, 2, 0.5) 60%,
+          rgba(2, 2, 2, 0.7) 100%
         );
       }
 
@@ -411,11 +411,11 @@
       &__bg-overlay {
         background: linear-gradient(
           180deg,
-          rgba(var(--secondary-950-rgb), 0.85) 0%,
-          rgba(var(--secondary-950-rgb), 0.3) 25%,
-          rgba(var(--secondary-950-rgb), 0.2) 50%,
-          rgba(var(--secondary-950-rgb), 0.5) 75%,
-          rgba(var(--secondary-950-rgb), 0.95) 100%
+          rgba(2, 2, 2, 0.85) 0%,
+          rgba(2, 2, 2, 0.3) 25%,
+          rgba(2, 2, 2, 0.2) 50%,
+          rgba(2, 2, 2, 0.5) 75%,
+          rgba(2, 2, 2, 0.95) 100%
         );
 
         &::after {
@@ -434,13 +434,13 @@
 
       &__title {
         font-size: 28px;
-        text-shadow: 0 2px 20px rgba(var(--secondary-950-rgb), 0.5);
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
       }
 
       &__badge {
         padding: 6px 12px;
         font-size: 11px;
-        background: rgba(var(--secondary-950-rgb), 0.5);
+        background: rgba(0, 0, 0, 0.5);
       }
     }
   });

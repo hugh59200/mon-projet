@@ -439,7 +439,7 @@
       font-family: @font-display;
       font-size: clamp(28px, 4vw, 40px);
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
@@ -448,7 +448,7 @@
     &__subtitle {
       font-family: @font-body;
       font-size: 16px;
-      color: var(--text-secondary);
+      color: @neutral-300;
       margin: 0;
       max-width: 400px;
     }
@@ -565,7 +565,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: @neutral-500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
 
@@ -746,7 +746,7 @@
       font-family: @font-body;
       font-size: 10px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: @neutral-500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -755,7 +755,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       margin: 0;
       line-height: 1.3;
       display: -webkit-box;
@@ -780,7 +780,7 @@
     &__price-old {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--text-muted);
+      color: @neutral-500;
       text-decoration: line-through;
     }
 
@@ -788,10 +788,10 @@
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: @neutral-50;
 
       &--sale {
-        color: var(--danger-500);
+        color: @danger-500;
       }
     }
 
@@ -936,7 +936,7 @@
       font-family: @font-display;
       font-size: 12px;
       font-weight: 700;
-      color: var(--text-muted);
+      color: @neutral-500;
       min-width: 24px;
     }
 
@@ -972,7 +972,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -1003,7 +1003,7 @@
       background: var(--secondary-700);
       border: none;
       border-radius: 8px;
-      color: var(--text-primary);
+      color: @neutral-50;
       cursor: pointer;
       transition: all 0.2s @ease;
       flex-shrink: 0;
@@ -1068,7 +1068,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

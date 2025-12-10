@@ -959,16 +959,16 @@
 
       // Variants
       &--success {
-        --nav-color: var(--success-500);
-        --nav-color-rgb: var(--success-500-rgb);
+        --nav-color: @success-500;
+        --nav-color-rgb: red(@success-500), green(@success-500), blue(@success-500);
       }
       &--primary {
         --nav-color: var(--primary-500);
         --nav-color-rgb: var(--primary-500-rgb);
       }
       &--warning {
-        --nav-color: var(--warning-500);
-        --nav-color-rgb: var(--warning-500-rgb);
+        --nav-color: @warning-500;
+        --nav-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500);
       }
       &--info {
         --nav-color: #3b82f6;
@@ -987,8 +987,8 @@
         --nav-color-rgb: 20, 184, 166;
       }
       &--orange {
-        --nav-color: var(--warning-500);
-        --nav-color-rgb: var(--warning-500-rgb);
+        --nav-color: @warning-500;
+        --nav-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500);
       }
       &--indigo {
         --nav-color: #6366f1;
@@ -1053,16 +1053,16 @@
 
     // Slide Variants
     &__slide--success {
-      --slide-color: var(--success-500);
-      --slide-color-rgb: var(--success-500-rgb);
+      --slide-color: @success-500;
+      --slide-color-rgb: red(@success-500), green(@success-500), blue(@success-500);
     }
     &__slide--primary {
       --slide-color: var(--primary-500);
       --slide-color-rgb: var(--primary-500-rgb);
     }
     &__slide--warning {
-      --slide-color: var(--warning-500);
-      --slide-color-rgb: var(--warning-500-rgb);
+      --slide-color: @warning-500;
+      --slide-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500);
     }
     &__slide--info {
       --slide-color: #3b82f6;
@@ -1081,8 +1081,8 @@
       --slide-color-rgb: 20, 184, 166;
     }
     &__slide--orange {
-      --slide-color: var(--warning-500);
-      --slide-color-rgb: var(--warning-500-rgb);
+      --slide-color: @warning-500;
+      --slide-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500);
     }
     &__slide--indigo {
       --slide-color: #6366f1;
@@ -1389,13 +1389,13 @@
 
       // Variants
       &--success {
-        --prog-color: var(--success-500);
+        --prog-color: @success-500;
       }
       &--primary {
         --prog-color: var(--primary-500);
       }
       &--warning {
-        --prog-color: var(--warning-500);
+        --prog-color: @warning-500;
       }
       &--info {
         --prog-color: #3b82f6;
@@ -1410,7 +1410,7 @@
         --prog-color: #14b8a6;
       }
       &--orange {
-        --prog-color: var(--warning-500);
+        --prog-color: @warning-500;
       }
       &--indigo {
         --prog-color: #6366f1;
@@ -1616,14 +1616,14 @@
     flex-direction: column;
 
     // Variants de couleur
-    &--success { --accent-color: var(--success-500); --accent-color-rgb: var(--success-500-rgb); }
+    &--success { --accent-color: @success-500; --accent-color-rgb: red(@success-500), green(@success-500), blue(@success-500); }
     &--primary { --accent-color: var(--primary-500); --accent-color-rgb: var(--primary-500-rgb); }
-    &--warning { --accent-color: var(--warning-500); --accent-color-rgb: var(--warning-500-rgb); }
+    &--warning { --accent-color: @warning-500; --accent-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500); }
     &--info { --accent-color: #3b82f6; --accent-color-rgb: 59, 130, 246; }
     &--purple { --accent-color: #8b5cf6; --accent-color-rgb: 139, 92, 246; }
     &--pink { --accent-color: #ec4899; --accent-color-rgb: 236, 72, 153; }
     &--teal { --accent-color: #14b8a6; --accent-color-rgb: 20, 184, 166; }
-    &--orange { --accent-color: var(--warning-500); --accent-color-rgb: var(--warning-500-rgb); }
+    &--orange { --accent-color: @warning-500; --accent-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500); }
     &--indigo { --accent-color: #6366f1; --accent-color-rgb: 99, 102, 241; }
     &--emerald { --accent-color: #10b981; --accent-color-rgb: 16, 185, 129; }
 
@@ -1805,14 +1805,14 @@
       min-width: 72px;
 
       // Variants
-      &--success { --item-color: var(--success-500); --item-color-rgb: var(--success-500-rgb); }
+      &--success { --item-color: @success-500; --item-color-rgb: red(@success-500), green(@success-500), blue(@success-500); }
       &--primary { --item-color: var(--primary-500); --item-color-rgb: var(--primary-500-rgb); }
-      &--warning { --item-color: var(--warning-500); --item-color-rgb: var(--warning-500-rgb); }
+      &--warning { --item-color: @warning-500; --item-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500); }
       &--info { --item-color: #3b82f6; --item-color-rgb: 59, 130, 246; }
       &--purple { --item-color: #8b5cf6; --item-color-rgb: 139, 92, 246; }
       &--pink { --item-color: #ec4899; --item-color-rgb: 236, 72, 153; }
       &--teal { --item-color: #14b8a6; --item-color-rgb: 20, 184, 166; }
-      &--orange { --item-color: var(--warning-500); --item-color-rgb: var(--warning-500-rgb); }
+      &--orange { --item-color: @warning-500; --item-color-rgb: red(@warning-500), green(@warning-500), blue(@warning-500); }
       &--indigo { --item-color: #6366f1; --item-color-rgb: 99, 102, 241; }
       &--emerald { --item-color: #10b981; --item-color-rgb: 16, 185, 129; }
 

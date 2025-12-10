@@ -151,14 +151,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       letter-spacing: -0.01em;
     }
 
     &__label {
       font-family: @font-body;
       font-size: 12px;
-      color: var(--text-muted);
+      color: @neutral-500;
     }
   }
 

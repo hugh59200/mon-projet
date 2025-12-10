@@ -15,24 +15,22 @@
           size="medium"
           class="catalogue-search catalogue-search--mobile"
         />
-        <PremiumButton
-          type="primary"
-          variant="outline"
-          size="sm"
-          :label="t('common.filter')"
-          icon-left="SlidersHorizontal"
-          class="catalogue-filter-btn"
+        <!-- Filtre icon only -->
+        <button
+          class="catalogue-mobile-bar__icon-btn"
           @click="showFilters = true"
         >
-          <template #append>
-            <span
-              v-if="activeFiltersCount"
-              class="catalogue-filter-btn__badge"
-            >
-              {{ activeFiltersCount }}
-            </span>
-          </template>
-        </PremiumButton>
+          <BasicIconNext
+            name="SlidersHorizontal"
+            :size="20"
+          />
+          <span
+            v-if="activeFiltersCount"
+            class="catalogue-mobile-bar__badge"
+          >
+            {{ activeFiltersCount }}
+          </span>
+        </button>
       </div>
     </PageHeader>
 
@@ -79,17 +77,26 @@
             icon-state="iconLeft"
             deletable
             size="small"
-            variant="ghost"
             class="catalogue-search"
           />
 
-          <!-- Results count - bien séparé -->
-          <div class="catalogue-toolbar__results">
+          <!-- Results count -->
+          <div
+            v-if="!isMobile"
+            class="catalogue-toolbar__results"
+          >
             <span class="catalogue-toolbar__count">{{ finalProducts.length }}</span>
             <span class="catalogue-toolbar__label">
               {{ t('catalogue.results.products') }}
             </span>
           </div>
+          <!-- Results count mobile (compact) -->
+          <span
+            v-else
+            class="catalogue-toolbar__results-mobile"
+          >
+            {{ finalProducts.length }} {{ t('catalogue.results.products') }}
+          </span>
 
           <!-- Right side controls -->
           <div class="catalogue-toolbar__right">
@@ -104,8 +111,11 @@
               class="catalogue-toolbar__dropdown"
             />
 
-            <!-- View Mode Toggle -->
-            <div class="catalogue-toolbar__view">
+            <!-- View Mode Toggle (desktop only) -->
+            <div
+              v-if="!isMobile"
+              class="catalogue-toolbar__view"
+            >
               <PremiumButton
                 type="secondary"
                 :variant="viewMode === 'grid' ? 'outline' : 'ghost'"
@@ -239,9 +249,9 @@
           </div>
         </WrapperLoader>
 
-        <!-- Pagination -->
+        <!-- Pagination Desktop -->
         <div
-          v-if="totalPages > 1"
+          v-if="totalPages > 1 && !isMobile"
           class="catalogue-pagination"
         >
           <PremiumButton
@@ -267,6 +277,24 @@
             :disabled="page === totalPages"
             @click="page++"
           />
+        </div>
+
+        <!-- Load More Mobile -->
+        <div
+          v-if="totalPages > 1 && isMobile && page < totalPages"
+          class="catalogue-load-more"
+        >
+          <PremiumButton
+            type="primary"
+            variant="outline"
+            size="md"
+            :label="t('common.loadMore')"
+            icon-left="Plus"
+            @click="page++"
+          />
+          <span class="catalogue-load-more__info">
+            {{ page }} / {{ totalPages }}
+          </span>
         </div>
       </main>
     </PageContent>
@@ -534,12 +562,51 @@
     // =========================================
     &-mobile-bar {
       display: flex;
-      gap: 12px;
-      margin-top: 16px;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+
+      &__icon-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: var(--surface-1);
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+        color: var(--text-primary);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+
+        &:active {
+          transform: scale(0.95);
+          background: var(--surface-2);
+        }
+      }
+
+      &__badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        background: var(--primary-500);
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     // =========================================
-    // FILTER BTN
+    // FILTER BTN (desktop)
     // =========================================
     &-filter-btn {
       display: flex;
@@ -606,6 +673,7 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 16px;
+      flex-wrap: wrap;
 
       &__results {
         display: flex;
@@ -629,6 +697,12 @@
         font-family: @font-body;
         font-size: 14px;
         color: @neutral-400;
+      }
+
+      &__results-mobile {
+        font-family: @font-body;
+        font-size: 13px;
+        color: var(--text-muted);
       }
 
       &__right {
@@ -879,18 +953,24 @@
         color: @neutral-500;
       }
 
-      // Mobile (≤ 720px)
-      .respond-mobile({
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 24px;
-        padding-top: 20px;
+    }
 
-        &__btn {
-          width: 100%;
-          justify-content: center;
-        }
-      });
+    // =========================================
+    // LOAD MORE (Mobile)
+    // =========================================
+    &-load-more {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+
+      &__info {
+        font-family: @font-body;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
     }
 
     // =========================================

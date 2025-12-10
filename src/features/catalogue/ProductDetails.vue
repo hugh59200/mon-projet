@@ -77,31 +77,44 @@
                   {{ t('aov.alreadyOrdered.badge') }}
                 </div>
 
-                <!-- Image principale avec zoom -->
+                <!-- Image principale avec zoom (desktop) / simple (mobile) -->
                 <div class="product__image-wrapper">
-                  <!-- Image produit -->
+                  <!-- Desktop: Image produit avec zoom -->
                   <InnerImageZoom
-                    v-if="product.image && !showCoa"
+                    v-if="product.image && !showCoa && !isMobile"
                     :src="product.image"
                     :zoomSrc="product.image"
                     :alt="`Peptide ${productName}`"
                     class="product__image"
                     :zoomScale="1.5"
-                    :fullscreenOnMobile="true"
                     hideHint
                   />
-                  <!-- COA en grand -->
+                  <!-- Desktop: COA avec zoom -->
                   <InnerImageZoom
-                    v-else-if="product.coa_url && showCoa"
+                    v-else-if="product.coa_url && showCoa && !isMobile"
                     :src="product.coa_url"
                     :zoomSrc="product.coa_url"
                     :alt="`COA ${productName}`"
                     class="product__image product__image--coa"
                     :zoomScale="2"
-                    :fullscreenOnMobile="true"
                     hideHint
                   />
-                  <div class="product__image-hint">
+                  <!-- Mobile: Image produit simple -->
+                  <img
+                    v-else-if="product.image && !showCoa && isMobile"
+                    :src="product.image"
+                    :alt="`Peptide ${productName}`"
+                    class="product__image product__image--mobile"
+                  />
+                  <!-- Mobile: COA simple -->
+                  <img
+                    v-else-if="product.coa_url && showCoa && isMobile"
+                    :src="product.coa_url"
+                    :alt="`COA ${productName}`"
+                    class="product__image product__image--coa product__image--mobile"
+                  />
+                  <!-- Hint zoom (desktop only) -->
+                  <div v-if="!isMobile" class="product__image-hint">
                     <BasicIconNext name="ZoomIn" :size="16" />
                     {{ t('product.clickToZoom') }}
                   </div>
@@ -110,6 +123,13 @@
                     <BasicIconNext name="FileCheck" :size="14" />
                     <span>Certificate of Analysis</span>
                   </div>
+                  <!-- Wishlist sur image (mobile only) -->
+                  <WishlistButton
+                    v-if="isMobile"
+                    :product-id="product.id"
+                    :size="20"
+                    class="product__image-wishlist"
+                  />
                 </div>
 
                 <!-- Indicateurs de confiance -->
@@ -155,8 +175,8 @@
                   </div>
                 </button>
 
-                <!-- Bloc Analyse Indépendante -->
-                <ContentBlock v-if="product.coa_url" variant="success" size="md" class="product__lab-verification">
+                <!-- Bloc Analyse Indépendante (desktop only - redondant avec FilterSection mobile) -->
+                <ContentBlock v-if="product.coa_url && !isMobile" variant="success" size="md" class="product__lab-verification">
                   <div class="product__lab-header">
                     <BasicIconNext name="ShieldCheck" :size="20" />
                     <span class="product__lab-title">Analyse indépendante</span>
@@ -224,7 +244,8 @@
 
               <!-- Specs rapides -->
               <div class="product__specs">
-                <div class="product__spec">
+                <!-- Pureté (desktop only - redondant avec garanties sur mobile) -->
+                <div v-if="!isMobile" class="product__spec">
                   <div class="product__spec-icon product__spec-icon--purity">
                     <BasicIconNext name="FlaskConical" :size="20" />
                   </div>
@@ -236,6 +257,7 @@
                   </div>
                 </div>
 
+                <!-- Stock (toujours visible - info critique) -->
                 <div class="product__spec">
                   <div class="product__spec-icon product__spec-icon--stock">
                     <BasicIconNext name="Package" :size="20" />
@@ -256,7 +278,8 @@
                   </div>
                 </div>
 
-                <div class="product__spec">
+                <!-- Origine (desktop only - réassurance secondaire) -->
+                <div v-if="!isMobile" class="product__spec">
                   <div class="product__spec-icon product__spec-icon--origin">
                     <span class="product__spec-flag">🇪🇺</span>
                   </div>
@@ -389,6 +412,7 @@
                   />
 
                   <WishlistButton
+                    v-if="!isMobile"
                     :product-id="product.id"
                     :size="24"
                     class="product__wishlist-btn"
@@ -420,8 +444,62 @@
                 </ContentBlock>
               </ContentBlock>
 
-              <!-- Garanties -->
-              <div class="product__guarantees">
+              <!-- ========== MOBILE: Sections collapsibles ========== -->
+              <template v-if="isMobile">
+                <!-- Section Qualité & Certifications -->
+                <FilterSection
+                  title="Qualité & Certifications"
+                  icon="ShieldCheck"
+                  :default-open="false"
+                  class="product__mobile-section"
+                >
+                  <div class="product__mobile-guarantees">
+                    <div class="product__mobile-guarantee">
+                      <BasicIconNext name="ShieldCheck" :size="20" />
+                      <div>
+                        <strong>{{ t('product.guarantees.purity') }}</strong>
+                        <span>{{ t('product.guarantees.purityDesc') }}</span>
+                      </div>
+                    </div>
+                    <div class="product__mobile-guarantee">
+                      <BasicIconNext name="Truck" :size="20" />
+                      <div>
+                        <strong>{{ t('product.guarantees.secureShipping') }}</strong>
+                        <span>{{ t('product.guarantees.secureShippingDesc') }}</span>
+                      </div>
+                    </div>
+                    <div class="product__mobile-guarantee">
+                      <BasicIconNext name="Shield" :size="20" />
+                      <div>
+                        <strong>{{ t('product.guarantees.securePayment') }}</strong>
+                        <span>{{ t('product.guarantees.securePaymentDesc') }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </FilterSection>
+
+                <!-- Section Informations légales -->
+                <FilterSection
+                  title="Informations légales"
+                  icon="AlertTriangle"
+                  :default-open="false"
+                  class="product__mobile-section product__mobile-section--danger"
+                >
+                  <div class="product__mobile-disclaimer">
+                    <strong>Usage Recherche Uniquement (RUO)</strong>
+                    <p>
+                      Ce réactif chimique est <strong>strictement réservé à la recherche en laboratoire</strong>.
+                      <span class="product__mobile-disclaimer-warning">
+                        Interdit pour usage humain ou vétérinaire.
+                      </span>
+                      Manipulation par personnel qualifié uniquement.
+                    </p>
+                  </div>
+                </FilterSection>
+              </template>
+
+              <!-- Garanties (desktop only) -->
+              <div v-if="!isMobile" class="product__guarantees">
                 <ContentBlock variant="card" size="sm" :interactive="true" class="product__guarantee">
                   <div class="product__guarantee-icon">
                     <BasicIconNext name="ShieldCheck" :size="24" />
@@ -460,7 +538,7 @@
                 :type="activeTab === 'description' ? 'primary' : 'secondary'"
                 :variant="activeTab === 'description' ? 'solid' : 'ghost'"
                 size="md"
-                :label="t('product.tabs.specs')"
+                :label="isMobile ? '' : t('product.tabs.specs')"
                 icon-left="FileText"
                 class="product__tab"
                 @click="activeTab = 'description'"
@@ -469,7 +547,7 @@
                 :type="activeTab === 'protocol' ? 'primary' : 'secondary'"
                 :variant="activeTab === 'protocol' ? 'solid' : 'ghost'"
                 size="md"
-                :label="t('product.tabs.protocols')"
+                :label="isMobile ? '' : t('product.tabs.protocols')"
                 icon-left="FlaskConical"
                 class="product__tab"
                 @click="activeTab = 'protocol'"
@@ -478,7 +556,7 @@
                 :type="activeTab === 'shipping' ? 'primary' : 'secondary'"
                 :variant="activeTab === 'shipping' ? 'solid' : 'ghost'"
                 size="md"
-                :label="t('product.tabs.shipping')"
+                :label="isMobile ? '' : t('product.tabs.shipping')"
                 icon-left="Truck"
                 class="product__tab"
                 @click="activeTab = 'shipping'"
@@ -539,8 +617,8 @@
             </div>
           </ContentBlock>
 
-          <!-- Disclaimer RUO renforcé -->
-          <ContentBlock variant="danger" size="md" class="product__disclaimer">
+          <!-- Disclaimer RUO renforcé (desktop only) -->
+          <ContentBlock v-if="!isMobile" variant="danger" size="md" class="product__disclaimer">
             <div class="product__disclaimer-icon">
               <BasicIconNext name="AlertTriangle" :size="24" />
             </div>
@@ -584,18 +662,36 @@
           class="product-sticky-cta"
         >
           <div class="product-sticky-cta__price">
-            <span v-if="product.is_on_sale && product.sale_price" class="product-sticky-cta__price-old">
-              {{ product.price.toFixed(2) }}€
-            </span>
-            <span class="product-sticky-cta__price-current" :class="{ 'product-sticky-cta__price-current--sale': product.is_on_sale }">
-              {{ (product.is_on_sale && product.sale_price ? product.sale_price : product.price).toFixed(2) }}€
-            </span>
+            <!-- Affichage avec pack -->
+            <template v-if="packInfo && selectedQuantity > 1">
+              <span class="product-sticky-cta__pack-info">
+                x{{ packInfo.qty }}
+                <span v-if="packInfo.totalDiscountPercent > 0" class="product-sticky-cta__discount">
+                  -{{ packInfo.totalDiscountPercent }}%
+                </span>
+              </span>
+              <span class="product-sticky-cta__price-current">
+                {{ packInfo.totalPrice.toFixed(2) }}€
+              </span>
+            </template>
+            <!-- Affichage unitaire -->
+            <template v-else>
+              <span v-if="product.is_on_sale && product.sale_price" class="product-sticky-cta__price-old">
+                {{ product.price.toFixed(2) }}€
+              </span>
+              <span
+                class="product-sticky-cta__price-current"
+                :class="{ 'product-sticky-cta__price-current--sale': product.is_on_sale && product.sale_price }"
+              >
+                {{ (product.is_on_sale && product.sale_price ? product.sale_price : product.price).toFixed(2) }}€
+              </span>
+            </template>
           </div>
           <PremiumButton
             type="primary"
             variant="solid"
             size="md"
-            :label="t('catalogue.product.addToCart')"
+            :label="packInfo && selectedQuantity > 1 ? t('aov.quantity.addPack') : t('catalogue.product.addToCart')"
             icon-left="ShoppingCart"
             :shine="true"
             class="product-sticky-cta__btn"
@@ -632,6 +728,7 @@
   import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
   import { useOrderHistoryStore } from '@/features/order/stores/useOrderHistoryStore'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+  import FilterSection from '@/features/shared/components/FilterSection.vue'
 
   const { t } = useI18n()
   const { isMobile } = useDeviceBreakpoint()
@@ -1135,6 +1232,7 @@
     position: relative;
     min-height: 100vh;
     background: var(--bg-page);
+    overflow-x: hidden;
 
     &__bg {
       position: fixed;
@@ -2093,47 +2191,17 @@
 
     &__details-tabs {
       display: flex;
-      gap: 4px;
-      padding: 8px;
-      background: var(--bg-surface-secondary);
-      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
+      border-radius: 12px;
+      padding: 4px;
+      margin: 0 24px 24px;
     }
 
     &__tab {
       flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px 20px;
-      background: transparent;
-      border: none;
-      border-radius: 12px;
-      font-family: @font-body;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s @ease;
-
-      svg {
-        opacity: 0.6;
-      }
-
-      &:hover:not(&--active) {
-        background: var(--bg-subtle);
-        color: var(--text-primary);
-      }
-
-      &--active {
-        background: var(--bg-subtle);
-        color: var(--primary-700);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-
-        svg {
-          opacity: 1;
-          color: var(--primary-500);
-        }
+      :deep(button) {
+        width: 100%;
+        justify-content: center;
       }
     }
 
@@ -2357,7 +2425,9 @@
   .respond-mobile({
     .product-page {
       &__container {
-        padding: 16px 16px 60px;
+        padding: 16px 16px 80px;
+        max-width: 100%;
+        overflow-x: hidden;
       }
 
       &__nav {
@@ -2379,6 +2449,17 @@
     .product {
       &__main {
         gap: 24px;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      &__gallery {
+        max-width: 100%; // Override tablet max-width: 600px
+        width: 100%;
+      }
+
+      &__info {
+        width: 100%;
       }
 
       &__image-card {
@@ -2387,108 +2468,254 @@
       }
 
       &__image-wrapper {
-        height: 320px;
+        height: 260px;
+        border-radius: 12px;
       }
 
       &__image {
         :deep(img) {
-          max-height: 320px;
+          max-height: 260px;
+          border-radius: 12px;
+        }
+
+        &--mobile {
+          width: 100%;
+          height: 100%;
+          max-height: 260px;
+          object-fit: contain;
+          border-radius: 12px;
         }
       }
 
       &__badge {
-        padding: 5px 10px;
-        font-size: 10px;
+        padding: 4px 8px;
+        font-size: 9px;
+        border-radius: 6px;
 
         &--promo {
-          top: 12px;
-          left: 12px;
+          top: 8px;
+          left: 8px;
         }
 
         &--ruo {
-          top: 12px;
-          right: 12px;
+          top: 8px;
+          right: 8px;
+          padding: 3px 6px;
+          font-size: 8px;
+        }
+
+        &--ordered {
+          top: 36px;
+          right: 8px;
+          padding: 3px 6px;
+          font-size: 8px;
         }
       }
 
+      &__image-wishlist {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        z-index: 10;
+        width: 40px;
+        height: 40px;
+        background: var(--bg-surface);
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       &__trust-strip {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        display: none; // Masqué sur mobile - info redondante avec garanties
+      }
+
+      &__header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 4px 12px;
+        align-items: start;
+      }
+
+      &__category-tag {
+        grid-column: 2;
+        grid-row: 1;
+        padding: 6px 12px;
+        font-size: 12px;
+        gap: 6px;
+        margin-right: 16px; // Aligné avec le contenu du ContentBlock pricing
       }
 
       &__title {
-        font-size: 28px;
+        grid-column: 1;
+        grid-row: 1;
+        font-size: 24px;
       }
 
       &__subtitle {
+        grid-column: 1 / -1;
+        grid-row: 2;
         font-size: 16px;
       }
 
       &__specs {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 8px;
+        width: 100%;
       }
 
       &__spec {
-        min-width: auto;
-        padding: 10px 14px;
+        flex: 1 1 calc(50% - 4px);
+        min-width: 0;
+        max-width: calc(50% - 4px);
+        padding: 10px 12px;
+        gap: 10px;
+        box-sizing: border-box;
       }
 
-      &__pricing {
-        padding: 20px;
-        border-radius: 16px;
-      }
+      &__spec-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
 
-      &__price-current {
-        font-size: 32px;
-
-        span {
-          font-size: 20px;
+        svg {
+          width: 16px;
+          height: 16px;
         }
       }
 
-      &__actions {
-        flex-direction: column;
-        gap: 10px;
+      &__spec-flag {
+        font-size: 16px;
       }
 
-      &__wishlist-btn {
-        width: 100%;
-        height: 48px;
+      &__spec-label {
+        font-size: 10px;
       }
 
-      &__guarantees {
+      &__spec-value {
+        font-size: 12px;
+      }
+
+      &__pricing {
+        padding: 16px;
+        border-radius: 14px;
+        gap: 12px;
+      }
+
+      &__price-container {
+        gap: 2px;
+      }
+
+      &__price-old {
+        font-size: 14px;
         gap: 8px;
       }
 
+      &__discount-badge {
+        padding: 2px 6px;
+        font-size: 10px;
+      }
+
+      &__price-current {
+        font-size: 28px;
+
+        span {
+          font-size: 16px;
+        }
+      }
+
+      &__price-info {
+        font-size: 11px;
+      }
+
+      &__actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+
+        // Boutons principaux en full width
+        > :deep(button:not(.product__wishlist-btn)) {
+          flex: 1 1 100%;
+        }
+      }
+
+      &__wishlist-btn {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+      }
+
+      &__guarantees {
+        gap: 6px;
+      }
+
       &__guarantee {
-        padding: 12px 14px;
+        padding: 10px 12px;
+        gap: 10px;
       }
 
       &__guarantee-icon {
-        width: 38px;
-        height: 38px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      &__guarantee div:last-child {
+        strong {
+          font-size: 12px;
+        }
+
+        span {
+          font-size: 11px;
+        }
+      }
+
+      // COA preview compact
+      &__coa {
+        padding: 10px 12px;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      &__coa-preview {
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
+      }
+
+      &__coa-badge {
+        padding: 3px 8px;
+
+        span {
+          font-size: 10px;
+        }
+      }
+
+      &__coa-label {
+        font-size: 11px;
       }
 
       &__details {
-        border-radius: 16px;
+        border-radius: 14px;
+        margin-bottom: 20px;
       }
 
       &__details-tabs {
-        flex-direction: column;
-        gap: 2px;
-        padding: 6px;
-      }
-
-      &__tab {
-        justify-content: flex-start;
-        padding: 12px 16px;
+        margin: 0 14px 16px;
         border-radius: 10px;
+        padding: 4px;
       }
 
       &__details-content {
-        padding: 20px 16px;
+        padding: 16px 14px;
       }
 
       &__description {
@@ -2505,17 +2732,47 @@
       }
 
       &__lab-verification {
-        padding: 16px;
+        padding: 12px;
+      }
+
+      &__lab-header {
+        margin-bottom: 8px;
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      &__lab-title {
+        font-size: 13px;
+      }
+
+      &__lab-description {
+        font-size: 12px;
+        margin-bottom: 12px;
       }
 
       &__lab-details {
         flex-direction: column;
-        gap: 12px;
-        padding: 12px;
+        gap: 8px;
+        padding: 10px;
+        margin-bottom: 12px;
       }
 
       &__lab-detail {
         min-width: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      &__lab-detail-label {
+        font-size: 10px;
+      }
+
+      &__lab-detail-value {
+        font-size: 13px;
       }
 
       &__lab-actions {
@@ -2524,19 +2781,129 @@
 
       &__lab-link,
       &__lab-download {
-        padding: 12px 14px;
-        font-size: 12px;
+        padding: 10px 12px;
+        font-size: 11px;
+        border-radius: 6px;
       }
 
       &__disclaimer {
-        padding: 16px;
-        border-radius: 12px;
-        font-size: 13px;
+        padding: 12px;
+        border-radius: 10px;
+        gap: 12px;
+      }
+
+      &__disclaimer-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 8px;
 
         svg {
           width: 18px;
           height: 18px;
         }
+      }
+
+      &__disclaimer-title {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      &__disclaimer-text {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      &__disclaimer-warning {
+        padding: 1px 6px;
+        font-size: 11px;
+      }
+
+      // ========== MOBILE: FilterSections collapsibles ==========
+      &__mobile-section {
+        margin-top: 12px;
+
+        &--danger {
+          :deep(.filter-section__header) {
+            color: var(--danger-600);
+          }
+        }
+      }
+
+      &__mobile-guarantees {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      &__mobile-guarantee {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px;
+        background: var(--bg-subtle);
+        border-radius: 8px;
+
+        svg {
+          flex-shrink: 0;
+          color: var(--success-600);
+        }
+
+        div {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        strong {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        span {
+          font-size: 11px;
+          color: var(--text-muted);
+          line-height: 1.4;
+        }
+      }
+
+      &__mobile-disclaimer {
+        padding: 12px;
+        background: var(--danger-50);
+        border-radius: 8px;
+        border: 1px solid var(--danger-200);
+
+        strong {
+          display: block;
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--danger-700);
+          margin-bottom: 6px;
+        }
+
+        p {
+          font-size: 12px;
+          line-height: 1.5;
+          color: var(--danger-800);
+          margin: 0;
+
+          strong {
+            display: inline;
+            font-size: inherit;
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      &__mobile-disclaimer-warning {
+        display: inline;
+        padding: 1px 6px;
+        background: var(--danger-100);
+        color: var(--danger-700);
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
       }
     }
   });
@@ -2551,40 +2918,63 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px 20px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, rgba(15, 15, 25, 0.98) 0%, rgba(10, 10, 20, 1) 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
+  gap: 12px;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
 
-  &__price {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+:global(.product-sticky-cta__price) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-decoration: none;
+}
 
-  &__price-old {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-decoration: line-through;
-  }
+:global(.product-sticky-cta__price-old) {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
 
-  &__price-current {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text-primary);
+:global(.product-sticky-cta__price-current) {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-600);
+  text-decoration: none;
+}
 
-    &--sale {
-      color: var(--danger-500);
-    }
-  }
+:global(.product-sticky-cta__price-current--sale) {
+  color: var(--danger-500);
+}
 
-  &__btn {
-    flex: 1;
-    max-width: 200px;
-  }
+:global(.product-sticky-cta__pack-info) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+:global(.product-sticky-cta__discount) {
+  padding: 2px 6px;
+  background: var(--success-100);
+  color: var(--success-700);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+:global(.product-sticky-cta__btn) {
+  flex: 1;
+  max-width: none;
+  text-decoration: none;
 }
 
 // Animation slide-up

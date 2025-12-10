@@ -62,8 +62,11 @@
       <!-- Name -->
       <h3 class="product-card__name">{{ productName }}</h3>
 
-      <!-- Specs Row -->
-      <div class="product-card__specs">
+      <!-- Specs Row (desktop only) -->
+      <div
+        v-if="!isMobile"
+        class="product-card__specs"
+      >
         <span class="product-card__spec product-card__spec--highlight">
           <BasicIconNext
             name="FlaskConical"
@@ -104,7 +107,21 @@
 
       <!-- Actions -->
       <div class="product-card__actions">
+        <!-- Mobile: icon button -->
+        <button
+          v-if="isMobile"
+          class="product-card__icon-btn"
+          :disabled="(product.stock ?? 0) <= 0"
+          @click.stop="$emit('add', product)"
+        >
+          <BasicIconNext
+            name="ShoppingCart"
+            :size="20"
+          />
+        </button>
+        <!-- Desktop: full button -->
         <PremiumButton
+          v-else
           type="primary"
           variant="solid"
           size="sm"
@@ -114,8 +131,9 @@
           class="product-card__btn"
           @click.stop="$emit('add', product)"
         />
+        <!-- Buy now (desktop only) -->
         <PremiumButton
-          v-if="(product.stock ?? 0) > 0"
+          v-if="!isMobile && (product.stock ?? 0) > 0"
           type="secondary"
           variant="outline"
           size="sm"
@@ -131,6 +149,7 @@
 
 <script setup lang="ts">
   import { useTranslatedProduct } from '@/composables/useTranslated'
+  import { useDeviceBreakpoint } from '@/plugin/device-breakpoint/DeviceBreakpoint.types'
   import type { Products } from '@/supabase/types/supabase.types'
   import { computed, toRef } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -138,6 +157,7 @@
   import { useWishlistStore } from '../stores/useWishlistStore'
 
   const { t } = useI18n()
+  const { isMobile } = useDeviceBreakpoint()
   const wishlistStore = useWishlistStore()
 
   const props = defineProps<{
@@ -204,8 +224,16 @@
   @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
 
   // ============ VARIABLES ============
-  @font-display: 'Instrument Sans', 'SF Pro Display', -apple-system, sans-serif;
-  @font-body: 'Inter', 'SF Pro Text', -apple-system, sans-serif;
+  @font-display:
+    'Instrument Sans',
+    'SF Pro Display',
+    -apple-system,
+    sans-serif;
+  @font-body:
+    'Inter',
+    'SF Pro Text',
+    -apple-system,
+    sans-serif;
   @ease: cubic-bezier(0.4, 0, 0.2, 1);
   @radius-card: 16px;
   @radius-sm: 8px;
@@ -215,11 +243,18 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--bg-surface);
+    background:
+      linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
+      linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.015) 0%, transparent 40%),
+      var(--surface-1);
     border: 1px solid var(--border-default);
     border-radius: @radius-card;
     overflow: hidden;
     cursor: pointer;
+
+    .respond-mobile({
+      border-radius: 12px;
+    });
     transition:
       border-color 0.2s @ease,
       box-shadow 0.2s @ease;
@@ -250,6 +285,14 @@
       font-weight: 700;
       color: @white;
       box-shadow: 0 2px 8px rgba(var(--danger-500-rgb), 0.4);
+
+      .respond-mobile({
+        top: 8px;
+        left: 8px;
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 4px;
+      });
     }
 
     // ============ STOCK BADGE ============
@@ -275,17 +318,29 @@
         background: @warning-500;
         color: @white;
       }
+
+      .respond-mobile({
+        top: 8px;
+        left: 8px;
+        padding: 3px 6px;
+        font-size: 8px;
+        border-radius: 4px;
+      });
     }
 
     // Si promo présente, décaler le stock badge
     &__promo + &__stock-badge {
       top: 46px;
+
+      .respond-mobile({
+        top: 34px;
+      });
     }
 
     // ============ IMAGE SECTION ============
     &__image {
       position: relative;
-      background: var(--card-bg-subtle);
+      background: var(--bg-subtle);
       padding: 20px;
 
       .respond-tablet({
@@ -293,7 +348,7 @@
       });
 
       .respond-mobile({
-        padding: 12px;
+        padding: 0;
       });
     }
 
@@ -310,8 +365,8 @@
         transition: transform 0.3s @ease;
 
         .respond-mobile({
-          max-width: 85%;
-          max-height: 85%;
+          max-width: 90%;
+          max-height: 90%;
         });
       }
     }
@@ -337,9 +392,9 @@
       text-transform: uppercase;
       letter-spacing: 0.4px;
 
+      // Mobile: masquer pour éviter chevauchement avec badge promo
       .respond-mobile({
-        padding: 4px 8px;
-        font-size: 8px;
+        display: none;
       });
     }
 
@@ -375,11 +430,13 @@
       transform: translateY(0);
     }
 
-    // Mobile: toujours visible
+    // Mobile: toujours visible, bord droit aligné avec la card
     .respond-mobile({
       &__wishlist {
         opacity: 1;
-        transform: translateY(0);
+        transform: none;
+        bottom: -16px;
+        right: 0;
       }
     });
 
@@ -396,8 +453,8 @@
       });
 
       .respond-mobile({
-        padding: 12px;
-        gap: 8px;
+        padding: 6px 10px 8px;
+        gap: 2px;
       });
     }
 
@@ -416,8 +473,11 @@
       min-height: 2.7em; // 2 lignes minimum pour alignement
 
       .respond-mobile({
-        font-size: 14px;
-        min-height: 2.7em;
+        font-size: 15px;
+        -webkit-line-clamp: 1;
+        min-height: unset;
+        padding-left: 4px;
+        margin-bottom: 4px;
       });
     }
 
@@ -521,6 +581,30 @@
 
     &__btn {
       flex: 1;
+    }
+
+    &__icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 36px;
+      background: var(--primary-500);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: scale(0.95);
+        background: var(--primary-600);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
     // ============ LIST MODE ============

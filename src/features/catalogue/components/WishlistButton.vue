@@ -62,10 +62,10 @@ function handleClick(event: Event): void {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 
-  // Mobile: Taille touch-friendly (≤ 720px)
+  // Mobile: Taille compacte mais cliquable (≤ 720px)
   .respond-mobile({
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
   });
 
   .wishlist-icon {

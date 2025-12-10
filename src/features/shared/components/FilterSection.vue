@@ -60,12 +60,15 @@
     position: relative;
     border-radius: 14px;
 
-    // Utilise les variables sémantiques pour light/dark
-    background: rgba(var(--bg-surface-rgb), 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    // Light mode
+    background: @neutral-200;
     border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
+
+    // Dark mode - même fond que les ProductCards
+    html[data-theme='dark'] & {
+      background: var(--surface-1);
+    }
 
     overflow: hidden;
     transition: all 0.25s ease;

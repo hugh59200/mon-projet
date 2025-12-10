@@ -267,16 +267,13 @@ const containerStyle = computed(() => {
     --content-block-border: var(--border-default);
     --content-block-bg-subtle: var(--bg-subtle);
 
-    // Card - Standard avec gradient subtil
+    // Card - Standard
     &.content-block--card {
-      background:
-        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.02) 0%, transparent 50%),
-        linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.015) 0%, transparent 40%),
-        var(--surface-1);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.08);
+      background: @neutral-300;
+      border: 1px solid var(--border-default);
       box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.03),
-        0 4px 20px rgba(var(--primary-500-rgb), 0.04);
+        0 4px 20px rgba(0, 0, 0, 0.04);
 
       // Background levels
       &.content-block--bg-elevated {

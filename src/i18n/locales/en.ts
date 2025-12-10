@@ -32,6 +32,7 @@ export default {
     learnMore: 'Learn more',
     viewAll: 'View all',
     showMore: 'Show more',
+    loadMore: 'Load more',
     showLess: 'Show less',
     comingSoon: 'Coming soon',
     select: 'Select...',

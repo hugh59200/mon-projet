@@ -399,7 +399,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      color: var(--text-primary);
+      color: @neutral-50;
     }
 
     &__eyebrow {
@@ -422,7 +422,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      color: var(--text-secondary);
+      color: @neutral-300;
 
       li {
         display: flex;
@@ -444,7 +444,7 @@
       font-size: 0.75rem;
       text-align: center;
       opacity: 0.7;
-      color: var(--text-muted);
+      color: @neutral-500;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -492,18 +492,18 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.02em;
-        color: var(--text-secondary);
+        color: @neutral-300;
       }
 
       &__info {
         display: flex;
         flex-direction: column;
         gap: 2px;
-        color: var(--text-primary);
+        color: @neutral-50;
       }
 
       &__role {
-        color: var(--text-muted);
+        color: @neutral-500;
       }
     }
 
@@ -530,15 +530,15 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      color: var(--text-primary);
+      color: @neutral-50;
     }
 
     &__bottom-subtitle {
-      color: var(--text-muted);
+      color: @neutral-500;
     }
 
     &__top-sub {
-      color: var(--text-secondary);
+      color: @neutral-300;
     }
 
     .scroll-track {
@@ -556,7 +556,7 @@
         cursor: pointer;
         width: 100px;
         flex-shrink: 0;
-        color: var(--text-secondary);
+        color: @neutral-300;
 
         &__img-wrapper {
           width: 72px;

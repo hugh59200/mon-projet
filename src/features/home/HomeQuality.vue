@@ -429,14 +429,14 @@
     &__badge {
       display: inline-block;
       padding: 6px 14px;
-      background: rgba(var(--success-500-rgb), 0.15);
+      background: rgba(@success-500, 0.15);
       border-radius: 100px;
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: var(--success-500);
+      color: @success-500;
       width: fit-content;
     }
 
@@ -444,12 +444,12 @@
       font-family: @font-display;
       font-size: clamp(36px, 4vw, 52px);
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
       margin: 0;
       line-height: 1.1;
       letter-spacing: -0.02em;
       span {
-        background: linear-gradient(135deg, var(--success-500) 0%, var(--primary-400) 100%);
+        background: linear-gradient(135deg, @success-500 0%, var(--primary-400) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -459,7 +459,7 @@
       font-family: @font-body;
       font-size: 17px;
       line-height: 1.7;
-      color: var(--text-secondary);
+      color: @neutral-300;
       margin: 0;
     }
     &__features {
@@ -474,20 +474,20 @@
       gap: 16px;
       align-items: flex-start;
       &--success .quality__feature-icon {
-        background: rgba(var(--success-500-rgb), 0.15);
-        color: var(--success-500);
+        background: rgba(@success-500, 0.15);
+        color: @success-500;
       }
       &--primary .quality__feature-icon {
         background: rgba(var(--primary-500-rgb), 0.15);
         color: var(--primary-400);
       }
       &--warning .quality__feature-icon {
-        background: rgba(var(--warning-500-rgb), 0.15);
-        color: var(--warning-500);
+        background: rgba(@warning-500, 0.15);
+        color: @warning-500;
       }
       &--info .quality__feature-icon {
-        background: rgba(var(--info-500-rgb), 0.15);
-        color: var(--info-500);
+        background: rgba(@info-500, 0.15);
+        color: @info-500;
       }
 
       &-icon {
@@ -509,13 +509,13 @@
           font-family: @font-display;
           font-size: 16px;
           font-weight: 600;
-          color: var(--text-primary);
+          color: @neutral-50;
           margin: 0 0 4px;
         }
         p {
           font-family: @font-body;
           font-size: 14px;
-          color: var(--text-muted);
+          color: @neutral-500;
           margin: 0;
           line-height: 1.5;
         }
@@ -586,21 +586,21 @@
 
     &__badge {
       padding: 2px 6px;
-      background: rgba(var(--success-500-rgb), 0.2);
+      background: rgba(@success-500, 0.2);
       border-radius: 4px;
       font-family: @font-body;
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--success-500);
+      color: @success-500;
     }
 
     &__title {
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: @neutral-50;
     }
 
     &__body {
@@ -617,22 +617,22 @@
       font-size: 11px;
 
       span:first-child {
-        color: var(--text-muted);
+        color: @neutral-500;
       }
 
       span:last-child {
-        color: var(--text-primary);
+        color: @neutral-50;
         font-weight: 500;
       }
 
       &--highlight {
         padding: 8px;
         margin: 2px -6px;
-        background: rgba(var(--success-500-rgb), 0.1);
+        background: rgba(@success-500, 0.1);
         border-radius: 6px;
 
         span:last-child {
-          color: var(--success-500);
+          color: @success-500;
           font-weight: 700;
           font-size: 12px;
         }
@@ -646,13 +646,13 @@
       gap: 5px;
       width: 100%;
       padding: 8px 12px;
-      background: rgba(var(--success-500-rgb), 0.08);
+      background: rgba(@success-500, 0.08);
       border: none;
       border-top: 1px solid var(--border-default);
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;
-      color: var(--success-500);
+      color: @success-500;
       cursor: pointer;
       transition: background 0.2s @ease;
 
@@ -662,7 +662,7 @@
       }
 
       &:hover {
-        background: rgba(var(--success-500-rgb), 0.15);
+        background: rgba(@success-500, 0.15);
       }
     }
   }

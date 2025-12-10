@@ -17,13 +17,11 @@
           <BasicText
             size="body-l"
             weight="bold"
-            color="secondary-900"
           >
             Conservation
           </BasicText>
           <BasicText
             size="body-s"
-            color="neutral-600"
             class="info-card__text"
           >
             <strong>Lyophilisé (Poudre) :</strong>
@@ -43,13 +41,11 @@
           <BasicText
             size="body-l"
             weight="bold"
-            color="secondary-900"
           >
             Reconstitution
           </BasicText>
           <BasicText
             size="body-s"
-            color="neutral-600"
             class="info-card__text"
           >
             Il est recommandé d'utiliser de l'
@@ -68,13 +64,11 @@
           <BasicText
             size="body-l"
             weight="bold"
-            color="secondary-900"
           >
             Usage Recherche
           </BasicText>
           <BasicText
             size="body-s"
-            color="neutral-600"
             class="info-card__text"
           >
             Utilisez toujours du matériel stérile (seringues, tampons d'alcool). Ce produit est
@@ -99,7 +93,7 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 1.1rem !important;
-      color: var(--secondary-900);
+      color: var(--text-primary); // Adapté dark/light mode
       display: flex;
       align-items: center;
       height: 24px;
@@ -113,8 +107,8 @@
   }
 
   .info-card {
-    background: white;
-    border: 1px solid @neutral-200;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -126,8 +120,7 @@
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      /* ✅ CORRECTION ICI : On utilise rgba() avec la variable CSS -rgb */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-color: rgba(var(--primary-500-rgb), 0.3);
     }
 
@@ -160,7 +153,7 @@
       line-height: 1.5;
 
       strong {
-        color: var(--secondary-900);
+        color: var(--text-primary);
         font-weight: 600;
       }
     }
