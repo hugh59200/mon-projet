@@ -3,12 +3,21 @@
   <section class="hero">
     <!-- Fond absolu (pleine largeur) -->
     <div class="hero__bg">
+      <!-- Background image mobile -->
+      <div
+        v-if="isMobile"
+        class="hero__bg-image"
+        :style="{ backgroundImage: `url(${peptidesHeroMobileImage})` }"
+      ></div>
       <div class="hero__bg-overlay"></div>
       <div class="hero__bg-grid"></div>
     </div>
 
-    <!-- Niveau 2 : Wrapper image max-width 1200px -->
-    <div class="hero__image-wrapper">
+    <!-- Niveau 2 : Wrapper image max-width 1200px (desktop only) -->
+    <div
+      v-if="!isMobile"
+      class="hero__image-wrapper"
+    >
       <img
         :src="heroImage"
         alt="Fioles de peptides Fast Peptides"
@@ -18,7 +27,7 @@
 
     <!-- Niveau 3 : Wrapper flex pour les éléments -->
     <div class="hero__content">
-      <!-- Header : titre à gauche, badge à droite -->
+      <!-- Header : titre à gauche, badge à droite (desktop) -->
       <div class="hero__header">
         <h1 class="hero__title">
           <span>{{ t('home.hero.title.line1') }}</span>
@@ -26,22 +35,21 @@
           <span v-if="!isMobile">{{ t('home.hero.title.line2') }}</span>
         </h1>
 
-        <div class="hero__badge">
+        <!-- Badge desktop uniquement -->
+        <div
+          v-if="!isMobile"
+          class="hero__badge"
+        >
           <span class="hero__badge-dot"></span>
           <span>{{ t('home.hero.badge.certified') }}</span>
-          <span
-            v-if="!isMobile"
-            class="hero__badge-sep"
-          >
-            •
-          </span>
-          <span v-if="!isMobile">{{ t('home.hero.badge.researchOnly') }}</span>
+          <span class="hero__badge-sep">•</span>
+          <span>{{ t('home.hero.badge.researchOnly') }}</span>
         </div>
       </div>
 
       <!-- Actions et trust -->
       <div class="hero__footer">
-        <!-- Mobile : bouton + badges sur une ligne -->
+        <!-- Mobile : bouton + badge en dessous -->
         <div
           v-if="isMobile"
           class="hero__bottom-row"
@@ -54,25 +62,9 @@
             icon-right="ArrowRight"
             @click="$router.push('/catalogue')"
           />
-          <div class="hero__trust-mobile">
-            <div class="hero__trust-mobile-item">
-              <BasicIconNext
-                name="ShieldCheck"
-                :size="16"
-              />
-            </div>
-            <div class="hero__trust-mobile-item">
-              <BasicIconNext
-                name="FileText"
-                :size="16"
-              />
-            </div>
-            <div class="hero__trust-mobile-item">
-              <BasicIconNext
-                name="Zap"
-                :size="16"
-              />
-            </div>
+          <div class="hero__badge hero__badge--mobile">
+            <span class="hero__badge-dot"></span>
+            <span>{{ t('home.hero.badge.certified') }}</span>
           </div>
         </div>
 
@@ -340,30 +332,13 @@
     // Mobile : bouton + badges sur une ligne
     &__bottom-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
       width: 100%;
-      gap: 16px;
-    }
+      gap: 12px;
 
-    // Trust badges mobile (icônes seules)
-    &__trust-mobile {
-      display: flex;
-      gap: 8px;
-
-      &-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        background: rgba(@success-500, 0.15);
-        border: 1px solid rgba(@success-500, 0.3);
-        border-radius: 8px;
-
-        svg {
-          color: @success-400;
-        }
+      .hero__badge--mobile {
+        align-self: flex-end;
       }
     }
   }
@@ -404,8 +379,12 @@
     .hero {
       min-height: 480px;
 
-      &__image {
-        object-position: center center;
+      &__bg-image {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
 
       &__bg-overlay {
@@ -426,6 +405,7 @@
       &__content {
         min-height: 480px;
         padding: 20px;
+        padding-top: 40px; // Descend le texte
       }
 
       &__footer {
@@ -435,6 +415,10 @@
       &__title {
         font-size: 28px;
         text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+
+        &-accent {
+          font-size: 32px; // Légèrement plus gros que le reste
+        }
       }
 
       &__badge {
