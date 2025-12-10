@@ -257,7 +257,7 @@
       padding-bottom: 8px;
 
       &:hover {
-        background: var(--admin-bg-card-hover);
+        background: rgba(var(--primary-500-rgb), 0.08);
       }
     }
 
@@ -275,8 +275,8 @@
       height: 60px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--admin-border-subtle);
-      background: var(--admin-bg-surface);
+      border: 1px solid var(--content-block-border);
+      background: var(--content-block-bg-subtle);
       flex-shrink: 0;
     }
 
@@ -296,20 +296,20 @@
     &__name {
       font-size: 15px;
       font-weight: 600;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
     }
 
     &__dosage {
       font-size: 13px;
       font-weight: 400;
-      color: var(--admin-text-secondary);
+      color: var(--content-block-text-secondary);
     }
 
     &__badge-promo {
       margin-top: 8px;
       width: fit-content;
       background-color: var(--danger-600);
-      color: var(--admin-text-inverse);
+      color: @white;
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
@@ -326,7 +326,7 @@
 
       .price-old {
         font-size: 12px;
-        color: var(--admin-text-muted);
+        color: var(--content-block-text-muted);
         text-decoration: line-through;
       }
 

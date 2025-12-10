@@ -35,7 +35,7 @@
       <template v-if="isDesktop || isTablet">
         <div class="cardLayoutWrapper cardLayoutWrapper--header admin-glossary__header">
           <BasicCell
-            :span="14"
+            :span="12"
             text="Terme"
             :is-active="sortKey === 'term'"
             :icon-color="getSortColor('term')"
@@ -43,7 +43,7 @@
             :on-icon-click="() => toggleSort('term')"
           />
           <BasicCell
-            :span="8"
+            :span="6"
             text="Status"
             :is-active="sortKey === 'status'"
             :icon-color="getSortColor('status')"
@@ -74,7 +74,7 @@
             @click="openTermModal(term.id)"
           >
             <BasicCell
-              :span="14"
+              :span="12"
               class="admin-glossary__info"
             >
               <div class="admin-glossary__icon">
@@ -89,7 +89,7 @@
                 class="admin-glossary__title"
               />
             </BasicCell>
-            <BasicCell :span="8">
+            <BasicCell :span="6">
               <span
                 :class="[
                   'admin-glossary__status',
@@ -251,7 +251,7 @@ function openTermModal(id: string) {
     cursor: pointer;
 
     &:hover {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
   }
 

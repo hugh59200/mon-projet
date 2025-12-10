@@ -72,10 +72,9 @@
 
 <style scoped lang="less">
   .mobile-card {
-    background: var(--admin-bg-card);
+    background: var(--content-block-bg-subtle);
     border-radius: 10px;
     padding: 14px;
-    box-shadow: 0 1px 3px var(--admin-shadow);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -85,11 +84,10 @@
       transform 0.2s ease;
 
     &:hover {
-      background: var(--admin-bg-card);
       border-color: var(--primary-300);
     }
     &:active {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
   }
 
@@ -105,8 +103,8 @@
     height: 56px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid var(--admin-border-subtle);
-    background: var(--admin-bg-subtle);
+    border: 1px solid var(--content-block-border);
+    background: var(--content-block-bg-subtle);
     flex-shrink: 0;
   }
 
@@ -134,7 +132,7 @@
   }
 
   .theme {
-    color: var(--admin-text-secondary);
+    color: var(--content-block-text-secondary);
   }
 
   .date {

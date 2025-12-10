@@ -238,11 +238,29 @@
 </script>
 
 <style scoped lang="less">
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
   .admin-users {
     &__filters {
       display: flex;
       gap: 8px;
       margin-left: 16px;
+
+      .respond-tablet({
+        margin-left: 0;
+        gap: 6px;
+      });
+
+      .respond-mobile({
+        margin-left: 0;
+        gap: 4px;
+        flex-wrap: nowrap;
+
+        :deep(.PremiumButton) {
+          padding: 6px 10px;
+          font-size: 12px;
+          flex-shrink: 0;
+        }
+      });
     }
 
     &__item {
@@ -250,7 +268,7 @@
       transition: background-color 0.15s ease;
 
       &:hover {
-        background: var(--admin-bg-card-hover, var(--primary-0));
+        background: rgba(var(--primary-500-rgb), 0.08);
       }
     }
 

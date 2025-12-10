@@ -103,30 +103,28 @@
   .mobile-card {
     padding: 16px;
     border-radius: 12px;
-    background: var(--admin-bg-surface);
+    background: var(--content-block-bg-subtle);
     display: flex;
     flex-direction: column;
     gap: 12px;
-    box-shadow: 0 2px 8px var(--admin-shadow);
-    border: 1px solid var(--admin-border-subtle);
+    border: 1px solid var(--content-block-border);
     transition:
       background 0.2s ease,
       transform 0.2s ease;
     cursor: pointer;
 
     &:hover {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
       border-color: var(--primary-300);
-      box-shadow: 0 4px 12px var(--admin-shadow-hover);
     }
 
     &:active {
-      background: var(--admin-bg-card);
+      background: var(--content-block-bg-subtle);
     }
 
     &--pending {
       border-left: 3px solid var(--warning-500);
-      background: linear-gradient(90deg, var(--warning-50) 0%, var(--admin-bg-surface) 20%);
+      background: linear-gradient(90deg, var(--warning-50) 0%, transparent 20%);
     }
   }
 
@@ -193,7 +191,7 @@
   .separator {
     width: 1px;
     height: 16px;
-    background: var(--admin-border);
+    background: var(--content-block-border);
   }
 
   .validate-btn-mobile {
@@ -211,7 +209,7 @@
 
     &:hover {
       background: var(--success-500);
-      color: var(--admin-text-inverse);
+      color: @white;
     }
 
     &:active {

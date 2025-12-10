@@ -1,29 +1,23 @@
 <template>
   <div
-    class="tabs-wrapper"
-    v-responsive-animate.fade.once
+    class="tabs"
+    :class="[`tabs--${tabsPlacement}`, { 'tabs--mobile': isMobile }]"
+    ref="tabsContainer"
+    v-responsive-animate.slide.once
   >
-    <Transition name="fade">
-      <div
-        class="tabs"
-        :class="[`tabs--${tabsPlacement}`, { 'tabs--mobile': isMobile }]"
-        ref="tabsContainer"
-        v-responsive-animate.slide.once
-      >
-        <BasicTab
-          v-for="tab in tabs"
-          :key="tab.routeName"
-          v-model="modelValue"
-          :tabKey="tab.tabKey"
-          :routeName="tab.routeName"
-          :color="tab.color"
-          class="tabs__item"
-          v-responsive-animate.fade.stagger="{ delay: 60, speed: 400 }"
-        >
-          <template #tab-text>{{ tab.tabKey }}</template>
-        </BasicTab>
-      </div>
-    </Transition>
+    <BasicTab
+      v-for="tab in tabs"
+      :key="tab.routeName"
+      v-model="modelValue"
+      :tabKey="tab.tabKey"
+      :routeName="tab.routeName"
+      :color="tab.color"
+      :icon="tab.icon"
+      class="tabs__item"
+      v-responsive-animate.fade.stagger="{ delay: 60, speed: 400 }"
+    >
+      <template #tab-text>{{ tab.tabKey }}</template>
+    </BasicTab>
   </div>
 </template>
 
@@ -62,58 +56,34 @@
 </script>
 
 <style lang="less">
-  .tabs-wrapper {
-    position: relative;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    display: flex;
-    white-space: nowrap;
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, @neutral-700 30%, transparent) transparent;
-
-    &::-webkit-scrollbar {
-      height: 6px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: color-mix(in srgb, @neutral-700 30%, transparent);
-      border-radius: 3px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-  }
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
 
   .tabs {
     display: flex;
     position: relative;
     gap: 8px;
-    padding-bottom: 6px;
     justify-content: center;
     transition: all 0.25s ease;
+    white-space: nowrap;
 
     &--start {
       justify-content: flex-start;
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // 📱 MOBILE - Style Premium
+    // ══════════════════════════════════════════════════════════════
     &--mobile {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 2px 6px color-mix(in srgb, @neutral-800 12%, transparent);
-      margin: 0 auto;
-
-      .tab {
-        display: none;
-
-        &--selected {
-          display: flex;
-        }
-      }
-
-      .tab--selected:active .tab__icon {
-        opacity: 0.7;
-      }
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 2px;
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--secondary-800) 85%, transparent) 0%,
+        color-mix(in srgb, var(--secondary-900) 90%, transparent) 100%
+      );
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
   }
 </style>

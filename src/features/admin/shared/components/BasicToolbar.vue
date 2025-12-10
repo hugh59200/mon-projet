@@ -9,12 +9,15 @@
         size="small"
         class="admin-toolbar__search"
       />
-      <slot name="filters" />
+      <div class="admin-toolbar__filters">
+        <slot name="filters" />
+      </div>
       <PremiumButton
         v-if="showReset"
         label="Réinitialiser"
         variant="outline"
         size="sm"
+        class="admin-toolbar__reset"
         @click="emit('reset')"
       />
       <slot name="actions" />
@@ -41,12 +44,16 @@
 </script>
 
 <style scoped lang="less">
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+
   .admin-toolbar {
-    background: var(--admin-bg-card);
-    border: 1px solid var(--admin-border-subtle);
+    background: var(--content-block-bg-subtle);
+    border: 1px solid var(--content-block-border);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 16px;
+    max-width: 100%;
+    overflow: visible;
 
     &__row {
       display: flex;
@@ -59,6 +66,13 @@
       flex: 0 1 280px;
       min-width: 180px;
       max-width: 320px;
+    }
+
+    &__filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     &__pagination {
@@ -78,6 +92,10 @@
         min-width: 160px;
       }
 
+      &__filters {
+        gap: 6px;
+      }
+
       &__pagination {
         margin-left: auto;
         flex-shrink: 0;
@@ -86,13 +104,14 @@
 
     // Mobile (≤ 720px)
     .respond-mobile({
-      padding: 10px 12px;
+      padding: 12px;
       border-radius: 12px;
 
       &__row {
-        gap: 8px;
+        gap: 10px;
       }
 
+      // Recherche en premier, pleine largeur
       &__search {
         min-width: 100%;
         max-width: none;
@@ -100,6 +119,38 @@
         order: -1;
       }
 
+      // Filtres : pleine largeur, scroll horizontal si nécessaire
+      &__filters {
+        width: 100%;
+        order: 0;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 4px 0;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        // Styles pour les boutons enfants
+        :deep(.PremiumButton),
+        :deep(button) {
+          flex-shrink: 0;
+          font-size: 12px;
+          padding: 6px 10px;
+          white-space: nowrap;
+        }
+      }
+
+      // Bouton reset
+      &__reset {
+        order: 1;
+        flex-shrink: 0;
+      }
+
+      // Pagination en dernier, centrée
       &__pagination {
         margin-left: 0;
         width: 100%;
@@ -108,7 +159,7 @@
         order: 20;
       }
 
-      // Réduire taille boutons sur mobile
+      // Réduire taille boutons généraux sur mobile
       :deep(.PremiumButton) {
         font-size: 13px;
         padding: 8px 12px;

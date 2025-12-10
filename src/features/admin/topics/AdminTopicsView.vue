@@ -207,7 +207,7 @@
       cursor: pointer;
 
       &:hover {
-        background: var(--admin-bg-card-hover);
+        background: rgba(var(--primary-500-rgb), 0.08);
       }
     }
 
@@ -226,8 +226,8 @@
       height: 48px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--admin-border-subtle);
-      background: var(--admin-bg-subtle);
+      border: 1px solid var(--content-block-border);
+      background: var(--content-block-bg-subtle);
     }
   }
 </style>

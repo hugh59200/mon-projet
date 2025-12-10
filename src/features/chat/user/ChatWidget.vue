@@ -82,14 +82,25 @@
             </div>
           </div>
 
-          <PremiumButton
-            type="secondary"
-            variant="ghost"
-            size="sm"
-            icon-left="Minus"
-            class="chat-widget__header-close"
-            @click="toggleChat"
-          />
+          <div class="chat-widget__header-right">
+            <div
+              v-if="userAvatar"
+              class="chat-widget__header-user-avatar"
+            >
+              <img
+                :src="userAvatar"
+                alt="Mon avatar"
+              />
+            </div>
+            <PremiumButton
+              type="secondary"
+              variant="ghost"
+              size="sm"
+              icon-left="Minus"
+              class="chat-widget__header-close"
+              @click="toggleChat"
+            />
+          </div>
         </header>
 
         <!-- Zone de chat -->
@@ -118,7 +129,8 @@
   import { useChat } from '@/features/chat/shared/composables/useChat'
   import { useChatNotifStore } from '@/features/chat/shared/stores/useChatNotifStore'
   import { useChatWidgetStore } from './useChatWidgetStore'
-  import { getSupportProfile, getAvatarDisplayUrl } from '@/api/supabase/profiles'
+  import { getSupportProfile, getAvatarDisplayUrl, getProfile } from '@/api/supabase/profiles'
+  import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 
   const { isMobile } = useDeviceBreakpoint()
   const chatHeight = computed(() => (isMobile.value ? undefined : 400))
@@ -126,16 +138,27 @@
   const chatNotif = useChatNotifStore()
   const chatStore = useChatWidgetStore()
   const userChat = useChat('user')
+  const auth = useAuthStore()
 
   const { sendMessage, sendTyping, userId, messages, newMessage, isTyping, isReady } = userChat
 
   // Avatar du support
   const supportAvatar = ref<string | null>(null)
+  // Avatar de l'utilisateur
+  const userAvatar = ref<string | null>(null)
 
   async function loadSupportAvatar() {
     const profile = await getSupportProfile()
     if (profile?.avatar_url) {
       supportAvatar.value = getAvatarDisplayUrl(profile.avatar_url)
+    }
+  }
+
+  async function loadUserAvatar() {
+    if (!auth.user?.id) return
+    const profile = await getProfile(auth.user.id)
+    if (profile?.avatar_url) {
+      userAvatar.value = getAvatarDisplayUrl(profile.avatar_url)
     }
   }
 
@@ -169,6 +192,7 @@
     chatNotif.listenRealtime()
     await chatNotif.fetchUnreadByUser()
     await loadSupportAvatar()
+    await loadUserAvatar()
     window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
@@ -390,6 +414,26 @@
 
       &:hover {
         background: color-mix(in srgb, white 20%, transparent);
+      }
+    }
+
+    &__header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    &__header-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid color-mix(in srgb, white 30%, transparent);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
   }

@@ -377,7 +377,7 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: 24px;
-    border-bottom: 1px solid var(--admin-border-subtle);
+    border-bottom: 1px solid var(--content-block-border);
 
     &:last-child {
       border-bottom: none;
@@ -385,7 +385,7 @@
     }
 
     &--stats {
-      background: var(--admin-bg-subtle);
+      background: var(--content-block-bg-subtle);
       padding: 16px;
       border-radius: 12px;
       border-bottom: none;
@@ -425,17 +425,17 @@
     justify-content: center;
     gap: 8px;
     padding: 14px 16px;
-    background: var(--admin-bg-subtle);
+    background: var(--content-block-bg-subtle);
     border: 2px solid transparent;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 14px;
     font-weight: 500;
-    color: var(--admin-text-secondary);
+    color: var(--content-block-text-secondary);
 
     &:hover {
-      background: var(--admin-bg-card);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
 
     &--active {
@@ -451,7 +451,7 @@
 
   .form-hint {
     font-size: 12px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     margin: 0;
     font-style: italic;
   }
@@ -471,11 +471,11 @@
   .stat-value {
     font-size: 18px;
     font-weight: 600;
-    color: var(--admin-text-primary);
+    color: var(--content-block-text);
   }
 
   .stat-label {
     font-size: 12px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
   }
 </style>

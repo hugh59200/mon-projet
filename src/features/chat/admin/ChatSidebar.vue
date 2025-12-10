@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-  import { getAvatarPublicUrl, getProfile } from '@/api'
+  import { getAvatarDisplayUrl, getProfile } from '@/api'
   import { useAuthStore } from '@/features/auth/stores/useAuthStore'
   import type { ConversationOverview } from '@/supabase/types/supabase.types'
   import { computed, onMounted, ref } from 'vue'
@@ -108,7 +108,7 @@
     const profile = await getProfile(auth.user.id)
 
     if (profile?.avatar_url) {
-      avatarUrl.value = getAvatarPublicUrl(profile.avatar_url)
+      avatarUrl.value = getAvatarDisplayUrl(profile.avatar_url)
     }
   })
 </script>

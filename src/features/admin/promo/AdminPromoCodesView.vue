@@ -351,7 +351,7 @@
   }
 
   .admin-promo__header {
-    background: var(--admin-bg-subtle);
+    background: var(--content-block-bg-subtle);
     border-radius: 8px;
     padding: 12px 16px;
   }
@@ -366,15 +366,15 @@
   }
 
   .admin-promo__item {
-    background: var(--admin-bg-surface);
-    border: 1px solid var(--admin-border-subtle);
+    background: transparent;
+    border: 1px solid var(--content-block-border);
     border-radius: 10px;
     padding: 16px;
     transition: all 0.2s ease;
 
     &:hover {
       border-color: var(--primary-200);
-      box-shadow: 0 4px 12px var(--admin-shadow);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
   }
 
@@ -401,7 +401,7 @@
 
   .admin-promo__description {
     font-size: 12px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -417,7 +417,7 @@
   .admin-promo__min {
     display: block;
     font-size: 11px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     margin-top: 2px;
   }
 
@@ -426,16 +426,16 @@
     align-items: baseline;
     gap: 4px;
     font-size: 14px;
-    color: var(--admin-text-primary);
+    color: var(--content-block-text);
   }
 
   .admin-promo__usage-max {
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     font-size: 12px;
   }
 
   .admin-promo__usage-unlimited {
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     font-size: 11px;
     font-style: italic;
   }
@@ -448,12 +448,12 @@
 
   .admin-promo__date {
     font-size: 13px;
-    color: var(--admin-text-secondary);
+    color: var(--content-block-text-secondary);
   }
 
   .admin-promo__permanent {
     font-size: 12px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
     font-style: italic;
   }
 
@@ -465,15 +465,15 @@
 
   // Mobile styles
   .admin-promo__mobile-card {
-    background: var(--admin-bg-surface);
-    border: 1px solid var(--admin-border-subtle);
+    background: transparent;
+    border: 1px solid var(--content-block-border);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 12px;
     cursor: pointer;
 
     &:active {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
   }
 
@@ -506,13 +506,13 @@
 
   .admin-promo__mobile-label {
     font-size: 13px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
   }
 
   .admin-promo__mobile-value {
     font-size: 14px;
     font-weight: 500;
-    color: var(--admin-text-primary);
+    color: var(--content-block-text);
   }
 
   .admin-promo__mobile-actions {
@@ -520,6 +520,6 @@
     gap: 8px;
     justify-content: flex-end;
     padding-top: 12px;
-    border-top: 1px solid var(--admin-border-subtle);
+    border-top: 1px solid var(--content-block-border);
   }
 </style>

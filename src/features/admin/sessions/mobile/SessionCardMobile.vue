@@ -136,8 +136,8 @@
 
 <style scoped lang="less">
   .session-card-mobile {
-    background: var(--admin-bg-surface);
-    border: 1px solid var(--admin-border-subtle);
+    background: var(--content-block-bg-subtle);
+    border: 1px solid var(--content-block-border);
     border-radius: 12px;
     padding: 14px;
     margin-bottom: 8px;
@@ -157,7 +157,7 @@
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: var(--admin-bg-card);
+          background: var(--content-block-bg-subtle);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -176,13 +176,13 @@
 
           .name {
             font-weight: 600;
-            color: var(--admin-text-primary);
+            color: var(--content-block-text);
             font-size: 14px;
           }
 
           .meta {
             font-size: 12px;
-            color: var(--admin-text-muted);
+            color: var(--content-block-text-muted);
           }
         }
       }
@@ -193,8 +193,8 @@
       flex-direction: column;
       gap: 8px;
       padding: 12px 0;
-      border-top: 1px solid var(--admin-border-subtle);
-      border-bottom: 1px solid var(--admin-border-subtle);
+      border-top: 1px solid var(--content-block-border);
+      border-bottom: 1px solid var(--content-block-border);
 
       .info-row {
         display: flex;
@@ -206,12 +206,12 @@
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          color: var(--admin-text-muted);
+          color: var(--content-block-text-muted);
         }
 
         .value {
           font-size: 13px;
-          color: var(--admin-text-primary);
+          color: var(--content-block-text);
           font-weight: 500;
         }
       }

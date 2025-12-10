@@ -143,19 +143,19 @@
         <template v-if="isDesktop || isTablet">
           <div class="cardLayoutWrapper cardLayoutWrapper--header sessions-header">
             <BasicCell
-              :span="6"
+              :span="8"
               text="Utilisateur"
             />
             <BasicCell
-              :span="4"
+              :span="5"
               text="Type"
             />
             <BasicCell
-              :span="4"
+              :span="5"
               text="Localisation"
             />
             <BasicCell
-              :span="4"
+              :span="5"
               text="Appareil"
             />
             <BasicCell
@@ -163,7 +163,7 @@
               text="Date"
             />
             <BasicCell
-              :span="3"
+              :span="4"
               text="Durée"
             />
             <BasicCell
@@ -179,7 +179,7 @@
           >
             <div class="cardLayoutWrapper sessions-item">
               <!-- Utilisateur -->
-              <BasicCell :span="6">
+              <BasicCell :span="8">
                 <div class="user-cell">
                   <img
                     v-if="session.profiles?.avatar_url"
@@ -200,7 +200,7 @@
               </BasicCell>
 
               <!-- Type -->
-              <BasicCell :span="4">
+              <BasicCell :span="5">
                 <BasicBadge
                   :label="getSessionTypeLabel(session.session_type)"
                   :type="getSessionTypeBadge(session.session_type)"
@@ -209,7 +209,7 @@
               </BasicCell>
 
               <!-- Localisation -->
-              <BasicCell :span="4">
+              <BasicCell :span="5">
                 <span class="location-cell">
                   {{ getCountryFlag(session.country_code) }}
                   {{ session.city || session.country || '—' }}
@@ -217,7 +217,7 @@
               </BasicCell>
 
               <!-- Appareil -->
-              <BasicCell :span="4">
+              <BasicCell :span="5">
                 <span class="device-cell">
                   <BasicIconNext
                     :name="getDeviceIcon(session.device_type)"
@@ -236,7 +236,7 @@
 
               <!-- Durée -->
               <BasicCell
-                :span="3"
+                :span="4"
                 :text="formatDuration(session.duration_seconds)"
               />
 
@@ -597,11 +597,10 @@
     gap: 24px;
 
     .dashboard-card {
-      background: var(--admin-bg-surface);
-      border: 1px solid var(--admin-border-subtle);
+      background: var(--content-block-bg-subtle);
+      border: 1px solid var(--content-block-border);
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 2px 10px var(--admin-shadow);
     }
   }
 
@@ -616,14 +615,14 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: var(--admin-bg-surface);
-    border: 1px solid var(--admin-border-subtle);
+    background: var(--content-block-bg-subtle);
+    border: 1px solid var(--content-block-border);
     border-radius: 12px;
     padding: 20px;
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--admin-border);
+      border-color: var(--primary-300);
     }
 
     &--primary {
@@ -647,12 +646,12 @@
     &__value {
       font-size: 28px;
       font-weight: 700;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
     }
 
     &__label {
       font-size: 14px;
-      color: var(--admin-text-muted);
+      color: var(--content-block-text-muted);
     }
   }
 
@@ -687,19 +686,19 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--admin-bg-subtle);
+    background: var(--content-block-bg-subtle);
     border-radius: 8px;
     transition: background 0.15s ease;
 
     &:hover {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
 
     &__avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--admin-border-subtle);
+      background: var(--content-block-border);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -719,12 +718,12 @@
 
       .name {
         font-weight: 600;
-        color: var(--admin-text-primary);
+        color: var(--content-block-text);
       }
 
       .details {
         font-size: 13px;
-        color: var(--admin-text-muted);
+        color: var(--content-block-text-muted);
       }
     }
   }
@@ -746,7 +745,7 @@
     transition: background 0.15s ease;
 
     &:hover {
-      background: var(--admin-bg-card-hover);
+      background: rgba(var(--primary-500-rgb), 0.08);
     }
   }
 
@@ -764,7 +763,7 @@
 
     .user-name {
       font-size: 14px;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -777,7 +776,7 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: var(--admin-text-secondary);
+    color: var(--content-block-text-secondary);
   }
 
   .actions-cell {
@@ -787,7 +786,7 @@
 
   .pages-viewed {
     font-size: 13px;
-    color: var(--admin-text-muted);
+    color: var(--content-block-text-muted);
   }
 
   // Countries
@@ -805,7 +804,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px;
-    background: var(--admin-bg-subtle);
+    background: var(--content-block-bg-subtle);
     border-radius: 8px;
 
     .country-flag {
@@ -815,12 +814,12 @@
     .country-name {
       flex: 1;
       font-weight: 500;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
     }
 
     .country-sessions {
       font-size: 13px;
-      color: var(--admin-text-muted);
+      color: var(--content-block-text-muted);
     }
   }
 

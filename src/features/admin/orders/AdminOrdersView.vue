@@ -503,7 +503,7 @@
       flex-wrap: wrap;
       gap: 4px;
       margin-left: 16px;
-      background: var(--admin-bg-subtle);
+      background: var(--content-block-bg-subtle);
       padding: 4px;
       border-radius: 8px;
     }
@@ -519,19 +519,19 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      color: var(--admin-text-secondary);
+      color: var(--content-block-text-secondary);
       transition: all 0.2s ease;
       white-space: nowrap;
 
       &:hover {
-        background: var(--admin-bg-card-hover);
-        color: var(--admin-text-primary);
+        background: rgba(var(--primary-500-rgb), 0.08);
+        color: var(--content-block-text);
       }
 
       &--active {
-        background: var(--admin-bg-surface);
-        color: var(--admin-text-primary);
-        box-shadow: 0 1px 3px var(--admin-shadow);
+        background: rgba(var(--primary-500-rgb), 0.12);
+        color: var(--content-block-text);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
       &--priority {
@@ -562,12 +562,12 @@
       font-size: 11px;
       font-weight: 600;
       border-radius: 10px;
-      background: var(--admin-border-subtle);
-      color: var(--admin-text-secondary);
+      background: var(--content-block-border);
+      color: var(--content-block-text-secondary);
 
       &--alert {
         background: var(--warning-500);
-        color: var(--admin-text-inverse);
+        color: @white;
         animation: pulse 2s infinite;
       }
     }
@@ -639,7 +639,7 @@
       transition: background-color 0.15s ease;
 
       &:hover {
-        background: var(--admin-bg-card-hover);
+        background: rgba(var(--primary-500-rgb), 0.08);
       }
     }
 
@@ -647,15 +647,15 @@
       font-family: monospace;
       font-size: 12px;
       font-weight: 600;
-      color: var(--admin-text-secondary);
-      background: var(--admin-bg-card);
+      color: var(--content-block-text-secondary);
+      background: var(--content-block-bg-subtle);
       padding: 4px 8px;
       border-radius: 4px;
     }
 
     &__date {
       font-size: 13px;
-      color: var(--admin-text-secondary);
+      color: var(--content-block-text-secondary);
     }
 
     &__client {
@@ -666,19 +666,19 @@
 
     &__client-name {
       font-weight: 500;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
       font-size: 14px;
     }
 
     &__client-email {
       font-size: 12px;
-      color: var(--admin-text-muted);
+      color: var(--content-block-text-muted);
     }
 
     &__amount {
       font-weight: 600;
       font-size: 14px;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
       font-variant-numeric: tabular-nums;
     }
 
@@ -743,14 +743,14 @@
 
       &:hover {
         background: var(--success-500);
-        color: var(--admin-text-inverse);
+        color: @white;
         box-shadow: 0 2px 8px rgba(var(--success-500-rgb), 0.3);
       }
     }
 
     &__details-btn {
-      background: var(--admin-bg-card);
-      color: var(--admin-text-secondary);
+      background: var(--content-block-bg-subtle);
+      color: var(--content-block-text-secondary);
 
       &:hover {
         background: var(--primary-100);
@@ -760,7 +760,7 @@
 
     &__delete-btn {
       background: transparent;
-      color: var(--admin-text-muted);
+      color: var(--content-block-text-muted);
 
       &:hover {
         background: var(--danger-100);
@@ -808,18 +808,18 @@
 
     &__question {
       font-size: 16px;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
       margin-bottom: 24px;
       line-height: 1.5;
 
       strong {
-        color: var(--admin-text-primary);
+        color: var(--content-block-text);
         font-weight: 700;
       }
     }
 
     &__details {
-      background: var(--admin-bg-subtle);
+      background: var(--content-block-bg-subtle);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 20px;
@@ -830,7 +830,7 @@
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
-      border-bottom: 1px solid var(--admin-border-subtle);
+      border-bottom: 1px solid var(--content-block-border);
 
       &:last-child {
         border-bottom: none;
@@ -839,13 +839,13 @@
 
     &__detail-label {
       font-size: 13px;
-      color: var(--admin-text-muted);
+      color: var(--content-block-text-muted);
     }
 
     &__detail-value {
       font-size: 13px;
       font-weight: 500;
-      color: var(--admin-text-primary);
+      color: var(--content-block-text);
     }
 
     &__warning {

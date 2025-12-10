@@ -5,16 +5,13 @@
     :class="{ 'tab--selected': isSelected, 'tab--unselected': !isSelected }"
     @click="handleSelect"
   >
-    <BasicText
-      :wrap-all="!isSelected"
-      :nb-max-lines="isSelected ? '2' : '1'"
-      :size="isSelected ? 'body-l' : 'body-m'"
-      :weight="isSelected ? 'semibold' : 'regular'"
-      class="tab__label"
-      :color="computedTextColor"
-    >
-      {{ tabKey }}
-    </BasicText>
+    <!-- Icône (visible en mobile, cachée en desktop sauf si sélectionné) -->
+    <BasicIconNext
+      v-if="!$slots['tab-icon'] && icon"
+      class="tab__icon"
+      :name="icon"
+      :size="20"
+    />
 
     <slot
       name="tab-icon"
@@ -22,20 +19,12 @@
       :selected="isSelected"
     />
 
-    <!-- ✅ Couleur icône selon sélection -->
-    <BasicIconNext
-      v-if="!$slots['tab-icon'] && icon"
-      class="tab__icon"
-      :name="icon"
-      :color="isSelected ? color : ('neutral-600' as IconColor)"
-    />
+    <span class="tab__label">{{ tabKey }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue'
-  import type { IconColor } from '../icon'
-  import type { TextColor } from '../text'
   import type { TabProps } from './BasicTab.types'
 
   const props = defineProps<TabProps>()
@@ -48,15 +37,11 @@
   const handleSelect = () => {
     modelValue.value = props.routeName ?? props.tabKey
   }
-
-  // ✅ Couleur du texte (normal / sélectionné)
-  const computedTextColor = computed<TextColor>(() => {
-    if (isSelected.value && props.color) return props.color
-    return 'neutral-600'
-  })
 </script>
 
 <style scoped lang="less">
+  @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
+
   .tab {
     display: flex;
     justify-content: center;
@@ -70,36 +55,32 @@
     user-select: none;
     position: relative;
     overflow: hidden;
-    font-weight: 600;
-    font-size: 13px;
 
-    // Effet de hover subtil
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        transparent 0%,
-        color-mix(in srgb, var(--primary-500) 5%, transparent) 100%
-      );
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      border-radius: 12px;
+    &__label {
+      font-weight: 500;
+      font-size: 13px;
+      color: @neutral-600;
+      transition: color 0.2s ease;
+      white-space: nowrap;
     }
 
+    &__icon {
+      display: none;
+      flex-shrink: 0;
+      color: @neutral-500;
+      transition: color 0.2s ease;
+    }
+
+    // Hover desktop
     &:hover:not(.tab--selected) {
       background: @neutral-100;
 
-      &::before {
-        opacity: 1;
-      }
-
       .tab__label {
-        color: @neutral-700 !important;
+        color: @neutral-700;
       }
     }
 
+    // État sélectionné
     &--selected {
       background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
       box-shadow:
@@ -107,11 +88,12 @@
         0 4px 16px color-mix(in srgb, var(--primary-700) 20%, transparent);
 
       .tab__label {
-        color: white !important;
+        color: white;
+        font-weight: 600;
       }
 
       .tab__icon {
-        color: white !important;
+        color: white;
       }
 
       &:hover {
@@ -121,5 +103,67 @@
           0 6px 20px color-mix(in srgb, var(--primary-700) 25%, transparent);
       }
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // 📱 MOBILE - Style Premium avec icônes
+    // ══════════════════════════════════════════════════════════════
+    .respond-mobile({
+      flex-direction: column;
+      padding: 10px 12px;
+      gap: 6px;
+      min-width: 60px;
+      min-height: 60px;
+      border-radius: 14px;
+
+      // Onglet NON sélectionné - Style visible
+      &--unselected {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid @neutral-200;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+        .tab__icon {
+          color: var(--primary-500);
+        }
+
+        .tab__label {
+          color: @neutral-700;
+        }
+
+        &:active {
+          background: @neutral-100;
+          transform: scale(0.96);
+          border-color: @neutral-300;
+        }
+      }
+
+      // Onglet sélectionné mobile
+      &--selected {
+        padding: 10px 14px;
+        min-width: 68px;
+        border: none;
+
+        .tab__label {
+          font-size: 11px;
+        }
+      }
+
+      // Icône visible en mobile
+      .tab__icon {
+        display: flex;
+      }
+
+      // Label adapté mobile
+      .tab__label {
+        font-size: 10px;
+        line-height: 1.2;
+        text-align: center;
+      }
+
+      // Désactiver hover sur mobile
+      &:hover:not(.tab--selected) {
+        background: rgba(255, 255, 255, 0.9);
+        transform: none;
+      }
+    });
   }
 </style>

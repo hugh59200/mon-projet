@@ -32,7 +32,8 @@
       "Bash(npx supabase functions deploy:*)",
       "Bash(curl:*)",
       "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node -e \"\nconst { Client } = require(''pg'');\nconst client = new Client({\n  host: ''db.dwomsbawthlktapmtmqu.supabase.co'',\n  port: 5432,\n  database: ''postgres'',\n  user: ''postgres'',\n  password: ''Chipsau59126!3'',\n  ssl: { rejectUnauthorized: false }\n});\nclient.connect()\n  .then(() => client.query(''SELECT jobid, jobname, schedule, command FROM cron.job''))\n  .then(res => { console.log(''Jobs pg_cron:''); console.table(res.rows); })\n  .finally(() => client.end());\n\")",
-      "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node:*)"
+      "Bash(DATABASE_PASSWORD=\"Chipsau59126!3\" node:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
