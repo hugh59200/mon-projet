@@ -403,9 +403,9 @@
       }
 
       &__content {
-        min-height: 480px;
+        min-height: 450px;
         padding: 20px;
-        padding-top: 40px; // Descend le texte
+        padding-top: 35px; // Descend le texte
       }
 
       &__footer {
