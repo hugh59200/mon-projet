@@ -438,14 +438,14 @@
       .newsletter-signup__title {
         font-size: 24px;
         font-weight: 700;
-        color: var(--content-block-text);
+        color: var(--text-primary);
         margin: 0;
         letter-spacing: -0.02em;
       }
 
       .newsletter-signup__desc {
         font-size: 14px;
-        color: var(--content-block-text-secondary);
+        color: var(--text-secondary);
         max-width: 320px;
         margin: 0 auto;
         line-height: 1.6;
@@ -465,7 +465,7 @@
         gap: 8px;
         font-size: 13px;
         font-weight: 500;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
 
         svg {
           color: var(--primary-400);
@@ -744,13 +744,13 @@
       .newsletter-signup__success-title {
         font-size: 20px;
         font-weight: 600;
-        color: var(--content-block-text);
+        color: var(--text-primary);
         margin: 8px 0 0;
       }
 
       .newsletter-signup__success-desc {
         font-size: 14px;
-        color: var(--content-block-text-secondary);
+        color: var(--text-secondary);
         max-width: 280px;
         margin: 0;
       }
@@ -815,11 +815,11 @@
       justify-content: center;
       gap: 6px;
       font-size: 11px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0;
 
       svg {
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
         opacity: 0.7;
       }
     }

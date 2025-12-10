@@ -50,7 +50,7 @@
     gap: 8px;
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.2s ease;
     background: transparent;
     user-select: none;
     position: relative;
@@ -59,7 +59,7 @@
     &__label {
       font-weight: 500;
       font-size: 13px;
-      color: @neutral-600;
+      color: var(--text-secondary, @neutral-600);
       transition: color 0.2s ease;
       white-space: nowrap;
     }
@@ -67,16 +67,16 @@
     &__icon {
       display: none;
       flex-shrink: 0;
-      color: @neutral-500;
+      color: var(--text-muted, @neutral-500);
       transition: color 0.2s ease;
     }
 
     // Hover desktop
     &:hover:not(.tab--selected) {
-      background: @neutral-100;
+      background: var(--bg-subtle, @neutral-100);
 
       .tab__label {
-        color: @neutral-700;
+        color: var(--text-primary, @neutral-700);
       }
     }
 
@@ -97,7 +97,6 @@
       }
 
       &:hover {
-        transform: translateY(-1px);
         box-shadow:
           0 4px 12px color-mix(in srgb, var(--primary-600) 40%, transparent),
           0 6px 20px color-mix(in srgb, var(--primary-700) 25%, transparent);
@@ -105,7 +104,7 @@
     }
 
     // ══════════════════════════════════════════════════════════════
-    // 📱 MOBILE - Style Premium avec icônes
+    // 📱 MOBILE - Style avec icônes
     // ══════════════════════════════════════════════════════════════
     .respond-mobile({
       flex-direction: column;
@@ -113,26 +112,23 @@
       gap: 6px;
       min-width: 60px;
       min-height: 60px;
-      border-radius: 14px;
+      border-radius: 12px;
 
-      // Onglet NON sélectionné - Style visible
+      // Onglet NON sélectionné
       &--unselected {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid @neutral-200;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        background: var(--bg-subtle, @neutral-50);
 
         .tab__icon {
           color: var(--primary-500);
         }
 
         .tab__label {
-          color: @neutral-700;
+          color: var(--text-primary, @neutral-700);
         }
 
         &:active {
-          background: @neutral-100;
-          transform: scale(0.96);
-          border-color: @neutral-300;
+          background: var(--border-default, @neutral-200);
+          transform: scale(0.97);
         }
       }
 
@@ -140,7 +136,6 @@
       &--selected {
         padding: 10px 14px;
         min-width: 68px;
-        border: none;
 
         .tab__label {
           font-size: 11px;
@@ -161,7 +156,7 @@
 
       // Désactiver hover sur mobile
       &:hover:not(.tab--selected) {
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--bg-subtle, @neutral-50);
         transform: none;
       }
     });

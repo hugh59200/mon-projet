@@ -103,11 +103,11 @@
   .mobile-card {
     padding: 16px;
     border-radius: 12px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     display: flex;
     flex-direction: column;
     gap: 12px;
-    border: 1px solid var(--content-block-border);
+    border: 1px solid var(--border-default);
     transition:
       background 0.2s ease,
       transform 0.2s ease;
@@ -119,7 +119,7 @@
     }
 
     &:active {
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
     }
 
     &--pending {
@@ -191,7 +191,7 @@
   .separator {
     width: 1px;
     height: 16px;
-    background: var(--content-block-border);
+    background: var(--border-default);
   }
 
   .validate-btn-mobile {

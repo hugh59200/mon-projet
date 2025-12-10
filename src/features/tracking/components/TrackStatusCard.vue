@@ -221,7 +221,7 @@ function formatDate(date: string | null | undefined) {
   &__message {
     font-family: @font-body;
     font-size: 15px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
     margin: 0;
     max-width: 400px;
     line-height: 1.5;

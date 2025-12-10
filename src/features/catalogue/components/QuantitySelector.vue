@@ -178,7 +178,7 @@ function selectQuantity(qty: number) {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
   }
 
   &__lot-badge {
@@ -210,11 +210,11 @@ function selectQuantity(qty: number) {
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 8px;
     font-family: @font-body;
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
 
     svg {
       color: var(--primary-500);
@@ -278,7 +278,7 @@ function selectQuantity(qty: number) {
     font-family: @font-display;
     font-size: 28px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     line-height: 1;
     transition: color 0.2s @ease;
   }
@@ -286,7 +286,7 @@ function selectQuantity(qty: number) {
   &__unit {
     font-family: @font-body;
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__pricing {
@@ -299,7 +299,7 @@ function selectQuantity(qty: number) {
     font-family: @font-display;
     font-size: 18px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   &__discount {
@@ -315,7 +315,7 @@ function selectQuantity(qty: number) {
   &__per-unit {
     font-family: @font-body;
     font-size: 11px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__savings {

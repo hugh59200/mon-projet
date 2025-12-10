@@ -1404,7 +1404,7 @@
       gap: 24px;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
     }
 
     &__trust-item {
@@ -1413,7 +1413,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 12px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
 
       svg {
         color: var(--primary-500);
@@ -1488,7 +1488,7 @@
     &__coa-label {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
     }
 
     // ============ LAB VERIFICATION (Analyse indépendante) ============
@@ -1512,18 +1512,18 @@
       font-family: @font-display;
       font-size: 15px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__lab-description {
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 0 0 16px;
 
       strong {
-        color: var(--content-block-text);
+        color: var(--text-primary);
         font-weight: 600;
       }
     }
@@ -1534,9 +1534,9 @@
       gap: 16px;
       margin-bottom: 16px;
       padding: 12px 16px;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 8px;
-      border: 1px solid var(--content-block-border);
+      border: 1px solid var(--border-default);
     }
 
     &__lab-detail {
@@ -1553,14 +1553,14 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__lab-detail-value {
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
 
       &--success {
         color: @success-600;
@@ -1759,7 +1759,7 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 18px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-decoration: line-through;
     }
 
@@ -1782,7 +1782,7 @@
 
       span {
         font-size: 24px;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
 
       &--sale {
@@ -1793,7 +1793,7 @@
     &__price-info {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     // ─────────────────────────────────────────
@@ -1820,7 +1820,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
 
       svg {
         color: var(--primary-500);
@@ -1855,7 +1855,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 12px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
 
       svg {
         color: @success-500;
@@ -1871,7 +1871,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 700;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__pack-details {
@@ -1879,8 +1879,8 @@
       flex-direction: column;
       gap: 8px;
       padding: 12px 16px;
-      background: var(--content-block-bg-subtle, rgba(var(--primary-500-rgb), 0.05));
-      border: 1px solid var(--content-block-border, rgba(var(--primary-500-rgb), 0.1));
+      background: var(--bg-subtle, rgba(var(--primary-500-rgb), 0.05));
+      border: 1px solid var(--border-default, rgba(var(--primary-500-rgb), 0.1));
       border-radius: 10px;
     }
 
@@ -1892,7 +1892,7 @@
 
       &--savings {
         padding-top: 8px;
-        border-top: 1px solid var(--content-block-border, rgba(var(--primary-500-rgb), 0.15));
+        border-top: 1px solid var(--border-default, rgba(var(--primary-500-rgb), 0.15));
       }
     }
 
@@ -1902,7 +1902,7 @@
       gap: 6px;
       font-family: @font-body;
       font-size: 14px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
 
       svg {
         color: @success-500;
@@ -1913,7 +1913,7 @@
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__pack-savings {
@@ -2074,13 +2074,13 @@
         font-family: @font-body;
         font-size: 14px;
         font-weight: 600;
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
 
       span {
         font-family: @font-body;
         font-size: 13px;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
     }
 
@@ -2112,7 +2112,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 500;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
@@ -2121,12 +2121,12 @@
       }
 
       &:hover:not(&--active) {
-        background: var(--content-block-bg-subtle);
-        color: var(--content-block-text);
+        background: var(--bg-subtle);
+        color: var(--text-primary);
       }
 
       &--active {
-        background: var(--content-block-bg-subtle);
+        background: var(--bg-subtle);
         color: var(--primary-700);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
@@ -2149,7 +2149,7 @@
       font-family: @font-body;
       font-size: 16px;
       line-height: 1.8;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
 
       :deep(p) {
         margin-bottom: 16px;
@@ -2157,7 +2157,7 @@
 
       :deep(strong) {
         font-weight: 700;
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
 
       :deep(ul) {
@@ -2178,7 +2178,7 @@
       :deep(h4) {
         font-family: @font-display;
         font-weight: 600;
-        color: var(--content-block-text);
+        color: var(--text-primary);
         margin: 24px 0 12px;
       }
     }
@@ -2194,12 +2194,12 @@
       align-items: center;
       gap: 16px;
       padding: 20px;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 16px;
       transition: all 0.2s @ease;
 
       &:hover {
-        background: var(--content-block-border);
+        background: var(--border-default);
       }
     }
 
@@ -2211,14 +2211,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0 0 4px;
     }
 
     &__shipping-card p {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -2265,11 +2265,11 @@
       font-family: @font-body;
       font-size: 14px;
       line-height: 1.6;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 0;
 
       strong {
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
     }
 

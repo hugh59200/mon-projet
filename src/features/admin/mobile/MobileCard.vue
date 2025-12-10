@@ -40,8 +40,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: var(--content-block-bg-subtle);
-    border: 1px solid var(--content-block-border);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-default);
     border-radius: 10px;
     padding: 16px 18px;
     transition: all 0.2s ease-in-out;

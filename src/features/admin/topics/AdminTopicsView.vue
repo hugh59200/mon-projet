@@ -226,8 +226,8 @@
       height: 48px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--content-block-border);
-      background: var(--content-block-bg-subtle);
+      border: 1px solid var(--border-default);
+      background: var(--bg-subtle);
     }
   }
 </style>

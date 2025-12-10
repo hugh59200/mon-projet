@@ -79,7 +79,7 @@
         font-family: @font-display;
         font-size: clamp(32px, 4vw, 48px);
         font-weight: 600;
-        color: var(--content-block-text);
+        color: var(--text-primary);
         margin: 0;
         line-height: 1.15;
         letter-spacing: -0.02em;
@@ -95,7 +95,7 @@
         font-family: @font-body;
         font-size: 17px;
         line-height: 1.7;
-        color: var(--content-block-text-secondary);
+        color: var(--text-secondary);
         margin: 0;
         max-width: 520px;
       }
@@ -152,7 +152,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
     }
 
@@ -160,7 +160,7 @@
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0;
     }
   }

@@ -503,7 +503,7 @@
       flex-wrap: wrap;
       gap: 4px;
       margin-left: 16px;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       padding: 4px;
       border-radius: 8px;
     }
@@ -519,18 +519,18 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       transition: all 0.2s ease;
       white-space: nowrap;
 
       &:hover {
         background: rgba(var(--primary-500-rgb), 0.08);
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
 
       &--active {
         background: rgba(var(--primary-500-rgb), 0.12);
-        color: var(--content-block-text);
+        color: var(--text-primary);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
@@ -562,8 +562,8 @@
       font-size: 11px;
       font-weight: 600;
       border-radius: 10px;
-      background: var(--content-block-border);
-      color: var(--content-block-text-secondary);
+      background: var(--border-default);
+      color: var(--text-secondary);
 
       &--alert {
         background: var(--warning-500);
@@ -647,15 +647,15 @@
       font-family: monospace;
       font-size: 12px;
       font-weight: 600;
-      color: var(--content-block-text-secondary);
-      background: var(--content-block-bg-subtle);
+      color: var(--text-secondary);
+      background: var(--bg-subtle);
       padding: 4px 8px;
       border-radius: 4px;
     }
 
     &__date {
       font-size: 13px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
     }
 
     &__client {
@@ -666,19 +666,19 @@
 
     &__client-name {
       font-weight: 500;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       font-size: 14px;
     }
 
     &__client-email {
       font-size: 12px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__amount {
       font-weight: 600;
       font-size: 14px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       font-variant-numeric: tabular-nums;
     }
 
@@ -749,8 +749,8 @@
     }
 
     &__details-btn {
-      background: var(--content-block-bg-subtle);
-      color: var(--content-block-text-secondary);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
 
       &:hover {
         background: var(--primary-100);
@@ -760,7 +760,7 @@
 
     &__delete-btn {
       background: transparent;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
 
       &:hover {
         background: var(--danger-100);
@@ -808,18 +808,18 @@
 
     &__question {
       font-size: 16px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin-bottom: 24px;
       line-height: 1.5;
 
       strong {
-        color: var(--content-block-text);
+        color: var(--text-primary);
         font-weight: 700;
       }
     }
 
     &__details {
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 20px;
@@ -830,7 +830,7 @@
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
-      border-bottom: 1px solid var(--content-block-border);
+      border-bottom: 1px solid var(--border-default);
 
       &:last-child {
         border-bottom: none;
@@ -839,13 +839,13 @@
 
     &__detail-label {
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__detail-value {
       font-size: 13px;
       font-weight: 500;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__warning {

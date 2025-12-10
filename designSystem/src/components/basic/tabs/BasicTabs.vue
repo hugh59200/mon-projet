@@ -71,19 +71,11 @@
     }
 
     // ══════════════════════════════════════════════════════════════
-    // 📱 MOBILE - Style Premium
+    // 📱 MOBILE - Pas de fond supplémentaire, le parent gère
     // ══════════════════════════════════════════════════════════════
     &--mobile {
       justify-content: flex-start;
       gap: 8px;
-      padding: 2px;
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--secondary-800) 85%, transparent) 0%,
-        color-mix(in srgb, var(--secondary-900) 90%, transparent) 100%
-      );
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
     }
   }
 </style>

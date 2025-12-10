@@ -377,7 +377,7 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: 24px;
-    border-bottom: 1px solid var(--content-block-border);
+    border-bottom: 1px solid var(--border-default);
 
     &:last-child {
       border-bottom: none;
@@ -385,7 +385,7 @@
     }
 
     &--stats {
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       padding: 16px;
       border-radius: 12px;
       border-bottom: none;
@@ -425,14 +425,14 @@
     justify-content: center;
     gap: 8px;
     padding: 14px 16px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border: 2px solid transparent;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 14px;
     font-weight: 500;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
 
     &:hover {
       background: rgba(var(--primary-500-rgb), 0.08);
@@ -451,7 +451,7 @@
 
   .form-hint {
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
     font-style: italic;
   }
@@ -471,11 +471,11 @@
   .stat-value {
     font-size: 18px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   .stat-label {
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 </style>

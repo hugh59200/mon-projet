@@ -187,14 +187,14 @@
       font-family: @font-display;
       font-size: 20px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
     }
 
     &__subtitle {
       font-family: @font-body;
       font-size: 14px;
-      color: var(--content-block-text-muted);
+      color: var(--text-primary-muted);
       margin: 0;
     }
 
@@ -260,14 +260,14 @@
     &__bundle-count {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-primary-muted);
     }
 
     &__bundle-total {
       font-family: @font-display;
       font-size: 18px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
 
       .respond-mobile({
         font-size: 16px;

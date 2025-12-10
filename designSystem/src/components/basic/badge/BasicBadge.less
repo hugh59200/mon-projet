@@ -1,10 +1,11 @@
 /* ══════════════════════════════════════════════════════════════
-   BASIC BADGE — Couleurs fixes (non affectées par ContentBlock)
+   BASIC BADGE — Système de couleurs hybride
    ══════════════════════════════════════════════════════════════
 
-   Les badges utilisent des couleurs FIXES basées sur les variables
-   de couleur globales pour garantir un rendu cohérent peu importe
-   le contexte (ContentBlock dark/light, etc.)
+   Stratégie de couleurs :
+   - default/secondary/canceled : Variables de thème (s'adaptent light/dark)
+   - success/danger/warning/info/pending : Couleurs sémantiques fixes
+   - color-* (tags) : Couleurs décoratives fixes avec bonne lisibilité
 
    ══════════════════════════════════════════════════════════════ */
 
@@ -37,11 +38,11 @@
   // ══════════════════════════════════════════════════════════════
 
   &--default {
-    background-color: @neutral-100;
-    color: @neutral-600;
-    border-color: @neutral-300;
+    background-color: var(--bg-subtle);
+    color: var(--text-secondary);
+    border-color: var(--border-default);
     svg {
-      fill: @neutral-600;
+      fill: var(--text-secondary);
     }
   }
 
@@ -82,11 +83,11 @@
   }
 
   &--canceled {
-    background-color: @neutral-200;
-    color: @neutral-500;
-    border-color: @neutral-400;
+    background-color: var(--bg-surface-tertiary);
+    color: var(--text-disabled);
+    border-color: var(--border-default);
     svg {
-      fill: @neutral-500;
+      fill: var(--text-disabled);
     }
   }
 
@@ -100,11 +101,11 @@
   }
 
   &--secondary {
-    background-color: @neutral-100;
-    color: @neutral-500;
-    border-color: @neutral-200;
+    background-color: var(--bg-surface-secondary);
+    color: var(--text-muted);
+    border-color: var(--border-subtle);
     svg {
-      fill: @neutral-500;
+      fill: var(--text-muted);
     }
   }
 

@@ -399,7 +399,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__eyebrow {
@@ -422,7 +422,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
 
       li {
         display: flex;
@@ -444,7 +444,7 @@
       font-size: 0.75rem;
       text-align: center;
       opacity: 0.7;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -467,7 +467,7 @@
         position: relative;
         border-radius: 10px;
         overflow: hidden;
-        background: var(--content-block-bg-subtle);
+        background: var(--bg-subtle);
         aspect-ratio: 4 / 3;
         min-height: 120px;
 
@@ -484,7 +484,7 @@
         position: absolute;
         bottom: 6px;
         left: 6px;
-        background: var(--content-block-bg-subtle);
+        background: var(--bg-subtle);
         backdrop-filter: blur(4px);
         padding: 3px 8px;
         border-radius: 8px;
@@ -492,18 +492,18 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.02em;
-        color: var(--content-block-text-secondary);
+        color: var(--text-secondary);
       }
 
       &__info {
         display: flex;
         flex-direction: column;
         gap: 2px;
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
 
       &__role {
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
     }
 
@@ -530,15 +530,15 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__bottom-subtitle {
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__top-sub {
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
     }
 
     .scroll-track {
@@ -556,15 +556,15 @@
         cursor: pointer;
         width: 100px;
         flex-shrink: 0;
-        color: var(--content-block-text-secondary);
+        color: var(--text-secondary);
 
         &__img-wrapper {
           width: 72px;
           height: 72px;
           border-radius: 50%;
           overflow: hidden;
-          background: var(--content-block-bg-subtle);
-          border: 3px solid var(--content-block-border);
+          background: var(--bg-subtle);
+          border: 3px solid var(--border-default);
           box-shadow: var(--shadow-sm);
           transition:
             transform 0.25s ease,

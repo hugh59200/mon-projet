@@ -47,8 +47,8 @@
   @import '@designSystem/fondation/breakpoints/responsive-mixins.less';
 
   .admin-toolbar {
-    background: var(--content-block-bg-subtle);
-    border: 1px solid var(--content-block-border);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-default);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 16px;

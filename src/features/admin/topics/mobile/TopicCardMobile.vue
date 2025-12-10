@@ -68,7 +68,7 @@
 
 <style scoped lang="less">
   .mobile-card {
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 10px;
     padding: 14px;
     display: flex;
@@ -98,8 +98,8 @@
     height: 56px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid var(--content-block-border);
-    background: var(--content-block-bg-subtle);
+    border: 1px solid var(--border-default);
+    background: var(--bg-subtle);
     flex-shrink: 0;
   }
 

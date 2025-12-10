@@ -275,8 +275,8 @@
       height: 60px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--content-block-border);
-      background: var(--content-block-bg-subtle);
+      border: 1px solid var(--border-default);
+      background: var(--bg-subtle);
       flex-shrink: 0;
     }
 
@@ -296,13 +296,13 @@
     &__name {
       font-size: 15px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__dosage {
       font-size: 13px;
       font-weight: 400;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
     }
 
     &__badge-promo {
@@ -326,7 +326,7 @@
 
       .price-old {
         font-size: 12px;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
         text-decoration: line-through;
       }
 

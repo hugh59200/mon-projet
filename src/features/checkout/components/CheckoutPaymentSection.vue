@@ -145,13 +145,13 @@ const showComingSoon = ref(false)
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -162,7 +162,7 @@ const showComingSoon = ref(false)
   }
 
   &__coming-soon {
-    border: 1px solid var(--content-block-border);
+    border: 1px solid var(--border-default);
     border-radius: 16px;
     overflow: hidden;
   }
@@ -173,7 +173,7 @@ const showComingSoon = ref(false)
     align-items: center;
     justify-content: space-between;
     padding: 14px 18px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -188,7 +188,7 @@ const showComingSoon = ref(false)
     align-items: center;
     gap: 10px;
     font-size: 14px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
   }
 
   &__coming-badge {
@@ -201,7 +201,7 @@ const showComingSoon = ref(false)
   }
 
   &__coming-chevron {
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     transition: transform 0.3s ease;
 
     &--open {
@@ -211,13 +211,13 @@ const showComingSoon = ref(false)
 
   &__coming-content {
     padding: 16px;
-    border-top: 1px solid var(--content-block-border);
+    border-top: 1px solid var(--border-default);
   }
 
   &__crypto-help {
     margin-top: 16px;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(@orange-500, 0.1) 0%, var(--content-block-bg-subtle) 100%);
+    background: linear-gradient(135deg, rgba(@orange-500, 0.1) 0%, var(--bg-subtle) 100%);
     border: 1px solid rgba(@orange-500, 0.2);
     border-radius: 14px;
   }
@@ -238,7 +238,7 @@ const showComingSoon = ref(false)
     margin: 0 0 14px 0;
     padding-left: 20px;
     font-size: 13px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
     line-height: 1.8;
 
     li {
@@ -297,7 +297,7 @@ const showComingSoon = ref(false)
   &__radio {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--content-block-border);
+    border: 2px solid var(--border-default);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -350,14 +350,14 @@ const showComingSoon = ref(false)
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin-bottom: 2px;
   }
 
   &__desc {
     display: block;
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__crypto-icons {
@@ -378,8 +378,8 @@ const showComingSoon = ref(false)
   &__badge-coming {
     font-size: 11px;
     font-weight: 600;
-    color: var(--content-block-text-muted);
-    background: var(--content-block-bg-subtle);
+    color: var(--text-muted);
+    background: var(--bg-subtle);
     padding: 4px 10px;
     border-radius: 8px;
     flex-shrink: 0;

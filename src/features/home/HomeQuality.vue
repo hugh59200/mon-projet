@@ -444,7 +444,7 @@
       font-family: @font-display;
       font-size: clamp(36px, 4vw, 52px);
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -459,7 +459,7 @@
       font-family: @font-body;
       font-size: 17px;
       line-height: 1.7;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 0;
     }
     &__features {
@@ -509,13 +509,13 @@
           font-family: @font-display;
           font-size: 16px;
           font-weight: 600;
-          color: var(--content-block-text);
+          color: var(--text-primary);
           margin: 0 0 4px;
         }
         p {
           font-family: @font-body;
           font-size: 14px;
-          color: var(--content-block-text-muted);
+          color: var(--text-muted);
           margin: 0;
           line-height: 1.5;
         }
@@ -580,8 +580,8 @@
       align-items: center;
       gap: 8px;
       padding: 10px 12px;
-      background: var(--content-block-bg-subtle);
-      border-bottom: 1px solid var(--content-block-border);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-default);
     }
 
     &__badge {
@@ -600,7 +600,7 @@
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__body {
@@ -617,11 +617,11 @@
       font-size: 11px;
 
       span:first-child {
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
 
       span:last-child {
-        color: var(--content-block-text);
+        color: var(--text-primary);
         font-weight: 500;
       }
 
@@ -648,7 +648,7 @@
       padding: 8px 12px;
       background: rgba(@success-500, 0.08);
       border: none;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
       font-family: @font-body;
       font-size: 11px;
       font-weight: 500;

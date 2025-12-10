@@ -157,7 +157,7 @@ onMounted(async () => {
   &__header {
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid var(--content-block-border);
+    border-bottom: 1px solid var(--border-default);
   }
 
   &__global {
@@ -204,13 +204,13 @@ onMounted(async () => {
   &__global-title {
     font-size: 22px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0 0 4px;
   }
 
   &__global-subtitle {
     font-size: 14px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -226,9 +226,9 @@ onMounted(async () => {
     gap: 10px;
     margin-top: 32px;
     padding-top: 20px;
-    border-top: 1px solid var(--content-block-border);
+    border-top: 1px solid var(--border-default);
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
 
     svg {
       flex-shrink: 0;
@@ -245,7 +245,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  background: var(--content-block-bg-subtle);
+  background: var(--bg-subtle);
   border-radius: 12px;
   transition: background 0.2s ease;
 
@@ -296,12 +296,12 @@ onMounted(async () => {
   &__label {
     font-size: 15px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   &__detail {
     font-size: 13px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
   }
 
   &__status {
@@ -339,13 +339,13 @@ onMounted(async () => {
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0 0 4px;
     }
 
     p {
       font-size: 14px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0;
     }
   }

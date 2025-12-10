@@ -311,13 +311,13 @@ function formatPrice(value: number) {
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -352,7 +352,7 @@ function formatPrice(value: number) {
   &__radio {
     width: 22px;
     height: 22px;
-    border: 2px solid var(--content-block-border);
+    border: 2px solid var(--border-default);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -405,20 +405,20 @@ function formatPrice(value: number) {
     display: block;
     font-size: 15px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin-bottom: 2px;
   }
 
   &__option-desc {
     display: block;
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__option-price {
     font-size: 14px;
     font-weight: 600;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
     flex-shrink: 0;
 
     &--free {
@@ -429,7 +429,7 @@ function formatPrice(value: number) {
   &__relay {
     margin-bottom: 24px;
     padding: 20px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 16px;
   }
 

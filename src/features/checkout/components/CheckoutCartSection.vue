@@ -196,13 +196,13 @@ function getLineTotal(item: SimpleCartItem) {
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0 0 4px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -219,13 +219,13 @@ function getLineTotal(item: SimpleCartItem) {
     h3 {
       font-size: 18px;
       font-weight: 600;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 16px 0 8px;
     }
 
     p {
       font-size: 14px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0 0 24px;
     }
   }
@@ -236,10 +236,10 @@ function getLineTotal(item: SimpleCartItem) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 50%;
     margin: 0 auto;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 }
 
@@ -247,7 +247,7 @@ function getLineTotal(item: SimpleCartItem) {
   display: flex;
   gap: 16px;
   padding: 16px;
-  background: var(--content-block-bg-subtle);
+  background: var(--bg-subtle);
   border-radius: 16px;
   transition: all 0.2s ease;
 
@@ -266,7 +266,7 @@ function getLineTotal(item: SimpleCartItem) {
       height: 100%;
       object-fit: cover;
       border-radius: 12px;
-      border: 1px solid var(--content-block-border);
+      border: 1px solid var(--border-default);
     }
   }
 
@@ -301,14 +301,14 @@ function getLineTotal(item: SimpleCartItem) {
   &__name {
     font-size: 15px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0;
     line-height: 1.3;
   }
 
   &__dosage {
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 4px 0 0;
   }
 
@@ -383,10 +383,10 @@ function getLineTotal(item: SimpleCartItem) {
     display: flex;
     align-items: center;
     gap: 4px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     padding: 4px;
     border-radius: 10px;
-    border: 1px solid var(--content-block-border);
+    border: 1px solid var(--border-default);
   }
 
   &__qty-btn {
@@ -400,7 +400,7 @@ function getLineTotal(item: SimpleCartItem) {
     text-align: center;
     font-size: 14px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   &__price {
@@ -412,14 +412,14 @@ function getLineTotal(item: SimpleCartItem) {
 
   &__price-old {
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     text-decoration: line-through;
   }
 
   &__price-current {
     font-size: 16px;
     font-weight: 700;
-    color: var(--content-block-text);
+    color: var(--text-primary);
 
     &--sale {
       color: @red-600;

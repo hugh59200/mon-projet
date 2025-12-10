@@ -91,8 +91,8 @@
     });
 
     &__nav {
-      background: var(--content-block-bg-subtle);
-      border: 1px solid var(--content-block-border);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
       border-radius: 12px;
       padding: 6px;
       display: inline-flex;

@@ -259,12 +259,13 @@ const containerStyle = computed(() => {
 
   // ============ LIGHT THEME ============
   &--light {
-    // CSS Variables pour le contenu enfant
-    --content-block-text: @neutral-900;
-    --content-block-text-secondary: @neutral-600;
-    --content-block-text-muted: @neutral-500;
-    --content-block-border: @neutral-200;
-    --content-block-bg-subtle: @neutral-50;
+    // CSS Variables aliasées vers les variables globales (semantic-theme.less)
+    // Ces alias sont conservés pour rétrocompatibilité pendant la migration
+    --content-block-text: var(--text-primary);
+    --content-block-text-secondary: var(--text-secondary);
+    --content-block-text-muted: var(--text-muted);
+    --content-block-border: var(--border-default);
+    --content-block-bg-subtle: var(--bg-subtle);
 
     // Card - Standard avec gradient subtil
     &.content-block--card {
@@ -358,7 +359,8 @@ const containerStyle = computed(() => {
 
   // ============ DARK THEME ============
   &--dark {
-    // CSS Variables pour le contenu enfant
+    // CSS Variables aliasées vers les variables globales (semantic-theme.less)
+    // En dark, on force les valeurs dark même si le thème global est light
     --content-block-text: @neutral-100;
     --content-block-text-secondary: @neutral-300;
     --content-block-text-muted: @neutral-400;

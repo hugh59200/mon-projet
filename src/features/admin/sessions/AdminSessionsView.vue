@@ -597,8 +597,8 @@
     gap: 24px;
 
     .dashboard-card {
-      background: var(--content-block-bg-subtle);
-      border: 1px solid var(--content-block-border);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
       border-radius: 12px;
       padding: 20px;
     }
@@ -615,8 +615,8 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: var(--content-block-bg-subtle);
-    border: 1px solid var(--content-block-border);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-default);
     border-radius: 12px;
     padding: 20px;
     transition: all 0.2s ease;
@@ -646,12 +646,12 @@
     &__value {
       font-size: 28px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__label {
       font-size: 14px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
   }
 
@@ -686,7 +686,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 8px;
     transition: background 0.15s ease;
 
@@ -698,7 +698,7 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--content-block-border);
+      background: var(--border-default);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -718,12 +718,12 @@
 
       .name {
         font-weight: 600;
-        color: var(--content-block-text);
+        color: var(--text-primary);
       }
 
       .details {
         font-size: 13px;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
     }
   }
@@ -763,7 +763,7 @@
 
     .user-name {
       font-size: 14px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -776,7 +776,7 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
   }
 
   .actions-cell {
@@ -786,7 +786,7 @@
 
   .pages-viewed {
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   // Countries
@@ -804,7 +804,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 8px;
 
     .country-flag {
@@ -814,12 +814,12 @@
     .country-name {
       flex: 1;
       font-weight: 500;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     .country-sessions {
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
   }
 

@@ -77,7 +77,7 @@ defineProps<{
 
 <style scoped lang="less">
 .mobile-card {
-  background: var(--content-block-bg-subtle);
+  background: var(--bg-subtle);
   border-radius: 10px;
   padding: 14px;
   display: flex;
@@ -160,7 +160,7 @@ defineProps<{
 }
 
 .products {
-  color: var(--content-block-text-secondary);
+  color: var(--text-secondary);
 }
 
 .date {

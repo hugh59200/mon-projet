@@ -439,7 +439,7 @@
       font-family: @font-display;
       font-size: clamp(28px, 4vw, 40px);
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
@@ -448,7 +448,7 @@
     &__subtitle {
       font-family: @font-body;
       font-size: 16px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 0;
       max-width: 400px;
     }
@@ -549,7 +549,7 @@
 
     // ============ HONORABLE SECTION ============
     &__honorable {
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
       padding-top: 24px;
 
       .respond-mobile({
@@ -565,7 +565,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
 
@@ -699,7 +699,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 20px 20px 0 0;
 
       img {
@@ -746,7 +746,7 @@
       font-family: @font-body;
       font-size: 10px;
       font-weight: 600;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -755,7 +755,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
       line-height: 1.3;
       display: -webkit-box;
@@ -780,7 +780,7 @@
     &__price-old {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-decoration: line-through;
     }
 
@@ -788,7 +788,7 @@
       font-family: @font-display;
       font-size: 22px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
 
       &--sale {
         color: @danger-500;
@@ -858,7 +858,7 @@
       align-items: center;
       justify-content: center;
       background: var(--secondary-800);
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
       border-radius: 0 0 20px 20px;
       padding: 12px;
       margin-top: auto;
@@ -936,7 +936,7 @@
       font-family: @font-display;
       font-size: 12px;
       font-weight: 700;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       min-width: 24px;
     }
 
@@ -947,7 +947,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 8px;
       padding: 4px;
 
@@ -972,7 +972,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -1003,7 +1003,7 @@
       background: var(--secondary-700);
       border: none;
       border-radius: 8px;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       cursor: pointer;
       transition: all 0.2s @ease;
       flex-shrink: 0;
@@ -1046,7 +1046,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 8px;
 
       img {
@@ -1068,7 +1068,7 @@
       font-family: @font-display;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

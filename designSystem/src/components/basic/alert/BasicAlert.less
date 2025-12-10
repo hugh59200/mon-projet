@@ -1,5 +1,10 @@
 /* ══════════════════════════════════════════════════════════════
    BASIC ALERT — Composant d'alerte (BEM)
+   ══════════════════════════════════════════════════════════════
+
+   Utilise rgba() pour les fonds afin de s'adapter au thème light/dark
+   tout en conservant la sémantique des couleurs.
+
    ══════════════════════════════════════════════════════════════ */
 .alert {
   flex: 1;
@@ -47,16 +52,16 @@
   }
 
   &--danger {
-    background-color: @danger-0;
-    color: @danger-600;
+    background-color: rgba(var(--danger-500-rgb), 0.12);
+    color: @danger-500;
 
     svg {
-      fill: @danger-600;
+      fill: @danger-500;
     }
   }
 
   &--success {
-    background-color: @success-50;
+    background-color: rgba(var(--success-500-rgb), 0.12);
     color: @success-500;
 
     svg {
@@ -65,7 +70,7 @@
   }
 
   &--info {
-    background-color: @info-50;
+    background-color: rgba(var(--info-500-rgb), 0.12);
     color: @info-500;
 
     svg {
@@ -74,7 +79,7 @@
   }
 
   &--warning {
-    background-color: @warning-50;
+    background-color: rgba(var(--warning-500-rgb), 0.12);
     color: @warning-500;
 
     svg {

@@ -26,7 +26,7 @@
     width: 16px;
     height: 16px;
     align-self: flex-start;
-    background-color: @white;
+    background-color: var(--input-bg); // Adaptatif au thème
     display: flex;
     align-items: center;
     justify-content: center;
@@ -51,12 +51,12 @@
     }
 
     &--unchecked {
-      border: 1px @neutral-200 solid;
+      border: 1px solid var(--input-border); // Adaptatif au thème
       border-radius: @border-radius-s;
     }
 
     &--unchecked:not(.checkbox--indeterminate, .checkbox--disabled):hover {
-      border: 1px @blue-info-500 solid;
+      border: 1px solid var(--primary-500);
     }
 
     &--container {

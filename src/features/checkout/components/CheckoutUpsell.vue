@@ -226,13 +226,13 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   &__shipping-subtitle {
     font-family: @font-body;
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__suggestions {
@@ -253,7 +253,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 15px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
 
     svg {
       color: var(--primary-500);
@@ -272,8 +272,8 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: var(--content-block-bg-subtle);
-  border: 1px solid var(--content-block-border);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   transition: all 0.2s @ease;
 
@@ -286,7 +286,7 @@ onMounted(() => {
     height: 40px;
     object-fit: contain;
     border-radius: 6px;
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
   }
 
   &__info {
@@ -301,7 +301,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 13px;
     font-weight: 500;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -324,8 +324,8 @@ onMounted(() => {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: var(--content-block-bg-subtle);
-  border: 1px solid var(--content-block-border);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
 
   &__info {
@@ -338,7 +338,7 @@ onMounted(() => {
     font-family: @font-body;
     font-size: 14px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     line-height: 1.3;
   }
 
@@ -348,7 +348,7 @@ onMounted(() => {
     gap: 6px;
     font-family: @font-body;
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
 
     svg {
       color: var(--primary-500);
@@ -362,7 +362,7 @@ onMounted(() => {
     justify-content: space-between;
     gap: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--content-block-border);
+    border-top: 1px solid var(--border-default);
   }
 
   &__price {

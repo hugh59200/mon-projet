@@ -44,7 +44,7 @@
       font-family: @font-body;
       font-size: 13px;
       line-height: 1.6;
-      color: var(--content-block-text-secondary);
+      color: var(--text-secondary);
       margin: 0;
 
       strong {

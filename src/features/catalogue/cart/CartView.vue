@@ -762,9 +762,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
       border-radius: 50%;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
 
     &__empty-circles {
@@ -773,7 +773,7 @@
 
       span {
         position: absolute;
-        border: 2px dashed var(--content-block-border);
+        border: 2px dashed var(--border-default);
         border-radius: 50%;
 
         &:nth-child(1) {
@@ -797,14 +797,14 @@
       font-family: @font-display;
       font-size: 24px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0 0 12px;
     }
 
     &__empty-text {
       font-family: @font-body;
       font-size: 16px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0 0 32px;
       max-width: 400px;
     }
@@ -834,14 +834,14 @@
     &__suggestions {
       margin-top: 48px;
       padding-top: 32px;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
     }
 
     &__suggestions-title {
       font-family: @font-body;
       font-size: 13px;
       font-weight: 500;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0 0 16px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -876,12 +876,12 @@
       grid-template-columns: 2fr 1fr 1fr 1fr 60px;
       gap: 16px;
       padding: 16px 24px;
-      background: var(--content-block-bg-subtle);
-      border-bottom: 1px solid var(--content-block-border);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-default);
       font-family: @font-body;
       font-size: 12px;
       font-weight: 600;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -925,10 +925,10 @@
       font-family: @font-display;
       font-size: 18px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0 0 24px;
       padding-bottom: 16px;
-      border-bottom: 1px solid var(--content-block-border);
+      border-bottom: 1px solid var(--border-default);
 
       svg {
         color: var(--primary-500);
@@ -946,7 +946,7 @@
       justify-content: space-between;
       font-family: @font-body;
       font-size: 14px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-primary-secondary);
 
       &--discount {
         color: @success-500;
@@ -962,7 +962,7 @@
         padding-top: 16px;
         font-size: 18px;
         font-weight: 700;
-        color: var(--content-block-text);
+        color: var(--text-primary);
 
         span:last-child {
           color: var(--primary-700);
@@ -978,7 +978,7 @@
 
     &__summary-divider {
       height: 1px;
-      background: var(--content-block-border);
+      background: var(--border-default);
       margin: 8px 0;
     }
 
@@ -989,7 +989,7 @@
 
     &__shipping-bar {
       height: 6px;
-      background: var(--content-block-border);
+      background: var(--border-default);
       border-radius: 3px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -1009,7 +1009,7 @@
       gap: 8px;
       font-family: @font-body;
       font-size: 12px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-primary-secondary);
       margin: 0;
 
       svg {
@@ -1069,7 +1069,7 @@
       gap: 12px;
       margin-top: 24px;
       padding-top: 24px;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
     }
 
     &__trust-item {
@@ -1078,7 +1078,7 @@
       gap: 10px;
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
 
       svg {
         color: @success-500;
@@ -1088,13 +1088,13 @@
     &__payment-methods {
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid var(--content-block-border);
+      border-top: 1px solid var(--border-default);
       text-align: center;
 
       > span {
         font-family: @font-body;
         font-size: 12px;
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
       }
     }
 
@@ -1127,7 +1127,7 @@
     gap: 16px;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid var(--content-block-border);
+    border-bottom: 1px solid var(--border-default);
     transition: background 0.2s @ease;
 
     &:last-child {
@@ -1135,7 +1135,7 @@
     }
 
     &:hover {
-      background: var(--content-block-bg-subtle);
+      background: var(--bg-subtle);
     }
 
     &__product {
@@ -1156,8 +1156,8 @@
         height: 100%;
         object-fit: cover;
         border-radius: 12px;
-        background: var(--content-block-bg-subtle);
-        border: 1px solid var(--content-block-border);
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-default);
         transition: transform 0.2s @ease;
       }
 
@@ -1190,7 +1190,7 @@
       font-family: @font-display;
       font-size: 15px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       margin: 0;
       cursor: pointer;
       transition: color 0.2s @ease;
@@ -1203,7 +1203,7 @@
     &__dosage {
       font-family: @font-body;
       font-size: 13px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       margin: 0;
     }
 
@@ -1268,7 +1268,7 @@
     &__price-old {
       font-family: @font-body;
       font-size: 12px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       text-decoration: line-through;
     }
 
@@ -1276,7 +1276,7 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
 
       &--sale {
         color: @danger-500;
@@ -1292,8 +1292,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      background: var(--content-block-bg-subtle);
-      border: 1px solid var(--content-block-border);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
       border-radius: 10px;
       padding: 4px;
 
@@ -1311,17 +1311,17 @@
       background: transparent;
       border: none;
       border-radius: 8px;
-      color: var(--content-block-text-secondary);
+      color: var(--text-primary-secondary);
       cursor: pointer;
       transition: all 0.2s @ease;
 
       &:hover:not(:disabled) {
-        background: var(--content-block-border);
-        color: var(--content-block-text);
+        background: var(--border-default);
+        color: var(--text-primary);
       }
 
       &:disabled {
-        color: var(--content-block-text-muted);
+        color: var(--text-muted);
         cursor: not-allowed;
         background: transparent;
       }
@@ -1333,7 +1333,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       border: none;
       background: transparent;
       -moz-appearance: textfield;
@@ -1355,7 +1355,7 @@
       font-family: @font-body;
       font-size: 14px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__total {
@@ -1366,7 +1366,7 @@
       font-family: @font-display;
       font-size: 16px;
       font-weight: 700;
-      color: var(--content-block-text);
+      color: var(--text-primary);
     }
 
     &__actions {
@@ -1379,7 +1379,7 @@
       background: transparent;
       border: none;
       border-radius: 8px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s @ease;
 
@@ -1609,12 +1609,12 @@
         align-items: center;
         width: 100%;
         padding-top: 12px;
-        border-top: 1px dashed var(--content-block-border);
+        border-top: 1px dashed var(--border-default);
       }
 
       &__qty-control--mobile {
         display: flex;
-        background: var(--content-block-bg-subtle);
+        background: var(--bg-subtle);
         border-radius: 8px;
         padding: 2px;
       }

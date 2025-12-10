@@ -88,9 +88,9 @@
       justify-content: center;
       align-items: stretch;
       gap: 0;
-      background: var(--content-block-bg);
+      background: var(--bg-default);
       backdrop-filter: blur(20px);
-      border: 1px solid var(--content-block-border);
+      border: 1px solid var(--border-default);
       border-radius: 16px;
       overflow: hidden;
       box-shadow: var(--shadow-lg);
@@ -103,7 +103,7 @@
       justify-content: center;
       gap: 12px;
       padding: 22px 24px;
-      border-right: 1px solid var(--content-block-border);
+      border-right: 1px solid var(--border-default);
       transition: background 0.2s ease;
       text-decoration: none;
 
@@ -151,14 +151,14 @@
       font-family: @font-body;
       font-size: 15px;
       font-weight: 600;
-      color: var(--content-block-text);
+      color: var(--text-primary);
       letter-spacing: -0.01em;
     }
 
     &__label {
       font-family: @font-body;
       font-size: 12px;
-      color: var(--content-block-text-muted);
+      color: var(--text-muted);
     }
   }
 
@@ -175,7 +175,7 @@
       &__item {
         flex: 1 1 50%;
         padding: 16px 20px;
-        border-bottom: 1px solid var(--content-block-border);
+        border-bottom: 1px solid var(--border-default);
 
         &:nth-child(2) {
           border-right: none;

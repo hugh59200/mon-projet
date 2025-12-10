@@ -175,7 +175,7 @@
       justify-content: space-between;
       align-items: center;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--content-block-border, rgba(255, 255, 255, 0.1));
+      border-bottom: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
     }
 
     &__actions {

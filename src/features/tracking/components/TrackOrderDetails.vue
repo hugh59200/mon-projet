@@ -125,7 +125,7 @@ defineEmits<{
     gap: 14px;
     margin-bottom: 16px;
     padding-bottom: 14px;
-    border-bottom: 1px solid var(--content-block-border);
+    border-bottom: 1px solid var(--border-default);
   }
 
   &__icon {
@@ -148,7 +148,7 @@ defineEmits<{
     font-family: @font-body;
     font-size: 13px;
     font-weight: 600;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -163,14 +163,14 @@ defineEmits<{
     font-family: @font-display;
     font-size: 17px;
     font-weight: 600;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     margin: 0;
   }
 
   &__address {
     font-family: @font-body;
     font-size: 14px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
     line-height: 1.6;
     margin: 0;
   }
@@ -178,7 +178,7 @@ defineEmits<{
   &__info {
     font-family: @font-body;
     font-size: 14px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -201,7 +201,7 @@ defineEmits<{
     gap: 8px;
     font-family: @font-body;
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin: 4px 0 0;
     font-style: italic;
   }
@@ -216,7 +216,7 @@ defineEmits<{
   &__tracking-label {
     font-family: @font-body;
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   &__tracking-btn {
@@ -244,12 +244,12 @@ defineEmits<{
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 14px;
     font-weight: 500;
-    color: var(--content-block-text);
+    color: var(--text-primary);
     flex: 1;
   }
 
   &__tracking-copy {
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     transition: color 0.25s @ease;
   }
 }

@@ -131,7 +131,7 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: @neutral-300;
+      background: var(--border-strong); // Adaptatif au thème
       border-radius: 2px;
       z-index: 1;
     }

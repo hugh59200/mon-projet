@@ -351,7 +351,7 @@
   }
 
   .admin-promo__header {
-    background: var(--content-block-bg-subtle);
+    background: var(--bg-subtle);
     border-radius: 8px;
     padding: 12px 16px;
   }
@@ -367,7 +367,7 @@
 
   .admin-promo__item {
     background: transparent;
-    border: 1px solid var(--content-block-border);
+    border: 1px solid var(--border-default);
     border-radius: 10px;
     padding: 16px;
     transition: all 0.2s ease;
@@ -401,7 +401,7 @@
 
   .admin-promo__description {
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -417,7 +417,7 @@
   .admin-promo__min {
     display: block;
     font-size: 11px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     margin-top: 2px;
   }
 
@@ -426,16 +426,16 @@
     align-items: baseline;
     gap: 4px;
     font-size: 14px;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   .admin-promo__usage-max {
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     font-size: 12px;
   }
 
   .admin-promo__usage-unlimited {
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     font-size: 11px;
     font-style: italic;
   }
@@ -448,12 +448,12 @@
 
   .admin-promo__date {
     font-size: 13px;
-    color: var(--content-block-text-secondary);
+    color: var(--text-secondary);
   }
 
   .admin-promo__permanent {
     font-size: 12px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
     font-style: italic;
   }
 
@@ -466,7 +466,7 @@
   // Mobile styles
   .admin-promo__mobile-card {
     background: transparent;
-    border: 1px solid var(--content-block-border);
+    border: 1px solid var(--border-default);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 12px;
@@ -506,13 +506,13 @@
 
   .admin-promo__mobile-label {
     font-size: 13px;
-    color: var(--content-block-text-muted);
+    color: var(--text-muted);
   }
 
   .admin-promo__mobile-value {
     font-size: 14px;
     font-weight: 500;
-    color: var(--content-block-text);
+    color: var(--text-primary);
   }
 
   .admin-promo__mobile-actions {
@@ -520,6 +520,6 @@
     gap: 8px;
     justify-content: flex-end;
     padding-top: 12px;
-    border-top: 1px solid var(--content-block-border);
+    border-top: 1px solid var(--border-default);
   }
 </style>
