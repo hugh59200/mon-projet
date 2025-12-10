@@ -367,13 +367,13 @@ const containerStyle = computed(() => {
     // Card - Standard dark avec glow subtil
     &.content-block--card {
       background:
-        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.06) 0%, transparent 40%),
-        linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.03) 0%, transparent 30%),
-        var(--secondary-600);
-      border: 1px solid rgba(var(--primary-500-rgb), 0.15);
+        linear-gradient(135deg, rgba(var(--primary-500-rgb), 0.04) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(var(--primary-400-rgb), 0.02) 0%, transparent 30%),
+        var(--secondary-800);
+      border: 1px solid rgba(var(--primary-500-rgb), 0.12);
       box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        0 4px 24px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 
       // Background levels
       &.content-block--bg-elevated {
